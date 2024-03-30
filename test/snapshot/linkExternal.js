@@ -87,6 +87,10 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     'https://community.fandom.com/wiki/',
     'https://community.fandom.com/wiki/Community_Central',
 
+    // platform: gamebanana
+    'https://gamebanana.com/members/2028092',
+    'https://gamebanana.com/mods/459476',
+
     // platform: homestuck
     'https://homestuck.com/',
 

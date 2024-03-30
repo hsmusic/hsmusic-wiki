@@ -95,6 +95,8 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://community.fandom.com/" class="nowrap">Fandom</a>
 <a href="https://community.fandom.com/wiki/" class="nowrap">Fandom</a>
 <a href="https://community.fandom.com/wiki/Community_Central" class="nowrap">Fandom</a>
+<a href="https://gamebanana.com/members/2028092" class="nowrap">GameBanana</a>
+<a href="https://gamebanana.com/mods/459476" class="nowrap">GameBanana</a>
 <a href="https://homestuck.com/" class="nowrap">Homestuck</a>
 <a href="https://archive.org/details/a-life-well-lived" class="nowrap">Internet Archive</a>
 <a href="https://archive.org/details/VastError_Volume1/11+Renaissance.mp3" class="nowrap">Internet Archive</a>
@@ -162,6 +164,8 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://community.fandom.com/" class="nowrap">Fandom</a>
 <a href="https://community.fandom.com/wiki/" class="nowrap">Fandom</a>
 <a href="https://community.fandom.com/wiki/Community_Central" class="nowrap">Fandom</a>
+<a href="https://gamebanana.com/members/2028092" class="nowrap">GameBanana</a>
+<a href="https://gamebanana.com/mods/459476" class="nowrap">GameBanana</a>
 <a href="https://homestuck.com/" class="nowrap">Homestuck</a>
 <a href="https://archive.org/details/a-life-well-lived" class="nowrap">Internet Archive</a>
 <a href="https://archive.org/details/VastError_Volume1/11+Renaissance.mp3" class="nowrap">Internet Archive</a>

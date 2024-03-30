@@ -531,6 +531,8 @@ misc:
         _: "MSPA Wiki"
         page: "MSPA Wiki ({PAGE})"
 
+    gamebanana: "GameBanana"
+
     homestuck:
       _: "Homestuck"
       page: "Homestuck (page {PAGE})"

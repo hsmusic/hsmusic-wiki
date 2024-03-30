@@ -365,6 +365,12 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'gamebanana.com'},
+    platform: 'gamebanana',
+    icon: 'globe',
+  },
+
+  {
     match: {domain: 'homestuck.com'},
     platform: 'homestuck',
     icon: 'globe',
