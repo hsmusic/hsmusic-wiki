@@ -105,6 +105,7 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     'https://archive.org/details/VastError_Volume1/11+Renaissance.mp3',
 
     // platform: instagram
+    'https://instagram.com/bass.and.noises',
     'https://www.instagram.com/levc_egm/',
 
     // platform: itch

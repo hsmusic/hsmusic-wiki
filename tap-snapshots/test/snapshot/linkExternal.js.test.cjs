@@ -102,7 +102,8 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://hsmusic.wiki/feedback/" class="nowrap">HSMusic</a>
 <a href="https://archive.org/details/a-life-well-lived" class="nowrap">Internet Archive</a>
 <a href="https://archive.org/details/VastError_Volume1/11+Renaissance.mp3" class="nowrap">Internet Archive</a>
-<a href="https://www.instagram.com/levc_egm/" class="nowrap">Instagram</a>
+<a href="https://instagram.com/bass.and.noises" class="nowrap">bass.and.noises</a>
+<a href="https://www.instagram.com/levc_egm/" class="nowrap">levc_egm</a>
 <a href="https://tuyoki.itch.io/" class="nowrap">tuyoki</a>
 <a href="https://itch.io/profile/bravelittletoreador" class="nowrap">bravelittletoreador</a>
 <a href="https://ko-fi.com/gnaach" class="nowrap">gnaach</a>
@@ -171,6 +172,7 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://hsmusic.wiki/feedback/" class="nowrap">HSMusic</a>
 <a href="https://archive.org/details/a-life-well-lived" class="nowrap">Internet Archive</a>
 <a href="https://archive.org/details/VastError_Volume1/11+Renaissance.mp3" class="nowrap">Internet Archive</a>
+<a href="https://instagram.com/bass.and.noises" class="nowrap">Instagram</a>
 <a href="https://www.instagram.com/levc_egm/" class="nowrap">Instagram</a>
 <a href="https://tuyoki.itch.io/" class="nowrap">itch.io</a>
 <a href="https://itch.io/profile/bravelittletoreador" class="nowrap">itch.io</a>

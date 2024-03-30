@@ -395,6 +395,15 @@ export const externalLinkSpec = [
 
   {
     match: {domain: 'instagram.com'},
+
+    platform: 'instagram',
+    handle: {pathname: /^[^/]+/},
+
+    icon: 'instagram',
+  },
+
+  {
+    match: {domain: 'instagram.com'},
     platform: 'instagram',
     icon: 'instagram',
   },
