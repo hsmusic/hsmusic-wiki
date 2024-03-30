@@ -220,7 +220,7 @@ export const externalLinkSpec = [
     match: {domain: 'artstation.com'},
 
     platform: 'artstation',
-    handle: {pathname: /^[^/]+/},
+    handle: {pathname: /^([^/]+)\/?$/},
 
     icon: 'globe',
   },
@@ -248,7 +248,7 @@ export const externalLinkSpec = [
     match: {domain: '.bandcamp.com'},
 
     platform: 'bandcamp',
-    handle: {domain: /^[^.]*/},
+    handle: {domain: /^[^.]+/},
 
     icon: 'bandcamp',
   },
@@ -266,7 +266,7 @@ export const externalLinkSpec = [
     match: {domain: '.carrd.co'},
 
     platform: 'carrd',
-    handle: {domain: /^[^.]*/},
+    handle: {domain: /^[^.]+/},
 
     icon: 'carrd',
   },
@@ -296,7 +296,7 @@ export const externalLinkSpec = [
     match: {domain: 'deviantart.com'},
 
     platform: 'deviantart',
-    handle: {pathname: /^[^/]+\/?$/},
+    handle: {pathname: /^([^/]+)\/?$/},
 
     icon: 'deviantart',
   },
@@ -397,7 +397,7 @@ export const externalLinkSpec = [
     match: {domain: 'instagram.com'},
 
     platform: 'instagram',
-    handle: {pathname: /^[^/]+/},
+    handle: {pathname: /^([^/]+)\/?$/},
 
     icon: 'instagram',
   },
@@ -419,7 +419,7 @@ export const externalLinkSpec = [
     match: {domain: '.itch.io'},
 
     platform: 'itch',
-    handle: {domain: /^[^.]*/},
+    handle: {domain: /^[^.]+/},
 
     icon: 'itch',
   },
@@ -428,7 +428,7 @@ export const externalLinkSpec = [
     match: {domain: 'itch.io'},
 
     platform: 'itch',
-    handle: {pathname: /^profile\/(.+)\/?$/},
+    handle: {pathname: /^profile\/([^/]+)\/?$/},
 
     icon: 'itch',
   },
@@ -437,7 +437,7 @@ export const externalLinkSpec = [
     match: {domain: 'ko-fi.com'},
 
     platform: 'kofi',
-    handle: {pathname: /^(.+)\/?/},
+    handle: {pathname: /^([^/]+)\/?$/},
 
     icon: 'kofi',
   },
@@ -489,7 +489,7 @@ export const externalLinkSpec = [
     match: {domain: 'patreon.com'},
 
     platform: 'patreon',
-    handle: {pathname: /([^/]+)\/?$/},
+    handle: {pathname: /^([^/]+)\/?$/},
 
     icon: 'globe',
   },
@@ -510,8 +510,14 @@ export const externalLinkSpec = [
     match: {domain: 'soundcloud.com'},
 
     platform: 'soundcloud',
-    handle: /([^/]*)\/?$/,
+    handle: {pathname: /^([^/]+)\/?$/},
 
+    icon: 'soundcloud',
+  },
+
+  {
+    match: {domain: 'soundcloud.com'},
+    platform: 'soundcloud',
     icon: 'soundcloud',
   },
 
@@ -525,7 +531,7 @@ export const externalLinkSpec = [
     match: {domain: 'tiktok.com'},
 
     platform: 'tiktok',
-    handle: {pathname: /^@?([a-zA-Z0-9_]*)\/?$/},
+    handle: {pathname: /^@?([^/]+)\/?$/},
 
     icon: 'tiktok',
   },
@@ -534,7 +540,7 @@ export const externalLinkSpec = [
     match: {domain: '.tumblr.com'},
 
     platform: 'tumblr',
-    handle: {domain: /^[^.]*/},
+    handle: {domain: /^[^.]+/},
 
     icon: 'tumblr',
   },
@@ -567,7 +573,7 @@ export const externalLinkSpec = [
     match: {domain: 'twitter.com'},
 
     platform: 'twitter',
-    handle: {pathname: /^@?([a-zA-Z0-9_]*)\/?$/},
+    handle: {pathname: /^@?([^/]+)\/?$/},
 
     icon: 'twitter',
   },

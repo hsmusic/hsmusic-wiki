@@ -117,7 +117,7 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://www.poetryfoundation.org/poets/christina-rossetti" class="nowrap">Poetry Foundation</a>
 <a href="https://www.poetryfoundation.org/poems/45000/remember-56d224509b7ae" class="nowrap">Poetry Foundation</a>
 <a href="https://soundcloud.com/plazmataz" class="nowrap">plazmataz</a>
-<a href="https://soundcloud.com/worthikids/1-i-accidentally-broke-my" class="nowrap">1-i-accidentally-broke-my</a>
+<a href="https://soundcloud.com/worthikids/1-i-accidentally-broke-my" class="nowrap">SoundCloud</a>
 <a href="https://open.spotify.com/artist/63SNNpNOicDzG3LY82G4q3" class="nowrap">Spotify</a>
 <a href="https://open.spotify.com/album/0iHvPD8rM3hQa0qeVtPQ3t" class="nowrap">Spotify</a>
 <a href="https://open.spotify.com/track/6YEGQH32aAXb9vQQbBrPlw" class="nowrap">Spotify</a>
