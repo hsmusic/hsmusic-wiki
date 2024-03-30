@@ -68,7 +68,9 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     'https://www.deconreconstruction.com/',
 
     // platform: deviantart
+    'https://culdhira.deviantart.com',
     'https://www.deviantart.com/chesswanderlust-sama',
+    'https://www.deviantart.com/shilloshilloh/art/Homestuck-Jake-English-268874606',
 
     // platform: fandom.mspaintadventures
     'https://mspaintadventures.fandom.com/wiki/Draconian_Dignitary',

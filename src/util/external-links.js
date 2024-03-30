@@ -284,6 +284,24 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: '.deviantart.com'},
+
+    platform: 'deviantart',
+    handle: {domain: /^[^.]+/},
+
+    icon: 'deviantart',
+  },
+
+  {
+    match: {domain: 'deviantart.com'},
+
+    platform: 'deviantart',
+    handle: {pathname: /^[^/]+\/?$/},
+
+    icon: 'deviantart',
+  },
+
+  {
     match: {domain: 'deviantart.com'},
     platform: 'deviantart',
     icon: 'deviantart',

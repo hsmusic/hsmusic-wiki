@@ -83,7 +83,9 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://music.deconreconstruction.com/albums/catch-322" class="nowrap">MUSIC@DCRC</a>
 <a href="https://music.deconreconstruction.com/albums/catch-322?track=arcjecs-theme" class="nowrap">MUSIC@DCRC</a>
 <a href="https://www.deconreconstruction.com/" class="nowrap">Deconreconstruction</a>
-<a href="https://www.deviantart.com/chesswanderlust-sama" class="nowrap">DeviantArt</a>
+<a href="https://culdhira.deviantart.com" class="nowrap">culdhira</a>
+<a href="https://www.deviantart.com/chesswanderlust-sama" class="nowrap">chesswanderlust-sama</a>
+<a href="https://www.deviantart.com/shilloshilloh/art/Homestuck-Jake-English-268874606" class="nowrap">DeviantArt</a>
 <a href="https://mspaintadventures.fandom.com/wiki/Draconian_Dignitary" class="nowrap">MSPA Wiki (Draconian Dignitary)</a>
 <a href="https://mspaintadventures.fandom.com/wiki/" class="nowrap">MSPA Wiki</a>
 <a href="https://mspaintadventures.fandom.com/" class="nowrap">MSPA Wiki</a>
@@ -145,7 +147,9 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://music.deconreconstruction.com/albums/catch-322" class="nowrap">MUSIC@DCRC</a>
 <a href="https://music.deconreconstruction.com/albums/catch-322?track=arcjecs-theme" class="nowrap">MUSIC@DCRC</a>
 <a href="https://www.deconreconstruction.com/" class="nowrap">Deconreconstruction</a>
+<a href="https://culdhira.deviantart.com" class="nowrap">DeviantArt</a>
 <a href="https://www.deviantart.com/chesswanderlust-sama" class="nowrap">DeviantArt</a>
+<a href="https://www.deviantart.com/shilloshilloh/art/Homestuck-Jake-English-268874606" class="nowrap">DeviantArt</a>
 <a href="https://mspaintadventures.fandom.com/wiki/Draconian_Dignitary" class="nowrap">MSPA Wiki (Draconian Dignitary)</a>
 <a href="https://mspaintadventures.fandom.com/wiki/" class="nowrap">MSPA Wiki</a>
 <a href="https://mspaintadventures.fandom.com/" class="nowrap">MSPA Wiki</a>
