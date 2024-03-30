@@ -461,7 +461,11 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {domains: ['types.pl']},
+    match: {domains: [
+      'mastodon.social',
+      'shrike.club',
+      'types.pl',
+    ]},
 
     platform: 'mastodon',
     handle: {domain: /.+/},
