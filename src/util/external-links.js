@@ -222,7 +222,7 @@ export const externalLinkSpec = [
     platform: 'artstation',
     handle: {pathname: /^([^/]+)\/?$/},
 
-    icon: 'globe',
+    icon: 'artstation',
   },
 
   {
@@ -231,7 +231,7 @@ export const externalLinkSpec = [
     platform: 'artstation',
     handle: {domain: /^[^.]+/},
 
-    icon: 'globe',
+    icon: 'artstation',
   },
 
   {
@@ -497,13 +497,13 @@ export const externalLinkSpec = [
     platform: 'patreon',
     handle: {pathname: /^([^/]+)\/?$/},
 
-    icon: 'globe',
+    icon: 'patreon',
   },
 
   {
     match: {domain: 'patreon.com'},
     platform: 'patreon',
-    icon: 'globe',
+    icon: 'patreon',
   },
 
   {
