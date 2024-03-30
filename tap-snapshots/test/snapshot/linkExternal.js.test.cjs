@@ -107,6 +107,7 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://tuyoki.itch.io/" class="nowrap">tuyoki</a>
 <a href="https://itch.io/profile/bravelittletoreador" class="nowrap">bravelittletoreador</a>
 <a href="https://ko-fi.com/gnaach" class="nowrap">gnaach</a>
+<a href="https://linktr.ee/bbpanzu" class="nowrap">bbpanzu</a>
 <a href="https://types.pl/" class="nowrap">types.pl</a>
 <a href="https://wodaro.neocities.org" class="nowrap">wodaro.neocities.org</a>
 <a href="https://neomints.neocities.org/" class="nowrap">neomints.neocities.org</a>
@@ -177,6 +178,7 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://tuyoki.itch.io/" class="nowrap">itch.io</a>
 <a href="https://itch.io/profile/bravelittletoreador" class="nowrap">itch.io</a>
 <a href="https://ko-fi.com/gnaach" class="nowrap">Ko-fi</a>
+<a href="https://linktr.ee/bbpanzu" class="nowrap">Linktree</a>
 <a href="https://types.pl/" class="nowrap">Mastodon (types.pl)</a>
 <a href="https://wodaro.neocities.org" class="nowrap">Neocities</a>
 <a href="https://neomints.neocities.org/" class="nowrap">Neocities</a>

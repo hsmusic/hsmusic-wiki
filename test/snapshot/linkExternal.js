@@ -115,6 +115,9 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     // platform: ko-fi
     'https://ko-fi.com/gnaach',
 
+    // platform: linktree
+    'https://linktr.ee/bbpanzu',
+
     // platform: mastodon
     'https://types.pl/',
 

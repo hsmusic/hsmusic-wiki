@@ -443,6 +443,15 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'linktr.ee'},
+
+    platform: 'linktree',
+    handle: {pathname: /^([^/]+)\/?$/},
+
+    icon: 'linktree',
+  },
+
+  {
     match: {domains: ['types.pl']},
 
     platform: 'mastodon',
