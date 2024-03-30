@@ -29,6 +29,12 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
   // Try to comprehensively test every regular expression
   // (in `match` and extractions like `handle` or `details`).
 
+  // Try to *also* represent a reasonable variety of what kinds
+  // of URLs appear throughout the wiki. (This should serve to
+  // identify areas which #external-links is expected to
+  // accommodate, regardless whether or not there is special
+  // attention given in the actual descriptors.)
+
   // For normal custom-domain matches (e.g. Mastodon),
   // it's OK to just test one custom domain in the list.
 
@@ -36,50 +42,116 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
   // so corresponding and missing test cases are easy to locate.
 
   quickSnapshotAllStyles('generic', [
+    // platform: appleMusic
+    'https://music.apple.com/us/artist/system-of-a-down/462715',
+
+    // platform: artstation
+    'https://www.artstation.com/eevaningtea',
+    'https://witnesstheabsurd.artstation.com/',
+
     // platform: bandcamp
     'https://music.solatrus.com/',
     'https://homestuck.bandcamp.com/',
 
+    // platform: bluesky
+    'https://bsky.app/profile/jacobtheloofah.bsky.social',
+
+    // platform: carrd
+    'https://aliceflare.carrd.co',
+    'https://bigchaslappa.carrd.co/',
+
+    // platform: deconreconstruction.music
+    'https://music.deconreconstruction.com/albums/catch-322',
+    'https://music.deconreconstruction.com/albums/catch-322?track=arcjecs-theme',
+
+    // platform: deconreconstruction
+    'https://www.deconreconstruction.com/',
+
     // platform: deviantart
     'https://www.deviantart.com/chesswanderlust-sama',
 
-    // platform: fandom
-    'https://mspaintadventures.fandom.com/',
-    'https://mspaintadventures.fandom.com/wiki/',
+    // platform: fandom.mspaintadventures
     'https://mspaintadventures.fandom.com/wiki/Draconian_Dignitary',
+    'https://mspaintadventures.fandom.com/wiki/',
+    'https://mspaintadventures.fandom.com/',
+
+    // platform: fandom
     'https://community.fandom.com/',
     'https://community.fandom.com/wiki/',
     'https://community.fandom.com/wiki/Community_Central',
 
+    // platform: homestuck
+    'https://homestuck.com/',
+
     // platform: instagram
     'https://www.instagram.com/levc_egm/',
+
+    // platform: itch
+    'https://tuyoki.itch.io/',
+    'https://itch.io/profile/bravelittletoreador',
+
+    // platform: ko-fi
+    'https://ko-fi.com/gnaach',
+
+    // platform: local
+    'https://hsmusic.wiki/feedback/',
+    'https://hsmusic.wiki/media/misc/archive/Firefly%20Cloud%20Remix.mp3',
 
     // platform: mastodon
     'https://types.pl/',
 
+    // platform: neocities
+    'https://wodaro.neocities.org',
+    'https://neomints.neocities.org/',
+
     // platform: newgrounds
     'https://buzinkai.newgrounds.com/',
+    'https://www.newgrounds.com/audio/listen/1256058',
 
     // platform: patreon
     'https://www.patreon.com/CecilyRenns',
 
     // platform: poetryFoundation
     'https://www.poetryfoundation.org/poets/christina-rossetti',
+    'https://www.poetryfoundation.org/poems/45000/remember-56d224509b7ae',
 
     // platform: soundcloud
     'https://soundcloud.com/plazmataz',
+    'https://soundcloud.com/worthikids/1-i-accidentally-broke-my',
 
     // platform: spotify
     'https://open.spotify.com/artist/63SNNpNOicDzG3LY82G4q3',
+    'https://open.spotify.com/album/0iHvPD8rM3hQa0qeVtPQ3t',
+    'https://open.spotify.com/track/6YEGQH32aAXb9vQQbBrPlw',
+
+    // platform: tiktok
+    'https://www.tiktok.com/@richaadeb',
 
     // platform: tumblr
     'https://aeritus.tumblr.com/',
+    'https://vol5anthology.tumblr.com/post/159528808107/hey-everyone-its-413-and-that-means-we-have',
+    'https://www.tumblr.com/electricwestern',
+    'https://www.tumblr.com/spellmynamewithabang/142767566733/happy-413-this-is-the-first-time-anyones-heard',
+
+    // platform: twitch
+    'https://www.twitch.tv/ajhebard',
+    'https://www.twitch.tv/vargskelethor/',
 
     // platform: twitter
     'https://twitter.com/awkwarddoesart',
+    'https://twitter.com/purenonsens/',
+    'https://twitter.com/circlejourney/status/1202265927183548416',
 
     // platform: wikipedia
     'https://en.wikipedia.org/wiki/Haydn_Quartet_(vocal_ensemble)',
+
+    // platform: youtube
+    'https://youtube.com/@bani-chan8949',
+    'https://www.youtube.com/@Razzie16',
+    'https://www.youtube.com/channel/UCQXfvlKkpbOqEz4BepHqK7g',
+    'https://www.youtube.com/watch?v=6ekVnZm29kw',
+    'https://youtu.be/WBkC038wSio',
+    'https://www.youtube.com/playlist?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H',
   ]);
 
   quickSnapshotAllStyles('album', [
