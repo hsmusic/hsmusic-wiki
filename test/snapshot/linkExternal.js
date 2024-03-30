@@ -156,6 +156,9 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     // platform: tiktok
     'https://www.tiktok.com/@richaadeb',
 
+    // platform: toyhouse
+    'https://toyhou.se/ghastaboo',
+
     // platform: tumblr
     'https://aeritus.tumblr.com/',
     'https://vol5anthology.tumblr.com/post/159528808107/hey-everyone-its-413-and-that-means-we-have',

@@ -556,6 +556,15 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'toyhou.se'},
+
+    platform: 'toyhouse',
+    handle: {pathname: /^([^/]+)\/?$/},
+
+    icon: 'toyhouse',
+  },
+
+  {
     match: {domain: '.tumblr.com'},
 
     platform: 'tumblr',
@@ -568,7 +577,7 @@ export const externalLinkSpec = [
     match: {domain: 'tumblr.com'},
 
     platform: 'tumblr',
-    handle: {pathname: /^[^/]+\/?$/},
+    handle: {pathname: /^([^/]+)\/?$/},
 
     icon: 'tumblr',
   },

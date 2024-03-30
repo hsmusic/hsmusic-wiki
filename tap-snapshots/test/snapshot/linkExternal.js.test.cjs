@@ -126,6 +126,7 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://open.spotify.com/album/0iHvPD8rM3hQa0qeVtPQ3t" class="nowrap">Spotify</a>
 <a href="https://open.spotify.com/track/6YEGQH32aAXb9vQQbBrPlw" class="nowrap">Spotify</a>
 <a href="https://www.tiktok.com/@richaadeb" class="nowrap">richaadeb</a>
+<a href="https://toyhou.se/ghastaboo" class="nowrap">ghastaboo</a>
 <a href="https://aeritus.tumblr.com/" class="nowrap">aeritus</a>
 <a href="https://vol5anthology.tumblr.com/post/159528808107/hey-everyone-its-413-and-that-means-we-have" class="nowrap">vol5anthology</a>
 <a href="https://www.tumblr.com/electricwestern" class="nowrap">electricwestern</a>
@@ -201,6 +202,7 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://open.spotify.com/album/0iHvPD8rM3hQa0qeVtPQ3t" class="nowrap">Spotify</a>
 <a href="https://open.spotify.com/track/6YEGQH32aAXb9vQQbBrPlw" class="nowrap">Spotify</a>
 <a href="https://www.tiktok.com/@richaadeb" class="nowrap">TikTok</a>
+<a href="https://toyhou.se/ghastaboo" class="nowrap">Toyhouse</a>
 <a href="https://aeritus.tumblr.com/" class="nowrap">Tumblr</a>
 <a href="https://vol5anthology.tumblr.com/post/159528808107/hey-everyone-its-413-and-that-means-we-have" class="nowrap">Tumblr</a>
 <a href="https://www.tumblr.com/electricwestern" class="nowrap">Tumblr</a>
