@@ -80,7 +80,7 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://en.wikipedia.org/wiki/Haydn_Quartet_(vocal_ensemble)" class="nowrap">Wikipedia</a>
 <a href="https://www.poetryfoundation.org/poets/christina-rossetti" class="nowrap">Poetry Foundation</a>
 <a href="https://www.instagram.com/levc_egm/" class="nowrap">Instagram</a>
-<a href="https://www.patreon.com/CecilyRenns" class="nowrap">Patreon</a>
+<a href="https://www.patreon.com/CecilyRenns" class="nowrap">CecilyRenns</a>
 <a href="https://open.spotify.com/artist/63SNNpNOicDzG3LY82G4q3" class="nowrap">Spotify</a>
 <a href="https://buzinkai.newgrounds.com/" class="nowrap">buzinkai</a>
 <a href="https://music.solatrus.com/" class="nowrap">music.solatrus.com</a>

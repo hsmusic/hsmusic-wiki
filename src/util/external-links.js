@@ -152,32 +152,6 @@ export const externalLinkSpec = [
     icon: 'youtube',
   },
 
-  // Special handling for artist links
-
-  {
-    match: {
-      domain: 'patreon.com',
-      context: 'artist',
-    },
-
-    platform: 'patreon',
-    handle: {pathname: /([^/]+)\/?$/},
-
-    icon: 'globe',
-  },
-
-  {
-    match: {
-      context: 'artist',
-      domain: 'youtube.com',
-    },
-
-    platform: 'youtube',
-    handle: {pathname: /^@([^/]+)\/?$/},
-
-    icon: 'youtube',
-  },
-
   // Special handling for flash links
 
   {
@@ -438,6 +412,15 @@ export const externalLinkSpec = [
 
   {
     match: {domain: 'patreon.com'},
+
+    platform: 'patreon',
+    handle: {pathname: /([^/]+)\/?$/},
+
+    icon: 'globe',
+  },
+
+  {
+    match: {domain: 'patreon.com'},
     platform: 'patreon',
     icon: 'globe',
   },
@@ -494,6 +477,15 @@ export const externalLinkSpec = [
     match: {domains: ['wikipedia.org', '.wikipedia.org']},
     platform: 'wikipedia',
     icon: 'misc',
+  },
+
+  {
+    match: {domain: 'youtube.com'},
+
+    platform: 'youtube',
+    handle: {pathname: /^@([^/]+)\/?$/},
+
+    icon: 'youtube',
   },
 
   {
