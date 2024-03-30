@@ -60,6 +60,9 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     'https://aliceflare.carrd.co',
     'https://bigchaslappa.carrd.co/',
 
+    // platform: cohost
+    'https://cohost.org/cosmoptera',
+
     // platform: deconreconstruction.music
     'https://music.deconreconstruction.com/albums/catch-322',
     'https://music.deconreconstruction.com/albums/catch-322?track=arcjecs-theme',

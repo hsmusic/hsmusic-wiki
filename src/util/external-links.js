@@ -272,6 +272,15 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'cohost.org'},
+
+    platform: 'cohost',
+    handle: {pathname: /^([^/]+)\/?$/},
+
+    icon: 'cohost',
+  },
+
+  {
     match: {domain: 'music.deconreconstruction.com'},
     platform: 'deconreconstruction.music',
     icon: 'globe',

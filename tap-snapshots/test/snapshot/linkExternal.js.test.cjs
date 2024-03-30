@@ -80,6 +80,7 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://bsky.app/profile/jacobtheloofah.bsky.social" class="nowrap">jacobtheloofah</a>
 <a href="https://aliceflare.carrd.co" class="nowrap">aliceflare</a>
 <a href="https://bigchaslappa.carrd.co/" class="nowrap">bigchaslappa</a>
+<a href="https://cohost.org/cosmoptera" class="nowrap">cosmoptera</a>
 <a href="https://music.deconreconstruction.com/albums/catch-322" class="nowrap">MUSIC@DCRC</a>
 <a href="https://music.deconreconstruction.com/albums/catch-322?track=arcjecs-theme" class="nowrap">MUSIC@DCRC</a>
 <a href="https://www.deconreconstruction.com/" class="nowrap">Deconreconstruction</a>
@@ -154,6 +155,7 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://bsky.app/profile/jacobtheloofah.bsky.social" class="nowrap">Bluesky</a>
 <a href="https://aliceflare.carrd.co" class="nowrap">Carrd</a>
 <a href="https://bigchaslappa.carrd.co/" class="nowrap">Carrd</a>
+<a href="https://cohost.org/cosmoptera" class="nowrap">Cohost</a>
 <a href="https://music.deconreconstruction.com/albums/catch-322" class="nowrap">MUSIC@DCRC</a>
 <a href="https://music.deconreconstruction.com/albums/catch-322?track=arcjecs-theme" class="nowrap">MUSIC@DCRC</a>
 <a href="https://www.deconreconstruction.com/" class="nowrap">Deconreconstruction</a>
