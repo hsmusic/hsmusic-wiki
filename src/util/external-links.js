@@ -377,6 +377,23 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {
+      domain: 'hsmusic.wiki',
+      pathname: /^media\/misc\/archive/,
+    },
+
+    platform: 'hsmusic.archive',
+
+    icon: 'globe',
+  },
+
+  {
+    match: {domain: 'hsmusic.wiki'},
+    platform: 'hsmusic',
+    icon: 'globe',
+  },
+
+  {
     match: {domain: 'instagram.com'},
     platform: 'instagram',
     icon: 'instagram',
@@ -414,12 +431,6 @@ export const externalLinkSpec = [
     handle: {pathname: /^(.+)\/?/},
 
     icon: 'kofi',
-  },
-
-  {
-    match: {domain: 'hsmusic.wiki'},
-    platform: 'local',
-    icon: 'globe',
   },
 
   {

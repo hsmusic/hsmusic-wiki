@@ -94,6 +94,12 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     // platform: homestuck
     'https://homestuck.com/',
 
+    // platform: hsmusic.archive
+    'https://hsmusic.wiki/media/misc/archive/Firefly%20Cloud%20Remix.mp3',
+
+    // platform: hsmusic
+    'https://hsmusic.wiki/feedback/',
+
     // platform: internetArchive
     'https://archive.org/details/a-life-well-lived',
     'https://archive.org/details/VastError_Volume1/11+Renaissance.mp3',
@@ -107,10 +113,6 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
 
     // platform: ko-fi
     'https://ko-fi.com/gnaach',
-
-    // platform: local
-    'https://hsmusic.wiki/feedback/',
-    'https://hsmusic.wiki/media/misc/archive/Firefly%20Cloud%20Remix.mp3',
 
     // platform: mastodon
     'https://types.pl/',

@@ -98,14 +98,14 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://gamebanana.com/members/2028092" class="nowrap">GameBanana</a>
 <a href="https://gamebanana.com/mods/459476" class="nowrap">GameBanana</a>
 <a href="https://homestuck.com/" class="nowrap">Homestuck</a>
+<a href="https://hsmusic.wiki/media/misc/archive/Firefly%20Cloud%20Remix.mp3" class="nowrap">HSMusic (wiki archive)</a>
+<a href="https://hsmusic.wiki/feedback/" class="nowrap">HSMusic</a>
 <a href="https://archive.org/details/a-life-well-lived" class="nowrap">Internet Archive</a>
 <a href="https://archive.org/details/VastError_Volume1/11+Renaissance.mp3" class="nowrap">Internet Archive</a>
 <a href="https://www.instagram.com/levc_egm/" class="nowrap">Instagram</a>
 <a href="https://tuyoki.itch.io/" class="nowrap">tuyoki</a>
 <a href="https://itch.io/profile/bravelittletoreador" class="nowrap">bravelittletoreador</a>
 <a href="https://ko-fi.com/gnaach" class="nowrap">gnaach</a>
-<a href="https://hsmusic.wiki/feedback/" class="nowrap">Wiki Archive (local upload)</a>
-<a href="https://hsmusic.wiki/media/misc/archive/Firefly%20Cloud%20Remix.mp3" class="nowrap">Wiki Archive (local upload)</a>
 <a href="https://types.pl/" class="nowrap">types.pl</a>
 <a href="https://wodaro.neocities.org" class="nowrap">wodaro.neocities.org</a>
 <a href="https://neomints.neocities.org/" class="nowrap">neomints.neocities.org</a>
@@ -167,14 +167,14 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://gamebanana.com/members/2028092" class="nowrap">GameBanana</a>
 <a href="https://gamebanana.com/mods/459476" class="nowrap">GameBanana</a>
 <a href="https://homestuck.com/" class="nowrap">Homestuck</a>
+<a href="https://hsmusic.wiki/media/misc/archive/Firefly%20Cloud%20Remix.mp3" class="nowrap">HSMusic (wiki archive)</a>
+<a href="https://hsmusic.wiki/feedback/" class="nowrap">HSMusic</a>
 <a href="https://archive.org/details/a-life-well-lived" class="nowrap">Internet Archive</a>
 <a href="https://archive.org/details/VastError_Volume1/11+Renaissance.mp3" class="nowrap">Internet Archive</a>
 <a href="https://www.instagram.com/levc_egm/" class="nowrap">Instagram</a>
 <a href="https://tuyoki.itch.io/" class="nowrap">itch.io</a>
 <a href="https://itch.io/profile/bravelittletoreador" class="nowrap">itch.io</a>
 <a href="https://ko-fi.com/gnaach" class="nowrap">Ko-fi</a>
-<a href="https://hsmusic.wiki/feedback/" class="nowrap">Wiki Archive (local upload)</a>
-<a href="https://hsmusic.wiki/media/misc/archive/Firefly%20Cloud%20Remix.mp3" class="nowrap">Wiki Archive (local upload)</a>
 <a href="https://types.pl/" class="nowrap">Mastodon (types.pl)</a>
 <a href="https://wodaro.neocities.org" class="nowrap">Neocities</a>
 <a href="https://neomints.neocities.org/" class="nowrap">Neocities</a>

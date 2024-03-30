@@ -504,8 +504,6 @@ misc:
     withHandle:
       "{PLATFORM} ({HANDLE})"
 
-    local: "Wiki Archive (local upload)"
-
     appleMusic: "Apple Music"
     artstation: "ArtStation"
     bandcamp: "Bandcamp"
@@ -537,6 +535,10 @@ misc:
       _: "Homestuck"
       page: "Homestuck (page {PAGE})"
       secretPage: "Homestuck (secret page)"
+
+    hsmusic:
+      _: "HSMusic"
+      archive: "HSMusic (wiki archive)"
 
     instagram: "Instagram"
     internetArchive: "Internet Archive"
