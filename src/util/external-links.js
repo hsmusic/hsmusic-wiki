@@ -211,13 +211,13 @@ export const externalLinkSpec = [
   // Generic domains, sorted alphabetically (by string)
 
   {
-    match: {domains: ['music.apple.com']},
+    match: {domain: 'music.apple.com'},
     platform: 'appleMusic',
     icon: 'globe',
   },
 
   {
-    match: {domains: ['artstation.com']},
+    match: {domain: 'artstation.com'},
 
     platform: 'artstation',
     handle: {pathname: /^[^/]+/},
@@ -226,7 +226,7 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {domains: ['.artstation.com']},
+    match: {domain: '.artstation.com'},
 
     platform: 'artstation',
     handle: {domain: /^[^.]+/},
@@ -368,7 +368,7 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {domains: ['tiktok.com']},
+    match: {domain: 'tiktok.com'},
 
     platform: 'tiktok',
     handle: {pathname: /^@?([a-zA-Z0-9_]*)\/?$/},
