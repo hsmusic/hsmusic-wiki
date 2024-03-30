@@ -536,6 +536,7 @@ misc:
       secretPage: "Homestuck (secret page)"
 
     instagram: "Instagram"
+    internetArchive: "Internet Archive"
     itch: "itch.io"
     kofi: "Ko-fi"
     mastodon: "Mastodon"
@@ -549,6 +550,7 @@ misc:
     tumblr: "Tumblr"
     twitch: "Twitch"
     twitter: "Twitter"
+    waybackMachine: "Wayback Machine"
     wikipedia: "Wikipedia"
 
     youtube:

@@ -83,6 +83,10 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     // platform: homestuck
     'https://homestuck.com/',
 
+    // platform: internetArchive
+    'https://archive.org/details/a-life-well-lived',
+    'https://archive.org/details/VastError_Volume1/11+Renaissance.mp3',
+
     // platform: instagram
     'https://www.instagram.com/levc_egm/',
 
@@ -141,6 +145,10 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     'https://twitter.com/awkwarddoesart',
     'https://twitter.com/purenonsens/',
     'https://twitter.com/circlejourney/status/1202265927183548416',
+
+    // platform: waybackMachine
+    'https://web.archive.org/web/20120405160556/https://homestuck.bandcamp.com/album/colours-and-mayhem-universe-a',
+    'https://web.archive.org/web/20160807111207/http://griffinspacejam.com:80/',
 
     // platform: wikipedia
     'https://en.wikipedia.org/wiki/Haydn_Quartet_(vocal_ensemble)',

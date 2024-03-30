@@ -91,6 +91,8 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://community.fandom.com/wiki/" class="nowrap">Fandom</a>
 <a href="https://community.fandom.com/wiki/Community_Central" class="nowrap">Fandom</a>
 <a href="https://homestuck.com/" class="nowrap">Homestuck</a>
+<a href="https://archive.org/details/a-life-well-lived" class="nowrap">Internet Archive</a>
+<a href="https://archive.org/details/VastError_Volume1/11+Renaissance.mp3" class="nowrap">Internet Archive</a>
 <a href="https://www.instagram.com/levc_egm/" class="nowrap">Instagram</a>
 <a href="https://tuyoki.itch.io/" class="nowrap">tuyoki</a>
 <a href="https://itch.io/profile/bravelittletoreador" class="nowrap">bravelittletoreador</a>
@@ -120,6 +122,8 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://twitter.com/awkwarddoesart" class="nowrap">awkwarddoesart</a>
 <a href="https://twitter.com/purenonsens/" class="nowrap">purenonsens</a>
 <a href="https://twitter.com/circlejourney/status/1202265927183548416" class="nowrap">Twitter</a>
+<a href="https://web.archive.org/web/20120405160556/https://homestuck.bandcamp.com/album/colours-and-mayhem-universe-a" class="nowrap">Wayback Machine</a>
+<a href="https://web.archive.org/web/20160807111207/http://griffinspacejam.com:80/" class="nowrap">Wayback Machine</a>
 <a href="https://en.wikipedia.org/wiki/Haydn_Quartet_(vocal_ensemble)" class="nowrap">Wikipedia</a>
 <a href="https://youtube.com/@bani-chan8949" class="nowrap">bani-chan8949</a>
 <a href="https://www.youtube.com/@Razzie16" class="nowrap">Razzie16</a>
@@ -149,6 +153,8 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://community.fandom.com/wiki/" class="nowrap">Fandom</a>
 <a href="https://community.fandom.com/wiki/Community_Central" class="nowrap">Fandom</a>
 <a href="https://homestuck.com/" class="nowrap">Homestuck</a>
+<a href="https://archive.org/details/a-life-well-lived" class="nowrap">Internet Archive</a>
+<a href="https://archive.org/details/VastError_Volume1/11+Renaissance.mp3" class="nowrap">Internet Archive</a>
 <a href="https://www.instagram.com/levc_egm/" class="nowrap">Instagram</a>
 <a href="https://tuyoki.itch.io/" class="nowrap">itch.io</a>
 <a href="https://itch.io/profile/bravelittletoreador" class="nowrap">itch.io</a>
@@ -178,6 +184,8 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://twitter.com/awkwarddoesart" class="nowrap">Twitter</a>
 <a href="https://twitter.com/purenonsens/" class="nowrap">Twitter</a>
 <a href="https://twitter.com/circlejourney/status/1202265927183548416" class="nowrap">Twitter</a>
+<a href="https://web.archive.org/web/20120405160556/https://homestuck.bandcamp.com/album/colours-and-mayhem-universe-a" class="nowrap">Wayback Machine</a>
+<a href="https://web.archive.org/web/20160807111207/http://griffinspacejam.com:80/" class="nowrap">Wayback Machine</a>
 <a href="https://en.wikipedia.org/wiki/Haydn_Quartet_(vocal_ensemble)" class="nowrap">Wikipedia</a>
 <a href="https://youtube.com/@bani-chan8949" class="nowrap">YouTube</a>
 <a href="https://www.youtube.com/@Razzie16" class="nowrap">YouTube</a>

@@ -334,6 +334,13 @@ export const externalLinkSpec = [
     icon: 'instagram',
   },
 
+  // The Wayback Machine is a separate entry.
+  {
+    match: {domain: 'archive.org'},
+    platform: 'internetArchive',
+    icon: 'internetArchive',
+  },
+
   {
     match: {domain: '.itch.io'},
 
@@ -492,6 +499,12 @@ export const externalLinkSpec = [
     match: {domain: 'twitter.com'},
     platform: 'twitter',
     icon: 'twitter',
+  },
+
+  {
+    match: {domain: 'web.archive.org'},
+    platform: 'waybackMachine',
+    icon: 'internetArchive',
   },
 
   {
