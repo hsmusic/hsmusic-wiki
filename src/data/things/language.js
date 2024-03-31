@@ -540,10 +540,16 @@ export class Language extends Thing {
 
     isExternalLinkStyle(style);
 
-    return getExternalLinkStringOfStyleFromDescriptors(url, style, this.externalLinkSpec, {
-      language: this,
-      context,
-    });
+    const result =
+      getExternalLinkStringOfStyleFromDescriptors(url, style, this.externalLinkSpec, {
+        language: this,
+        context,
+      });
+
+    // It's possible for there to not actually be any string available for the
+    // given URL, style, and context, and we want this to be detectable via
+    // html.blank().
+    return result ?? html.blank();
   }
 
   formatIndex(value) {

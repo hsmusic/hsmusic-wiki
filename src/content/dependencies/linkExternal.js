@@ -33,7 +33,7 @@ export default {
       });
 
     // Fall back to platform if nothing matched the desired style.
-    if (!formattedText && slots.style !== 'platform') {
+    if (html.isBlank(formattedText) && slots.style !== 'platform') {
       formattedText =
         language.formatExternalLink(data.url, {
           style: 'platform',
