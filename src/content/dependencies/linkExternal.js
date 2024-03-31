@@ -26,31 +26,30 @@ export default {
   },
 
   generate(data, slots, {html, language}) {
-    let formattedText =
+    const linkAttributes = html.attributes();
+
+    let linkContent =
       language.formatExternalLink(data.url, {
         style: slots.style,
         context: slots.context,
       });
 
     // Fall back to platform if nothing matched the desired style.
-    if (html.isBlank(formattedText) && slots.style !== 'platform') {
-      formattedText =
+    if (html.isBlank(linkContent) && slots.style !== 'platform') {
+      linkContent =
         language.formatExternalLink(data.url, {
           style: 'platform',
           context: slots.context,
         });
     }
 
-    const link =
-      html.tag('a', formattedText);
-
-    link.attributes.set('href', data.url);
-    link.attributes.set('class', 'nowrap');
+    linkAttributes.set('href', data.url);
+    linkAttributes.set('class', 'nowrap');
 
     if (slots.tab === 'separate') {
-      link.attributes.set('target', '_blank');
+      linkAttributes.set('target', '_blank');
     }
 
-    return link;
+    return html.tag('a', linkAttributes, linkContent);
   },
 };
