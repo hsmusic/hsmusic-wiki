@@ -36,9 +36,6 @@ export default {
 
     const details =
       html.tag('details',
-        slots.items.length <= 5 &&
-          {open: true},
-
         [summary, content]);
 
     return html.tag('li', details);
