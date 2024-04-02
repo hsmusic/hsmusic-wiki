@@ -45,6 +45,7 @@ export default {
 
     const groupsSortedByCount =
       allGroupsOrdered
+        .slice()
         .sort((a, b) => groupToCountMap.get(b) - groupToCountMap.get(a));
 
     // The filter here ensures all displayed groups have at least some duration
