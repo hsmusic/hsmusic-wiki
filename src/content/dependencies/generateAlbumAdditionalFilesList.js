@@ -20,13 +20,15 @@ export default {
 
     chunkItems:
       additionalFiles
-        .map(({files}) => files
-          .map(() => relation('generateAdditionalFilesListChunkItem'))),
+        .map(({files}) =>
+          (files ?? [])
+            .map(() => relation('generateAdditionalFilesListChunkItem'))),
 
     chunkItemFileLinks:
       additionalFiles
-        .map(({files}) => files
-          .map(file => relation('linkAlbumAdditionalFile', album, file))),
+        .map(({files}) =>
+          (files ?? [])
+            .map(file => relation('linkAlbumAdditionalFile', album, file))),
   }),
 
   data: (album, additionalFiles) => ({
@@ -38,11 +40,11 @@ export default {
 
     chunkDescriptions:
       additionalFiles
-        .map(({description}) => description),
+        .map(({description}) => description ?? null),
 
     chunkItemLocations:
       additionalFiles
-        .map(({files}) => files),
+        .map(({files}) => files ?? []),
   }),
 
   slots: {
