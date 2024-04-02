@@ -206,7 +206,7 @@ export default {
                 duration:
                   getDurations(
                     data.groupDurationsSortedByDuration,
-                    data.groupDurationsApproximateSortedByCount),
+                    data.groupDurationsApproximateSortedByDuration),
               }).map(({group, count, duration}) =>
                   html.tag('li',
                     html.tag('div', {class: 'group-contributions-row'}, [
