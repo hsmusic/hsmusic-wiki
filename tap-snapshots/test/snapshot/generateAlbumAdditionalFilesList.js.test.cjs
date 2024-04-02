@@ -28,9 +28,9 @@ exports[`test/snapshot/generateAlbumAdditionalFilesList.js > TAP > generateAlbum
         </details>
     </li>
     <li>
-        <details>
+        <details open>
             <summary><span>Empty Section: These files haven&apos;t been made available.</span></summary>
-            <ul></ul>
+            <ul><li>There are no files available or listed for this entry.</li></ul>
         </details>
     </li>
     <li>

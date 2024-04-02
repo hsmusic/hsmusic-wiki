@@ -32,10 +32,17 @@ export default {
           language.$(...titleParts, titleOptions)));
 
     const content =
-      html.tag('ul', slots.items);
+      html.tag('ul',
+        (html.isBlank(slots.items)
+          ? html.tag('li',
+              language.$('releaseInfo.additionalFiles.entry.noFilesAvailable'))
+          : slots.items));
 
     const details =
       html.tag('details',
+        html.isBlank(slots.items) &&
+          {open: true},
+
         [summary, content]);
 
     return html.tag('li', details);
