@@ -623,7 +623,7 @@ export const isContributionList = validateArrayItems(isContribution);
 export const isAdditionalFile = validateProperties({
   title: isName,
   description: optional(isContentString),
-  files: validateArrayItems(isString),
+  files: optional(validateArrayItems(isString)),
 });
 
 export const isAdditionalFileList = validateArrayItems(isAdditionalFile);
