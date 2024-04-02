@@ -19,7 +19,11 @@ export default {
 
   generate(slots, {html, language}) {
     const titleParts = ['releaseInfo.additionalFiles.entry'];
-    const titleOptions = {title: slots.title};
+    const titleOptions = {
+      title:
+        html.tag('span', {class: 'group-name'},
+          slots.title),
+    };
 
     if (!html.isBlank(slots.description)) {
       titleParts.push('withDescription');

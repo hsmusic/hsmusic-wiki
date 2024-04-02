@@ -9,7 +9,7 @@ exports[`test/snapshot/generateAlbumAdditionalFilesList.js > TAP > generateAlbum
 <ul class="additional-files-list">
     <li>
         <details>
-            <summary><span>SBURB Wallpaper</span></summary>
+            <summary><span><span class="group-name">SBURB Wallpaper</span></span></summary>
             <ul>
                 <li><a href="media/album-additional/exciting-album/sburbwp_1280x1024.jpg">sburbwp_1280x1024.jpg</a></li>
                 <li><a href="media/album-additional/exciting-album/sburbwp_1440x900.jpg">sburbwp_1440x900.jpg</a></li>
@@ -19,7 +19,7 @@ exports[`test/snapshot/generateAlbumAdditionalFilesList.js > TAP > generateAlbum
     </li>
     <li>
         <details>
-            <summary><span>Fake Section: No sizes for these files</span></summary>
+            <summary><span><span class="group-name">Fake Section</span>: No sizes for these files</span></summary>
             <ul>
                 <li><a href="media/album-additional/exciting-album/oops.mp3">oops.mp3</a></li>
                 <li><a href="media/album-additional/exciting-album/Internet%20Explorer.gif">Internet Explorer.gif</a></li>
@@ -29,13 +29,13 @@ exports[`test/snapshot/generateAlbumAdditionalFilesList.js > TAP > generateAlbum
     </li>
     <li>
         <details open>
-            <summary><span>Empty Section: These files haven&apos;t been made available.</span></summary>
+            <summary><span><span class="group-name">Empty Section</span>: These files haven&apos;t been made available.</span></summary>
             <ul><li>There are no files available or listed for this entry.</li></ul>
         </details>
     </li>
     <li>
         <details>
-            <summary><span>Alternate Covers: This is just an example description.</span></summary>
+            <summary><span><span class="group-name">Alternate Covers</span>: This is just an example description.</span></summary>
             <ul>
                 <li><a href="media/album-additional/exciting-album/Homestuck_Vol4_alt1.jpg">Homestuck_Vol4_alt1.jpg</a></li>
                 <li><a href="media/album-additional/exciting-album/Homestuck_Vol4_alt2.jpg">Homestuck_Vol4_alt2.jpg</a></li>
