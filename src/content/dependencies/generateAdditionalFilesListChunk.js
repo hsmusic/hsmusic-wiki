@@ -26,14 +26,21 @@ export default {
       titleOptions.description = slots.description;
     }
 
-    const dt =
-      html.tag('dt',
-        language.$(...titleParts, titleOptions));
+    const summary =
+      html.tag('summary',
+        html.tag('span',
+          language.$(...titleParts, titleOptions)));
 
-    const dd =
-      html.tag('dd',
-        html.tag('ul', slots.items));
+    const content =
+      html.tag('ul', slots.items);
 
-    return html.tags([dt, dd]);
+    const details =
+      html.tag('details',
+        slots.items.length <= 5 &&
+          {open: true},
+
+        [summary, content]);
+
+    return html.tag('li', details);
   },
 };

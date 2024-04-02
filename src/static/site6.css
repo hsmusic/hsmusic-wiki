@@ -1074,6 +1074,28 @@ li > ul {
   margin-top: 5px;
 }
 
+.additional-files-list {
+  padding-left: 0;
+}
+
+.additional-files-list > li {
+  list-style-type: none;
+}
+
+.additional-files-list summary {
+  /* Sorry, Safari!
+   * https://bugs.webkit.org/show_bug.cgi?id=157323
+   */
+  list-style-position: outside;
+  margin-left: 40px;
+}
+
+.additional-files-list details ul {
+  margin-left: 40px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
 .group-contributions-table {
   display: inline-block;
 }

@@ -14,7 +14,7 @@ export default {
   },
 
   generate: (slots, {html}) =>
-    html.tag('dl',
+    html.tag('ul', {class: 'additional-files-list'},
       stitchArrays({
         chunk: slots.chunks,
         items: slots.chunkItems,
