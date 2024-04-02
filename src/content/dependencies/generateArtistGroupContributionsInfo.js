@@ -189,16 +189,16 @@ export default {
                     data.groupDurationsSortedByCount,
                     data.groupDurationsApproximateSortedByCount),
               }).map(({group, count, duration}) =>
-                html.tag('li',
-                  html.tag('div', {class: 'group-contributions-row'}, [
-                    group,
-                    html.tag('span', {class: 'group-contributions-metrics'},
-                      // When sorting by count, duration details aren't necessarily
-                      // available for all items.
-                      (slots.showBothColumns && duration
-                        ? language.$('artistPage.groupContributions.item.countDurationAccent', {count, duration})
-                        : language.$('artistPage.groupContributions.item.countAccent', {count}))),
-                  ])))
+                  html.tag('li',
+                    html.tag('div', {class: 'group-contributions-row'}, [
+                      group,
+                      html.tag('span', {class: 'group-contributions-metrics'},
+                        // When sorting by count, duration details aren't necessarily
+                        // available for all items.
+                        (slots.showBothColumns && duration
+                          ? language.$('artistPage.groupContributions.item.countDurationAccent', {count, duration})
+                          : language.$('artistPage.groupContributions.item.countAccent', {count}))),
+                    ])))
 
             : stitchArrays({
                 group: relations.groupLinksSortedByDuration,
@@ -208,17 +208,17 @@ export default {
                     data.groupDurationsSortedByDuration,
                     data.groupDurationsApproximateSortedByCount),
               }).map(({group, count, duration}) =>
-                html.tag('li',
-                  html.tag('div', {class: 'group-contributions-row'}, [
-                    group,
-                    html.tag('span', {class: 'group-contributions-metrics'},
-                      // Count details are always available, since they're just the
-                      // number of contributions directly. And duration details are
-                      // guaranteed for every item when sorting by duration.
-                      (slots.showBothColumns
-                        ? language.$('artistPage.groupContributions.item.durationCountAccent', {duration, count})
-                        : language.$('artistPage.groupContributions.item.durationAccent', {duration}))),
-                  ])))))),
+                  html.tag('li',
+                    html.tag('div', {class: 'group-contributions-row'}, [
+                      group,
+                      html.tag('span', {class: 'group-contributions-metrics'},
+                        // Count details are always available, since they're just the
+                        // number of contributions directly. And duration details are
+                        // guaranteed for every item when sorting by duration.
+                        (slots.showBothColumns
+                          ? language.$('artistPage.groupContributions.item.durationCountAccent', {duration, count})
+                          : language.$('artistPage.groupContributions.item.durationAccent', {duration}))),
+                    ])))))),
     ]);
   },
 };
