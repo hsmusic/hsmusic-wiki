@@ -311,8 +311,11 @@ export function isCommentary(commentaryText) {
 
     const ownInput = commentaryText.slice(position, position + length);
     const restOfInput = commentaryText.slice(position + length);
-    const nextLineBreak = restOfInput.indexOf('\n');
-    const upToNextLineBreak = restOfInput.slice(0, nextLineBreak);
+
+    const upToNextLineBreak =
+      (restOfInput.includes('\n')
+        ? restOfInput.slice(0, restOfInput.indexOf('\n'))
+        : restOfInput);
 
     if (/\S/.test(upToNextLineBreak)) {
       throw new TypeError(
