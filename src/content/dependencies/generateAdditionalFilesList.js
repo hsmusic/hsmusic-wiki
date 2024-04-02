@@ -27,12 +27,10 @@ function validateFileMapping(v, validateValue) {
 export default {
   extraDependencies: ['html', 'language'],
 
-  data(additionalFiles) {
-    return {
-      // Additional files are already a serializable format.
-      additionalFiles,
-    };
-  },
+  data: (additionalFiles) => ({
+    // Additional files are already a serializable format.
+    additionalFiles,
+  }),
 
   slots: {
     fileLinks: {
