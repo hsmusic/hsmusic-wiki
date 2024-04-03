@@ -1,6 +1,8 @@
 export default {
   contentDependencies: [
     'generatePageLayout',
+    'generatePageSidebar',
+    'generatePageSidebarBox',
     'generateWikiHomeAlbumsRow',
     'generateWikiHomeNewsBox',
     'transformContent',
@@ -22,7 +24,13 @@ export default {
     relations.layout =
       relation('generatePageLayout');
 
+    relations.sidebar =
+      relation('generatePageSidebar');
+
     if (homepageLayout.sidebarContent) {
+      relations.customSidebarBox =
+        relation('generatePageSidebarBox');
+
       relations.customSidebarContent =
         relation('transformContent', homepageLayout.sidebarContent);
     }
@@ -69,21 +77,23 @@ export default {
         relations.contentRows,
       ],
 
-      leftSidebarCollapse: false,
-      leftSidebarWide: true,
+      leftSidebar:
+        relations.sidebar.slots({
+          collapse: false,
+          wide: true,
 
-      leftSidebarMultiple: [
-        (relations.customSidebarContent
-          ? {
-              class: 'custom-content-sidebar-box',
-              content:
-                relations.customSidebarContent
-                  .slot('mode', 'multiline'),
-            }
-          : null),
+          boxes: [
+            relations.customSidebarContent &&
+              relations.customSidebarBox.slots({
+                attributes: {class: 'custom-content-sidebar-box'},
+                content:
+                  relations.customSidebarContent
+                    .slot('mode', 'multiline'),
+              }),
 
-        relations.newsSidebarBox ?? null,
-      ],
+            relations.newsSidebarBox,
+          ],
+        }),
 
       navLinkStyle: 'index',
       navLinks: [

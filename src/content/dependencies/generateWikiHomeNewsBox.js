@@ -1,48 +1,51 @@
 import {empty, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['linkNewsEntry', 'transformContent'],
+  contentDependencies: [
+    'generatePageSidebarBox',
+    'linkNewsEntry',
+    'transformContent',
+  ],
+
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl({newsData}) {
-    return {
-      entries: newsData.slice(0, 3),
-    };
-  },
+  sprawl: ({newsData}) => ({
+    entries:
+      newsData.slice(0, 3),
+  }),
 
-  relations(relation, sprawl) {
-    return {
-      entryContents:
-        sprawl.entries
-          .map(entry => relation('transformContent', entry.contentShort)),
+  relations: (relation, sprawl) => ({
+    box:
+      relation('generatePageSidebarBox'),
 
-      entryMainLinks:
-        sprawl.entries
-          .map(entry => relation('linkNewsEntry', entry)),
+    entryContents:
+      sprawl.entries
+        .map(entry => relation('transformContent', entry.contentShort)),
 
-      entryReadMoreLinks:
-        sprawl.entries
-          .map(entry =>
-            entry.contentShort !== entry.content &&
-              relation('linkNewsEntry', entry)),
-    };
-  },
+    entryMainLinks:
+      sprawl.entries
+        .map(entry => relation('linkNewsEntry', entry)),
 
-  data(sprawl) {
-    return {
-      entryDates:
-        sprawl.entries
-          .map(entry => entry.date),
-    }
-  },
+    entryReadMoreLinks:
+      sprawl.entries
+        .map(entry =>
+          entry.contentShort !== entry.content &&
+            relation('linkNewsEntry', entry)),
+  }),
+
+  data: (sprawl) => ({
+    entryDates:
+      sprawl.entries
+        .map(entry => entry.date),
+  }),
 
   generate(data, relations, {html, language}) {
     if (empty(relations.entryContents)) {
       return html.blank();
     }
 
-    return {
-      class: 'latest-news-sidebar-box',
+    return relations.box.slots({
+      attributes: {class: 'latest-news-sidebar-box'},
       content: [
         html.tag('h1', language.$('homepage.news.title')),
 
@@ -77,6 +80,6 @@ export default {
                     })),
               ])),
       ],
-    };
+    });
   },
 };
