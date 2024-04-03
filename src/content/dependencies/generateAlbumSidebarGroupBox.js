@@ -3,6 +3,7 @@ import {atOffset, empty} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generatePageSidebarBox',
     'linkAlbum',
     'linkExternal',
     'linkGroup',
@@ -40,6 +41,9 @@ export default {
   relations(relation, query, album, group) {
     const relations = {};
 
+    relations.box =
+      relation('generatePageSidebarBox');
+
     relations.groupLink =
       relation('linkGroup', group);
 
@@ -72,39 +76,41 @@ export default {
     },
   },
 
-  generate(relations, slots, {html, language}) {
-    return html.tags([
-      html.tag('h1',
-        language.$('albumSidebar.groupBox.title', {
-          group: relations.groupLink,
-        })),
-
-      slots.mode === 'album' &&
-        relations.description
-          ?.slot('mode', 'multiline'),
-
-      !empty(relations.externalLinks) &&
-        html.tag('p',
-          language.$('releaseInfo.visitOn', {
-            links:
-              language.formatDisjunctionList(
-                relations.externalLinks
-                  .map(link => link.slot('context', 'group'))),
+  generate: (relations, slots, {html, language}) =>
+    relations.box.slots({
+      attributes: {class: 'individual-group-sidebar-box'},
+      content: [
+        html.tag('h1',
+          language.$('albumSidebar.groupBox.title', {
+            group: relations.groupLink,
           })),
 
-      slots.mode === 'album' &&
-      relations.nextAlbumLink &&
-        html.tag('p', {class: 'group-chronology-link'},
-          language.$('albumSidebar.groupBox.next', {
-            album: relations.nextAlbumLink,
-          })),
+        slots.mode === 'album' &&
+          relations.description
+            ?.slot('mode', 'multiline'),
 
-      slots.mode === 'album' &&
-      relations.previousAlbumLink &&
-        html.tag('p', {class: 'group-chronology-link'},
-          language.$('albumSidebar.groupBox.previous', {
-            album: relations.previousAlbumLink,
-          })),
-    ]);
-  },
+        !empty(relations.externalLinks) &&
+          html.tag('p',
+            language.$('releaseInfo.visitOn', {
+              links:
+                language.formatDisjunctionList(
+                  relations.externalLinks
+                    .map(link => link.slot('context', 'group'))),
+            })),
+
+        slots.mode === 'album' &&
+        relations.nextAlbumLink &&
+          html.tag('p', {class: 'group-chronology-link'},
+            language.$('albumSidebar.groupBox.next', {
+              album: relations.nextAlbumLink,
+            })),
+
+        slots.mode === 'album' &&
+        relations.previousAlbumLink &&
+          html.tag('p', {class: 'group-chronology-link'},
+            language.$('albumSidebar.groupBox.previous', {
+              album: relations.previousAlbumLink,
+            })),
+      ],
+    }),
 };

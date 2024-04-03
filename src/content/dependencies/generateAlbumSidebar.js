@@ -1,74 +1,46 @@
 export default {
   contentDependencies: [
     'generateAlbumSidebarGroupBox',
-    'generateAlbumSidebarTrackSection',
+    'generateAlbumSidebarTrackListBox',
     'generatePageSidebar',
-    'linkAlbum',
+    'generatePageSidebarConjoinedBox',
   ],
 
-  extraDependencies: ['html'],
+  relations: (relation, album, track) => ({
+    sidebar:
+      relation('generatePageSidebar'),
 
-  relations(relation, album, track) {
-    const relations = {};
+    conjoinedBox:
+      relation('generatePageSidebarConjoinedBox'),
 
-    relations.sidebar =
-      relation('generatePageSidebar');
+    trackListBox:
+      relation('generateAlbumSidebarTrackListBox', album, track),
 
-    relations.albumLink =
-      relation('linkAlbum', album);
-
-    relations.groupBoxes =
+    groupBoxes:
       album.groups.map(group =>
-        relation('generateAlbumSidebarGroupBox', album, group));
+        relation('generateAlbumSidebarGroupBox', album, group)),
+  }),
 
-    relations.trackSections =
-      album.trackSections.map(trackSection =>
-        relation('generateAlbumSidebarTrackSection', album, track, trackSection));
+  data: (album, track) => ({
+    isAlbumPage: !track,
+  }),
 
-    return relations;
-  },
+  generate: (data, relations) =>
+    relations.sidebar.slots({
+      boxes: [
+        relations.trackListBox,
 
-  data(album, track) {
-    return {isAlbumPage: !track};
-  },
+        (data.isAlbumPage
+          ? relations.groupBoxes
+              .map(box => box.slot('mode', 'album'))
 
-  generate(data, relations, {html}) {
-    const multipleContents = [];
-    const multipleAttributes = [];
-
-    multipleAttributes.push({class: 'track-list-sidebar-box'});
-    multipleContents.push(
-      html.tags([
-        html.tag('h1', relations.albumLink),
-        relations.trackSections,
-      ]));
-
-    if (data.isAlbumPage) {
-      multipleAttributes.push(...
-        relations.groupBoxes
-          .map(() => ({class: 'individual-group-sidebar-box'})));
-
-      multipleContents.push(...
-        relations.groupBoxes
-          .map(content => content.slot('mode', 'album')));
-    } else {
-      multipleAttributes.push({class: 'conjoined-group-sidebar-box'});
-      multipleContents.push(
-        relations.groupBoxes
-          .flatMap((content, i, {length}) => [
-            content.slot('mode', 'track'),
-            i < length - 1 &&
-              html.tag('hr', {
-                style: `border-color: var(--primary-color); border-style: none none dotted none`
-              }),
-          ])
-          .filter(Boolean));
-    }
-
-    return relations.sidebar.slots({
-      // stickyMode: 'column',
-      multipleContents,
-      multipleAttributes,
-    });
-  },
+          : relations.conjoinedBox.slots({
+              attributes: {class: 'conjoined-group-sidebar-box'},
+              boxes:
+                relations.groupBoxes
+                  .map(box => box.slot('mode', 'track'))
+                  .map(box => box.content), /* TODO: Kludge. */
+            })),
+      ],
+    }),
 };

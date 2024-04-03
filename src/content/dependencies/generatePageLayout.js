@@ -35,6 +35,7 @@ export default {
     'generateColorStyleRules',
     'generateFooterLocalizationLinks',
     'generatePageSidebar',
+    'generatePageSidebarBox',
     'generateStickyHeadingContainer',
     'transformContent',
   ],
@@ -73,11 +74,11 @@ export default {
     relations.stickyHeadingContainer =
       relation('generateStickyHeadingContainer');
 
-    relations.leftSidebar =
+    relations.sidebar =
       relation('generatePageSidebar');
 
-    relations.rightSidebar =
-      relation('generatePageSidebar');
+    relations.sidebarBox =
+      relation('generatePageSidebarBox');
 
     if (sprawl.footerContent) {
       relations.defaultFooterContent =
@@ -409,7 +410,7 @@ export default {
         ]);
 
     const applyLegacySidebarSlots = (side, id) =>
-      relations[side].slots({
+      relations.sidebar.clone().slots({
         content: slots[side + 'Content'],
 
         attributes: [
@@ -418,16 +419,15 @@ export default {
             {class: slots[side + 'Class']},
         ],
 
-        multipleContents:
+        boxes:
           (slots[side + 'Multiple']
-            ? slots[side + 'Multiple']
-                .map(({content}) => content)
-            : null),
-
-        multipleAttributes:
-          (slots[side + 'Multiple']
-            ? slots[side + 'Multiple']
-                .map(({class: className}) => [{class: className}])
+            ? slots[side + 'Multiple'].map(box =>
+                relations.sidebarBox
+                  .clone()
+                  .slots({
+                    content: box.content,
+                    attributes: {class: box.class},
+                  }))
             : null),
 
         stickyMode: slots[side + 'StickyMode'],

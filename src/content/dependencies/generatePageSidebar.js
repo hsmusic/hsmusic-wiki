@@ -1,10 +1,14 @@
-import {empty, filterMultipleArrays, stitchArrays} from '#sugar';
-
 export default {
+  contentDependencies: ['generatePageSidebarBox'],
   extraDependencies: ['html'],
 
+  relations: (relation) => ({
+    box:
+      relation('generatePageSidebarBox'),
+  }),
+
   slots: {
-    // Content is a flat HTML array. It'll generate one sidebar section
+    // Content is a flat HTML array. It'll all be placed into one sidebar box
     // if specified.
     content: {
       type: 'html',
@@ -19,14 +23,10 @@ export default {
       mutable: false,
     },
 
-    // Chunks of content to be split into separate sections or "boxes" in the
-    // sidebar. Each of these can also be associated with HTML attributes.
-    multipleContents: {
-      validate: v => v.strictArrayOf(v.isHTML),
-    },
-
-    multipleAttributes: {
-      validate: v => v.strictArrayOf(v.isAttributes),
+    // Chunks of content to be split into separate boxes in the sidebar.
+    boxes: {
+      type: 'html',
+      mutable: false,
     },
 
     // Sticky mode controls which sidebar sections, if any, follow the
@@ -62,9 +62,12 @@ export default {
     },
   },
 
-  generate(slots, {html}) {
+  generate(relations, slots, {html}) {
     const attributes =
-      html.attributes({class: 'sidebar-column'});
+      html.attributes({class: [
+        'sidebar-column',
+        'sidebar-multiple',
+      ]});
 
     attributes.add(slots.attributes);
 
@@ -84,38 +87,17 @@ export default {
       attributes.add('class', `sticky-${slots.stickyMode}`);
     }
 
-    let content = slots.content;
+    const boxes =
+      (!html.isBlank(slots.boxes)
+        ? slots.boxes
+     : !html.isBlank(slots.content)
+        ? relations.box.slot('content', slots.content)
+        : html.blank());
 
-    if (html.isBlank(content)) {
-      if (!slots.multipleContents) {
-        return html.blank();
-      }
-
-      const multipleContents = slots.multipleContents.slice();
-      const multipleAttributes = slots.multipleAttributes?.slice() ?? [];
-
-      filterMultipleArrays(
-        multipleContents,
-        multipleAttributes,
-        content => !html.isBlank(content));
-
-      if (empty(multipleContents)) {
-        return html.blank();
-      }
-
-      attributes.add('class', 'sidebar-multiple');
-      content =
-        stitchArrays({
-          content: multipleContents,
-          attributes: multipleAttributes,
-        }).map(({content, attributes}) =>
-            html.tag('div', {class: 'sidebar'},
-              attributes,
-              content));
+    if (html.isBlank(boxes)) {
+      return html.blank();
     } else {
-      attributes.add('class', 'sidebar');
+      return html.tag('div', attributes, boxes);
     }
-
-    return html.tag('div', attributes, content);
   },
 };
