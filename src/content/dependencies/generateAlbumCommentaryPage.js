@@ -10,6 +10,7 @@ export default {
     'generateContentHeading',
     'generateTrackCoverArtwork',
     'generatePageLayout',
+    'generatePageSidebar',
     'linkAlbum',
     'linkExternal',
     'linkTrack',
@@ -22,6 +23,9 @@ export default {
 
     relations.layout =
       relation('generatePageLayout');
+
+    relations.sidebar =
+      relation('generatePageSidebar');
 
     relations.albumStyleRules =
       relation('generateAlbumStyleRules', album, null);
@@ -249,17 +253,22 @@ export default {
           },
         ],
 
-        leftSidebarStickyMode: 'column',
-        leftSidebarClass: 'commentary-track-list-sidebar-box',
-        leftSidebarContent: [
-          html.tag('h1', relations.sidebarAlbumLink),
-          relations.sidebarTrackSections.map(section =>
-            section.slots({
-              anchor: true,
-              open: true,
-              mode: 'commentary',
-            })),
-        ],
+        leftSidebar:
+          relations.sidebar.slots({
+            attributes: {class: 'commentary-track-list-sidebar-box'},
+
+            stickyMode: 'column',
+
+            content: [
+              html.tag('h1', relations.sidebarAlbumLink),
+              relations.sidebarTrackSections.map(section =>
+                section.slots({
+                  anchor: true,
+                  open: true,
+                  mode: 'commentary',
+                })),
+            ],
+          }),
       });
   },
 };
