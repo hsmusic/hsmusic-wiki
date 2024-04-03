@@ -417,48 +417,54 @@ export default {
         ]);
 
     const generateSidebarHTML = (side, id) => {
-      const content = slots[side + 'Content'];
+      const attributes = html.attributes({
+        class: 'sidebar-column',
+        id,
+      });
+
       const topClass = slots[side + 'Class'];
-      const multiple = slots[side + 'Multiple'];
+      if (topClass) {
+        attributes.add('class', topClass);
+      }
+
+      if (slots[side + 'Wide']) {
+        attributes.add('class', 'wide');
+      }
+
+      if (!slots[side + 'Collapse']) {
+        attributes.add('class', 'no-hide');
+      }
+
       const stickyMode = slots[side + 'StickyMode'];
-      const wide = slots[side + 'Wide'];
-      const collapse = slots[side + 'Collapse'];
-
-      let sidebarClasses = [];
-      let sidebarContent = html.blank();
-
-      if (!html.isBlank(content)) {
-        sidebarClasses = ['sidebar', topClass];
-        sidebarContent = content;
-      } else if (multiple) {
-        sidebarClasses = ['sidebar-multiple', topClass];
-        sidebarContent =
-          multiple
-            .filter(Boolean)
-            .map(box =>
-              html.tag('div', {class: 'sidebar'},
-                {[html.onlyIfContent]: true},
-                {class: box.class},
-                box.content));
+      if (stickyMode !== 'static') {
+        attributes.add('class', `sticky-${stickyMode}`);
       }
 
-      if (html.isBlank(sidebarContent)) {
-        return html.blank();
+      let content = slots[side + 'Content'];
+
+      if (html.isBlank(content)) {
+        if (!slots[side + 'Multiple']) {
+          return html.blank();
+        }
+
+        const multiple =
+          slots[side + 'Multiple'].filter(Boolean);
+
+        if (empty(multiple)) {
+          return html.blank();
+        }
+
+        attributes.add('class', 'sidebar-multiple');
+        content =
+          multiple.map(box =>
+            html.tag('div', {class: 'sidebar'},
+              {class: box.class},
+              box.content));
+      } else {
+        attributes.add('class', 'sidebar');
       }
 
-      return html.tag('div', {class: 'sidebar-column'},
-        {id, class: sidebarClasses},
-
-        wide &&
-          {class: 'wide'},
-
-        !collapse &&
-          {class: 'no-hide'},
-
-        stickyMode !== 'static' &&
-          {class: `sticky-${stickyMode}`},
-
-        sidebarContent);
+      return html.tag('div', attributes, content);
     }
 
     const sidebarLeftHTML = generateSidebarHTML('leftSidebar', 'sidebar-left');
