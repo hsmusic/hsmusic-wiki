@@ -1,23 +1,15 @@
 import {openAggregate} from '#aggregate';
 import {empty} from '#sugar';
 
-function sidebarSlots(side) {
+function legacySidebarSlots(side) {
   return {
-    // Content is a flat HTML array. It'll generate one sidebar section
-    // if specified.
     [side + 'Content']: {
       type: 'html',
       mutable: false,
     },
 
-    // A single class to apply to the whole sidebar. If specifying multiple
-    // sections, this be added to the containing sidebar-column - specify a
-    // class on each section if that's more suitable.
     [side + 'Class']: {type: 'string'},
 
-    // Multiple is an array of objects, each specifying content (HTML) and
-    // optionally class (a string). Each of these will generate one sidebar
-    // section.
     [side + 'Multiple']: {
       validate: v =>
         v.sparseArrayOf(
@@ -27,30 +19,13 @@ function sidebarSlots(side) {
           })),
     },
 
-    // Sticky mode controls which sidebar section(s), if any, follow the
-    // scroll position, "sticking" to the top of the browser viewport.
-    //
-    // 'last' - last or only sidebar box is sticky
-    // 'column' - entire column, incl. multiple boxes from top, is sticky
-    // 'none' - sidebar not sticky at all, stays at top of page
-    //
-    // Note: This doesn't affect the content of any sidebar section, only
-    // the whole section's containing box (or the sidebar column as a whole).
     [side + 'StickyMode']: {
       validate: v => v.is('last', 'column', 'static'),
       default: 'static',
     },
 
-    // Collapsing sidebars disappear when the viewport is sufficiently
-    // thin. (This is the default.) Override as false to make the sidebar
-    // stay visible in thinner viewports, where the page layout will be
-    // reflowed so the sidebar is as wide as the screen and appears below
-    // nav, above the main content.
     [side + 'Collapse']: {type: 'boolean', default: true},
 
-    // Wide sidebars generally take up more horizontal space in the normal
-    // page layout, and should be used if the content of the sidebar has
-    // a greater than typical focus compared to main content.
     [side + 'Wide']: {type: 'boolean', defualt: false},
   };
 }
@@ -59,6 +34,7 @@ export default {
   contentDependencies: [
     'generateColorStyleRules',
     'generateFooterLocalizationLinks',
+    'generatePageSidebar',
     'generateStickyHeadingContainer',
     'transformContent',
   ],
@@ -96,6 +72,12 @@ export default {
 
     relations.stickyHeadingContainer =
       relation('generateStickyHeadingContainer');
+
+    relations.leftSidebar =
+      relation('generatePageSidebar');
+
+    relations.rightSidebar =
+      relation('generatePageSidebar');
 
     if (sprawl.footerContent) {
       relations.defaultFooterContent =
@@ -162,8 +144,8 @@ export default {
 
     // Sidebars
 
-    ...sidebarSlots('leftSidebar'),
-    ...sidebarSlots('rightSidebar'),
+    ...legacySidebarSlots('leftSidebar'),
+    ...legacySidebarSlots('rightSidebar'),
 
     // Banner
 
@@ -416,62 +398,38 @@ export default {
             slots.navContent),
         ]);
 
-    const generateSidebarHTML = (side, id) => {
-      const attributes = html.attributes({
-        class: 'sidebar-column',
-        id,
+    const applyLegacySidebarSlots = (side, id) =>
+      relations[side].slots({
+        content: slots[side + 'Content'],
+
+        attributes: [
+          {id},
+          slots[side + 'Class'] &&
+            {class: slots[side + 'Class']},
+        ],
+
+        multipleContents:
+          (slots[side + 'Multiple']
+            ? slots[side + 'Multiple']
+                .map(({content}) => content)
+            : null),
+
+        multipleAttributes:
+          (slots[side + 'Multiple']
+            ? slots[side + 'Multiple']
+                .map(({class: className}) => [{class: className}])
+            : null),
+
+        stickyMode: slots[side + 'StickyMode'],
+        collapse: slots[side + 'Collapse'],
+        wide: slots[side + 'Wide'],
       });
 
-      const topClass = slots[side + 'Class'];
-      if (topClass) {
-        attributes.add('class', topClass);
-      }
+    const leftSidebar = applyLegacySidebarSlots('leftSidebar', 'sidebar-left');
+    const rightSidebar = applyLegacySidebarSlots('rightSidebar', 'sidebar-right');
 
-      if (slots[side + 'Wide']) {
-        attributes.add('class', 'wide');
-      }
-
-      if (!slots[side + 'Collapse']) {
-        attributes.add('class', 'no-hide');
-      }
-
-      const stickyMode = slots[side + 'StickyMode'];
-      if (stickyMode !== 'static') {
-        attributes.add('class', `sticky-${stickyMode}`);
-      }
-
-      let content = slots[side + 'Content'];
-
-      if (html.isBlank(content)) {
-        if (!slots[side + 'Multiple']) {
-          return html.blank();
-        }
-
-        const multiple =
-          slots[side + 'Multiple'].filter(Boolean);
-
-        if (empty(multiple)) {
-          return html.blank();
-        }
-
-        attributes.add('class', 'sidebar-multiple');
-        content =
-          multiple.map(box =>
-            html.tag('div', {class: 'sidebar'},
-              {class: box.class},
-              box.content));
-      } else {
-        attributes.add('class', 'sidebar');
-      }
-
-      return html.tag('div', attributes, content);
-    }
-
-    const sidebarLeftHTML = generateSidebarHTML('leftSidebar', 'sidebar-left');
-    const sidebarRightHTML = generateSidebarHTML('rightSidebar', 'sidebar-right');
-
-    const hasSidebarLeft = !html.isBlank(sidebarLeftHTML);
-    const hasSidebarRight = !html.isBlank(sidebarRightHTML);
+    const hasSidebarLeft = !html.isBlank(html.resolve(leftSidebar));
+    const hasSidebarRight = !html.isBlank(html.resolve(rightSidebar));
 
     const collapseSidebars = slots.leftSidebarCollapse && slots.rightSidebarCollapse;
 
@@ -597,9 +555,9 @@ export default {
           {class: 'vertical-when-thin'},
 
         [
-          sidebarLeftHTML,
+          leftSidebar,
           mainHTML,
-          sidebarRightHTML,
+          rightSidebar,
         ]),
 
       slots.bannerPosition === 'bottom' &&
