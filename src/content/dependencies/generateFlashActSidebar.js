@@ -4,8 +4,6 @@ export default {
   contentDependencies: ['linkFlash', 'linkFlashAct', 'linkFlashIndex'],
   extraDependencies: ['getColors', 'html', 'language', 'wikiData'],
 
-  // So help me Gog, the flash sidebar is heavily hard-coded.
-
   sprawl: ({flashActData, flashSideData}) => ({flashActData, flashSideData}),
 
   query(sprawl, act, flash) {
@@ -37,9 +35,7 @@ export default {
       currentSideActs.indexOf(act);
 
     const fallbackListTerminology =
-      (currentSideIndex <= 1
-        ? 'flashesInThisAct'
-        : 'entriesInThisSection');
+      'entriesInThisSection';
 
     return {
       sideNames,

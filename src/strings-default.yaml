@@ -1069,9 +1069,8 @@ flashIndex:
 flashSidebar:
   flashList:
 
-    # These two strings are the default ones used when a flash act
-    # doesn't specify a custom phrasing.
-    flashesInThisAct: "Flashes in this act"
+    # This is the default string used when neither a flash act nor its side
+    # specifies a custom phrasing.
     entriesInThisSection: "Entries in this section"
 
 #
