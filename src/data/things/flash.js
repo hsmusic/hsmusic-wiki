@@ -25,6 +25,7 @@ import {
 } from '#composite/wiki-properties';
 
 import {withFlashAct} from '#composite/things/flash';
+import {withFlashSide} from '#composite/things/flash-act';
 
 export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';
@@ -109,6 +110,17 @@ export class Flash extends Thing {
       withFlashAct(),
       exposeDependency({dependency: '#flashAct'}),
     ],
+
+    side: [
+      withFlashAct(),
+
+      withPropertyFromObject({
+        object: '#flashAct',
+        property: input.value('side'),
+      }),
+
+      exposeDependency({dependency: '#flashAct.side'}),
+    ],
   });
 
   static [Thing.getSerializeDescriptors] = ({
@@ -192,6 +204,17 @@ export class FlashAct extends Thing {
     flashData: wikiData({
       class: input.value(Flash),
     }),
+
+    flashSideData: wikiData({
+      class: input.value(FlashSide),
+    }),
+
+    // Expose only
+
+    side: [
+      withFlashSide(),
+      exposeDependency({dependency: '#flashSide'}),
+    ],
   });
 
   static [Thing.findSpecs] = {
@@ -215,6 +238,46 @@ export class FlashAct extends Thing {
       'Review Points': {ignore: true},
     },
   };
+}
+
+export class FlashSide extends Thing {
+  static [Thing.referenceType] = 'flash-side';
+  static [Thing.friendlyName] = `Flash Side`;
+
+  static [Thing.getPropertyDescriptors] = () => ({
+    // Update & expose
+
+    name: name('Unnamed Flash Side'),
+    directory: directory(),
+    color: color(),
+
+    acts: referenceList({
+      class: input.value(FlashAct),
+      find: input.value(find.flashAct),
+      data: 'flashActData',
+    }),
+
+    // Update only
+
+    flashActData: wikiData({
+      class: input.value(FlashAct),
+    }),
+  });
+
+  static [Thing.yamlDocumentSpec] = {
+    fields: {
+      'Side': {property: 'name'},
+      'Directory': {property: 'directory'},
+      'Color': {property: 'color'},
+    },
+  };
+
+  static [Thing.findSpecs] = {
+    flashSide: {
+      referenceTypes: ['flash-side'],
+      bindTo: 'flashSideData',
+    },
+  };
 
   static [Thing.getYamlLoadingSpec] = ({
     documentModes: {allInOne},
@@ -225,39 +288,49 @@ export class FlashAct extends Thing {
 
     documentMode: allInOne,
     documentThing: document =>
-      ('Act' in document
+      ('Side' in document
+        ? FlashSide
+     : 'Act' in document
         ? FlashAct
         : Flash),
 
     save(results) {
-      let flashAct;
-      let flashRefs = [];
-
-      if (results[0] && !(results[0] instanceof FlashAct)) {
-        throw new Error(`Expected an act at top of flash data file`);
-      }
-
-      for (const thing of results) {
-        if (thing instanceof FlashAct) {
-          if (flashAct) {
-            Object.assign(flashAct, {flashes: flashRefs});
-          }
-
-          flashAct = thing;
-          flashRefs = [];
-        } else {
-          flashRefs.push(Thing.getReference(thing));
+      let thing;
+      for (let index = 0; thing = results[index]; index++) {
+        if (index === 0 && !(thing instanceof FlashSide)) {
+          throw new Error(`Expected a side at top of flash data file`);
         }
-      }
 
-      if (flashAct) {
-        Object.assign(flashAct, {flashes: flashRefs});
+        // JavaScript likes you.
+        const flashSide = thing;
+        const flashActRefs = [];
+        for (
+          index++;
+          (thing = results[index]) && thing instanceof FlashAct;
+          index++
+        ) {
+          const flashAct = thing;
+          const flashRefs = [];
+          for (
+            index++;
+            (thing = results[index]) && thing instanceof Flash;
+            index++
+          ) {
+            flashRefs.push(Thing.getReference(thing));
+          }
+          index--;
+          flashAct.flashes = flashRefs;
+          flashActRefs.push(Thing.getReference(flashAct));
+        }
+        index--;
+        flashSide.acts = flashActRefs;
       }
 
       const flashData = results.filter(x => x instanceof Flash);
       const flashActData = results.filter(x => x instanceof FlashAct);
+      const flashSideData = results.filter(x => x instanceof FlashSide);
 
-      return {flashData, flashActData};
+      return {flashData, flashActData, flashSideData};
     },
 
     sort({flashData}) {

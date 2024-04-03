@@ -942,6 +942,11 @@ export function linkWikiDataArrays(wikiData) {
 
     [wikiData.flashActData, [
       'flashData',
+      'flashSideData',
+    ]],
+
+    [wikiData.flashSideData, [
+      'flashActData',
     ]],
 
     [wikiData.groupData, [

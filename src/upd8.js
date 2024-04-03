@@ -981,6 +981,7 @@ async function main() {
       if (wikiData.flashData) {
         logThings('flashData', 'flashes');
         logThings('flashActData', 'flash acts');
+        logThings('flashSideData', 'flash sides');
       }
       logThings('groupData', 'groups');
       logThings('groupCategoryData', 'group categories');
