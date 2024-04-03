@@ -181,18 +181,6 @@ export class FlashAct extends Thing {
     color: color(),
     listTerminology: contentString(),
 
-    jump: contentString(),
-
-    jumpColor: {
-      flags: {update: true, expose: true},
-      update: {validate: isColor},
-      expose: {
-        dependencies: ['color'],
-        transform: (jumpColor, {color}) =>
-          jumpColor ?? color,
-      }
-    },
-
     flashes: referenceList({
       class: input.value(Flash),
       find: input.value(find.flash),
@@ -231,9 +219,6 @@ export class FlashAct extends Thing {
 
       'Color': {property: 'color'},
       'List Terminology': {property: 'listTerminology'},
-
-      'Jump': {property: 'jump'},
-      'Jump Color': {property: 'jumpColor'},
 
       'Review Points': {ignore: true},
     },

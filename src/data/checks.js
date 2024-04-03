@@ -485,7 +485,6 @@ export function reportContentTextErrors(wikiData, {
     }],
 
     ['flashActData', {
-      jump: '_content',
       listTerminology: '_content',
     }],
 
