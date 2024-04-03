@@ -2,6 +2,7 @@ export default {
   contentDependencies: [
     'generateAlbumSidebarGroupBox',
     'generateAlbumSidebarTrackSection',
+    'generatePageSidebar',
     'linkAlbum',
   ],
 
@@ -9,6 +10,9 @@ export default {
 
   relations(relation, album, track) {
     const relations = {};
+
+    relations.sidebar =
+      relation('generatePageSidebar');
 
     relations.albumLink =
       relation('linkAlbum', album);
@@ -29,34 +33,27 @@ export default {
   },
 
   generate(data, relations, {html}) {
-    const trackListBox = {
-      class: 'track-list-sidebar-box',
-      content:
-        html.tags([
-          html.tag('h1', relations.albumLink),
-          relations.trackSections,
-        ]),
-    };
+    const multipleContents = [];
+    const multipleAttributes = [];
+
+    multipleAttributes.push({class: 'track-list-sidebar-box'});
+    multipleContents.push(
+      html.tags([
+        html.tag('h1', relations.albumLink),
+        relations.trackSections,
+      ]));
 
     if (data.isAlbumPage) {
-      const groupBoxes =
+      multipleAttributes.push(...
         relations.groupBoxes
-          .map(content => ({
-            class: 'individual-group-sidebar-box',
-            content: content.slot('mode', 'album'),
-          }));
+          .map(() => ({class: 'individual-group-sidebar-box'})));
 
-      return {
-        leftSidebarMultiple: [
-          ...groupBoxes,
-          trackListBox,
-        ],
-      };
-    }
-
-    const conjoinedGroupBox = {
-      class: 'conjoined-group-sidebar-box',
-      content:
+      multipleContents.push(...
+        relations.groupBoxes
+          .map(content => content.slot('mode', 'album')));
+    } else {
+      multipleAttributes.push({class: 'conjoined-group-sidebar-box'});
+      multipleContents.push(
         relations.groupBoxes
           .flatMap((content, i, {length}) => [
             content.slot('mode', 'track'),
@@ -65,15 +62,13 @@ export default {
                 style: `border-color: var(--primary-color); border-style: none none dotted none`
               }),
           ])
-          .filter(Boolean),
-    };
+          .filter(Boolean));
+    }
 
-    return {
-      // leftSidebarStickyMode: 'column',
-      leftSidebarMultiple: [
-        trackListBox,
-        conjoinedGroupBox,
-      ],
-    };
+    return relations.sidebar.slots({
+      // stickyMode: 'column',
+      multipleContents,
+      multipleAttributes,
+    });
   },
 };

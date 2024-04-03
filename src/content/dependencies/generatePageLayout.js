@@ -144,6 +144,16 @@ export default {
 
     // Sidebars
 
+    leftSidebar: {
+      type: 'html',
+      mutable: true,
+    },
+
+    rightSidebar: {
+      type: 'html',
+      mutable: true,
+    },
+
     ...legacySidebarSlots('leftSidebar'),
     ...legacySidebarSlots('rightSidebar'),
 
@@ -425,8 +435,21 @@ export default {
         wide: slots[side + 'Wide'],
       });
 
-    const leftSidebar = applyLegacySidebarSlots('leftSidebar', 'sidebar-left');
-    const rightSidebar = applyLegacySidebarSlots('rightSidebar', 'sidebar-right');
+    const applyUpdatedSidebar = (side, id) =>
+      slots[side].slots({
+        attributes:
+          slots[side]
+            .getSlotValue('attributes')
+            .with({id}),
+      });
+
+    const getSidebar = (side, id) =>
+      (html.isBlank(slots[side])
+        ? applyLegacySidebarSlots(side, id)
+        : applyUpdatedSidebar(side, id));
+
+    const leftSidebar = getSidebar('leftSidebar', 'sidebar-left');
+    const rightSidebar = getSidebar('rightSidebar', 'sidebar-right');
 
     const hasSidebarLeft = !html.isBlank(html.resolve(leftSidebar));
     const hasSidebarRight = !html.isBlank(html.resolve(rightSidebar));

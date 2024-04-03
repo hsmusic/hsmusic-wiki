@@ -265,7 +265,7 @@ export default {
 
         secondaryNav: relations.secondaryNav,
 
-        ...relations.sidebar,
+        leftSidebar: relations.sidebar,
 
         socialEmbed: relations.socialEmbed,
       });

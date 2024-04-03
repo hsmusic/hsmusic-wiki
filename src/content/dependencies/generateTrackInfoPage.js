@@ -595,7 +595,7 @@ export default {
             ],
           }),
 
-        ...relations.sidebar,
+        leftSidebar: relations.sidebar,
 
         socialEmbed: relations.socialEmbed,
       });
