@@ -12,7 +12,7 @@ export default templateCompositeFrom({
   compose: false,
 
   inputs: {
-    value: input.staticValue(),
+    value: input.staticValue({acceptsNull: true}),
   },
 
   steps: () => [
