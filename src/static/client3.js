@@ -1337,7 +1337,25 @@ function handleTooltipHoverableTouchEnded(hoverable, domEvent) {
 
   // Don't proceed if this hoverable's tooltip is already visible - in that
   // case touching the hoverable again should behave just like a normal click.
-  if (state.currentlyShownTooltip === tooltip) return;
+  if (state.currentlyShownTooltip === tooltip) {
+    // If the hoverable was *recently* touched - meaning that this is a second
+    // touchend in short succession - then just letting the click come through
+    // naturally would (depending on timing) not actually navigate anywhere,
+    // because we've deliberately banished the *first* touch from navigation.
+    // We do want the second touch to navigate, so clear that recently-touched
+    // state, allowing this touch's click to behave as normal.
+    if (state.hoverableWasRecentlyTouched) {
+      clearTimeout(state.touchTimeout);
+      state.touchTimeout = null;
+      state.hoverableWasRecentlyTouched = false;
+    }
+
+    // Otherwise, this is just a second touch after enough time has passed
+    // that the one which showed the tooltip is no longer "recent", and we're
+    // not in any special state. The link will navigate to its page just like
+    // normal.
+    return;
+  }
 
   const touches = Array.from(domEvent.changedTouches);
   const identifiers = touches.map(touch => touch.identifier);
@@ -1379,8 +1397,9 @@ function handleTooltipHoverableTouchEnded(hoverable, domEvent) {
   state.hoverableWasRecentlyTouched = true;
   state.touchTimeout =
     setTimeout(() => {
+      state.touchTimeout = null;
       state.hoverableWasRecentlyTouched = false;
-    }, 250);
+    }, 1200);
 }
 
 function handleTooltipHoverableClicked(hoverable) {
