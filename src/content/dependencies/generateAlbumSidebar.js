@@ -28,19 +28,20 @@ export default {
   generate: (data, relations) =>
     relations.sidebar.slots({
       boxes: [
+        data.isAlbumPage &&
+          relations.groupBoxes
+            .map(box => box.slot('mode', 'album')),
+
         relations.trackListBox,
 
-        (data.isAlbumPage
-          ? relations.groupBoxes
-              .map(box => box.slot('mode', 'album'))
-
-          : relations.conjoinedBox.slots({
-              attributes: {class: 'conjoined-group-sidebar-box'},
-              boxes:
-                relations.groupBoxes
-                  .map(box => box.slot('mode', 'track'))
-                  .map(box => box.content), /* TODO: Kludge. */
-            })),
+        !data.isAlbumPage &&
+          relations.conjoinedBox.slots({
+            attributes: {class: 'conjoined-group-sidebar-box'},
+            boxes:
+              relations.groupBoxes
+                .map(box => box.slot('mode', 'track'))
+                .map(box => box.content), /* TODO: Kludge. */
+          }),
       ],
     }),
 };
