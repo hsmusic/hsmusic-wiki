@@ -1,41 +1,10 @@
 import {openAggregate} from '#aggregate';
 import {empty} from '#sugar';
 
-function legacySidebarSlots(side) {
-  return {
-    [side + 'Content']: {
-      type: 'html',
-      mutable: false,
-    },
-
-    [side + 'Class']: {type: 'string'},
-
-    [side + 'Multiple']: {
-      validate: v =>
-        v.sparseArrayOf(
-          v.validateProperties({
-            class: v.optional(v.isString),
-            content: v.isHTML,
-          })),
-    },
-
-    [side + 'StickyMode']: {
-      validate: v => v.is('last', 'column', 'static'),
-      default: 'static',
-    },
-
-    [side + 'Collapse']: {type: 'boolean', default: true},
-
-    [side + 'Wide']: {type: 'boolean', defualt: false},
-  };
-}
-
 export default {
   contentDependencies: [
     'generateColorStyleRules',
     'generateFooterLocalizationLinks',
-    'generatePageSidebar',
-    'generatePageSidebarBox',
     'generateStickyHeadingContainer',
     'transformContent',
   ],
@@ -73,12 +42,6 @@ export default {
 
     relations.stickyHeadingContainer =
       relation('generateStickyHeadingContainer');
-
-    relations.sidebar =
-      relation('generatePageSidebar');
-
-    relations.sidebarBox =
-      relation('generatePageSidebarBox');
 
     if (sprawl.footerContent) {
       relations.defaultFooterContent =
@@ -154,9 +117,6 @@ export default {
       type: 'html',
       mutable: true,
     },
-
-    ...legacySidebarSlots('leftSidebar'),
-    ...legacySidebarSlots('rightSidebar'),
 
     // Banner
 
@@ -409,44 +369,15 @@ export default {
             slots.navContent),
         ]);
 
-    const applyLegacySidebarSlots = (side, id) =>
-      relations.sidebar.clone().slots({
-        content: slots[side + 'Content'],
-
-        attributes: [
-          {id},
-          slots[side + 'Class'] &&
-            {class: slots[side + 'Class']},
-        ],
-
-        boxes:
-          (slots[side + 'Multiple']
-            ? slots[side + 'Multiple'].map(box =>
-                relations.sidebarBox
-                  .clone()
-                  .slots({
-                    content: box.content,
-                    attributes: {class: box.class},
-                  }))
-            : null),
-
-        stickyMode: slots[side + 'StickyMode'],
-        collapse: slots[side + 'Collapse'],
-        wide: slots[side + 'Wide'],
-      });
-
-    const applyUpdatedSidebar = (side, id) =>
-      slots[side].slots({
-        attributes:
-          slots[side]
-            .getSlotValue('attributes')
-            .with({id}),
-      });
-
     const getSidebar = (side, id) =>
       (html.isBlank(slots[side])
-        ? applyLegacySidebarSlots(side, id)
-        : applyUpdatedSidebar(side, id));
+        ? null
+        : slots[side].slots({
+            attributes:
+              slots[side]
+                .getSlotValue('attributes')
+                .with({id}),
+          }));
 
     const leftSidebar = getSidebar('leftSidebar', 'sidebar-left');
     const rightSidebar = getSidebar('rightSidebar', 'sidebar-right');
@@ -454,7 +385,13 @@ export default {
     const hasSidebarLeft = !html.isBlank(html.resolve(leftSidebar));
     const hasSidebarRight = !html.isBlank(html.resolve(rightSidebar));
 
-    const collapseSidebars = slots.leftSidebarCollapse && slots.rightSidebarCollapse;
+    const collapseSidebars =
+      (leftSidebar
+        ? leftSidebar.getSlotValue('collapse')
+        : true) &&
+      (rightSidebar
+        ? rightSidebar.getSlotValue('collapse')
+        : true);
 
     const hasID = (() => {
       // Hilariously jank. Sorry!
