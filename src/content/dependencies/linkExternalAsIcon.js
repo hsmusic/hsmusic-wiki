@@ -43,7 +43,9 @@ export default {
 
         slots.withText &&
           html.tag('span', {class: 'icon-text'},
-            handleText ?? platformText),
+            (html.isBlank(handleText)
+              ? platformText
+              : handleText)),
       ]);
   },
 };
