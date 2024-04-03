@@ -1,5 +1,4 @@
-import find from '#find';
-import {filterMultipleArrays, stitchArrays} from '#sugar';
+import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: ['linkFlash', 'linkFlashAct', 'linkFlashIndex'],
@@ -7,67 +6,20 @@ export default {
 
   // So help me Gog, the flash sidebar is heavily hard-coded.
 
-  sprawl: ({flashActData}) => ({flashActData}),
+  sprawl: ({flashActData, flashSideData}) => ({flashActData, flashSideData}),
 
   query(sprawl, act, flash) {
-    const findFlashAct = directory =>
-      find.flashAct(directory, sprawl.flashActData, {mode: 'quiet'});
+    const sideNames =
+      sprawl.flashSideData
+        .map(side => side.name);
 
-    const homestuckSide1 = findFlashAct('flash-act:a1');
-
-    const sideFirstActs = [
-      sprawl.flashActData[0],
-      findFlashAct('flash-act:a6a1'),
-      findFlashAct('flash-act:hiveswap'),
-      findFlashAct('flash-act:cool-and-new-web-comic'),
-      findFlashAct('flash-act:sunday-night-strifin'),
-    ];
-
-    const sideNames = [
-      (homestuckSide1
-        ? `Side 1 (Acts 1-5)`
-        : `All flashes & games`),
-      `Side 2 (Acts 6-7)`,
-      `Additional Canon`,
-      `Fan Adventures`,
-      `Fan Games & More`,
-    ];
-
-    const sideColors = [
-      (homestuckSide1
-        ? '#4ac925'
-        : null),
-      '#3796c6',
-      '#f2a400',
-      '#c466ff',
-      '#32c7fe',
-    ];
-
-    filterMultipleArrays(sideFirstActs, sideNames, sideColors,
-      firstAct => firstAct);
-
-    const sideFirstActIndexes =
-      sideFirstActs
-        .map(act => sprawl.flashActData.indexOf(act));
-
-    const actSideIndexes =
-      sprawl.flashActData
-        .map((act, actIndex) => actIndex)
-        .map(actIndex =>
-          sideFirstActIndexes
-            .findIndex((firstActIndex, i) =>
-              i === sideFirstActs.length - 1 ||
-                firstActIndex <= actIndex &&
-                sideFirstActIndexes[i + 1] > actIndex));
+    const sideColors =
+      sprawl.flashSideData
+        .map(side => side.color);
 
     const sideActs =
-      sideNames
-        .map((name, sideIndex) =>
-          stitchArrays({
-            act: sprawl.flashActData,
-            actSideIndex: actSideIndexes,
-          }).filter(({actSideIndex}) => actSideIndex === sideIndex)
-            .map(({act}) => act));
+      sprawl.flashSideData
+        .map(side => side.acts);
 
     const currentActFlashes =
       act.flashes;
@@ -76,7 +28,7 @@ export default {
       currentActFlashes.indexOf(flash);
 
     const currentSideIndex =
-      actSideIndexes[sprawl.flashActData.indexOf(act)];
+      sideActs.findIndex(acts => acts.includes(act));
 
     const currentSideActs =
       sideActs[currentSideIndex];
