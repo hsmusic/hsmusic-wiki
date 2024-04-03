@@ -2,6 +2,7 @@ export const FLASH_DATA_FILE = 'flashes.yaml';
 
 import {input} from '#composite';
 import find from '#find';
+import {empty} from '#sugar';
 import {sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
 import {anyOf, isColor, isContentString, isDirectory, isNumber, isString}
@@ -308,15 +309,22 @@ export class FlashSide extends Thing {
         : Flash),
 
     save(results) {
-      let thing;
-      for (let index = 0; thing = results[index]; index++) {
-        if (index === 0 && !(thing instanceof FlashSide)) {
-          throw new Error(`Expected a side at top of flash data file`);
-        }
+      // JavaScript likes you.
 
-        // JavaScript likes you.
+      if (!empty(results) && !(results[0] instanceof FlashSide)) {
+        throw new Error(`Expected a side at top of flash data file`);
+      }
+
+      let index = 0;
+      let thing;
+      for (; thing = results[index]; index++) {
         const flashSide = thing;
         const flashActRefs = [];
+
+        if (results[index + 1] instanceof Flash) {
+          throw new Error(`Expected an act to immediately follow a side`);
+        }
+
         for (
           index++;
           (thing = results[index]) && thing instanceof FlashAct;
