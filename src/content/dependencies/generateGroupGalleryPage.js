@@ -178,10 +178,12 @@ export default {
             }),
         ],
 
-        ...
-          relations.sidebar
-            ?.slot('currentExtra', 'gallery')
-            ?.content,
+        leftSidebar:
+          (relations.sidebar
+            ? relations.sidebar
+                .slot('currentExtra', 'gallery')
+                .content /* TODO: Kludge. */
+            : null),
 
         navLinkStyle: 'hierarchical',
         navLinks:

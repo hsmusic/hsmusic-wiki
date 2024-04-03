@@ -1,18 +1,21 @@
 export default {
-  contentDependencies: ['generateGroupSidebarCategoryDetails'],
+  contentDependencies: [
+    'generateGroupSidebarCategoryDetails',
+    'generatePageSidebar',
+  ],
+
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl({groupCategoryData}) {
-    return {groupCategoryData};
-  },
+  sprawl: ({groupCategoryData}) => ({groupCategoryData}),
 
-  relations(relation, sprawl, group) {
-    return {
-      categoryDetails:
-        sprawl.groupCategoryData.map(category =>
-          relation('generateGroupSidebarCategoryDetails', category, group)),
-    };
-  },
+  relations: (relation, sprawl, group) => ({
+    sidebar:
+      relation('generatePageSidebar'),
+
+    categoryDetails:
+      sprawl.groupCategoryData.map(category =>
+        relation('generateGroupSidebarCategoryDetails', category, group)),
+  }),
 
   slots: {
     currentExtra: {
@@ -20,10 +23,11 @@ export default {
     },
   },
 
-  generate(relations, slots, {html, language}) {
-    return {
-      leftSidebarClass: 'category-map-sidebar-box',
-      leftSidebarContent: [
+  generate: (relations, slots, {html, language}) =>
+    relations.sidebar.slots({
+      attributes: {class: 'category-map-sidebar-box'},
+
+      content: [
         html.tag('h1',
           language.$('groupSidebar.title')),
 
@@ -31,6 +35,5 @@ export default {
           .map(details =>
             details.slot('currentExtra', slots.currentExtra)),
       ],
-    };
-  },
+    }),
 };

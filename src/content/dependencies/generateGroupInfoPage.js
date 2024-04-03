@@ -207,7 +207,11 @@ export default {
           ],
         ],
 
-        ...relations.sidebar?.content ?? {},
+        leftSidebar:
+          (relations.sidebar
+            ? relations.sidebar
+                .content /* TODO: Kludge. */
+            : null),
 
         navLinkStyle: 'hierarchical',
         navLinks: relations.navLinks.content,
