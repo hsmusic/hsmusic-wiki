@@ -4,12 +4,18 @@ import {input} from '#composite';
 import find from '#find';
 import {sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
-import {anyOf, isColor, isDirectory, isNumber, isString} from '#validators';
+import {anyOf, isColor, isContentString, isDirectory, isNumber, isString}
+  from '#validators';
 import {parseDate, parseContributors} from '#yaml';
 
-import {exposeDependency, exposeUpdateValueOrContinue}
-  from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
+
+import {
+  exposeConstant,
+  exposeDependency,
+  exposeDependencyOrContinue,
+  exposeUpdateValueOrContinue,
+} from '#composite/control-flow';
 
 import {
   color,
@@ -179,7 +185,27 @@ export class FlashAct extends Thing {
     name: name('Unnamed Flash Act'),
     directory: directory(),
     color: color(),
-    listTerminology: contentString(),
+
+    listTerminology: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isContentString),
+      }),
+
+      withFlashSide(),
+
+      withPropertyFromObject({
+        object: '#flashSide',
+        property: input.value('listTerminology'),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#flashSide.listTerminology',
+      }),
+
+      exposeConstant({
+        value: input.value(null),
+      }),
+    ],
 
     flashes: referenceList({
       class: input.value(Flash),
@@ -235,6 +261,7 @@ export class FlashSide extends Thing {
     name: name('Unnamed Flash Side'),
     directory: directory(),
     color: color(),
+    listTerminology: contentString(),
 
     acts: referenceList({
       class: input.value(FlashAct),
@@ -254,6 +281,7 @@ export class FlashSide extends Thing {
       'Side': {property: 'name'},
       'Directory': {property: 'directory'},
       'Color': {property: 'color'},
+      'List Terminology': {property: 'listTerminology'},
     },
   };
 

@@ -488,6 +488,10 @@ export function reportContentTextErrors(wikiData, {
       listTerminology: '_content',
     }],
 
+    ['flashSideData', {
+      listTerminology: '_content',
+    }],
+
     ['groupData', {
       description: '_content',
     }],
