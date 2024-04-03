@@ -1,59 +1,26 @@
 // Gets the track's album. This will early exit if albumData is missing.
-// By default, if there's no album whose list of tracks includes this track,
-// the output dependency will be null; set {notFoundMode: 'exit'} to early
-// exit instead.
+// If there's no album whose list of tracks includes this track, the output
+// dependency will be null.
 //
 // This step models with Flash.withFlashAct.
 
 import {input, templateCompositeFrom} from '#composite';
 import {is} from '#validators';
 
-import {exitWithoutDependency, withResultOfAvailabilityCheck}
+import {exitWithoutDependency, raiseOutputWithoutDependency}
   from '#composite/control-flow';
 import {withPropertyFromList} from '#composite/data';
 
 export default templateCompositeFrom({
   annotation: `withAlbum`,
 
-  inputs: {
-    notFoundMode: input({
-      validate: is('exit', 'null'),
-      defaultValue: 'null',
-    }),
-  },
-
   outputs: ['#album'],
 
   steps: () => [
-    // null albumData is always an early exit.
-
     exitWithoutDependency({
       dependency: 'albumData',
       mode: input.value('null'),
     }),
-
-    // empty albumData conditionally exits early or outputs null.
-
-    withResultOfAvailabilityCheck({
-      from: 'albumData',
-      mode: input.value('empty'),
-    }).outputs({
-      '#availability': '#albumDataAvailability',
-    }),
-
-    {
-      dependencies: [input('notFoundMode'), '#albumDataAvailability'],
-      compute(continuation, {
-        [input('notFoundMode')]: notFoundMode,
-        ['#albumDataAvailability']: albumDataIsAvailable,
-      }) {
-        if (albumDataIsAvailable) return continuation();
-        switch (notFoundMode) {
-          case 'exit': return continuation.exit(null);
-          case 'null': return continuation.raiseOutput({'#album': null});
-        }
-      },
-    },
 
     withPropertyFromList({
       list: 'albumData',
@@ -71,28 +38,11 @@ export default templateCompositeFrom({
       }),
     },
 
-    // album not found conditionally exits or outputs null.
-
-    withResultOfAvailabilityCheck({
-      from: '#albumIndex',
+    raiseOutputWithoutDependency({
+      dependency: '#albumIndex',
       mode: input.value('index'),
-    }).outputs({
-      '#availability': '#albumAvailability',
+      output: input.value({'#album': null}),
     }),
-
-    {
-      dependencies: [input('notFoundMode'), '#albumAvailability'],
-      compute(continuation, {
-        [input('notFoundMode')]: notFoundMode,
-        ['#albumAvailability']: albumIsAvailable,
-      }) {
-        if (albumIsAvailable) return continuation();
-        switch (notFoundMode) {
-          case 'exit': return continuation.exit(null);
-          case 'null': return continuation.raiseOutput({'#album': null});
-        }
-      },
-    },
 
     {
       dependencies: ['albumData', '#albumIndex'],

@@ -1,7 +1,5 @@
 // Gets a single property from this track's album, providing it as the same
-// property name prefixed with '#album.' (by default). If the track's album
-// isn't available, then by default, the property will be provided as null;
-// set {notFoundMode: 'exit'} to early exit instead.
+// property name prefixed with '#album.' (by default).
 
 import {input, templateCompositeFrom} from '#composite';
 import {is} from '#validators';
@@ -15,11 +13,6 @@ export default templateCompositeFrom({
 
   inputs: {
     property: input.staticValue({type: 'string'}),
-
-    notFoundMode: input({
-      validate: is('exit', 'null'),
-      defaultValue: 'null',
-    }),
   },
 
   outputs: ({
@@ -27,9 +20,7 @@ export default templateCompositeFrom({
   }) => ['#album.' + property],
 
   steps: () => [
-    withAlbum({
-      notFoundMode: input('notFoundMode'),
-    }),
+    withAlbum(),
 
     withPropertyFromObject({
       object: '#album',

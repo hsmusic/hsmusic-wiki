@@ -40,7 +40,7 @@ t.test(`withAlbum: basic behavior`, t => {
     null);
 });
 
-t.test(`withAlbum: early exit conditions (notFoundMode: null)`, t => {
+t.test(`withAlbum: early exit conditions`, t => {
   t.plan(4);
 
   const composite = compositeFrom({
@@ -80,59 +80,6 @@ t.test(`withAlbum: early exit conditions (notFoundMode: null)`, t => {
     }),
     'bimbam',
     `does not early exit if albumData is empty array`);
-
-  t.equal(
-    composite.expose.compute({
-      albumData: null,
-      this: fakeTrack1,
-    }),
-    null,
-    `early exits if albumData is null`);
-});
-
-t.test(`withAlbum: early exit conditions (notFoundMode: exit)`, t => {
-  t.plan(4);
-
-  const composite = compositeFrom({
-    compose: false,
-    steps: [
-      withAlbum({
-        notFoundMode: input.value('exit'),
-      }),
-
-      exposeConstant({
-        value: input.value('bimbam'),
-      }),
-    ],
-  });
-
-  const fakeTrack1 = {directory: 'foo'};
-  const fakeTrack2 = {directory: 'bar'};
-  const fakeAlbum = {directory: 'baz', tracks: [fakeTrack1]};
-
-  t.equal(
-    composite.expose.compute({
-      albumData: [fakeAlbum],
-      this: fakeTrack1,
-    }),
-    'bimbam',
-    `does not early exit if albumData is present and contains the track`);
-
-  t.equal(
-    composite.expose.compute({
-      albumData: [fakeAlbum],
-      this: fakeTrack2,
-    }),
-    null,
-    `early exits if albumData is present and does not contain the track`);
-
-  t.equal(
-    composite.expose.compute({
-      albumData: [],
-      this: fakeTrack1,
-    }),
-    null,
-    `early exits if albumData is empty array`);
 
   t.equal(
     composite.expose.compute({
