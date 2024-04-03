@@ -2,12 +2,13 @@ import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateColorStyleAttribute',
     'generatePageSidebarBox',
     'linkFlashAct',
     'linkFlashIndex',
   ],
 
-  extraDependencies: ['getColors', 'html', 'wikiData'],
+  extraDependencies: ['html', 'wikiData'],
 
   sprawl: ({flashSideData}) => ({flashSideData}),
 
@@ -17,6 +18,10 @@ export default {
 
     flashIndexLink:
       relation('linkFlashIndex'),
+
+    sideColorStyles:
+      sprawl.flashSideData
+        .map(side => relation('generateColorStyleAttribute', side.color)),
 
     sideActLinks:
       sprawl.flashSideData
@@ -32,10 +37,6 @@ export default {
       sprawl.flashSideData
         .map(side => side.name),
 
-    sideColors:
-      sprawl.flashSideData
-        .map(side => side.color),
-
     currentSideIndex:
       sprawl.flashSideData.indexOf(act.side),
 
@@ -43,7 +44,7 @@ export default {
       act.side.acts.indexOf(act),
   }),
 
-  generate: (data, relations, {getColors, html}) =>
+  generate: (data, relations, {html}) =>
     relations.box.slots({
       attributes: {class: 'flash-act-map-sidebar-box'},
 
@@ -52,9 +53,9 @@ export default {
 
         stitchArrays({
           sideName: data.sideNames,
-          sideColor: data.sideColors,
+          sideColorStyle: relations.sideColorStyles,
           actLinks: relations.sideActLinks,
-        }).map(({sideName, sideColor, actLinks}, sideIndex) =>
+        }).map(({sideName, sideColorStyle, actLinks}, sideIndex) =>
             html.tag('details',
               sideIndex === data.currentSideIndex &&
                 {class: 'current'},
@@ -63,8 +64,7 @@ export default {
               sideIndex === data.currentSideIndex &&
                 {open: true},
 
-              sideColor &&
-                {style: `--primary-color: ${getColors(sideColor).primary}`},
+              sideColorStyle.slot('context', 'primary-only'),
 
               [
                 html.tag('summary',
