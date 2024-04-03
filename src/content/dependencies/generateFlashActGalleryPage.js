@@ -85,7 +85,7 @@ export default {
 
       navBottomRowContent: relations.flashActNavAccent,
 
-      ...relations.sidebar,
+      leftSidebar: relations.sidebar,
     });
   },
 };

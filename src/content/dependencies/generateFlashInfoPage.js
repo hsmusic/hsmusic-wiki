@@ -169,7 +169,7 @@ export default {
 
       navBottomRowContent: sec.nav.flashNavAccent,
 
-      ...relations.sidebar,
+      leftSidebar: relations.sidebar,
     });
   },
 };

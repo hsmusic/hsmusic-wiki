@@ -1,7 +1,14 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['linkFlash', 'linkFlashAct', 'linkFlashIndex'],
+  contentDependencies: [
+    'generatePageSidebar',
+    'generatePageSidebarBox',
+    'linkFlash',
+    'linkFlashAct',
+    'linkFlashIndex',
+  ],
+
   extraDependencies: ['getColors', 'html', 'language', 'wikiData'],
 
   sprawl: ({flashActData, flashSideData}) => ({flashActData, flashSideData}),
@@ -53,6 +60,15 @@ export default {
   },
 
   relations: (relation, query, sprawl, act, _flash) => ({
+    sidebar:
+      relation('generatePageSidebar'),
+
+    currentActBox:
+      relation('generatePageSidebarBox'),
+
+    sideMapBox:
+      relation('generatePageSidebarBox'),
+
     currentActLink:
       relation('linkFlashAct', act),
 
@@ -144,21 +160,23 @@ export default {
             ])),
     ]);
 
-    const sideMapBox = {
-      class: 'flash-act-map-sidebar-box',
-      content: sideMapBoxContent,
-    };
+    const sideMapBox =
+      relations.sideMapBox.slots({
+        attributes: {class: 'flash-act-map-sidebar-box'},
+        content: sideMapBoxContent,
+      });
 
-    const currentActBox = {
-      class: 'flash-current-act-sidebar-box',
-      content: currentActBoxContent,
-    };
+    const currentActBox =
+      relations.currentActBox.slots({
+        attributes: {class: 'flash-current-act-sidebar-box'},
+        content: currentActBoxContent,
+      });
 
-    return {
-      leftSidebarMultiple:
+    return relations.sidebar.slots({
+      boxes:
         (data.isFlashActPage
           ? [sideMapBox, currentActBox]
           : [currentActBox, sideMapBox]),
-    };
+    });
   },
 };
