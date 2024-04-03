@@ -20,7 +20,7 @@ export default {
 
     const jumpActs =
       flashActs
-        .filter(act => act.jump);
+        .filter(act => act.side.acts.indexOf(act) === 0);
 
     return {flashActs, jumpActs};
   },
@@ -31,7 +31,7 @@ export default {
 
     jumpLinkColorStyles:
       query.jumpActs
-        .map(act => relation('generateColorStyleAttribute', act.jumpColor)),
+        .map(act => relation('generateColorStyleAttribute', act.side.color)),
 
     actColorStyles:
       query.flashActs
@@ -63,7 +63,7 @@ export default {
 
     jumpLinkLabels:
       query.jumpActs
-        .map(act => act.jump),
+        .map(act => act.side.name),
 
     actAnchors:
       query.flashActs
