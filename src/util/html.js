@@ -994,6 +994,12 @@ export class Attributes {
     }
   }
 
+  with(...args) {
+    const clone = this.clone();
+    clone.add(...args);
+    return clone;
+  }
+
   #addMultipleAttributes(attributes) {
     const flatInputAttributes =
       [attributes].flat(Infinity).filter(Boolean);
