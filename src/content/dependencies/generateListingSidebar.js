@@ -1,21 +1,29 @@
 export default {
-  contentDependencies: ['generateListingIndexList', 'linkListingIndex'],
+  contentDependencies: [
+    'generateListingIndexList',
+    'generatePageSidebar',
+    'linkListingIndex',
+  ],
+
   extraDependencies: ['html'],
 
-  relations(relation, currentListing) {
-    return {
-      listingIndexLink: relation('linkListingIndex'),
-      listingIndexList: relation('generateListingIndexList', currentListing),
-    };
-  },
+  relations: (relation, currentListing) => ({
+    sidebar:
+      relation('generatePageSidebar'),
 
-  generate(relations, {html}) {
-    return {
-      leftSidebarClass: 'listing-map-sidebar-box',
-      leftSidebarContent: [
+    listingIndexLink:
+      relation('linkListingIndex'),
+
+    listingIndexList:
+      relation('generateListingIndexList', currentListing),
+  }),
+
+  generate: (relations, {html}) =>
+    relations.sidebar.slots({
+      attributes: {class: 'listing-map-sidebar-box'},
+      content: [
         html.tag('h1', relations.listingIndexLink),
         relations.listingIndexList.slot('mode', 'sidebar'),
       ],
-    };
-  },
+    }),
 };

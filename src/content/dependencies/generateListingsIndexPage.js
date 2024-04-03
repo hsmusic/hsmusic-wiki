@@ -83,7 +83,7 @@ export default {
         {auto: 'current'},
       ],
 
-      ...relations.sidebar,
+      leftSidebar: relations.sidebar,
     });
   },
 };
