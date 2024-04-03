@@ -6,20 +6,26 @@
  */
 'use strict'
 exports[`test/snapshot/generateAlbumSidebarGroupBox.js > TAP > generateAlbumSidebarGroupBox (snapshot) > basic behavior, mode: album 1`] = `
-<h1><a href="group/vcg/">VCG</a></h1>
-Very cool group.
-<p>Visit on <a href="https://vcg.bandcamp.com/" class="nowrap">Bandcamp</a> or <a href="https://youtube.com/@vcg" class="nowrap">YouTube</a>.</p>
-<p class="group-chronology-link">Next: <a href="album/last/">Last</a></p>
-<p class="group-chronology-link">Previous: <a href="album/first/">First</a></p>
+<div class="sidebar individual-group-sidebar-box">
+    <h1><a href="group/vcg/">VCG</a></h1>
+    Very cool group.
+    <p>Visit on <a class="external-link" href="https://vcg.bandcamp.com/">Bandcamp</a> or <a class="external-link" href="https://youtube.com/@vcg">YouTube</a>.</p>
+    <p class="group-chronology-link">Next: <a href="album/last/">Last</a></p>
+    <p class="group-chronology-link">Previous: <a href="album/first/">First</a></p>
+</div>
 `
 
 exports[`test/snapshot/generateAlbumSidebarGroupBox.js > TAP > generateAlbumSidebarGroupBox (snapshot) > basic behavior, mode: track 1`] = `
-<h1><a href="group/vcg/">VCG</a></h1>
-<p>Visit on <a href="https://vcg.bandcamp.com/" class="nowrap">Bandcamp</a> or <a href="https://youtube.com/@vcg" class="nowrap">YouTube</a>.</p>
+<div class="sidebar individual-group-sidebar-box">
+    <h1><a href="group/vcg/">VCG</a></h1>
+    <p>Visit on <a class="external-link" href="https://vcg.bandcamp.com/">Bandcamp</a> or <a class="external-link" href="https://youtube.com/@vcg">YouTube</a>.</p>
+</div>
 `
 
 exports[`test/snapshot/generateAlbumSidebarGroupBox.js > TAP > generateAlbumSidebarGroupBox (snapshot) > dateless album in mixed group 1`] = `
-<h1><a href="group/vcg/">VCG</a></h1>
-Very cool group.
-<p>Visit on <a href="https://vcg.bandcamp.com/" class="nowrap">Bandcamp</a> or <a href="https://youtube.com/@vcg" class="nowrap">YouTube</a>.</p>
+<div class="sidebar individual-group-sidebar-box">
+    <h1><a href="group/vcg/">VCG</a></h1>
+    Very cool group.
+    <p>Visit on <a class="external-link" href="https://vcg.bandcamp.com/">Bandcamp</a> or <a class="external-link" href="https://youtube.com/@vcg">YouTube</a>.</p>
+</div>
 `

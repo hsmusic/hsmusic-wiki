@@ -11,6 +11,8 @@ testContentFunctions(t, 'generateAlbumSidebarGroupBox (snapshot)', async (t, eva
   let album, group;
 
   album = {
+    name: 'Middle',
+    directory: 'middle',
     date: new Date('2010-04-13'),
   };
 
