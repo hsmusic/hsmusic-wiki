@@ -105,16 +105,10 @@ export class Flash extends Thing {
 
     // Expose only
 
-    act: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['this', 'flashActData'],
-
-        compute: ({this: flash, flashActData}) =>
-          flashActData.find((act) => act.flashes.includes(flash)) ?? null,
-      },
-    },
+    act: [
+      withFlashAct(),
+      exposeDependency({dependency: '#flashAct'}),
+    ],
   });
 
   static [Thing.getSerializeDescriptors] = ({
