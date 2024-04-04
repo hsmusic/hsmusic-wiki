@@ -6,6 +6,7 @@ export default {
     'generateAdditionalFilesListChunk',
     'generateAdditionalFilesListChunkItem',
     'linkAlbumAdditionalFile',
+    'transformContent',
   ],
 
   extraDependencies: ['getSizeOfAdditionalFile', 'html', 'urls'],
@@ -17,6 +18,13 @@ export default {
     chunks:
       additionalFiles
         .map(() => relation('generateAdditionalFilesListChunk')),
+
+    chunkDescriptions:
+      additionalFiles
+        .map(({description}) =>
+          (description
+            ? relation('transformContent', description)
+            : null)),
 
     chunkItems:
       additionalFiles
@@ -38,10 +46,6 @@ export default {
       additionalFiles
         .map(({title}) => title),
 
-    chunkDescriptions:
-      additionalFiles
-        .map(({description}) => description ?? null),
-
     chunkItemLocations:
       additionalFiles
         .map(({files}) => files ?? []),
@@ -56,10 +60,13 @@ export default {
       chunks:
         stitchArrays({
           chunk: relations.chunks,
+          description: relations.chunkDescriptions,
           title: data.chunkTitles,
-          description: data.chunkDescriptions,
         }).map(({chunk, title, description}) =>
-            chunk.slots({title, description})),
+            chunk.slots({
+              title,
+              description: description.slot('mode', 'inline'),
+            })),
 
       chunkItems:
         stitchArrays({
