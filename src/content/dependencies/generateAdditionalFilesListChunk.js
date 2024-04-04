@@ -18,29 +18,28 @@ export default {
   },
 
   generate(slots, {html, language}) {
-    const titleParts = ['releaseInfo.additionalFiles.entry'];
-    const titleOptions = {
-      title:
-        html.tag('span', {class: 'group-name'},
-          slots.title),
-    };
-
-    if (!html.isBlank(slots.description)) {
-      titleParts.push('withDescription');
-      titleOptions.description = slots.description;
-    }
-
     const summary =
       html.tag('summary',
         html.tag('span',
-          language.$(...titleParts, titleOptions)));
+          language.$('releaseInfo.additionalFiles.entry', {
+            title:
+              html.tag('span', {class: 'group-name'},
+                slots.title),
+          })));
+
+    const description =
+      html.tag('li', {class: 'entry-description'},
+        {[html.onlyIfContent]: true},
+        slots.description);
+
+    const items =
+      (html.isBlank(slots.items)
+        ? html.tag('li',
+            language.$('releaseInfo.additionalFiles.entry.noFilesAvailable'))
+        : slots.items);
 
     const content =
-      html.tag('ul',
-        (html.isBlank(slots.items)
-          ? html.tag('li',
-              language.$('releaseInfo.additionalFiles.entry.noFilesAvailable'))
-          : slots.items));
+      html.tag('ul', [description, items]);
 
     const details =
       html.tag('details',

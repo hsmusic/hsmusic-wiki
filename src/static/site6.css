@@ -1095,6 +1095,16 @@ li > ul {
   margin-bottom: 10px;
 }
 
+.additional-files-list .entry-description {
+  list-style-type: none;
+  max-width: 540px;
+
+  /* This should be margin-bottom, but cascading rules
+   * cause some awkwardness - `#content li` takes precedence.
+   */
+  padding-bottom: 3px;
+}
+
 .group-contributions-table {
   display: inline-block;
 }

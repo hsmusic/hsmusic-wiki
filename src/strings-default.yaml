@@ -325,7 +325,7 @@ releaseInfo:
 
     entry:
       _: "{TITLE}"
-      withDescription: "{TITLE}: {DESCRIPTION}"
+
       noFilesAvailable: >-
         There are no files available or listed for this entry.
 
