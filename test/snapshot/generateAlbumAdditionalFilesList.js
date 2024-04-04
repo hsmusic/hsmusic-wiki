@@ -23,7 +23,11 @@ testContentFunctions(t, 'generateAlbumAdditionalFilesList (snapshot)', async (t,
         ?.at(1) ?? null,
   };
 
-  await evaluate.load();
+  await evaluate.load({
+    mock: {
+      image: evaluate.stubContentFunction('image'),
+    },
+  });
 
   const album = new Album();
   album.directory = 'exciting-album';
