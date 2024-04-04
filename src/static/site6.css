@@ -957,7 +957,6 @@ ul.quick-info li:not(:last-child)::after {
 }
 
 li .by {
-  display: inline-block;
   font-style: oblique;
   max-width: 600px;
 }

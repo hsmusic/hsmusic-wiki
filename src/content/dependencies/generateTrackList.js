@@ -44,15 +44,16 @@ export default {
                     track: trackLink,
                     by:
                       html.tag('span', {class: 'by'},
-                        language.$('trackList.item.withArtists.by', {
-                          artists:
-                            language.formatConjunctionList(
-                              contributionLinks.map(link =>
-                                link.slots({
-                                  showContribution: slots.showContribution,
-                                  showIcons: slots.showIcons,
-                                }))),
-                        })),
+                        html.metatag('chunkwrap', {split: ','},
+                          language.$('trackList.item.withArtists.by', {
+                            artists:
+                              language.formatConjunctionList(
+                                contributionLinks.map(link =>
+                                  link.slots({
+                                    showContribution: slots.showContribution,
+                                    showIcons: slots.showIcons,
+                                  }))),
+                          }))),
                   }))))));
   },
 };

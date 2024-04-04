@@ -119,9 +119,11 @@ export default {
       parts.push('withArtists');
       options.by =
         html.tag('span', {class: 'by'},
-          language.$('trackList.item.withArtists.by', {
-            artists: language.formatConjunctionList(relations.contributionLinks),
-          }));
+          html.metatag('chunkwrap', {split: ','},
+            html.resolve(
+              language.$('trackList.item.withArtists.by', {
+                artists: language.formatConjunctionList(relations.contributionLinks),
+              }))));
     }
 
     return html.tag('li',
