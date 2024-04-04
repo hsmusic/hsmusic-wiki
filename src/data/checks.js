@@ -469,6 +469,10 @@ export class ContentNodeError extends Error {
 export function reportContentTextErrors(wikiData, {
   bindFind,
 }) {
+  const additionalFileShape = {
+    description: 'description',
+  };
+
   const commentaryShape = {
     body: 'commentary body',
     artistDisplayText: 'commentary artist display text',
@@ -477,6 +481,7 @@ export function reportContentTextErrors(wikiData, {
 
   const contentTextSpec = [
     ['albumData', {
+      additionalFiles: additionalFileShape,
       commentary: commentaryShape,
     }],
 
@@ -509,8 +514,11 @@ export function reportContentTextErrors(wikiData, {
     }],
 
     ['trackData', {
+      additionalFiles: additionalFileShape,
       commentary: commentaryShape,
       lyrics: '_content',
+      midiProjectFiles: additionalFileShape,
+      sheetMusicFiles: additionalFileShape,
     }],
 
     ['wikiInfo', {
