@@ -65,7 +65,10 @@ export default {
         }).map(({chunk, title, description}) =>
             chunk.slots({
               title,
-              description: description.slot('mode', 'inline'),
+              description:
+                (description
+                  ? description.slot('mode', 'inline')
+                  : null),
             })),
 
       chunkItems:
