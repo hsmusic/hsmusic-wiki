@@ -2,6 +2,7 @@ import {empty} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateCommentarySection',
     'generateContentHeading',
     'generateContributionList',
     'generateFlashActSidebar',
@@ -89,6 +90,13 @@ export default {
         relation('generateContributionList', flash.contributorContribs);
     }
 
+    // Section: Artist commentary
+
+    if (flash.commentary) {
+      sections.artistCommentary =
+        relation('generateCommentarySection', flash.commentary);
+    }
+
     return relations;
   },
 
@@ -136,6 +144,19 @@ export default {
                     .map(link => link.slot('context', 'flash'))),
             })),
 
+        html.tag('p',
+          {[html.onlyIfContent]: true},
+          {[html.joinChildren]: html.tag('br')},
+
+          [
+            sec.artistCommentary &&
+              language.$('releaseInfo.readCommentary', {
+                link: html.tag('a',
+                  {href: '#artist-commentary'},
+                  language.$('releaseInfo.readCommentary.link')),
+              }),
+          ]),
+
         sec.featuredTracks && [
           sec.featuredTracks.heading
             .slots({
@@ -158,6 +179,8 @@ export default {
 
           sec.contributors.list,
         ],
+
+        sec.artistCommentary,
       ],
 
       navLinkStyle: 'hierarchical',
