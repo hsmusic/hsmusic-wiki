@@ -166,6 +166,10 @@ export function filterReferenceErrors(wikiData, {
       commentary: '_commentary',
     }],
 
+    ['flashData', {
+      commentary: '_commentary',
+    }],
+
     ['groupCategoryData', {
       groups: 'group',
     }],
@@ -487,6 +491,10 @@ export function reportContentTextErrors(wikiData, {
 
     ['artistData', {
       contextNotes: '_content',
+    }],
+
+    ['flashData', {
+      commentary: commentaryShape,
     }],
 
     ['flashActData', {

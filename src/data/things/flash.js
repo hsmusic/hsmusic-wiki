@@ -20,6 +20,8 @@ import {
 
 import {
   color,
+  commentary,
+  commentatorArtists,
   contentString,
   contributionList,
   directory,
@@ -97,6 +99,8 @@ export class Flash extends Thing {
 
     urls: urls(),
 
+    commentary: commentary(),
+
     // Update only
 
     artistData: wikiData({
@@ -112,6 +116,8 @@ export class Flash extends Thing {
     }),
 
     // Expose only
+
+    commentatorArtists: commentatorArtists(),
 
     act: [
       withFlashAct(),
@@ -166,10 +172,13 @@ export class Flash extends Thing {
       'Cover Art File Extension': {property: 'coverArtFileExtension'},
 
       'Featured Tracks': {property: 'featuredTracks'},
+
       'Contributors': {
         property: 'contributorContribs',
         transform: parseContributors,
       },
+
+      'Commentary': {property: 'commentary'},
 
       'Review Points': {ignore: true},
     },

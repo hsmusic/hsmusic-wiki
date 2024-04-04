@@ -220,6 +220,11 @@ export class Artist extends Thing {
       data: 'flashData',
       list: input.value('contributorContribs'),
     }),
+
+    flashesAsCommentator: reverseReferenceList({
+      data: 'flashData',
+      list: input.value('commentatorArtists'),
+    }),
   });
 
   static [Thing.getSerializeDescriptors] = ({
