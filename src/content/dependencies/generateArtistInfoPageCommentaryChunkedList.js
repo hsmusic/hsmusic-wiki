@@ -1,5 +1,10 @@
-import {sortAlbumsTracksChronologically, sortEntryThingPairs} from '#sort';
 import {chunkByProperties, stitchArrays} from '#sugar';
+
+import {
+  sortAlbumsTracksChronologically,
+  sortByDate,
+  sortEntryThingPairs,
+} from '#sort';
 
 export default {
   contentDependencies: [
@@ -7,6 +12,8 @@ export default {
     'generateArtistInfoPageChunkItem',
     'generateArtistInfoPageOtherArtistLinks',
     'linkAlbum',
+    'linkFlash',
+    'linkFlashAct',
     'linkTrack',
     'transformContent',
   ],
@@ -14,32 +21,66 @@ export default {
   extraDependencies: ['html', 'language'],
 
   query(artist) {
-    const processEntry = ({thing, entry, type, track, album}) => ({
+    const processEntry = ({
+      thing,
+      entry,
+
+      chunkType,
+      itemType,
+
+      album = null,
+      track = null,
+      flashAct = null,
+      flash = null,
+    }) => ({
       thing: thing,
       entry: {
-        type: type,
-        track: track,
-        album: album,
+        chunkType,
+        itemType,
+
+        album,
+        track,
+        flashAct,
+        flash,
+
         annotation: entry.annotation,
       },
     });
 
-    const processAlbumEntry = ({type, album, entry}) =>
+    const processAlbumEntry = ({thing: album, entry}) =>
       processEntry({
         thing: album,
         entry: entry,
-        type: type,
+
+        chunkType: 'album',
+        itemType: 'album',
+
         album: album,
         track: null,
       });
 
-    const processTrackEntry = ({type, track, entry}) =>
+    const processTrackEntry = ({thing: track, entry}) =>
       processEntry({
         thing: track,
         entry: entry,
-        type: type,
+
+        chunkType: 'album',
+        itemType: 'track',
+
         album: track.album,
         track: track,
+      });
+
+    const processFlashEntry = ({thing: flash, entry}) =>
+      processEntry({
+        thing: flash,
+        entry: entry,
+
+        chunkType: 'flash-act',
+        itemType: 'flash',
+
+        flashAct: flash.act,
+        flash: flash,
       });
 
     const processEntries = ({things, processEntry}) =>
@@ -49,136 +90,180 @@ export default {
             .filter(entry => entry.artists.includes(artist))
             .map(entry => processEntry({thing, entry})));
 
-    const processAlbumEntries = ({type, albums}) =>
+    const processAlbumEntries = ({albums}) =>
       processEntries({
         things: albums,
-        processEntry: ({thing, entry}) =>
-          processAlbumEntry({
-            type: type,
-            album: thing,
-            entry: entry,
-          }),
+        processEntry: processAlbumEntry,
       });
 
-    const processTrackEntries = ({type, tracks}) =>
+    const processTrackEntries = ({tracks}) =>
       processEntries({
         things: tracks,
-        processEntry: ({thing, entry}) =>
-          processTrackEntry({
-            type: type,
-            track: thing,
-            entry: entry,
-          }),
+        processEntry: processTrackEntry,
       });
 
-    const {albumsAsCommentator, tracksAsCommentator} = artist;
-
-    const trackEntries =
-      processTrackEntries({
-        type: 'track',
-        tracks: tracksAsCommentator,
+    const processFlashEntries = ({flashes}) =>
+      processEntries({
+        things: flashes,
+        processEntry: processFlashEntry,
       });
+
+    const {
+      albumsAsCommentator,
+      tracksAsCommentator,
+      flashesAsCommentator,
+    } = artist;
 
     const albumEntries =
       processAlbumEntries({
-        type: 'album',
         albums: albumsAsCommentator,
       });
 
-    const entries = [
-      ...albumEntries,
-      ...trackEntries,
-    ];
+    const trackEntries =
+      processTrackEntries({
+        tracks: tracksAsCommentator,
+      });
 
-    sortEntryThingPairs(entries, sortAlbumsTracksChronologically);
+    const flashEntries =
+      processFlashEntries({
+        flashes: flashesAsCommentator,
+      })
+
+    const albumTrackEntries =
+      sortEntryThingPairs(
+        [...albumEntries, ...trackEntries],
+        sortAlbumsTracksChronologically);
+
+    const allEntries =
+      sortEntryThingPairs(
+        [...albumTrackEntries, ...flashEntries],
+        sortByDate);
 
     const chunks =
       chunkByProperties(
-        entries.map(({entry}) => entry),
-        ['album']);
+        allEntries.map(({entry}) => entry),
+        ['chunkType', 'album', 'flashAct']);
 
     return {chunks};
   },
 
-  relations(relation, query) {
-    return {
-      chunks:
-        query.chunks.map(() => relation('generateArtistInfoPageChunk')),
+  relations: (relation, query) => ({
+    chunks:
+      query.chunks
+        .map(() => relation('generateArtistInfoPageChunk')),
 
-      albumLinks:
-        query.chunks.map(({album}) => relation('linkAlbum', album)),
+    chunkLinks:
+      query.chunks
+        .map(({chunkType, album, flashAct}) =>
+          (chunkType === 'album'
+            ? relation('linkAlbum', album)
+         : chunkType === 'flash-act'
+            ? relation('linkFlashAct', flashAct)
+            : null)),
 
-      items:
-        query.chunks.map(({chunk}) =>
-          chunk.map(() => relation('generateArtistInfoPageChunkItem'))),
+    items:
+      query.chunks
+        .map(({chunk}) => chunk
+          .map(() => relation('generateArtistInfoPageChunkItem'))),
 
-      itemTrackLinks:
-        query.chunks.map(({chunk}) =>
-          chunk.map(({track}) =>
+    itemLinks:
+      query.chunks
+        .map(({chunk}) => chunk
+          .map(({track, flash}) =>
             (track
               ? relation('linkTrack', track)
+           : flash
+              ? relation('linkFlash', flash)
               : null))),
 
-      itemAnnotations:
-        query.chunks.map(({chunk}) =>
-          chunk.map(({annotation}) =>
+    itemAnnotations:
+      query.chunks
+        .map(({chunk}) => chunk
+          .map(({annotation}) =>
             (annotation
               ? relation('transformContent', annotation)
               : null))),
-    };
-  },
+  }),
 
-  data(query) {
-    return {
-      itemTypes:
-        query.chunks.map(({chunk}) =>
-          chunk.map(({type}) => type)),
-    };
-  },
+  data: (query) => ({
+    chunkTypes:
+      query.chunks
+        .map(({chunkType}) => chunkType),
 
-  generate(data, relations, {html, language}) {
-    return html.tag('dl',
+    itemTypes:
+      query.chunks
+        .map(({chunk}) => chunk
+          .map(({itemType}) => itemType)),
+  }),
+
+  generate: (data, relations, {html, language}) =>
+    html.tag('dl',
       stitchArrays({
         chunk: relations.chunks,
-        albumLink: relations.albumLinks,
+        chunkLink: relations.chunkLinks,
+        chunkType: data.chunkTypes,
 
         items: relations.items,
-        itemTrackLinks: relations.itemTrackLinks,
+        itemLinks: relations.itemLinks,
         itemAnnotations: relations.itemAnnotations,
         itemTypes: data.itemTypes,
       }).map(({
           chunk,
-          albumLink,
+          chunkLink,
+          chunkType,
 
           items,
-          itemTrackLinks,
+          itemLinks,
           itemAnnotations,
           itemTypes,
         }) =>
-          chunk.slots({
-            mode: 'album',
-            albumLink,
-            items:
-              stitchArrays({
-                item: items,
-                trackLink: itemTrackLinks,
-                annotation: itemAnnotations,
-                type: itemTypes,
-              }).map(({item, trackLink, annotation, type}) =>
-                item.slots({
-                  annotation:
-                    (annotation
-                      ? annotation.slot('mode', 'inline')
-                      : null),
+          (chunkType === 'album'
+            ? chunk.slots({
+                mode: 'album',
+                albumLink: chunkLink,
+                items:
+                  stitchArrays({
+                    item: items,
+                    link: itemLinks,
+                    annotation: itemAnnotations,
+                    type: itemTypes,
+                  }).map(({item, link, annotation, type}) =>
+                    item.slots({
+                      annotation:
+                        (annotation
+                          ? annotation.slot('mode', 'inline')
+                          : null),
 
-                  content:
-                    (type === 'album'
-                      ? html.tag('i',
-                          language.$('artistPage.creditList.entry.album.commentary'))
-                      : language.$('artistPage.creditList.entry.track', {
-                          track: trackLink,
-                        })),
-                })),
-          })));
-  },
+                      content:
+                        (type === 'album'
+                          ? html.tag('i',
+                              language.$('artistPage.creditList.entry.album.commentary'))
+                          : language.$('artistPage.creditList.entry.track', {
+                              track: link,
+                            })),
+                    })),
+              })
+         : chunkType === 'flash-act'
+            ? chunk.slots({
+                mode: 'flash',
+                flashActLink: chunkLink,
+                items:
+                  stitchArrays({
+                    item: items,
+                    link: itemLinks,
+                    annotation: itemAnnotations,
+                  }).map(({item, link, annotation}) =>
+                    item.slots({
+                      annotation:
+                        (annotation
+                          ? annotation.slot('mode', 'inline')
+                          : null),
+
+                      content:
+                        language.$('artistPage.creditList.entry.flash', {
+                          flash: link,
+                        }),
+                    })),
+              })
+            : null))),
 };
