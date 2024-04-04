@@ -697,7 +697,7 @@ export class Tag {
             if (index === 0) {
               content += chunk;
             } else {
-              const whitespace = chunk.match(/^\s+/);
+              const whitespace = chunk.match(/^\s+/) ?? '';
               content += chunkwrapSplitter;
               content += '</span>';
               content += whitespace;
