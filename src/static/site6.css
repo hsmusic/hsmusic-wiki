@@ -707,16 +707,19 @@ li:not(:first-child:last-child) .tooltip,
 }
 
 .rerelease,
-.other-group-accent {
+.other-group-accent,
+.group-accent {
   opacity: 0.7;
   font-style: oblique;
 }
 
-.other-group-accent {
+.other-group-accent,
+.group-accent {
   white-space: nowrap;
 }
 
-.other-group-accent a {
+.other-group-accent a,
+.group-accent a {
   color: var(--page-primary-color);
 }
 
@@ -1127,6 +1130,16 @@ li > ul {
 .group-contributions-sort-button {
   text-decoration: underline;
   text-decoration-style: dotted;
+}
+
+.guest-track-list dt {
+  display: list-item;
+  padding-left: 0;
+  margin-left: 40px;
+}
+
+.guest-track-list dd li {
+  list-style-type: circle;
 }
 
 html[data-url-key="localized.albumCommentary"] li.no-commentary {

@@ -1146,6 +1146,31 @@ groupInfoPage:
       yearAccent: "({YEAR})"
       otherGroupAccent:  "(from {GROUPS})"
 
+  guestTrackList:
+    title: "Guest Tracks"
+
+    infoLine: >-
+      These "guest tracks" are in albums from other groups.
+
+    chunk:
+      title:
+        _: >-
+          {ALBUM}
+
+        withYear: >-
+          {YEAR_ACCENT} {ALBUM}
+
+        withGroup: >-
+          {ALBUM} {GROUP_ACCENT}
+
+        withYear.withGroups: >-
+          {YEAR_ACCENT} {ALBUM} {GROUP_ACCENT}
+
+        yearAccent: "({YEAR})"
+        groupAccent: "(from {GROUPS})"
+
+      item: "{TRACK}"
+
 #
 # groupGalleryPage:
 #   The group gallery page shows a grid of all the albums from that
