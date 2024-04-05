@@ -2134,6 +2134,11 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   background: var(--deep-ghost-color);
   overflow: hidden;
 
+  box-shadow:
+    0 0 90px 30px #00000060,
+    0 0 20px 10px #00000040,
+    0 0 10px 3px #00000080;
+
   -webkit-backdrop-filter: blur(3px);
           backdrop-filter: blur(3px);
 }
