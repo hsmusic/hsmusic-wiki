@@ -266,12 +266,21 @@ export default {
                     {class: 'pixelate'});
 
               if (link) {
-                // TODO: Would be nice to use an external link component here,
-                // just for the title text (ex. "YouTube (opens in new tab)")
                 content =
                   html.tag('a',
                     {href: link},
                     {target: '_blank'},
+
+                    {title:
+                      language.$('misc.external.opensInNewTab', {
+                        link:
+                          language.formatExternalLink(link, {
+                            style: 'platform',
+                          }),
+
+                        annotation:
+                          language.$('misc.external.opensInNewTab.annotation'),
+                      }).toString()},
 
                     content);
               }
