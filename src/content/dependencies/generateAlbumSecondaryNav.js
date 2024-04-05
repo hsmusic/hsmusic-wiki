@@ -94,6 +94,16 @@ export default {
     return relations;
   },
 
+  data: (query, album, _track) => {
+    const data = {};
+
+    data.groupIsGuest =
+      query.groups
+        .map(group => !album.groups.includes(group));
+
+    return data;
+  },
+
   slots: {
     mode: {
       validate: v => v.is('album', 'track'),
@@ -101,7 +111,7 @@ export default {
     },
   },
 
-  generate(relations, slots, {html, language}) {
+  generate(data, relations, slots, {html, language}) {
     const navLinksShouldShowPreviousNext =
       (slots.mode === 'track'
         ? Array.from(relations.previousNextLinks ?? [], () => false)
@@ -138,12 +148,17 @@ export default {
 
     const navLinkContents =
       stitchArrays({
+        groupIsGuest: data.groupIsGuest,
         groupLink: relations.groupLinks,
         previousNextLinks: navLinkPreviousNextLinks,
-      }).map(({groupLink, previousNextLinks}) => [
-          language.$('albumSidebar.groupBox.title', {
-            group: groupLink,
-          }),
+      }).map(({groupIsGuest, groupLink, previousNextLinks}) => [
+          (groupIsGuest
+            ? language.$('albumSidebar.groupBox.title.guestTrack', {
+                group: groupLink,
+              })
+            : language.$('albumSidebar.groupBox.title', {
+                group: groupLink,
+              })),
 
           previousNextLinks &&
             `(${language.formatUnitList(previousNextLinks.content)})`,

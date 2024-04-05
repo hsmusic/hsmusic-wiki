@@ -772,6 +772,8 @@ albumSidebar:
 
   groupBox:
     title: "{GROUP}"
+    title.guestTrack: "{GROUP} (guest track)"
+
     next: "Next: {ALBUM}"
     previous: "Previous: {ALBUM}"
 
