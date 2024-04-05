@@ -102,7 +102,7 @@ export default {
   generate(relations, slots, {html, language}) {
     const navLinksShouldShowPreviousNext =
       (slots.mode === 'track'
-        ? Array.from(relations.previousNextLinks, () => false)
+        ? Array.from(relations.previousNextLinks ?? [], () => false)
         : stitchArrays({
             previousAlbumLink: relations.previousAlbumLinks ?? null,
             nextAlbumLink: relations.nextAlbumLinks ?? null,
