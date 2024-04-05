@@ -1979,7 +1979,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   position: absolute;
   width: 100%;
   box-sizing: border-box;
-  padding: 10px 40px 5px 20px;
+  padding: 10px 20px 5px 20px;
   margin-top: 0;
   z-index: -1;
 
@@ -2007,6 +2007,10 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 .content-sticky-subheading-row:not(.visible) {
   margin-top: -20px;
   opacity: 0;
+}
+
+.content-sticky-subheading {
+  padding-right: 20px;
 }
 
 .content-sticky-heading-container h2.visible {
