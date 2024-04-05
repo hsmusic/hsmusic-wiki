@@ -13,11 +13,13 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  query(album) {
+  query(album, track) {
     const query = {};
 
     query.groups =
-      album.groups;
+      (track
+        ? track.groups
+        : album.groups);
 
     if (album.date) {
       // Sort by latest first. This matches the sorting order used on group
@@ -52,7 +54,7 @@ export default {
     return query;
   },
 
-  relations(relation, query, album) {
+  relations(relation, query, album, _track) {
     const relations = {};
 
     relations.secondaryNav =
