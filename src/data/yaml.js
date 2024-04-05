@@ -952,6 +952,7 @@ export function linkWikiDataArrays(wikiData) {
     [wikiData.groupData, [
       'albumData',
       'groupCategoryData',
+      'trackData',
     ]],
 
     [wikiData.groupCategoryData, [

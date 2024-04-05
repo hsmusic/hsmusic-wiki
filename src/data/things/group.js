@@ -4,6 +4,8 @@ import {input} from '#composite';
 import find from '#find';
 import Thing from '#thing';
 
+import {exposeDependency} from '#composite/control-flow';
+
 import {
   color,
   contentString,
@@ -14,10 +16,12 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
+import {withGuestTracks} from '#composite/things/group';
+
 export class Group extends Thing {
   static [Thing.referenceType] = 'group';
 
-  static [Thing.getPropertyDescriptors] = ({Album}) => ({
+  static [Thing.getPropertyDescriptors] = ({Album, Track}) => ({
     // Update & expose
 
     name: name('Unnamed Group'),
@@ -43,6 +47,10 @@ export class Group extends Thing {
       class: input.value(GroupCategory),
     }),
 
+    trackData: wikiData({
+      class: input.value(Track),
+    }),
+
     // Expose only
 
     descriptionShort: {
@@ -66,6 +74,11 @@ export class Group extends Thing {
           albumData?.filter((album) => album.groups.includes(group)) ?? [],
       },
     },
+
+    guestTracks: [
+      withGuestTracks(),
+      exposeDependency({dependency: '#guestTracks'}),
+    ],
 
     color: {
       flags: {expose: true},
