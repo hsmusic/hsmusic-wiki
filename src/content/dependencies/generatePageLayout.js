@@ -371,7 +371,7 @@ export default {
 
     const getSidebar = (side, id) =>
       (html.isBlank(slots[side])
-        ? null
+        ? html.blank()
         : slots[side].slots({
             attributes:
               slots[side]
@@ -386,10 +386,10 @@ export default {
     const hasSidebarRight = !html.isBlank(html.resolve(rightSidebar));
 
     const collapseSidebars =
-      (leftSidebar
+      (hasSidebarLeft
         ? leftSidebar.getSlotValue('collapse')
         : true) &&
-      (rightSidebar
+      (hasSidebarRight
         ? rightSidebar.getSlotValue('collapse')
         : true);
 
