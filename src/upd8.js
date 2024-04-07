@@ -1685,7 +1685,7 @@ async function main() {
             ...(track.midiProjectFiles ?? []),
           ]),
         ]
-          .flatMap((fileGroup) => fileGroup.files)
+          .flatMap((fileGroup) => fileGroup.files ?? [])
           .map((file) => ({
             device: path.join(
               mediaPath,
