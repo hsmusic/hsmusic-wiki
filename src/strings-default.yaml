@@ -1651,6 +1651,7 @@ listingPage:
       file:
         _: "{TITLE}"
         withMultipleFiles: "{TITLE} ({FILES})"
+        withNoFiles: "{TITLE} (no files)"
 
     # other.midiProjectFiles:
     #   Same as other.allSheetMusic, but for MIDI & project files.
@@ -1663,6 +1664,7 @@ listingPage:
       file:
         _: "{TITLE}"
         withMultipleFiles: "{TITLE} ({FILES})"
+        withNoFiles: "{TITLE} (no files)"
 
     # other.additionalFiles:
     #   Same as other.allSheetMusic, but for additional files.
@@ -1675,6 +1677,7 @@ listingPage:
       file:
         _: "{TITLE}"
         withMultipleFiles: "{TITLE} ({FILES})"
+        withNoFiles: "{TITLE} (no files available)"
 
     # other.randomPages:
     #   Special listing which shows a bunch of buttons that each

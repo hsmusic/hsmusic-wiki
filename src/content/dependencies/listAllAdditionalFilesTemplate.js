@@ -63,7 +63,7 @@ export default {
     const albumAdditionalFileFiles =
       albumAdditionalFileObjects
         .map(byAlbum => byAlbum
-          .map(({files}) => files));
+          .map(({files}) => files ?? []));
 
     const trackAdditionalFileTitles =
       trackAdditionalFileObjects
@@ -75,7 +75,7 @@ export default {
       trackAdditionalFileObjects
         .map(byAlbum => byAlbum
           .map(byTrack => byTrack
-            .map(({files}) => files)));
+            .map(({files}) => files ?? [])));
 
     return {
       spec,

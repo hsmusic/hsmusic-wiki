@@ -51,6 +51,12 @@ export default {
                         }),
                     }))
 
+             : additionalFileLinks.length === 0
+                ? html.tag('li',
+                    language.$('listingPage', slots.stringsKey, 'file.withNoFiles', {
+                      title: additionalFileTitle,
+                    }))
+
                 : html.tag('li', {class: 'has-details'},
                     html.tag('details', [
                       html.tag('summary',
