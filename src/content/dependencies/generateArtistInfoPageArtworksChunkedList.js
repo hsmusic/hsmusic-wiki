@@ -203,7 +203,7 @@ export default {
             chunk.slots({
               mode: 'album',
               albumLink,
-              date,
+              dates: [date],
 
               items:
                 stitchArrays({

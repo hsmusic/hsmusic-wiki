@@ -1,4 +1,4 @@
-import {empty, unique} from '#sugar';
+import {unique} from '#sugar';
 import {getTotalDuration} from '#wiki-data';
 
 export default {
@@ -27,34 +27,17 @@ export default {
   data(_artist, album, trackContribLists) {
     const data = {};
 
-    const allDates =
-      trackContribLists
-        .flat()
-        .filter(contrib => contrib.date)
+    const contribs =
+      trackContribLists.flat();
+
+    data.dates =
+      contribs
         .map(contrib => contrib.date);
-
-    if (!empty(allDates)) {
-      const earliestDate =
-        allDates
-          .reduce((a, b) => a <= b ? a : b);
-
-      const latestDate =
-        allDates
-          .reduce((a, b) => a <= b ? b : a);
-
-      if (+earliestDate === +latestDate) {
-        data.date = earliestDate;
-      } else {
-        data.earliestDate = earliestDate;
-        data.latestDate = latestDate;
-      }
-    }
 
     // TODO: Duration stuff should *maybe* be in proper data logic? Maaaybe?
     const durationTerms =
       unique(
-        trackContribLists
-          .flat()
+        contribs
           .filter(contrib => contrib.countInDurationTotals)
           .map(contrib => contrib.thing)
           .filter(track => track.isOriginalRelease)
@@ -75,10 +58,7 @@ export default {
 
       albumLink: relations.albumLink,
 
-      date: data.date ?? null,
-      dateRangeStart: data.earliestDate ?? null,
-      dateRangeEnd: data.latestDate ?? null,
-
+      dates: data.dates,
       duration: data.duration,
       durationApproximate: data.durationApproximate,
 
