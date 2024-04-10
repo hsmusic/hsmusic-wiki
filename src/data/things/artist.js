@@ -154,6 +154,12 @@ export class Artist extends Thing {
       mode: input.value('contributions'),
     }),
 
+    trackCoverArtistContributions: reverseContributionList({
+      data: 'trackData',
+      list: input.value('coverArtistContribs'),
+      mode: input.value('contributions'),
+    }),
+
     albumsAsAlbumArtist: reverseContributionList({
       data: 'albumData',
       list: input.value('artistContribs'),
@@ -229,6 +235,30 @@ export class Artist extends Thing {
     albumsAsCommentator: reverseReferenceList({
       data: 'albumData',
       list: input.value('commentatorArtists'),
+    }),
+
+    albumArtistContributions: reverseContributionList({
+      data: 'albumData',
+      list: input.value('artistContribs'),
+      mode: input.value('contributions'),
+    }),
+
+    albumCoverArtistContributions: reverseContributionList({
+      data: 'albumData',
+      list: input.value('coverArtistContribs'),
+      mode: input.value('contributions'),
+    }),
+
+    albumWallpaperArtistContributions: reverseContributionList({
+      data: 'albumData',
+      list: input.value('wallpaperArtistContribs'),
+      mode: input.value('contributions'),
+    }),
+
+    albumBannerArtistContributions: reverseContributionList({
+      data: 'albumData',
+      list: input.value('bannerArtistContribs'),
+      mode: input.value('contributions'),
     }),
 
     flashesAsContributor: reverseContributionList({
