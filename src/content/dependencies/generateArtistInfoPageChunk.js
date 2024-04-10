@@ -1,3 +1,5 @@
+import {empty} from '#sugar';
+
 export default {
   extraDependencies: ['html', 'language'],
 
@@ -21,15 +23,33 @@ export default {
       mutable: false,
     },
 
-    date: {validate: v => v.isDate},
-    dateRangeStart: {validate: v => v.isDate},
-    dateRangeEnd: {validate: v => v.isDate},
+    dates: {
+      validate: v => v.sparseArrayOf(v.isDate),
+    },
 
     duration: {validate: v => v.isDuration},
     durationApproximate: {type: 'boolean'},
   },
 
   generate(slots, {html, language}) {
+    let earliestDate = null;
+    let latestDate = null;
+    let onlyDate = null;
+
+    if (!empty(slots.dates)) {
+      earliestDate =
+        slots.dates
+          .reduce((a, b) => a <= b ? a : b);
+
+      latestDate =
+        slots.dates
+          .reduce((a, b) => a <= b ? b : a);
+
+      if (+earliestDate === +latestDate) {
+        onlyDate = earliestDate;
+      }
+    }
+
     let accentedLink;
 
     accent: {
@@ -40,9 +60,9 @@ export default {
           const options = {album: accentedLink};
           const parts = ['artistPage.creditList.album'];
 
-          if (slots.date) {
+          if (onlyDate) {
             parts.push('withDate');
-            options.date = language.formatDate(slots.date);
+            options.date = language.formatDate(onlyDate);
           }
 
           if (slots.duration) {
@@ -63,16 +83,13 @@ export default {
           const options = {act: accentedLink};
           const parts = ['artistPage.creditList.flashAct'];
 
-          if (
-            slots.dateRangeStart &&
-            slots.dateRangeEnd &&
-            slots.dateRangeStart !== slots.dateRangeEnd
-          ) {
-            parts.push('withDateRange');
-            options.dateRange = language.formatDateRange(slots.dateRangeStart, slots.dateRangeEnd);
-          } else if (slots.dateRangeStart || slots.date) {
+          if (onlyDate) {
             parts.push('withDate');
-            options.date = language.formatDate(slots.dateRangeStart ?? slots.date);
+            options.date = language.formatDate(onlyDate);
+          } else if (earliestDate && latestDate) {
+            parts.push('withDateRange');
+            options.dateRange =
+              language.formatDateRange(earliestDate, latestDate);
           }
 
           accentedLink = language.formatString(...parts, options);

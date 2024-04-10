@@ -82,11 +82,9 @@ export default {
       actNames:
         query.chunks.map(({act}) => act.name),
 
-      firstDates:
-        query.chunks.map(({chunk}) => chunk[0].flash.date ?? null),
-
-      lastDates:
-        query.chunks.map(({chunk}) => chunk.at(-1).flash.date ?? null),
+      dates:
+        query.chunks.map(({chunk}) =>
+          chunk.map(({flash}) => flash.date)),
 
       itemContributions:
         query.chunks.map(({chunk}) =>
@@ -103,8 +101,7 @@ export default {
         chunk: relations.chunks,
         actLink: relations.actLinks,
         actName: data.actNames,
-        firstDate: data.firstDates,
-        lastDate: data.lastDates,
+        dates: data.dates,
 
         items: relations.items,
         itemFlashLinks: relations.itemFlashLinks,
@@ -113,8 +110,7 @@ export default {
           chunk,
           actLink,
           actName,
-          firstDate,
-          lastDate,
+          dates,
 
           items,
           itemFlashLinks,
@@ -123,8 +119,7 @@ export default {
           chunk.slots({
             mode: 'flash',
             flashActLink: actLink.slot('content', actName),
-            dateRangeStart: firstDate,
-            dateRangeEnd: lastDate,
+            dates,
 
             items:
               stitchArrays({
