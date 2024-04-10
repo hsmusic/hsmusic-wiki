@@ -10,7 +10,6 @@ export default {
   contentDependencies: [
     'generateArtistInfoPageChunk',
     'generateArtistInfoPageChunkItem',
-    'generateArtistInfoPageOtherArtistLinks',
     'linkAlbum',
     'linkFlash',
     'linkFlashAct',

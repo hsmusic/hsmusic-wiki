@@ -1,3 +1,5 @@
+import {empty} from '#sugar';
+
 export default {
   extraDependencies: ['html', 'language'],
 
@@ -35,7 +37,7 @@ export default {
       const parts = ['artistPage.creditList.entry'];
       const options = {entry: accentedContent};
 
-      if (slots.otherArtistLinks) {
+      if (!empty(slots.otherArtistLinks)) {
         parts.push('withArtists');
         options.artists = language.formatConjunctionList(slots.otherArtistLinks);
       }
