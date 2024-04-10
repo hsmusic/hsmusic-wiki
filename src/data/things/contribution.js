@@ -14,6 +14,8 @@ import {flag, simpleDate} from '#composite/wiki-properties';
 
 import {
   inheritFromContributionPresets,
+  thingPropertyMatches,
+  thingReferenceTypeMatches,
   withContributionArtist,
   withContributionContext,
   withMatchingContributionPresets,
@@ -121,6 +123,38 @@ export class Contribution extends Thing {
         dependency: '#value',
       }),
     ],
+
+    isArtistContribution: thingPropertyMatches({
+      value: input.value('artistContribs'),
+    }),
+
+    isContributorContribution: thingPropertyMatches({
+      value: input.value('contributorContribs'),
+    }),
+
+    isCoverArtistContribution: thingPropertyMatches({
+      value: input.value('coverArtistContribs'),
+    }),
+
+    isBannerArtistContribution: thingPropertyMatches({
+      value: input.value('bannerArtistContribs'),
+    }),
+
+    isWallpaperArtistContribution: thingPropertyMatches({
+      value: input.value('wallpaperArtistContribs'),
+    }),
+
+    isForTrack: thingReferenceTypeMatches({
+      value: input.value('track'),
+    }),
+
+    isForAlbum: thingReferenceTypeMatches({
+      value: input.value('album'),
+    }),
+
+    isForFlash: thingReferenceTypeMatches({
+      value: input.value('flash'),
+    }),
   });
 
   [inspect.custom](depth, options, inspect) {
