@@ -271,18 +271,6 @@ export function getNewReleases(numReleases, {albumData}) {
     .slice(0, numReleases);
 }
 
-export function isArtistContribution(contrib) {
-  return contrib.thingProperty === 'artistContribs';
-}
-
-export function isContributorContribution(contrib) {
-  return contrib.thingProperty === 'contributorContribs';
-}
-
-export function isCoverArtistContribution(contrib) {
-  return contrib.thingProperty === 'coverArtistContribs';
-}
-
 // Carousel layout and utilities
 
 // Layout constants:
