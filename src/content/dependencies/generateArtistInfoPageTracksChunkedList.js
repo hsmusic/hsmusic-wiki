@@ -12,8 +12,8 @@ export default {
     const query = {};
 
     const allContributions = [
-      ...artist.artistContributions,
-      ...artist.contributorContributions,
+      ...artist.trackArtistContributions,
+      ...artist.trackContributorContributions,
     ];
 
     sortContributionsChronologically(
