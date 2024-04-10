@@ -7,7 +7,8 @@ import {empty} from '#sugar';
 import Thing from '#thing';
 import {isStringNonEmpty, isThing, validateReference} from '#validators';
 
-import {exposeDependency} from '#composite/control-flow';
+import {exitWithoutDependency, exposeDependency} from '#composite/control-flow';
+import {withPropertyFromObject} from '#composite/data';
 import {withResolvedReference} from '#composite/wiki-data';
 import {flag, simpleDate} from '#composite/wiki-properties';
 
@@ -93,6 +94,31 @@ export class Contribution extends Thing {
 
       exposeDependency({
         dependency: '#matchingContributionPresets',
+      }),
+    ],
+
+    // All the contributions from the list which includes this contribution.
+    // Note that this list contains not only other contributions by the same
+    // artist, but also this very contribution. It doesn't mix contributions
+    // exposed on different properties.
+    associatedContributions: [
+      exitWithoutDependency({
+        dependency: 'thing',
+        value: input.value([]),
+      }),
+
+      exitWithoutDependency({
+        dependency: 'thingProperty',
+        value: input.value([]),
+      }),
+
+      withPropertyFromObject({
+        object: 'thing',
+        property: 'thingProperty',
+      }),
+
+      exposeDependency({
+        dependency: '#value',
       }),
     ],
   });
