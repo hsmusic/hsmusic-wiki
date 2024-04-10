@@ -1,24 +1,30 @@
-import {empty} from '#sugar';
+import {unique} from '#sugar';
 
 export default {
   contentDependencies: ['linkArtist'],
 
-  relations(relation, contribs, artist) {
-    const otherArtistContribs =
-      contribs.filter(contrib => contrib.artist !== artist);
+  query(contribs) {
+    const associatedContributionsByOtherArtists =
+      contribs
+        .flatMap(ownContrib =>
+          ownContrib.associatedContributions
+            .filter(associatedContrib =>
+              associatedContrib.artist !== ownContrib.artist));
 
-    if (empty(otherArtistContribs)) {
-      return {};
-    }
+    const otherArtists =
+      unique(
+        associatedContributionsByOtherArtists
+          .map(contrib => contrib.artist));
 
-    const otherArtistLinks =
-      otherArtistContribs
-        .map(contrib => relation('linkArtist', contrib.artist));
-
-    return {otherArtistLinks};
+    return {otherArtists};
   },
 
-  generate(relations) {
-    return relations.otherArtistLinks ?? null;
-  },
+  relations: (relation, query) => ({
+    artistLinks:
+      query.otherArtists
+        .map(artist => relation('linkArtist', artist)),
+  }),
+
+  generate: (relations) =>
+    relations.artistLinks,
 };

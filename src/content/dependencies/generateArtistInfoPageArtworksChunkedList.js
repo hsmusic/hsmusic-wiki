@@ -154,7 +154,7 @@ export default {
 
       itemOtherArtistLinks:
         query.chunks.map(({chunk}) =>
-          chunk.map(({contribs}) => relation('generateArtistInfoPageOtherArtistLinks', contribs, artist))),
+          chunk.map(({contribs}) => relation('generateArtistInfoPageOtherArtistLinks', contribs))),
     };
   },
 

@@ -73,9 +73,7 @@ export default {
       relation('linkTrack', query.track),
 
     otherArtistLinks:
-      relation('generateArtistInfoPageOtherArtistLinks',
-        contribs,
-        artist),
+      relation('generateArtistInfoPageOtherArtistLinks', contribs),
   }),
 
   data: (query) => ({
