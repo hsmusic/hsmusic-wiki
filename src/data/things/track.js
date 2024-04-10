@@ -232,8 +232,10 @@ export class Track extends Thing {
     contributorContribs: [
       inheritContributionListFromOriginalRelease(),
 
+      withDate(),
+
       contributionList({
-        date: 'date',
+        date: '#date',
       }),
     ],
 
