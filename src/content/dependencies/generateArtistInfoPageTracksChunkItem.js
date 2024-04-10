@@ -1,4 +1,5 @@
 import {empty} from '#sugar';
+import {isArtistContribution, isContributorContribution} from '#wiki-data';
 
 export default {
   contentDependencies: [
@@ -19,11 +20,11 @@ export default {
 
     const creditedAsArtist =
       contribs
-        .some(contrib => contrib.kind === 'artist');
+        .some(isArtistContribution);
 
     const creditedAsContributor =
       contribs
-        .some(contrib => contrib.kind === 'contributor');
+        .some(isContributorContribution);
 
     const annotatedContribs =
       contribs
@@ -31,11 +32,11 @@ export default {
 
     const annotatedArtistContribs =
       annotatedContribs
-        .filter(contrib => contrib.kind === 'artist');
+        .filter(isArtistContribution);
 
     const annotatedContributorContribs =
       annotatedContribs
-        .filter(contrib => contrib.kind === 'contributor');
+        .filter(isContributorContribution);
 
     // Don't display annotations associated with crediting in the
     // Contributors field if the artist is also credited as an Artist
