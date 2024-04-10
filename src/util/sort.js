@@ -429,5 +429,10 @@ export function sortContributionsChronologically(data, sortThings, {
 
   sortByDate(contribs, {latestFirst});
 
-  return contribs;
+  // We're not actually operating on the original data array at any point,
+  // so since this is meant to be a mutating function like any other, splice
+  // the sorted contribs into the original array.
+  data.splice(0, data.length, ...contribs);
+
+  return data;
 }
