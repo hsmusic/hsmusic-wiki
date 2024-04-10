@@ -150,7 +150,7 @@ export class Artist extends Thing {
 
     contributorContributions: reverseContributionList({
       data: 'trackData',
-      list: input.value('artistContribs'),
+      list: input.value('contributorContribs'),
       mode: input.value('contributions'),
     }),
 
