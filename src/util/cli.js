@@ -215,12 +215,30 @@ export function decorateTime(arg1, arg2) {
     timeSpent: 0,
     timesCalled: 0,
     displayTime() {
-      const averageTime = meta.timeSpent / meta.timesCalled;
+      const align1 = 48;
+      const align2 = 22;
+
+      const averageTime = (meta.timeSpent / meta.timesCalled).toExponential(1);
+      const idPart = typeof id === 'symbol' ? id.description : id;
+      const timePart = `${meta.timeSpent} ms / ${meta.timesCalled} calls`;
+      const avgPart = `(avg: ${averageTime} ms)`;
+
+      const alignPart1 =
+        (idPart.length >= align1
+          ? ' '
+          : ' ' + '.'.repeat(Math.max(0, align1 - 2 - idPart.length)) + ' ');
+
+      const alignPart2 =
+        (timePart.length >= align2
+          ? ' '
+          : ' '.repeat(Math.max(0, align2 - timePart.length)));
+
       console.log(
-        `\x1b[1m${typeof id === 'symbol' ? id.description : id}(...):\x1b[0m ${
-          meta.timeSpent
-        } ms / ${meta.timesCalled} calls \x1b[2m(avg: ${averageTime} ms)\x1b[0m`
-      );
+        colors.bright(idPart) +
+        alignPart1 +
+        timePart +
+        alignPart2 +
+        colors.dim(avgPart));
     },
   };
 
@@ -250,11 +268,20 @@ decorateTime.displayTime = function () {
     ...Object.getOwnPropertyNames(map),
   ];
 
-  if (keys.length) {
-    console.log(`\x1b[1mdecorateTime results: ` + '-'.repeat(40) + '\x1b[0m');
-    for (const key of keys) {
-      map[key].displayTime();
-    }
+  if (!keys.length) {
+    return;
+  }
+
+  console.log(`\x1b[1mdecorateTime results: ` + '-'.repeat(40) + '\x1b[0m');
+
+  const metas =
+    keys
+      .map(key => map[key])
+      .filter(meta => meta.timeSpent >= 1)  // Milliseconds!
+      .sort((a, b) => a.timeSpent - b.timeSpent);
+
+  for (const meta of metas) {
+    meta.displayTime();
   }
 };
 
