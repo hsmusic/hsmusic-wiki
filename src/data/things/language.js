@@ -392,6 +392,7 @@ export class Language extends Thing {
   // contents, if needed.
   #wrapSanitized(content) {
     return html.tags(content, {
+      [html.blessAttributes]: true,
       [html.joinChildren]: '',
       [html.noEdgeWhitespace]: true,
     });
