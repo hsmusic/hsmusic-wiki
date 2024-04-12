@@ -2,6 +2,7 @@ import { Temporal, toTemporalInstant } from '@js-temporal/polyfill';
 
 import {withAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
+import {logWarn} from '#cli';
 import * as html from '#html';
 import {empty} from '#sugar';
 import {isLanguageCode} from '#validators';
@@ -62,14 +63,46 @@ export class Language extends Thing {
     strings: {
       flags: {update: true, expose: true},
       update: {validate: (t) => typeof t === 'object'},
+
       expose: {
-        dependencies: ['inheritedStrings'],
-        transform(strings, {inheritedStrings}) {
-          if (strings || inheritedStrings) {
-            return {...(inheritedStrings ?? {}), ...(strings ?? {})};
-          } else {
-            return null;
+        dependencies: ['inheritedStrings', 'code'],
+        transform(strings, {inheritedStrings, code}) {
+          if (!strings && !inheritedStrings) return null;
+          if (!inheritedStrings) return strings;
+
+          const validStrings = {
+            ...inheritedStrings,
+            ...strings,
+          };
+
+          const optionsFromTemplate = template =>
+            Array.from(template.matchAll(languageOptionRegex))
+              .map(({groups}) => groups.name);
+
+          for (const [key, providedTemplate] of Object.entries(strings)) {
+            const inheritedTemplate = inheritedStrings[key];
+            if (!inheritedTemplate) continue;
+
+            const providedOptions = optionsFromTemplate(providedTemplate);
+            const inheritedOptions = optionsFromTemplate(inheritedTemplate);
+
+            const missingOptionNames =
+              inheritedOptions.filter(name => !providedOptions.includes(name));
+
+            const misplacedOptionNames =
+              providedOptions.filter(name => !inheritedOptions.includes(name));
+
+            if (!empty(missingOptionNames) || !empty(misplacedOptionNames)) {
+              logWarn`Not using ${code ?? '(no code)'} string ${key}:`;
+              if (!empty(missingOptionNames))
+                logWarn`- Missing options: ${missingOptionNames.join(', ')}`;
+              if (!empty(misplacedOptionNames))
+                logWarn`- Unexpected options: ${misplacedOptionNames.join(', ')}`;
+              validStrings[key] = inheritedStrings[key];
+            }
           }
+
+          return validStrings;
         },
       },
     },
