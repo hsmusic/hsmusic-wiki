@@ -73,6 +73,15 @@ export const joinChildren = Symbol();
 // or when there are multiple children.
 export const noEdgeWhitespace = Symbol();
 
+// Pass as a value on an object-shaped set of attributes to indicate that it's
+// always, absolutely, no matter what, a valid attribute addition. It will be
+// completely exempt from validation, which may provide a significant speed
+// boost IF THIS OPERATION IS REPEATED MANY TENS OF THOUSANDS OF TIMES.
+// Basically, don't use this unless you're 1) providing a constant set of
+// attributes, and 2) writing a very basic building block which loads of other
+// content will build off of!
+export const blessAttributes = Symbol();
+
 // Don't pass this directly, use html.metatag('blockwrap') instead.
 // Causes *following* content (past the metatag) to be placed inside a span
 // which is styled 'inline-block', which ensures that the words inside the
@@ -1009,6 +1018,8 @@ export class Attributes {
       const setResults = {};
 
       for (const key of Reflect.ownKeys(set)) {
+        if (key === blessAttributes) continue;
+
         const value = set[key];
         setResults[key] = this.#addOneAttribute(key, value);
       }
@@ -1819,9 +1830,25 @@ export const isAttributesAdditionPair = pair => {
   return true;
 };
 
-export const isAttributesAdditionSinglet =
+const isAttributesAdditionSingletHelper =
   anyOf(
     validateInstanceOf(Template),
     validateInstanceOf(Attributes),
     validateAllPropertyValues(isAttributeValue),
     looseArrayOf(value => isAttributesAdditionSinglet(value)));
+
+export const isAttributesAdditionSinglet = (value) => {
+  if (typeof value === 'object') {
+    if (Object.hasOwn(value, blessAttributes)) {
+      return true;
+    }
+
+    if (Array.isArray(value) && value.length === 1) {
+      if (Object.hasOwn(value[0]), blessAttributes) {
+        return true;
+      }
+    }
+  }
+
+  return isAttributesAdditionSingletHelper(value);
+};
