@@ -1,13 +1,15 @@
 import {inspect as nodeInspect} from 'node:util';
 
 import {decorateError} from '#aggregate';
-import {colors, ENABLE_COLOR} from '#cli';
+import {colors, decorateTime, ENABLE_COLOR} from '#cli';
 import {Template} from '#html';
 import {annotateFunction, empty, setIntersection} from '#sugar';
 
 function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
 }
+
+const DECORATE_TIME = process.env.HSMUSIC_DEBUG_CONTENT_PERF === '1';
 
 export class ContentFunctionSpecError extends Error {}
 
@@ -104,6 +106,11 @@ export function expectDependencies({
 
   let wrappedGenerate;
 
+  const optionalDecorateTime = (prefix, fn) =>
+    (DECORATE_TIME
+      ? decorateTime(`${prefix}/${generate.name}`, fn)
+      : fn);
+
   if (isInvalidated) {
     wrappedGenerate = function() {
       throw new Error(`Generate invalidated because unfulfilled dependencies provided: ${[...invalidatingDependencyKeys].join(', ')}`);
@@ -119,7 +126,7 @@ export function expectDependencies({
     annotateFunction(wrappedGenerate, {name: generate, trait: 'unfulfilled'});
     wrappedGenerate.fulfilled = false;
   } else {
-    const callUnderlyingGenerate = ([arg1, arg2], ...extraArgs) => {
+    let callUnderlyingGenerate = ([arg1, arg2], ...extraArgs) => {
       if (hasDataFunction && !arg1) {
         throw new Error(`Expected data`);
       }
@@ -160,6 +167,9 @@ export function expectDependencies({
         throw error;
       }
     };
+
+    callUnderlyingGenerate =
+      optionalDecorateTime(`generate`, callUnderlyingGenerate);
 
     if (hasSlotsDescription) {
       const stationery = fulfilledDependencies.html.stationery({
@@ -204,19 +214,19 @@ export function expectDependencies({
   wrappedGenerate[contentFunction.identifyingSymbol] = true;
 
   if (hasSprawlFunction) {
-    wrappedGenerate.sprawl = sprawl;
+    wrappedGenerate.sprawl = optionalDecorateTime(`sprawl`, sprawl);
   }
 
   if (hasQueryFunction) {
-    wrappedGenerate.query = query;
+    wrappedGenerate.query = optionalDecorateTime(`query`, query);
   }
 
   if (hasRelationsFunction) {
-    wrappedGenerate.relations = relations;
+    wrappedGenerate.relations = optionalDecorateTime(`relations`, relations);
   }
 
   if (hasDataFunction) {
-    wrappedGenerate.data = data;
+    wrappedGenerate.data = optionalDecorateTime(`data`, data);
   }
 
   wrappedGenerate.fulfill ??= function fulfill(dependencies) {
