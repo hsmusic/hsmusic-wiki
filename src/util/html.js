@@ -1844,7 +1844,7 @@ export const isAttributesAdditionSinglet = (value) => {
     }
 
     if (Array.isArray(value) && value.length === 1) {
-      if (Object.hasOwn(value[0]), blessAttributes) {
+      if (Object.hasOwn(value[0], blessAttributes)) {
         return true;
       }
     }
