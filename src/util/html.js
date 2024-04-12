@@ -373,13 +373,12 @@ export class Tag {
       throw new Error(`Tag <${this.tagName}> is self-closing but got content`);
     }
 
-    let contentArray;
-
-    if (Array.isArray(value)) {
-      contentArray = value;
-    } else {
-      contentArray = [value];
-    }
+    const contentArray =
+      (Array.isArray(value)
+        ? value.flat(Infinity).filter(Boolean)
+     : value
+        ? [value]
+        : []);
 
     if (this.chunkwrap) {
       if (contentArray.some(content => content?.blockwrap)) {
@@ -387,10 +386,7 @@ export class Tag {
       }
     }
 
-    this.#content = contentArray
-      .flat(Infinity)
-      .filter(Boolean);
-
+    this.#content = contentArray;
     this.#content.toString = () => this.#stringifyContent();
   }
 
