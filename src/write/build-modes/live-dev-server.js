@@ -474,10 +474,15 @@ export async function go({
   if (skipServing) {
     logInfo`Ready to serve! But --skip-serving was passed, so all done.`;
   } else {
-    server.listen(port, host);
+    process.on('SIGINT', () => {
+      process.stdout.write('\n');
+      server.close();
+    });
 
-    // Just keep going... forever!!!
-    await new Promise(() => {});
+    await new Promise(resolve => {
+      server.listen(port, host);
+      server.on('close', () => resolve());
+    });
   }
 
   return true;
