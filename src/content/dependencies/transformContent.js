@@ -448,13 +448,10 @@ export default {
             return getTextNodeContents(node, index);
           }
 
-          const attributes = html.attributes({
-            class: 'INSERT-NON-TEXT',
-            'data-type': node.type,
-          });
+          let attributes = `class="INSERT-NON-TEXT" data-type="${node.type}"`;
 
-          if (node.type === 'processed-image') {
-            attributes.set('data-inline', node.inline);
+          if (node.type === 'processed-image' && node.inline) {
+            attributes += ` data-inline`;
           }
 
           return `<span ${attributes}>${index}</span>`;
