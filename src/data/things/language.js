@@ -17,6 +17,8 @@ import {
 
 import {externalFunction, flag, name} from '#composite/wiki-properties';
 
+export const languageOptionRegex = /{(?<name>[A-Z0-9_]+)}/g;
+
 export class Language extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
@@ -201,7 +203,7 @@ export class Language extends Thing {
     const output = this.#iterateOverTemplate({
       template: this.strings[key],
 
-      match: /{(?<name>[A-Z0-9_]+)}/g,
+      match: languageOptionRegex,
 
       insert: ({name: optionName}, canceledForming) => {
         if (optionsMap.has(optionName)) {
