@@ -1548,14 +1548,16 @@ export class Template {
       return true;
     }
 
-    if ('validate' in description) {
+    if (Object.hasOwn(description, 'validate')) {
       description.validate({
         ...commonValidators,
         ...validators,
       })(value);
+
+      return true;
     }
 
-    if ('type' in description) {
+    if (Object.hasOwn(description, 'type')) {
       switch (description.type) {
         case 'html': {
           return isHTML(value);
@@ -1566,13 +1568,13 @@ export class Template {
         }
 
         case 'string': {
+          if (typeof value === 'string')
+            return true;
+
           // Tags and templates are valid in string arguments - they'll be
           // stringified when exposed to the description's .content() function.
           if (value instanceof Tag || value instanceof Template)
             return true;
-
-          if (typeof value !== 'string')
-            throw new TypeError(`Slot expects string, got ${typeof value}`);
 
           return true;
         }
