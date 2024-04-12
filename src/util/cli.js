@@ -246,7 +246,7 @@ export function decorateTime(arg1, arg2) {
 
   const fn = function (...args) {
     const start = Date.now();
-    const ret = functionToBeWrapped(...args);
+    const ret = functionToBeWrapped.apply(this, args);
     const end = Date.now();
     meta.timeSpent += end - start;
     meta.timesCalled++;
