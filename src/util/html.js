@@ -1838,15 +1838,19 @@ const isAttributesAdditionSingletHelper =
     looseArrayOf(value => isAttributesAdditionSinglet(value)));
 
 export const isAttributesAdditionSinglet = (value) => {
-  if (typeof value === 'object') {
+  if (typeof value === 'object' && value !== null) {
     if (Object.hasOwn(value, blessAttributes)) {
       return true;
     }
 
-    if (Array.isArray(value) && value.length === 1) {
-      if (Object.hasOwn(value[0], blessAttributes)) {
-        return true;
-      }
+    if (
+      Array.isArray(value) &&
+      value.length === 1 &&
+      typeof value[0] === 'object' &&
+      value[0] !== null &&
+      Object.hasOwn(value[0], blessAttributes)
+    ) {
+      return true;
     }
   }
 
