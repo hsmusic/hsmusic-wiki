@@ -145,6 +145,18 @@ export default {
             : null)),
     ];
 
+    data.dimensions = [
+      (album.hasCoverArt
+        ? album.coverArtDimensions
+        : null),
+
+      ...
+        album.tracks.map(track =>
+          (track.hasUniqueCoverArt
+            ? track.coverArtDimensions
+            : null)),
+    ];
+
     return data;
   },
 
@@ -175,10 +187,12 @@ export default {
                 stitchArrays({
                   image: relations.images,
                   path: data.paths,
+                  dimensions: data.dimensions,
                   name: data.names,
-                }).map(({image, path, name}) =>
+                }).map(({image, path, dimensions, name}) =>
                     image.slots({
                       path,
+                      dimensions,
                       missingSourceContent:
                         language.$('misc.albumGalleryGrid.noCoverArt', {name}),
                     })),

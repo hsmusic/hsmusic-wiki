@@ -68,6 +68,9 @@ export default {
           ? ['media.trackCover', thing.album.directory, thing.directory, thing.coverArtFileExtension]
           : ['media.albumCover', thing.directory, thing.coverArtFileExtension]));
 
+    data.dimensions =
+      query.things.map(thing => thing.coverArtDimensions);
+
     data.otherCoverArtists =
       query.things.map(thing =>
         (thing.coverArtistContribs.length > 1
@@ -107,8 +110,12 @@ export default {
                 stitchArrays({
                   image: relations.images,
                   path: data.paths,
-                }).map(({image, path}) =>
-                    image.slot('path', path)),
+                  dimensions: data.dimensions,
+                }).map(({image, path, dimensions}) =>
+                    image.slots({
+                      path,
+                      dimensions,
+                    })),
 
               info:
                 data.otherCoverArtists.map(names =>
