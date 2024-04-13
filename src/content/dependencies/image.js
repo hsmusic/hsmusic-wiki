@@ -69,8 +69,6 @@ export default {
     },
 
     alt: {type: 'string'},
-    width: {type: 'number'},
-    height: {type: 'number'},
 
     attributes: {
       type: 'attributes',
@@ -139,8 +137,13 @@ export default {
       !isMissingImageFile &&
       !empty(contentWarnings);
 
+    const hasBothDimensions =
+      !!(slots.dimensions &&
+         slots.dimensions[0] !== null &&
+         slots.dimensions[1] !== null);
+
     const willSquare =
-      (slots.dimensions
+      (hasBothDimensions
         ? slots.dimensions[0] === slots.dimensions[1]
         : slots.square);
 
@@ -148,8 +151,12 @@ export default {
       {class: 'image'},
 
       slots.alt && {alt: slots.alt},
-      slots.width && {width: slots.width},
-      slots.height && {height: slots.height},
+
+      slots.dimensions?.[0] &&
+        {width: slots.dimensions[0]},
+
+      slots.dimensions?.[1] &&
+        {width: slots.dimensions[1]},
     ]);
 
     const isPlaceholder =

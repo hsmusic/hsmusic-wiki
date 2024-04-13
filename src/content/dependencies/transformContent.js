@@ -294,6 +294,25 @@ export default {
 
             const image = relations.images[imageIndex++];
 
+            image.setSlots({
+              src,
+
+              link: link ?? true,
+              warnings: warnings ?? null,
+              thumb: slots.thumb,
+            });
+
+            if (width || height) {
+              image.setSlot('dimensions', [width ?? null, height ?? null]);
+            }
+
+            image.setSlot('attributes', [
+              {class: 'content-image'},
+
+              pixelate &&
+                {class: 'pixelate'},
+            ]);
+
             return {
               type: 'processed-image',
               inline: false,
@@ -302,22 +321,7 @@ export default {
                   align === 'center' &&
                     {class: 'align-center'},
 
-                  image.slots({
-                    src,
-
-                    link: link ?? true,
-                    width: width ?? null,
-                    height: height ?? null,
-                    warnings: warnings ?? null,
-                    thumb: slots.thumb,
-
-                    attributes: [
-                      {class: 'content-image'},
-
-                      pixelate &&
-                        {class: 'pixelate'},
-                    ],
-                  })),
+                  image),
             };
           }
 

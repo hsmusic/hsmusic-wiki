@@ -74,7 +74,7 @@ export default {
     const sizeSlots =
       (square
         ? {square: true}
-        : {width: slots.dimensions[0], height: slots.dimensions[1]});
+        : {dimensions: slots.dimensions});
 
     switch (slots.mode) {
       case 'primary':
