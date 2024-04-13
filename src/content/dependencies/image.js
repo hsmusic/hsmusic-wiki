@@ -235,11 +235,9 @@ export default {
           to('thumb.path', mediaSrcJpeg);
       }
 
-      const dimensions = getDimensionsOfImagePath(mediaSrc);
-      const availableThumbs = getThumbnailsAvailableForDimensions(dimensions);
-
-      const [width, height] = dimensions;
-      const originalLength = Math.max(width, height)
+      const originalDimensions = getDimensionsOfImagePath(mediaSrc);
+      const availableThumbs = getThumbnailsAvailableForDimensions(originalDimensions);
+      const originalLength = Math.max(originalDimensions[0], originalDimensions[1]);
 
       const fileSize =
         (willLink && mediaSrc
