@@ -13,6 +13,7 @@ import {
   parseAdditionalNames,
   parseContributors,
   parseDate,
+  parseDimensions,
   parseDuration,
 } from '#yaml';
 
@@ -34,6 +35,7 @@ import {
   commentatorArtists,
   contentString,
   contributionList,
+  dimensions,
   directory,
   duration,
   flag,
@@ -156,6 +158,11 @@ export class Track extends Thing {
       }),
 
       exposeDependency({dependency: '#album.trackArtDate'}),
+    ],
+
+    coverArtDimensions: [
+      exitWithoutUniqueCoverArt(),
+      dimensions(),
     ],
 
     commentary: commentary(),
@@ -388,6 +395,11 @@ export class Track extends Thing {
       },
 
       'Cover Art File Extension': {property: 'coverArtFileExtension'},
+
+      'Cover Art Dimensions': {
+        property: 'coverArtDimensions',
+        transform: parseDimensions,
+      },
 
       'Has Cover Art': {
         property: 'disableUniqueCoverArt',
