@@ -17,12 +17,18 @@ export default {
 
     color:
       track.color,
+
+    dimensions:
+      (track.hasUniqueCoverArt
+        ? track.coverArtDimensions
+        : track.album.coverArtDimensions),
   }),
 
   generate: (data, relations) =>
     relations.coverArtwork.slots({
       path: data.path,
       color: data.color,
+      dimensions: data.dimensions,
     }),
 };
 
