@@ -61,7 +61,12 @@ export default {
 
     reveal: {type: 'boolean', default: true},
     lazy: {type: 'boolean', default: false},
+
     square: {type: 'boolean', default: false},
+
+    dimensions: {
+      validate: v => v.isDimensions,
+    },
 
     alt: {type: 'string'},
     width: {type: 'number'},
@@ -134,7 +139,10 @@ export default {
       !isMissingImageFile &&
       !empty(contentWarnings);
 
-    const willSquare = slots.square;
+    const willSquare =
+      (slots.dimensions
+        ? slots.dimensions[0] === slots.dimensions[1]
+        : slots.square);
 
     const imgAttributes = html.attributes([
       {class: 'image'},
