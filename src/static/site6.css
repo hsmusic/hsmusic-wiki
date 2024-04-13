@@ -473,7 +473,7 @@ a:not([href]):hover {
 }
 
 .external-link.indicate-external::after {
-  content: ' ➚';
+  content: '\00a0➚';
 }
 
 .external-link.indicate-external:hover::after {
