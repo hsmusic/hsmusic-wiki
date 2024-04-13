@@ -219,6 +219,14 @@ export default {
     const colors = getColors(slots.color ?? data.wikiColor);
     const hasSocialEmbed = !html.isBlank(slots.socialEmbed);
 
+    // Hilariously jank. Sorry! We're going to need this content later ANYWAY,
+    // so it's "fine" to stringify it here, but this DOES mean that we're
+    // stringifying (and resolving) the content without the context that it's
+    // e.g. going to end up in a page HTML hierarchy. Might have implications
+    // later, mainly for: https://github.com/hsmusic/hsmusic-wiki/issues/434
+    const mainContentHTML = html.tags([slots.mainContent]).toString();
+    const hasID = id => mainContentHTML.includes(`id="${id}"`);
+
     const titleContentsHTML =
       (html.isBlank(slots.title)
         ? null
@@ -264,7 +272,7 @@ export default {
 
           html.tag('div', {class: 'main-content-container'},
             {[html.onlyIfContent]: true},
-            slots.mainContent),
+            mainContentHTML),
         ]);
 
     const footerHTML =
@@ -392,12 +400,6 @@ export default {
       (hasSidebarRight
         ? rightSidebar.getSlotValue('collapse')
         : true);
-
-    const hasID = (() => {
-      // Hilariously jank. Sorry!
-      const mainContentHTML = slots.mainContent.toString();
-      return id => mainContentHTML.includes(`id="${id}"`);
-    })();
 
     const processSkippers = skipperList =>
       skipperList
