@@ -643,10 +643,15 @@ export function isDimensions(dimensions) {
 
   if (dimensions.length !== 2) throw new TypeError(`Expected 2 item array`);
 
-  isPositive(dimensions[0]);
-  isInteger(dimensions[0]);
-  isPositive(dimensions[1]);
-  isInteger(dimensions[1]);
+  if (dimensions[0] !== null) {
+    isPositive(dimensions[0]);
+    isInteger(dimensions[0]);
+  }
+
+  if (dimensions[1] !== null) {
+    isPositive(dimensions[1]);
+    isInteger(dimensions[1]);
+  }
 
   return true;
 }
