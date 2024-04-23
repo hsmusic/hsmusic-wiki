@@ -1,30 +1,118 @@
+import {sortAlbumsTracksChronologically} from '#sort';
+
+import getChronologyRelations from '../util/getChronologyRelations.js';
+
 export default {
   contentDependencies: [
+    'generateChronologyLinks',
     'generateChronologyLinksScopeSwitcher',
-    'generateScopedTrackChronologyLinks',
+    'linkAlbum',
+    'linkArtist',
+    'linkTrack',
   ],
 
-  relations: (relation, track) => ({
-    scopeSwitcher:
-      relation('generateChronologyLinksScopeSwitcher'),
+  relations(relation, track) {
+    function getScopedRelations(album) {
+      const albumFilter =
+        (album
+          ? track => track.album === album
+          : () => true);
 
-    wikiChronologyLinks:
-      relation('generateScopedTrackChronologyLinks', null, track),
+      return {
+        chronologyLinks:
+          relation('generateChronologyLinks'),
 
-    albumChronologyLinks:
-      relation('generateScopedTrackChronologyLinks', track.album, track),
-  }),
+        artistChronologyContributions:
+          getChronologyRelations(track, {
+            contributions: [
+              ...track.artistContribs ?? [],
+              ...track.contributorContribs ?? [],
+            ],
 
-  generate: (relations) =>
-    relations.scopeSwitcher.slots({
+            linkArtist: artist => relation('linkArtist', artist),
+            linkThing: track => relation('linkTrack', track),
+
+            getThings(artist) {
+              const getDate = thing => thing.date;
+
+              const things =
+                ([
+                  ...artist.tracksAsArtist,
+                  ...artist.tracksAsContributor,
+                ]).filter(getDate)
+                  .filter(albumFilter);
+
+              return sortAlbumsTracksChronologically(things, {getDate});
+            },
+          }),
+
+        coverArtistChronologyContributions:
+          getChronologyRelations(track, {
+            contributions: track.coverArtistContribs ?? [],
+
+            linkArtist: artist => relation('linkArtist', artist),
+
+            linkThing: trackOrAlbum =>
+              (trackOrAlbum.album
+                ? relation('linkTrack', trackOrAlbum)
+                : relation('linkAlbum', trackOrAlbum)),
+
+            getThings(artist) {
+              const getDate = thing => thing.coverArtDate ?? thing.date;
+
+              const things =
+                ([
+                  ...artist.albumsAsCoverArtist,
+                  ...artist.tracksAsCoverArtist,
+                ]).filter(getDate)
+                  .filter(albumFilter);
+
+              return sortAlbumsTracksChronologically(things, {getDate});
+            },
+          }),
+      };
+    }
+
+    return {
+      scopeSwitcher:
+        relation('generateChronologyLinksScopeSwitcher'),
+
+      wiki:
+        getScopedRelations(null),
+
+      album:
+        getScopedRelations(track.album),
+    };
+  },
+
+  generate(relations) {
+    function slotScopedRelations(scope) {
+      return scope.chronologyLinks.slots({
+        showOnly: true,
+
+        chronologyInfoSets: [
+          {
+            headingString: 'misc.chronology.heading.track',
+            contributions: scope.artistChronologyContributions,
+          },
+          {
+            headingString: 'misc.chronology.heading.coverArt',
+            contributions: scope.coverArtistChronologyContributions,
+          },
+        ],
+      });
+    }
+
+    return relations.scopeSwitcher.slots({
       scopes: [
         'wiki',
         'album',
       ],
 
       contents: [
-        relations.wikiChronologyLinks,
-        relations.albumChronologyLinks,
+        slotScopedRelations(relations.wiki),
+        slotScopedRelations(relations.album),
       ],
-    }),
+    });
+  },
 };
