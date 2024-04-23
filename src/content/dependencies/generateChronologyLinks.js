@@ -33,8 +33,14 @@ export default {
 
     if (!slots.showOnly) {
       infoSets = infoSets
-        .filter(({nextLink, previousLink}) =>
-          nextLink || previousLink);
+        .map(({contributions, ...entry}) => ({
+          ...entry,
+          contributions:
+            contributions
+              .filter(({nextLink, previousLink}) =>
+                nextLink || previousLink),
+        }))
+        .filter(({contributions}) => !empty(contributions));
     }
 
     const totalContributionCount =
