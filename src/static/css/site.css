@@ -155,7 +155,6 @@ body::before {
 .nav-bottom-row {
   grid-area: bottom-row;
   align-self: start;
-  margin-top: 0.25em;
 }
 
 .sidebar-column {
