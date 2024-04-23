@@ -97,7 +97,7 @@ export default {
           .map(({artistDirectory}) => artistDirectory);
 
       albumSet.sort((a, b) =>
-        (a.index === b.index
+        (a.only === b.only && a.index === b.index
           ? (wikiArtistDirectories.indexOf(a.artistDirectory)
            - wikiArtistDirectories.indexOf(b.artistDirectory))
           : 0));
