@@ -25,18 +25,21 @@ export default {
 
       [
         html.tag('summary',
-          language.$('trackPage.nav.chronology.scope.title', {
-            scope:
-              slots.scopes.map((scope, index) =>
-                html.tag('a', {class: 'switcher-link'},
-                  {href: '#'},
+          {class: 'underline-white'},
 
-                  (index === 0
-                    ? {style: 'display: inline'}
-                    : {style: 'display: none'}),
+          html.tag('span',
+            language.$('trackPage.nav.chronology.scope.title', {
+              scope:
+                slots.scopes.map((scope, index) =>
+                  html.tag('a', {class: 'switcher-link'},
+                    {href: '#'},
 
-                  language.$('trackPage.nav.chronology.scope', scope))),
-          })),
+                    (index === 0
+                      ? {style: 'display: inline'}
+                      : {style: 'display: none'}),
+
+                    language.$('trackPage.nav.chronology.scope', scope))),
+            }))),
 
         stitchArrays({
           scope: slots.scopes,

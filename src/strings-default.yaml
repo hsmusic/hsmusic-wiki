@@ -1844,7 +1844,7 @@ trackPage:
 
     chronology:
       scope:
-        title: "Chronology links {SCOPE}:"
+        title: "Chronology links {SCOPE}"
         wiki: "across this wiki"
         album: "within this album"
 
