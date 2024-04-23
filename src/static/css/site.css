@@ -395,6 +395,36 @@ summary > span:hover {
   text-decoration-color: var(--primary-color);
 }
 
+summary > span:hover a {
+  text-decoration: none !important;
+}
+
+summary > span:hover:has(a:hover),
+summary > span:hover:has(a.nested-hover),
+summary.has-nested-hover > span {
+  text-decoration: none !important;
+}
+
+summary > span:hover:has(a:hover) a,
+summary > span:hover:has(a.nested-hover) a,
+summary.has-nested-hover > span a {
+  text-decoration: underline !important;
+}
+
+summary.underline-white > span:hover {
+  text-decoration-color: white;
+}
+
+/* This link isn't supposed to be underlined *at all*
+ * when the summary (and not link) is hovered, but
+ * for some reason Safari is still applying its colored
+ * and dotted(!) underline. Get around the apparent
+ * effect by just making it white.
+ */
+summary.underline-white > span:hover a:not(:hover) {
+  text-decoration-color: white;
+}
+
 summary .group-name {
   color: var(--primary-color);
 }
