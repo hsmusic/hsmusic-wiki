@@ -4,6 +4,11 @@ export default {
   extraDependencies: ['html', 'language'],
 
   slots: {
+    allowCollapsing: {
+      type: 'boolean',
+      default: true,
+    },
+
     showOnly: {
       type: 'boolean',
       default: false,
@@ -52,7 +57,7 @@ export default {
       return html.blank();
     }
 
-    if (totalContributionCount > 8) {
+    if (slots.allowCollapsing && totalContributionCount > 8) {
       return html.tag('div', {class: 'chronology'},
         language.$('misc.chronology.seeArtistPages'));
     }

@@ -1,4 +1,5 @@
 import {sortAlbumsTracksChronologically} from '#sort';
+import {accumulateSum} from '#sugar';
 
 import getChronologyRelations from '../util/getChronologyRelations.js';
 
@@ -86,33 +87,52 @@ export default {
   },
 
   generate(relations) {
-    function slotScopedRelations(scope) {
-      return scope.chronologyLinks.slots({
+    function slotScopedRelations(content) {
+      return content.chronologyLinks.slots({
         showOnly: true,
+        allowCollapsing: false,
 
         chronologyInfoSets: [
           {
             headingString: 'misc.chronology.heading.track',
-            contributions: scope.artistChronologyContributions,
+            contributions: content.artistChronologyContributions,
           },
           {
             headingString: 'misc.chronology.heading.coverArt',
-            contributions: scope.coverArtistChronologyContributions,
+            contributions: content.coverArtistChronologyContributions,
           },
         ],
       });
     }
 
-    return relations.scopeSwitcher.slots({
-      scopes: [
-        'wiki',
-        'album',
-      ],
+    const scopes = [
+      'wiki',
+      'album',
+    ];
 
-      contents: [
-        slotScopedRelations(relations.wiki),
-        slotScopedRelations(relations.album),
-      ],
+    const contents = [
+      relations.wiki,
+      relations.album,
+    ];
+
+    const totalContributionCount =
+      accumulateSum(
+        contents.flatMap(content => [
+          content.artistChronologyContributions,
+          content.coverArtistChronologyContributions,
+        ]),
+        contributions => contributions.length);
+
+    relations.scopeSwitcher.setSlots({
+      scopes,
+
+      open:
+        totalContributionCount <= 5,
+
+      contents:
+        contents.map(content => slotScopedRelations(content))
     });
+
+    return relations.scopeSwitcher;
   },
 };
