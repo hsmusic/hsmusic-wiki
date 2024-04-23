@@ -116,12 +116,12 @@ export default {
     ];
 
     const totalContributionCount =
-      accumulateSum(
-        contents.flatMap(content => [
-          content.artistChronologyContributions,
-          content.coverArtistChronologyContributions,
-        ]),
-        contributions => contributions.length);
+      Math.max(...
+        contents.map(content =>
+          accumulateSum([
+            content.artistChronologyContributions,
+            content.coverArtistChronologyContributions,
+          ], contributions => contributions.length)));
 
     relations.scopeSwitcher.setSlots({
       scopes,
