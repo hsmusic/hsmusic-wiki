@@ -1841,6 +1841,12 @@ trackPage:
       _: "{TRACK}"
       withNumber: "{NUMBER}. {TRACK}"
 
+    chronology:
+      scope:
+        _: "({SCOPE})"
+        wiki: "Across this wiki..."
+        album: "Within this album..."
+
   socialEmbed:
     heading: "{ALBUM}"
     title: "{TRACK}"

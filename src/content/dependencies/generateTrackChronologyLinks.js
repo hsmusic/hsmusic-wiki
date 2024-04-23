@@ -12,7 +12,14 @@ export default {
 
   generate: (relations, {html}) =>
     html.tags([
-      relations.wikiChronologyLinks,
-      relations.albumChronologyLinks,
+      relations.wikiChronologyLinks.slots({
+        scope: 'wiki',
+        visible: true,
+      }),
+
+      relations.albumChronologyLinks.slots({
+        scope: 'album',
+        visible: false,
+      }),
     ]),
 };

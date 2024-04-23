@@ -5,7 +5,7 @@
 // that cannot 8e done at static-site compile time, 8y its fundamentally
 // ephemeral nature.
 
-import {accumulateSum, empty, filterMultipleArrays, stitchArrays}
+import {accumulateSum, atOffset, empty, filterMultipleArrays, stitchArrays}
   from '../shared-util/sugar.js';
 import {fetchWithProgress} from './xhr-util.js';
 
@@ -2949,6 +2949,45 @@ function toggleAdditionalNamesBox() {
 clientSteps.getPageReferences.push(getAdditionalNamesBoxReferences);
 clientSteps.addInternalListeners.push(addAdditionalNamesBoxInternalListeners);
 clientSteps.addPageListeners.push(addAdditionalNamesBoxListeners);
+
+// Scoped chronology links --------------------------------
+
+const scopedChronologyLinksInfo = initInfo('scopedChronologyLinksInfo', {
+  containers: null,
+  switchers: null,
+});
+
+function getScopedChronologyLinksReferences() {
+  const info = scopedChronologyLinksInfo;
+
+  info.containers =
+    Array.from(document.querySelectorAll('.scoped-chronology'));
+
+  info.switchers =
+    info.containers
+      .map(container => container.querySelector('.scoped-chronology-switcher'));
+}
+
+function addScopedChronologyLinksPageHandlers() {
+  const info = scopedChronologyLinksInfo;
+
+  for (const [index, switcher] of info.switchers.entries()) {
+    const currentContainer =
+      info.containers[index];
+
+    const nextContainer =
+      atOffset(info.containers, index, +1, {wrap: true});
+
+    switcher.addEventListener('click', domEvent => {
+      domEvent.preventDefault();
+      cssProp(currentContainer, 'display', 'none');
+      cssProp(nextContainer, 'display', 'block');
+    });
+  }
+}
+
+clientSteps.getPageReferences.push(getScopedChronologyLinksReferences);
+clientSteps.addPageListeners.push(addScopedChronologyLinksPageHandlers);
 
 // Group contributions table ------------------------------
 

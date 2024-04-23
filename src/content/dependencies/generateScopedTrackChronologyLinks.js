@@ -10,6 +10,8 @@ export default {
     'linkTrack',
   ],
 
+  extraDependencies: ['html', 'language'],
+
   relations(relation, album, track) {
     const albumFilter =
       (album
@@ -71,17 +73,39 @@ export default {
     };
   },
 
-  generate: (relations) =>
-    relations.chronologyLinks.slots({
-      chronologyInfoSets: [
-        {
-          headingString: 'misc.chronology.heading.track',
-          contributions: relations.artistChronologyContributions,
-        },
-        {
-          headingString: 'misc.chronology.heading.coverArt',
-          contributions: relations.coverArtistChronologyContributions,
-        },
-      ],
-    }),
+  slots: {
+    scope: {
+      validate: v => v.is('wiki', 'album'),
+    },
+
+    visible: {type: 'boolean'},
+  },
+
+  generate: (relations, slots, {html, language}) =>
+    html.tag('div', {class: 'scoped-chronology'},
+      {class: 'scope-' + slots.scope},
+      slots.visible && {style: 'display: block'},
+
+      [
+        html.tag('p',
+          language.$('trackPage.nav.chronology.scope', {
+            scope:
+              html.tag('a', {class: 'scoped-chronology-switcher'},
+                {href: '#'},
+                language.$('trackPage.nav.chronology.scope', slots.scope)),
+          })),
+
+        relations.chronologyLinks.slots({
+          chronologyInfoSets: [
+            {
+              headingString: 'misc.chronology.heading.track',
+              contributions: relations.artistChronologyContributions,
+            },
+            {
+              headingString: 'misc.chronology.heading.coverArt',
+              contributions: relations.coverArtistChronologyContributions,
+            },
+          ],
+        }),
+      ]),
 };
