@@ -21,10 +21,11 @@ export default {
             headingString: v.isString,
             contributions: v.strictArrayOf(v.validateProperties({
               index: v.isCountingNumber,
+              only: v.isBoolean,
+              artistDirectory: v.isDirectory,
               artistLink: v.isHTML,
               previousLink: v.isHTML,
               nextLink: v.isHTML,
-              only: v.isBoolean,
             })),
           })),
     }

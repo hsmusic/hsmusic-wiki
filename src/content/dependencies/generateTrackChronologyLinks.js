@@ -74,16 +74,36 @@ export default {
       };
     }
 
-    return {
-      scopeSwitcher:
-        relation('generateChronologyLinksScopeSwitcher'),
+    const relations = {};
 
-      wiki:
-        getScopedRelations(null),
+    relations.scopeSwitcher =
+      relation('generateChronologyLinksScopeSwitcher');
 
-      album:
-        getScopedRelations(track.album),
-    };
+    relations.wiki =
+      getScopedRelations(null);
+
+    relations.album =
+      getScopedRelations(track.album);
+
+    for (const setKey of [
+      'artistChronologyContributions',
+      'coverArtistChronologyContributions',
+    ]) {
+      const wikiSet = relations.wiki[setKey];
+      const albumSet = relations.album[setKey];
+
+      const wikiArtistDirectories =
+        wikiSet
+          .map(({artistDirectory}) => artistDirectory);
+
+      albumSet.sort((a, b) =>
+        (a.index === b.index
+          ? (wikiArtistDirectories.indexOf(a.artistDirectory)
+           - wikiArtistDirectories.indexOf(b.artistDirectory))
+          : 0));
+    }
+
+    return relations;
   },
 
   generate(relations) {

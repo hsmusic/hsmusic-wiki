@@ -42,10 +42,12 @@ export default function getChronologyRelations(thing, {
 
     return {
       index: index + 1,
+      artistDirectory: artist.directory,
+      only: !(previous || next),
+
       artistLink: linkArtist(artist),
       previousLink: previous ? linkThing(previous) : null,
       nextLink: next ? linkThing(next) : null,
-      only: !(previous || next),
     };
   }).filter(Boolean)
     .sort((a, b) =>
