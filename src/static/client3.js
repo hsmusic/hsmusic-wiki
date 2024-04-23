@@ -18,7 +18,7 @@ const clientSteps = {
   addPageListeners: [],
 };
 
-function initInfo(key, description) {
+function initInfo(infoKey, description) {
   const object = {...description};
 
   for (const obj of [
@@ -31,7 +31,47 @@ function initInfo(key, description) {
     Object.preventExtensions(obj);
   }
 
-  clientInfo[key] = object;
+  if (object.session) {
+    const sessionDefaults = object.session;
+
+    object.session = {};
+
+    for (const [key, defaultValue] of Object.entries(sessionDefaults)) {
+      const storageKey = `hsmusic.${infoKey}.${key}`;
+
+      let fallbackValue = defaultValue;
+
+      Object.defineProperty(object.session, key, {
+        get: () => {
+          try {
+            return sessionStorage.getItem(storageKey) ?? defaultValue;
+          } catch (error) {
+            if (error instanceof DOMException) {
+              return fallbackValue;
+            } else {
+              throw error;
+            }
+          }
+        },
+
+        set: (value) => {
+          try {
+            sessionStorage.setItem(storageKey, value);
+          } catch (error) {
+            if (error instanceof DOMException) {
+              fallbackValue = value;
+            } else {
+              throw error;
+            }
+          }
+        },
+      });
+    }
+
+    Object.preventExtensions(object.session);
+  }
+
+  clientInfo[infoKey] = object;
 
   return object;
 }
