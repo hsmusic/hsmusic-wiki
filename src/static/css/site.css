@@ -510,14 +510,13 @@ a:not([href]):hover {
   display: none;
 }
 
-#header .scoped-chronology p {
-  margin-top: 0;
-  margin-bottom: 0.25em;
-}
-
-#header .scoped-chronology-switcher {
+#header .scoped-chronology-switcher .switcher-link {
   text-decoration: underline;
   text-decoration-style: dotted;
+}
+
+#header .scoped-chronology-switcher > div {
+  margin-left: 20px;
 }
 
 #secondary-nav {

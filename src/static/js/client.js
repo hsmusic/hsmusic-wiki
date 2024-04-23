@@ -2954,7 +2954,7 @@ clientSteps.addPageListeners.push(addAdditionalNamesBoxListeners);
 
 const scopedChronologyLinksInfo = initInfo('scopedChronologyLinksInfo', {
   containers: null,
-  switchers: null,
+  switcherLinks: null,
   modes: null,
 
   session: {
@@ -2965,12 +2965,18 @@ const scopedChronologyLinksInfo = initInfo('scopedChronologyLinksInfo', {
 function getScopedChronologyLinksReferences() {
   const info = scopedChronologyLinksInfo;
 
-  info.containers =
-    Array.from(document.querySelectorAll('.scoped-chronology'));
+  const switcher =
+    document.querySelector('.scoped-chronology-switcher');
 
-  info.switchers =
-    info.containers
-      .map(container => container.querySelector('.scoped-chronology-switcher'));
+  if (!switcher) {
+    return;
+  }
+
+  info.containers =
+    Array.from(switcher.querySelectorAll(':scope > div'));
+
+  info.switcherLinks =
+    Array.from(switcher.querySelectorAll('.switcher-link'));
 
   info.modes =
     info.containers
@@ -2984,21 +2990,29 @@ function addScopedChronologyLinksPageHandlers() {
   const info = scopedChronologyLinksInfo;
   const {session} = scopedChronologyLinksInfo;
 
-  for (const [index, switcher] of info.switchers.entries()) {
-    const currentContainer =
-      info.containers[index];
-
+  for (const [index, {
+    container: currentContainer,
+    switcherLink: currentSwitcherLink,
+  }] of stitchArrays({
+    container: info.containers,
+    switcherLink: info.switcherLinks,
+  }).entries()) {
     const nextContainer =
       atOffset(info.containers, index, +1, {wrap: true});
+
+    const nextSwitcherLink =
+      atOffset(info.switcherLinks, index, +1, {wrap: true});
 
     const nextMode =
       atOffset(info.modes, index, +1, {wrap: true});
 
-    switcher.addEventListener('click', domEvent => {
+    currentSwitcherLink.addEventListener('click', domEvent => {
       domEvent.preventDefault();
 
       cssProp(currentContainer, 'display', 'none');
+      cssProp(currentSwitcherLink, 'display', 'none');
       cssProp(nextContainer, 'display', 'block');
+      cssProp(nextSwitcherLink, 'display', 'inline');
 
       session.selectedMode = nextMode;
     });
@@ -3013,11 +3027,19 @@ function mutateScopedChronologyLinksContent() {
   if (info.modes.includes(selectedMode)) {
     const selectedIndex = info.modes.indexOf(selectedMode);
 
-    for (const [index, container] of info.containers.entries()) {
+    for (const [index, {
+      container,
+      switcherLink,
+    }] of stitchArrays({
+      container: info.containers,
+      switcherLink: info.switcherLinks,
+    }).entries()) {
       if (index === selectedIndex) {
         cssProp(container, 'display', 'block');
+        cssProp(switcherLink, 'display', 'inline');
       } else {
         cssProp(container, 'display', 'none');
+        cssProp(switcherLink, 'display', 'none');
       }
     }
   }

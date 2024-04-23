@@ -1,8 +1,13 @@
 export default {
-  contentDependencies: ['generateScopedTrackChronologyLinks'],
-  extraDependencies: ['html'],
+  contentDependencies: [
+    'generateChronologyLinksScopeSwitcher',
+    'generateScopedTrackChronologyLinks',
+  ],
 
   relations: (relation, track) => ({
+    scopeSwitcher:
+      relation('generateChronologyLinksScopeSwitcher'),
+
     wikiChronologyLinks:
       relation('generateScopedTrackChronologyLinks', null, track),
 
@@ -10,16 +15,16 @@ export default {
       relation('generateScopedTrackChronologyLinks', track.album, track),
   }),
 
-  generate: (relations, {html}) =>
-    html.tags([
-      relations.wikiChronologyLinks.slots({
-        scope: 'wiki',
-        visible: true,
-      }),
+  generate: (relations) =>
+    relations.scopeSwitcher.slots({
+      scopes: [
+        'wiki',
+        'album',
+      ],
 
-      relations.albumChronologyLinks.slots({
-        scope: 'album',
-        visible: false,
-      }),
-    ]),
+      contents: [
+        relations.wikiChronologyLinks,
+        relations.albumChronologyLinks,
+      ],
+    }),
 };
