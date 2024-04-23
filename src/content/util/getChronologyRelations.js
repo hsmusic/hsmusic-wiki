@@ -45,6 +45,11 @@ export default function getChronologyRelations(thing, {
       artistLink: linkArtist(artist),
       previousLink: previous ? linkThing(previous) : null,
       nextLink: next ? linkThing(next) : null,
+      only: !(previous || next),
     };
-  }).filter(Boolean);
+  }).filter(Boolean)
+    .sort((a, b) =>
+      (a.only === b.only ?  b.index - a.index
+     : a.only            ? +1
+                         : -1))
 }

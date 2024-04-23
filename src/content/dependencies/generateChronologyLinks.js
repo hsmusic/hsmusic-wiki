@@ -19,6 +19,7 @@ export default {
               artistLink: v.isHTML,
               previousLink: v.isHTML,
               nextLink: v.isHTML,
+              only: v.isBoolean,
             })),
           })),
     }
@@ -37,8 +38,7 @@ export default {
           ...entry,
           contributions:
             contributions
-              .filter(({nextLink, previousLink}) =>
-                nextLink || previousLink),
+              .filter(({only}) => !only),
         }))
         .filter(({contributions}) => !empty(contributions));
     }
@@ -67,20 +67,21 @@ export default {
           artistLink,
           previousLink,
           nextLink,
+          only,
         }) => {
           const heading =
             html.tag('span', {class: 'heading'},
               language.$(headingString, {
                 index:
-                  (previousLink || nextLink
-                    ? language.formatIndex(index)
-                    : language.formatString('misc.chronology.heading.onlyIndex')),
+                  (only
+                    ? language.formatString('misc.chronology.heading.onlyIndex')
+                    : language.formatIndex(index)),
 
                 artist: artistLink,
               }));
 
           const navigation =
-            (previousLink || nextLink) &&
+            !only &&
               html.tag('span', {class: 'buttons'},
                 language.formatUnitList([
                   previousLink?.slots({
