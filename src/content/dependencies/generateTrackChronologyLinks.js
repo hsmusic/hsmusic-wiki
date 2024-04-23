@@ -1,75 +1,18 @@
-import {sortAlbumsTracksChronologically} from '#sort';
-
-import getChronologyRelations from '../util/getChronologyRelations.js';
-
 export default {
-  contentDependencies: [
-    'generateChronologyLinks',
-    'linkArtist',
-    'linkTrack',
-  ],
+  contentDependencies: ['generateScopedTrackChronologyLinks'],
+  extraDependencies: ['html'],
 
   relations: (relation, track) => ({
-    chronologyLinks:
-      relation('generateChronologyLinks'),
+    wikiChronologyLinks:
+      relation('generateScopedTrackChronologyLinks', null, track),
 
-    artistChronologyContributions:
-      getChronologyRelations(track, {
-        contributions: [
-          ...track.artistContribs ?? [],
-          ...track.contributorContribs ?? [],
-        ],
-
-        linkArtist: artist => relation('linkArtist', artist),
-        linkThing: track => relation('linkTrack', track),
-
-        getThings(artist) {
-          const getDate = thing => thing.date;
-
-          const things = [
-            ...artist.tracksAsArtist,
-            ...artist.tracksAsContributor,
-          ].filter(getDate);
-
-          return sortAlbumsTracksChronologically(things, {getDate});
-        },
-      }),
-
-    coverArtistChronologyContributions:
-      getChronologyRelations(track, {
-        contributions: track.coverArtistContribs ?? [],
-
-        linkArtist: artist => relation('linkArtist', artist),
-
-        linkThing: trackOrAlbum =>
-          (trackOrAlbum.album
-            ? relation('linkTrack', trackOrAlbum)
-            : relation('linkAlbum', trackOrAlbum)),
-
-        getThings(artist) {
-          const getDate = thing => thing.coverArtDate ?? thing.date;
-
-          const things = [
-            ...artist.albumsAsCoverArtist,
-            ...artist.tracksAsCoverArtist,
-          ].filter(getDate);
-
-          return sortAlbumsTracksChronologically(things, {getDate});
-        },
-      }),
+    albumChronologyLinks:
+      relation('generateScopedTrackChronologyLinks', track.album, track),
   }),
 
-  generate: (relations) =>
-    relations.chronologyLinks.slots({
-      chronologyInfoSets: [
-        {
-          headingString: 'misc.chronology.heading.track',
-          contributions: relations.artistChronologyContributions,
-        },
-        {
-          headingString: 'misc.chronology.heading.coverArt',
-          contributions: relations.coverArtistChronologyContributions,
-        },
-      ],
-    }),
+  generate: (relations, {html}) =>
+    html.tags([
+      relations.wikiChronologyLinks,
+      relations.albumChronologyLinks,
+    ]),
 };
