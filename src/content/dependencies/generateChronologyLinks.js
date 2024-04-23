@@ -4,6 +4,11 @@ export default {
   extraDependencies: ['html', 'language'],
 
   slots: {
+    showOnly: {
+      type: 'boolean',
+      default: false,
+    },
+
     chronologyInfoSets: {
       validate: v =>
         v.strictArrayOf(
@@ -24,9 +29,17 @@ export default {
       return html.blank();
     }
 
+    let infoSets = slots.chronologyInfoSets;
+
+    if (!slots.showOnly) {
+      infoSets = infoSets
+        .filter(({nextLink, previousLink}) =>
+          nextLink || previousLink);
+    }
+
     const totalContributionCount =
       accumulateSum(
-        slots.chronologyInfoSets,
+        infoSets,
         ({contributions}) => contributions.length);
 
     if (totalContributionCount === 0) {
@@ -39,7 +52,7 @@ export default {
     }
 
     return html.tags(
-      slots.chronologyInfoSets.map(({
+      infoSets.map(({
         headingString,
         contributions,
       }) =>
@@ -52,7 +65,11 @@ export default {
           const heading =
             html.tag('span', {class: 'heading'},
               language.$(headingString, {
-                index: language.formatIndex(index),
+                index:
+                  (previousLink || nextLink
+                    ? language.formatIndex(index)
+                    : language.formatString('misc.chronology.heading.onlyIndex')),
+
                 artist: artistLink,
               }));
 

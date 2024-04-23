@@ -490,6 +490,7 @@ misc:
       coverArt: "{INDEX} cover art by {ARTIST}"
       flash: "{INDEX} flash/game by {ARTIST}"
       track: "{INDEX} track by {ARTIST}"
+      onlyIndex: "Only"
 
   # external:
   #   Links which will generally bring you somewhere off of the wiki.

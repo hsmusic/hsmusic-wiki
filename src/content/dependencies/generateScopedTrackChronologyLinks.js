@@ -96,6 +96,8 @@ export default {
           })),
 
         relations.chronologyLinks.slots({
+          showOnly: true,
+
           chronologyInfoSets: [
             {
               headingString: 'misc.chronology.heading.track',

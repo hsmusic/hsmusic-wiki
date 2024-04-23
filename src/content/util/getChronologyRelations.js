@@ -37,13 +37,8 @@ export default function getChronologyRelations(thing, {
       return;
     }
 
-    // Don't show a line if this contribution is the *only* item in the
-    // artist's chronology (since there's nothing to navigate there).
     const previous = things[index - 1];
     const next = things[index + 1];
-    if (!previous && !next) {
-      return;
-    }
 
     return {
       index: index + 1,
