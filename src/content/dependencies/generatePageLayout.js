@@ -606,7 +606,14 @@ export default {
             ]),
 
             html.tag('script', {
+              blocking: 'render',
               src: to('staticJS.path', 'lazy-loading.js'),
+            }),
+
+            html.tag('script', {
+              blocking: 'render',
+              type: 'module',
+              src: to('staticJS.path', 'client.js'),
             }),
           ]),
 
@@ -633,11 +640,6 @@ export default {
 
               // infoCardHTML,
               imageOverlayHTML,
-
-              html.tag('script', {
-                type: 'module',
-                src: to('staticJS.path', 'client.js'),
-              }),
             ]),
         ])
     ]).toString();
