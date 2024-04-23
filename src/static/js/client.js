@@ -2955,6 +2955,11 @@ clientSteps.addPageListeners.push(addAdditionalNamesBoxListeners);
 const scopedChronologyLinksInfo = initInfo('scopedChronologyLinksInfo', {
   containers: null,
   switchers: null,
+  modes: null,
+
+  session: {
+    selectedMode: 'wiki',
+  },
 });
 
 function getScopedChronologyLinksReferences() {
@@ -2966,10 +2971,18 @@ function getScopedChronologyLinksReferences() {
   info.switchers =
     info.containers
       .map(container => container.querySelector('.scoped-chronology-switcher'));
+
+  info.modes =
+    info.containers
+      .map(container =>
+        Array.from(container.classList)
+          .find(className => className.startsWith('scope-'))
+          .slice('scope-'.length));
 }
 
 function addScopedChronologyLinksPageHandlers() {
   const info = scopedChronologyLinksInfo;
+  const {session} = scopedChronologyLinksInfo;
 
   for (const [index, switcher] of info.switchers.entries()) {
     const currentContainer =
@@ -2978,15 +2991,40 @@ function addScopedChronologyLinksPageHandlers() {
     const nextContainer =
       atOffset(info.containers, index, +1, {wrap: true});
 
+    const nextMode =
+      atOffset(info.modes, index, +1, {wrap: true});
+
     switcher.addEventListener('click', domEvent => {
       domEvent.preventDefault();
+
       cssProp(currentContainer, 'display', 'none');
       cssProp(nextContainer, 'display', 'block');
+
+      session.selectedMode = nextMode;
     });
   }
 }
 
+function mutateScopedChronologyLinksContent() {
+  const info = scopedChronologyLinksInfo;
+
+  const {selectedMode} = info.session;
+
+  if (info.modes.includes(selectedMode)) {
+    const selectedIndex = info.modes.indexOf(selectedMode);
+
+    for (const [index, container] of info.containers.entries()) {
+      if (index === selectedIndex) {
+        cssProp(container, 'display', 'block');
+      } else {
+        cssProp(container, 'display', 'none');
+      }
+    }
+  }
+}
+
 clientSteps.getPageReferences.push(getScopedChronologyLinksReferences);
+clientSteps.mutatePageContent.push(mutateScopedChronologyLinksContent);
 clientSteps.addPageListeners.push(addScopedChronologyLinksPageHandlers);
 
 // Group contributions table ------------------------------
