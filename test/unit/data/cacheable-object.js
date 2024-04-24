@@ -4,7 +4,7 @@ import CacheableObject from '#cacheable-object';
 
 function newCacheableObject(PD) {
   return new (class extends CacheableObject {
-    static propertyDescriptors = PD;
+    static [CacheableObject.propertyDescriptors] = PD;
   });
 }
 
