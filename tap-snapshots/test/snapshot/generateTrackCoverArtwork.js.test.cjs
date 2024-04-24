@@ -15,7 +15,7 @@ exports[`test/snapshot/generateTrackCoverArtwork.js > TAP > generateTrackCoverAr
      { name: 'creepy crawlies', isContentWarning: true }
    ]
  ]
- slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], color: '#abcdef', thumb: 'medium', reveal: true, link: true, square: true }]
+ slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], color: '#abcdef', thumb: 'medium', reveal: true, link: true, dimensions: [ 400, 300 ] }]
 <ul class="image-details">
     <li><a href="tag/damara/">Damara</a></li>
     <li><a href="tag/cronus/">Cronus</a></li>
@@ -40,7 +40,7 @@ exports[`test/snapshot/generateTrackCoverArtwork.js > TAP > generateTrackCoverAr
      { name: 'creepy crawlies', isContentWarning: true }
    ]
  ]
- slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], color: '#abcdef', thumb: 'small', reveal: false, link: false, square: true }]
+ slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], color: '#abcdef', thumb: 'small', reveal: false, link: false, dimensions: [ 400, 300 ] }]
 `
 
 exports[`test/snapshot/generateTrackCoverArtwork.js > TAP > generateTrackCoverArtwork (snapshot) > display: thumbnail - unique art 1`] = `
