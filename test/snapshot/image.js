@@ -38,17 +38,24 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
     },
   });
 
-  quickSnapshot('width & height', {
+  quickSnapshot('dimensions', {
     slots: {
       src: 'foobar',
-      width: 600,
-      height: 400,
+      dimensions: [600, 400],
     },
   });
 
   quickSnapshot('square', {
     slots: {
       src: 'foobar',
+      square: true,
+    },
+  });
+
+  quickSnapshot('dimensions with square', {
+    slots: {
+      src: 'foobar',
+      dimensions: [600, 400],
       square: true,
     },
   });
