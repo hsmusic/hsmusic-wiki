@@ -1,4 +1,4 @@
-import {logInfo, logWarn} from '#cli';
+import {logWarn} from '#cli';
 import {empty} from '#sugar';
 
 export default {
@@ -118,10 +118,6 @@ export default {
 
     const isMissingImageFile =
       missingImagePaths.includes(mediaSrc);
-
-    if (isMissingImageFile) {
-      logInfo`No image file for ${mediaSrc} - build again for list of missing images.`;
-    }
 
     const willLink =
       !isMissingImageFile &&
