@@ -8,22 +8,22 @@
 exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) > loads of links (inline) 1`] = `
 <span class="contribution nowrap"><a href="artist/lorem-ipsum-lover/">Lorem Ipsum Lover</a> (<span class="icons icons-inline"><a class="icon" href="https://loremipsum.io">
             <svg>
-                <title>External (loremipsum.io)</title>
+                <title>loremipsum.io</title>
                 <use href="static/icons.svg#icon-globe"></use>
             </svg>
         </a>, <a class="icon" href="https://loremipsum.io/generator/">
             <svg>
-                <title>External (loremipsum.io)</title>
+                <title>loremipsum.io</title>
                 <use href="static/icons.svg#icon-globe"></use>
             </svg>
         </a>, <a class="icon" href="https://loremipsum.io/#meaning">
             <svg>
-                <title>External (loremipsum.io)</title>
+                <title>loremipsum.io</title>
                 <use href="static/icons.svg#icon-globe"></use>
             </svg>
         </a>, <a class="icon" href="https://loremipsum.io/#usage-and-examples">
             <svg>
-                <title>External (loremipsum.io)</title>
+                <title>loremipsum.io</title>
                 <use href="static/icons.svg#icon-globe"></use>
             </svg>
         </a></span>)</span>
@@ -33,28 +33,28 @@ exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) >
 <span class="contribution"><span class="text-with-tooltip"><span class="hoverable"><a class="text-with-tooltip-interaction-cue" href="artist/lorem-ipsum-lover/">Lorem Ipsum Lover</a></span><span class="tooltip icons icons-tooltip"><span class="tooltip-content"><a class="icon has-text" href="https://loremipsum.io">
                     <svg><use href="static/icons.svg#icon-globe"></use></svg>
                     <span class="icon-text">loremipsum.io</span>
-                </a><a class="icon has-text" href="https://loremipsum.io/generator/">
+                </a><span class="icon-platform">Other</span><a class="icon has-text" href="https://loremipsum.io/generator/">
                     <svg><use href="static/icons.svg#icon-globe"></use></svg>
                     <span class="icon-text">loremipsum.io</span>
-                </a><a class="icon has-text" href="https://loremipsum.io/#meaning">
+                </a><span class="icon-platform">Other</span><a class="icon has-text" href="https://loremipsum.io/#meaning">
                     <svg><use href="static/icons.svg#icon-globe"></use></svg>
                     <span class="icon-text">loremipsum.io</span>
-                </a><a class="icon has-text" href="https://loremipsum.io/#usage-and-examples">
+                </a><span class="icon-platform">Other</span><a class="icon has-text" href="https://loremipsum.io/#usage-and-examples">
                     <svg><use href="static/icons.svg#icon-globe"></use></svg>
                     <span class="icon-text">loremipsum.io</span>
-                </a><a class="icon has-text" href="https://loremipsum.io/#controversy">
+                </a><span class="icon-platform">Other</span><a class="icon has-text" href="https://loremipsum.io/#controversy">
                     <svg><use href="static/icons.svg#icon-globe"></use></svg>
                     <span class="icon-text">loremipsum.io</span>
-                </a><a class="icon has-text" href="https://loremipsum.io/#when-to-use-lorem-ipsum">
+                </a><span class="icon-platform">Other</span><a class="icon has-text" href="https://loremipsum.io/#when-to-use-lorem-ipsum">
                     <svg><use href="static/icons.svg#icon-globe"></use></svg>
                     <span class="icon-text">loremipsum.io</span>
-                </a><a class="icon has-text" href="https://loremipsum.io/#lorem-ipsum-all-the-things">
+                </a><span class="icon-platform">Other</span><a class="icon has-text" href="https://loremipsum.io/#lorem-ipsum-all-the-things">
                     <svg><use href="static/icons.svg#icon-globe"></use></svg>
                     <span class="icon-text">loremipsum.io</span>
-                </a><a class="icon has-text" href="https://loremipsum.io/#original-source">
+                </a><span class="icon-platform">Other</span><a class="icon has-text" href="https://loremipsum.io/#original-source">
                     <svg><use href="static/icons.svg#icon-globe"></use></svg>
                     <span class="icon-text">loremipsum.io</span>
-                </a></span></span></span></span>
+                </a><span class="icon-platform">Other</span></span></span></span></span>
 `
 
 exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) > no accents 1`] = `
@@ -78,7 +78,7 @@ exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) >
             </svg>
         </a>, <a class="icon" href="https://toby.fox/">
             <svg>
-                <title>External (toby.fox)</title>
+                <title>toby.fox</title>
                 <use href="static/icons.svg#icon-globe"></use>
             </svg>
         </a></span>)</span>
@@ -105,7 +105,7 @@ exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) >
             </svg>
         </a>, <a class="icon" href="https://toby.fox/">
             <svg>
-                <title>External (toby.fox)</title>
+                <title>toby.fox</title>
                 <use href="static/icons.svg#icon-globe"></use>
             </svg>
         </a></span>)</span>
@@ -115,15 +115,15 @@ exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) >
 <span class="contribution"><span class="text-with-tooltip"><span class="hoverable"><a class="text-with-tooltip-interaction-cue" href="artist/clark-powell/">Clark Powell</a></span><span class="tooltip icons icons-tooltip"><span class="tooltip-content"><a class="icon has-text" href="https://soundcloud.com/plazmataz">
                     <svg><use href="static/icons.svg#icon-soundcloud"></use></svg>
                     <span class="icon-text">plazmataz</span>
-                </a></span></span></span></span>
+                </a><span class="icon-platform">SoundCloud</span></span></span></span></span>
 <span class="contribution nowrap"><a href="artist/the-big-baddies/">Grounder &amp; Scratch</a> (Snooping)</span>
 <span class="contribution nowrap"><span class="text-with-tooltip"><span class="hoverable"><a class="text-with-tooltip-interaction-cue" href="artist/toby-fox/">Toby Fox</a></span><span class="tooltip icons icons-tooltip"><span class="tooltip-content"><a class="icon has-text" href="https://tobyfox.bandcamp.com/">
                     <svg><use href="static/icons.svg#icon-bandcamp"></use></svg>
                     <span class="icon-text">tobyfox</span>
-                </a><a class="icon has-text" href="https://toby.fox/">
+                </a><span class="icon-platform">Bandcamp</span><a class="icon has-text" href="https://toby.fox/">
                     <svg><use href="static/icons.svg#icon-globe"></use></svg>
                     <span class="icon-text">toby.fox</span>
-                </a></span></span></span> (Arrangement)</span>
+                </a><span class="icon-platform">Other</span></span></span></span> (Arrangement)</span>
 `
 
 exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) > showContribution & showIcons (inline) 1`] = `
@@ -141,7 +141,7 @@ exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) >
             </svg>
         </a>, <a class="icon" href="https://toby.fox/">
             <svg>
-                <title>External (toby.fox)</title>
+                <title>toby.fox</title>
                 <use href="static/icons.svg#icon-globe"></use>
             </svg>
         </a></span>)</span>
@@ -151,13 +151,13 @@ exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) >
 <span class="contribution"><span class="text-with-tooltip"><span class="hoverable"><a class="text-with-tooltip-interaction-cue" href="artist/clark-powell/">Clark Powell</a></span><span class="tooltip icons icons-tooltip"><span class="tooltip-content"><a class="icon has-text" href="https://soundcloud.com/plazmataz">
                     <svg><use href="static/icons.svg#icon-soundcloud"></use></svg>
                     <span class="icon-text">plazmataz</span>
-                </a></span></span></span></span>
+                </a><span class="icon-platform">SoundCloud</span></span></span></span></span>
 <span class="contribution nowrap"><a href="artist/the-big-baddies/">Grounder &amp; Scratch</a> (Snooping)</span>
 <span class="contribution nowrap"><span class="text-with-tooltip"><span class="hoverable"><a class="text-with-tooltip-interaction-cue" href="artist/toby-fox/">Toby Fox</a></span><span class="tooltip icons icons-tooltip"><span class="tooltip-content"><a class="icon has-text" href="https://tobyfox.bandcamp.com/">
                     <svg><use href="static/icons.svg#icon-bandcamp"></use></svg>
                     <span class="icon-text">tobyfox</span>
-                </a><a class="icon has-text" href="https://toby.fox/">
+                </a><span class="icon-platform">Bandcamp</span><a class="icon has-text" href="https://toby.fox/">
                     <svg><use href="static/icons.svg#icon-globe"></use></svg>
                     <span class="icon-text">toby.fox</span>
-                </a></span></span></span> (Arrangement)</span>
+                </a><span class="icon-platform">Other</span></span></span></span> (Arrangement)</span>
 `
