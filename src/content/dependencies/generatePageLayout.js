@@ -348,9 +348,6 @@ export default {
                     showAsCurrent &&
                       {class: 'current'},
 
-                    i > 0 &&
-                      {class: 'has-divider'},
-
                     [
                       html.tag('span', {class: 'nav-link-content'},
                         // Use inline-block styling on the content span,
