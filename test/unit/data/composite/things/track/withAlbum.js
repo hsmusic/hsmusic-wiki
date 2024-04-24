@@ -2,6 +2,8 @@ import t from 'tap';
 
 import '#import-heck';
 
+import Thing from '#thing';
+
 import {compositeFrom, input} from '#composite';
 import {exposeConstant, exposeDependency} from '#composite/control-flow';
 import {withAlbum} from '#composite/things/track';
@@ -23,9 +25,21 @@ t.test(`withAlbum: basic behavior`, t => {
     },
   });
 
-  const fakeTrack1 = {directory: 'foo'};
-  const fakeTrack2 = {directory: 'bar'};
-  const fakeAlbum = {directory: 'baz', tracks: [fakeTrack1]};
+  const fakeTrack1 = {
+    [Thing.isThing]: true,
+    directory: 'foo',
+  };
+
+  const fakeTrack2 = {
+    [Thing.isThing]: true,
+    directory: 'bar',
+  };
+
+  const fakeAlbum = {
+    [Thing.isThing]: true,
+    directory: 'baz',
+    tracks: [fakeTrack1],
+  };
 
   t.equal(
     composite.expose.compute({
@@ -55,9 +69,21 @@ t.test(`withAlbum: early exit conditions`, t => {
     ],
   });
 
-  const fakeTrack1 = {directory: 'foo'};
-  const fakeTrack2 = {directory: 'bar'};
-  const fakeAlbum = {directory: 'baz', tracks: [fakeTrack1]};
+  const fakeTrack1 = {
+    [Thing.isThing]: true,
+    directory: 'foo',
+  };
+
+  const fakeTrack2 = {
+    [Thing.isThing]: true,
+    directory: 'bar',
+  };
+
+  const fakeAlbum = {
+    [Thing.isThing]: true,
+    directory: 'baz',
+    tracks: [fakeTrack1],
+  };
 
   t.equal(
     composite.expose.compute({
