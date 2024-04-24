@@ -13,7 +13,8 @@
 
 import {input, templateCompositeFrom} from '#composite';
 
-import {exitWithoutDependency} from '#composite/control-flow';
+import {exitWithoutDependency, raiseOutputWithoutDependency}
+  from '#composite/control-flow';
 
 import inputWikiData from './inputWikiData.js';
 
@@ -34,10 +35,17 @@ export default templateCompositeFrom({
   outputs: ['#reverseReferenceList'],
 
   steps: () => [
+    // Early exit with an empty array if the data list isn't available.
     exitWithoutDependency({
       dependency: input('data'),
       value: input.value([]),
+    }),
+
+    // Raise an empty array (don't early exit) if the data list is empty.
+    raiseOutputWithoutDependency({
+      dependency: input('data'),
       mode: input.value('empty'),
+      output: input.value({'#reverseReferenceList': []}),
     }),
 
     {
