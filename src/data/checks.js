@@ -261,7 +261,7 @@ export function filterReferenceErrors(wikiData, {
                 break;
 
               case '_contrib':
-                findFn = contribRef => findArtistOrAlias(contribRef.who);
+                findFn = contribRef => findArtistOrAlias(contribRef.artist);
                 break;
 
               case '_homepageSourceGroup':

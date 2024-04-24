@@ -16,7 +16,10 @@ export function toRefs(things) {
 }
 
 export function toContribRefs(contribs) {
-  return contribs?.map(({who, what}) => ({who: toRef(who), what}));
+  return contribs?.map(({artist, annotation}) => ({
+    artist: toRef(artist),
+    annotation,
+  }));
 }
 
 export function toCommentaryRefs(entries) {
