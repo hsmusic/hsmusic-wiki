@@ -150,7 +150,7 @@ export default {
         query.chunks.map(({chunk}) =>
           chunk
             .map(({contribs}) =>
-              contribs.filter(({who}) => who === artist))
+              contribs.filter(contrib => contrib.artist === artist))
             .map(ownContribs => ({
               creditedAsArtist:
                 ownContribs
@@ -162,7 +162,7 @@ export default {
 
               annotatedContribs:
                 ownContribs
-                  .filter(({what}) => what),
+                  .filter(({annotation}) => annotation),
             }))
             .map(({annotatedContribs, ...rest}) => ({
               ...rest,
@@ -203,7 +203,7 @@ export default {
               ];
             })
             .map(contribs =>
-              contribs.map(({what}) => what))
+              contribs.map(({annotation}) => annotation))
             .map(contributions =>
               (empty(contributions)
                 ? null

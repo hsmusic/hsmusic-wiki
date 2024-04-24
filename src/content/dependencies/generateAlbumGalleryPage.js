@@ -30,7 +30,7 @@ export default {
       const allCoverArtistArrays =
         tracksWithUniqueCoverArt
           .map(track => track.coverArtistContribs)
-          .map(contribs => contribs.map(contrib => contrib.who));
+          .map(contribs => contribs.map(contrib => contrib.artist));
 
       const allSameCoverArtists =
         allCoverArtistArrays
@@ -116,7 +116,7 @@ export default {
 
     data.coverArtists = [
       (album.hasCoverArt
-        ? album.coverArtistContribs.map(({who: artist}) => artist.name)
+        ? album.coverArtistContribs.map(({artist}) => artist.name)
         : null),
 
       ...
@@ -126,7 +126,7 @@ export default {
           }
 
           if (track.hasUniqueCoverArt) {
-            return track.coverArtistContribs.map(({who: artist}) => artist.name);
+            return track.coverArtistContribs.map(({artist}) => artist.name);
           }
 
           return null;

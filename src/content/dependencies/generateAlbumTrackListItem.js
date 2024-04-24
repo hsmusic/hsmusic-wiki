@@ -64,8 +64,8 @@ export default {
       !empty(track.artistContribs) &&
        (empty(album.artistContribs) ||
         !compareArrays(
-          track.artistContribs.map(c => c.who),
-          album.artistContribs.map(c => c.who),
+          track.artistContribs.map(contrib => contrib.artist),
+          album.artistContribs.map(contrib => contrib.artist),
           {checkOrder: false}));
 
     return data;

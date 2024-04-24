@@ -80,7 +80,7 @@ export default {
     data.coverArtists =
       query.things.map(thing =>
         thing.coverArtistContribs
-          .map(({who: artist}) => artist.name));
+          .map(({artist}) => artist.name));
 
     return data;
   },

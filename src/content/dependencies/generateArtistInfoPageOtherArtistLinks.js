@@ -4,7 +4,8 @@ export default {
   contentDependencies: ['linkArtist'],
 
   relations(relation, contribs, artist) {
-    const otherArtistContribs = contribs.filter(({who}) => who !== artist);
+    const otherArtistContribs =
+      contribs.filter(contrib => contrib.artist !== artist);
 
     if (empty(otherArtistContribs)) {
       return {};
@@ -12,7 +13,7 @@ export default {
 
     const otherArtistLinks =
       otherArtistContribs
-        .map(({who}) => relation('linkArtist', who));
+        .map(contrib => relation('linkArtist', contrib.artist));
 
     return {otherArtistLinks};
   },
