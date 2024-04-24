@@ -2,27 +2,27 @@ import t from 'tap';
 import {testContentFunctions} from '#test-lib';
 
 t.test('generateContributionLinks (unit)', async t => {
-  const who1 = {
+  const artist1 = {
     name: 'Clark Powell',
     directory: 'clark-powell',
     urls: ['https://soundcloud.com/plazmataz'],
   };
 
-  const who2 = {
+  const artist2 = {
     name: 'Grounder & Scratch',
     directory: 'the-big-baddies',
     urls: [],
   };
 
-  const who3 = {
+  const artist3 = {
     name: 'Toby Fox',
     directory: 'toby-fox',
     urls: ['https://tobyfox.bandcamp.com/', 'https://toby.fox/'],
   };
 
-  const what1 = null;
-  const what2 = 'Snooping';
-  const what3 = 'Arrangement';
+  const annotation1 = null;
+  const annotation2 = 'Snooping';
+  const annotation3 = 'Arrangement';
 
   await testContentFunctions(t, 'generateContributionLinks (unit 1)', async (t, evaluate) => {
     const slots = {
@@ -34,14 +34,14 @@ t.test('generateContributionLinks (unit)', async t => {
       mock: evaluate.mock(mock => ({
         linkArtist: {
           relations: mock.function('linkArtist.relations', () => ({}))
-            .args([undefined, who1]).next()
-            .args([undefined, who2]).next()
-            .args([undefined, who3]),
+            .args([undefined, artist1]).next()
+            .args([undefined, artist2]).next()
+            .args([undefined, artist3]),
 
           data: mock.function('linkArtist.data', () => ({}))
-            .args([who1]).next()
-            .args([who2]).next()
-            .args([who3]),
+            .args([artist1]).next()
+            .args([artist2]).next()
+            .args([artist3]),
 
           // This can be tweaked to return a specific (mocked) template
           // for each artist if we need to test for slots in the future.
@@ -51,9 +51,9 @@ t.test('generateContributionLinks (unit)', async t => {
 
         linkExternalAsIcon: {
           data: mock.function('linkExternalAsIcon.data', () => ({}))
-            .args([who1.urls[0]]).next()
-            .args([who3.urls[0]]).next()
-            .args([who3.urls[1]]),
+            .args([artist1.urls[0]]).next()
+            .args([artist3.urls[0]]).next()
+            .args([artist3.urls[1]]),
 
           generate: mock.function('linkExternalAsIcon.generate', () => 'icon')
             .repeat(3),
@@ -64,9 +64,9 @@ t.test('generateContributionLinks (unit)', async t => {
     evaluate({
       name: 'linkContribution',
       multiple: [
-        {args: [{who: who1, what: what1}]},
-        {args: [{who: who2, what: what2}]},
-        {args: [{who: who3, what: what3}]},
+        {args: [{artist: artist1, annotation: annotation1}]},
+        {args: [{artist: artist2, annotation: annotation2}]},
+        {args: [{artist: artist3, annotation: annotation3}]},
       ],
       slots,
     });
@@ -82,14 +82,14 @@ t.test('generateContributionLinks (unit)', async t => {
       mock: evaluate.mock(mock => ({
         linkArtist: {
           relations: mock.function('linkArtist.relations', () => ({}))
-            .args([undefined, who1]).next()
-            .args([undefined, who2]).next()
-            .args([undefined, who3]),
+            .args([undefined, artist1]).next()
+            .args([undefined, artist2]).next()
+            .args([undefined, artist3]),
 
           data: mock.function('linkArtist.data', () => ({}))
-            .args([who1]).next()
-            .args([who2]).next()
-            .args([who3]),
+            .args([artist1]).next()
+            .args([artist2]).next()
+            .args([artist3]),
 
           generate: mock.function(() => 'artist link')
             .repeat(3),
@@ -112,9 +112,9 @@ t.test('generateContributionLinks (unit)', async t => {
     evaluate({
       name: 'linkContribution',
       multiple: [
-        {args: [{who: who1, what: what1}]},
-        {args: [{who: who2, what: what2}]},
-        {args: [{who: who3, what: what3}]},
+        {args: [{artist: artist1, annotation: annotation1}]},
+        {args: [{artist: artist2, annotation: annotation2}]},
+        {args: [{artist: artist3, annotation: annotation3}]},
       ],
       slots,
     });

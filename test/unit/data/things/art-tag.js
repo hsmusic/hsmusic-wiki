@@ -43,8 +43,8 @@ function stubArtist(artistName = `Test Artist`) {
 
 function stubArtistAndContribs(artistName = `Test Artist`) {
   const artist = stubArtist(artistName);
-  const contribs = [{who: artistName, what: null}];
-  const badContribs = [{who: `Figment of Your Imagination`, what: null}];
+  const contribs = [{artist: artistName, annotation: null}];
+  const badContribs = [{artist: `Figment of Your Imagination`, annotation: null}];
 
   return {artist, contribs, badContribs};
 }
