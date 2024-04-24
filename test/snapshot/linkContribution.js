@@ -9,25 +9,25 @@ testContentFunctions(t, 'linkContribution (snapshot)', async (t, evaluate) => {
       name: 'linkContribution',
       multiple: [
         {args: [
-          {who: {
+          {artist: {
             name: 'Clark Powell',
             directory: 'clark-powell',
             urls: ['https://soundcloud.com/plazmataz'],
-          }, what: null},
+          }, annotation: null},
         ]},
         {args: [
-          {who: {
+          {artist: {
             name: 'Grounder & Scratch',
             directory: 'the-big-baddies',
             urls: [],
-          }, what: 'Snooping'},
+          }, annotation: 'Snooping'},
         ]},
         {args: [
-          {who: {
+          {artist: {
             name: 'Toby Fox',
             directory: 'toby-fox',
             urls: ['https://tobyfox.bandcamp.com/', 'https://toby.fox/'],
-          }, what: 'Arrangement'},
+          }, annotation: 'Arrangement'},
         ]},
       ],
       slots,
@@ -65,7 +65,7 @@ testContentFunctions(t, 'linkContribution (snapshot)', async (t, evaluate) => {
   evaluate.snapshot('loads of links (inline)', {
     name: 'linkContribution',
     args: [
-      {who: {name: 'Lorem Ipsum Lover', directory: 'lorem-ipsum-lover', urls: [
+      {artist: {name: 'Lorem Ipsum Lover', directory: 'lorem-ipsum-lover', urls: [
         'https://loremipsum.io',
         'https://loremipsum.io/generator/',
         'https://loremipsum.io/#meaning',
@@ -74,7 +74,7 @@ testContentFunctions(t, 'linkContribution (snapshot)', async (t, evaluate) => {
         'https://loremipsum.io/#when-to-use-lorem-ipsum',
         'https://loremipsum.io/#lorem-ipsum-all-the-things',
         'https://loremipsum.io/#original-source',
-      ]}, what: null},
+      ]}, annotation: null},
     ],
     slots: {showIcons: true},
   });
@@ -82,7 +82,7 @@ testContentFunctions(t, 'linkContribution (snapshot)', async (t, evaluate) => {
   evaluate.snapshot('loads of links (tooltip)', {
     name: 'linkContribution',
     args: [
-      {who: {name: 'Lorem Ipsum Lover', directory: 'lorem-ipsum-lover', urls: [
+      {artist: {name: 'Lorem Ipsum Lover', directory: 'lorem-ipsum-lover', urls: [
         'https://loremipsum.io',
         'https://loremipsum.io/generator/',
         'https://loremipsum.io/#meaning',
@@ -91,7 +91,7 @@ testContentFunctions(t, 'linkContribution (snapshot)', async (t, evaluate) => {
         'https://loremipsum.io/#when-to-use-lorem-ipsum',
         'https://loremipsum.io/#lorem-ipsum-all-the-things',
         'https://loremipsum.io/#original-source',
-      ]}, what: null},
+      ]}, annotation: null},
     ],
     slots: {showIcons: true, iconMode: 'tooltip'},
   });

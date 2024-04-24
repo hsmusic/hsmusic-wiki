@@ -46,8 +46,8 @@ function stubArtist(artistName = `Test Artist`) {
 
 function stubArtistAndContribs(artistName = `Test Artist`) {
   const artist = stubArtist(artistName);
-  const contribs = [{who: artistName, what: null}];
-  const badContribs = [{who: `Figment of Your Imagination`, what: null}];
+  const contribs = [{artist: artistName, annotation: null}];
+  const badContribs = [{artist: `Figment of Your Imagination`, annotation: null}];
 
   return {artist, contribs, badContribs};
 }
@@ -189,31 +189,31 @@ t.test(`Track.artistContribs`, t => {
     `artistContribs #1: defaults to empty array`);
 
   album.artistContribs = [
-    {who: `Artist 1`, what: `composition`},
-    {who: `Artist 2`, what: null},
+    {artist: `Artist 1`, annotation: `composition`},
+    {artist: `Artist 2`, annotation: null},
   ];
 
   XXX_decacheWikiData();
 
   t.same(track.artistContribs,
-    [{who: artist1, what: `composition`}, {who: artist2, what: null}],
+    [{artist: artist1, annotation: `composition`}, {artist: artist2, annotation: null}],
     `artistContribs #2: inherits album artistContribs`);
 
   track.artistContribs = [
-    {who: `Artist 1`, what: `arrangement`},
+    {artist: `Artist 1`, annotation: `arrangement`},
   ];
 
-  t.same(track.artistContribs, [{who: artist1, what: `arrangement`}],
+  t.same(track.artistContribs, [{artist: artist1, annotation: `arrangement`}],
     `artistContribs #3: resolves from own value`);
 
   track.artistContribs = [
-    {who: `Artist 1`, what: `snooping`},
-    {who: `Artist 413`, what: `as`},
-    {who: `Artist 2`, what: `usual`},
+    {artist: `Artist 1`, annotation: `snooping`},
+    {artist: `Artist 413`, annotation: `as`},
+    {artist: `Artist 2`, annotation: `usual`},
   ];
 
   t.same(track.artistContribs,
-    [{who: artist1, what: `snooping`}, {who: artist2, what: `usual`}],
+    [{artist: artist1, annotation: `snooping`}, {artist: artist2, annotation: `usual`}],
     `artistContribs #4: filters out names without matches`);
 });
 
@@ -303,7 +303,7 @@ t.test(`Track.commentatorArtists`, t => {
     `Track.commentatorArtists #2: works with two commentators`);
 
   track.commentary = commentary +=
-    `<i>Icy|<b>Icy What You Did There</b>:</i>\n` +
+    `<i>Icy|<b>Icy annotation You Did There</b>:</i>\n` +
     `Incredible.\n`;
 
   t.same(track.commentatorArtists, [artist1, artist2, artist3],
@@ -362,31 +362,31 @@ t.test(`Track.coverArtistContribs`, t => {
     `coverArtistContribs #1: defaults to empty array`);
 
   album.trackCoverArtistContribs = [
-    {who: `Artist 1`, what: `lines`},
-    {who: `Artist 2`, what: null},
+    {artist: `Artist 1`, annotation: `lines`},
+    {artist: `Artist 2`, annotation: null},
   ];
 
   XXX_decacheWikiData();
 
   t.same(track.coverArtistContribs,
-    [{who: artist1, what: `lines`}, {who: artist2, what: null}],
+    [{artist: artist1, annotation: `lines`}, {artist: artist2, annotation: null}],
     `coverArtistContribs #2: inherits album trackCoverArtistContribs`);
 
   track.coverArtistContribs = [
-    {who: `Artist 1`, what: `collage`},
+    {artist: `Artist 1`, annotation: `collage`},
   ];
 
-  t.same(track.coverArtistContribs, [{who: artist1, what: `collage`}],
+  t.same(track.coverArtistContribs, [{artist: artist1, annotation: `collage`}],
     `coverArtistContribs #3: resolves from own value`);
 
   track.coverArtistContribs = [
-    {who: `Artist 1`, what: `snooping`},
-    {who: `Artist 413`, what: `as`},
-    {who: `Artist 2`, what: `usual`},
+    {artist: `Artist 1`, annotation: `snooping`},
+    {artist: `Artist 413`, annotation: `as`},
+    {artist: `Artist 2`, annotation: `usual`},
   ];
 
   t.same(track.coverArtistContribs,
-    [{who: artist1, what: `snooping`}, {who: artist2, what: `usual`}],
+    [{artist: artist1, annotation: `snooping`}, {artist: artist2, annotation: `usual`}],
     `coverArtistContribs #4: filters out names without matches`);
 
   track.disableUniqueCoverArt = true;

@@ -280,17 +280,17 @@ t.test('isContentString', t => {
 
 t.test('isContribution', t => {
   t.plan(4);
-  t.ok(isContribution({who: 'artist:toby-fox', what: 'Music'}));
-  t.ok(isContribution({who: 'Toby Fox'}));
-  t.throws(() => isContribution(({who: 'group:umspaf', what: 'Organizing'})),
-    {errors: /who/});
-  t.throws(() => isContribution(({who: 'artist:toby-fox', what: 123})),
-    {errors: /what/});
+  t.ok(isContribution({artist: 'artist:toby-fox', annotation: 'Music'}));
+  t.ok(isContribution({artist: 'Toby Fox'}));
+  t.throws(() => isContribution(({artist: 'group:umspaf', annotation: 'Organizing'})),
+    {errors: /artist/});
+  t.throws(() => isContribution(({artist: 'artist:toby-fox', annotation: 123})),
+    {errors: /annotation/});
 });
 
 t.test('isContributionList', t => {
   t.plan(4);
-  t.ok(isContributionList([{who: 'Beavis'}, {who: 'Butthead', what: 'Wrangling'}]));
+  t.ok(isContributionList([{artist: 'Beavis'}, {artist: 'Butthead', annotation: 'Wrangling'}]));
   t.ok(isContributionList([]));
   t.throws(() => isContributionList(2));
   t.throws(() => isContributionList(['Charlie', 'Woodstock']));
