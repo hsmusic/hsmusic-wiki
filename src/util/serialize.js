@@ -14,10 +14,10 @@ export function serializeLink(thing) {
 }
 
 export function serializeContribs(contribs) {
-  return contribs.map(({who, what}) => {
+  return contribs.map(({artist, annotation}) => {
     const ret = {};
-    ret.artist = serializeLink(who);
-    if (what) ret.contribution = what;
+    ret.artist = serializeLink(artist);
+    if (annotation) ret.contribution = annotation;
     return ret;
   });
 }
