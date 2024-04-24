@@ -21,11 +21,10 @@ export default templateCompositeFrom({
   outputs: ['#uniqueReferencingThing'],
 
   steps: () => [
-    // withReverseRefernceList does this check too, but it early exits with
-    // an empty array. That's no good here!
+    // Early exit with null (not an empty array) if the data list
+    // isn't available.
     exitWithoutDependency({
       dependency: input('data'),
-      mode: input.value('empty'),
     }),
 
     withReverseReferenceList({
