@@ -59,11 +59,11 @@ export default {
       relation('generateSecondaryNav');
 
     relations.groupLinks =
-      album.groups
+      query.groups
         .map(group => relation('linkGroup', group));
 
     relations.colorStyles =
-      album.groups
+      query.groups
         .map(group => relation('generateColorStyleAttribute', group.color));
 
     if (album.date) {
