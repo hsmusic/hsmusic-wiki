@@ -614,8 +614,8 @@ export function isThingClass(thingClass) {
 }
 
 export const isContribution = validateProperties({
-  who: isArtistRef,
-  what: optional(isStringNonEmpty),
+  artist: isArtistRef,
+  annotation: optional(isStringNonEmpty),
 });
 
 export const isContributionList = validateArrayItems(isContribution);
