@@ -488,13 +488,13 @@ a:not([href]):hover {
   display: inline-block;
 }
 
-.nav-links-index .nav-link.has-divider::before,
-.nav-links-groups .nav-link.has-divider::before {
+.nav-links-index .nav-link:not(:first-child)::before,
+.nav-links-groups .nav-link:not(:first-child)::before {
   content: "\0020\00b7\0020";
   font-weight: 800;
 }
 
-.nav-links-hierarchical .nav-link.has-divider::before {
+.nav-links-hierarchical .nav-link:not(:first-child)::before {
   content: "\0020/\0020";
 }
 

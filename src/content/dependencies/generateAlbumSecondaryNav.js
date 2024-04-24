@@ -151,11 +151,8 @@ export default {
       stitchArrays({
         content: navLinkContents,
         colorStyle: relations.colorStyles,
-      }).map(({content, colorStyle}, index) =>
+      }).map(({content, colorStyle}) =>
           html.tag('span', {class: 'nav-link'},
-            index > 0 &&
-              {class: 'has-divider'},
-
             colorStyle.slot('context', 'primary-only'),
 
             content));
