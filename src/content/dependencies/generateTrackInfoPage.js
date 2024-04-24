@@ -10,6 +10,7 @@ export default {
     'generateAdditionalFilesShortcut',
     'generateAlbumAdditionalFilesList',
     'generateAlbumNavAccent',
+    'generateAlbumSecondaryNav',
     'generateAlbumSidebar',
     'generateAlbumStyleRules',
     'generateChronologyLinks',
@@ -111,6 +112,9 @@ export default {
 
     relations.chronologyLinks =
       relation('generateChronologyLinks');
+
+    relations.secondaryNav =
+      relation('generateAlbumSecondaryNav', track.album);
 
     relations.sidebar =
       relation('generateAlbumSidebar', track.album, track);
@@ -594,6 +598,10 @@ export default {
               },
             ],
           }),
+
+        secondaryNav:
+          relations.secondaryNav
+            .slot('mode', 'track'),
 
         leftSidebar: relations.sidebar,
 
