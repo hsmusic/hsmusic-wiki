@@ -10,7 +10,7 @@ exports[`test/snapshot/generateAlbumReleaseInfo.js > TAP > generateAlbumReleaseI
     By <span class="contribution nowrap"><a href="artist/toby-fox/">Toby Fox</a> (music probably)</span> and <span class="contribution nowrap"><span class="text-with-tooltip"><span class="hoverable"><a class="text-with-tooltip-interaction-cue" href="artist/tensei/">Tensei</a></span><span class="tooltip icons icons-tooltip"><span class="tooltip-content"><a class="icon has-text" href="https://tenseimusic.bandcamp.com/">
                         <svg><use href="static/icons.svg#icon-bandcamp"></use></svg>
                         <span class="icon-text">tenseimusic</span>
-                    </a></span></span></span> (hot jams)</span>.
+                    </a><span class="icon-platform">Bandcamp</span></span></span></span> (hot jams)</span>.
     <br>
     Cover art by <a href="artist/hb/">Hanni Brosh</a>.
     <br>
@@ -24,7 +24,7 @@ exports[`test/snapshot/generateAlbumReleaseInfo.js > TAP > generateAlbumReleaseI
     <br>
     Duration: ~10:25.
 </p>
-<p>Listen on <a href="https://homestuck.bandcamp.com/album/alterniabound-with-alternia" class="nowrap">Bandcamp</a>, <a href="https://www.youtube.com/playlist?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2" class="nowrap">YouTube (playlist)</a>, or <a href="https://www.youtube.com/watch?v=HO5V2uogkYc" class="nowrap">YouTube (full album)</a>.</p>
+<p>Listen on <a class="external-link" href="https://homestuck.bandcamp.com/album/alterniabound-with-alternia">Bandcamp</a>, <a class="external-link" href="https://www.youtube.com/playlist?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2">YouTube (playlist)</a>, or <a class="external-link" href="https://www.youtube.com/watch?v=HO5V2uogkYc">YouTube (full album)</a>.</p>
 `
 
 exports[`test/snapshot/generateAlbumReleaseInfo.js > TAP > generateAlbumReleaseInfo (snapshot) > equal cover art date 1`] = `
@@ -36,5 +36,5 @@ exports[`test/snapshot/generateAlbumReleaseInfo.js > TAP > generateAlbumReleaseI
 `
 
 exports[`test/snapshot/generateAlbumReleaseInfo.js > TAP > generateAlbumReleaseInfo (snapshot) > URLs only 1`] = `
-<p>Listen on <a href="https://homestuck.bandcamp.com/foo" class="nowrap">Bandcamp</a> or <a href="https://soundcloud.com/bar" class="nowrap">SoundCloud</a>.</p>
+<p>Listen on <a class="external-link" href="https://homestuck.bandcamp.com/foo">Bandcamp</a> or <a class="external-link" href="https://soundcloud.com/bar">SoundCloud</a>.</p>
 `

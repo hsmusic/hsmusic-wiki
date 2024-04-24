@@ -13,7 +13,7 @@ exports[`test/snapshot/generateTrackReleaseInfo.js > TAP > generateTrackReleaseI
     <br>
     Duration: 0:58.
 </p>
-<p>Listen on <a href="https://soundcloud.com/foo" class="nowrap">SoundCloud</a> or <a href="https://youtube.com/watch?v=bar" class="nowrap">YouTube</a>.</p>
+<p>Listen on <a class="external-link" href="https://soundcloud.com/foo">SoundCloud</a> or <a class="external-link" href="https://youtube.com/watch?v=bar">YouTube</a>.</p>
 `
 
 exports[`test/snapshot/generateTrackReleaseInfo.js > TAP > generateTrackReleaseInfo (snapshot) > cover artist contribs, non-unique 1`] = `
