@@ -3,15 +3,15 @@
 // into one property. Update value will look something like this:
 //
 //   [
-//     {who: 'Artist Name', what: 'Viola'},
-//     {who: 'artist:john-cena', what: null},
+//     {artist: 'Artist Name', annotation: 'Viola'},
+//     {artist: 'artist:john-cena', annotation: null},
 //     ...
 //   ]
 //
 // ...typically as processed from YAML, spreadsheet, or elsewhere.
-// Exposes as the same, but with the "who" replaced with matches found in
-// artistData - which means this always depends on an `artistData` property
-// also existing on this object!
+// Exposes as the same, but with the artist property replaced with matches
+// found in artistData - which means this always depends on an `artistData`
+// property also existing on this object!
 //
 
 import {input, templateCompositeFrom} from '#composite';

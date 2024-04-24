@@ -1,7 +1,8 @@
 // Resolves the contribsByRef contained in the provided dependency,
 // providing (named by the second argument) the result. "Resolving"
-// means mapping the "who" reference of each contribution to an artist
-// object, and filtering out those whose "who" doesn't match any artist.
+// means mapping the artist reference of each contribution to an artist
+// object, and filtering out those whose artist reference doesn't match
+// any artist.
 
 import {input, templateCompositeFrom} from '#composite';
 import find from '#find';
@@ -46,29 +47,30 @@ export default templateCompositeFrom({
 
     withPropertiesFromList({
       list: input('from'),
-      properties: input.value(['who', 'what']),
+      properties: input.value(['artist', 'annotation']),
       prefix: input.value('#contribs'),
     }),
 
     withResolvedReferenceList({
-      list: '#contribs.who',
+      list: '#contribs.artist',
       data: 'artistData',
       find: input.value(find.artist),
       notFoundMode: input('notFoundMode'),
     }).outputs({
-      ['#resolvedReferenceList']: '#contribs.who',
+      ['#resolvedReferenceList']: '#contribs.artist',
     }),
 
     {
-      dependencies: ['#contribs.who', '#contribs.what'],
+      dependencies: ['#contribs.artist', '#contribs.annotation'],
 
       compute(continuation, {
-        ['#contribs.who']: who,
-        ['#contribs.what']: what,
+        ['#contribs.artist']: artist,
+        ['#contribs.annotation']: annotation,
       }) {
-        filterMultipleArrays(who, what, (who, _what) => who);
+        filterMultipleArrays(artist, annotation, (artist, _annotation) => artist);
         return continuation({
-          ['#resolvedContribs']: stitchArrays({who, what}),
+          ['#resolvedContribs']:
+            stitchArrays({artist, annotation}),
         });
       },
     },

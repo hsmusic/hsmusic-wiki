@@ -393,7 +393,16 @@ export function parseContributors(contributionStrings) {
 
   return contributionStrings.map(item => {
     if (typeof item === 'object' && item['Who'])
-      return {who: item['Who'], what: item['What'] ?? null};
+      return {
+        artist: item['Who'],
+        annotation: item['What'] ?? null,
+      };
+
+    if (typeof item === 'object' && item['Artist'])
+      return {
+        artist: item['Artist'],
+        annotation: item['Annotation'] ?? null,
+      };
 
     if (typeof item !== 'string') return item;
 
@@ -401,8 +410,8 @@ export function parseContributors(contributionStrings) {
     if (!match) return item;
 
     return {
-      who: match.groups.main,
-      what: match.groups.accent ?? null,
+      artist: match.groups.main,
+      annotation: match.groups.accent ?? null,
     };
   });
 }

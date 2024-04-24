@@ -58,10 +58,10 @@ export default templateCompositeFrom({
           for (const referencingThing of data) {
             const referenceList = referencingThing[list];
 
-            // Destructuring {who} is the only unique part of the
+            // Destructuring {artist} is the only unique part of the
             // withReverseContributionList implementation, compared to
             // withReverseReferneceList.
-            for (const {who: referencedThing} of referenceList) {
+            for (const {artist: referencedThing} of referenceList) {
               if (cacheRecord.has(referencedThing)) {
                 cacheRecord.get(referencedThing).push(referencingThing);
               } else {
