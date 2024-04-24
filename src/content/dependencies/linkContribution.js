@@ -14,7 +14,7 @@ export default {
     const relations = {};
 
     relations.artistLink =
-      relation('linkArtist', contribution.who);
+      relation('linkArtist', contribution.artist);
 
     relations.textWithTooltip =
       relation('generateTextWithTooltip');
@@ -22,9 +22,9 @@ export default {
     relations.tooltip =
       relation('generateTooltip');
 
-    if (!empty(contribution.who.urls)) {
+    if (!empty(contribution.artist.urls)) {
       relations.artistIcons =
-        contribution.who.urls
+        contribution.artist.urls
           .map(url => relation('linkExternalAsIcon', url));
     }
 
@@ -33,8 +33,8 @@ export default {
 
   data(contribution) {
     return {
-      what: contribution.what,
-      urls: contribution.who.urls,
+      contribution: contribution.annotation,
+      urls: contribution.artist.urls,
     };
   },
 
@@ -50,7 +50,7 @@ export default {
   },
 
   generate(data, relations, slots, {html, language}) {
-    const hasContribution = !!(slots.showContribution && data.what);
+    const hasContribution = !!(slots.showContribution && data.contribution);
     const hasExternalIcons = !!(slots.showIcons && relations.artistIcons);
 
     const parts = ['misc.artistLink'];
@@ -111,7 +111,7 @@ export default {
 
     if (hasContribution) {
       parts.push('withContribution');
-      options.contrib = data.what;
+      options.contrib = data.contribution;
     }
 
     if (hasExternalIcons && slots.iconMode === 'inline') {

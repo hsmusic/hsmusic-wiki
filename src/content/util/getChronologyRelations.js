@@ -18,17 +18,17 @@ export default function getChronologyRelations(thing, {
 
   const artistsSoFar = new Set();
 
-  contributions = contributions.filter(({who}) => {
-    if (artistsSoFar.has(who)) {
+  contributions = contributions.filter(({artist}) => {
+    if (artistsSoFar.has(artist)) {
       return false;
     } else {
-      artistsSoFar.add(who);
+      artistsSoFar.add(artist);
       return true;
     }
   });
 
-  return contributions.map(({who}) => {
-    const things = Array.from(new Set(getThings(who)));
+  return contributions.map(({artist}) => {
+    const things = Array.from(new Set(getThings(artist)));
 
     // Don't show a line if this contribution isn't part of the artist's
     // chronology at all (usually because this thing isn't dated).
@@ -47,7 +47,7 @@ export default function getChronologyRelations(thing, {
 
     return {
       index: index + 1,
-      artistLink: linkArtist(who),
+      artistLink: linkArtist(artist),
       previousLink: previous ? linkThing(previous) : null,
       nextLink: next ? linkThing(next) : null,
     };

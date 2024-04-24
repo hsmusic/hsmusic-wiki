@@ -75,8 +75,8 @@ export default {
       query.things.map(thing =>
         (thing.coverArtistContribs.length > 1
           ? thing.coverArtistContribs
-              .filter(({who}) => who !== artist)
-              .map(({who}) => who.name)
+              .filter(({artist: otherArtist}) => otherArtist !== artist)
+              .map(({artist: otherArtist}) => otherArtist.name)
           : null));
 
     return data;

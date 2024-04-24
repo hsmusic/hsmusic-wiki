@@ -83,7 +83,8 @@ export default {
       });
     };
 
-    const getArtists = (thing, key) => thing[key].map(({who}) => who);
+    const getArtists = (thing, key) =>
+      thing[key].map(({artist}) => artist);
 
     const albumsLatestFirst = sortAlbumsTracksChronologically(sprawl.albumData.slice());
     const tracksLatestFirst = sortAlbumsTracksChronologically(sprawl.trackData.slice());

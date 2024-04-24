@@ -171,8 +171,8 @@ export default {
         query.chunks.map(({chunk}) =>
           chunk.map(({contribs}) =>
             contribs
-              .find(({who}) => who === artist)
-              .what)),
+              .find(contrib => contrib.artist === artist)
+              .annotation)),
     };
   },
 
