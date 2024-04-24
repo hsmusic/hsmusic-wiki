@@ -73,7 +73,7 @@ export default {
       relation('generateChronologyLinks');
 
     relations.secondaryNav =
-      relation('generateAlbumSecondaryNav', album);
+      relation('generateAlbumSecondaryNav', album, null);
 
     relations.sidebar =
       relation('generateAlbumSidebar', album, null);

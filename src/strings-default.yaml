@@ -772,8 +772,13 @@ albumSidebar:
 
   groupBox:
     title: "{GROUP}"
+    title.guestTrack: "{GROUP} (guest track)"
+
     next: "Next: {ALBUM}"
     previous: "Previous: {ALBUM}"
+
+    trackGroupsDiffer: >-
+      This track's group list differs from its album, which is placed under {GROUPS}.
 
 #
 # albumPage:
@@ -1142,6 +1147,31 @@ groupInfoPage:
 
       yearAccent: "({YEAR})"
       otherGroupAccent:  "(from {GROUPS})"
+
+  guestTrackList:
+    title: "Guest Tracks"
+
+    infoLine: >-
+      These "guest tracks" are in albums from other groups.
+
+    chunk:
+      title:
+        _: >-
+          {ALBUM}
+
+        withYear: >-
+          {YEAR_ACCENT} {ALBUM}
+
+        withGroup: >-
+          {ALBUM} {GROUP_ACCENT}
+
+        withYear.withGroups: >-
+          {YEAR_ACCENT} {ALBUM} {GROUP_ACCENT}
+
+        yearAccent: "({YEAR})"
+        groupAccent: "(from {GROUPS})"
+
+      item: "{TRACK}"
 
 #
 # groupGalleryPage:

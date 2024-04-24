@@ -13,11 +13,13 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  query(album) {
+  query(album, track) {
     const query = {};
 
     query.groups =
-      album.groups;
+      (track
+        ? track.groups
+        : album.groups);
 
     if (album.date) {
       // Sort by latest first. This matches the sorting order used on group
@@ -52,7 +54,7 @@ export default {
     return query;
   },
 
-  relations(relation, query, album) {
+  relations(relation, query, album, _track) {
     const relations = {};
 
     relations.secondaryNav =
@@ -92,6 +94,16 @@ export default {
     return relations;
   },
 
+  data: (query, album, _track) => {
+    const data = {};
+
+    data.groupIsGuest =
+      query.groups
+        .map(group => !album.groups.includes(group));
+
+    return data;
+  },
+
   slots: {
     mode: {
       validate: v => v.is('album', 'track'),
@@ -99,7 +111,7 @@ export default {
     },
   },
 
-  generate(relations, slots, {html, language}) {
+  generate(data, relations, slots, {html, language}) {
     const navLinksShouldShowPreviousNext =
       (slots.mode === 'track'
         ? Array.from(relations.previousNextLinks ?? [], () => false)
@@ -136,12 +148,17 @@ export default {
 
     const navLinkContents =
       stitchArrays({
+        groupIsGuest: data.groupIsGuest,
         groupLink: relations.groupLinks,
         previousNextLinks: navLinkPreviousNextLinks,
-      }).map(({groupLink, previousNextLinks}) => [
-          language.$('albumSidebar.groupBox.title', {
-            group: groupLink,
-          }),
+      }).map(({groupIsGuest, groupLink, previousNextLinks}) => [
+          (groupIsGuest
+            ? language.$('albumSidebar.groupBox.title.guestTrack', {
+                group: groupLink,
+              })
+            : language.$('albumSidebar.groupBox.title', {
+                group: groupLink,
+              })),
 
           previousNextLinks &&
             `(${language.formatUnitList(previousNextLinks.content)})`,

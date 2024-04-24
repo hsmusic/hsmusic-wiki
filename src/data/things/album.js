@@ -8,13 +8,18 @@ import {traverse} from '#node-utils';
 import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {empty} from '#sugar';
 import Thing from '#thing';
-import {isDate} from '#validators';
+import {isDate, validateReferenceList} from '#validators';
 import {parseAdditionalFiles, parseContributors, parseDate, parseDimensions}
   from '#yaml';
 
-import {exposeDependency, exposeUpdateValueOrContinue}
-  from '#composite/control-flow';
-import {exitWithoutContribs} from '#composite/wiki-data';
+import {
+  exposeDependency,
+  exposeDependencyOrContinue,
+  exposeUpdateValueOrContinue,
+} from '#composite/control-flow';
+
+import {exitWithoutContribs, withResolvedReferenceList}
+  from '#composite/wiki-data';
 
 import {
   additionalFiles,
@@ -125,6 +130,32 @@ export class Album extends Thing {
       find: input.value(find.group),
       data: 'groupData',
     }),
+
+    trackGroups: [
+      withResolvedReferenceList({
+        list: input.updateValue({
+          validate: validateReferenceList(Group[Thing.referenceType]),
+        }),
+
+        find: input.value(find.group),
+        data: 'groupData',
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#resolvedReferenceList',
+        mode: input.value('empty'),
+      }),
+
+      withResolvedReferenceList({
+        list: 'groups',
+        find: input.value(find.group),
+        data: 'groupData',
+      }),
+
+      exposeDependency({
+        dependency: '#resolvedReferenceList',
+      }),
+    ],
 
     artTags: [
       exitWithoutContribs({
@@ -317,6 +348,7 @@ export class Album extends Thing {
       },
 
       'Groups': {property: 'groups'},
+      'Default Track Groups': {property: 'trackGroups'},
       'Art Tags': {property: 'artTags'},
 
       'Review Points': {ignore: true},

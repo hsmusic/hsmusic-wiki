@@ -9,6 +9,7 @@ const {
   Artist,
   Flash,
   FlashAct,
+  Group,
   Thing,
   Track,
 } = thingConstructors;
@@ -50,6 +51,13 @@ function stubArtistAndContribs(artistName = `Test Artist`) {
   const badContribs = [{who: `Figment of Your Imagination`, what: null}];
 
   return {artist, contribs, badContribs};
+}
+
+function stubGroup(directory) {
+  const group = new Group();
+  group.directory = directory;
+
+  return group;
 }
 
 function stubArtTag(tagName = `Test Art Tag`) {
@@ -564,6 +572,41 @@ t.test(`Track.featuredInFlashes`, t => {
 
   t.same(track.featuredInFlashes, [flash1, flash2],
     `featuredInFlashes #2: matches flashes' featuredTracks`);
+});
+
+t.only(`Track.groups`, t => {
+  t.plan(4);
+
+  const {track, album} = stubTrackAndAlbum();
+
+  const group1 = stubGroup('group1');
+  const group2 = stubGroup('group2');
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    albumData: [album],
+    groupData: [group1, group2],
+    trackData: [track],
+  });
+
+  t.same(track.groups, [],
+    `groups #1: defaults to empty array`);
+
+  album.groups = ['group:group1', 'group:group2'];
+  XXX_decacheWikiData();
+
+  t.same(track.groups, [group1, group2],
+    `groups #2: inherits album groups`);
+
+  album.trackGroups = ['group:group2'];
+  XXX_decacheWikiData();
+
+  t.same(track.groups, [group2],
+    `groups #3: inherits album trackGroups`);
+
+  track.groups = ['group:group1'];
+
+  t.same(track.groups, [group1],
+    `groups #4: resolves from own value`);
 });
 
 t.test(`Track.hasUniqueCoverArt`, t => {

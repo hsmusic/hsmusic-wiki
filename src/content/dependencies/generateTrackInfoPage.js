@@ -114,7 +114,7 @@ export default {
       relation('generateChronologyLinks');
 
     relations.secondaryNav =
-      relation('generateAlbumSecondaryNav', track.album);
+      relation('generateAlbumSecondaryNav', track.album, track);
 
     relations.sidebar =
       relation('generateAlbumSidebar', track.album, track);

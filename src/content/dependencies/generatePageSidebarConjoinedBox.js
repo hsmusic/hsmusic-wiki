@@ -28,6 +28,7 @@ export default {
       attributes: slots.attributes,
       content:
         slots.boxes.slice()
+          .filter(Boolean)
           .map(box => box.getSlotValue('content'))
           .map((content, index, {length}) => [
             content,

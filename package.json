@@ -23,6 +23,7 @@
         "#composite/things/album": "./src/data/composite/things/album/index.js",
         "#composite/things/flash": "./src/data/composite/things/flash/index.js",
         "#composite/things/flash-act": "./src/data/composite/things/flash-act/index.js",
+        "#composite/things/group": "./src/data/composite/things/group/index.js",
         "#composite/things/track": "./src/data/composite/things/track/index.js",
         "#content-dependencies": "./src/content/dependencies/index.js",
         "#content-function": "./src/content-function.js",
