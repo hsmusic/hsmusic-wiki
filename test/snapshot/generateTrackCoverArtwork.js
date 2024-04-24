@@ -11,6 +11,7 @@ testContentFunctions(t, 'generateTrackCoverArtwork (snapshot)', async (t, evalua
   const album = {
     directory: 'bee-forus-seatbelt-safebee',
     coverArtFileExtension: 'png',
+    coverArtDimensions: [400, 300],
     artTags: [
       {name: 'Damara', directory: 'damara', isContentWarning: false},
       {name: 'Cronus', directory: 'cronus', isContentWarning: false},
@@ -23,6 +24,7 @@ testContentFunctions(t, 'generateTrackCoverArtwork (snapshot)', async (t, evalua
     directory: 'beesmp3',
     hasUniqueCoverArt: true,
     coverArtFileExtension: 'jpg',
+    coverArtDimensions: null,
     color: '#f28514',
     artTags: [{name: 'Bees', directory: 'bees', isContentWarning: false}],
     album,
