@@ -443,24 +443,23 @@ for (const entry of illegalContentSpec) {
   }
 }
 
-const illegalContentRegexp =
-  new RegExp(
-    illegalContentSpec
-      .map(entry => entry.illegal)
-      .map(illegal => `${illegal}+`)
-      .join('|'),
-    'g');
-
-const illegalCharactersInContent =
+const illegalSequencesInContent =
   illegalContentSpec
     .map(entry => entry.illegal)
-    .join('');
+    .map(illegal =>
+      (illegal.length === 1
+        ? `${illegal}+`
+        : `(?:${illegal})+`))
+    .join('|');
+
+const illegalContentRegexp =
+  new RegExp(illegalSequencesInContent, 'g');
 
 const legalContentNearEndRegexp =
-  new RegExp(`[^\n${illegalCharactersInContent}]+$`);
+  new RegExp(`(?<=^|${illegalSequencesInContent})(?:(?!${illegalSequencesInContent}).)+$`);
 
 const legalContentNearStartRegexp =
-  new RegExp(`^[^\n${illegalCharactersInContent}]+`);
+  new RegExp(`^(?:(?!${illegalSequencesInContent}).)+`);
 
 const trimWhitespaceNearBothSidesRegexp =
   /^ +| +$/gm;
