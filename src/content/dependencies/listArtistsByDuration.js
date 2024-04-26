@@ -1,6 +1,5 @@
 import {sortAlphabetically, sortByCount} from '#sort';
-import {filterByCount, stitchArrays, unique} from '#sugar';
-import {getTotalDuration} from '#wiki-data';
+import {filterByCount, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtist'],
@@ -16,13 +15,7 @@ export default {
         artistData.filter(artist => !artist.isAlias));
 
     const durations =
-      artists.map(artist =>
-        getTotalDuration(
-          unique([
-            ...(artist.tracksAsArtist ?? []),
-            ...(artist.tracksAsContributor ?? []),
-          ]),
-          {originalReleasesOnly: true}));
+      artists.map(artist => artist.totalDuration);
 
     filterByCount(artists, durations);
     sortByCount(artists, durations, {greatestFirst: true});
