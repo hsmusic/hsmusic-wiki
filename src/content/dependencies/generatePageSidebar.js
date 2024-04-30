@@ -30,16 +30,6 @@ export default {
       default: 'static',
     },
 
-    // Collapsing sidebars disappear when the viewport is sufficiently
-    // thin. (This is the default.) Override as false to make the sidebar
-    // stay visible in thinner viewports, where the page layout will be
-    // reflowed so the sidebar is as wide as the screen and appears below
-    // nav, above the main content.
-    collapse: {
-      type: 'boolean',
-      default: true,
-    },
-
     // Wide sidebars generally take up more horizontal space in the normal
     // page layout, and should be used if the content of the sidebar has
     // a greater than typical focus compared to main content.
@@ -58,20 +48,24 @@ export default {
 
     attributes.add(slots.attributes);
 
-    if (slots.class) {
-      attributes.add('class', slots.class);
-    }
-
     if (slots.wide) {
       attributes.add('class', 'wide');
     }
 
-    if (!slots.collapse) {
-      attributes.add('class', 'no-hide');
-    }
-
     if (slots.stickyMode !== 'static') {
       attributes.add('class', `sticky-${slots.stickyMode}`);
+    }
+
+    const {content: boxes} = html.smooth(slots.boxes);
+
+    const allBoxesCollapsible =
+      boxes.every(box =>
+        html.resolve(box)
+          .attributes
+          .has('class', 'collapsible'));
+
+    if (allBoxesCollapsible) {
+      attributes.add('class', 'all-boxes-collapsible');
     }
 
     if (html.isBlank(slots.boxes)) {

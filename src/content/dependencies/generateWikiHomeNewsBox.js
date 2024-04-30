@@ -46,6 +46,8 @@ export default {
 
     return relations.box.slots({
       attributes: {class: 'latest-news-sidebar-box'},
+      collapsible: false,
+
       content: [
         html.tag('h1', language.$('homepage.news.title')),
 

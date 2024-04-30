@@ -79,13 +79,14 @@ export default {
 
       leftSidebar:
         relations.sidebar.slots({
-          collapse: false,
           wide: true,
 
           boxes: [
             relations.customSidebarContent &&
               relations.customSidebarBox.slots({
                 attributes: {class: 'custom-content-sidebar-box'},
+                collapsible: false,
+
                 content:
                   relations.customSidebarContent
                     .slot('mode', 'multiline'),

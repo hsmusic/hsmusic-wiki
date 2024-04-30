@@ -390,14 +390,6 @@ export default {
     const hasSidebarLeft = !html.isBlank(html.resolve(leftSidebar));
     const hasSidebarRight = !html.isBlank(html.resolve(rightSidebar));
 
-    const collapseSidebars =
-      (hasSidebarLeft
-        ? leftSidebar.getSlotValue('collapse')
-        : true) &&
-      (hasSidebarRight
-        ? rightSidebar.getSlotValue('collapse')
-        : true);
-
     const processSkippers = skipperList =>
       skipperList
         .filter(({condition, id}) =>
@@ -509,15 +501,11 @@ export default {
 
       slots.secondaryNav,
 
-      html.tag('div', {class: 'layout-columns'},
-        !collapseSidebars &&
-          {class: 'vertical-when-thin'},
-
-        [
-          leftSidebar,
-          mainHTML,
-          rightSidebar,
-        ]),
+      html.tag('div', {class: 'layout-columns'}, [
+        leftSidebar,
+        mainHTML,
+        rightSidebar,
+      ]),
 
       slots.bannerPosition === 'bottom' &&
         slots.banner,
