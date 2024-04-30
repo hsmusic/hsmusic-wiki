@@ -2,6 +2,7 @@ export default {
   contentDependencies: [
     'generateGroupSidebarCategoryDetails',
     'generatePageSidebar',
+    'generatePageSidebarBox',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
@@ -11,6 +12,9 @@ export default {
   relations: (relation, sprawl, group) => ({
     sidebar:
       relation('generatePageSidebar'),
+
+    sidebarBox:
+      relation('generatePageSidebarBox'),
 
     categoryDetails:
       sprawl.groupCategoryData.map(category =>
@@ -25,15 +29,18 @@ export default {
 
   generate: (relations, slots, {html, language}) =>
     relations.sidebar.slots({
-      attributes: {class: 'category-map-sidebar-box'},
+      boxes: [
+        relations.sidebarBox.slots({
+          attributes: {class: 'category-map-sidebar-box'},
+          content: [
+            html.tag('h1',
+              language.$('groupSidebar.title')),
 
-      content: [
-        html.tag('h1',
-          language.$('groupSidebar.title')),
-
-        relations.categoryDetails
-          .map(details =>
-            details.slot('currentExtra', slots.currentExtra)),
+            relations.categoryDetails
+              .map(details =>
+                details.slot('currentExtra', slots.currentExtra)),
+          ],
+        }),
       ],
     }),
 };

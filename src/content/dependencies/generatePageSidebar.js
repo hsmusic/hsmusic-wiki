@@ -1,29 +1,16 @@
 export default {
-  contentDependencies: ['generatePageSidebarBox'],
   extraDependencies: ['html'],
 
-  relations: (relation) => ({
-    box:
-      relation('generatePageSidebarBox'),
-  }),
-
   slots: {
-    // Content is a flat HTML array. It'll all be placed into one sidebar box
-    // if specified.
-    content: {
-      type: 'html',
-      mutable: false,
-    },
-
-    // Attributes to apply to the whole sidebar. If specifying multiple
-    // sections, this be added to the containing sidebar-column, arr - specify
-    // attributes on each section if that's more suitable.
+    // Attributes to apply to the whole sidebar. This be added to the
+    // containing sidebar-column, arr - specify attributes on each section if
+    // that's more suitable.
     attributes: {
       type: 'attributes',
       mutable: false,
     },
 
-    // Chunks of content to be split into separate boxes in the sidebar.
+    // Content boxes to line up vertically in the sidebar.
     boxes: {
       type: 'html',
       mutable: false,
@@ -62,7 +49,7 @@ export default {
     },
   },
 
-  generate(relations, slots, {html}) {
+  generate(slots, {html}) {
     const attributes =
       html.attributes({class: [
         'sidebar-column',
@@ -87,17 +74,10 @@ export default {
       attributes.add('class', `sticky-${slots.stickyMode}`);
     }
 
-    const boxes =
-      (!html.isBlank(slots.boxes)
-        ? slots.boxes
-     : !html.isBlank(slots.content)
-        ? relations.box.slot('content', slots.content)
-        : html.blank());
-
-    if (html.isBlank(boxes)) {
+    if (html.isBlank(slots.boxes)) {
       return html.blank();
     } else {
-      return html.tag('div', attributes, boxes);
+      return html.tag('div', attributes, slots.boxes);
     }
   },
 };
