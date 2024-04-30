@@ -1338,6 +1338,22 @@ export function smush(smushee) {
   return smush(Tag.normalize(smushee));
 }
 
+// Much gentler version of smush - this only flattens nested html.tags(), and
+// guarantees the result is itself an html.tags(). It doesn't manipulate text
+// content, and it doesn't resolve templates.
+export function smooth(smoothie) {
+  // Helper function to avoid intermediate html.tags() calls.
+  function helper(tag) {
+    if (tag instanceof Tag && tag.contentOnly) {
+      return tag.content.flatMap(helper);
+    } else {
+      return tag;
+    }
+  }
+
+  return tags(helper(smoothie));
+}
+
 export function template(description) {
   return new Template(description);
 }
