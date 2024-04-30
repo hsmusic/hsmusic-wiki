@@ -1101,8 +1101,17 @@ export class Attributes {
     return this.#attributes[attribute];
   }
 
-  has(attribute) {
-    return attribute in this.#attributes;
+  has(attribute, pattern) {
+    if (typeof pattern === 'undefined') {
+      return attribute in this.#attributes;
+    } else if (this.has(attribute)) {
+      const value = this.get(attribute);
+      if (Array.isArray(value)) {
+        return value.includes(pattern);
+      } else {
+        return value === pattern;
+      }
+    }
   }
 
   remove(attribute) {
