@@ -2,15 +2,14 @@ import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateAlbumCommentarySidebar',
     'generateAlbumCoverArtwork',
     'generateAlbumNavAccent',
-    'generateAlbumSidebarTrackSection',
     'generateAlbumStyleRules',
     'generateCommentaryEntry',
     'generateContentHeading',
     'generateTrackCoverArtwork',
     'generatePageLayout',
-    'generatePageSidebar',
     'linkAlbum',
     'linkExternal',
     'linkTrack',
@@ -25,7 +24,7 @@ export default {
       relation('generatePageLayout');
 
     relations.sidebar =
-      relation('generatePageSidebar');
+      relation('generateAlbumCommentarySidebar', album);
 
     relations.albumStyleRules =
       relation('generateAlbumStyleRules', album, null);
@@ -85,13 +84,6 @@ export default {
         .map(track =>
           track.commentary
             .map(entry => relation('generateCommentaryEntry', entry)));
-
-    relations.sidebarAlbumLink =
-      relation('linkAlbum', album);
-
-    relations.sidebarTrackSections =
-      album.trackSections.map(trackSection =>
-        relation('generateAlbumSidebarTrackSection', album, null, trackSection));
 
     return relations;
   },
@@ -253,22 +245,7 @@ export default {
           },
         ],
 
-        leftSidebar:
-          relations.sidebar.slots({
-            attributes: {class: 'commentary-track-list-sidebar-box'},
-
-            stickyMode: 'column',
-
-            content: [
-              html.tag('h1', relations.sidebarAlbumLink),
-              relations.sidebarTrackSections.map(section =>
-                section.slots({
-                  anchor: true,
-                  open: true,
-                  mode: 'commentary',
-                })),
-            ],
-          }),
+        leftSidebar: relations.sidebar,
       });
   },
 };

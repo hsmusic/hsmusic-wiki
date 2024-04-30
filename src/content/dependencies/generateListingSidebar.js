@@ -2,6 +2,7 @@ export default {
   contentDependencies: [
     'generateListingIndexList',
     'generatePageSidebar',
+    'generatePageSidebarBox',
     'linkListingIndex',
   ],
 
@@ -10,6 +11,9 @@ export default {
   relations: (relation, currentListing) => ({
     sidebar:
       relation('generatePageSidebar'),
+
+    sidebarBox:
+      relation('generatePageSidebarBox'),
 
     listingIndexLink:
       relation('linkListingIndex'),
@@ -20,10 +24,14 @@ export default {
 
   generate: (relations, {html}) =>
     relations.sidebar.slots({
-      attributes: {class: 'listing-map-sidebar-box'},
-      content: [
-        html.tag('h1', relations.listingIndexLink),
-        relations.listingIndexList.slot('mode', 'sidebar'),
+      boxes: [
+        relations.sidebarBox.slots({
+          attributes: {class: 'listing-map-sidebar-box'},
+          content: [
+            html.tag('h1', relations.listingIndexLink),
+            relations.listingIndexList.slot('mode', 'sidebar'),
+          ],
+        }),
       ],
     }),
 };
