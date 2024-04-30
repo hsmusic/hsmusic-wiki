@@ -2313,7 +2313,8 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
 /* Layout - Medium or Thin */
 
 @media (max-width: 899.98px) {
-  .sidebar-column:not(.no-hide) {
+  .sidebar.collapsible,
+  .sidebar-column.all-boxes-collapsible {
     display: none;
   }
 
@@ -2321,15 +2322,15 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
     display: block;
   }
 
-  .layout-columns.vertical-when-thin {
+  .layout-columns {
     flex-direction: column;
   }
 
-  .layout-columns.vertical-when-thin > *:not(:last-child) {
+  .layout-columns > *:not(:last-child) {
     margin-bottom: 10px;
   }
 
-  .sidebar-column.no-hide {
+  .sidebar-column {
     max-width: unset !important;
     flex-basis: unset !important;
     margin-right: 0 !important;
