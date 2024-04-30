@@ -462,6 +462,47 @@ summary .group-name {
   font-weight: normal;
 }
 
+.search-sidebar-box {
+  padding: 2px;
+  position: sticky;
+  top: 5px;
+  z-index: 999;
+
+  background-color: #000000c0;
+  box-shadow:
+    0 3px 4px #00000080,
+    0 -2px 8px #000000c0,
+    0 -6px 3px #000000f0;
+
+  -webkit-backdrop-filter:
+    brightness(1.2) blur(4px);
+
+          backdrop-filter:
+    brightness(1.2) blur(4px);
+}
+
+.wiki-search-input {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--dim-color);
+  border-radius: 3px;
+  padding: 2px 4px;
+  color: inherit;
+}
+
+.wiki-search-input:focus {
+  border: 1px solid var(--primary-color);
+}
+
+.wiki-search-input::placeholder {
+  color: var(--primary-color);
+  font-style: oblique;
+}
+
+.wiki-search-input:focus::placeholder {
+  color: var(--dim-color);
+}
+
 #content {
   overflow-wrap: anywhere;
 }

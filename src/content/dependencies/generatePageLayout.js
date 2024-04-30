@@ -5,6 +5,7 @@ export default {
   contentDependencies: [
     'generateColorStyleRules',
     'generateFooterLocalizationLinks',
+    'generateSearchSidebarBox',
     'generateStickyHeadingContainer',
     'transformContent',
   ],
@@ -42,6 +43,9 @@ export default {
     relations.stickyHeadingContainer =
       relation('generateStickyHeadingContainer');
 
+    relations.searchBox =
+      relation('generateSearchSidebarBox');
+
     if (sprawl.footerContent) {
       relations.defaultFooterContent =
         relation('transformContent', sprawl.footerContent);
@@ -60,6 +64,11 @@ export default {
     },
 
     showWikiNameInTitle: {
+      type: 'boolean',
+      default: true,
+    },
+
+    showSearch: {
       type: 'boolean',
       default: true,
     },
@@ -384,6 +393,14 @@ export default {
 
     const leftSidebar = getSidebar('leftSidebar', 'sidebar-left');
     const rightSidebar = getSidebar('rightSidebar', 'sidebar-right');
+
+    if (slots.showSearch && !html.isBlank(leftSidebar)) {
+      leftSidebar.setSlot('boxes',
+        html.tags([
+          relations.searchBox,
+          leftSidebar.getSlotValue('boxes'),
+        ]));
+    }
 
     const hasSidebarLeft = !html.isBlank(html.resolve(leftSidebar));
     const hasSidebarRight = !html.isBlank(html.resolve(rightSidebar));
