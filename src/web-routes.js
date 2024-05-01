@@ -45,6 +45,13 @@ export const dependencyRoutes = [
 
     to: ['staticLib.path', 'flexsearch'],
   },
+
+  {
+    from:
+      getNodeDependencyRootPath('chroma-js'),
+
+    to: ['staticLib.path', 'chroma-js'],
+  }
 ];
 
 export const allStaticWebRoutes = [

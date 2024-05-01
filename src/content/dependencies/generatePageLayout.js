@@ -624,6 +624,10 @@ export default {
             ]),
 
             html.tag('script', {
+              src: to('staticLib.path', 'chroma-js/chroma.min.js'),
+            }),
+
+            html.tag('script', {
               blocking: 'render',
               src: to('staticJS.path', 'lazy-loading.js'),
             }),
