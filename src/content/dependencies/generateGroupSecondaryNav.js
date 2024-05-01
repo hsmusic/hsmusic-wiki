@@ -69,12 +69,16 @@ export default {
   }),
 
   generate(data, relations, {html, language}) {
-    const {content: previousNextPart} =
-      relations.previousNextLinks.slots({
-        previousLink: relations.previousGroupLink,
-        nextLink: relations.nextGroupLink,
-        id: true,
-      });
+    const previousNextPart =
+      (relations.previousNextLinks
+        ? relations.previousNextLinks
+            .slots({
+              previousLink: relations.previousGroupLink,
+              nextLink: relations.nextGroupLink,
+              id: true,
+            })
+            .content /* TODO: Kludge. */
+        : null);
 
     const {categoryLink} = relations;
 
@@ -83,7 +87,7 @@ export default {
     return relations.secondaryNav.slots({
       class: 'nav-links-groups',
       content:
-        (relations.previousGroupLink || relations.nextGroupLink
+        (previousNextPart
           ? html.tag('span', {class: 'nav-link'},
               relations.colorStyle.slot('context', 'primary-only'),
 
