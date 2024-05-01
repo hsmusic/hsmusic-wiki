@@ -17,12 +17,12 @@ function getNodeDependencyRootPath(dependencyName) {
 export const stationaryCodeRoutes = [
   {
     from: path.join(codeSrcPath, 'static'),
-    to: '/static',
+    to: ['static.root'],
   },
 
   {
     from: path.join(codeSrcPath, 'util'),
-    to: '/util',
+    to: ['util.root'],
   },
 ];
 
@@ -39,8 +39,8 @@ export async function identifyDynamicWebRoutes({
 }) {
   const routeFunctions = [
     () => Promise.resolve([
-      {from: path.resolve(mediaPath), to: '/media'},
-      {from: path.resolve(mediaCachePath), to: '/thumb'},
+      {from: path.resolve(mediaPath), to: ['media.root']},
+      {from: path.resolve(mediaCachePath), to: ['thumb.root']},
     ]),
   ];
 

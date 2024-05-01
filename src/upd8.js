@@ -40,7 +40,21 @@ import {fileURLToPath} from 'node:url';
 
 import wrap from 'word-wrap';
 
-import {showAggregate} from '#aggregate';
+// Due to import time shenanigans, these imports have to come in the specified
+// order. This obviously needs fixing up.
+
+/* precede #find */
+import {
+  filterReferenceErrors,
+  reportDuplicateDirectories,
+  reportContentTextErrors,
+} from '#data-checks';
+
+import {bindFind, getAllFindSpecs} from '#find';
+
+// End of import time shenanigans (hopefully)
+
+import {mapAggregate, showAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
 import {displayCompositeCacheAnalysis} from '#composite';
 import {bindFind, getAllFindSpecs} from '#find';
@@ -1788,13 +1802,27 @@ async function main() {
       timeStart: Date.now(),
     });
 
+    const fromRoot = urls.from('shared.root');
+
     try {
-      webRoutes = await identifyAllWebRoutes({
+      const webRouteSources = await identifyAllWebRoutes({
         mediaCachePath,
         mediaPath,
       });
+
+      const {aggregate, result} =
+        mapAggregate(
+          webRouteSources,
+          ({to, ...rest}) => ({
+            ...rest,
+            to: fromRoot.to(...to),
+          }),
+          {message: `Errors computing effective web route paths`},);
+
+      aggregate.close();
+      webRoutes = result;
     } catch (error) {
-      console.error(error);
+      niceShowAggregate(error);
 
       logError`There was an issue identifying web routes!`;
       fileIssue();
