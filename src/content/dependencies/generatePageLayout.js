@@ -543,6 +543,7 @@ export default {
         {'data-rebase-localized': to('localized.root')},
         {'data-rebase-shared': to('shared.root')},
         {'data-rebase-media': to('media.root')},
+        {'data-rebase-thumb': to('thumb.root')},
         {'data-rebase-data': to('data.root')},
 
         [
