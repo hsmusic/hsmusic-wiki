@@ -500,9 +500,27 @@ summary .group-name {
 }
 
 .wiki-search-result {
+  position: relative;
   display: flex;
-  padding: 0 6px;
-  margin: 3px 0 5px 0;
+  padding: 4px 3px 4px 6px;
+}
+
+.wiki-search-result::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+
+  border: 2px solid var(--primary-color);
+  border-radius: 4px;
+  display: none;
+}
+
+.wiki-search-result:hover::before {
+  display: block;
+  background: var(--light-ghost-color);
 }
 
 .wiki-search-result-name {
@@ -517,6 +535,7 @@ summary .group-name {
   width: 1.8em;
   height: 1.8em;
   margin-right: 6px;
+  border-radius: 2px;
 }
 
 .wiki-search-result-image-placeholder {

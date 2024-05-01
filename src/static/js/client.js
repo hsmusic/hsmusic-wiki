@@ -5,6 +5,7 @@
 // that cannot 8e done at static-site compile time, 8y its fundamentally
 // ephemeral nature.
 
+import {getColors} from '../shared-util/colors.js';
 import {accumulateSum, atOffset, empty, filterMultipleArrays, stitchArrays}
   from '../shared-util/sugar.js';
 
@@ -3544,6 +3545,13 @@ function showSidebarSearchResults(results) {
 
     link.setAttribute('href', openTrack(result.directory));
     cssProp(link, '--primary-color', result.data.color);
+
+    try {
+      const colors = getColors(result.data.color, {chroma});
+      cssProp(link, '--light-ghost-color', colors.lightGhost);
+    } catch (error) {
+      console.warn(error);
+    }
 
     const span = document.createElement('span');
     span.classList.add('wiki-search-result-name');
