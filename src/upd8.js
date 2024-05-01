@@ -40,7 +40,7 @@ import {fileURLToPath} from 'node:url';
 
 import wrap from 'word-wrap';
 
-import {showAggregate} from '#aggregate';
+import {mapAggregate, showAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
 import {displayCompositeCacheAnalysis} from '#composite';
 import {bindFind, getAllFindSpecs} from '#find';
@@ -1788,13 +1788,27 @@ async function main() {
       timeStart: Date.now(),
     });
 
+    const fromRoot = urls.from('shared.root');
+
     try {
-      webRoutes = await identifyAllWebRoutes({
+      const webRouteSources = await identifyAllWebRoutes({
         mediaCachePath,
         mediaPath,
       });
+
+      const {aggregate, result} =
+        mapAggregate(
+          webRouteSources,
+          ({to, ...rest}) => ({
+            ...rest,
+            to: fromRoot.to(...to),
+          }),
+          {message: `Errors computing effective web route paths`},);
+
+      aggregate.close();
+      webRoutes = result;
     } catch (error) {
-      console.error(error);
+      niceShowAggregate(error);
 
       logError`There was an issue identifying web routes!`;
       fileIssue();

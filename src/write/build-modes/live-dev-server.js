@@ -225,10 +225,10 @@ export async function go({
 
     const matchedWebRoute =
       webRoutes
-        .find(({to}) => pathname.startsWith(to));
+        .find(({to}) => pathname.startsWith('/' + to));
 
     if (matchedWebRoute) {
-      const localFilePath = pathname.slice(matchedWebRoute.to.length);
+      const localFilePath = pathname.slice(1 + matchedWebRoute.to.length);
 
       // Not security tested, man, this is a dev server!!
       const safePath =

@@ -99,6 +99,16 @@ const urlSpec = {
     prefix: 'thumb/',
     paths: genericPaths,
   },
+
+  static: {
+    prefix: 'static/',
+    paths: genericPaths,
+  },
+
+  util: {
+    prefix: 'util/',
+    paths: genericPaths,
+  },
 };
 
 // This gets automatically switched in place when working from a baseDirectory,

@@ -438,17 +438,7 @@ function writeWebRouteSymlinks({
 }) {
   const promises =
     webRoutes.map(async route => {
-      // TODO: Make web routes specify `to` via url spec
-      /*
-      const pathname = urls.from('shared.root').toDevice(urlKey);
-      const file = path.join(outputPath, pathname);
-      */
-
-      const parts =
-        route.to
-          .replace(/^\//, '')
-          .split('/');
-
+      const parts = route.to.split('/');
       const parentDirectoryParts = parts.slice(0, -1);
       const symlinkNamePart = parts.at(-1);
 
