@@ -6,7 +6,7 @@
  */
 'use strict'
 exports[`test/snapshot/generateAlbumSidebarGroupBox.js > TAP > generateAlbumSidebarGroupBox (snapshot) > basic behavior, mode: album 1`] = `
-<div class="sidebar individual-group-sidebar-box">
+<div class="sidebar collapsible individual-group-sidebar-box">
     <h1><a href="group/vcg/">VCG</a></h1>
     Very cool group.
     <p>Visit on <a class="external-link" href="https://vcg.bandcamp.com/">Bandcamp</a> or <a class="external-link" href="https://youtube.com/@vcg">YouTube</a>.</p>
@@ -16,14 +16,14 @@ exports[`test/snapshot/generateAlbumSidebarGroupBox.js > TAP > generateAlbumSide
 `
 
 exports[`test/snapshot/generateAlbumSidebarGroupBox.js > TAP > generateAlbumSidebarGroupBox (snapshot) > basic behavior, mode: track 1`] = `
-<div class="sidebar individual-group-sidebar-box">
+<div class="sidebar collapsible individual-group-sidebar-box">
     <h1><a href="group/vcg/">VCG</a></h1>
     <p>Visit on <a class="external-link" href="https://vcg.bandcamp.com/">Bandcamp</a> or <a class="external-link" href="https://youtube.com/@vcg">YouTube</a>.</p>
 </div>
 `
 
 exports[`test/snapshot/generateAlbumSidebarGroupBox.js > TAP > generateAlbumSidebarGroupBox (snapshot) > dateless album in mixed group 1`] = `
-<div class="sidebar individual-group-sidebar-box">
+<div class="sidebar collapsible individual-group-sidebar-box">
     <h1><a href="group/vcg/">VCG</a></h1>
     Very cool group.
     <p>Visit on <a class="external-link" href="https://vcg.bandcamp.com/">Bandcamp</a> or <a class="external-link" href="https://youtube.com/@vcg">YouTube</a>.</p>
