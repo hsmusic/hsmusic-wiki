@@ -3465,6 +3465,14 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
 
   resultsContainer: null,
   results: null,
+
+  state: {
+    stoppedTypingTimeout: null,
+  },
+
+  settings: {
+    stoppedTyingDelay: 800,
+  },
 });
 
 function getSidebarSearchReferences() {
@@ -3506,12 +3514,40 @@ function addSidebarSearchListeners() {
   if (!info.searchInput) return;
 
   info.searchInput.addEventListener('change', domEvent => {
-    activateSidebarSearch(info.searchInput.value);
+    if (info.searchInput.value) {
+      activateSidebarSearch(info.searchInput.value);
+    }
+  });
+
+  info.searchInput.addEventListener('input', domEvent => {
+    const {settings, state} = info;
+
+    if (!info.searchInput.value) {
+      clearSidebarSearch();
+      return;
+    }
+
+    if (state.stoppedTypingTimeout) {
+      clearTimeout(state.stoppedTypingTimeout);
+    }
+
+    state.stoppedTypingTimeout =
+      setTimeout(() => {
+        activateSidebarSearch(info.searchInput.value);
+      }, settings.stoppedTyingDelay);
   });
 }
 
 function activateSidebarSearch(query) {
   showSidebarSearchResults(searchAll(query, {enrich: true}));
+}
+
+function clearSidebarSearch() {
+  const info = sidebarSearchInfo;
+
+  info.searchInput.value = '';
+
+  hideSidebarSearchResults();
 }
 
 function showSidebarSearchResults(results) {
@@ -3593,6 +3629,16 @@ function showSidebarSearchResults(results) {
     link.appendChild(span);
 
     info.results.appendChild(link);
+  }
+}
+
+function hideSidebarSearchResults() {
+  const info = sidebarSearchInfo;
+
+  cssProp(info.resultsContainer, 'display', 'none');
+
+  while (info.results.firstChild) {
+    info.results.firstChild.remove();
   }
 }
 
