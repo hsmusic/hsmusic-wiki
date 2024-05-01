@@ -3456,6 +3456,142 @@ document.addEventListener('DOMContentLoaded', initSearch);
 
 window.searchAll = searchAll;
 
+// Sidebar search box -------------------------------------
+
+const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
+  searchBox: null,
+  searchInput: null,
+
+  resultsContainer: null,
+  results: null,
+});
+
+function getSidebarSearchReferences() {
+  const info = sidebarSearchInfo;
+
+  info.searchBox =
+    document.querySelector('.wiki-search-sidebar-box');
+
+  info.searchInput =
+    document.querySelector('.wiki-search-input');
+}
+
+function mutateSidebarSearchContent() {
+  const info = sidebarSearchInfo;
+
+  if (!info.searchBox) return;
+
+  info.resultsContainer =
+    document.createElement('div');
+
+  info.resultsContainer.classList.add('wiki-search-results-container');
+
+  cssProp(info.resultsContainer, 'display', 'none');
+  info.resultsContainer.appendChild(document.createElement('hr'));
+
+  info.results =
+    document.createElement('div');
+
+  info.results.classList.add('wiki-search-results');
+
+  info.resultsContainer.appendChild(info.results);
+
+  info.searchBox.appendChild(info.resultsContainer);
+}
+
+function addSidebarSearchListeners() {
+  const info = sidebarSearchInfo;
+
+  if (!info.searchInput) return;
+
+  info.searchInput.addEventListener('change', domEvent => {
+    activateSidebarSearch(info.searchInput.value);
+  });
+}
+
+function activateSidebarSearch(query) {
+  showSidebarSearchResults(searchAll(query, {enrich: true}));
+}
+
+function showSidebarSearchResults(results) {
+  const info = sidebarSearchInfo;
+
+  const flatResults =
+    Object.entries(results)
+      .flatMap(([index, results]) => results
+        .flatMap(({field, result}) => result
+          .flatMap(({doc, id}) => ({
+            index,
+            field,
+            reference: id ?? null,
+            directory: (id ? id.split(':')[1] : null),
+            data: doc,
+          }))));
+
+  console.log(flatResults);
+
+  while (info.results.firstChild) {
+    info.results.firstChild.remove();
+  }
+
+  cssProp(info.resultsContainer, 'display', 'block');
+
+  for (const result of flatResults) {
+    if (result.index !== 'tracks') continue;
+
+    const link = document.createElement('a');
+    link.classList.add('wiki-search-result');
+
+    link.setAttribute('href', openTrack(result.directory));
+    cssProp(link, '--primary-color', result.data.color);
+
+    const span = document.createElement('span');
+    span.classList.add('wiki-search-result-name');
+
+    span.appendChild(document.createTextNode(result.data.name));
+
+    let image;
+    image = document.createElement('img');
+    image.classList.add('wiki-search-result-image');
+
+    switch (result.data.artworkKind) {
+      case 'track':
+        image.setAttribute('src', rebase(
+          (`album-art`
+         + `/${result.data.albumDirectory}`
+         + `/${result.directory}`
+         + `.small.jpg`),
+          'rebaseThumb'));
+        break;
+
+      case 'album':
+        image.setAttribute('src', rebase(
+          (`album-art`
+         + `/${result.data.albumDirectory}`
+         + `/cover.small.jpg`),
+          'rebaseThumb'));
+        break;
+
+      default:
+        image = document.createElement('span');
+        image.classList.add('wiki-search-result-image-placeholder');
+        break;
+    }
+
+    if (image) {
+      link.appendChild(image);
+    }
+
+    link.appendChild(span);
+
+    info.results.appendChild(link);
+  }
+}
+
+clientSteps.getPageReferences.push(getSidebarSearchReferences);
+clientSteps.mutatePageContent.push(mutateSidebarSearchContent);
+clientSteps.addPageListeners.push(addSidebarSearchListeners);
+
 // Sticky commentary sidebar ------------------------------
 
 const albumCommentarySidebarInfo = initInfo('albumCommentarySidebarInfo', {

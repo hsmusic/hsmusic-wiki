@@ -462,7 +462,7 @@ summary .group-name {
   font-weight: normal;
 }
 
-.search-sidebar-box {
+.wiki-search-sidebar-box {
   padding: 2px;
   position: sticky;
   top: 5px;
@@ -488,6 +488,43 @@ summary .group-name {
   border-radius: 3px;
   padding: 2px 4px;
   color: inherit;
+}
+
+.wiki-search-results-container hr {
+  border-color: var(--primary-color);
+  border-style: none none dotted none;
+}
+
+.wiki-search-results-container {
+  margin-bottom: 5px;
+}
+
+.wiki-search-result {
+  display: flex;
+  padding: 0 6px;
+  margin: 3px 0 5px 0;
+}
+
+.wiki-search-result-name {
+  align-self: center;
+  flex-grow: 1;
+  padding-bottom: 2px;
+}
+
+.wiki-search-result-image,
+.wiki-search-result-image-placeholder {
+  align-self: flex-start;
+  width: 1.8em;
+  height: 1.8em;
+  margin-right: 6px;
+}
+
+.wiki-search-result-image-placeholder {
+  display: inline-block;
+}
+
+.wiki-search-results:not(:has(.wiki-search-result-image)) .wiki-search-result-image-placeholder {
+  display: none;
 }
 
 .wiki-search-input:focus {

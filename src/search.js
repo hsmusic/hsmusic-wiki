@@ -70,12 +70,23 @@ async function populateSearchIndexes(indexes, wikiData) {
     indexes.tracks,
     track => ({
       name: track.name,
+      color: track.color,
       album: track.album.name,
+      albumDirectory: track.album.directory,
+
       artists: [
         track.artistContribs.map(contrib => contrib.artist.name),
         ...track.artistContribs.map(contrib => contrib.artist.aliasNames)
       ].flat(),
+
       additionalNames: track.additionalNames.map(entry => entry.name),
+
+      artworkKind:
+        (track.hasUniqueCoverArt
+          ? 'track'
+       : track.album.hasCoverArt
+          ? 'album'
+          : 'none'),
     })
   );
 

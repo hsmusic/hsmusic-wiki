@@ -3,28 +3,41 @@
 export function makeSearchIndexes(FlexSearch) {
   const indexes = {
     albums: new FlexSearch.Document({
-      id: "reference",
-      index: ["name", "groups"],
+      id: 'reference',
+      index: ['name', 'groups'],
     }),
 
     tracks: new FlexSearch.Document({
-      id: "reference",
-      index: ["name", "album", "artists", "additionalNames"],
+      id: 'reference',
+
+      index: [
+        'name',
+        'album',
+        'artists',
+        'additionalNames',
+      ],
+
+      store: [
+        'color',
+        'name',
+        'albumDirectory',
+        'artworkKind',
+      ],
     }),
 
     artists: new FlexSearch.Document({
-      id: "reference",
-      index: ["names"],
+      id: 'reference',
+      index: ['names'],
     }),
 
     groups: new FlexSearch.Document({
-      id: "reference",
-      index: ["name", "description", "category"],
+      id: 'reference',
+      index: ['name', 'description', 'category'],
     }),
 
     flashes: new FlexSearch.Document({
-      id: "reference",
-      index: ["name", "tracks", "contributors"],
+      id: 'reference',
+      index: ['name', 'tracks', 'contributors'],
     }),
   };
 

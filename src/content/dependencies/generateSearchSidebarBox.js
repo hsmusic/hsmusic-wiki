@@ -9,7 +9,7 @@ export default {
 
   generate: (relations, {html}) =>
     relations.sidebarBox.slots({
-      attributes: {class: 'search-sidebar-box'},
+      attributes: {class: 'wiki-search-sidebar-box'},
       collapsible: false,
 
       content: [
