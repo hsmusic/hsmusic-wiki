@@ -118,6 +118,11 @@ const urlSpec = {
     prefix: 'thumb/',
     paths: genericPaths,
   },
+
+  searchData: {
+    prefix: 'search-data/',
+    paths: genericPaths,
+  },
 };
 
 // This gets automatically switched in place when working from a baseDirectory,

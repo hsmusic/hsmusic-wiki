@@ -53,6 +53,18 @@ export async function identifyDynamicWebRoutes({
       {from: path.resolve(mediaPath), to: ['media.root']},
       {from: path.resolve(mediaCachePath), to: ['thumb.root']},
     ]),
+
+    () => {
+      if (!wikiCachePath) return [];
+
+      const from =
+        path.resolve(path.join(wikiCachePath, 'search'));
+
+      return (
+        readdir(from).then(
+          () => [{from, to: ['searchData.root']}],
+          () => []));
+    },
   ];
 
   const routeCheckPromises =
