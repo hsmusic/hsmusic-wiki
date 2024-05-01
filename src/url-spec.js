@@ -1,12 +1,16 @@
 import {withEntries} from '#sugar';
 
+const genericPaths = {
+  root: '',
+  path: '<>/',
+};
+
 const urlSpec = {
   data: {
     prefix: 'data/',
 
     paths: {
-      root: '',
-      path: '<>',
+      ...genericPaths,
 
       album: 'album/<>',
       artist: 'artist/<>',
@@ -19,8 +23,7 @@ const urlSpec = {
     // prefix: '_languageCode',
 
     paths: {
-      root: '',
-      path: '<>',
+      ...genericPaths,
       page: '<>/',
 
       home: '',
@@ -61,8 +64,7 @@ const urlSpec = {
 
   shared: {
     paths: {
-      root: '',
-      path: '<>',
+      ...genericPaths,
 
       utilityRoot: 'util',
       staticRoot: 'static',
@@ -78,8 +80,7 @@ const urlSpec = {
     prefix: 'media/',
 
     paths: {
-      root: '',
-      path: '<>',
+      ...genericPaths,
 
       albumAdditionalFile: 'album-additional/<>/<>',
       albumBanner: 'album-art/<>/banner.<>',
@@ -96,11 +97,7 @@ const urlSpec = {
 
   thumb: {
     prefix: 'thumb/',
-
-    paths: {
-      root: '',
-      path: '<>',
-    },
+    paths: genericPaths,
   },
 };
 
