@@ -1,15 +1,18 @@
 // Index structures shared by client and server.
 
 export function makeSearchIndexes(FlexSearch) {
-  const indexes = {
-    albums: new FlexSearch.Document({
+  const doc = config =>
+    new FlexSearch.Document({
       id: 'reference',
+      ...config,
+    });
+
+  const indexes = {
+    albums: doc({
       index: ['name', 'groups'],
     }),
 
-    tracks: new FlexSearch.Document({
-      id: 'reference',
-
+    tracks: doc({
       index: [
         'name',
         'album',
@@ -25,18 +28,15 @@ export function makeSearchIndexes(FlexSearch) {
       ],
     }),
 
-    artists: new FlexSearch.Document({
-      id: 'reference',
+    artists: doc({
       index: ['names'],
     }),
 
-    groups: new FlexSearch.Document({
-      id: 'reference',
+    groups: doc({
       index: ['name', 'description', 'category'],
     }),
 
-    flashes: new FlexSearch.Document({
-      id: 'reference',
+    flashes: doc({
       index: ['name', 'tracks', 'contributors'],
     }),
   };
