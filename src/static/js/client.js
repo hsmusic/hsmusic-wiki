@@ -12,11 +12,10 @@ import {
   atOffset,
   empty,
   filterMultipleArrays,
+  promiseWithResolvers,
   stitchArrays,
   withEntries,
 } from '../shared-util/sugar.js';
-
-import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
 
 import {fetchWithProgress} from './xhr-util.js';
 
@@ -3429,38 +3428,134 @@ clientSteps.addPageListeners.push(addArtistExternalLinkTooltipPageListeners);
 
 // Internal search functionality --------------------------
 
-async function initSearch() {
-  const indexes =
-    makeSearchIndexes(FlexSearch);
+const wikiSearchInfo = initInfo('wikiSearchInfo', {
+  state: {
+    worker: null,
 
-  const searchData =
-    await fetch('/search-data/index.json')
-      .then(resp => resp.json());
+    workerReadyPromise: null,
+    resolveWorkerReadyPromise: null,
 
-  // If this fails, it's because an outdated index was cached.
-  // TODO: If this fails, try again once with a cache busting url.
-  for (const [indexName, indexData] of Object.entries(searchData)) {
-    for (const [key, value] of Object.entries(indexData)) {
-      indexes[indexName].import(key, value);
-    }
+    workerActionCounter: 0,
+    workerActionPromiseMap: new Map(),
+  },
+});
+
+async function initializeSearchWorker() {
+  const {state} = wikiSearchInfo;
+
+  if (state.worker) {
+    return await state.workerReadyPromise;
   }
 
-  // Expose variable to window
-  window.searchIndexes = indexes;
+  state.worker =
+    new Worker(
+      import.meta.resolve('./search-worker.js'),
+      {type: 'module'});
+
+  state.worker.onmessage = handleSearchWorkerMessage;
+
+  ({promise: state.workerReadyPromise,
+    resolve: state.resolveWorkerReadyPromise} =
+      promiseWithResolvers());
+
+  return await state.workerReadyPromise;
 }
 
-function searchAll(query, options = {}) {
-  return (
-    withEntries(window.searchIndexes, entries => entries
-      .map(([indexName, index]) => [
-        indexName,
-        index.search(query, options),
-      ])));
+function handleSearchWorkerMessage(message) {
+  switch (message.data.kind) {
+    case 'status':
+      handleSearchWorkerStatusMessage(message);
+      break;
+
+    case 'result':
+      handleSearchWorkerResultMessage(message);
+      break;
+
+    default:
+      console.warn(`Unknown message kind "${message.data.kind}" <- from search worker`);
+      break;
+  }
 }
 
-document.addEventListener('DOMContentLoaded', initSearch);
+function handleSearchWorkerStatusMessage(message) {
+  const {state} = wikiSearchInfo;
 
-window.searchAll = searchAll;
+  switch (message.data.status) {
+    case 'alive':
+      console.debug(`Search worker is alive, but not yet ready.`);
+      break;
+
+    case 'ready':
+      console.debug(`Search worker has loaded corpuses and is ready.`);
+      state.resolveWorkerReadyPromise(state.worker);
+      break;
+
+    default:
+      console.warn(`Unknown status "${message.data.status}" <- from search worker`);
+      break;
+  }
+}
+
+function handleSearchWorkerResultMessage(message) {
+  const {state} = wikiSearchInfo;
+  const {id} = message.data;
+
+  if (!id) {
+    console.warn(`Result without id <- from search worker:`, message.data);
+    return;
+  }
+
+  if (!state.workerActionPromiseMap.has(id)) {
+    console.warn(`Runaway result id <- from search worker:`, message.data);
+    return;
+  }
+
+  const {resolve, reject} =
+    state.workerActionPromiseMap.get(id);
+
+  switch (message.data.status) {
+    case 'resolve':
+      resolve(message.data.value);
+      break;
+
+    case 'reject':
+      reject(message.data.value);
+      break;
+
+    default:
+      console.warn(`Unknown result status "${message.data.status}" <- from search worker`);
+      return;
+  }
+
+  state.workerActionPromiseMap.delete(id);
+}
+
+async function postSearchWorkerAction(action, options) {
+  const {state} = wikiSearchInfo;
+
+  const worker = await initializeSearchWorker();
+  const id = ++state.workerActionCounter;
+
+  const {promise, resolve, reject} = promiseWithResolvers();
+
+  state.workerActionPromiseMap.set(id, {resolve, reject});
+
+  worker.postMessage({
+    kind: 'action',
+    action: action,
+    id,
+    options,
+  });
+
+  return await promise;
+}
+
+async function searchAll(query, options = {}) {
+  return await postSearchWorkerAction('search', {
+    query,
+    options,
+  });
+}
 
 // Sidebar search box -------------------------------------
 
@@ -3543,7 +3638,7 @@ function addSidebarSearchListeners() {
   });
 }
 
-function activateSidebarSearch(query) {
+async function activateSidebarSearch(query) {
   const {state} = sidebarSearchInfo;
 
   if (state.stoppedTypingTimeout) {
@@ -3551,7 +3646,7 @@ function activateSidebarSearch(query) {
     state.stoppedTypingTimeout = null;
   }
 
-  const results = searchAll(query, {enrich: true});
+  const results = await searchAll(query, {enrich: true});
 
   showSidebarSearchResults(results);
 }
