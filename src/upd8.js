@@ -2158,7 +2158,8 @@ async function main() {
     }
   }
 
-  let webRoutes = null;
+  let webRouteSources = null;
+  let preparedWebRoutes = null;
 
   if (stepStatusSummary.identifyWebRoutes.status === STATUS_NOT_STARTED) {
     Object.assign(stepStatusSummary.identifyWebRoutes, {
@@ -2169,7 +2170,7 @@ async function main() {
     const fromRoot = urls.from('shared.root');
 
     try {
-      const webRouteSources = await identifyAllWebRoutes({
+      webRouteSources = await identifyAllWebRoutes({
         mediaCachePath,
         mediaPath,
         wikiCachePath,
@@ -2185,7 +2186,7 @@ async function main() {
           {message: `Errors computing effective web route paths`},);
 
       aggregate.close();
-      webRoutes = result;
+      preparedWebRoutes = result;
     } catch (error) {
       if (!paragraph) console.log('');
       niceShowAggregate(error);
@@ -2274,7 +2275,7 @@ async function main() {
       thumbsCache,
       urls,
       urlSpec,
-      webRoutes,
+      webRoutes: preparedWebRoutes,
       wikiData,
 
       closeLanguageWatchers,
