@@ -1,10 +1,11 @@
 // Index structures shared by client and server.
 
-export function makeSearchIndexes(FlexSearch) {
-  const doc = config =>
+export function makeSearchIndexes(FlexSearch, documentOptions = {}) {
+  const doc = documentSchema =>
     new FlexSearch.Document({
       id: 'reference',
-      ...config,
+      ...documentOptions,
+      ...documentSchema,
     });
 
   const indexes = {
