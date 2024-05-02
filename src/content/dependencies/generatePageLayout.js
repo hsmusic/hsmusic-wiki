@@ -551,6 +551,7 @@ export default {
         {'data-rebase-shared': to('shared.root')},
         {'data-rebase-media': to('media.root')},
         {'data-rebase-thumb': to('thumb.root')},
+        {'data-rebase-lib': to('staticLib.root')},
         {'data-rebase-data': to('data.root')},
 
         [
