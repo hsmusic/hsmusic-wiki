@@ -6,8 +6,15 @@
 // ephemeral nature.
 
 import {getColors} from '../shared-util/colors.js';
-import {accumulateSum, atOffset, empty, filterMultipleArrays, stitchArrays}
-  from '../shared-util/sugar.js';
+
+import {
+  accumulateSum,
+  atOffset,
+  empty,
+  filterMultipleArrays,
+  stitchArrays,
+  withEntries,
+} from '../shared-util/sugar.js';
 
 import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
 
@@ -3423,9 +3430,8 @@ clientSteps.addPageListeners.push(addArtistExternalLinkTooltipPageListeners);
 // Internal search functionality --------------------------
 
 async function initSearch() {
-
-  // Copied directly from server search.js
-  const indexes = makeSearchIndexes(FlexSearch);
+  const indexes =
+    makeSearchIndexes(FlexSearch);
 
   const searchData =
     await fetch('/search-data/index.json')
@@ -3444,13 +3450,12 @@ async function initSearch() {
 }
 
 function searchAll(query, options = {}) {
-  const results = {};
-
-  for (const [indexName, index] of Object.entries(window.searchIndexes)) {
-    results[indexName] = index.search(query, options);
-  }
-
-  return results;
+  return (
+    withEntries(window.searchIndexes, entries => entries
+      .map(([indexName, index]) => [
+        indexName,
+        index.search(query, options),
+      ])));
 }
 
 document.addEventListener('DOMContentLoaded', initSearch);
@@ -3539,7 +3544,16 @@ function addSidebarSearchListeners() {
 }
 
 function activateSidebarSearch(query) {
-  showSidebarSearchResults(searchAll(query, {enrich: true}));
+  const {state} = sidebarSearchInfo;
+
+  if (state.stoppedTypingTimeout) {
+    clearTimeout(state.stoppedTypingTimeout);
+    state.stoppedTypingTimeout = null;
+  }
+
+  const results = searchAll(query, {enrich: true});
+
+  showSidebarSearchResults(results);
 }
 
 function clearSidebarSearch() {
@@ -3564,8 +3578,6 @@ function showSidebarSearchResults(results) {
             directory: (id ? id.split(':')[1] : null),
             data: doc,
           }))));
-
-  console.log(flatResults);
 
   while (info.results.firstChild) {
     info.results.firstChild.remove();
