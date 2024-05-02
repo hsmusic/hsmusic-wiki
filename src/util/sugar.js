@@ -183,8 +183,14 @@ export const compareArrays = (arr1, arr2, {checkOrder = true} = {}) =>
     : arr1.every((x) => arr2.includes(x)));
 
 // Stolen from jq! Which pro8a8ly stole the concept from other places. Nice.
-export const withEntries = (obj, fn) =>
-  Object.fromEntries(fn(Object.entries(obj)));
+export const withEntries = (obj, fn) => {
+  const result = fn(Object.entries(obj));
+  if (result instanceof Promise) {
+    return result.then(entries => Object.fromEntries(entries));
+  } else {
+    return Object.fromEntries(result);
+  }
+}
 
 export function setIntersection(set1, set2) {
   const intersection = new Set();
