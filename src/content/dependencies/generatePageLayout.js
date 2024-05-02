@@ -21,6 +21,7 @@ export default {
 
   sprawl({wikiInfo}) {
     return {
+      enableSearch: wikiInfo.enableSearch,
       footerContent: wikiInfo.footerContent,
       wikiColor: wikiInfo.color,
       wikiName: wikiInfo.nameShort,
@@ -43,8 +44,10 @@ export default {
     relations.stickyHeadingContainer =
       relation('generateStickyHeadingContainer');
 
-    relations.searchBox =
-      relation('generateSearchSidebarBox');
+    if (sprawl.enableSearch) {
+      relations.searchBox =
+        relation('generateSearchSidebarBox');
+    }
 
     if (sprawl.footerContent) {
       relations.defaultFooterContent =
@@ -394,7 +397,11 @@ export default {
     const leftSidebar = getSidebar('leftSidebar', 'sidebar-left');
     const rightSidebar = getSidebar('rightSidebar', 'sidebar-right');
 
-    if (slots.showSearch && !html.isBlank(leftSidebar)) {
+    if (
+      slots.showSearch &&
+      relations.searchBox &&
+      !html.isBlank(leftSidebar)
+    ) {
       leftSidebar.setSlot('boxes',
         html.tags([
           relations.searchBox,
