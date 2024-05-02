@@ -266,6 +266,16 @@ export function delay(ms) {
   return new Promise((res) => setTimeout(res, ms));
 }
 
+export function promiseWithResolvers() {
+  let obj = {};
+
+  obj.promise =
+    new Promise((...opts) =>
+      ([obj.resolve, obj.reject] = opts));
+
+  return obj;
+}
+
 // Stolen from here: https://stackoverflow.com/a/3561711
 //
 // There's a proposal for a native JS function like this, 8ut it's not even
