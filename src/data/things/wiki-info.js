@@ -3,8 +3,9 @@ export const WIKI_INFO_FILE = 'wiki-info.yaml';
 import {input} from '#composite';
 import find from '#find';
 import Thing from '#thing';
-import {isColor, isLanguageCode, isName, isURL} from '#validators';
+import {isBoolean, isColor, isLanguageCode, isName, isURL} from '#validators';
 
+import {exitWithoutDependency} from '#composite/control-flow';
 import {contentString, flag, name, referenceList, wikiData}
   from '#composite/wiki-properties';
 
@@ -64,7 +65,25 @@ export class WikiInfo extends Thing {
     enableArtTagUI: flag(false),
     enableGroupUI: flag(false),
 
+    enableSearch: [
+      exitWithoutDependency({
+        dependency: 'searchDataAvailable',
+        mode: input.value('falsy'),
+        value: input.value(false),
+      }),
+
+      flag(true),
+    ],
+
     // Update only
+
+    searchDataAvailable: {
+      flags: {update: true},
+      update: {
+        validate: isBoolean,
+        default: false,
+      },
+    },
 
     groupData: wikiData({
       class: input.value(Group),

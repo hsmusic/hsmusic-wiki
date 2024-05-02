@@ -2215,6 +2215,10 @@ async function main() {
     });
   }
 
+  wikiData.wikiInfo.searchDataAvailable =
+    webRouteSources
+      .some(({to}) => to[0].startsWith('searchData'));
+
   if (stepStatusSummary.performBuild.status === STATUS_NOT_APPLICABLE) {
     return true;
   }
