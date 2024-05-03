@@ -3433,10 +3433,10 @@ const wikiSearchInfo = initInfo('wikiSearchInfo', {
     worker: null,
 
     workerReadyPromise: null,
-    resolveWorkerReadyPromise: null,
+    workerReadyPromiseResolvers: null,
 
     workerActionCounter: 0,
-    workerActionPromiseMap: new Map(),
+    workerActionPromiseResolverMap: new Map(),
   },
 });
 
@@ -3454,11 +3454,11 @@ async function initializeSearchWorker() {
 
   state.worker.onmessage = handleSearchWorkerMessage;
 
-  ({promise: state.workerReadyPromise,
-    resolve: state.resolveWorkerReadyPromise} =
-      promiseWithResolvers());
+  const {promise, resolve, reject} = promiseWithResolvers();
 
-  return await state.workerReadyPromise;
+  state.workerReadyPromiseResolvers = {resolve, reject};
+
+  return await (state.workerReadyPromise = promise);
 }
 
 function handleSearchWorkerMessage(message) {
@@ -3487,7 +3487,12 @@ function handleSearchWorkerStatusMessage(message) {
 
     case 'ready':
       console.debug(`Search worker has loaded corpuses and is ready.`);
-      state.resolveWorkerReadyPromise(state.worker);
+      state.workerReadyPromiseResolvers.resolve(state.worker);
+      break;
+
+    case 'setup-error':
+      console.debug(`Search worker failed to initialize.`);
+      state.workerReadyPromiseResolvers.reject('setup-error');
       break;
 
     default:
@@ -3505,13 +3510,13 @@ function handleSearchWorkerResultMessage(message) {
     return;
   }
 
-  if (!state.workerActionPromiseMap.has(id)) {
+  if (!state.workerActionPromiseResolverMap.has(id)) {
     console.warn(`Runaway result id <- from search worker:`, message.data);
     return;
   }
 
   const {resolve, reject} =
-    state.workerActionPromiseMap.get(id);
+    state.workerActionPromiseResolverMap.get(id);
 
   switch (message.data.status) {
     case 'resolve':
@@ -3527,7 +3532,7 @@ function handleSearchWorkerResultMessage(message) {
       return;
   }
 
-  state.workerActionPromiseMap.delete(id);
+  state.workerActionPromiseResolverMap.delete(id);
 }
 
 async function postSearchWorkerAction(action, options) {
@@ -3538,7 +3543,7 @@ async function postSearchWorkerAction(action, options) {
 
   const {promise, resolve, reject} = promiseWithResolvers();
 
-  state.workerActionPromiseMap.set(id, {resolve, reject});
+  state.workerActionPromiseResolverMap.set(id, {resolve, reject});
 
   worker.postMessage({
     kind: 'action',

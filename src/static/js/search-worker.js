@@ -13,6 +13,10 @@ postStatus('alive');
 main().then(
   () => {
     postStatus('ready');
+  },
+  error => {
+    console.error(`Search worker setup error:`, error);
+    postStatus('setup-error');
   });
 
 async function main() {
