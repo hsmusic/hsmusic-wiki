@@ -3667,6 +3667,8 @@ function clearSidebarSearch() {
 function showSidebarSearchResults(results) {
   const info = sidebarSearchInfo;
 
+  console.debug(`Showing search results:`, results);
+
   const flatResults =
     Object.entries(results)
       .flatMap(([index, results]) => results

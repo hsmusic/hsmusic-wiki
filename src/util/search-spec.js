@@ -1,6 +1,61 @@
 // Index structures shared by client and server, and relevant interfaces.
 
 export const searchSpec = {
+  generic: {
+    query: ({
+      albumData,
+      artistData,
+      flashData,
+      trackData,
+    }) => [
+      albumData,
+
+      artistData
+        .filter(artist => !artist.isAlias),
+
+      flashData,
+
+      trackData
+        // Exclude rereleases - there's no reasonable way to differentiate
+        // them from the main release as part of this query.
+        .filter(track => !track.originalReleaseTrack),
+    ].flat(),
+
+    process: (thing) => ({
+      primaryName:
+        thing.name,
+
+      additionalNames:
+        (Object.hasOwn(thing, 'additionalNames')
+          ? thing.additionalNames.map(entry => entry.name)
+       : Object.hasOwn(thing, 'aliasNames')
+          ? thing.aliasNames
+          : []),
+
+      contributors:
+        ([
+          'artistContribs',
+          'bannerArtistContribs',
+          'contributorContribs',
+          'coverArtistContribs',
+          'wallpaperArtistContribs',
+        ]).filter(key => Object.hasOwn(thing, key))
+          .flatMap(key => thing[key])
+          .map(contrib => contrib.artist)
+          .flatMap(artist => [artist.name, ...artist.aliasNames]),
+    }),
+
+    index: [
+      'primaryName',
+      'additionalNames',
+      'contributors',
+    ],
+
+    store: [
+      'primaryName',
+    ],
+  },
+
   albums: {
     query: ({albumData}) => albumData,
 
