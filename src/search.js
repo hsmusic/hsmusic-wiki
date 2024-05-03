@@ -6,143 +6,17 @@ import * as path from 'node:path';
 import FlexSearch from 'flexsearch';
 
 import {logError, logInfo, logWarn} from '#cli';
-import Thing from '#thing';
+import {makeSearchIndex, populateSearchIndex, searchSpec} from '#search-spec';
+import {stitchArrays} from '#sugar';
 
-import {makeSearchIndexes} from './util/searchSchema.js';
+async function exportIndexToJSON(index) {
+  const results = {};
 
-const DEBUG_DOC_GEN = true;
+  await index.export((key, data) => {
+    results[key] = data;
+  })
 
-async function populateSearchIndexes(indexes, wikiData) {
-
-  const haveLoggedDocOfThing = {}; // debugging only
-
-  function readCollectionIntoIndex(
-    collection,
-    index,
-    mapper
-  ) {
-    // Add a doc for mapper(thing) to index for each thing in collection.
-    for (const thing of collection) {
-      const reference = Thing.getReference(thing);
-
-      // Get mapped fields from thing
-      let mappedResult;
-      try {
-        mappedResult = mapper(thing);
-      } catch (e) {
-        // Enrich error context
-        logError`Failed to write searchable doc for thing ${reference}`;
-        const thingSchemaSummary = Object.fromEntries(
-          Object.entries(thing)
-          .map(([k, v]) => [k, v ? (v.constructor.name || typeof v) : v])
-        );
-        logError("Availible properties: " + JSON.stringify(thingSchemaSummary, null, 2));
-        throw e;
-      }
-
-      // Build doc and add to index
-      const doc = {
-        reference,
-        ...mappedResult
-      }
-      // Print description of an output doc, if debugging enabled.
-      if (DEBUG_DOC_GEN && !haveLoggedDocOfThing[thing.constructor.name]) {
-        logInfo(JSON.stringify(doc, null, 2));
-        haveLoggedDocOfThing[thing.constructor.name] = true;
-      }
-      index.add(doc);
-    }
-  }
-
-  // Albums
-  readCollectionIntoIndex(
-    wikiData.albumData,
-    indexes.albums,
-    album => ({
-      name: album.name,
-      groups: album.groups.map(group => group.name),
-    })
-  );
-
-  // Tracks
-  readCollectionIntoIndex(
-    wikiData.trackData,
-    indexes.tracks,
-    track => ({
-      name: track.name,
-      color: track.color,
-      album: track.album.name,
-      albumDirectory: track.album.directory,
-
-      artists: [
-        track.artistContribs.map(contrib => contrib.artist.name),
-        ...track.artistContribs.map(contrib => contrib.artist.aliasNames)
-      ].flat(),
-
-      additionalNames: track.additionalNames.map(entry => entry.name),
-
-      artworkKind:
-        (track.hasUniqueCoverArt
-          ? 'track'
-       : track.album.hasCoverArt
-          ? 'album'
-          : 'none'),
-    })
-  );
-
-  // Artists
-  const realArtists =
-    wikiData.artistData
-      .filter(artist => !artist.isAlias);
-
-  readCollectionIntoIndex(
-    realArtists,
-    indexes.artists,
-    artist => ({
-      names: [artist.name, ...artist.aliasNames],
-    })
-  );
-
-  // Groups
-  readCollectionIntoIndex(
-    wikiData.groupData,
-    indexes.groups,
-    group => ({
-      names: group.name,
-      description: group.description,
-      // category: group.category
-    })
-  );
-
-  // Flashes
-  readCollectionIntoIndex(
-    wikiData.flashData,
-    indexes.flashes,
-    flash => ({
-      name: flash.name,
-      tracks: flash.featuredTracks.map(track => track.name),
-      contributors: [
-        flash.contributorContribs.map(contrib => contrib.artist.name),
-        ...flash.contributorContribs.map(contrib => contrib.artist.aliasNames)
-      ].flat()
-    })
-  );
-}
-
-async function exportIndexesToJson(indexes) {
-  const searchData = {};
-
-  // Map each index to an export promise, and await all.
-  await Promise.all(
-    Object.entries(indexes)
-      .map(([indexName, index]) => {
-        searchData[indexName] = {};
-        return index.export((key, data) => {
-          searchData[indexName][key] = data;
-        });
-      }));
-
-  return searchData;
+  return results;
 }
 
 export async function writeSearchData({
@@ -158,11 +32,32 @@ export async function writeSearchData({
   // 2. Add documents to index
   // 3. Save index to exportable json
 
-  const indexes = makeSearchIndexes(FlexSearch);
+  const keys =
+    Object.keys(searchSpec);
 
-  await populateSearchIndexes(indexes, wikiData);
+  const descriptors =
+    Object.values(searchSpec);
 
-  const searchData = await exportIndexesToJson(indexes);
+  const indexes =
+    descriptors
+      .map(descriptor =>
+        makeSearchIndex(descriptor, {FlexSearch}));
+
+  stitchArrays({
+    index: indexes,
+    descriptor: descriptors,
+  }).forEach(({index, descriptor}) =>
+      populateSearchIndex(index, descriptor, {wikiData}));
+
+  const jsonIndexes =
+    await Promise.all(indexes.map(exportIndexToJSON));
+
+  const searchData =
+    Object.fromEntries(
+      stitchArrays({
+        key: keys,
+        value: jsonIndexes,
+      }).map(({key, value}) => [key, value]));
 
   const outputDirectory =
     path.join(wikiCachePath, 'search');

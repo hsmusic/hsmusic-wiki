@@ -1,4 +1,4 @@
-import {makeSearchIndexes} from '../shared-util/searchSchema.js';
+import {makeSearchIndex, searchSpec} from '../shared-util/search-spec.js';
 import {withEntries} from '../shared-util/sugar.js';
 
 import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
@@ -21,7 +21,11 @@ main().then(
 
 async function main() {
   indexes =
-    makeSearchIndexes(FlexSearch);
+    withEntries(searchSpec, entries => entries
+      .map(([key, descriptor]) => [
+        key,
+        makeSearchIndex(descriptor, {FlexSearch}),
+      ]));
 
   searchData =
     await fetch('/search-data/index.json')
