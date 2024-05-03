@@ -4,27 +4,33 @@ import {withEntries} from '../shared-util/sugar.js';
 import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
 
 let status = null;
+let indexes = null;
+let searchData = null;
 
 onmessage = handleWindowMessage;
-
 postStatus('alive');
 
-const indexes =
-  makeSearchIndexes(FlexSearch);
+main().then(
+  () => {
+    postStatus('ready');
+  });
 
-const searchData =
-  await fetch('/search-data/index.json')
-    .then(resp => resp.json());
+async function main() {
+  indexes =
+    makeSearchIndexes(FlexSearch);
 
-// If this fails, it's because an outdated index was cached.
-// TODO: If this fails, try again once with a cache busting url.
-for (const [indexName, indexData] of Object.entries(searchData)) {
-  for (const [key, value] of Object.entries(indexData)) {
-    indexes[indexName].import(key, value);
+  searchData =
+    await fetch('/search-data/index.json')
+      .then(resp => resp.json());
+
+  // If this fails, it's because an outdated index was cached.
+  // TODO: If this fails, try again once with a cache busting url.
+  for (const [indexName, indexData] of Object.entries(searchData)) {
+    for (const [key, value] of Object.entries(indexData)) {
+      indexes[indexName].import(key, value);
+    }
   }
 }
-
-postStatus('ready');
 
 function handleWindowMessage(message) {
   switch (message.data.kind) {
