@@ -145,7 +145,7 @@ async function exportIndexesToJson(indexes) {
   return searchData;
 }
 
-export async function writeSearchJson({
+export async function writeSearchData({
   wikiCachePath,
   wikiData,
 }) {

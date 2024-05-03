@@ -47,7 +47,7 @@ import {bindFind, getAllFindSpecs} from '#find';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
 import {isMain, traverse} from '#node-utils';
-import {writeSearchJson} from '#search';
+import {writeSearchData} from '#search';
 import {sortByName} from '#sort';
 import {generateURLs, urlSpec} from '#urls';
 import {identifyAllWebRoutes} from '#web-routes';
@@ -1489,7 +1489,7 @@ async function main() {
       timeStart: Date.now(),
     });
 
-    await writeSearchJson({
+    await writeSearchData({
       wikiCachePath,
       wikiData,
     });
