@@ -3575,6 +3575,10 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
     stoppedTypingTimeout: null,
   },
 
+  session: {
+    activeQuery: null,
+  },
+
   settings: {
     stoppedTyingDelay: 800,
   },
@@ -3643,8 +3647,20 @@ function addSidebarSearchListeners() {
   });
 }
 
+function initializeSidebarSearchState() {
+  const info = sidebarSearchInfo;
+  const {session} = info;
+
+  if (!info.searchInput) return;
+
+  if (session.activeQuery) {
+    info.searchInput.value = session.activeQuery;
+    activateSidebarSearch(session.activeQuery);
+  }
+}
+
 async function activateSidebarSearch(query) {
-  const {state} = sidebarSearchInfo;
+  const {session, state} = sidebarSearchInfo;
 
   if (state.stoppedTypingTimeout) {
     clearTimeout(state.stoppedTypingTimeout);
@@ -3653,13 +3669,17 @@ async function activateSidebarSearch(query) {
 
   const results = await searchAll(query, {enrich: true});
 
+  session.activeQuery = query;
+
   showSidebarSearchResults(results);
 }
 
 function clearSidebarSearch() {
   const info = sidebarSearchInfo;
+  const {session} = info;
 
   info.searchInput.value = '';
+  session.activeQuery = '';
 
   hideSidebarSearchResults();
 }
@@ -3759,6 +3779,7 @@ function hideSidebarSearchResults() {
 clientSteps.getPageReferences.push(getSidebarSearchReferences);
 clientSteps.mutatePageContent.push(mutateSidebarSearchContent);
 clientSteps.addPageListeners.push(addSidebarSearchListeners);
+clientSteps.initializeState.push(initializeSidebarSearchState);
 
 // Sticky commentary sidebar ------------------------------
 
