@@ -3714,19 +3714,40 @@ function showSidebarSearchResults(results) {
   cssProp(info.resultsContainer, 'display', 'block');
 
   for (const result of flatResults) {
-    if (result.index !== 'tracks') continue;
-    info.results.appendChild(generateSidebarSearchTrackResult(result));
+    if (result.index !== 'generic') continue;
+
+    const el = generateSidebarSearchResult(result);
+    if (!el) continue;
+
+    info.results.appendChild(el);
   }
 }
 
 function generateSidebarSearchResult(result) {
+  const preparedSlots = {
+    color:
+      result.data.color ?? null,
+
+    name:
+      result.data.name ?? result.data.primaryName ?? null,
+
+    imageSource:
+      getSearchResultImageSource(result),
+  };
+
   switch (result.referenceType) {
-    case 'track':
-      return generateSidebarSearchTrackResult(result);
+    case 'track': {
+      preparedSlots.href =
+        openTrack(result.directory);
+
+      break;
+    }
 
     default:
       return null;
   }
+
+  return generateSidebarSearchResultTemplate(preparedSlots);
 }
 
 function getSearchResultImageSource(result) {
@@ -3755,22 +3776,6 @@ function getSearchResultImageSource(result) {
     default:
       return null;
   }
-}
-
-function generateSidebarSearchTrackResult(result) {
-  return generateSidebarSearchResultTemplate({
-    href:
-      openTrack(result.directory),
-
-    color:
-      result.data.color,
-
-    name:
-      result.data.name,
-
-    imageSource:
-      getSearchResultImageSource(result),
-  });
 }
 
 function generateSidebarSearchResultTemplate(slots) {

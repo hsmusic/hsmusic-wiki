@@ -42,6 +42,9 @@ export const searchSpec = {
       primaryName:
         thing.name,
 
+      color:
+        thing.color,
+
       additionalNames:
         (Object.hasOwn(thing, 'additionalNames')
           ? thing.additionalNames.map(entry => entry.name)
@@ -74,6 +77,7 @@ export const searchSpec = {
     store: [
       'primaryName',
       'artwork',
+      'color',
     ],
   },
 
