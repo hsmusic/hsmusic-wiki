@@ -3676,7 +3676,12 @@ async function activateSidebarSearch(query) {
 
 function clearSidebarSearch() {
   const info = sidebarSearchInfo;
-  const {session} = info;
+  const {session, state} = info;
+
+  if (state.stoppedTypingTimeout) {
+    clearTimeout(state.stoppedTypingTimeout);
+    state.stoppedTypingTimeout = null;
+  }
 
   info.searchInput.value = '';
   session.activeQuery = '';
