@@ -1,5 +1,22 @@
 // Index structures shared by client and server, and relevant interfaces.
 
+function prepareArtwork(thing) {
+  switch (thing.constructor[Symbol.for('Thing.referenceType')]) {
+    case 'track': {
+      if (thing.hasUniqueCoverArt) {
+        return ['track', thing.album.directory];
+      } else if (thing.album.hasCoverArt) {
+        return ['track-album', thing.album.directory];
+      } else {
+        return undefined;
+      }
+    }
+
+    default:
+      return undefined;
+  }
+}
+
 export const searchSpec = {
   generic: {
     query: ({
@@ -43,6 +60,9 @@ export const searchSpec = {
           .flatMap(key => thing[key])
           .map(contrib => contrib.artist)
           .flatMap(artist => [artist.name, ...artist.aliasNames]),
+
+      artwork:
+        prepareArtwork(thing),
     }),
 
     index: [
@@ -53,6 +73,7 @@ export const searchSpec = {
 
     store: [
       'primaryName',
+      'artwork',
     ],
   },
 
@@ -98,12 +119,8 @@ export const searchSpec = {
         track.additionalNames
           .map(entry => entry.name),
 
-      artworkKind:
-        (track.hasUniqueCoverArt
-          ? 'track'
-       : track.album.hasCoverArt
-          ? 'album'
-          : 'none'),
+      artwork:
+        prepareArtwork(track),
     }),
 
     index: [
@@ -117,7 +134,7 @@ export const searchSpec = {
       'color',
       'name',
       'albumDirectory',
-      'artworkKind',
+      'artwork',
     ],
   },
 

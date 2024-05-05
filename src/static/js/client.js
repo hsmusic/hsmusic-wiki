@@ -3702,6 +3702,7 @@ function showSidebarSearchResults(results) {
             index,
             field,
             reference: id ?? null,
+            referenceType: (id ? id.split(':')[0] : null),
             directory: (id ? id.split(':')[1] : null),
             data: doc,
           }))));
@@ -3718,6 +3719,44 @@ function showSidebarSearchResults(results) {
   }
 }
 
+function generateSidebarSearchResult(result) {
+  switch (result.referenceType) {
+    case 'track':
+      return generateSidebarSearchTrackResult(result);
+
+    default:
+      return null;
+  }
+}
+
+function getSearchResultImageSource(result) {
+  const {artwork} = result.data;
+
+  if (!artwork) return null;
+
+  const [kind, ...opts] = artwork;
+
+  switch (kind) {
+    case 'track':
+      return rebase(
+        (`album-art`
+       + `/${opts[0]}`
+       + `/${result.directory}`
+       + `.small.jpg`),
+        'rebaseThumb');
+
+    case 'track-album':
+      return rebase(
+         (`album-art`
+        + `/${opts[0]}`
+        + `/cover.small.jpg`),
+        'rebaseThumb');
+
+    default:
+      return null;
+  }
+}
+
 function generateSidebarSearchTrackResult(result) {
   return generateSidebarSearchResultTemplate({
     href:
@@ -3730,20 +3769,7 @@ function generateSidebarSearchTrackResult(result) {
       result.data.name,
 
     imageSource:
-      (result.data.artworkKind === 'track'
-        ? rebase(
-            (`album-art`
-           + `/${result.data.albumDirectory}`
-           + `/${result.directory}`
-           + `.small.jpg`),
-            'rebaseThumb')
-     : result.data.artworkKind === 'album'
-        ? rebase(
-            (`album-art`
-           + `/${result.data.albumDirectory}`
-           + `/cover.small.jpg`),
-            'rebaseThumb')
-        : null),
+      getSearchResultImageSource(result),
   });
 }
 
