@@ -1,5 +1,5 @@
 import {makeSearchIndex, searchSpec} from '../shared-util/search-spec.js';
-import {withEntries} from '../shared-util/sugar.js';
+import {empty, unique, withEntries} from '../shared-util/sugar.js';
 
 import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
 
@@ -68,7 +68,7 @@ async function handleWindowActionMessage(message) {
 
   switch (message.data.action) {
     case 'search':
-      value = await performSearch(message.data.options);
+      value = await performSearchAction(message.data.options);
       break;
 
     default:
@@ -96,11 +96,87 @@ function postActionResult(id, status, value) {
   });
 }
 
-function performSearch({query, options}) {
-  return (
-    withEntries(indexes, entries => entries
+function performSearchAction({query, options}) {
+  const {generic, ...otherIndexes} = indexes;
+
+  const genericResults =
+    queryGenericIndex(generic, query, options);
+
+  const otherResults =
+    withEntries(otherIndexes, entries => entries
       .map(([indexName, index]) => [
         indexName,
         index.search(query, options),
-      ])));
+      ]));
+
+  return {
+    generic: genericResults,
+    ...otherResults,
+  };
+}
+
+function queryGenericIndex(index, query, options) {
+  const terms = query.split(' ');
+  const particles = particulate(terms);
+  console.log(particles);
+
+  const boilerplate = queryBoilerplate(index, query, options);
+
+  const {primaryName} = boilerplate.fieldResults;
+
+  return boilerplate.constitute(primaryName);
+}
+
+function particulate(terms) {
+  if (empty(terms)) return [];
+
+  const results = [];
+
+  for (let slice = 1; slice <= 2; slice++) {
+    if (slice === terms.length) {
+      break;
+    }
+
+    const front = terms.slice(0, slice);
+    const back = terms.slice(slice);
+
+    results.push(...
+      particulate(back)
+        .map(result => [
+          {terms: front},
+          ...result
+        ]));
+  }
+
+  results.push([{terms}]);
+
+  return results;
+}
+
+function queryBoilerplate(index, query, options) {
+  const rawResults =
+    index.search(query, options);
+
+  const fieldResults =
+    Object.fromEntries(
+      rawResults
+        .map(({field, result}) => [
+          field,
+          result.map(({id}) => id),
+        ]));
+
+  const idToDoc =
+    Object.fromEntries(
+      rawResults
+        .flatMap(({result}) => result)
+        .map(({id, doc}) => [id, doc]));
+
+  return {
+    rawResults,
+    fieldResults,
+    idToDoc,
+
+    constitute: ids =>
+      ids.map(id => ({id, doc: idToDoc[id]})),
+  };
 }

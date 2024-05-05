@@ -3696,16 +3696,15 @@ function showSidebarSearchResults(results) {
 
   const flatResults =
     Object.entries(results)
+      .filter(([index]) => index === 'generic')
       .flatMap(([index, results]) => results
-        .flatMap(({field, result}) => result
-          .flatMap(({doc, id}) => ({
-            index,
-            field,
-            reference: id ?? null,
-            referenceType: (id ? id.split(':')[0] : null),
-            directory: (id ? id.split(':')[1] : null),
-            data: doc,
-          }))));
+        .flatMap(({doc, id}) => ({
+          index,
+          reference: id ?? null,
+          referenceType: (id ? id.split(':')[0] : null),
+          directory: (id ? id.split(':')[1] : null),
+          data: doc,
+        })));
 
   while (info.results.firstChild) {
     info.results.firstChild.remove();
@@ -3714,8 +3713,6 @@ function showSidebarSearchResults(results) {
   cssProp(info.resultsContainer, 'display', 'block');
 
   for (const result of flatResults) {
-    if (result.index !== 'generic') continue;
-
     const el = generateSidebarSearchResult(result);
     if (!el) continue;
 
@@ -3739,6 +3736,13 @@ function generateSidebarSearchResult(result) {
     case 'track': {
       preparedSlots.href =
         openTrack(result.directory);
+
+      break;
+    }
+
+    case 'artist': {
+      preparedSlots.href =
+        openArtist(result.directory);
 
       break;
     }
