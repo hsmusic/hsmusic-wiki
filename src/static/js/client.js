@@ -3714,61 +3714,77 @@ function showSidebarSearchResults(results) {
 
   for (const result of flatResults) {
     if (result.index !== 'tracks') continue;
+    info.results.appendChild(generateSidebarSearchTrackResult(result));
+  }
+}
 
-    const link = document.createElement('a');
-    link.classList.add('wiki-search-result');
+function generateSidebarSearchTrackResult(result) {
+  return generateSidebarSearchResultTemplate({
+    href:
+      openTrack(result.directory),
 
-    link.setAttribute('href', openTrack(result.directory));
-    cssProp(link, '--primary-color', result.data.color);
+    color:
+      result.data.color,
+
+    name:
+      result.data.name,
+
+    imageSource:
+      (result.data.artworkKind === 'track'
+        ? rebase(
+            (`album-art`
+           + `/${result.data.albumDirectory}`
+           + `/${result.directory}`
+           + `.small.jpg`),
+            'rebaseThumb')
+     : result.data.artworkKind === 'album'
+        ? rebase(
+            (`album-art`
+           + `/${result.data.albumDirectory}`
+           + `/cover.small.jpg`),
+            'rebaseThumb')
+        : null),
+  });
+}
+
+function generateSidebarSearchResultTemplate(slots) {
+  const link = document.createElement('a');
+  link.classList.add('wiki-search-result');
+
+  if (slots.href) {
+    link.setAttribute('href', slots.href);
+  }
+
+  if (slots.color) {
+    cssProp(link, '--primary-color', slots.color);
 
     try {
-      const colors = getColors(result.data.color, {chroma});
+      const colors = getColors(slots.color, {chroma});
       cssProp(link, '--light-ghost-color', colors.lightGhost);
     } catch (error) {
       console.warn(error);
     }
+  }
 
+  if (slots.imageSource) {
+    const img = document.createElement('img');
+    img.classList.add('wiki-search-result-image');
+    img.setAttribute('src', slots.imageSource);
+    link.appendChild(img);
+  } else {
+    const placeholder = document.createElement('span');
+    placeholder.classList.add('wiki-search-result-image-placeholder');
+    link.appendChild(placeholder);
+  }
+
+  if (slots.name) {
     const span = document.createElement('span');
     span.classList.add('wiki-search-result-name');
-
-    span.appendChild(document.createTextNode(result.data.name));
-
-    let image;
-    image = document.createElement('img');
-    image.classList.add('wiki-search-result-image');
-
-    switch (result.data.artworkKind) {
-      case 'track':
-        image.setAttribute('src', rebase(
-          (`album-art`
-         + `/${result.data.albumDirectory}`
-         + `/${result.directory}`
-         + `.small.jpg`),
-          'rebaseThumb'));
-        break;
-
-      case 'album':
-        image.setAttribute('src', rebase(
-          (`album-art`
-         + `/${result.data.albumDirectory}`
-         + `/cover.small.jpg`),
-          'rebaseThumb'));
-        break;
-
-      default:
-        image = document.createElement('span');
-        image.classList.add('wiki-search-result-image-placeholder');
-        break;
-    }
-
-    if (image) {
-      link.appendChild(image);
-    }
-
+    span.appendChild(document.createTextNode(slots.name));
     link.appendChild(span);
-
-    info.results.appendChild(link);
   }
+
+  return link;
 }
 
 function hideSidebarSearchResults() {
