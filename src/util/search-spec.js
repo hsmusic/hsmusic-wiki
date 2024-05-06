@@ -64,6 +64,13 @@ export const searchSpec = {
           .map(contrib => contrib.artist)
           .flatMap(artist => [artist.name, ...artist.aliasNames]),
 
+      groups:
+        (Object.hasOwn(thing, 'groups')
+          ? thing.groups.map(group => group.name)
+       : Object.hasOwn(thing, 'album')
+          ? thing.album.groups.map(group => group.name)
+          : []),
+
       artwork:
         prepareArtwork(thing),
     }),
@@ -72,6 +79,7 @@ export const searchSpec = {
       'primaryName',
       'additionalNames',
       'contributors',
+      'groups',
     ],
 
     store: [
