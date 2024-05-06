@@ -4,8 +4,12 @@ function prepareArtwork(thing) {
   switch (thing.constructor[Symbol.for('Thing.referenceType')]) {
     case 'track': {
       if (thing.hasUniqueCoverArt) {
+        if (thing.coverArtFileExtension === 'gif')
+          return undefined;
         return ['track', thing.album.directory];
       } else if (thing.album.hasCoverArt) {
+        if (thing.album.coverArtFileExtension === 'gif')
+          return undefined;
         return ['track-album', thing.album.directory];
       } else {
         return undefined;
