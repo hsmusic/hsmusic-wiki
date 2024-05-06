@@ -616,6 +616,15 @@ misc:
     _: "{TITLE}"
     withWikiName: "{TITLE} | {WIKI_NAME}"
 
+  # search:
+  #   Strings to do with the search bar!
+
+  search:
+    placeholder: "Search for anything"
+    noResults: >-
+      No results for this query, sorry!
+      Check spelling and use complete words.
+
   # skippers:
   #
   #   These are navigational links that only show up when you're

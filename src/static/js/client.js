@@ -154,6 +154,14 @@ function cssProp(el, ...args) {
   }
 }
 
+function templateContent(el) {
+  if (el?.nodeName !== 'TEMPLATE') {
+    throw new Error(`Expected a <template> element`);
+  }
+
+  return el.content.cloneNode(true);
+}
+
 // Curry-style, so multiple points can more conveniently be tested at once.
 function pointIsOverAnyOf(elements) {
   return (clientX, clientY) => {
@@ -3571,6 +3579,8 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   resultsContainer: null,
   results: null,
 
+  noResultsString: null,
+
   state: {
     stoppedTypingTimeout: null,
   },
@@ -3591,7 +3601,10 @@ function getSidebarSearchReferences() {
     document.querySelector('.wiki-search-sidebar-box');
 
   info.searchInput =
-    document.querySelector('.wiki-search-input');
+    info.searchBox.querySelector('.wiki-search-input');
+
+  info.noResultsString =
+    info.searchBox.querySelector('.wiki-search-no-results-string');
 }
 
 function mutateSidebarSearchContent() {
@@ -3711,6 +3724,13 @@ function showSidebarSearchResults(results) {
   }
 
   cssProp(info.resultsContainer, 'display', 'block');
+
+  if (empty(flatResults)) {
+    const p = document.createElement('p');
+    p.classList.add('wiki-search-no-results');
+    p.appendChild(templateContent(info.noResultsString));
+    info.results.appendChild(p);
+  }
 
   for (const result of flatResults) {
     const el = generateSidebarSearchResult(result);

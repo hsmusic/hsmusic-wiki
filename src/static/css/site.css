@@ -499,6 +499,12 @@ summary .group-name {
   margin-bottom: 5px;
 }
 
+.wiki-search-no-results {
+  font-size: 0.9em;
+  padding: 2px 3px 4px 6px;
+  cursor: default;
+}
+
 .wiki-search-result {
   position: relative;
   display: flex;
