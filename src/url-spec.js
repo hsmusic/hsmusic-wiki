@@ -2,7 +2,7 @@ import {withEntries} from '#sugar';
 
 const genericPaths = {
   root: '',
-  path: '<>/',
+  path: '<>',
 };
 
 const urlSpec = {
