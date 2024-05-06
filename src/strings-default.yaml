@@ -621,9 +621,12 @@ misc:
 
   search:
     placeholder: "Search for anything"
+
     noResults: >-
       No results for this query, sorry!
       Check spelling and use complete words.
+
+    currentResult: "(you are here)"
 
   # skippers:
   #

@@ -511,6 +511,10 @@ summary .group-name {
   padding: 4px 3px 4px 6px;
 }
 
+.wiki-search-result:hover {
+  text-decoration: none !important;
+}
+
 .wiki-search-result::before {
   content: '';
   position: absolute;
@@ -529,10 +533,24 @@ summary .group-name {
   background: var(--light-ghost-color);
 }
 
-.wiki-search-result-name {
+.wiki-search-result-text-area {
   align-self: center;
   flex-grow: 1;
   padding-bottom: 2px;
+}
+
+.wiki-search-result-name {
+  margin-right: 0.25em;
+}
+
+.wiki-search-result:hover .wiki-search-result-name {
+  text-decoration: underline;
+}
+
+.wiki-search-current-result-text {
+  font-style: oblique;
+  opacity: 0.9;
+  display: inline-block;
 }
 
 .wiki-search-result-image,

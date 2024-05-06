@@ -3580,6 +3580,7 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   results: null,
 
   noResultsString: null,
+  currentResultString: null,
 
   state: {
     stoppedTypingTimeout: null,
@@ -3605,6 +3606,9 @@ function getSidebarSearchReferences() {
 
   info.noResultsString =
     info.searchBox.querySelector('.wiki-search-no-results-string');
+
+  info.currentResultString =
+    info.searchBox.querySelector('.wiki-search-current-result-string');
 }
 
 function mutateSidebarSearchContent() {
@@ -3803,6 +3807,8 @@ function getSearchResultImageSource(result) {
 }
 
 function generateSidebarSearchResultTemplate(slots) {
+  const info = sidebarSearchInfo;
+
   const link = document.createElement('a');
   link.classList.add('wiki-search-result');
 
@@ -3832,12 +3838,29 @@ function generateSidebarSearchResultTemplate(slots) {
     link.appendChild(placeholder);
   }
 
+  const text = document.createElement('span');
+  text.classList.add('wiki-search-result-text-area');
+
   if (slots.name) {
     const span = document.createElement('span');
     span.classList.add('wiki-search-result-name');
     span.appendChild(document.createTextNode(slots.name));
-    link.appendChild(span);
+    text.appendChild(span);
   }
+
+  if (link.href) {
+    const here = location.href.replace(/\/$/, '');
+    const there = link.href.replace(/\/$/, '');
+    if (here === there) {
+      const span = document.createElement('span');
+      span.classList.add('wiki-search-current-result-text');
+      span.appendChild(templateContent(info.currentResultString));
+      text.appendChild(document.createTextNode(' '));
+      text.appendChild(span);
+    }
+  }
+
+  link.appendChild(text);
 
   return link;
 }
