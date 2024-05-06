@@ -117,6 +117,16 @@ function performSearchAction({query, options}) {
 }
 
 function queryGenericIndex(index, query, options) {
+  const interestingFieldCombinations = [
+    ['primaryName', 'contributors', 'groups'],
+    ['primaryName', 'groups'],
+    ['primaryName', 'contributors'],
+    ['primaryName'],
+  ];
+
+  const interestingFields =
+    unique(interestingFieldCombinations.flat());
+
   const terms = query.split(' ');
 
   const particles = particulate(terms);
@@ -125,29 +135,61 @@ function queryGenericIndex(index, query, options) {
     groupArray(particles, ({length}) => length);
 
   const queriesBy = keys =>
-    groupedParticles
-      .get(keys.length)
+    (groupedParticles.get(keys.length) ?? [])
       .flatMap(permutations)
       .map(values => values.map(({terms}) => terms.join(' ')))
       .map(values => Object.fromEntries(stitchArrays([keys, values])));
 
-  console.log(
-    queriesBy(['primaryName'])
-      .map(l => JSON.stringify(l))
-      .join('\n'));
-
-  console.log(
-    queriesBy(['primaryName', 'contributors'])
-      .map(l => JSON.stringify(l))
-      .join('\n'));
-
   const boilerplate = queryBoilerplate(index);
 
-  const {fieldResults} = boilerplate.query(query, options);
+  const particleResults =
+    Object.fromEntries(
+      interestingFields.map(field => [
+        field,
+        Object.fromEntries(
+          particles.flat()
+            .map(({terms}) => terms.join(' '))
+            .map(query => [
+              query,
+              new Set(
+                boilerplate
+                  .query(query, {
+                    ...options,
+                    field,
+                    limit: Infinity,
+                  })
+                  .fieldResults[field]),
+            ])),
+      ]));
 
-  const {primaryName} = fieldResults;
+  const results = new Set();
 
-  return boilerplate.constitute(primaryName);
+  for (const interestingFieldCombination of interestingFieldCombinations) {
+    for (const query of queriesBy(interestingFieldCombination)) {
+      const idToMatchingFieldsMap = new Map();
+      for (const [field, fieldQuery] of Object.entries(query)) {
+        for (const id of particleResults[field][fieldQuery]) {
+          if (idToMatchingFieldsMap.has(id)) {
+            idToMatchingFieldsMap.get(id).push(field);
+          } else {
+            idToMatchingFieldsMap.set(id, [field]);
+          }
+        }
+      }
+
+      const commonAcrossFields =
+        Array.from(idToMatchingFieldsMap.entries())
+          .filter(([id, matchingFields]) =>
+            matchingFields.length === interestingFieldCombination.length)
+          .map(([id]) => id);
+
+      for (const result of commonAcrossFields) {
+        results.add(result);
+      }
+    }
+  }
+
+  return boilerplate.constitute(results);
 }
 
 function particulate(terms) {
@@ -204,7 +246,8 @@ function queryBoilerplate(index, query, options) {
     idToDoc,
 
     constitute: (ids) =>
-      ids.map(id => ({id, doc: idToDoc[id]})),
+      Array.from(ids)
+        .map(id => ({id, doc: idToDoc[id]})),
 
     query: (query, options) => {
       const rawResults =
@@ -215,7 +258,10 @@ function queryBoilerplate(index, query, options) {
           rawResults
             .map(({field, result}) => [
               field,
-              result.map(({id}) => id),
+              result.map(result =>
+                (typeof result === 'string'
+                  ? result
+                  : result.id)),
             ]));
 
       Object.assign(
