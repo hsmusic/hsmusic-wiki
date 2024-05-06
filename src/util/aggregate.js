@@ -136,15 +136,15 @@ export function aggregateThrows(errorClass) {
   return {[openAggregate.errorClassSymbol]: errorClass};
 }
 
-// Helper function for allowing both (fn, aggregateOpts) and (aggregateOpts, fn)
-// in aggregate utilities.
-function _reorganizeAggregateArguments(arg1, arg2) {
-  if (typeof arg1 === 'function') {
-    return {fn: arg1, opts: arg2 ?? {}};
-  } else if (typeof arg2 === 'function') {
-    return {fn: arg2, opts: arg1 ?? {}};
+// Helper function for allowing both (fn, opts) and (opts, fn) in aggregate
+// utilities (or other shapes besides functions).
+function _reorganizeAggregateArguments(arg1, arg2, desire = v => typeof v === 'function') {
+  if (desire(arg1)) {
+    return [arg1, arg2 ?? {}];
+  } else if (desire(arg2)) {
+    return [arg2, arg1];
   } else {
-    throw new Error(`Expected a function`);
+    return [undefined, undefined];
   }
 }
 
@@ -158,12 +158,20 @@ function _reorganizeAggregateArguments(arg1, arg2) {
 // use aggregate.close() to throw the error. (This aggregate may be passed to a
 // parent aggregate: `parent.call(aggregate.close)`!)
 export function mapAggregate(array, arg1, arg2) {
-  const {fn, opts} = _reorganizeAggregateArguments(arg1, arg2);
+  const [fn, opts] = _reorganizeAggregateArguments(arg1, arg2);
+  if (!fn) {
+    throw new Error(`Expected a function`);
+  }
+
   return _mapAggregate('sync', null, array, fn, opts);
 }
 
 export function mapAggregateAsync(array, arg1, arg2) {
-  const {fn, opts} = _reorganizeAggregateArguments(arg1, arg2);
+  const [fn, opts] = _reorganizeAggregateArguments(arg1, arg2);
+  if (!fn) {
+    throw new Error(`Expected a function`);
+  }
+
   const {promiseAll = Promise.all.bind(Promise), ...remainingOpts} = opts;
   return _mapAggregate('async', promiseAll, array, fn, remainingOpts);
 }
@@ -200,12 +208,20 @@ export function _mapAggregate(mode, promiseAll, array, fn, aggregateOpts) {
 //
 // As with mapAggregate, the returned aggregate property is not yet closed.
 export function filterAggregate(array, arg1, arg2) {
-  const {fn, opts} = _reorganizeAggregateArguments(arg1, arg2);
+  const [fn, opts] = _reorganizeAggregateArguments(arg1, arg2);
+  if (!fn) {
+    throw new Error(`Expected a function`);
+  }
+
   return _filterAggregate('sync', null, array, fn, opts);
 }
 
 export async function filterAggregateAsync(array, arg1, arg2) {
-  const {fn, opts} = _reorganizeAggregateArguments(arg1, arg2);
+  const [fn, opts] = _reorganizeAggregateArguments(arg1, arg2);
+  if (!fn) {
+    throw new Error(`Expected a function`);
+  }
+
   const {promiseAll = Promise.all.bind(Promise), ...remainingOpts} = opts;
   return _filterAggregate('async', promiseAll, array, fn, remainingOpts);
 }
@@ -268,12 +284,20 @@ function _filterAggregate(mode, promiseAll, array, fn, aggregateOpts) {
 // function with it, then closing the function and returning the result (if
 // there's no throw).
 export function withAggregate(arg1, arg2) {
-  const {fn, opts} = _reorganizeAggregateArguments(arg1, arg2);
+  const [fn, opts] = _reorganizeAggregateArguments(arg1, arg2);
+  if (!fn) {
+    throw new Error(`Expected a function`);
+  }
+
   return _withAggregate('sync', opts, fn);
 }
 
 export function withAggregateAsync(arg1, arg2) {
-  const {fn, opts} = _reorganizeAggregateArguments(arg1, arg2);
+  const [fn, opts] = _reorganizeAggregateArguments(arg1, arg2);
+  if (!fn) {
+    throw new Error(`Expected a function`);
+  }
+
   return _withAggregate('async', opts, fn);
 }
 
