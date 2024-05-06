@@ -3588,10 +3588,15 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
 
   session: {
     activeQuery: null,
+    activeQueryResults: null,
+
+    repeatQueryOnReload: false,
   },
 
   settings: {
     stoppedTyingDelay: 800,
+
+    maxActiveResultsStorage: 100000,
   },
 });
 
@@ -3672,12 +3677,17 @@ function initializeSidebarSearchState() {
 
   if (session.activeQuery) {
     info.searchInput.value = session.activeQuery;
+  }
+
+  if (session.repeatQueryOnReload) {
     activateSidebarSearch(session.activeQuery);
+  } else if (session.activeQueryResults) {
+    showSidebarSearchResults(JSON.parse(session.activeQueryResults));
   }
 }
 
 async function activateSidebarSearch(query) {
-  const {session, state} = sidebarSearchInfo;
+  const {session, settings, state} = sidebarSearchInfo;
 
   if (state.stoppedTypingTimeout) {
     clearTimeout(state.stoppedTypingTimeout);
@@ -3687,6 +3697,11 @@ async function activateSidebarSearch(query) {
   const results = await searchAll(query, {enrich: true});
 
   session.activeQuery = query;
+
+  const stringifiedResults = JSON.stringify(results);
+  if (stringifiedResults.length < settings.maxActiveResultsStorage) {
+    session.activeQueryResults = JSON.stringify(results);
+  }
 
   showSidebarSearchResults(results);
 }
