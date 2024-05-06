@@ -1,5 +1,6 @@
 import {makeSearchIndex, searchSpec} from '../shared-util/search-spec.js';
-import {empty, unique, withEntries} from '../shared-util/sugar.js';
+import {empty, groupArray, stitchArrays, unique, withEntries}
+  from '../shared-util/sugar.js';
 
 import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
 
@@ -117,12 +118,34 @@ function performSearchAction({query, options}) {
 
 function queryGenericIndex(index, query, options) {
   const terms = query.split(' ');
+
   const particles = particulate(terms);
-  console.log(particles);
 
-  const boilerplate = queryBoilerplate(index, query, options);
+  const groupedParticles =
+    groupArray(particles, ({length}) => length);
 
-  const {primaryName} = boilerplate.fieldResults;
+  const queriesBy = keys =>
+    groupedParticles
+      .get(keys.length)
+      .flatMap(permutations)
+      .map(values => values.map(({terms}) => terms.join(' ')))
+      .map(values => Object.fromEntries(stitchArrays([keys, values])));
+
+  console.log(
+    queriesBy(['primaryName'])
+      .map(l => JSON.stringify(l))
+      .join('\n'));
+
+  console.log(
+    queriesBy(['primaryName', 'contributors'])
+      .map(l => JSON.stringify(l))
+      .join('\n'));
+
+  const boilerplate = queryBoilerplate(index);
+
+  const {fieldResults} = boilerplate.query(query, options);
+
+  const {primaryName} = fieldResults;
 
   return boilerplate.constitute(primaryName);
 }
@@ -153,30 +176,56 @@ function particulate(terms) {
   return results;
 }
 
+// This function doesn't even come close to "performant",
+// but it only operates on small data here.
+function permutations(array) {
+  switch (array.length) {
+    case 0:
+      return [];
+
+    case 1:
+      return [array];
+
+    default:
+      return array.flatMap((item, index) => {
+        const behind = array.slice(0, index);
+        const ahead = array.slice(index + 1);
+        return (
+          permutations([...behind, ...ahead])
+            .map(rest => [item, ...rest]));
+      });
+  }
+}
+
 function queryBoilerplate(index, query, options) {
-  const rawResults =
-    index.search(query, options);
-
-  const fieldResults =
-    Object.fromEntries(
-      rawResults
-        .map(({field, result}) => [
-          field,
-          result.map(({id}) => id),
-        ]));
-
-  const idToDoc =
-    Object.fromEntries(
-      rawResults
-        .flatMap(({result}) => result)
-        .map(({id, doc}) => [id, doc]));
+  const idToDoc = {};
 
   return {
-    rawResults,
-    fieldResults,
     idToDoc,
 
-    constitute: ids =>
+    constitute: (ids) =>
       ids.map(id => ({id, doc: idToDoc[id]})),
+
+    query: (query, options) => {
+      const rawResults =
+        index.search(query, options);
+
+      const fieldResults =
+        Object.fromEntries(
+          rawResults
+            .map(({field, result}) => [
+              field,
+              result.map(({id}) => id),
+            ]));
+
+      Object.assign(
+        idToDoc,
+        Object.fromEntries(
+          rawResults
+            .flatMap(({result}) => result)
+            .map(({id, doc}) => [id, doc])));
+
+      return {rawResults, fieldResults};
+    },
   };
 }
