@@ -1107,7 +1107,11 @@ async function main() {
       logInfo`Loaded data and processed objects:`;
       logThings('albumData', 'albums');
       logThings('trackData', 'tracks');
-      logThings(wikiData.artistData.filter(artist => !artist.isAlias), 'artists');
+      logThings(
+        (wikiData.artistData
+          ? wikiData.artistData.filter(artist => !artist.isAlias)
+          : null),
+        'artists');
       if (wikiData.flashData) {
         logThings('flashData', 'flashes');
         logThings('flashActData', 'flash acts');
