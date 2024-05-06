@@ -136,6 +136,23 @@ export function stitchArrays(keyToArray) {
   return results;
 }
 
+// Like Map.groupBy! Collects the items of an unsorted array into buckets
+// according to a per-item computed value.
+export function groupArray(items, fn) {
+  const buckets = new Map();
+
+  for (const [index, item] of Array.prototype.entries.call(items)) {
+    const key = fn(item, index);
+    if (buckets.has(key)) {
+      buckets.get(key).push(item);
+    } else {
+      buckets.set(key, [item]);
+    }
+  }
+
+  return buckets;
+}
+
 // Turns this:
 //
 //   [
