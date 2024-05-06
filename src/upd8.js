@@ -51,8 +51,6 @@ import {sortByName} from '#sort';
 import {empty, withEntries} from '#sugar';
 import {generateURLs, urlSpec} from '#urls';
 import {identifyAllWebRoutes} from '#web-routes';
-import {linkWikiDataArrays, loadAndProcessDataDocuments, sortWikiDataArrays}
-  from '#yaml';
 
 import {
   colors,
@@ -79,6 +77,13 @@ import genThumbs, {
   migrateThumbsIntoDedicatedCacheDirectory,
   verifyImagePaths,
 } from '#thumbs';
+
+import {
+  getAllDataSteps,
+  linkWikiDataArrays,
+  loadAndProcessDataDocuments,
+  sortWikiDataArrays,
+} from '#yaml';
 
 import FileSizePreloader from './file-size-preloader.js';
 import {listingSpec, listingTargetSpec} from './listing-spec.js';
@@ -1066,9 +1071,11 @@ async function main() {
 
   let processDataAggregate, wikiDataResult;
 
+  const yamlDataSteps = getAllDataSteps();
+
   try {
     ({aggregate: processDataAggregate, result: wikiDataResult} =
-        await loadAndProcessDataDocuments({dataPath}));
+        await loadAndProcessDataDocuments(yamlDataSteps, {dataPath}));
   } catch (error) {
     console.error(error);
 
@@ -1351,7 +1358,7 @@ async function main() {
     timeStart: Date.now(),
   });
 
-  sortWikiDataArrays(wikiData);
+  sortWikiDataArrays(yamlDataSteps, wikiData);
 
   Object.assign(stepStatusSummary.sortWikiDataArrays, {
     status: STATUS_DONE_CLEAN,

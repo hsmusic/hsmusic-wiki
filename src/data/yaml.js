@@ -9,10 +9,16 @@ import yaml from 'js-yaml';
 
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import {sortByName} from '#sort';
-import {atOffset, empty, filterProperties, typeAppearance, withEntries}
-  from '#sugar';
 import Thing from '#thing';
 import thingConstructors from '#things';
+
+import {
+  annotateErrorWithFile,
+  decorateErrorWithIndex,
+  decorateErrorWithAnnotation,
+  openAggregate,
+  showAggregate,
+} from '#aggregate';
 
 import {
   filterReferenceErrors,
@@ -21,13 +27,13 @@ import {
 } from '#data-checks';
 
 import {
-  annotateErrorWithFile,
-  decorateErrorWithIndex,
-  decorateErrorWithAnnotation,
-  openAggregate,
-  showAggregate,
-  withAggregate,
-} from '#aggregate';
+  atOffset,
+  empty,
+  filterProperties,
+  stitchArrays,
+  typeAppearance,
+  withEntries,
+} from '#sugar';
 
 function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
@@ -532,7 +538,13 @@ export const documentModes = {
 //   them to each other, setting additional properties, etc). Input argument
 //   format depends on documentMode.
 //
-export const getDataSteps = () => {
+export function getAllDataSteps() {
+  try {
+    thingConstructors;
+  } catch (error) {
+    throw new Error(`Thing constructors aren't ready yet, can't get all data steps`);
+  }
+
   const steps = [];
 
   for (const thingConstructor of Object.values(thingConstructors)) {
@@ -548,14 +560,271 @@ export const getDataSteps = () => {
   sortByName(steps, {getName: step => step.title});
 
   return steps;
-};
+}
 
-export async function loadAndProcessDataDocuments({dataPath}) {
-  const processDataAggregate = openAggregate({
-    message: `Errors processing data files`,
+export async function getFilesFromDataStep(dataStep, {dataPath}) {
+  const {documentMode} = dataStep;
+
+  switch (documentMode) {
+    case documentModes.allInOne:
+    case documentModes.oneDocumentTotal: {
+      if (!dataStep.file) {
+        throw new Error(`Expected 'file' property for ${documentMode.toString()}`);
+      }
+
+      const localFile =
+        (typeof dataStep.file === 'function'
+          ? await dataStep.file(dataPath)
+          : dataStep.file);
+
+      const fileUnderDataPath =
+        path.join(dataPath, localFile);
+
+      const statResult =
+        await stat(fileUnderDataPath).then(
+          () => true,
+          error => {
+            if (error.code === 'ENOENT') {
+              return false;
+            } else {
+              throw error;
+            }
+          });
+
+      if (statResult) {
+        return [fileUnderDataPath];
+      } else {
+        return [];
+      }
+    }
+
+    case documentModes.headerAndEntries:
+    case documentModes.onePerFile: {
+      if (!dataStep.files) {
+        throw new Error(`Expected 'files' property for ${documentMode.toString()}`);
+      }
+
+      const localFiles =
+        (typeof dataStep.files === 'function'
+          ? await dataStep.files(dataPath).then(
+              files => files,
+              error => {
+                if (error.code === 'ENOENT') {
+                  return [];
+                } else {
+                  throw error;
+                }
+              })
+          : dataStep.files);
+
+      const filesUnderDataPath =
+        localFiles
+          .map(file => path.join(dataPath, file));
+
+      return filesUnderDataPath;
+    }
+
+    default:
+      throw new Error(`Unknown document mode ${documentMode.toString()}`);
+  }
+}
+
+export async function loadYAMLDocumentsFromFile(file) {
+  let contents;
+  try {
+    contents = await readFile(file, 'utf-8');
+  } catch (caughtError) {
+    throw new Error(`Failed to read data file`, {cause: caughtError});
+  }
+
+  let documents;
+  try {
+    documents = yaml.loadAll(contents);
+  } catch (caughtError) {
+    throw new Error(`Failed to parse valid YAML`, {cause: caughtError});
+  }
+
+  const aggregate = openAggregate({
+    message: `Found blank documents - check for extra '${colors.cyan(`---`)}'`,
   });
-  const wikiDataResult = {};
 
+  const filteredDocuments =
+    documents
+      .filter(doc => doc !== null);
+
+  if (filteredDocuments.length !== documents.length) {
+    const blankIndexRangeInfo =
+      documents
+        .map((doc, index) => [doc, index])
+        .filter(([doc]) => doc === null)
+        .map(([doc, index]) => index)
+        .reduce((accumulator, index) => {
+          if (accumulator.length === 0) {
+            return [[index, index]];
+          }
+          const current = accumulator.at(-1);
+          const rest = accumulator.slice(0, -1);
+          if (current[1] === index - 1) {
+            return rest.concat([[current[0], index]]);
+          } else {
+            return accumulator.concat([[index, index]]);
+          }
+        }, [])
+        .map(([start, end]) => ({
+          start,
+          end,
+          count: end - start + 1,
+          previous: atOffset(documents, start, -1),
+          next: atOffset(documents, end, +1),
+        }));
+
+    for (const {start, end, count, previous, next} of blankIndexRangeInfo) {
+      const parts = [];
+
+      if (count === 1) {
+        const range = `#${start + 1}`;
+        parts.push(`${count} document (${colors.yellow(range)}), `);
+      } else {
+        const range = `#${start + 1}-${end + 1}`;
+        parts.push(`${count} documents (${colors.yellow(range)}), `);
+      }
+
+      if (previous === null) {
+        parts.push(`at start of file`);
+      } else if (next === null) {
+        parts.push(`at end of file`);
+      } else {
+        const previousDescription = Object.entries(previous).at(0).join(': ');
+        const nextDescription = Object.entries(next).at(0).join(': ');
+        parts.push(`between "${colors.cyan(previousDescription)}" and "${colors.cyan(nextDescription)}"`);
+      }
+
+      aggregate.push(new Error(parts.join('')));
+    }
+  }
+
+  return {result: filteredDocuments, aggregate};
+}
+
+export function processYAMLDocumentsFromDataStep(documents, dataStep) {
+  function processDocument(document, thingClassOrFn) {
+    const thingClass =
+      (thingClassOrFn.prototype instanceof Thing
+        ? thingClassOrFn
+        : thingClassOrFn(document));
+
+    if (typeof thingClass !== 'function') {
+      throw new Error(`Expected a thing class, got ${typeAppearance(thingClass)}`);
+    }
+
+    if (!(thingClass.prototype instanceof Thing)) {
+      throw new Error(`Expected a thing class, got ${thingClass.name}`);
+    }
+
+    const spec = thingClass[Thing.yamlDocumentSpec];
+
+    if (!spec) {
+      throw new Error(`Class "${thingClass.name}" doesn't specify Thing.yamlDocumentSpec`);
+    }
+
+    // TODO: Making a function to only call it just like that is
+    // obviously pretty jank! It should be created once per data step.
+    const fn = makeProcessDocument(thingClass, spec);
+    return fn(document);
+  }
+
+  const {documentMode} = dataStep;
+
+  switch (documentMode) {
+    case documentModes.allInOne: {
+      const result = [];
+      const aggregate = openAggregate({message: `Errors processing documents`});
+
+      documents.forEach(
+        decorateErrorWithIndex(document => {
+          const {thing, aggregate: subAggregate} =
+            processDocument(document, dataStep.documentThing);
+
+          result.push(thing);
+          aggregate.call(subAggregate.close);
+        }));
+
+      return {aggregate, result};
+    }
+
+    case documentModes.oneDocumentTotal: {
+      if (documents.length > 1)
+        throw new Error(`Only expected one document to be present, got ${documents.length}`);
+
+      const {thing, aggregate} =
+        processDocument(documents[0], dataStep.documentThing);
+
+      return {aggregate, result: thing};
+    }
+
+    case documentModes.headerAndEntries: {
+      const headerDocument = documents[0];
+      const entryDocuments = documents.slice(1).filter(Boolean);
+
+      if (!headerDocument)
+        throw new Error(`Missing header document (empty file or erroneously starting with "---"?)`);
+
+      const aggregate = openAggregate({message: `Errors processing documents`});
+
+      const {thing: headerThing, aggregate: headerAggregate} =
+        processDocument(headerDocument, dataStep.headerDocumentThing);
+
+      try {
+        headerAggregate.close();
+      } catch (caughtError) {
+        caughtError.message = `(${colors.yellow(`header`)}) ${caughtError.message}`;
+        aggregate.push(caughtError);
+      }
+
+      const entryThings = [];
+
+      for (const [index, entryDocument] of entryDocuments.entries()) {
+        const {thing: entryThing, aggregate: entryAggregate} =
+          processDocument(entryDocument, dataStep.entryDocumentThing);
+
+        entryThings.push(entryThing);
+
+        try {
+          entryAggregate.close();
+        } catch (caughtError) {
+          caughtError.message = `(${colors.yellow(`entry #${index + 1}`)}) ${caughtError.message}`;
+          aggregate.push(caughtError);
+        }
+      }
+
+      return {
+        aggregate,
+        result: {
+          header: headerThing,
+          entries: entryThings,
+        },
+      };
+    }
+
+    case documentModes.onePerFile: {
+      if (documents.length > 1)
+        throw new Error(`Only expected one document to be present per file, got ${documents.length} here`);
+
+      if (empty(documents) || !documents[0])
+        throw new Error(`Expected a document, this file is empty`);
+
+      const {thing, aggregate} =
+        processDocument(documents[0], dataStep.documentThing);
+
+      return {aggregate, result: thing};
+    }
+
+    default:
+      throw new Error(`Unknown document mode ${documentMode.toString()}`);
+  }
+}
+
+export async function loadAndProcessDataDocuments(dataSteps, {dataPath}) {
   function decorateErrorWithFile(fn) {
     return decorateErrorWithAnnotation(fn,
       (caughtError, firstArg) =>
@@ -568,355 +837,107 @@ export async function loadAndProcessDataDocuments({dataPath}) {
               : firstArg))));
   }
 
-  function asyncDecorateErrorWithFile(fn) {
-    return decorateErrorWithFile(fn).async;
-  }
-
-  for (const dataStep of getDataSteps()) {
-    await processDataAggregate.nestAsync(
-      {
-        message: `Errors during data step: ${colors.bright(dataStep.title)}`,
-        translucent: true,
-      },
-      async ({call, callAsync, map, mapAsync, push}) => {
-        const {documentMode} = dataStep;
-
-        if (!Object.values(documentModes).includes(documentMode)) {
-          throw new Error(`Invalid documentMode: ${documentMode.toString()}`);
-        }
-
-        // Hear me out, it's been like 1200 years since I wrote the rest of
-        // this beautifully error-containing code and I don't know how to
-        // integrate this nicely. So I'm just returning the result and the
-        // error that should be thrown. Yes, we're back in callback hell,
-        // just without the callbacks. Thank you.
-        const filterBlankDocuments = documents => {
-          const aggregate = openAggregate({
-            message: `Found blank documents - check for extra '${colors.cyan(`---`)}'`,
-          });
-
-          const filteredDocuments =
-            documents
-              .filter(doc => doc !== null);
-
-          if (filteredDocuments.length !== documents.length) {
-            const blankIndexRangeInfo =
-              documents
-                .map((doc, index) => [doc, index])
-                .filter(([doc]) => doc === null)
-                .map(([doc, index]) => index)
-                .reduce((accumulator, index) => {
-                  if (accumulator.length === 0) {
-                    return [[index, index]];
-                  }
-                  const current = accumulator.at(-1);
-                  const rest = accumulator.slice(0, -1);
-                  if (current[1] === index - 1) {
-                    return rest.concat([[current[0], index]]);
-                  } else {
-                    return accumulator.concat([[index, index]]);
-                  }
-                }, [])
-                .map(([start, end]) => ({
-                  start,
-                  end,
-                  count: end - start + 1,
-                  previous: atOffset(documents, start, -1),
-                  next: atOffset(documents, end, +1),
-                }));
-
-            for (const {start, end, count, previous, next} of blankIndexRangeInfo) {
-              const parts = [];
-
-              if (count === 1) {
-                const range = `#${start + 1}`;
-                parts.push(`${count} document (${colors.yellow(range)}), `);
-              } else {
-                const range = `#${start + 1}-${end + 1}`;
-                parts.push(`${count} documents (${colors.yellow(range)}), `);
-              }
-
-              if (previous === null) {
-                parts.push(`at start of file`);
-              } else if (next === null) {
-                parts.push(`at end of file`);
-              } else {
-                const previousDescription = Object.entries(previous).at(0).join(': ');
-                const nextDescription = Object.entries(next).at(0).join(': ');
-                parts.push(`between "${colors.cyan(previousDescription)}" and "${colors.cyan(nextDescription)}"`);
-              }
-
-              aggregate.push(new Error(parts.join('')));
-            }
-          }
-
-          return {documents: filteredDocuments, aggregate};
-        };
-
-        const processDocument = (document, thingClassOrFn) => {
-          const thingClass =
-            (thingClassOrFn.prototype instanceof Thing
-              ? thingClassOrFn
-              : thingClassOrFn(document));
-
-          if (typeof thingClass !== 'function') {
-            throw new Error(`Expected a thing class, got ${typeAppearance(thingClass)}`);
-          }
-
-          if (!(thingClass.prototype instanceof Thing)) {
-            throw new Error(`Expected a thing class, got ${thingClass.name}`);
-          }
-
-          const spec = thingClass[Thing.yamlDocumentSpec];
-
-          if (!spec) {
-            throw new Error(`Class "${thingClass.name}" doesn't specify Thing.yamlDocumentSpec`);
-          }
-
-          // TODO: Making a function to only call it just like that is
-          // obviously pretty jank! It should be created once per data step.
-          const fn = makeProcessDocument(thingClass, spec);
-          return fn(document);
-        };
-
-        if (
-          documentMode === documentModes.allInOne ||
-          documentMode === documentModes.oneDocumentTotal
-        ) {
-          if (!dataStep.file) {
-            throw new Error(`Expected 'file' property for ${documentMode.toString()}`);
-          }
-
-          const file = path.join(
-            dataPath,
-            typeof dataStep.file === 'function'
-              ? await callAsync(dataStep.file, dataPath)
-              : dataStep.file);
-
-          const statResult = await callAsync(() =>
-            stat(file).then(
-              () => true,
-              error => {
-                if (error.code === 'ENOENT') {
-                  return false;
-                } else {
-                  throw error;
-                }
-              }));
-
-          if (statResult === false) {
-            const saveResult = call(dataStep.save, {
-              [documentModes.allInOne]: [],
-              [documentModes.oneDocumentTotal]: {},
-            }[documentMode]);
-
-            if (!saveResult) return;
-
-            Object.assign(wikiDataResult, saveResult);
-
-            return;
-          }
-
-          const readResult = await callAsync(readFile, file, 'utf-8');
-
-          if (!readResult) {
-            return;
-          }
-
-          let processResults;
-
-          switch (documentMode) {
-            case documentModes.oneDocumentTotal: {
-              const yamlResult = call(yaml.load, readResult);
-
-              if (!yamlResult) {
-                processResults = null;
-                break;
-              }
-
-              const {thing, aggregate} =
-                processDocument(yamlResult, dataStep.documentThing);
-
-              processResults = thing;
-
-              call(() => aggregate.close());
-
-              break;
-            }
-
-            case documentModes.allInOne: {
-              const yamlResults = call(yaml.loadAll, readResult);
-
-              if (!yamlResults) {
-                processResults = [];
-                return;
-              }
-
-              const {documents, aggregate: filterAggregate} =
-                filterBlankDocuments(yamlResults);
-
-              call(filterAggregate.close);
-
-              processResults = [];
-
-              map(documents, decorateErrorWithIndex(document => {
-                const {thing, aggregate} =
-                  processDocument(document, dataStep.documentThing);
-
-                processResults.push(thing);
-                aggregate.close();
-              }), {message: `Errors processing documents`});
-
-              break;
-            }
-          }
-
-          if (!processResults) return;
-
-          const saveResult = call(dataStep.save, processResults);
-
-          if (!saveResult) return;
-
-          Object.assign(wikiDataResult, saveResult);
-
-          return;
-        }
-
-        if (!dataStep.files) {
-          throw new Error(`Expected 'files' property for ${documentMode.toString()}`);
-        }
-
-        const filesFromDataStep =
-          (typeof dataStep.files === 'function'
-            ? await callAsync(() =>
-                dataStep.files(dataPath).then(
-                  files => files,
-                  error => {
-                    if (error.code === 'ENOENT') {
-                      return [];
-                    } else {
-                      throw error;
-                    }
-                  }))
-            : dataStep.files);
-
-        const filesUnderDataPath =
-          filesFromDataStep
-            .map(file => path.join(dataPath, file));
-
-        const yamlResults = [];
-
-        await mapAsync(filesUnderDataPath, {message: `Errors loading data files`},
-          asyncDecorateErrorWithFile(async file => {
-            let contents;
-            try {
-              contents = await readFile(file, 'utf-8');
-            } catch (caughtError) {
-              throw new Error(`Failed to read data file`, {cause: caughtError});
-            }
-
-            let documents;
-            try {
-              documents = yaml.loadAll(contents);
-            } catch (caughtError) {
-              throw new Error(`Failed to parse valid YAML`, {cause: caughtError});
-            }
-
-            const {documents: filteredDocuments, aggregate: filterAggregate} =
-              filterBlankDocuments(documents);
-
-            try {
-              filterAggregate.close();
-            } catch (caughtError) {
-              // Blank documents aren't a critical error, they're just something
-              // that should be noted - the (filtered) documents still get pushed.
-              const pathToFile = path.relative(dataPath, file);
-              annotateErrorWithFile(caughtError, pathToFile);
-              push(caughtError);
-            }
-
-            yamlResults.push({file, documents: filteredDocuments});
-          }));
-
-        const processResults = [];
-
-        switch (documentMode) {
-          case documentModes.headerAndEntries:
-            map(yamlResults, {message: `Errors processing documents in data files`, translucent: true},
-              decorateErrorWithFile(({documents}) => {
-                const headerDocument = documents[0];
-                const entryDocuments = documents.slice(1).filter(Boolean);
-
-                if (!headerDocument)
-                  throw new Error(`Missing header document (empty file or erroneously starting with "---"?)`);
-
-                withAggregate({message: `Errors processing documents`}, ({push}) => {
-                  const {thing: headerObject, aggregate: headerAggregate} =
-                    processDocument(headerDocument, dataStep.headerDocumentThing);
-
-                  try {
-                    headerAggregate.close();
-                  } catch (caughtError) {
-                    caughtError.message = `(${colors.yellow(`header`)}) ${caughtError.message}`;
-                    push(caughtError);
-                  }
-
-                  const entryObjects = [];
-
-                  for (let index = 0; index < entryDocuments.length; index++) {
-                    const entryDocument = entryDocuments[index];
-
-                    const {thing: entryObject, aggregate: entryAggregate} =
-                      processDocument(entryDocument, dataStep.entryDocumentThing);
-
-                    entryObjects.push(entryObject);
-
-                    try {
-                      entryAggregate.close();
-                    } catch (caughtError) {
-                      caughtError.message = `(${colors.yellow(`entry #${index + 1}`)}) ${caughtError.message}`;
-                      push(caughtError);
-                    }
-                  }
-
-                  processResults.push({
-                    header: headerObject,
-                    entries: entryObjects,
-                  });
-                });
-              }));
-            break;
-
-          case documentModes.onePerFile:
-            map(yamlResults, {message: `Errors processing data files as valid documents`},
-              decorateErrorWithFile(({documents}) => {
-                if (documents.length > 1)
-                  throw new Error(`Only expected one document to be present per file, got ${documents.length} here`);
-
-                if (empty(documents) || !documents[0])
-                  throw new Error(`Expected a document, this file is empty`);
-
-                const {thing, aggregate} =
-                  processDocument(documents[0], dataStep.documentThing);
-
-                processResults.push(thing);
-                aggregate.close();
-              }));
-            break;
-        }
-
-        const saveResult = call(dataStep.save, processResults);
-
-        if (!saveResult) return;
-
-        Object.assign(wikiDataResult, saveResult);
+  const processDataAggregate = openAggregate({
+    message: `Errors processing data files`,
+  });
+
+  const wikiData = {};
+
+  for (const dataStep of dataSteps) {
+    await processDataAggregate.nestAsync({
+      message: `Errors during data step: ${colors.bright(dataStep.title)}`,
+      translucent: true,
+    }, async ({call}) => {
+      const {documentMode} = dataStep;
+
+      if (!Object.values(documentModes).includes(documentMode)) {
+        throw new Error(`Invalid documentMode: ${documentMode.toString()}`);
       }
-    );
+
+      const files =
+        await getFilesFromDataStep(dataStep, {dataPath});
+
+      const loadAggregate =
+        openAggregate({
+          message: `Errors loading data files`,
+        });
+
+      const processAggregate =
+        openAggregate({
+          message: `Errors processing documents in data files`,
+          translucent: true,
+        });
+
+      const fileLoadResults =
+        loadAggregate.receive(
+          await Promise.all(
+            files.map(async file => {
+              const {result, aggregate} =
+                await loadYAMLDocumentsFromFile(file);
+
+              const close = decorateErrorWithFile(aggregate.close);
+              aggregate.close = () => close({file});
+
+              return {result, aggregate};
+            })));
+
+      const fileProcessResults =
+        processAggregate.receive(
+          stitchArrays({
+            file: files,
+            documents: fileLoadResults,
+          }).map(({file, documents}) => {
+              const {result, aggregate} =
+                processYAMLDocumentsFromDataStep(documents, dataStep);
+
+              const close = decorateErrorWithFile(aggregate.close);
+              aggregate.close = () => close({file});
+
+              return {result, aggregate};
+            }));
+
+      call(loadAggregate.close);
+      call(processAggregate.close);
+
+      let saveResult;
+
+      switch (documentMode) {
+        case documentModes.allInOne: {
+          const things =
+            (empty(fileProcessResults)
+              ? []
+              : fileProcessResults[0]);
+
+          saveResult = call(dataStep.save, things);
+          break;
+        }
+
+        case documentModes.oneDocumentTotal: {
+          const thing =
+            (empty(fileProcessResults)
+              ? {}
+              : fileProcessResults[0]);
+
+          saveResult = call(dataStep.save, thing);
+          break;
+        }
+
+        case documentModes.headerAndEntries:
+        case documentModes.onePerFile: {
+          saveResult = call(dataStep.save, fileProcessResults);
+          break;
+        }
+      }
+
+      if (saveResult) {
+        Object.assign(wikiData, saveResult);
+      }
+    });
   }
 
   return {
     aggregate: processDataAggregate,
-    result: wikiDataResult,
+    result: wikiData,
   };
 }
 
@@ -997,15 +1018,13 @@ export function linkWikiDataArrays(wikiData) {
   }
 }
 
-export function sortWikiDataArrays(wikiData) {
+export function sortWikiDataArrays(dataSteps, wikiData) {
   for (const [key, value] of Object.entries(wikiData)) {
     if (!Array.isArray(value)) continue;
     wikiData[key] = value.slice();
   }
 
-  const steps = getDataSteps();
-
-  for (const step of steps) {
+  for (const step of dataSteps) {
     if (!step.sort) continue;
     step.sort(wikiData);
   }
@@ -1032,10 +1051,12 @@ export async function quickLoadAllFromYAML(dataPath, {
 }) {
   const showAggregate = customShowAggregate;
 
+  const dataSteps = getAllDataSteps();
+
   let wikiData;
 
   {
-    const {aggregate, result} = await loadAndProcessDataDocuments({dataPath});
+    const {aggregate, result} = await loadAndProcessDataDocuments(dataSteps, {dataPath});
 
     wikiData = result;
 
@@ -1074,7 +1095,7 @@ export async function quickLoadAllFromYAML(dataPath, {
     logWarn`Content text errors found.`;
   }
 
-  sortWikiDataArrays(wikiData);
+  sortWikiDataArrays(dataSteps, wikiData);
 
   return wikiData;
 }
