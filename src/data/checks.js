@@ -37,7 +37,9 @@ export function reportDuplicateDirectories(wikiData, {
 
     const directoryPlaces = Object.create(null);
     const duplicateDirectories = new Set();
+
     const thingData = wikiData[findSpec.bindTo];
+    if (!thingData) continue;
 
     for (const thing of thingData) {
       if (findSpec.include && !findSpec.include(thing)) {
