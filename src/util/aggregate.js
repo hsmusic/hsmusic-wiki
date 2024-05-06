@@ -91,6 +91,22 @@ export function openAggregate({
     return aggregate.callAsync(() => withAggregateAsync(...args));
   };
 
+  aggregate.receive = (results) => {
+    if (!Array.isArray(results)) {
+      throw new Error(`Expected an array`);
+    }
+
+    return results.map(({aggregate, result}) => {
+      try {
+        aggregate.close();
+      } catch (error) {
+        errors.push(error);
+      }
+
+      return result;
+    });
+  };
+
   aggregate.map = (...args) => {
     const parent = aggregate;
     const {result, aggregate: child} = mapAggregate(...args);
@@ -146,6 +162,21 @@ function _reorganizeAggregateArguments(arg1, arg2, desire = v => typeof v === 'f
   } else {
     return [undefined, undefined];
   }
+}
+
+// Takes a list of {aggregate, result} objects, puts all the aggregates into
+// a new aggregate, and puts all the results into an array, returning both on
+// a new {aggregate, result} object. This is essentailly the generalized
+// composable version of functions like mapAggregate or filterAggregate.
+export function receiveAggregate(arg1, arg2) {
+  const [array, opts] = _reorganizeAggregateArguments(arg1, arg2, Array.isArray);
+  if (!array) {
+    throw new Error(`Expected an array`);
+  }
+
+  const aggregate = openAggregate(opts);
+  const result = aggregate.receive(array);
+  return {aggregate, result};
 }
 
 // Performs an ordinary array map with the given function, collating into a
