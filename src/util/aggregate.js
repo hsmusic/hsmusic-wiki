@@ -93,10 +93,27 @@ export function openAggregate({
 
   aggregate.receive = (results) => {
     if (!Array.isArray(results)) {
-      throw new Error(`Expected an array`);
+      if (typeof results === 'object' && results.aggregate) {
+        const {aggregate, result} = results;
+
+        try {
+          aggregate.close();
+        } catch (error) {
+          errors.push(error);
+        }
+
+        return result;
+      }
+
+      throw new Error(`Expected an array or {aggregate, result} object`);
     }
 
     return results.map(({aggregate, result}) => {
+      if (!aggregate) {
+        console.log('nope:', results);
+        throw new Error(`Expected an array of {aggregate, result} objects`);
+      }
+
       try {
         aggregate.close();
       } catch (error) {
