@@ -124,6 +124,13 @@ export function openAggregate({
     });
   };
 
+  aggregate.contain = (results) => {
+    return {
+      aggregate,
+      result: aggregate.receive(results),
+    };
+  };
+
   aggregate.map = (...args) => {
     const parent = aggregate;
     const {result, aggregate: child} = mapAggregate(...args);
