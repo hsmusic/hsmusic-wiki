@@ -853,18 +853,28 @@ export async function loadYAMLDocumentsFromDataSteps(dataSteps, {dataPath}) {
   const filePromises =
     fileLists
       .map(files => files
-        .map(async file => {
-          const {result, aggregate} =
-            await loadYAMLDocumentsFromFile(file);
+        .map(file =>
+          loadYAMLDocumentsFromFile(file).then(
+            ({result, aggregate}) => {
+              const close =
+                decorateErrorWithFileFromDataPath(aggregate.close, {dataPath});
 
-          const close =
-            decorateErrorWithFileFromDataPath(aggregate.close, {dataPath});
+              aggregate.close = () =>
+                close({file});
 
-          aggregate.close =
-            () => close({file});
+              return {result, aggregate};
+            },
+            (error) => {
+              const aggregate = {};
 
-          return {result, aggregate};
-        }));
+              annotateErrorWithFile(error, path.relative(dataPath, file));
+
+              aggregate.close = () => {
+                throw error;
+              };
+
+              return {result: [], aggregate};
+            })));
 
   const fileListPromises =
     filePromises
