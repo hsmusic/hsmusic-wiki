@@ -81,7 +81,9 @@ import genThumbs, {
 import {
   getAllDataSteps,
   linkWikiDataArrays,
-  loadAndProcessDataDocuments,
+  loadYAMLDocumentsFromDataSteps,
+  processThingsFromDataSteps,
+  saveThingsFromDataSteps,
   sortWikiDataArrays,
 } from '#yaml';
 
@@ -1064,34 +1066,99 @@ async function main() {
     CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES = true;
   }
 
+  let paragraph = false;
+
   Object.assign(stepStatusSummary.loadDataFiles, {
     status: STATUS_STARTED_NOT_DONE,
     timeStart: Date.now(),
   });
 
-  let processDataAggregate, wikiDataResult;
+  let yamlDataSteps;
+  let yamlDocumentProcessingAggregate;
 
-  const yamlDataSteps = getAllDataSteps();
+  {
+    const whoops = (error, stage) => {
+      console.error(error);
 
-  try {
-    ({aggregate: processDataAggregate, result: wikiDataResult} =
-        await loadAndProcessDataDocuments(yamlDataSteps, {dataPath}));
-  } catch (error) {
-    console.error(error);
+      logError`There was a JavaScript error ${stage}.`;
+      fileIssue();
 
-    logError`There was a JavaScript error loading data files.`;
-    fileIssue();
+      Object.assign(stepStatusSummary.loadDataFiles, {
+        status: STATUS_FATAL_ERROR,
+        annotation: `javascript error - view log for details`,
+        timeEnd: Date.now(),
+      });
 
-    Object.assign(stepStatusSummary.loadDataFiles, {
-      status: STATUS_FATAL_ERROR,
-      annotation: `javascript error - view log for details`,
-      timeEnd: Date.now(),
-    });
+      return false;
+    };
 
-    return false;
+    let loadAggregate, loadResult;
+    let processAggregate, processResult;
+    let saveAggregate, saveResult;
+
+    const dataSteps = getAllDataSteps();
+
+    try {
+      ({aggregate: loadAggregate, result: loadResult} =
+          await loadYAMLDocumentsFromDataSteps(
+            dataSteps,
+            {dataPath}));
+    } catch (error) {
+      return whoops(error, `loading data files`);
+    }
+
+    try {
+      loadAggregate.close();
+    } catch (error) {
+      if (!paragraph) console.log('');
+      niceShowAggregate(error);
+
+      logError`The above errors were detected while loading data files.`;
+      logError`Since this indicates some files weren't able to load at all,`;
+      logError`there would probably be pretty bad reference errors if the`;
+      logError`build were to continue. Please resolve these errors and`;
+      logError`then give it another go.`;
+
+      paragraph = true;
+      console.log('');
+
+      Object.assign(stepStatusSummary.loadDataFiles, {
+        status: STATUS_FATAL_ERROR,
+        annotation: `error loading data files`,
+        timeEnd: Date.now(),
+      });
+
+      return false;
+    }
+
+    try {
+      ({aggregate: processAggregate, result: processResult} =
+          await processThingsFromDataSteps(
+            loadResult.documentLists,
+            loadResult.fileLists,
+            dataSteps,
+            {dataPath}));
+    } catch (error) {
+      return whoops(error, `processing data files`);
+    }
+
+    try {
+      ({aggregate: saveAggregate, result: saveResult} =
+          saveThingsFromDataSteps(
+            processResult,
+            dataSteps));
+
+      saveAggregate.close();
+      saveAggregate = undefined;
+    } catch (error) {
+      return whoops(error, `finalizing data files`);
+    }
+
+    yamlDataSteps = dataSteps;
+    yamlDocumentProcessingAggregate = processAggregate;
+
+    Object.assign(wikiData, saveResult);
   }
-
-  Object.assign(wikiData, wikiDataResult);
 
   {
     const logThings = (prop, label) => {
@@ -1104,6 +1171,8 @@ async function main() {
     }
 
     try {
+      if (!paragraph) console.log('');
+
       logInfo`Loaded data and processed objects:`;
       logThings('albumData', 'albums');
       logThings('trackData', 'tracks');
@@ -1132,21 +1201,28 @@ async function main() {
       if (wikiData.wikiInfo) {
         logInfo` - ${1} wiki config file`;
       }
+
+      console.log('');
+      paragraph = true;
     } catch (error) {
       console.error(`Error showing data summary:`, error);
+      paragraph = false;
     }
 
     let errorless = true;
     try {
-      processDataAggregate.close();
+      yamlDocumentProcessingAggregate.close();
     } catch (error) {
+      if (!paragraph) console.log('');
       niceShowAggregate(error);
+
       logWarn`The above errors were detected while processing data files.`;
+
       errorless = false;
     }
 
     if (!wikiData.wikiInfo) {
-      logError`Can't proceed without wiki info file successfully loading`;
+      logError`Can't proceed without wiki info file successfully loading.`;
 
       Object.assign(stepStatusSummary.loadDataFiles, {
         status: STATUS_FATAL_ERROR,
@@ -1159,15 +1235,20 @@ async function main() {
 
     if (errorless) {
       logInfo`All data files processed without any errors - nice!`;
+      paragraph = false;
 
       Object.assign(stepStatusSummary.loadDataFiles, {
         status: STATUS_DONE_CLEAN,
         timeEnd: Date.now(),
       });
     } else {
-      logWarn`If the remaining valid data is complete enough, the wiki will`;
-      logWarn`still build - but all errored data will be skipped.`;
-      logWarn`(Resolve errors for more complete output!)`;
+      logWarn`This might indicate some fields in the YAML data weren't formatted`;
+      logWarn`correctly, for example. The build should still work, but invalid`;
+      logWarn`fields will be skipped. Take a look at the report above to see`;
+      logWarn`what needs fixing up, for a more complete build!`;
+
+      console.log('');
+      paragraph = true;
 
       Object.assign(stepStatusSummary.loadDataFiles, {
         status: STATUS_HAS_WARNINGS,
@@ -1267,18 +1348,23 @@ async function main() {
   try {
     reportDuplicateDirectories(wikiData, {getAllFindSpecs});
     logInfo`No duplicate directories found - nice!`;
+    paragraph = false;
 
     Object.assign(stepStatusSummary.reportDuplicateDirectories, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
     });
   } catch (aggregate) {
+    if (!paragraph) console.log('');
     niceShowAggregate(aggregate);
 
     logWarn`The above duplicate directories were detected while reviewing data files.`;
     logWarn`Since it's impossible to automatically determine which one's directory is`;
     logWarn`correct, the build can't continue. Specify unique 'Directory' fields in`;
     logWarn`some or all of these data entries to resolve the errors.`;
+
+    console.log('');
+    paragraph = true;
 
     Object.assign(stepStatusSummary.reportDuplicateDirectories, {
       status: STATUS_FATAL_ERROR,
@@ -1305,17 +1391,23 @@ async function main() {
       filterReferenceErrorsAggregate.close();
 
       logInfo`All references validated without any errors - nice!`;
+      paragraph = false;
 
       Object.assign(stepStatusSummary.filterReferenceErrors, {
         status: STATUS_DONE_CLEAN,
         timeEnd: Date.now(),
       });
     } catch (error) {
+      if (!paragraph) console.log('');
       niceShowAggregate(error);
 
       logWarn`The above errors were detected while validating references in data files.`;
-      logWarn`The wiki will still build, but these connections between data objects`;
-      logWarn`will be completely skipped. Resolve the errors for more complete output.`;
+      logWarn`The wiki should still build, but these connections between data objects`;
+      logWarn`will be skipped, which might have unexpected consequences. Take a look at`;
+      logWarn`the report above to see what needs fixing up, for a more complete build!`;
+
+      console.log('');
+      paragraph = true;
 
       Object.assign(stepStatusSummary.filterReferenceErrors, {
         status: STATUS_HAS_WARNINGS,
@@ -1333,18 +1425,24 @@ async function main() {
 
     try {
       reportContentTextErrors(wikiData, {bindFind});
+
       logInfo`All content text validated without any errors - nice!`;
+      paragraph = false;
 
       Object.assign(stepStatusSummary.reportContentTextErrors, {
         status: STATUS_DONE_CLEAN,
         timeEnd: Date.now(),
       });
     } catch (error) {
+      if (!paragraph) console.log('');
       niceShowAggregate(error);
 
       logWarn`The above errors were detected while processing content text in data files.`;
       logWarn`The wiki will still build, but placeholders will be displayed in these spots.`;
       logWarn`Resolve the errors for more complete output.`;
+
+      console.log('');
+      paragraph = true;
 
       Object.assign(stepStatusSummary.reportContentTextErrors, {
         status: STATUS_HAS_WARNINGS,
@@ -1657,6 +1755,7 @@ async function main() {
     }
 
     logInfo`Applying new default strings from custom ${customDefaultLanguage.code} language file.`;
+    paragraph = false;
 
     finalDefaultLanguage = customDefaultLanguage;
     finalDefaultLanguageAnnotation = `using wiki-specified custom default language`;
@@ -1737,6 +1836,7 @@ async function main() {
   }
 
   logInfo`Loaded language strings: ${Object.keys(languages).join(', ')}`;
+  paragraph = false;
 
   Object.assign(stepStatusSummary.initializeDefaultLanguage, {
     status: STATUS_DONE_CLEAN,
@@ -1869,6 +1969,7 @@ async function main() {
     await fileSizePreloader.waitUntilDoneLoading();
 
     logInfo`Preloading filesizes for ${imageFilePaths.length} full-resolution images...`;
+    paragraph = false;
 
     fileSizePreloader.loadPaths(...imageFilePaths.map((path) => path.device));
     await fileSizePreloader.waitUntilDoneLoading();
@@ -1885,6 +1986,7 @@ async function main() {
       });
     } else {
       logInfo`Done preloading filesizes without any errors - nice!`;
+      paragraph = false;
 
       Object.assign(stepStatusSummary.preloadFileSizes, {
         status: STATUS_DONE_CLEAN,
@@ -1922,10 +2024,14 @@ async function main() {
       aggregate.close();
       webRoutes = result;
     } catch (error) {
+      if (!paragraph) console.log('');
       niceShowAggregate(error);
 
       logError`There was an issue identifying web routes!`;
       fileIssue();
+
+      console.log('');
+      paragraph = true;
 
       Object.assign(stepStatusSummary.identifyWebRoutes, {
         status: STATUS_FATAL_ERROR,
@@ -1937,6 +2043,7 @@ async function main() {
     }
 
     logInfo`Successfully determined web routes.`;
+    paragraph = false;
 
     Object.assign(stepStatusSummary.identifyWebRoutes, {
       status: STATUS_DONE_CLEAN,
