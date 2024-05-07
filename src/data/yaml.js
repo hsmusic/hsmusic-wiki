@@ -706,30 +706,47 @@ export async function loadYAMLDocumentsFromFile(file) {
   return {result: filteredDocuments, aggregate};
 }
 
+// Mapping from dataStep (spec) object each to a sub-map, from thing class to
+// processDocument function.
+const processDocumentFns = new WeakMap();
+
 export function processThingsFromDataStep(documents, dataStep) {
+  let submap;
+  if (processDocumentFns.has(dataStep)) {
+    submap = processDocumentFns.get(dataStep);
+  } else {
+    submap = new Map();
+    processDocumentFns.set(dataStep, submap);
+  }
+
   function processDocument(document, thingClassOrFn) {
     const thingClass =
       (thingClassOrFn.prototype instanceof Thing
         ? thingClassOrFn
         : thingClassOrFn(document));
 
-    if (typeof thingClass !== 'function') {
-      throw new Error(`Expected a thing class, got ${typeAppearance(thingClass)}`);
+    let fn;
+    if (submap.has(thingClass)) {
+      fn = submap.get(thingClass);
+    } else {
+      if (typeof thingClass !== 'function') {
+        throw new Error(`Expected a thing class, got ${typeAppearance(thingClass)}`);
+      }
+
+      if (!(thingClass.prototype instanceof Thing)) {
+        throw new Error(`Expected a thing class, got ${thingClass.name}`);
+      }
+
+      const spec = thingClass[Thing.yamlDocumentSpec];
+
+      if (!spec) {
+        throw new Error(`Class "${thingClass.name}" doesn't specify Thing.yamlDocumentSpec`);
+      }
+
+      fn = makeProcessDocument(thingClass, spec);
+      submap.set(thingClass, fn);
     }
 
-    if (!(thingClass.prototype instanceof Thing)) {
-      throw new Error(`Expected a thing class, got ${thingClass.name}`);
-    }
-
-    const spec = thingClass[Thing.yamlDocumentSpec];
-
-    if (!spec) {
-      throw new Error(`Class "${thingClass.name}" doesn't specify Thing.yamlDocumentSpec`);
-    }
-
-    // TODO: Making a function to only call it just like that is
-    // obviously pretty jank! It should be created once per data step.
-    const fn = makeProcessDocument(thingClass, spec);
     return fn(document);
   }
 
