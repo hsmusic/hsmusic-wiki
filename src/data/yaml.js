@@ -706,7 +706,7 @@ export async function loadYAMLDocumentsFromFile(file) {
   return {result: filteredDocuments, aggregate};
 }
 
-export function processYAMLDocumentsFromDataStep(documents, dataStep) {
+export function processThingsFromDataStep(documents, dataStep) {
   function processDocument(document, thingClassOrFn) {
     const thingClass =
       (thingClassOrFn.prototype instanceof Thing
@@ -824,121 +824,210 @@ export function processYAMLDocumentsFromDataStep(documents, dataStep) {
   }
 }
 
-export async function loadAndProcessDataDocuments(dataSteps, {dataPath}) {
-  function decorateErrorWithFile(fn) {
-    return decorateErrorWithAnnotation(fn,
-      (caughtError, firstArg) =>
-        annotateErrorWithFile(
-          caughtError,
-          path.relative(
-            dataPath,
-            (typeof firstArg === 'object'
-              ? firstArg.file
-              : firstArg))));
-  }
+export function decorateErrorWithFileFromDataPath(fn, {dataPath}) {
+  return decorateErrorWithAnnotation(fn,
+    (caughtError, firstArg) =>
+      annotateErrorWithFile(
+        caughtError,
+        path.relative(
+          dataPath,
+          (typeof firstArg === 'object'
+            ? firstArg.file
+            : firstArg))));
+}
 
-  const processDataAggregate = openAggregate({
-    message: `Errors processing data files`,
-  });
+// Loads a list of files for each data step, and a list of documents
+// for each file.
+export async function loadYAMLDocumentsFromDataSteps(dataSteps, {dataPath}) {
+  const aggregate =
+    openAggregate({
+      message: `Errors loading data files`,
+      translucent: true,
+    });
+
+  const fileLists =
+    await Promise.all(
+      dataSteps.map(dataStep =>
+        getFilesFromDataStep(dataStep, {dataPath})));
+
+  const filePromises =
+    fileLists
+      .map(files => files
+        .map(async file => {
+          const {result, aggregate} =
+            await loadYAMLDocumentsFromFile(file);
+
+          const close =
+            decorateErrorWithFileFromDataPath(aggregate.close, {dataPath});
+
+          aggregate.close =
+            () => close({file});
+
+          return {result, aggregate};
+        }));
+
+  const fileListPromises =
+    filePromises
+      .map(filePromises => Promise.all(filePromises));
+
+  const dataStepPromises =
+    stitchArrays({
+      dataStep: dataSteps,
+      fileListPromise: fileListPromises,
+    }).map(async ({dataStep, fileListPromise}) =>
+        openAggregate({
+          message: `Errors loading data files for data step: ${colors.bright(dataStep.title)}`,
+          translucent: true,
+        }).contain(await fileListPromise));
+
+  const documentLists =
+    aggregate
+      .receive(await Promise.all(dataStepPromises));
+
+  return {aggregate, result: {documentLists, fileLists}};
+}
+
+// Loads a list of things from a list of documents for each file
+// for each data step. Nesting!
+export async function processThingsFromDataSteps(documentLists, fileLists, dataSteps, {dataPath}) {
+  const aggregate =
+    openAggregate({
+      message: `Errors processing documents in data files`,
+      translucent: true,
+    });
+
+  const filePromises =
+    stitchArrays({
+      dataStep: dataSteps,
+      files: fileLists,
+      documentLists: documentLists,
+    }).map(({dataStep, files, documentLists}) =>
+        stitchArrays({
+          file: files,
+          documents: documentLists,
+        }).map(({file, documents}) => {
+            const {result, aggregate} =
+              processThingsFromDataStep(documents, dataStep);
+
+            const close = decorateErrorWithFileFromDataPath(aggregate.close, {dataPath});
+            aggregate.close = () => close({file});
+
+            return {result, aggregate};
+          }));
+
+  const fileListPromises =
+    filePromises
+      .map(filePromises => Promise.all(filePromises));
+
+  const dataStepPromises =
+    stitchArrays({
+      dataStep: dataSteps,
+      fileListPromise: fileListPromises,
+    }).map(async ({dataStep, fileListPromise}) =>
+        openAggregate({
+          message: `Errors loading data files for data step: ${colors.bright(dataStep.title)}`,
+          translucent: true,
+        }).contain(await fileListPromise));
+
+  const thingLists =
+    aggregate
+      .receive(await Promise.all(dataStepPromises));
+
+  return {aggregate, result: thingLists};
+}
+
+// Flattens a list of *lists* of things for a given data step (each list
+// corresponding to one YAML file) into results to be saved on the final
+// wikiData object, routing thing lists into the step's save() function.
+export function saveThingsFromDataStep(thingLists, dataStep) {
+  const {documentMode} = dataStep;
+
+  switch (documentMode) {
+    case documentModes.allInOne: {
+      const things =
+        (empty(thingLists)
+          ? []
+          : thingLists[0]);
+
+      return dataStep.save(things);
+    }
+
+    case documentModes.oneDocumentTotal: {
+      const thing =
+        (empty(thingLists)
+          ? {}
+          : thingLists[0]);
+
+      return dataStep.save(thing);
+    }
+
+    case documentModes.headerAndEntries:
+    case documentModes.onePerFile: {
+      return dataStep.save(thingLists);
+    }
+
+    default:
+      throw new Error(`Invalid documentMode: ${documentMode.toString()}`);
+  }
+}
+
+// Flattens a list of *lists* of things for each data step (each list
+// corresponding to one YAML file) into the final wikiData object,
+// routing thing lists into each step's save() function.
+export function saveThingsFromDataSteps(thingLists, dataSteps) {
+  const aggregate =
+    openAggregate({
+      message: `Errors finalizing things from data files`,
+      translucent: true,
+    });
 
   const wikiData = {};
 
-  for (const dataStep of dataSteps) {
-    await processDataAggregate.nestAsync({
-      message: `Errors during data step: ${colors.bright(dataStep.title)}`,
-      translucent: true,
-    }, async ({call}) => {
-      const {documentMode} = dataStep;
+  stitchArrays({
+    dataStep: dataSteps,
+    thingLists: thingLists,
+  }).map(({dataStep, thingLists}) => {
+      try {
+        return saveThingsFromDataStep(thingLists, dataStep);
+      } catch (caughtError) {
+        const error = new Error(
+          `Error finalizing things for data step: ${colors.bright(dataStep.title)}`,
+          {cause: caughtError});
 
-      if (!Object.values(documentModes).includes(documentMode)) {
-        throw new Error(`Invalid documentMode: ${documentMode.toString()}`);
+        error[Symbol.for('hsmusic.aggregate.translucent')] = true;
+
+        aggregate.push(error);
+
+        return null;
       }
-
-      const files =
-        await getFilesFromDataStep(dataStep, {dataPath});
-
-      const loadAggregate =
-        openAggregate({
-          message: `Errors loading data files`,
-        });
-
-      const processAggregate =
-        openAggregate({
-          message: `Errors processing documents in data files`,
-          translucent: true,
-        });
-
-      const fileLoadResults =
-        loadAggregate.receive(
-          await Promise.all(
-            files.map(async file => {
-              const {result, aggregate} =
-                await loadYAMLDocumentsFromFile(file);
-
-              const close = decorateErrorWithFile(aggregate.close);
-              aggregate.close = () => close({file});
-
-              return {result, aggregate};
-            })));
-
-      const fileProcessResults =
-        processAggregate.receive(
-          stitchArrays({
-            file: files,
-            documents: fileLoadResults,
-          }).map(({file, documents}) => {
-              const {result, aggregate} =
-                processYAMLDocumentsFromDataStep(documents, dataStep);
-
-              const close = decorateErrorWithFile(aggregate.close);
-              aggregate.close = () => close({file});
-
-              return {result, aggregate};
-            }));
-
-      call(loadAggregate.close);
-      call(processAggregate.close);
-
-      let saveResult;
-
-      switch (documentMode) {
-        case documentModes.allInOne: {
-          const things =
-            (empty(fileProcessResults)
-              ? []
-              : fileProcessResults[0]);
-
-          saveResult = call(dataStep.save, things);
-          break;
-        }
-
-        case documentModes.oneDocumentTotal: {
-          const thing =
-            (empty(fileProcessResults)
-              ? {}
-              : fileProcessResults[0]);
-
-          saveResult = call(dataStep.save, thing);
-          break;
-        }
-
-        case documentModes.headerAndEntries:
-        case documentModes.onePerFile: {
-          saveResult = call(dataStep.save, fileProcessResults);
-          break;
-        }
-      }
-
-      if (saveResult) {
-        Object.assign(wikiData, saveResult);
-      }
+    })
+    .filter(Boolean)
+    .forEach(saveResult => {
+      Object.assign(wikiData, saveResult);
     });
-  }
 
-  return {
-    aggregate: processDataAggregate,
-    result: wikiData,
-  };
+  return {aggregate, result: wikiData};
+}
+
+export async function loadAndProcessDataDocuments(dataSteps, {dataPath}) {
+  const aggregate =
+    openAggregate({
+      message: `Errors processing data files`,
+    });
+
+  const {documentLists, fileLists} =
+    aggregate.receive(
+      await loadYAMLDocumentsFromDataSteps(dataSteps, {dataPath}));
+
+  const thingLists =
+    aggregate.receive(
+      await processThingsFromDataSteps(documentLists, fileLists, dataSteps, {dataPath}));
+
+  const wikiData =
+    aggregate.receive(
+      saveThingsFromDataSteps(thingLists, dataSteps));
+
+  return {aggregate, result: wikiData};
 }
 
 // Data linking! Basically, provide (portions of) wikiData to the Things which
