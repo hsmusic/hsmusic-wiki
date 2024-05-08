@@ -1078,7 +1078,10 @@ async function main() {
 
   {
     const whoops = (error, stage) => {
+      if (!paragraph) console.log('');
+
       console.error(error);
+      niceShowAggregate(error);
 
       logError`There was a JavaScript error ${stage}.`;
       fileIssue();
