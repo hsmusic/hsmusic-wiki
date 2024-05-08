@@ -122,6 +122,61 @@ t.test(`Track.album`, t => {
     `album #6: is null when album's trackSections don't match track`);
 });
 
+t.test(`Track.alwaysReferenceByDirectory`, t => {
+  t.plan(7);
+
+  const {track: originalTrack, album: originalAlbum} =
+    stubTrackAndAlbum('original-track', 'original-album');
+
+  const {track: rereleaseTrack, album: rereleaseAlbum} =
+    stubTrackAndAlbum('rerelease-track', 'rerelease-album');
+
+  originalTrack.name = 'Cowabunga';
+  rereleaseTrack.name = 'Cowabunga';
+
+  originalTrack.dataSourceAlbum = 'album:original-album';
+  rereleaseTrack.dataSourceAlbum = 'album:rerelease-album';
+
+  rereleaseTrack.originalReleaseTrack = 'track:original-track';
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    albumData: [originalAlbum, rereleaseAlbum],
+    trackData: [originalTrack, rereleaseTrack],
+  });
+
+  t.equal(originalTrack.alwaysReferenceByDirectory, false,
+    `alwaysReferenceByDirectory #1: defaults to false`);
+
+  t.equal(rereleaseTrack.alwaysReferenceByDirectory, true,
+    `alwaysReferenceByDirectory #2: is true if rerelease name matches original`);
+
+  rereleaseTrack.name = 'Foo Dog!';
+
+  t.equal(rereleaseTrack.alwaysReferenceByDirectory, false,
+    `alwaysReferenceByDirectory #3: is false if rerelease name doesn't match original`);
+
+  rereleaseTrack.name = `COWabunga`;
+
+  t.equal(rereleaseTrack.alwaysReferenceByDirectory, false,
+    `alwaysReferenceByDirectory #4: is false if rerelease name doesn't match original exactly`);
+
+  rereleaseAlbum.alwaysReferenceTracksByDirectory = true;
+  XXX_decacheWikiData();
+
+  t.equal(rereleaseTrack.alwaysReferenceByDirectory, true,
+    `alwaysReferenceByDirectory #5: is true if album's alwaysReferenceTracksByDirectory is true`);
+
+  rereleaseTrack.alwaysReferenceByDirectory = false;
+
+  t.equal(rereleaseTrack.alwaysReferenceByDirectory, false,
+    `alwaysReferenceByDirectory #6: doesn't inherit from album if set to false`);
+
+  rereleaseTrack.name = 'Cowabunga';
+
+  t.equal(rereleaseTrack.alwaysReferenceByDirectory, false,
+    `alwaysReferenceByDirectory #7: doesn't compare original release name if set to false`);
+});
+
 t.test(`Track.artTags`, t => {
   t.plan(6);
 
