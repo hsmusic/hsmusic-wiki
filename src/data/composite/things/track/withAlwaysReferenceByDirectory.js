@@ -7,10 +7,14 @@ import {input, templateCompositeFrom} from '#composite';
 import find from '#find';
 import {isBoolean} from '#validators';
 
-import {exitWithoutDependency, exposeUpdateValueOrContinue}
-  from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
 import {withResolvedReference} from '#composite/wiki-data';
+
+import {
+  exitWithoutDependency,
+  exposeDependencyOrContinue,
+  exposeUpdateValueOrContinue,
+} from '#composite/control-flow';
 
 export default templateCompositeFrom({
   annotation: `withAlwaysReferenceByDirectory`,
@@ -20,6 +24,29 @@ export default templateCompositeFrom({
   steps: () => [
     exposeUpdateValueOrContinue({
       validate: input.value(isBoolean),
+    }),
+
+    // withAlwaysReferenceByDirectory is sort of a fragile area - we can't
+    // find the track's album the normal way because albums' track lists
+    // recurse back into alwaysReferenceByDirectory!
+    withResolvedReference({
+      ref: 'dataSourceAlbum',
+      data: 'albumData',
+      find: input.value(find.album),
+    }).outputs({
+      '#resolvedReference': '#album',
+    }),
+
+    withPropertyFromObject({
+      object: '#album',
+      property: input.value('alwaysReferenceTracksByDirectory'),
+    }),
+
+    // Falsy mode means this exposes true if the album's property is true,
+    // but continues if the property is false (which is also the default).
+    exposeDependencyOrContinue({
+      dependency: '#album.alwaysReferenceTracksByDirectory',
+      mode: input.value('falsy'),
     }),
 
     // Remaining code is for defaulting to true if this track is a rerelease of

@@ -48,6 +48,8 @@ export class Album extends Thing {
     directory: directory(),
     urls: urls(),
 
+    alwaysReferenceTracksByDirectory: flag(false),
+
     bandcampAlbumIdentifier: simpleString(),
     bandcampArtworkIdentifier: simpleString(),
 
@@ -225,6 +227,10 @@ export class Album extends Thing {
     fields: {
       'Album': {property: 'name'},
       'Directory': {property: 'directory'},
+
+      'Always Reference Tracks By Directory': {
+        property: 'alwaysReferenceTracksByDirectory',
+      },
 
       'Bandcamp Album ID': {
         property: 'bandcampAlbumIdentifier',
