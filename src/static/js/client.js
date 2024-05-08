@@ -3576,11 +3576,17 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   searchBox: null,
   searchInput: null,
 
+  resultsRule: null,
   resultsContainer: null,
   results: null,
 
+  endSearchRule: null,
+  endSearchLine: null,
+  endSearchLink: null,
+
   noResultsString: null,
   currentResultString: null,
+  endSearchString: null,
 
   state: {
     stoppedTypingTimeout: null,
@@ -3609,11 +3615,17 @@ function getSidebarSearchReferences() {
   info.searchInput =
     info.searchBox.querySelector('.wiki-search-input');
 
+  const findString = classPart =>
+    info.searchBox.querySelector(`.wiki-search-${classPart}-string`);
+
   info.noResultsString =
-    info.searchBox.querySelector('.wiki-search-no-results-string');
+    findString('no-results');
 
   info.currentResultString =
-    info.searchBox.querySelector('.wiki-search-current-result-string');
+    findString('current-result');
+
+  info.endSearchString =
+    findString('end-search');
 }
 
 function mutateSidebarSearchContent() {
@@ -3621,13 +3633,16 @@ function mutateSidebarSearchContent() {
 
   if (!info.searchBox) return;
 
+  info.resultsRule =
+    document.createElement('hr');
+
   info.resultsContainer =
     document.createElement('div');
 
   info.resultsContainer.classList.add('wiki-search-results-container');
 
+  cssProp(info.resultsRule, 'display', 'none');
   cssProp(info.resultsContainer, 'display', 'none');
-  info.resultsContainer.appendChild(document.createElement('hr'));
 
   info.results =
     document.createElement('div');
@@ -3636,7 +3651,34 @@ function mutateSidebarSearchContent() {
 
   info.resultsContainer.appendChild(info.results);
 
+  info.searchBox.appendChild(info.resultsRule);
   info.searchBox.appendChild(info.resultsContainer);
+
+  info.endSearchRule =
+    document.createElement('hr');
+
+  info.searchBox.appendChild(info.endSearchRule);
+
+  info.endSearchLine =
+    document.createElement('p');
+
+  info.endSearchLink =
+    document.createElement('a');
+
+  {
+    const p = info.endSearchLine;
+    const a = info.endSearchLink;
+    p.classList.add('wiki-search-end-search-line');
+    a.setAttribute('href', '#');
+    a.appendChild(templateContent(info.endSearchString));
+    p.appendChild(a);
+  }
+
+  cssProp(info.endSearchRule, 'display', 'none');
+  cssProp(info.endSearchLine, 'display', 'none');
+
+  info.searchBox.appendChild(info.endSearchRule);
+  info.searchBox.appendChild(info.endSearchLine);
 }
 
 function addSidebarSearchListeners() {
@@ -3666,6 +3708,11 @@ function addSidebarSearchListeners() {
       setTimeout(() => {
         activateSidebarSearch(info.searchInput.value);
       }, settings.stoppedTyingDelay);
+  });
+
+  info.endSearchLink.addEventListener('click', domEvent => {
+    domEvent.preventDefault();
+    clearSidebarSearch();
   });
 }
 
@@ -3715,8 +3762,12 @@ function clearSidebarSearch() {
     state.stoppedTypingTimeout = null;
   }
 
+  info.searchBox.classList.remove('showing-results');
+
   info.searchInput.value = '';
+
   session.activeQuery = '';
+  session.activeQueryResults = '';
 
   hideSidebarSearchResults();
 }
@@ -3738,10 +3789,13 @@ function showSidebarSearchResults(results) {
           data: doc,
         })));
 
+  info.searchBox.classList.add('showing-results');
+
   while (info.results.firstChild) {
     info.results.firstChild.remove();
   }
 
+  cssProp(info.resultsRule, 'display', 'block');
   cssProp(info.resultsContainer, 'display', 'block');
 
   if (empty(flatResults)) {
@@ -3756,6 +3810,11 @@ function showSidebarSearchResults(results) {
     if (!el) continue;
 
     info.results.appendChild(el);
+  }
+
+  if (!empty(flatResults)) {
+    cssProp(info.endSearchRule, 'display', 'block');
+    cssProp(info.endSearchLine, 'display', 'block');
   }
 }
 
@@ -3883,11 +3942,15 @@ function generateSidebarSearchResultTemplate(slots) {
 function hideSidebarSearchResults() {
   const info = sidebarSearchInfo;
 
+  cssProp(info.resultsRule, 'display', 'none');
   cssProp(info.resultsContainer, 'display', 'none');
 
   while (info.results.firstChild) {
     info.results.firstChild.remove();
   }
+
+  cssProp(info.endSearchRule, 'display', 'none');
+  cssProp(info.endSearchLine, 'display', 'none');
 }
 
 clientSteps.getPageReferences.push(getSidebarSearchReferences);

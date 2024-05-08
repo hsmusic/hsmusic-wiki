@@ -463,16 +463,15 @@ summary .group-name {
 }
 
 .wiki-search-sidebar-box {
-  padding: 2px;
-  position: sticky;
-  top: 5px;
+  padding: 1px 0 0 0;
+
   z-index: 999;
+  max-height: calc(100vh - 20px);
+
+  display: flex;
+  flex-direction: column;
 
   background-color: #000000c0;
-  box-shadow:
-    0 3px 4px #00000080,
-    0 -2px 8px #000000c0,
-    0 -6px 3px #000000f0;
 
   -webkit-backdrop-filter:
     brightness(1.2) blur(4px);
@@ -481,22 +480,51 @@ summary .group-name {
     brightness(1.2) blur(4px);
 }
 
+.wiki-search-sidebar-box.showing-results {
+  position: sticky;
+  top: 5px;
+
+  box-shadow:
+    0 4px 16px -8px var(--primary-color),
+    0 10px 6px var(--bg-black-color),
+    0 6px 4px #00000040;
+}
+
+.wiki-search-sidebar-box.showing-results ~ .sidebar:not(:hover) {
+  opacity: 0.6;
+  filter: brightness(0.5);
+}
+
 .wiki-search-input {
-  width: 100%;
+  width: calc(100% - 4px);
+  padding: 2px 4px;
+  margin: 2px 2px 3px 2px;
+  box-sizing: border-box;
+
   background: transparent;
   border: 1px solid var(--dim-color);
   border-radius: 3px;
-  padding: 2px 4px;
   color: inherit;
 }
 
-.wiki-search-results-container hr {
+.wiki-search-sidebar-box hr {
   border-color: var(--primary-color);
   border-style: none none dotted none;
 }
 
+.wiki-search-sidebar-box hr:nth-of-type(1) {
+  margin-top: 3px;
+  margin-bottom: 6px;
+}
+
+.wiki-search-sidebar-box hr:nth-of-type(2) {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
 .wiki-search-results-container {
-  margin-bottom: 5px;
+  margin-bottom: 0;
+  padding: 2px;
 }
 
 .wiki-search-no-results {
@@ -523,7 +551,7 @@ summary .group-name {
   left: 0;
   right: 0;
 
-  border: 2px solid var(--primary-color);
+  border: 1.5px solid var(--primary-color);
   border-radius: 4px;
   display: none;
 }
@@ -560,6 +588,7 @@ summary .group-name {
   height: 1.8em;
   margin-right: 6px;
   border-radius: 2px;
+  aspect-ratio: 1 / 1;
 }
 
 .wiki-search-result-image-placeholder {
@@ -570,8 +599,29 @@ summary .group-name {
   display: none;
 }
 
+.wiki-search-end-search-line {
+  text-align: center;
+  margin-top: 6px;
+  margin-bottom: 2px;
+}
+
+.wiki-search-end-search-line a {
+  display: inline-block;
+  font-style: oblique;
+  opacity: 0.9;
+  padding: 3px 6px 4px 6px;
+  border-radius: 4px;
+  border: 1.5px solid transparent;
+}
+
+.wiki-search-end-search-line a:hover {
+  opacity: 1;
+  background: var(--light-ghost-color);
+  border-color: var(--deep-color);
+}
+
 .wiki-search-input:focus {
-  border: 1px solid var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .wiki-search-input::placeholder {
@@ -2206,40 +2256,40 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 
 /* Sticky sidebar */
 
-.sidebar-column.sidebar.sticky-column,
-.sidebar-column.sidebar.sticky-last,
-.sidebar-multiple.sticky-last > .sidebar:last-child,
-.sidebar-multiple.sticky-column {
-  position: sticky;
-  top: 10px;
-}
-
-.sidebar-multiple.sticky-last {
+.sidebar-column:not(.sticky-column) {
   align-self: stretch;
 }
 
-.sidebar-multiple.sticky-column {
+.sidebar-column.sticky-column {
+  position: sticky;
+  top: 10px;
   align-self: flex-start;
+  max-height: calc(100vh - 20px);
+  display: flex;
+  flex-direction: column;
 }
 
-.sidebar-column.sidebar.sticky-column {
-  max-height: calc(100vh - 20px);
-  align-self: start;
-  padding-bottom: 0;
-  box-sizing: border-box;
-  flex-basis: 275px;
-  padding-top: 0;
+.sidebar-multiple.sticky-column .sidebar:last-child {
+  flex-shrink: 1;
   overflow-y: scroll;
   scrollbar-width: thin;
   scrollbar-color: var(--dark-color);
 }
 
-.sidebar-column.sidebar.sticky-column::-webkit-scrollbar {
+.wiki-search-sidebar-box .wiki-search-results-container {
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dark-color);
+}
+
+.sidebar-column.sticky-column .sidebar:last-child::-webkit-scrollbar,
+.wiki-search-sidebar-box .wiki-search-results-container::-webkit-scrollbar {
   background: var(--dark-color);
   width: 12px;
 }
 
-.sidebar-column.sidebar.sticky-column::-webkit-scrollbar-thumb {
+.sidebar-column.sticky-column .sidebar:last-child::-webkit-scrollbar-thumb,
+.wiki-search-sidebar-box .wiki-search-results-container::-webkit-scrollbar-thumb {
   transition: background 0.2s;
   background: rgba(255, 255, 255, 0.2);
   border: 3px solid transparent;

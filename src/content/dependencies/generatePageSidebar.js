@@ -19,14 +19,13 @@ export default {
     // Sticky mode controls which sidebar sections, if any, follow the
     // scroll position, "sticking" to the top of the browser viewport.
     //
-    // 'last' - last or only sidebar box is sticky
     // 'column' - entire column, incl. multiple boxes from top, is sticky
     // 'static' - sidebar not sticky at all, stays at top of page
     //
     // Note: This doesn't affect the content of any sidebar section, only
     // the whole section's containing box (or the sidebar column as a whole).
     stickyMode: {
-      validate: v => v.is('last', 'column', 'static'),
+      validate: v => v.is('column', 'static'),
       default: 'static',
     },
 

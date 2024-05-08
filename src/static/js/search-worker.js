@@ -120,6 +120,7 @@ function queryGenericIndex(index, query, options) {
   const interestingFieldCombinations = [
     ['primaryName', 'contributors', 'groups'],
     ['primaryName', 'groups'],
+    ['contributors', 'groups'],
     ['primaryName', 'contributors'],
     ['primaryName'],
   ];

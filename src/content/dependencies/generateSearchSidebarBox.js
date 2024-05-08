@@ -25,6 +25,9 @@ export default {
 
         html.tag('template', {class: 'wiki-search-current-result-string'},
           language.$('misc.search.currentResult')),
+
+        html.tag('template', {class: 'wiki-search-end-search-string'},
+          language.$('misc.search.endSearch')),
       ],
     }),
 };

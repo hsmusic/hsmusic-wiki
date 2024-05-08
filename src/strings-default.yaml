@@ -627,6 +627,7 @@ misc:
       Check spelling and use complete words.
 
     currentResult: "(you are here)"
+    endSearch: "(OK, I'm done searching now.)"
 
   # skippers:
   #
