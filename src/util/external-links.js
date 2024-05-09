@@ -329,6 +329,12 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'discord.com'},
+    platform: 'discord',
+    icon: 'globe',
+  },
+
+  {
     match: {domain: 'facebook.com'},
 
     platform: 'facebook',
