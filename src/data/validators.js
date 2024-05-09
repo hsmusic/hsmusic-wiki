@@ -892,10 +892,13 @@ export const isReferenceDiscussion = validateProperties({
 });
 
 export function validateReviewPoint({
-  fields,
-}) {
+  fields = null,
+} = {}) {
   return validateProperties({
-    field: is(...fields),
+    field:
+      (fields
+        ? is(...fields)
+        : isString),
 
     dateRecorded: isDate,
 
