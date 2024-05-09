@@ -383,11 +383,20 @@ export function parseAdditionalFiles(array) {
   }));
 }
 
-export const extractAccentRegex =
+// E.g: "main (accent)" or "main"
+export const suffixAccentRegex =
   /^(?<main>.*?)(?: \((?<accent>.*)\))?$/;
 
-export const extractPrefixAccentRegex =
+// E.g: "(accent) main" or "main"
+export const prefixAccentRegex =
   /^(?:\((?<accent>.*)\) )?(?<main>.*?)$/;
+
+// E.g: "Jan 12, 2025, #issuefication-zone"
+//   -> date:       "Jan 12, 2025"
+//      annotation: "#issuefication-zone"
+// Mostly extracted from commentaryRegex in #wiki-data.
+export const dateAnnotationRegex =
+  /^(?:(?<date>[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,4}[-/][0-9]{1,4}[-/][0-9]{1,4})(?=[,)]|$))?(?:,? ?(?<annotation>.*))/;
 
 export function parseContributors(contributionStrings) {
   // If this isn't something we can parse, just return it as-is.
@@ -412,7 +421,7 @@ export function parseContributors(contributionStrings) {
 
     if (typeof item !== 'string') return item;
 
-    const match = item.match(extractAccentRegex);
+    const match = item.match(suffixAccentRegex);
     if (!match) return item;
 
     return {
@@ -433,7 +442,7 @@ export function parseAdditionalNames(additionalNameStrings) {
 
     if (typeof item !== 'string') return item;
 
-    const match = item.match(extractAccentRegex);
+    const match = item.match(suffixAccentRegex);
     if (!match) return item;
 
     return {
@@ -464,6 +473,106 @@ export function parseDimensions(string) {
   }
 
   return nums;
+}
+
+export function parseReferenceDiscussions(referenceDiscussions) {
+  if (!Array.isArray(referenceDiscussions)) {
+    return referenceDiscussions;
+  }
+
+  return referenceDiscussions.map(source => {
+    switch (typeof source) {
+      case 'object': {
+        const entry = {};
+
+        if (source['URL']) {
+          entry.url = source['URL'];
+        }
+
+        if (source['Date']) {
+          entry.date = new Date(source['Date']);
+        }
+
+        if (source['Participants']) {
+          entry.participatingArtists = source['Participants'];
+        }
+
+        if (source['Annotation']) {
+          entry.annotation = source['Annotation'];
+        }
+
+        return entry;
+      }
+
+      case 'string': {
+        const entry = {};
+
+        const match1 = source.match(prefixAccentRegex);
+
+        if (!match1) {
+          return source;
+        }
+
+        entry.url = match1.groups.main;
+
+        if (!match1.groups.accent) {
+          return entry;
+        }
+
+        const match2 = match1.groups.accent.match(dateAnnotationRegex);
+
+        if (match2.groups.date) {
+          entry.date = new Date(match2.groups.date);
+        }
+
+        if (match2.groups.annotation) {
+          entry.annotation = match2.groups.annotation;
+        }
+
+        return entry;
+      }
+
+      default:
+        return source;
+    }
+  });
+}
+
+export function parseReviewPoints(reviewPoints) {
+  if (!Array.isArray(reviewPoints)) {
+    return reviewPoints;
+  }
+
+  return reviewPoints.map(source => {
+    if (typeof source !== 'object') {
+      return source;
+    }
+
+    const entry = {};
+
+    if (source['Field']) {
+      entry.field = source['Field'];
+    }
+
+    if (source['Notes']) {
+      entry.notes = source['Notes'];
+    }
+
+    if (source['Date Recorded']) {
+      entry.dateRecorded = new Date(source['Date Recorded']);
+    }
+
+    if (source['Reference Discussions']) {
+      entry.referenceDiscussions =
+        parseReferenceDiscussions(source['Reference Discussions']);
+    }
+
+    if (source['Referral Artists']) {
+      entry.referralArtists = source['Referral Artists'];
+    }
+
+    return entry;
+  });
 }
 
 // documentModes: Symbols indicating sets of behavior for loading and processing

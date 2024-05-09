@@ -4,6 +4,7 @@ import {input} from '#composite';
 import {sortAlphabetically, sortAlbumsTracksChronologically} from '#sort';
 import Thing from '#thing';
 import {isName} from '#validators';
+import {parseReviewPoints} from '#yaml';
 
 import {exposeUpdateValueOrContinue} from '#composite/control-flow';
 
@@ -12,6 +13,7 @@ import {
   directory,
   flag,
   name,
+  reviewPointList,
   wikiData,
 } from '#composite/wiki-properties';
 
@@ -19,7 +21,7 @@ export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
   static [Thing.friendlyName] = `Art Tag`;
 
-  static [Thing.getPropertyDescriptors] = ({Album, Track}) => ({
+  static [Thing.getPropertyDescriptors] = ({Album, ArtTag, Track}) => ({
     // Update & expose
 
     name: name('Unnamed Art Tag'),
@@ -38,6 +40,10 @@ export class ArtTag extends Thing {
           name.replace(/ \([^)]*?\)$/, ''),
       },
     ],
+
+    reviewPoints: reviewPointList({
+      class: input.value(ArtTag),
+    }),
 
     // Update only
 
@@ -85,6 +91,11 @@ export class ArtTag extends Thing {
 
       'Color': {property: 'color'},
       'Is CW': {property: 'isContentWarning'},
+
+      'Review Points': {
+        property: 'reviewPoints',
+        transform: parseReviewPoints,
+      },
     },
   };
 

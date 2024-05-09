@@ -7,7 +7,7 @@ import {sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
 import {anyOf, isColor, isContentString, isDirectory, isNumber, isString}
   from '#validators';
-import {parseDate, parseContributors} from '#yaml';
+import {parseDate, parseContributors, parseReviewPoints} from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
 
@@ -28,6 +28,7 @@ import {
   fileExtension,
   name,
   referenceList,
+  reviewPointList,
   simpleDate,
   urls,
   wikiData,
@@ -39,7 +40,12 @@ import {withFlashSide} from '#composite/things/flash-act';
 export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';
 
-  static [Thing.getPropertyDescriptors] = ({Artist, Track, FlashAct}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    Artist,
+    Track,
+    Flash,
+    FlashAct,
+  }) => ({
     // Update & expose
 
     name: name('Unnamed Flash'),
@@ -100,6 +106,10 @@ export class Flash extends Thing {
     urls: urls(),
 
     commentary: commentary(),
+
+    reviewPoints: reviewPointList({
+      class: input.value(Flash),
+    }),
 
     // Update only
 
@@ -180,7 +190,10 @@ export class Flash extends Thing {
 
       'Commentary': {property: 'commentary'},
 
-      'Review Points': {ignore: true},
+      'Review Points': {
+        property: 'reviewPoints',
+        transform: parseReviewPoints,
+      },
     },
   };
 }
@@ -189,7 +202,7 @@ export class FlashAct extends Thing {
   static [Thing.referenceType] = 'flash-act';
   static [Thing.friendlyName] = `Flash Act`;
 
-  static [Thing.getPropertyDescriptors] = () => ({
+  static [Thing.getPropertyDescriptors] = ({FlashAct, Flash}) => ({
     // Update & expose
 
     name: name('Unnamed Flash Act'),
@@ -221,6 +234,10 @@ export class FlashAct extends Thing {
       class: input.value(Flash),
       find: input.value(find.flash),
       data: 'flashData',
+    }),
+
+    reviewPoints: reviewPointList({
+      classes: input.value([FlashAct, Flash]),
     }),
 
     // Update only
@@ -256,7 +273,10 @@ export class FlashAct extends Thing {
       'Color': {property: 'color'},
       'List Terminology': {property: 'listTerminology'},
 
-      'Review Points': {ignore: true},
+      'Review Points': {
+        property: 'reviewPoints',
+        transform: parseReviewPoints,
+      },
     },
   };
 }

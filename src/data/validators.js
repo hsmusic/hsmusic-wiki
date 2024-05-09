@@ -880,6 +880,42 @@ export const isAdditionalName = validateProperties({
 
 export const isAdditionalNameList = validateArrayItems(isAdditionalName);
 
+export const isReferenceDiscussion = validateProperties({
+  url: isURL,
+  date: isDate,
+
+  annotation:
+    optional(isContentString),
+
+  participatingArtists:
+    optional(validateArrayItems(isArtistRef)),
+});
+
+export function validateReviewPoint({
+  fields = null,
+} = {}) {
+  return validateProperties({
+    field:
+      (fields
+        ? is(...fields)
+        : isString),
+
+    dateRecorded: isDate,
+
+    notes: optional(isContentString),
+
+    referenceDiscussions:
+      optional(validateArrayItems(isReferenceDiscussion)),
+
+    referralArtists:
+      optional(validateArrayItems(isArtistRef)),
+  });
+}
+
+export function validateReviewPointList(opts = {}) {
+  return validateArrayItems(validateReviewPoint(opts));
+}
+
 // Compositional utilities
 
 export function anyOf(...validators) {

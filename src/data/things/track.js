@@ -15,6 +15,7 @@ import {
   parseDate,
   parseDimensions,
   parseDuration,
+  parseReviewPoints,
 } from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
@@ -42,6 +43,7 @@ import {
   name,
   referenceList,
   reverseReferenceList,
+  reviewPointList,
   simpleDate,
   singleReference,
   simpleString,
@@ -66,7 +68,13 @@ import {
 export class Track extends Thing {
   static [Thing.referenceType] = 'track';
 
-  static [Thing.getPropertyDescriptors] = ({Album, ArtTag, Artist, Flash}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    Album,
+    ArtTag,
+    Artist,
+    Flash,
+    Track,
+  }) => ({
     // Update & expose
 
     name: name('Unnamed Track'),
@@ -284,6 +292,10 @@ export class Track extends Thing {
       }),
     ],
 
+    reviewPoints: reviewPointList({
+      class: input.value(Track),
+    }),
+
     // Update only
 
     albumData: wikiData({
@@ -446,7 +458,10 @@ export class Track extends Thing {
 
       'Art Tags': {property: 'artTags'},
 
-      'Review Points': {ignore: true},
+      'Review Points': {
+        property: 'reviewPoints',
+        transform: parseReviewPoints,
+      },
     },
 
     invalidFieldCombinations: [

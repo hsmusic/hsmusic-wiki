@@ -1,5 +1,5 @@
 export default {
-  contentDependencies: ['generateCommentaryEntry', 'generateContentHeading'],
+  contentDependencies: ['generateReviewPointsEntry', 'generateContentHeading'],
   extraDependencies: ['html', 'language'],
 
   relations: (relation, entries) => ({
@@ -8,15 +8,15 @@ export default {
 
     entries:
       entries.map(entry =>
-        relation('generateCommentaryEntry', entry)),
+        relation('generateReviewPointsEntry', entry)),
   }),
 
   generate: (relations, {html, language}) =>
     html.tags([
       relations.heading
         .slots({
-          id: 'artist-commentary',
-          title: language.$('misc.artistCommentary'),
+          id: 'review-points',
+          title: language.$('misc.reviewPoints'),
         }),
 
       relations.entries,
