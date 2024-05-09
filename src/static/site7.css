@@ -803,7 +803,8 @@ ul.image-details li {
   content: " \00b7 ";
 }
 
-.commentary-entry-heading {
+#content .commentary-entry-heading,
+#content .review-point-heading {
   margin-left: 15px;
   padding-left: 5px;
   max-width: 625px;
@@ -811,11 +812,67 @@ ul.image-details li {
   border-bottom: 1px dotted var(--primary-color);
 }
 
-.commentary-entry-accent {
+#content .review-point-heading {
+  margin-bottom: 0.5em;
+}
+
+#content .commentary-entry-accent {
   font-style: oblique;
 }
 
-.commentary-art {
+#content .review-point-field {
+  font-style: normal;
+  text-transform: lowercase;
+  background: var(--dim-color);
+  padding: 1px 4px;
+  border-radius: 3px;
+  text-shadow: 0 1px 2px #000000a0;
+}
+
+#content .review-point-info {
+  margin-left: 40px;
+  max-width: 600px;
+  margin-top: 0.75em;
+  margin-bottom: 0.25em;
+}
+
+#content .review-point-reference-discussions {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+#content .review-point-discussion-participants {
+  display: inline-block;
+  opacity: 0.9;
+}
+
+#content .review-point-body {
+  margin-left: 35px;
+  padding-left: 5px;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+#content .review-point-body.no-notes {
+  margin-top: 0.25em;
+  font-size: 0.9em;
+}
+
+#content .review-point-body:not(.no-notes) {
+  border-top: 1px dashed var(--primary-color);
+  margin-top: 0.75em;
+  padding-top: 0.75em;
+}
+
+#content .review-point-body > :first-child {
+  margin-top: 0;
+}
+
+#content .review-point-body > :last-child {
+  margin-bottom: 0;
+}
+
+#content .commentary-art {
   float: right;
   width: 30%;
   max-width: 250px;
