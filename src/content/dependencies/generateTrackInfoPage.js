@@ -19,6 +19,7 @@ export default {
     'generateContributionList',
     'generatePageLayout',
     'generateRelativeDatetimestamp',
+    'generateReviewPointsSection',
     'generateTrackAdditionalNamesBox',
     'generateTrackCoverArtwork',
     'generateTrackList',
@@ -307,6 +308,13 @@ export default {
         relation('generateCommentarySection', track.commentary);
     }
 
+    // Section: Review points
+
+    if (!empty(track.reviewPoints)) {
+      sections.reviewPoints =
+        relation('generateReviewPointsSection', track.reviewPoints);
+    }
+
     return relations;
   },
 
@@ -376,6 +384,13 @@ export default {
                   link: html.tag('a',
                     {href: '#artist-commentary'},
                     language.$('releaseInfo.readCommentary.link')),
+                }),
+
+              sec.reviewPoints &&
+                language.$('releaseInfo.readReviewPoints', {
+                  link: html.tag('a',
+                    {href: '#review-points'},
+                    language.$('releaseInfo.readReviewPoints.link')),
                 }),
             ]),
 
@@ -552,6 +567,8 @@ export default {
           ],
 
           sec.artistCommentary,
+
+          sec.reviewPoints,
         ],
 
         navLinkStyle: 'hierarchical',

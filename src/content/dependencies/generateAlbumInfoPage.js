@@ -19,6 +19,7 @@ export default {
     'generateCommentarySection',
     'generateContentHeading',
     'generatePageLayout',
+    'generateReviewPointsSection',
     'linkAlbum',
     'linkAlbumCommentary',
     'linkAlbumGallery',
@@ -130,6 +131,13 @@ export default {
         relation('generateCommentarySection', album.commentary);
     }
 
+    // Section: Review points
+
+    if (!empty(album.reviewPoints)) {
+      sections.reviewPoints =
+        relation('generateReviewPointsSection', album.reviewPoints);
+    }
+
     return relations;
   },
 
@@ -204,6 +212,13 @@ export default {
                     sec.extra.commentaryLink
                       .slot('content', language.$('releaseInfo.viewCommentary.link')),
                 }),
+
+              sec.reviewPoints &&
+                language.$('releaseInfo.readReviewPoints', {
+                  link: html.tag('a',
+                    {href: '#review-points'},
+                    language.$('releaseInfo.readReviewPoints.link')),
+                }),
             ]),
 
           relations.trackList,
@@ -234,6 +249,8 @@ export default {
           ],
 
           sec.artistCommentary,
+
+          sec.reviewPoints,
         ],
 
         navLinkStyle: 'hierarchical',
