@@ -613,6 +613,31 @@ misc:
     _: "{TITLE}"
     withWikiName: "{TITLE} | {WIKI_NAME}"
 
+  reviewPoints:
+    entry:
+      title: "Regarding {FIELD}, dated {DATE}:"
+      referralArtists: "Refer comments/questions to: {ARTISTS}"
+      noNotes: "(No extra notes for this review point.)"
+
+      referenceDiscussions:
+        item: >-
+          {DATE_ACCENT} {LINK}
+
+        item.withParticipants: >-
+          {DATE_ACCENT} {LINK} {PARTICIPANTS_ACCENT}
+
+        dateAccent: >-
+          ({DATE})
+
+        participantsAccent: >-
+          (including: {PARTICIPANTS})
+
+        link: >-
+          {PLATFORM}
+
+        link.withAnnotation: >-
+          {PLATFORM}, {ANNOTATION}
+
   # skippers:
   #
   #   These are navigational links that only show up when you're
