@@ -320,6 +320,10 @@ releaseInfo:
     _: "Read {LINK}."
     link: "artist commentary"
 
+  readReviewPoints:
+    _: "Read {LINK}."
+    link: "wiki review points"
+
   additionalFiles:
     heading: "View or download {ADDITIONAL_FILES}:"
 
@@ -615,6 +619,8 @@ misc:
     withWikiName: "{TITLE} | {WIKI_NAME}"
 
   reviewPoints:
+    _: "Wiki review points:"
+
     entry:
       title: "Regarding {FIELD}, dated {DATE}:"
       referralArtists: "Refer comments/questions to: {ARTISTS}"
