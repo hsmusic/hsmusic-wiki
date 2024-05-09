@@ -3,9 +3,9 @@ import Thing from '#thing';
 import {isThingClass, validateArrayItems, validateReviewPointList}
   from '#validators';
 
-import {exposeConstant, exposeDependencyOrContinue}
+import {exitWithoutDependency, exposeDependencyOrContinue}
   from '#composite/control-flow';
-import {withResolvedContribs} from '#composite/wiki-data';
+import {withResolvedReviewPoints} from '#composite/wiki-data';
 
 export default templateCompositeFrom({
   annotation: `reviewPointList`,
@@ -44,10 +44,17 @@ export default templateCompositeFrom({
   },
 
   steps: () => [
-    // TODO:
-    // withResolvedReviewPoints({from: input.updateValue()}),
-    // exposeDependencyOrContinue({dependency: '#resolvedReviewPoints'}),
+    exitWithoutDependency({
+      dependency: input.updateValue(),
+      value: input.value([]),
+    }),
 
-    exposeConstant({value: input.value([])}),
+    withResolvedReviewPoints({
+      from: input.updateValue(),
+    }),
+
+    exposeDependencyOrContinue({
+      dependency: '#resolvedReviewPoints',
+    }),
   ],
 });
