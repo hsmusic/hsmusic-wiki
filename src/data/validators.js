@@ -887,7 +887,7 @@ export const isReferenceDiscussion = validateProperties({
   annotation:
     optional(isContentString),
 
-  participants:
+  participatingArtists:
     optional(validateArrayItems(isArtistRef)),
 });
 
@@ -909,7 +909,7 @@ export function validateReviewPoint({
   });
 }
 
-export function validateReviewList(opts) {
+export function validateReviewPointList(opts = {}) {
   return validateArrayItems(validateReviewPoint(opts));
 }
 
