@@ -1,6 +1,6 @@
 import {input, templateCompositeFrom} from '#composite';
 import Thing from '#thing';
-import {isThingClass, validateArrayItems, validateReviewList}
+import {isThingClass, validateArrayItems, validateReviewPointList}
   from '#validators';
 
 import {exposeConstant, exposeDependencyOrContinue}
@@ -39,7 +39,7 @@ export default templateCompositeFrom({
     }
 
     return {
-      validate: validateReviewList({fields}),
+      validate: validateReviewPointList({fields}),
     };
   },
 

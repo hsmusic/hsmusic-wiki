@@ -494,7 +494,7 @@ export function parseReferenceDiscussions(referenceDiscussions) {
         }
 
         if (source['Participants']) {
-          entry.participants = source['Participants'];
+          entry.participatingArtists = source['Participants'];
         }
 
         if (source['Annotation']) {
