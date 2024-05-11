@@ -2095,6 +2095,9 @@ async function main() {
 
   let buildModeResult;
 
+  logInfo`Passing control over to build mode: ${selectedBuildModeFlag}`;
+  console.log('');
+
   try {
     buildModeResult = await selectedBuildMode.go({
       cliOptions,
