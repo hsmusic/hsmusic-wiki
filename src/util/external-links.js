@@ -211,6 +211,18 @@ export const externalLinkSpec = [
   // Generic domains, sorted alphabetically (by string)
 
   {
+    match: {
+      domains: [
+        'music.amazon.co.jp',
+        'music.amazon.com',
+      ],
+    },
+
+    platform: 'amazonMusic',
+    icon: 'globe',
+  },
+
+  {
     match: {domain: 'music.apple.com'},
     platform: 'appleMusic',
     icon: 'appleMusic',

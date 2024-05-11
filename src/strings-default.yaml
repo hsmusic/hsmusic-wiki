@@ -514,6 +514,7 @@ misc:
       _: "{LINK} ({ANNOTATION})"
       annotation: "invalid URL"
 
+    amazonMusic: "Amazon Music"
     appleMusic: "Apple Music"
     artstation: "ArtStation"
     bandcamp: "Bandcamp"
