@@ -109,42 +109,49 @@ export const searchSpec = {
         .filter(track => !track.originalReleaseTrack),
     ].flat(),
 
-    process: (thing, opts) => ({
-      primaryName:
-        thing.name,
+    process(thing, opts) {
+      const fields = {};
 
-      color:
-        thing.color,
+      fields.primaryName =
+        thing.name;
 
-      additionalNames:
+      fields.color =
+        thing.color;
+
+      fields.additionalNames =
         (Object.hasOwn(thing, 'additionalNames')
           ? thing.additionalNames.map(entry => entry.name)
        : Object.hasOwn(thing, 'aliasNames')
           ? thing.aliasNames
-          : []),
+          : []);
 
-      contributors:
-        ([
-          'artistContribs',
-          'bannerArtistContribs',
-          'contributorContribs',
-          'coverArtistContribs',
-          'wallpaperArtistContribs',
-        ]).filter(key => Object.hasOwn(thing, key))
+      const contribKeys = [
+        'artistContribs',
+        'bannerArtistContribs',
+        'contributorContribs',
+        'coverArtistContribs',
+        'wallpaperArtistContribs',
+      ];
+
+      fields.contributors =
+        contribKeys
+          .filter(key => Object.hasOwn(thing, key))
           .flatMap(key => thing[key])
           .map(contrib => contrib.artist)
-          .flatMap(artist => [artist.name, ...artist.aliasNames]),
+          .flatMap(artist => [artist.name, ...artist.aliasNames]);
 
-      groups:
+      fields.groups =
         (Object.hasOwn(thing, 'groups')
           ? thing.groups.map(group => group.name)
        : Object.hasOwn(thing, 'album')
           ? thing.album.groups.map(group => group.name)
-          : []),
+          : []);
 
-      artwork:
-        prepareArtwork(thing, opts),
-    }),
+      fields.artwork =
+        prepareArtwork(thing, opts);
+
+      return fields;
+    },
 
     index: [
       'primaryName',
