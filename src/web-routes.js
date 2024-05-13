@@ -8,10 +8,10 @@ const codeSrcPath = __dirname;
 const codeRootPath = path.resolve(codeSrcPath, '..');
 
 function getNodeDependencyRootPath(dependencyName) {
-  const packageJSON =
-    import.meta.resolve(dependencyName + '/package.json');
-
-  return path.dirname(fileURLToPath(packageJSON));
+  return (
+    path.dirname(
+      fileURLToPath(
+        import.meta.resolve(dependencyName))));
 }
 
 export const stationaryCodeRoutes = [
@@ -36,23 +36,33 @@ export const stationaryCodeRoutes = [
   },
 ];
 
+function quickNodeDependency({
+  name,
+  path: subpath = '',
+}) {
+  const root = getNodeDependencyRootPath(name);
+
+  return [
+    {
+      from:
+        (subpath
+          ? path.join(root, subpath)
+          : root),
+
+      to: ['staticLib.path', name],
+    },
+  ];
+}
+
 export const dependencyRoutes = [
-  {
-    from:
-      path.join(
-        getNodeDependencyRootPath('flexsearch'),
-        'dist'),
+  quickNodeDependency({
+    name: 'chroma-js',
+  }),
 
-    to: ['staticLib.path', 'flexsearch'],
-  },
-
-  {
-    from:
-      getNodeDependencyRootPath('chroma-js'),
-
-    to: ['staticLib.path', 'chroma-js'],
-  }
-];
+  quickNodeDependency({
+    name: 'flexsearch',
+  }),
+].flat();
 
 export const allStaticWebRoutes = [
   ...stationaryCodeRoutes,
