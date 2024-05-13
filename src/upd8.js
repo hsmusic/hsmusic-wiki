@@ -1492,6 +1492,8 @@ async function main() {
     });
 
     await writeSearchData({
+      thumbsCache,
+      urls,
       wikiCachePath,
       wikiData,
     });

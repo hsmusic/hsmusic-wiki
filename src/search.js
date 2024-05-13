@@ -8,6 +8,8 @@ import FlexSearch from 'flexsearch';
 import {logError, logInfo, logWarn} from '#cli';
 import {makeSearchIndex, populateSearchIndex, searchSpec} from '#search-spec';
 import {stitchArrays} from '#sugar';
+import {checkIfImagePathHasCachedThumbnails, getThumbnailEqualOrSmaller}
+  from '#thumbs';
 
 async function exportIndexToJSON(index) {
   const results = {};
@@ -20,6 +22,8 @@ async function exportIndexToJSON(index) {
 }
 
 export async function writeSearchData({
+  thumbsCache,
+  urls,
   wikiCachePath,
   wikiData,
 }) {
@@ -47,7 +51,13 @@ export async function writeSearchData({
     index: indexes,
     descriptor: descriptors,
   }).forEach(({index, descriptor}) =>
-      populateSearchIndex(index, descriptor, {wikiData}));
+      populateSearchIndex(index, descriptor, {
+        checkIfImagePathHasCachedThumbnails,
+        getThumbnailEqualOrSmaller,
+        thumbsCache,
+        urls,
+        wikiData,
+      }));
 
   const jsonIndexes =
     await Promise.all(indexes.map(exportIndexToJSON));

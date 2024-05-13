@@ -222,7 +222,34 @@ export function makeSearchIndex(descriptor, {FlexSearch}) {
   });
 }
 
-export function populateSearchIndex(index, descriptor, {wikiData}) {
+// TODO: This function basically mirrors bind-utilities.js, which isn't
+// exactly robust, but... binding might need some more thought across the
+// codebase in *general.*
+function bindSearchUtilities({
+  checkIfImagePathHasCachedThumbnails,
+  getThumbnailEqualOrSmaller,
+  thumbsCache,
+  urls,
+}) {
+  const bound = {
+    urls,
+  };
+
+  bound.checkIfImagePathHasCachedThumbnails =
+    (imagePath) =>
+      checkIfImagePathHasCachedThumbnails(imagePath, thumbsCache);
+
+  bound.getThumbnailEqualOrSmaller =
+    (preferred, imagePath) =>
+      getThumbnailEqualOrSmaller(preferred, imagePath, thumbsCache);
+
+  return bound;
+}
+
+export function populateSearchIndex(index, descriptor, opts) {
+  const {wikiData} = opts;
+  const bound = bindSearchUtilities(opts);
+
   const collection = descriptor.query(wikiData);
 
   for (const thing of collection) {
@@ -230,7 +257,7 @@ export function populateSearchIndex(index, descriptor, {wikiData}) {
 
     let processed;
     try {
-      processed = descriptor.process(thing);
+      processed = descriptor.process(thing, bound);
     } catch (caughtError) {
       throw new Error(
         `Failed to process searchable thing ${reference}`,
