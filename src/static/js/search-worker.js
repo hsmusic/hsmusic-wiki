@@ -1,8 +1,15 @@
 import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
 
 import {makeSearchIndex, searchSpec} from '../shared-util/search-spec.js';
-import {empty, groupArray, stitchArrays, unique, withEntries}
-  from '../shared-util/sugar.js';
+
+import {
+  empty,
+  groupArray,
+  promiseWithResolvers,
+  stitchArrays,
+  unique,
+  withEntries,
+} from '../shared-util/sugar.js';
 
 import {loadDependency} from './module-import-shims.js';
 
@@ -10,14 +17,18 @@ import {loadDependency} from './module-import-shims.js';
 let decompress;
 let unpack;
 
+let idb;
+
 let status = null;
 let indexes = null;
 
 globalThis.onmessage = handleWindowMessage;
 postStatus('alive');
 
-loadDependencies()
-  .then(main)
+Promise.all([
+  loadDependencies(),
+  loadDatabase(),
+]).then(main)
   .then(
     () => {
       postStatus('ready');
@@ -38,11 +49,104 @@ async function loadDependencies() {
   ({unpack} = msgpackr);
 }
 
+async function promisifyIDBRequest(request) {
+  const {promise, resolve, reject} = promiseWithResolvers();
+
+  request.addEventListener('success', () => resolve(request.result));
+  request.addEventListener('error', () => reject(request.error));
+
+  return promise;
+}
+
+async function* iterateIDBObjectStore(store, query) {
+  const request =
+    store.openCursor(query);
+
+  let promise, resolve, reject;
+  let cursor;
+
+  request.onsuccess = () => {
+    cursor = request.result;
+    if (cursor) {
+      resolve({done: false, value: [cursor.key, cursor.value]});
+    } else {
+      resolve({done: true});
+    }
+  };
+
+  request.onerror = () => {
+    reject(request.error);
+  };
+
+  do {
+    ({promise, resolve, reject} = promiseWithResolvers());
+
+    const result = await promise;
+
+    if (result.done) {
+      return;
+    }
+
+    yield result.value;
+
+    cursor.continue();
+  } while (true);
+}
+
+async function loadCachedIndexFromIDB() {
+  if (!idb) return null;
+
+  const transaction =
+    idb.transaction(['indexes'], 'readwrite');
+
+  const store =
+    transaction.objectStore('indexes');
+
+  const result = {};
+
+  for await (const [key, object] of iterateIDBObjectStore(store)) {
+    result[key] = object;
+  }
+
+  return result;
+}
+
+async function loadDatabase() {
+  const request =
+    globalThis.indexedDB.open('hsmusicSearchDatabase', 4);
+
+  request.addEventListener('upgradeneeded', () => {
+    const idb = request.result;
+
+    idb.createObjectStore('indexes', {
+      keyPath: 'key',
+    });
+  });
+
+  try {
+    idb = await promisifyIDBRequest(request);
+  } catch (error) {
+    console.warn(`Couldn't load search IndexedDB - won't use an internal cache.`);
+    console.warn(request.error);
+    idb = null;
+  }
+}
+
 function rebase(path) {
   return `/search-data/` + path;
 }
 
 async function main() {
+  let background;
+
+  background =
+    Promise.all([
+      fetch(rebase('index.json'))
+        .then(resp => resp.json()),
+
+      loadCachedIndexFromIDB(),
+    ]);
+
   indexes =
     withEntries(searchSpec, entries => entries
       .map(([key, descriptor]) => [
@@ -50,21 +154,115 @@ async function main() {
         makeSearchIndex(descriptor, {FlexSearch}),
       ]));
 
-  const indexData =
-    await fetch(rebase('index.json'))
-      .then(resp => resp.json());
+  const [indexData, idbIndexData] = await background;
 
-  await Promise.all(
-    Object.entries(indexData)
-      .map(([key, _info]) =>
-        fetch(rebase(key + '.json.msgpack'))
-          .then(res => res.arrayBuffer())
-          .then(buffer => new Uint8Array(buffer))
-          .then(data => unpack(data))
-          .then(data => decompress(data))
-          .then(data => {
-            importIndex(key, data);
-          })));
+  const keysNeedingFetch =
+    (idbIndexData
+      ? Object.keys(indexData)
+          .filter(key =>
+            indexData[key].md5 !==
+            idbIndexData[key].md5)
+      : Object.keys(indexData));
+
+  const keysFromCache =
+    Object.keys(indexData)
+      .filter(key => !keysNeedingFetch.includes(key))
+
+  const fetchPromises =
+    keysNeedingFetch
+      .map(key => rebase(key + '.json.msgpack'))
+      .map(url => fetch(url));
+
+  const fetchBlobPromises =
+    fetchPromises
+      .map(promise => promise
+        .then(response => response.blob()));
+
+  const fetchArrayBufferPromises =
+    fetchBlobPromises
+      .map(promise => promise
+        .then(blob => blob.arrayBuffer()));
+
+  const cacheArrayBufferPromises =
+    keysFromCache
+      .map(key => idbIndexData[key])
+      .map(({cachedBinarySource}) =>
+        cachedBinarySource.arrayBuffer());
+
+  function arrayBufferToJSON(data) {
+    data = new Uint8Array(data);
+    data = unpack(data);
+    data = decompress(data);
+    return data;
+  }
+
+  function importIndexes(keys, jsons) {
+    stitchArrays({key: keys, json: jsons})
+      .forEach(({key, json}) => {
+        importIndex(key, json);
+      });
+  }
+
+  if (idb) {
+    console.debug(`Reusing indexes from search cache:`, keysFromCache);
+    console.debug(`Fetching indexes anew:`, keysNeedingFetch);
+  }
+
+  await Promise.all([
+    async () => {
+      const cacheArrayBuffers =
+        await Promise.all(cacheArrayBufferPromises);
+
+      const cacheJSONs =
+        cacheArrayBuffers
+          .map(arrayBufferToJSON);
+
+      importIndexes(keysFromCache, cacheJSONs);
+    },
+
+    async () => {
+      const fetchArrayBuffers =
+        await Promise.all(fetchArrayBufferPromises);
+
+      const fetchJSONs =
+        fetchArrayBuffers
+          .map(arrayBufferToJSON);
+
+      importIndexes(keysNeedingFetch, fetchJSONs);
+    },
+
+    async () => {
+      if (!idb) return;
+
+      const fetchBlobs =
+        await Promise.all(fetchBlobPromises);
+
+      const transaction =
+        idb.transaction(['indexes'], 'readwrite');
+
+      const store =
+        transaction.objectStore('indexes');
+
+      for (const {key, blob} of stitchArrays({
+        key: keysNeedingFetch,
+        blob: fetchBlobs,
+      })) {
+        const value = {
+          key,
+          md5: indexData[key].md5,
+          cachedBinarySource: blob,
+        };
+
+        try {
+          await promisifyIDBRequest(store.put(value));
+        } catch (error) {
+          console.warn(`Error saving ${key} to internal search cache:`, value);
+          console.warn(error);
+          continue;
+        }
+      }
+    },
+  ].map(fn => fn()));
 }
 
 function importIndex(indexKey, indexData) {
