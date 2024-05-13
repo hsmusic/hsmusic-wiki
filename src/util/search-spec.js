@@ -1,28 +1,75 @@
 // Index structures shared by client and server, and relevant interfaces.
 
-function prepareArtwork(thing) {
+function getArtworkPath(thing) {
   switch (thing.constructor[Symbol.for('Thing.referenceType')]) {
     case 'flash': {
-      return ['flash', thing.coverArtFileExtension];
+      return [
+        'media.flashArt',
+        thing.directory,
+        thing.coverArtFileExtension,
+      ];
     }
 
     case 'track': {
       if (thing.hasUniqueCoverArt) {
-        if (thing.coverArtFileExtension === 'gif')
-          return undefined;
-        return ['track', thing.album.directory];
+        return [
+          'media.trackCover',
+          thing.album.directory,
+          thing.directory,
+          thing.coverArtFileExtension,
+        ];
       } else if (thing.album.hasCoverArt) {
-        if (thing.album.coverArtFileExtension === 'gif')
-          return undefined;
-        return ['track-album', thing.album.directory];
+        return [
+          'media.albumCover',
+          thing.album.directory,
+          thing.album.coverArtFileExtension,
+        ];
       } else {
-        return undefined;
+        return null;
       }
     }
 
     default:
-      return undefined;
+      return null;
   }
+}
+
+function prepareArtwork(thing, {
+  checkIfImagePathHasCachedThumbnails,
+  getThumbnailEqualOrSmaller,
+  urls,
+}) {
+  const artworkPath =
+    getArtworkPath(thing);
+
+  if (!artworkPath) {
+    return undefined;
+  }
+
+  const mediaSrc =
+    urls
+      .from('media.root')
+      .to(...artworkPath);
+
+  if (!checkIfImagePathHasCachedThumbnails(mediaSrc)) {
+    return undefined;
+  }
+
+  const selectedSize =
+    getThumbnailEqualOrSmaller('small', mediaSrc);
+
+  const mediaSrcJpeg =
+    mediaSrc.replace(/\.(png|jpg)$/, `.${selectedSize}.jpg`);
+
+  const displaySrc =
+    urls
+      .from('thumb.root')
+      .to('thumb.path', mediaSrcJpeg);
+
+  const serializeSrc =
+    displaySrc.replace(thing.directory, '<>');
+
+  return serializeSrc;
 }
 
 export const searchSpec = {
@@ -46,7 +93,7 @@ export const searchSpec = {
         .filter(track => !track.originalReleaseTrack),
     ].flat(),
 
-    process: (thing) => ({
+    process: (thing, opts) => ({
       primaryName:
         thing.name,
 
@@ -80,7 +127,7 @@ export const searchSpec = {
           : []),
 
       artwork:
-        prepareArtwork(thing),
+        prepareArtwork(thing, opts),
     }),
 
     index: [
@@ -117,7 +164,7 @@ export const searchSpec = {
   tracks: {
     query: ({trackData}) => trackData,
 
-    process: (track) => ({
+    process: (track, opts) => ({
       name:
         track.name,
 
@@ -140,7 +187,7 @@ export const searchSpec = {
           .map(entry => entry.name),
 
       artwork:
-        prepareArtwork(track),
+        prepareArtwork(track, opts),
     }),
 
     index: [

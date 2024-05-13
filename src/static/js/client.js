@@ -3862,36 +3862,12 @@ function generateSidebarSearchResult(result) {
 
 function getSearchResultImageSource(result) {
   const {artwork} = result.data;
-
   if (!artwork) return null;
 
-  const [kind, ...opts] = artwork;
-
-  switch (kind) {
-    case 'flash':
-      return rebase(
-        ('flash-art'
-       + `/${result.directory}.small.jpg`),
-        'rebaseThumb');
-
-    case 'track':
-      return rebase(
-        (`album-art`
-       + `/${opts[0]}`
-       + `/${result.directory}`
-       + `.small.jpg`),
-        'rebaseThumb');
-
-    case 'track-album':
-      return rebase(
-         (`album-art`
-        + `/${opts[0]}`
-        + `/cover.small.jpg`),
-        'rebaseThumb');
-
-    default:
-      return null;
-  }
+  return (
+    rebase(
+      artwork.replace('<>', result.directory),
+      'rebaseThumb'));
 }
 
 function generateSidebarSearchResultTemplate(slots) {
