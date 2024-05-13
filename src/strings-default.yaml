@@ -630,6 +630,7 @@ misc:
     endSearch: "(OK, I'm done searching now.)"
 
     resultKind:
+      album: "(album)"
       artist: "(artist)"
       group: "(group)"
 

@@ -3590,6 +3590,7 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   currentResultString: null,
   endSearchString: null,
 
+  albumResultKindString: null,
   artistResultKindString: null,
   groupResultKindString: null,
 
@@ -3631,6 +3632,9 @@ function getSidebarSearchReferences() {
 
   info.endSearchString =
     findString('end-search');
+
+  info.albumResultKindString =
+    findString('album-result-kind');
 
   info.artistResultKindString =
     findString('artist-result-kind');
@@ -3844,6 +3848,16 @@ function generateSidebarSearchResult(result) {
   };
 
   switch (result.referenceType) {
+    case 'album': {
+      preparedSlots.href =
+        openAlbum(result.directory);
+
+      preparedSlots.kindString =
+        info.albumResultKindString;
+
+      break;
+    }
+
     case 'artist': {
       preparedSlots.href =
         openArtist(result.directory);

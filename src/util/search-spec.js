@@ -2,6 +2,14 @@
 
 function getArtworkPath(thing) {
   switch (thing.constructor[Symbol.for('Thing.referenceType')]) {
+    case 'album': {
+      return [
+        'media.albumCover',
+        thing.directory,
+        thing.coverArtFileExtension,
+      ];
+    }
+
     case 'flash': {
       return [
         'media.flashArt',
