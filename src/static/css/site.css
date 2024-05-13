@@ -605,7 +605,7 @@ summary .group-name {
 }
 
 .wiki-search-result-image.has-warning {
-  filter: blur(1px) brightness(0.8);
+  filter: blur(2px) brightness(0.8);
 }
 
 .wiki-search-end-search-line {
