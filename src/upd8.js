@@ -1483,6 +1483,8 @@ async function main() {
     });
   }
 
+  const urls = generateURLs(urlSpec);
+
   if (stepStatusSummary.buildSearchIndex.status === STATUS_NOT_STARTED) {
     Object.assign(stepStatusSummary.buildSearchIndex, {
       status: STATUS_STARTED_NOT_DONE,
@@ -2006,8 +2008,6 @@ async function main() {
     annotation: finalDefaultLanguageAnnotation,
     timeEnd: Date.now(),
   });
-
-  const urls = generateURLs(urlSpec);
 
   let missingImagePaths;
 
