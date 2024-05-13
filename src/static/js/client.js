@@ -3589,6 +3589,8 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   currentResultString: null,
   endSearchString: null,
 
+  artistResultKindString: null,
+
   state: {
     stoppedTypingTimeout: null,
   },
@@ -3627,6 +3629,9 @@ function getSidebarSearchReferences() {
 
   info.endSearchString =
     findString('end-search');
+
+  info.artistResultKindString =
+    findString('artist-result-kind');
 }
 
 function mutateSidebarSearchContent() {
@@ -3820,6 +3825,8 @@ function showSidebarSearchResults(results) {
 }
 
 function generateSidebarSearchResult(result) {
+  const info = sidebarSearchInfo;
+
   const preparedSlots = {
     color:
       result.data.color ?? null,
@@ -3835,6 +3842,9 @@ function generateSidebarSearchResult(result) {
     case 'artist': {
       preparedSlots.href =
         openArtist(result.directory);
+
+      preparedSlots.kindString =
+        info.artistResultKindString;
 
       break;
     }
@@ -3920,16 +3930,27 @@ function generateSidebarSearchResultTemplate(slots) {
     text.appendChild(span);
   }
 
+  let accentSpan = null;
+
   if (link.href) {
     const here = location.href.replace(/\/$/, '');
     const there = link.href.replace(/\/$/, '');
     if (here === there) {
-      const span = document.createElement('span');
-      span.classList.add('wiki-search-current-result-text');
-      span.appendChild(templateContent(info.currentResultString));
-      text.appendChild(document.createTextNode(' '));
-      text.appendChild(span);
+      accentSpan = document.createElement('span');
+      accentSpan.classList.add('wiki-search-current-result-text');
+      accentSpan.appendChild(templateContent(info.currentResultString));
     }
+  }
+
+  if (!accentSpan && slots.kindString) {
+    accentSpan = document.createElement('span');
+    accentSpan.classList.add('wiki-search-result-kind');
+    accentSpan.appendChild(templateContent(slots.kindString));
+  }
+
+  if (accentSpan) {
+    text.appendChild(document.createTextNode(' '));
+    text.appendChild(accentSpan);
   }
 
   link.appendChild(text);

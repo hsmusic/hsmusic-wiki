@@ -28,6 +28,9 @@ export default {
 
         html.tag('template', {class: 'wiki-search-end-search-string'},
           language.$('misc.search.endSearch')),
+
+        html.tag('template', {class: 'wiki-search-artist-result-kind-string'},
+          language.$('misc.search.resultKind.artist')),
       ],
     }),
 };

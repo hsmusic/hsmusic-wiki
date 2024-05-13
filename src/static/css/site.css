@@ -575,7 +575,8 @@ summary .group-name {
   text-decoration: underline;
 }
 
-.wiki-search-current-result-text {
+.wiki-search-current-result-text,
+.wiki-search-result-kind {
   font-style: oblique;
   opacity: 0.9;
   display: inline-block;
