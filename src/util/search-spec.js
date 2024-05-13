@@ -56,7 +56,7 @@ function prepareArtwork(thing, {
   }
 
   const selectedSize =
-    getThumbnailEqualOrSmaller('small', mediaSrc);
+    getThumbnailEqualOrSmaller('adorb', mediaSrc);
 
   const mediaSrcJpeg =
     mediaSrc.replace(/\.(png|jpg)$/, `.${selectedSize}.jpg`);

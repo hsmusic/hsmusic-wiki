@@ -91,7 +91,8 @@ const WARNING_DELAY_TIME = 10000;
 //   this particular thumbtack will be regenerated, but any others (whose
 //   `tackbust` listed below is equal or below the cache-recorded bust) will be
 //   reused. (Zero is a special value that means this tack's spec is still the
-//   same as it would've been generated prior to thumbtack versioning.)
+//   same as it would've been generated prior to thumbtack versioning; any new
+//   kinds of thumbnails should start counting up from one.)
 //
 // * `size` is the maximum length of the image. It will be scaled down,
 //   keeping aspect ratio, to fit in this dimension.
@@ -130,6 +131,12 @@ const thumbnailSpec = {
     tackbust: 0,
     size: 250,
     quality: 85,
+  },
+
+  'adorb': {
+    tackbust: 1,
+    size: 64,
+    quality: 90,
   },
 
   'mini': {
