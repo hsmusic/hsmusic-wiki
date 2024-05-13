@@ -3891,16 +3891,24 @@ function generateSidebarSearchResultTemplate(slots) {
     }
   }
 
+  const imgContainer = document.createElement('span');
+  imgContainer.classList.add('wiki-search-result-image-container');
+
   if (slots.imageSource) {
     const img = document.createElement('img');
     img.classList.add('wiki-search-result-image');
     img.setAttribute('src', slots.imageSource);
-    link.appendChild(img);
+    imgContainer.appendChild(img);
+    if (slots.imageSource.endsWith('.mini.jpg')) {
+      img.classList.add('has-warning');
+    }
   } else {
     const placeholder = document.createElement('span');
     placeholder.classList.add('wiki-search-result-image-placeholder');
-    link.appendChild(placeholder);
+    imgContainer.appendChild(placeholder);
   }
+
+  link.appendChild(imgContainer);
 
   const text = document.createElement('span');
   text.classList.add('wiki-search-result-text-area');

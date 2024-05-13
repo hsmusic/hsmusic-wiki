@@ -39,6 +39,9 @@ function prepareArtwork(thing, {
   getThumbnailEqualOrSmaller,
   urls,
 }) {
+  const hasWarnings =
+    thing.artTags?.some(artTag => artTag.isContentWarning);
+
   const artworkPath =
     getArtworkPath(thing);
 
@@ -56,7 +59,9 @@ function prepareArtwork(thing, {
   }
 
   const selectedSize =
-    getThumbnailEqualOrSmaller('adorb', mediaSrc);
+    getThumbnailEqualOrSmaller(
+      (hasWarnings ? 'mini' : 'adorb'),
+      mediaSrc);
 
   const mediaSrcJpeg =
     mediaSrc.replace(/\.(png|jpg)$/, `.${selectedSize}.jpg`);

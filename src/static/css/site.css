@@ -581,13 +581,17 @@ summary .group-name {
   display: inline-block;
 }
 
-.wiki-search-result-image,
-.wiki-search-result-image-placeholder {
+.wiki-search-result-image-container {
   align-self: flex-start;
-  width: 1.8em;
-  height: 1.8em;
   margin-right: 6px;
   border-radius: 2px;
+  overflow: hidden;
+}
+
+.wiki-search-result-image,
+.wiki-search-result-image-placeholder {
+  width: 1.8em;
+  height: 1.8em;
   aspect-ratio: 1 / 1;
 }
 
@@ -597,6 +601,10 @@ summary .group-name {
 
 .wiki-search-results:not(:has(.wiki-search-result-image)) .wiki-search-result-image-placeholder {
   display: none;
+}
+
+.wiki-search-result-image.has-warning {
+  filter: blur(1px) brightness(0.8);
 }
 
 .wiki-search-end-search-line {
