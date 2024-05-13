@@ -512,7 +512,8 @@ export class Tag {
     this.#setAttributeFlag(chunkwrap, value);
 
     try {
-      this.content = content;
+      /* eslint-disable-next-line no-self-assign */
+      this.content = this.content;
     } catch (error) {
       this.#setAttributeFlag(chunkwrap, false);
       throw error;

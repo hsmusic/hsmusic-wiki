@@ -1771,7 +1771,6 @@ function getTooltipFromHoverablePlacementOpportunityAreas(hoverable) {
   };
 
   const neededVerticalOverlap = 30;
-  const neededHorizontalOverlap = 30;
 
   // Please don't ask us to make this but horizontal?
   const prepareVerticalOrientationRects = (regionRects) => {
@@ -3225,9 +3224,6 @@ function handleArtistExternalLinkTooltipMouseMoved(domEvent) {
       state.mouseMovementPositions.splice(0, firstRecentMovementIndex - 1);
     }
   }
-
-  const currentMovementDistance =
-    Math.sqrt(domEvent.movementX ** 2 + domEvent.movementY ** 2);
 
   state.mouseMovementTimestamps.push(Date.now());
   state.mouseMovementPositions.push([domEvent.screenX, domEvent.screenY]);

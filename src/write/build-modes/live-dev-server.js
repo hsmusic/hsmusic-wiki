@@ -96,7 +96,6 @@ export async function go({
   defaultLanguage,
   languages,
   missingImagePaths,
-  srcRootPath,
   thumbsCache,
   urls,
   webRoutes,

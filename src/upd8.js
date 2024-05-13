@@ -2105,7 +2105,6 @@ async function main() {
       mediaPath,
       mediaCachePath,
       queueSize,
-      srcRootPath: __dirname,
 
       defaultLanguage: finalDefaultLanguage,
       languages,

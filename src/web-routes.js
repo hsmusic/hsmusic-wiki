@@ -1,12 +1,12 @@
-import {readdir} from 'node:fs/promises';
 import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const codeSrcPath = __dirname;
-const codeRootPath = path.resolve(codeSrcPath, '..');
+const codeRootPath = path.resolve(codeSrcPath, '..');  /* eslint-disable-line no-unused-vars */
 
+/* eslint-disable-next-line no-unused-vars */
 function getNodeDependencyRootPath(dependencyName) {
   const packageJSON =
     import.meta.resolve(dependencyName + '/package.json');
@@ -36,7 +36,7 @@ export const allStaticWebRoutes = [
 export async function identifyDynamicWebRoutes({
   mediaPath,
   mediaCachePath,
-  wikiCachePath,
+  wikiCachePath,  /* eslint-disable-line no-unused-vars */
 }) {
   const routeFunctions = [
     () => Promise.resolve([

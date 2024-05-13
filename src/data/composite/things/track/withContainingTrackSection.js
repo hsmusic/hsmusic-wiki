@@ -1,7 +1,6 @@
 // Gets the track section containing this track from its album's track list.
 
 import {input, templateCompositeFrom} from '#composite';
-import {is} from '#validators';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 
@@ -30,7 +29,6 @@ export default templateCompositeFrom({
 
       compute: (continuation, {
         [input.myself()]: track,
-        [input('notFoundMode')]: notFoundMode,
         ['#album.trackSections']: trackSections,
       }) => continuation({
         ['#trackSection']:
