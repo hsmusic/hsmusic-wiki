@@ -60,7 +60,17 @@ export const dependencyRoutes = [
   }),
 
   quickNodeDependency({
+    name: 'compress-json',
+    path: '..', // exit dist, access bundle.js
+  }),
+
+  quickNodeDependency({
     name: 'flexsearch',
+  }),
+
+  quickNodeDependency({
+    name: 'msgpackr',
+    path: 'dist',
   }),
 ].flat();
 

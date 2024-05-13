@@ -4,7 +4,9 @@ import {createHash} from 'node:crypto';
 import {mkdir, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
+import {compress} from 'compress-json';
 import FlexSearch from 'flexsearch';
+import {pack} from 'msgpackr';
 
 import {logWarn} from '#cli';
 import {makeSearchIndex, populateSearchIndex, searchSpec} from '#search-spec';
@@ -12,7 +14,7 @@ import {stitchArrays} from '#sugar';
 import {checkIfImagePathHasCachedThumbnails, getThumbnailEqualOrSmaller}
   from '#thumbs';
 
-async function exportIndexToJSON(index) {
+async function serializeIndex(index) {
   const results = {};
 
   await index.export((key, data) => {
@@ -29,7 +31,7 @@ async function exportIndexToJSON(index) {
     results[key] = JSON.parse(data);
   });
 
-  return JSON.stringify(results);
+  return results;
 }
 
 export async function writeSearchData({
@@ -70,8 +72,13 @@ export async function writeSearchData({
         wikiData,
       }));
 
-  const jsonIndexes =
-    await Promise.all(indexes.map(exportIndexToJSON));
+  const serializedIndexes =
+    await Promise.all(indexes.map(serializeIndex));
+
+  const packedIndexes =
+    serializedIndexes
+      .map(data => compress(data))
+      .map(data => pack(data));
 
   const outputDirectory =
     path.join(wikiCachePath, 'search');
@@ -84,10 +91,10 @@ export async function writeSearchData({
       Object.fromEntries(
         stitchArrays({
           key: keys,
-          json: jsonIndexes,
-        }).map(({key, json}) => {
+          buffer: packedIndexes,
+        }).map(({key, buffer}) => {
           const md5 = createHash('md5');
-          md5.write(json);
+          md5.write(buffer);
 
           const value = {
             md5: md5.digest('hex'),
@@ -102,11 +109,11 @@ export async function writeSearchData({
   await Promise.all(
     stitchArrays({
       key: keys,
-      json: jsonIndexes,
-    }).map(({key, json}) =>
+      buffer: packedIndexes,
+    }).map(({key, buffer}) =>
         writeFile(
-          path.join(outputDirectory, key + '.json'),
-          json)));
+          path.join(outputDirectory, key + '.json.msgpack'),
+          buffer)));
 
   await writeFile(mainIndexFile, mainIndexJSON);
 }

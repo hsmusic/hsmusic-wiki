@@ -1,8 +1,14 @@
+import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
+
 import {makeSearchIndex, searchSpec} from '../shared-util/search-spec.js';
 import {empty, groupArray, stitchArrays, unique, withEntries}
   from '../shared-util/sugar.js';
 
-import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
+import {loadDependency} from './module-import-shims.js';
+
+// Will be loaded from dependencies.
+let decompress;
+let unpack;
 
 let status = null;
 let indexes = null;
@@ -10,14 +16,27 @@ let indexes = null;
 onmessage = handleWindowMessage;
 postStatus('alive');
 
-main().then(
-  () => {
-    postStatus('ready');
-  },
-  error => {
-    console.error(`Search worker setup error:`, error);
-    postStatus('setup-error');
-  });
+loadDependencies()
+  .then(main)
+  .then(
+    () => {
+      postStatus('ready');
+    },
+    error => {
+      console.error(`Search worker setup error:`, error);
+      postStatus('setup-error');
+    });
+
+async function loadDependencies() {
+  const {compressJSON} =
+    await loadDependency.fromWindow('../lib/compress-json/bundle.min.js');
+
+  const msgpackr =
+    await loadDependency.fromModuleExports('../lib/msgpackr/index.js');
+
+  ({decompress} = compressJSON);
+  ({unpack} = msgpackr);
+}
 
 function rebase(path) {
   return `/search-data/` + path;
@@ -38,8 +57,11 @@ async function main() {
   await Promise.all(
     Object.entries(indexData)
       .map(([key, _info]) =>
-        fetch(rebase(key + '.json'))
-          .then(res => res.json())
+        fetch(rebase(key + '.json.msgpack'))
+          .then(res => res.arrayBuffer())
+          .then(buffer => new Uint8Array(buffer))
+          .then(data => unpack(data))
+          .then(data => decompress(data))
           .then(data => {
             importIndex(key, data);
           })));
