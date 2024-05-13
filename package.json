@@ -2,6 +2,14 @@
     "name": "hsmusic-wiki",
     "version": "0.1.0",
     "description": "static wiki software cataloguing collaborative creation",
+    "browserslist": {
+        "build": "node 20",
+        "client": [
+            "Chrome 124",
+            "Firefox 115",
+            "iOS 16"
+        ]
+    },
     "type": "module",
     "main": "src/upd8.js",
     "bin": {
@@ -9,7 +17,9 @@
     },
     "scripts": {
         "test": "tap",
-        "dev": "eslint src && node src/upd8.js"
+        "lint": "npm run lint-build && npm run lint-client",
+        "lint-build": "NODE_ENV=build eslint src --ignore-pattern src/util --ignore-pattern src/static",
+        "lint-client": "NODE_ENV=client eslint src/util src/static"
     },
     "imports": {
         "#aggregate": "./src/util/aggregate.js",
@@ -58,6 +68,7 @@
         "chroma-js": "^2.4.2",
         "command-exists": "^1.2.9",
         "eslint": "^8.37.0",
+        "eslint-plugin-compat": "^4.2.0",
         "he": "^1.2.0",
         "image-size": "^1.0.2",
         "js-yaml": "^4.1.0",
