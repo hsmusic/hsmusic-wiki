@@ -31,6 +31,9 @@ export default {
 
         html.tag('template', {class: 'wiki-search-artist-result-kind-string'},
           language.$('misc.search.resultKind.artist')),
+
+        html.tag('template', {class: 'wiki-search-group-result-kind-string'},
+          language.$('misc.search.resultKind.group')),
       ],
     }),
 };

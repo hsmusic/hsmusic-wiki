@@ -197,6 +197,7 @@ const getLinkHref = (type, directory) => rebase(`${type}/${directory}`);
 const openAlbum = d => rebase(`album/${d}`);
 const openArtist = d => rebase(`artist/${d}`);
 const openFlash = d => rebase(`flash/${d}`);
+const openGroup = d => rebase(`group/${d}`);
 const openTrack = d => rebase(`track/${d}`);
 
 // TODO: This should also use urlSpec.
@@ -3590,6 +3591,7 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   endSearchString: null,
 
   artistResultKindString: null,
+  groupResultKindString: null,
 
   state: {
     stoppedTypingTimeout: null,
@@ -3632,6 +3634,9 @@ function getSidebarSearchReferences() {
 
   info.artistResultKindString =
     findString('artist-result-kind');
+
+  info.groupResultKindString =
+    findString('group-result-kind');
 }
 
 function mutateSidebarSearchContent() {
@@ -3845,6 +3850,16 @@ function generateSidebarSearchResult(result) {
 
       preparedSlots.kindString =
         info.artistResultKindString;
+
+      break;
+    }
+
+    case 'group': {
+      preparedSlots.href =
+        openGroup(result.directory);
+
+      preparedSlots.kindString =
+        info.groupResultKindString;
 
       break;
     }

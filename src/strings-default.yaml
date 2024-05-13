@@ -631,6 +631,7 @@ misc:
 
     resultKind:
       artist: "(artist)"
+      group: "(group)"
 
   # skippers:
   #

@@ -83,6 +83,7 @@ export const searchSpec = {
       albumData,
       artistData,
       flashData,
+      groupData,
       trackData,
     }) => [
       albumData,
@@ -91,6 +92,8 @@ export const searchSpec = {
         .filter(artist => !artist.isAlias),
 
       flashData,
+
+      groupData,
 
       trackData
         // Exclude rereleases - there's no reasonable way to differentiate
