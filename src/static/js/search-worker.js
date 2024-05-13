@@ -13,7 +13,7 @@ let unpack;
 let status = null;
 let indexes = null;
 
-onmessage = handleWindowMessage;
+globalThis.onmessage = handleWindowMessage;
 postStatus('alive');
 
 loadDependencies()
@@ -116,14 +116,14 @@ async function handleWindowActionMessage(message) {
 
 function postStatus(newStatus) {
   status = newStatus;
-  postMessage({
+  globalThis.postMessage({
     kind: 'status',
     status: newStatus,
   });
 }
 
 function postActionResult(id, status, value) {
-  postMessage({
+  globalThis.postMessage({
     kind: 'result',
     id,
     status,
@@ -274,7 +274,7 @@ function permutations(array) {
   }
 }
 
-function queryBoilerplate(index, query, options) {
+function queryBoilerplate(index) {
   const idToDoc = {};
 
   return {
