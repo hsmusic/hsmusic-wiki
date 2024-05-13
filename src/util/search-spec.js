@@ -2,6 +2,10 @@
 
 function prepareArtwork(thing) {
   switch (thing.constructor[Symbol.for('Thing.referenceType')]) {
+    case 'flash': {
+      return ['flash', thing.coverArtFileExtension];
+    }
+
     case 'track': {
       if (thing.hasUniqueCoverArt) {
         if (thing.coverArtFileExtension === 'gif')

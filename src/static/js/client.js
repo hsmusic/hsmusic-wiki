@@ -194,9 +194,10 @@ function getVisuallyContainingElement(child) {
 const getLinkHref = (type, directory) => rebase(`${type}/${directory}`);
 */
 
-const openAlbum = (d) => rebase(`album/${d}`);
-const openTrack = (d) => rebase(`track/${d}`);
-const openArtist = (d) => rebase(`artist/${d}`);
+const openAlbum = d => rebase(`album/${d}`);
+const openArtist = d => rebase(`artist/${d}`);
+const openFlash = d => rebase(`flash/${d}`);
+const openTrack = d => rebase(`track/${d}`);
 
 // TODO: This should also use urlSpec.
 
@@ -3831,16 +3832,23 @@ function generateSidebarSearchResult(result) {
   };
 
   switch (result.referenceType) {
-    case 'track': {
+    case 'artist': {
       preparedSlots.href =
-        openTrack(result.directory);
+        openArtist(result.directory);
 
       break;
     }
 
-    case 'artist': {
+    case 'flash': {
       preparedSlots.href =
-        openArtist(result.directory);
+        openFlash(result.directory);
+
+      break;
+    }
+
+    case 'track': {
+      preparedSlots.href =
+        openTrack(result.directory);
 
       break;
     }
@@ -3860,6 +3868,12 @@ function getSearchResultImageSource(result) {
   const [kind, ...opts] = artwork;
 
   switch (kind) {
+    case 'flash':
+      return rebase(
+        ('flash-art'
+       + `/${result.directory}.small.jpg`),
+        'rebaseThumb');
+
     case 'track':
       return rebase(
         (`album-art`
