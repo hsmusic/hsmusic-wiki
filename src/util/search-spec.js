@@ -133,19 +133,33 @@ export const searchSpec = {
         'wallpaperArtistContribs',
       ];
 
-      fields.contributors =
+      const contributions =
         contribKeys
           .filter(key => Object.hasOwn(thing, key))
-          .flatMap(key => thing[key])
-          .map(contrib => contrib.artist)
-          .flatMap(artist => [artist.name, ...artist.aliasNames]);
+          .flatMap(key => thing[key]);
+
+      fields.contributors =
+        contributions
+          .flatMap(({artist}) => [
+            artist.name,
+            ...artist.aliasNames,
+          ]);
+
+      const groups =
+         (Object.hasOwn(thing, 'groups')
+           ? thing.groups
+        : Object.hasOwn(thing, 'album')
+           ? thing.album.groups
+           : []);
+
+      const mainContributorNames =
+        contributions
+          .map(({artist}) => artist.name);
 
       fields.groups =
-        (Object.hasOwn(thing, 'groups')
-          ? thing.groups.map(group => group.name)
-       : Object.hasOwn(thing, 'album')
-          ? thing.album.groups.map(group => group.name)
-          : []);
+        groups
+          .filter(group => !mainContributorNames.includes(group.name))
+          .map(group => group.name);
 
       fields.artwork =
         prepareArtwork(thing, opts);
