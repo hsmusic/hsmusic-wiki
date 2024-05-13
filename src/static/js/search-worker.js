@@ -6,7 +6,6 @@ import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
 
 let status = null;
 let indexes = null;
-let searchData = null;
 
 onmessage = handleWindowMessage;
 postStatus('alive');
@@ -20,6 +19,10 @@ main().then(
     postStatus('setup-error');
   });
 
+function rebase(path) {
+  return `/search-data/` + path;
+}
+
 async function main() {
   indexes =
     withEntries(searchSpec, entries => entries
@@ -28,16 +31,25 @@ async function main() {
         makeSearchIndex(descriptor, {FlexSearch}),
       ]));
 
-  searchData =
-    await fetch('/search-data/index.json')
+  const indexData =
+    await fetch(rebase('index.json'))
       .then(resp => resp.json());
 
+  await Promise.all(
+    Object.entries(indexData)
+      .map(([key, _info]) =>
+        fetch(rebase(key + '.json'))
+          .then(res => res.json())
+          .then(data => {
+            importIndex(key, data);
+          })));
+}
+
+function importIndex(indexKey, indexData) {
   // If this fails, it's because an outdated index was cached.
   // TODO: If this fails, try again once with a cache busting url.
-  for (const [indexName, indexData] of Object.entries(searchData)) {
-    for (const [key, value] of Object.entries(indexData)) {
-      indexes[indexName].import(key, value);
-    }
+  for (const [key, value] of Object.entries(indexData)) {
+    indexes[indexKey].import(key, JSON.stringify(value));
   }
 }
 

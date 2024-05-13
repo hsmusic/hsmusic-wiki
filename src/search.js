@@ -1,11 +1,12 @@
 'use strict';
 
+import {createHash} from 'node:crypto';
 import {mkdir, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
 import FlexSearch from 'flexsearch';
 
-import {logError, logInfo, logWarn} from '#cli';
+import {logWarn} from '#cli';
 import {makeSearchIndex, populateSearchIndex, searchSpec} from '#search-spec';
 import {stitchArrays} from '#sugar';
 import {checkIfImagePathHasCachedThumbnails, getThumbnailEqualOrSmaller}
@@ -15,10 +16,20 @@ async function exportIndexToJSON(index) {
   const results = {};
 
   await index.export((key, data) => {
-    results[key] = data;
-  })
+    if (data === undefined) {
+      return;
+    }
 
-  return results;
+    if (typeof data !== 'string') {
+      logWarn`Got something besides a string from index.export(), skipping:`;
+      console.warn(key, data);
+      return;
+    }
+
+    results[key] = JSON.parse(data);
+  });
+
+  return JSON.stringify(results);
 }
 
 export async function writeSearchData({
@@ -62,21 +73,40 @@ export async function writeSearchData({
   const jsonIndexes =
     await Promise.all(indexes.map(exportIndexToJSON));
 
-  const searchData =
-    Object.fromEntries(
-      stitchArrays({
-        key: keys,
-        value: jsonIndexes,
-      }).map(({key, value}) => [key, value]));
-
   const outputDirectory =
     path.join(wikiCachePath, 'search');
 
-  const outputFile =
+  const mainIndexFile =
     path.join(outputDirectory, 'index.json');
 
-  await mkdir(outputDirectory, {recursive: true});
-  await writeFile(outputFile, JSON.stringify(searchData));
+  const mainIndexJSON =
+    JSON.stringify(
+      Object.fromEntries(
+        stitchArrays({
+          key: keys,
+          json: jsonIndexes,
+        }).map(({key, json}) => {
+          const md5 = createHash('md5');
+          md5.write(json);
 
-  logInfo`Search index successfully written.`;
+          const value = {
+            md5: md5.digest('hex'),
+          };
+
+          return [key, value];
+        })));
+
+
+  await mkdir(outputDirectory, {recursive: true});
+
+  await Promise.all(
+    stitchArrays({
+      key: keys,
+      json: jsonIndexes,
+    }).map(({key, json}) =>
+        writeFile(
+          path.join(outputDirectory, key + '.json'),
+          json)));
+
+  await writeFile(mainIndexFile, mainIndexJSON);
 }

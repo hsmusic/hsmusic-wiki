@@ -1498,6 +1498,8 @@ async function main() {
       wikiData,
     });
 
+    logInfo`Search data successfully written.`;
+
     Object.assign(stepStatusSummary.buildSearchIndex, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
