@@ -1,0 +1,241 @@
+
+-------------------------------------------
+  Design Philosophy & Software Principles
+-------------------------------------------
+
+
+No transpiler, "just" JavaScript
+================================
+
+We do not use Babel, TypeScript, etc. Code is run through plain
+old `node` or browser evaluation; there's no go-between that
+enables access to future-supported syntactical features and
+we don't depend on loading behavior outside what the runtime
+environment supports.
+
+This isn't so much an "opinionated" decision as one that's
+practical - JavaScript is our language of choice, and we don't
+want to bother with added complexity within the very fabric of
+the code we write.
+
+
+No all-in-one frameworks
+========================
+
+We have no personal interest at all in using all-encompassing
+frameworks that handle "everything to do with state", or to do
+with templating, or to do with localization, or etc. Generally,
+we do enjoy working third-party *libraries* into hsmusic code,
+and we're happy to learn and work with a library's quirks and
+idiosyncracies. But the scope matters: the narrower the focus
+of a library, the more finely tuned its language and interfaces
+will be, and in our experience, by far the less likely it'll
+have been authored with superficial *universal* opinions on how
+code ought to be written or structured. This just makes for
+nicer interactions between our code and third party libraries,
+and is probably the greatest reason we avoid all-in-one or
+monolithic third-party frameworks.
+
+
+No all-in-one systems
+=====================
+
+For much the same reasoning as above, we try to take special
+care when writing or adapting systems that are going to touch
+many areas of the code at once. Mainly we see a duality in
+composition-capability versus specialized effectiveness;
+the wider a system spans the more it benefits from being
+composable (= meaning-adaptable and developer-friendly) and
+certainly the more it loses from *not* being composable, but
+the more composable a system is, generally, the more burdensome
+it can be to dial in on a particular behavior or language that
+suits a specialized task.
+
+The systems with the widest reach (#sugar, #aggregate) are
+written the most agnostically to how they get contextualized.
+The systems which suit a special, albeit large subset of the
+wiki's overall work (content functions, compositional data
+processing) provide language and interfaces suitable to more
+or less everything within that scope - which can be a lot,
+but often all doing work that's similar in broad strokes.
+The systems which specialize on narrowly-defined tasks get
+the greatest leeway in doing more or less whatever they
+want, but they also tend to have the clearest and most
+carefully defined entry points, because the guts are more
+experimental or unusual and may be rather opaque to other
+areas of the code.
+
+
+------------------------------------
+  JavaScript Technologies (common)
+------------------------------------
+
+
+ECMAScript Modules (ESM)
+========================
+
+We use ESM across all code. There are variations in how ESM
+is applied between build code and the client.
+
+
+ECMAScript Syntactical Features
+===============================
+
+We assume access to support for the following syntax forms
+across any JavaScript code to do with hsmusic:
+
+* (2015) Everything in ES6, as a baseline:
+    * arrow functions
+    * classes
+    * const & let
+    * for..of
+    * generator functions
+    * iterables in general
+    * rest elements (destructure "..." from array)
+    * spread elements ("..." in array literal)
+    * symbols & Symbol.for()
+* (2017) async/await
+    * chrome 55, firefox 52, safari 10.1
+* (2018) asynchronous iteration (for await)
+    * chrome 63, firefox 57, safari 12
+* (2018) rest properties (destructure "..." from object)
+    * chrome 49, firefox 52, safari 10
+* (2018) spread properties ("..." in object literal)
+    * chrome 47, firefox 15, safari 10
+* (2020) import() expression form
+    * chrome 63, firefox 67, safari 11.1
+* (2022) public & private class fields
+    * chrome 74, firefox 90, safari 14.1
+* (2022) private class methods
+    * chrome 84, firefox 90, safari 15
+
+
+ECMAScript General Features
+===========================
+
+We assume access to support for the following general features
+across any JavaScript code to do with hsmusic:
+
+* (2009) Various popular to less-popular ES5 features
+    * Object.defineProperty()
+    * all your favorite Array methods
+* (2017) Object.entries()
+    * chrome 54, firefox 47, safari 10.1
+* (2018) RegExp named capturing groups
+    * chrome 64, firefox 78, safari 11.1
+* (2019) Array.prototype.{flat,flatMap}
+    * chrome 69, firefox 62, safari 12
+* (2019) Object.fromEntries()
+    * chrome 73, firefox 63, safari 12.1
+* (2019) String.prototype{trimStart,trimEnd}
+    * chrome 68, firefox 61, safari 12
+* (2021) AggregateError
+    * chrome 85, firefox 79, safari 14
+* (2020) globalThis
+    * chrome 71, firefox 65, safari 12.1
+* (2022) error cause
+    * chrome 93, firefox 91, safari 15
+* (2022) Object.hasOwn()
+    * chrome 93, firefox 92, safari 15.4
+
+
+----------------------------------------
+  JavaScript Technologies (build code)
+----------------------------------------
+
+"Build code" refers to all JavaScript code run on the command
+line (e.g. to build or serve the website).
+
+
+ECMAScript Modules (ESM)
+========================
+
+We use ESM in build code. Although we don't use import maps,
+we more or less approximate its benefits by using the Node.js-
+specific package.json "imports" field. This lets us import
+commonly used packages from anywhere and makes moving files
+and functions around much less headache-inducing.
+
+
+Promises
+========
+
+Where possible, we prefer promises to Node.js-style callback
+interfaces. We generally wrap those in promises if we have to
+use them. We broadly structure our code to be "asynchronous",
+but in practice we always follow the same overall steps, in
+the same serial order, for each build/run. We make extensive
+use of async/await throughout any code that uses asynchronous
+interfaces.
+
+
+-----------------------------------------
+  JavaScript Technologies (client code)
+-----------------------------------------
+
+"Client code" refers to all JavaScript run in the browser.
+
+
+ECMAScript Modules (ESM)
+========================
+
+We use ESM in the browser. We don't use import maps yet.
+We generally use relative imports. Although the practical
+structure in a build may not literally be the same files as
+what's present in the `src` code directory, we do reflect
+its layout in the build as far as client-side code concerns
+iteslf, so relative paths work as you'd expect.
+
+The select combination of "no bundler" and "ESM" together
+pose a problem for web workers, which use some stealthy albeit
+straightforward shims to allow importing "bundle"-type library
+dependencies without access to importScripts or globals defined
+by a <script> element.
+
+
+Promises
+========
+
+We use promises where applicable in client-side code, mostly
+when interfacing with browser APIs. Like usual we use async/
+await for basic structuring, though we're more hands-on with
+promises when it might have a real performance benefit. This
+generally matters more to us in client than build code, since
+speed and responsiveness in the wiki's user interface is of
+critical importance. Promises help unfriendly edge cases have
+much less impact when handled effectively!
+
+
+sessionStorage
+==============
+
+We use session storage for temporarily tracking user interface
+state as you're browsing. We've written some infrastructure to
+support this, mainly so each client module can access its own
+session stoarge with simple object syntax, and so that we can
+gracefully fall back to in-memory storage if access is denied.
+
+
+Web Workers
+===========
+
+We use web workers sparingly, to run synchronous work off the
+main browser thread. We don't use any third-party frameworks
+to structure this. Use is generally "dumb" as of writing:
+we aren't handling a pool of workers, complex inter-worker
+communications, etc.
+
+We assume access to web workers; running the code without
+wouldn't be impossible, but no web worker code is structured
+to work without at the moment.
+
+
+indexedDB (IDB)
+===============
+
+We use IDB for larger and binary local storage, mainly to
+cache the search indexes/corpuses (rather than depending on
+browser HTTP caching). IDB isn't something we're very familiar
+with, so the code we've written with it may not behave very
+nicely; we try to account for this by logging and not bubbling
+errors.
