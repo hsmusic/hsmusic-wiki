@@ -5,9 +5,11 @@
     "browserslist": {
         "build": "node 20",
         "client": [
-            "Chrome 124",
-            "Firefox 115",
-            "iOS 16"
+            "> 0.2%",
+            "Firefox ESR",
+            "Safari >= 16.6",
+            "not Safari < 16.6",
+            "not dead"
         ]
     },
     "type": "module",
