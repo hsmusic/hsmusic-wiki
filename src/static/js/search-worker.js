@@ -161,7 +161,7 @@ async function main() {
       ? Object.keys(indexData)
           .filter(key =>
             indexData[key].md5 !==
-            idbIndexData[key].md5)
+            idbIndexData[key]?.md5)
       : Object.keys(indexData));
 
   const keysFromCache =
