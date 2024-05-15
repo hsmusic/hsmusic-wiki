@@ -7,7 +7,6 @@ import getChronologyRelations from '../util/getChronologyRelations.js';
 export default {
   contentDependencies: [
     'generateAbsoluteDatetimestamp',
-    'generateAdditionalFilesShortcut',
     'generateAlbumAdditionalFilesList',
     'generateAlbumNavAccent',
     'generateAlbumSecondaryNav',
@@ -137,15 +136,6 @@ export default {
 
     relations.releaseInfo =
       relation('generateTrackReleaseInfo', track);
-
-    // Section: Extra links
-
-    const extra = sections.extra = {};
-
-    if (!empty(track.additionalFiles)) {
-      extra.additionalFilesShortcut =
-        relation('generateAdditionalFilesShortcut', track.additionalFiles);
-    }
 
     // Section: Other releases
 
@@ -375,7 +365,11 @@ export default {
                 }),
 
               sec.additionalFiles &&
-                sec.extra.additionalFilesShortcut,
+                language.$('releaseInfo.additionalFiles.shortcut', {
+                  link: html.tag('a',
+                    {href: '#midi-project-files'},
+                    language.$('releaseInfo.additionalFiles.shortcut.link')),
+                }),
 
               sec.artistCommentary &&
                 language.$('releaseInfo.readCommentary', {

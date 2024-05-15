@@ -334,8 +334,8 @@ releaseInfo:
       withSize: "{FILE} ({SIZE})"
 
     shortcut:
-      _: "View {ANCHOR_LINK}: {TITLES}"
-      anchorLink: "additional files"
+      _: "View {LINK}."
+      link: "additional files"
 
   sheetMusicFiles:
     heading: "Print or download sheet music files:"

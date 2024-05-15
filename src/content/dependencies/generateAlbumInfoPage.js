@@ -5,7 +5,6 @@ import getChronologyRelations from '../util/getChronologyRelations.js';
 
 export default {
   contentDependencies: [
-    'generateAdditionalFilesShortcut',
     'generateAlbumAdditionalFilesList',
     'generateAlbumBanner',
     'generateAlbumCoverArtwork',
@@ -107,11 +106,6 @@ export default {
         relation('linkAlbumCommentary', album);
     }
 
-    if (!empty(album.additionalFiles)) {
-      extra.additionalFilesShortcut =
-        relation('generateAdditionalFilesShortcut', album.additionalFiles);
-    }
-
     // Section: Track list
 
     relations.trackList =
@@ -180,7 +174,12 @@ export default {
             {[html.joinChildren]: html.tag('br')},
 
             [
-              sec.extra.additionalFilesShortcut,
+              sec.additionalFiles &&
+                language.$('releaseInfo.additionalFiles.shortcut', {
+                  link: html.tag('a',
+                    {href: '#additional-files'},
+                    language.$('releaseInfo.additionalFiles.shortcut.link')),
+                }),
 
               sec.extra.galleryLink && sec.extra.commentaryLink &&
                 language.$('releaseInfo.viewGalleryOrCommentary', {
