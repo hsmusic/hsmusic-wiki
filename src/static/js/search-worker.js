@@ -1,3 +1,5 @@
+/* eslint-env worker */
+
 import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
 
 import {makeSearchIndex, searchSpec} from '../shared-util/search-spec.js';
