@@ -2653,7 +2653,7 @@ function addImageOverlayClickHandlers() {
   }
 }
 
-function handleImageLinkClicked(evt) {
+async function handleImageLinkClicked(evt) {
   if (evt.metaKey || evt.shiftKey || evt.altKey) {
     return;
   }
@@ -2720,26 +2720,46 @@ function handleImageLinkClicked(evt) {
   mainImage.addEventListener('load', handleMainImageLoaded);
   mainImage.addEventListener('error', handleMainImageErrored);
 
-  container.style.setProperty('--download-progress', '0%');
-  loadImage(mainSrc, progress => {
-    container.style.setProperty('--download-progress', (20 + 0.8 * progress) + '%');
-  }).then(
-    blobUrl => {
-      mainImage.src = blobUrl;
-      container.style.setProperty('--download-progress', '100%');
-    },
-    handleMainImageErrored);
+  const showProgress = amount => {
+    cssProp(container, '--download-progress', `${amount * 100}%`);
+  };
+
+  showProgress(0.00);
+
+  const response =
+    await fetchWithProgress(mainSrc, progress => {
+      if (progress === -1) {
+        // TODO: Indeterminate response progress cue
+        showProgress(0.00);
+      } else {
+        showProgress(0.20 + 0.80 * progress);
+      }
+    });
+
+  if (!response.status.toString().startsWith('2')) {
+    handleMainImageErrored();
+    return;
+  }
+
+  const blob = await response.blob();
+  const blobSrc = URL.createObjectURL(blob);
+
+  mainImage.src = blobSrc;
+  showProgress(1.00);
 
   function handleMainImageLoaded() {
-    mainImage.removeEventListener('load', handleMainImageLoaded);
-    mainImage.removeEventListener('error', handleMainImageErrored);
     container.classList.add('loaded');
+    removeEventListeners();
   }
 
   function handleMainImageErrored() {
+    container.classList.add('errored');
+    removeEventListeners();
+  }
+
+  function removeEventListeners() {
     mainImage.removeEventListener('load', handleMainImageLoaded);
     mainImage.removeEventListener('error', handleMainImageErrored);
-    container.classList.add('errored');
   }
 }
 
