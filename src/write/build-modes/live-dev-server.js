@@ -312,12 +312,13 @@ export async function go({
         if (error.code === 'EISDIR') {
           response.writeHead(404, contentTypePlain);
           response.end(`File not found for: ${safePath}`);
+          console.error(`${requestHead} [404] ${pathname} (is directory)`);
         } else {
           response.writeHead(500, contentTypePlain);
           response.end(`Failed during file-to-response pipeline`);
+          console.error(`${requestHead} [500] ${pathname}`);
+          showError(error);
         }
-        console.error(`${requestHead} [500] ${pathname}`);
-        showError(error);
       }
       return;
     }
