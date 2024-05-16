@@ -302,10 +302,10 @@ export async function go({
       try {
         const {size} = await stat(filePath);
         const buffer = await readFile(filePath)
-        response.writeHead(200, contentType ? {
-          'Content-Type': contentType,
+        response.writeHead(200, {
+          ...contentType ? {'Content-Type': contentType} : {},
           'Content-Length': size,
-        } : {});
+        });
         response.end(buffer);
         if (loudResponses) console.log(`${requestHead} [200] ${pathname}`);
       } catch (error) {
