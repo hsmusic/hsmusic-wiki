@@ -1,7 +1,8 @@
 import {spawn} from 'node:child_process';
 import * as http from 'node:http';
-import {readFile, stat} from 'node:fs/promises';
+import {open, stat} from 'node:fs/promises';
 import * as path from 'node:path';
+import {pipeline} from 'node:stream/promises';
 import {inspect as nodeInspect} from 'node:util';
 
 import {ENABLE_COLOR, logInfo, logWarn, progressCallAll} from '#cli';
@@ -299,15 +300,10 @@ export async function go({
         'zip': 'application/zip',
       }[extname];
 
+      let fd, size;
       try {
-        const {size} = await stat(filePath);
-        const buffer = await readFile(filePath)
-        response.writeHead(200, {
-          ...contentType ? {'Content-Type': contentType} : {},
-          'Content-Length': size,
-        });
-        response.end(buffer);
-        if (loudResponses) console.log(`${requestHead} [200] ${pathname}`);
+        ({size} = await stat(filePath));
+        fd = await open(filePath);
       } catch (error) {
         if (error.code === 'EISDIR') {
           response.writeHead(404, contentTypePlain);
@@ -319,7 +315,18 @@ export async function go({
           console.error(`${requestHead} [500] ${pathname}`);
           showError(error);
         }
+        return;
       }
+
+      response.writeHead(200, {
+        ...contentType ? {'Content-Type': contentType} : {},
+        'Content-Length': size,
+      });
+
+      await pipeline(fd.createReadStream(), response);
+
+      if (loudResponses) console.log(`${requestHead} [200] ${pathname}`);
+
       return;
     }
 
