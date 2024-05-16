@@ -5,7 +5,7 @@ import * as path from 'node:path';
 import {pipeline} from 'node:stream/promises';
 import {inspect as nodeInspect} from 'node:util';
 
-import {ENABLE_COLOR, logInfo, logWarn, progressCallAll} from '#cli';
+import {ENABLE_COLOR, colors, logInfo, logWarn, progressCallAll} from '#cli';
 import {watchContentDependencies} from '#content-dependencies';
 import {quickEvaluate} from '#content-function';
 import * as html from '#html';
@@ -214,7 +214,7 @@ export async function go({
 
         response.writeHead(200, contentTypeJSON);
         response.end(json);
-        if (loudResponses) console.log(`${requestHead} [200] ${pathname}`);
+        if (loudResponses) console.log(`${requestHead} [200] ${pathname} (${colors.yellow(`special`)})`);
       } catch (error) {
         response.writeHead(500, contentTypeJSON);
         response.end(`Internal error serializing wiki JSON`);
@@ -325,7 +325,7 @@ export async function go({
 
       await pipeline(fd.createReadStream(), response);
 
-      if (loudResponses) console.log(`${requestHead} [200] ${pathname}`);
+      if (loudResponses) console.log(`${requestHead} [200] ${pathname} (${colors.magenta(`web route`)})`);
 
       return;
     }
@@ -433,9 +433,9 @@ export async function go({
             ? `${(timeDelta / 1000).toFixed(2)}s`
             : `${timeDelta}ms`);
 
-        console.log(`${requestHead} [200, ${timeString}] ${pathname}`);
+        console.log(`${requestHead} [200, ${timeString}] ${pathname} (${colors.blue(`page`)})`);
       } else if (loudResponses) {
-        console.log(`${requestHead} [200] ${pathname}`);
+        console.log(`${requestHead} [200] ${pathname} (${colors.blue(`page`)})`);
       }
 
       response.writeHead(200, contentTypeHTML);
