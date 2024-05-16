@@ -14,6 +14,7 @@ import {
 } from '../shared-util/sugar.js';
 
 import {loadDependency} from './module-import-shims.js';
+import {fetchWithProgress} from './xhr-util.js';
 
 // Will be loaded from dependencies.
 let decompress;
@@ -24,7 +25,7 @@ let idb;
 let status = null;
 let indexes = null;
 
-globalThis.onmessage = handleWindowMessage;
+onmessage = handleWindowMessage;
 postStatus('alive');
 
 Promise.all([
@@ -158,6 +159,8 @@ async function main() {
 
   const [indexData, idbIndexData] = await background;
 
+  delete idbIndexData.generic;
+
   const keysNeedingFetch =
     (idbIndexData
       ? Object.keys(indexData)
@@ -170,10 +173,34 @@ async function main() {
     Object.keys(indexData)
       .filter(key => !keysNeedingFetch.includes(key))
 
+  if (!empty(keysNeedingFetch)) {
+    postMessage({
+      kind: 'download-begun',
+      context: 'search-indexes',
+      keys: keysNeedingFetch,
+    });
+  }
+
   const fetchPromises =
-    keysNeedingFetch
-      .map(key => rebase(key + '.json.msgpack'))
-      .map(url => fetch(url));
+    keysNeedingFetch.map(key =>
+      fetchWithProgress(
+        rebase(key + '.json.msgpack'),
+        progress => {
+          postMessage({
+            kind: 'download-progress',
+            context: 'search-indexes',
+            progress: progress / 1.00,
+            key,
+          });
+        }).then(response => {
+            postMessage({
+              kind: 'download-complete',
+              context: 'search-indexes',
+              key,
+            });
+
+            return response;
+          }));
 
   const fetchBlobPromises =
     fetchPromises
@@ -316,14 +343,14 @@ async function handleWindowActionMessage(message) {
 
 function postStatus(newStatus) {
   status = newStatus;
-  globalThis.postMessage({
+  postMessage({
     kind: 'status',
     status: newStatus,
   });
 }
 
 function postActionResult(id, status, value) {
-  globalThis.postMessage({
+  postMessage({
     kind: 'result',
     id,
     status,

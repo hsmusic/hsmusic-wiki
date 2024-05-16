@@ -3447,6 +3447,17 @@ const wikiSearchInfo = initInfo('wikiSearchInfo', {
 
     workerActionCounter: 0,
     workerActionPromiseResolverMap: new Map(),
+
+    downloads: Object.create(null),
+  },
+
+  event: {
+    whenDownloadBegins: [],
+    whenDownloadsBegin: [],
+
+    whenDownloadProgresses: [],
+
+    whenDownloadEnds: [],
   },
 });
 
@@ -3479,6 +3490,18 @@ function handleSearchWorkerMessage(message) {
 
     case 'result':
       handleSearchWorkerResultMessage(message);
+      break;
+
+    case 'download-begun':
+      handleSearchWorkerDownloadBegunMessage(message);
+      break;
+
+    case 'download-progress':
+      handleSearchWorkerDownloadProgressMessage(message);
+      break;
+
+    case 'download-complete':
+      handleSearchWorkerDownloadCompleteMessage(message);
       break;
 
     default:
@@ -3543,6 +3566,70 @@ function handleSearchWorkerResultMessage(message) {
   }
 
   state.workerActionPromiseResolverMap.delete(id);
+}
+
+function handleSearchWorkerDownloadBegunMessage(message) {
+  const {event} = wikiSearchInfo;
+  const {context: contextKey, keys} = message.data;
+
+  const context = getSearchWorkerDownloadContext(contextKey, true);
+
+  for (const key of keys) {
+    context[key] = 0.00;
+
+    dispatchInternalEvent(event, 'whenDownloadBegins', {
+      context: contextKey,
+      key,
+    });
+  }
+
+  dispatchInternalEvent(event, 'whenDownloadsBegin', {
+    context: contextKey,
+    keys,
+  });
+}
+
+function handleSearchWorkerDownloadProgressMessage(message) {
+  const {event} = wikiSearchInfo;
+  const {context: contextKey, key, progress} = message.data;
+
+  const context = getSearchWorkerDownloadContext(contextKey);
+
+  context[key] = progress;
+
+  dispatchInternalEvent(event, 'whenDownloadProgresses', {
+    context: contextKey,
+    key,
+    progress,
+  });
+}
+
+function handleSearchWorkerDownloadCompleteMessage(message) {
+  const {event} = wikiSearchInfo;
+  const {context: contextKey, key} = message.data;
+
+  const context = getSearchWorkerDownloadContext(contextKey);
+
+  context[key] = 1.00;
+
+  dispatchInternalEvent(event, 'whenDownloadEnds', {
+    context: contextKey,
+    key,
+  });
+}
+
+function getSearchWorkerDownloadContext(context, initialize = false) {
+  const {state} = wikiSearchInfo;
+
+  if (context in state.downloads) {
+    return state.downloads[context];
+  }
+
+  if (!initialize) {
+    return null;
+  }
+
+  return state.downloads[context] = Object.create(null);
 }
 
 async function postSearchWorkerAction(action, options) {
@@ -3641,6 +3728,16 @@ function getSidebarSearchReferences() {
 
   info.groupResultKindString =
     findString('group-result-kind');
+}
+
+function addSidebarSearchInternalListeners() {
+  const info = sidebarSearchInfo;
+
+  if (!info.searchBox) return;
+
+  wikiSearchInfo.event.whenDownloadsBegin.push(updateSidebarSearchStatus);
+  wikiSearchInfo.event.whenDownloadProgresses.push(updateSidebarSearchStatus);
+  wikiSearchInfo.event.whenDownloadEnds.push(updateSidebarSearchStatus);
 }
 
 function mutateSidebarSearchContent() {
@@ -3785,6 +3882,16 @@ function clearSidebarSearch() {
   session.activeQueryResults = '';
 
   hideSidebarSearchResults();
+}
+
+function updateSidebarSearchStatus() {
+  const info = sidebarSearchInfo;
+  const {state} = info;
+
+  const searchIndexDownloads =
+    getSearchWorkerDownloadContext('search-indexes');
+
+  console.log('Display:', searchIndexDownloads);
 }
 
 function showSidebarSearchResults(results) {
@@ -4002,6 +4109,7 @@ function hideSidebarSearchResults() {
 }
 
 clientSteps.getPageReferences.push(getSidebarSearchReferences);
+clientSteps.addInternalListeners.push(addSidebarSearchInternalListeners);
 clientSteps.mutatePageContent.push(mutateSidebarSearchContent);
 clientSteps.addPageListeners.push(addSidebarSearchListeners);
 clientSteps.initializeState.push(initializeSidebarSearchState);
