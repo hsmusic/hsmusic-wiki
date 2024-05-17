@@ -230,8 +230,8 @@ function dispatchInternalEvent(event, eventName, ...args) {
     try {
       results.push(listener(...args));
     } catch (error) {
-      console.warn(`Uncaught error in listener for ${infoName}.${eventName}`);
-      console.debug(error);
+      console.error(`Uncaught error in listener for ${infoName}.${eventName}`);
+      console.error(error);
       results.push(undefined);
     }
   }
@@ -4330,8 +4330,8 @@ for (const [key, steps] of Object.entries(clientSteps)) {
     try {
       step();
     } catch (error) {
-      console.warn(`During ${key}, failed to run ${step.name}`);
-      console.debug(error);
+      console.error(`During ${key}, failed to run ${step.name}`);
+      console.error(error);
     }
   }
 }
