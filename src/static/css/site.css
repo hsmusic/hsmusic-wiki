@@ -615,6 +615,10 @@ summary .group-name {
   border: 2px solid var(--deep-color);
 }
 
+.wiki-search-results:not(:has(.wiki-search-result-image)) .wiki-search-result-image-container {
+  display: none;
+}
+
 .wiki-search-result-image,
 .wiki-search-result-image-placeholder {
   display: block;
@@ -627,10 +631,6 @@ summary .group-name {
 .wiki-search-result-image-placeholder {
   background-color: #0004;
   box-shadow: 0 1px 3px -1px #0008 inset;
-}
-
-.wiki-search-results:not(:has(.wiki-search-result-image)) .wiki-search-result-image-placeholder {
-  display: none;
 }
 
 .wiki-search-result-image.has-warning {
