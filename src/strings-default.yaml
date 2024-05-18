@@ -622,6 +622,10 @@ misc:
   search:
     placeholder: "Search for anything"
 
+    preparing: "Preparing..."
+    loadingData: "Loading data..."
+    searching: "Searching..."
+
     noResults: >-
       No results for this query, sorry!
       Check spelling and use complete words.

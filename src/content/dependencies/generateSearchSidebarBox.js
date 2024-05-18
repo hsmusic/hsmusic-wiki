@@ -20,6 +20,15 @@ export default {
           },
           {type: 'search'}),
 
+        html.tag('template', {class: 'wiki-search-preparing-string'},
+          language.$('misc.search.preparing')),
+
+        html.tag('template', {class: 'wiki-search-loading-data-string'},
+          language.$('misc.search.loadingData')),
+
+        html.tag('template', {class: 'wiki-search-searching-string'},
+          language.$('misc.search.searching')),
+
         html.tag('template', {class: 'wiki-search-no-results-string'},
           language.$('misc.search.noResults')),
 

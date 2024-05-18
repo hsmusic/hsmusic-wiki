@@ -510,16 +510,25 @@ summary .group-name {
 .wiki-search-sidebar-box hr {
   border-color: var(--primary-color);
   border-style: none none dotted none;
-}
-
-.wiki-search-sidebar-box hr:nth-of-type(1) {
   margin-top: 3px;
-  margin-bottom: 6px;
+  margin-bottom: 3px;
 }
 
-.wiki-search-sidebar-box hr:nth-of-type(2) {
-  margin-top: 6px;
-  margin-bottom: 0;
+.wiki-search-progress-container {
+  padding: 2px 6px 4px 6px;
+  display: flex;
+  flex-direction: row;
+}
+
+.wiki-search-progress-label {
+  font-size: 0.9em;
+  font-style: oblique;
+  cursor: default;
+  margin-right: 1ch;
+}
+
+.wiki-search-progress-bar {
+  flex-grow: 1;
 }
 
 .wiki-search-results-container {
@@ -943,6 +952,10 @@ li:not(:first-child:last-child) .tooltip,
 
 .other-group-accent a {
   color: var(--page-primary-color);
+}
+
+progress {
+  accent-color: var(--primary-color);
 }
 
 .content-columns {

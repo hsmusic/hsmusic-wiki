@@ -3452,11 +3452,13 @@ const wikiSearchInfo = initInfo('wikiSearchInfo', {
   },
 
   event: {
+    whenWorkerAlive: [],
+    whenWorkerReady: [],
+    whenWorkerFailsToInitialize: [],
+
     whenDownloadBegins: [],
     whenDownloadsBegin: [],
-
     whenDownloadProgresses: [],
-
     whenDownloadEnds: [],
   },
 });
@@ -3511,21 +3513,24 @@ function handleSearchWorkerMessage(message) {
 }
 
 function handleSearchWorkerStatusMessage(message) {
-  const {state} = wikiSearchInfo;
+  const {state, event} = wikiSearchInfo;
 
   switch (message.data.status) {
     case 'alive':
       console.debug(`Search worker is alive, but not yet ready.`);
+      dispatchInternalEvent(event, 'whenWorkerAlive');
       break;
 
     case 'ready':
       console.debug(`Search worker has loaded corpuses and is ready.`);
       state.workerReadyPromiseResolvers.resolve(state.worker);
+      dispatchInternalEvent(event, 'whenWorkerReady');
       break;
 
     case 'setup-error':
       console.debug(`Search worker failed to initialize.`);
       state.workerReadyPromiseResolvers.reject('setup-error');
+      dispatchInternalEvent(event, 'whenWorkerFailsToInitialize');
       break;
 
     default:
@@ -3665,6 +3670,11 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   searchBox: null,
   searchInput: null,
 
+  progressRule: null,
+  progressContainer: null,
+  progressLabel: null,
+  progressBar: null,
+
   resultsRule: null,
   resultsContainer: null,
   results: null,
@@ -3672,6 +3682,10 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   endSearchRule: null,
   endSearchLine: null,
   endSearchLink: null,
+
+  preparingString: null,
+  loadingDataString: null,
+  searchingString: null,
 
   noResultsString: null,
   currentResultString: null,
@@ -3682,7 +3696,12 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   groupResultKindString: null,
 
   state: {
+    workerStatus: null,
+    searchStage: null,
+
     stoppedTypingTimeout: null,
+
+    indexDownloadStatuses: Object.create(null),
   },
 
   session: {
@@ -3711,6 +3730,15 @@ function getSidebarSearchReferences() {
   const findString = classPart =>
     info.searchBox.querySelector(`.wiki-search-${classPart}-string`);
 
+  info.preparingString =
+    findString('preparing');
+
+  info.loadingDataString =
+    findString('loading-data');
+
+  info.searchingString =
+    findString('searching');
+
   info.noResultsString =
     findString('no-results');
 
@@ -3735,15 +3763,67 @@ function addSidebarSearchInternalListeners() {
 
   if (!info.searchBox) return;
 
-  wikiSearchInfo.event.whenDownloadsBegin.push(updateSidebarSearchStatus);
-  wikiSearchInfo.event.whenDownloadProgresses.push(updateSidebarSearchStatus);
-  wikiSearchInfo.event.whenDownloadEnds.push(updateSidebarSearchStatus);
+  wikiSearchInfo.event.whenWorkerAlive.push(
+    trackSidebarSearchWorkerAlive,
+    updateSidebarSearchStatus);
+
+  wikiSearchInfo.event.whenWorkerReady.push(
+    trackSidebarSearchWorkerReady,
+    updateSidebarSearchStatus);
+
+  wikiSearchInfo.event.whenWorkerFailsToInitialize.push(
+    trackSidebarSearchWorkerFailsToInitialize,
+    updateSidebarSearchStatus);
+
+  wikiSearchInfo.event.whenDownloadsBegin.push(
+    trackSidebarSearchDownloadsBegin,
+    updateSidebarSearchStatus);
+
+  wikiSearchInfo.event.whenDownloadProgresses.push(
+    updateSidebarSearchStatus);
+
+  wikiSearchInfo.event.whenDownloadEnds.push(
+    trackSidebarSearchDownloadEnds,
+    updateSidebarSearchStatus);
 }
 
 function mutateSidebarSearchContent() {
   const info = sidebarSearchInfo;
 
   if (!info.searchBox) return;
+
+  // Progress section
+
+  info.progressRule =
+    document.createElement('hr');
+
+  info.progressContainer =
+    document.createElement('div');
+
+  info.progressContainer.classList.add('wiki-search-progress-container');
+
+  cssProp(info.progressRule, 'display', 'none');
+  cssProp(info.progressContainer, 'display', 'none');
+
+  info.progressLabel =
+    document.createElement('label');
+
+  info.progressLabel.classList.add('wiki-search-progress-label');
+  info.progressLabel.htmlFor = 'wiki-search-progress-bar';
+
+  info.progressBar =
+    document.createElement('progress');
+
+  info.progressBar.classList.add('wiki-search-progress-bar');
+  info.progressBar.id = 'wiki-search-progress-bar';
+
+  info.progressContainer.appendChild(info.progressLabel);
+  info.progressContainer.appendChild(info.progressBar);
+
+  info.searchBox.appendChild(info.progressRule);
+  info.searchBox.appendChild(info.progressContainer);
+
+  // Results section
 
   info.resultsRule =
     document.createElement('hr');
@@ -3766,10 +3846,10 @@ function mutateSidebarSearchContent() {
   info.searchBox.appendChild(info.resultsRule);
   info.searchBox.appendChild(info.resultsContainer);
 
+  // End search section
+
   info.endSearchRule =
     document.createElement('hr');
-
-  info.searchBox.appendChild(info.endSearchRule);
 
   info.endSearchLine =
     document.createElement('p');
@@ -3844,6 +3924,50 @@ function initializeSidebarSearchState() {
   }
 }
 
+function trackSidebarSearchWorkerAlive() {
+  const {state} = sidebarSearchInfo;
+
+  state.workerStatus = 'alive';
+}
+
+function trackSidebarSearchWorkerReady() {
+  const {state} = sidebarSearchInfo;
+
+  state.workerStatus = 'ready';
+  state.searchStage = 'searching';
+}
+
+function trackSidebarSearchWorkerFailsToInitialize() {
+  const {state} = sidebarSearchInfo;
+
+  state.workerStatus = 'failed';
+}
+
+function trackSidebarSearchDownloadsBegin(event) {
+  const {state} = sidebarSearchInfo;
+
+  if (event.context === 'search-indexes') {
+    for (const key of event.keys) {
+      state.indexDownloadStatuses[key] = 'active';
+    }
+  }
+}
+
+function trackSidebarSearchDownloadEnds(event) {
+  const {state} = sidebarSearchInfo;
+
+  if (event.context === 'search-indexes') {
+    state.indexDownloadStatuses[event.key] = 'complete';
+
+    const statuses = Object.values(state.indexDownloadStatuses);
+    if (statuses.every(status => status === 'complete')) {
+      for (const key of Object.keys(state.indexDownloadStatuses)) {
+        delete state.indexDownloadStatuses[key];
+      }
+    }
+  }
+}
+
 async function activateSidebarSearch(query) {
   const {session, settings, state} = sidebarSearchInfo;
 
@@ -3852,7 +3976,16 @@ async function activateSidebarSearch(query) {
     state.stoppedTypingTimeout = null;
   }
 
+  state.searchStage =
+    (state.workerStatus === 'ready'
+      ? 'searching'
+      : 'preparing');
+  updateSidebarSearchStatus();
+
   const results = await searchAll(query, {enrich: true});
+
+  state.searchStage = 'complete';
+  updateSidebarSearchStatus();
 
   session.activeQuery = query;
 
@@ -3877,6 +4010,8 @@ function clearSidebarSearch() {
 
   info.searchInput.value = '';
 
+  state.searchStage = null;
+
   session.activeQuery = '';
   session.activeQueryResults = '';
 
@@ -3890,7 +4025,62 @@ function updateSidebarSearchStatus() {
   const searchIndexDownloads =
     getSearchWorkerDownloadContext('search-indexes');
 
-  console.log('Display:', searchIndexDownloads);
+  const downloadProgressValues =
+    Object.values(searchIndexDownloads ?? {});
+
+  if (downloadProgressValues.some(v => v < 1.00)) {
+    const total = Object.keys(state.indexDownloadStatuses).length;
+    const sum = accumulateSum(downloadProgressValues);
+    showSidebarSearchProgress(
+      sum / total,
+      templateContent(info.loadingDataString));
+
+    return;
+  }
+
+  if (state.searchStage === 'preparing') {
+    showSidebarSearchProgress(
+      null,
+      templateContent(info.preparingString));
+
+    return;
+  }
+
+  if (state.searchStage === 'searching') {
+    showSidebarSearchProgress(
+      null,
+      templateContent(info.searchingString));
+
+    return;
+  }
+
+  hideSidebarSearchProgress();
+}
+
+function showSidebarSearchProgress(progress, label) {
+  const info = sidebarSearchInfo;
+
+  cssProp(info.progressRule, 'display', null);
+  cssProp(info.progressContainer, 'display', null);
+
+  if (progress === null) {
+    info.progressBar.removeAttribute('value');
+  } else {
+    info.progressBar.value = progress;
+  }
+
+  while (info.progressLabel.firstChild) {
+    info.progressLabel.firstChild.remove();
+  }
+
+  info.progressLabel.appendChild(label);
+}
+
+function hideSidebarSearchProgress() {
+  const info = sidebarSearchInfo;
+
+  cssProp(info.progressRule, 'display', 'none');
+  cssProp(info.progressContainer, 'display', 'none');
 }
 
 function showSidebarSearchResults(results) {
