@@ -112,6 +112,9 @@ export const searchSpec = {
     process(thing, opts) {
       const fields = {};
 
+      fields.kind =
+        thing.constructor[Symbol.for('Thing.referenceType')];
+
       fields.primaryName =
         thing.name;
 
@@ -168,6 +171,7 @@ export const searchSpec = {
     },
 
     index: [
+      'kind',
       'primaryName',
       'additionalNames',
       'contributors',
