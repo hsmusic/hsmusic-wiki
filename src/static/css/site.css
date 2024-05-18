@@ -606,6 +606,7 @@ summary .group-name {
 
 .wiki-search-result-image-container {
   align-self: flex-start;
+  flex-shrink: 0;
   margin-right: 6px;
   border-radius: 2px;
   overflow: hidden;
