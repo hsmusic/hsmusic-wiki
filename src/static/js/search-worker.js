@@ -27,6 +27,7 @@ let indexes = null;
 
 onmessage = handleWindowMessage;
 onerror = handleRuntimeError;
+onunhandledrejection = handleRuntimeError;
 postStatus('alive');
 
 Promise.all([
