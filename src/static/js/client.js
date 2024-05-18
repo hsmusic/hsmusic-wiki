@@ -3455,6 +3455,7 @@ const wikiSearchInfo = initInfo('wikiSearchInfo', {
     whenWorkerAlive: [],
     whenWorkerReady: [],
     whenWorkerFailsToInitialize: [],
+    whenWorkerHasRuntimeError: [],
 
     whenDownloadBegins: [],
     whenDownloadsBegin: [],
@@ -3531,6 +3532,11 @@ function handleSearchWorkerStatusMessage(message) {
       console.debug(`Search worker failed to initialize.`);
       state.workerReadyPromiseResolvers.reject(new Error('Received "setup-error" status from worker'));
       dispatchInternalEvent(event, 'whenWorkerFailsToInitialize');
+      break;
+
+    case 'runtime-error':
+      console.debug(`Search worker had an uncaught runtime error.`);
+      dispatchInternalEvent(event, 'whenWorkerHasRuntimeError');
       break;
 
     default:
@@ -3782,6 +3788,10 @@ function addSidebarSearchInternalListeners() {
     trackSidebarSearchWorkerFailsToInitialize,
     updateSidebarSearchStatus);
 
+  wikiSearchInfo.event.whenWorkerHasRuntimeError.push(
+    trackSidebarSearchWorkerHasRuntimeError,
+    updateSidebarSearchStatus);
+
   wikiSearchInfo.event.whenDownloadsBegin.push(
     trackSidebarSearchDownloadsBegin,
     updateSidebarSearchStatus);
@@ -3967,6 +3977,13 @@ function trackSidebarSearchWorkerReady() {
 }
 
 function trackSidebarSearchWorkerFailsToInitialize() {
+  const {state} = sidebarSearchInfo;
+
+  state.workerStatus = 'failed';
+  state.searchStage = 'failed';
+}
+
+function trackSidebarSearchWorkerHasRuntimeError() {
   const {state} = sidebarSearchInfo;
 
   state.workerStatus = 'failed';

@@ -26,6 +26,7 @@ let status = null;
 let indexes = null;
 
 onmessage = handleWindowMessage;
+onerror = handleRuntimeError;
 postStatus('alive');
 
 Promise.all([
@@ -300,6 +301,10 @@ function importIndex(indexKey, indexData) {
   for (const [key, value] of Object.entries(indexData)) {
     indexes[indexKey].import(key, JSON.stringify(value));
   }
+}
+
+function handleRuntimeError() {
+  postStatus('runtime-error');
 }
 
 function handleWindowMessage(message) {
