@@ -465,7 +465,7 @@ summary .group-name {
 .wiki-search-sidebar-box {
   padding: 1px 0 0 0;
 
-  z-index: 999;
+  z-index: 100;
   max-height: calc(100vh - 20px);
 
   display: flex;
@@ -2360,6 +2360,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 4000;
 
   background: rgba(0, 0, 0, 0.8);
   color: white;
