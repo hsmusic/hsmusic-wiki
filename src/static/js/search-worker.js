@@ -160,8 +160,6 @@ async function main() {
 
   const [indexData, idbIndexData] = await background;
 
-  delete idbIndexData.generic;
-
   const keysNeedingFetch =
     (idbIndexData
       ? Object.keys(indexData)
