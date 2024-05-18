@@ -3836,12 +3836,11 @@ function initializeSidebarSearchState() {
 
   if (session.activeQuery) {
     info.searchInput.value = session.activeQuery;
-  }
-
-  if (session.repeatQueryOnReload) {
-    activateSidebarSearch(session.activeQuery);
-  } else if (session.activeQueryResults) {
-    showSidebarSearchResults(JSON.parse(session.activeQueryResults));
+    if (session.repeatQueryOnReload) {
+      activateSidebarSearch(session.activeQuery);
+    } else if (session.activeQueryResults) {
+      showSidebarSearchResults(JSON.parse(session.activeQueryResults));
+    }
   }
 }
 
