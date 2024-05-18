@@ -4084,14 +4084,6 @@ function updateSidebarSearchStatus() {
     return;
   }
 
-  if (state.searchStage === 'preparing') {
-    showSidebarSearchProgress(
-      null,
-      templateContent(info.preparingString));
-
-    return;
-  }
-
   const searchIndexDownloads =
     getSearchWorkerDownloadContext('search-indexes');
 
@@ -4104,6 +4096,14 @@ function updateSidebarSearchStatus() {
     showSidebarSearchProgress(
       sum / total,
       templateContent(info.loadingDataString));
+
+    return;
+  }
+
+  if (state.searchStage === 'preparing') {
+    showSidebarSearchProgress(
+      null,
+      templateContent(info.preparingString));
 
     return;
   }
