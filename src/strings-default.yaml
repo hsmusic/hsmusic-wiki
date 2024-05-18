@@ -626,6 +626,12 @@ misc:
     loadingData: "Loading data..."
     searching: "Searching..."
 
+    failed: >-
+      There was an internal error,
+      and your search couldn't be processed.
+      Reloading this page and trying again may help.
+      Sorry for the trouble!
+
     noResults: >-
       No results for this query, sorry!
       Check spelling and use complete words.

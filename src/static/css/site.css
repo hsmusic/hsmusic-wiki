@@ -507,6 +507,11 @@ summary .group-name {
   color: inherit;
 }
 
+.wiki-search-input[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .wiki-search-sidebar-box hr {
   border-color: var(--primary-color);
   border-style: none none dotted none;
@@ -529,6 +534,14 @@ summary .group-name {
 
 .wiki-search-progress-bar {
   flex-grow: 1;
+}
+
+.wiki-search-failed-container {
+  padding: 2px 3px 4px 6px;
+}
+
+.wiki-search-failed-container p {
+  margin: 0;
 }
 
 .wiki-search-results-container {

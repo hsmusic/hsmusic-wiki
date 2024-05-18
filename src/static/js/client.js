@@ -3529,7 +3529,7 @@ function handleSearchWorkerStatusMessage(message) {
 
     case 'setup-error':
       console.debug(`Search worker failed to initialize.`);
-      state.workerReadyPromiseResolvers.reject('setup-error');
+      state.workerReadyPromiseResolvers.reject(new Error('Received "setup-error" status from worker'));
       dispatchInternalEvent(event, 'whenWorkerFailsToInitialize');
       break;
 
@@ -3675,6 +3675,9 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   progressLabel: null,
   progressBar: null,
 
+  failedRule: null,
+  failedContainer: null,
+
   resultsRule: null,
   resultsContainer: null,
   results: null,
@@ -3686,6 +3689,7 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   preparingString: null,
   loadingDataString: null,
   searchingString: null,
+  failedString: null,
 
   noResultsString: null,
   currentResultString: null,
@@ -3738,6 +3742,9 @@ function getSidebarSearchReferences() {
 
   info.searchingString =
     findString('searching');
+
+  info.failedString =
+    findString('failed');
 
   info.noResultsString =
     findString('no-results');
@@ -3822,6 +3829,28 @@ function mutateSidebarSearchContent() {
 
   info.searchBox.appendChild(info.progressRule);
   info.searchBox.appendChild(info.progressContainer);
+
+  // Search failed section
+
+  info.failedRule =
+    document.createElement('hr');
+
+  info.failedContainer =
+    document.createElement('div');
+
+  info.failedContainer.classList.add('wiki-search-failed-container');
+
+  {
+    const p = document.createElement('p');
+    p.appendChild(templateContent(info.failedString));
+    info.failedContainer.appendChild(p);
+  }
+
+  cssProp(info.failedRule, 'display', 'none');
+  cssProp(info.failedContainer, 'display', 'none');
+
+  info.searchBox.appendChild(info.failedRule);
+  info.searchBox.appendChild(info.failedContainer);
 
   // Results section
 
@@ -3941,6 +3970,7 @@ function trackSidebarSearchWorkerFailsToInitialize() {
   const {state} = sidebarSearchInfo;
 
   state.workerStatus = 'failed';
+  state.searchStage = 'failed';
 }
 
 function trackSidebarSearchDownloadsBegin(event) {
@@ -3982,7 +4012,15 @@ async function activateSidebarSearch(query) {
       : 'preparing');
   updateSidebarSearchStatus();
 
-  const results = await searchAll(query, {enrich: true});
+  let results;
+  try {
+    results = await searchAll(query, {enrich: true});
+  } catch (error) {
+    console.error(`There was an error performing a sidebar search:`);
+    console.error(error);
+    showSidebarSearchFailed();
+    return;
+  }
 
   state.searchStage = 'complete';
   updateSidebarSearchStatus();
@@ -4022,6 +4060,21 @@ function updateSidebarSearchStatus() {
   const info = sidebarSearchInfo;
   const {state} = info;
 
+  if (state.searchStage === 'failed') {
+    hideSidebarSearchResults();
+    showSidebarSearchFailed();
+
+    return;
+  }
+
+  if (state.searchStage === 'preparing') {
+    showSidebarSearchProgress(
+      null,
+      templateContent(info.preparingString));
+
+    return;
+  }
+
   const searchIndexDownloads =
     getSearchWorkerDownloadContext('search-indexes');
 
@@ -4034,14 +4087,6 @@ function updateSidebarSearchStatus() {
     showSidebarSearchProgress(
       sum / total,
       templateContent(info.loadingDataString));
-
-    return;
-  }
-
-  if (state.searchStage === 'preparing') {
-    showSidebarSearchProgress(
-      null,
-      templateContent(info.preparingString));
 
     return;
   }
@@ -4081,6 +4126,24 @@ function hideSidebarSearchProgress() {
 
   cssProp(info.progressRule, 'display', 'none');
   cssProp(info.progressContainer, 'display', 'none');
+}
+
+function showSidebarSearchFailed() {
+  const info = sidebarSearchInfo;
+  const {state} = info;
+
+  hideSidebarSearchProgress();
+  hideSidebarSearchResults();
+
+  cssProp(info.failedRule, 'display', null);
+  cssProp(info.failedContainer, 'display', null);
+
+  info.searchInput.disabled = true;
+
+  if (state.stoppedTypingTimeout) {
+    clearTimeout(state.stoppedTypingTimeout);
+    state.stoppedTypingTimeout = null;
+  }
 }
 
 function showSidebarSearchResults(results) {

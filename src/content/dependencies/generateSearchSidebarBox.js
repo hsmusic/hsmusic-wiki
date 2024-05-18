@@ -29,6 +29,9 @@ export default {
         html.tag('template', {class: 'wiki-search-searching-string'},
           language.$('misc.search.searching')),
 
+        html.tag('template', {class: 'wiki-search-failed-string'},
+          language.$('misc.search.failed')),
+
         html.tag('template', {class: 'wiki-search-no-results-string'},
           language.$('misc.search.noResults')),
 
