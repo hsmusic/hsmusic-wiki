@@ -4301,6 +4301,7 @@ function generateSidebarSearchResultTemplate(slots) {
     try {
       const colors = getColors(slots.color, {chroma});
       cssProp(link, '--light-ghost-color', colors.lightGhost);
+      cssProp(link, '--deep-color', colors.deep);
     } catch (error) {
       console.warn(error);
     }

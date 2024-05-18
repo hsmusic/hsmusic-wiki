@@ -610,17 +610,23 @@ summary .group-name {
   margin-right: 6px;
   border-radius: 2px;
   overflow: hidden;
+
+  background-color: var(--deep-color);
+  border: 2px solid var(--deep-color);
 }
 
 .wiki-search-result-image,
 .wiki-search-result-image-placeholder {
+  display: block;
   width: 1.8em;
   height: 1.8em;
   aspect-ratio: 1 / 1;
+  border-radius: 1.5px;
 }
 
 .wiki-search-result-image-placeholder {
-  display: inline-block;
+  background-color: #0004;
+  box-shadow: 0 1px 3px -1px #0008 inset;
 }
 
 .wiki-search-results:not(:has(.wiki-search-result-image)) .wiki-search-result-image-placeholder {
