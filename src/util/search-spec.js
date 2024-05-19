@@ -118,8 +118,22 @@ export const searchSpec = {
       fields.primaryName =
         thing.name;
 
+      fields.parentName =
+        (fields.kind === 'track'
+          ? thing.album.name
+       : fields.kind === 'group'
+          ? thing.category.name
+       : fields.kind === 'flash'
+          ? thing.act.name
+          : null);
+
       fields.color =
         thing.color;
+
+      fields.artTags =
+        (Object.hasOwn(thing, 'artTags')
+          ? thing.artTags.map(artTag => artTag.nameShort)
+          : []);
 
       fields.additionalNames =
         (Object.hasOwn(thing, 'additionalNames')
@@ -173,6 +187,8 @@ export const searchSpec = {
     index: [
       'kind',
       'primaryName',
+      'parentName',
+      'artTags',
       'additionalNames',
       'contributors',
       'groups',
