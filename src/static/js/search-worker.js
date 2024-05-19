@@ -389,6 +389,7 @@ function queryGenericIndex(index, query, options) {
     ['kind', 'primaryName', 'groups', 'artTags'],
     ['kind', 'primaryName', 'groups'],
     ['kind', 'primaryName', 'contributors'],
+    ['kind', 'primaryName', 'artTags'],
     ['kind', 'parentName', 'groups', 'artTags'],
     ['kind', 'parentName', 'artTags'],
     ['kind', 'groups', 'contributors'],
@@ -402,10 +403,17 @@ function queryGenericIndex(index, query, options) {
     ['primaryName', 'groups', 'artTags'],
     ['primaryName', 'groups'],
     ['primaryName', 'contributors'],
+    ['primaryName', 'artTags'],
     ['parentName', 'groups', 'artTags'],
     ['parentName', 'artTags'],
     ['groups', 'contributors'],
     ['groups', 'artTags'],
+
+    // This prevents just matching *everything* tagged "john" if you
+    // only search "john", but it actually supports matching more than
+    // *two* tags at once: "john rose lowas" works! This is thanks to
+    // flexsearch matching multiple field values in a single query.
+    ['artTags', 'artTags'],
 
     ['contributors', 'groups'],
     ['primaryName', 'contributors'],
@@ -426,7 +434,11 @@ function queryGenericIndex(index, query, options) {
     (groupedParticles.get(keys.length) ?? [])
       .flatMap(permutations)
       .map(values => values.map(({terms}) => terms.join(' ')))
-      .map(values => Object.fromEntries(stitchArrays([keys, values])));
+      .map(values =>
+        stitchArrays({
+          field: keys,
+          query: values,
+        }));
 
   const boilerplate = queryBoilerplate(index);
 
@@ -455,7 +467,7 @@ function queryGenericIndex(index, query, options) {
   for (const interestingFieldCombination of interestingFieldCombinations) {
     for (const query of queriesBy(interestingFieldCombination)) {
       const idToMatchingFieldsMap = new Map();
-      for (const [field, fieldQuery] of Object.entries(query)) {
+      for (const {field, query: fieldQuery} of query) {
         for (const id of particleResults[field][fieldQuery]) {
           if (idToMatchingFieldsMap.has(id)) {
             idToMatchingFieldsMap.get(id).push(field);
