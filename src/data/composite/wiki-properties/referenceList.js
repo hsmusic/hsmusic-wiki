@@ -1,5 +1,6 @@
 // Stores and exposes a list of references to other data objects; all items
-// must be references to the same type, which is specified on the class input.
+// must be references to the same type, which is either implied from the class
+// input, or explicitly set on the referenceType input.
 //
 // See also:
 //  - singleReference
@@ -18,7 +19,17 @@ export default templateCompositeFrom({
   compose: false,
 
   inputs: {
-    class: input.staticValue({validate: isThingClass}),
+    class: input.staticValue({
+      validate: isThingClass,
+      acceptsNull: true,
+      defaultValue: null,
+    }),
+
+    referenceType: input.staticValue({
+      type: 'string',
+      acceptsNull: true,
+      defaultValue: null,
+    }),
 
     data: inputWikiData({allowMixedTypes: false}),
 
@@ -27,10 +38,13 @@ export default templateCompositeFrom({
 
   update: ({
     [input.staticValue('class')]: thingClass,
+    [input.staticValue('referenceType')]: referenceType,
   }) => ({
     validate:
       validateReferenceList(
-        thingClass[Symbol.for('Thing.referenceType')]),
+        (thingClass
+          ? thingClass[Symbol.for('Thing.referenceType')]
+          : referenceType)),
   }),
 
   steps: () => [
