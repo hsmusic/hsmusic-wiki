@@ -24,13 +24,21 @@ function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
 }
 
-// Warn about directories which are reused across more than one of the same type
-// of Thing. Directories are the unique identifier for most data objects across
-// the wiki, so we have to make sure they aren't duplicated!
-export function reportDuplicateDirectories(wikiData, {
+// Warn about problems to do with directories.
+//
+// * Duplicate directories: these are the unique identifier for referencable
+//   data objects across the wiki, so duplicates introduce ambiguity where it
+//   can't fit.
+//
+// * Missing directories: in almost all cases directories can be computed,
+//   but in particularly brutal internal cases, it might not be possible, and
+//   a thing's directory is just null. This leaves it unable to be referenced.
+//
+export function reportDirectoryErrors(wikiData, {
   getAllFindSpecs,
 }) {
   const duplicateSets = [];
+  const missingDirectoryThings = new Set();
 
   for (const findSpec of Object.values(getAllFindSpecs())) {
     if (!findSpec.bindTo) continue;
@@ -52,6 +60,11 @@ export function reportDuplicateDirectories(wikiData, {
           : [thing.directory]);
 
       for (const directory of directories) {
+        if (directory === null || directory === undefined) {
+          missingDirectoryThings.add(thing);
+          continue;
+        }
+
         if (directory in directoryPlaces) {
           directoryPlaces[directory].push(thing);
           duplicateDirectories.add(directory);
@@ -60,8 +73,6 @@ export function reportDuplicateDirectories(wikiData, {
         }
       }
     }
-
-    if (empty(duplicateDirectories)) continue;
 
     const sortedDuplicateDirectories =
       Array.from(duplicateDirectories)
@@ -76,8 +87,6 @@ export function reportDuplicateDirectories(wikiData, {
       duplicateSets.push({directory, places});
     }
   }
-
-  if (empty(duplicateSets)) return;
 
   // Multiple find functions may effectively have duplicates across the same
   // things. These only need to be reported once, because resolving one of them
@@ -109,11 +118,19 @@ export function reportDuplicateDirectories(wikiData, {
     deduplicateDuplicateSets.push(set);
   }
 
-  withAggregate({message: `Duplicate directories found`}, ({push}) => {
+  withAggregate({message: `Directory errors detected`}, ({push}) => {
     for (const {directory, places} of deduplicateDuplicateSets) {
       push(new Error(
         `Duplicate directory ${colors.green(`"${directory}"`)}:\n` +
         places.map(thing => ` - ` + inspect(thing)).join('\n')));
+    }
+
+    if (!empty(missingDirectoryThings)) {
+      push(new Error(
+        `Couldn't figure out an implicit directory for:\n` +
+        Array.from(missingDirectoryThings)
+          .map(thing => `- ` + inspect(thing))
+          .join('\n')));
     }
   });
 }

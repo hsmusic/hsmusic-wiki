@@ -23,7 +23,7 @@ import {
 import {
   filterReferenceErrors,
   reportContentTextErrors,
-  reportDuplicateDirectories,
+  reportDirectoryErrors,
 } from '#data-checks';
 
 import {
@@ -1188,7 +1188,7 @@ export async function quickLoadAllFromYAML(dataPath, {
   linkWikiDataArrays(wikiData);
 
   try {
-    reportDuplicateDirectories(wikiData, {getAllFindSpecs});
+    reportDirectoryErrors(wikiData, {getAllFindSpecs});
     logInfo`No duplicate directories found. (complete data)`;
   } catch (error) {
     showAggregate(error);

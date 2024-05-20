@@ -65,7 +65,7 @@ import {
 
 import {
   filterReferenceErrors,
-  reportDuplicateDirectories,
+  reportDirectoryErrors,
   reportContentTextErrors,
 } from '#data-checks';
 
@@ -143,8 +143,8 @@ async function main() {
     precacheCommonData:
       {...defaultStepStatus, name: `precache common data`},
 
-    reportDuplicateDirectories:
-      {...defaultStepStatus, name: `report duplicate directories`},
+    reportDirectoryErrors:
+      {...defaultStepStatus, name: `report directory errors`},
 
     filterReferenceErrors:
       {...defaultStepStatus, name: `filter reference errors`},
@@ -1343,17 +1343,17 @@ async function main() {
   // Filter out any things with duplicate directories throughout the data,
   // warning about them too.
 
-  Object.assign(stepStatusSummary.reportDuplicateDirectories, {
+  Object.assign(stepStatusSummary.reportDirectoryErrors, {
     status: STATUS_STARTED_NOT_DONE,
     timeStart: Date.now(),
   });
 
   try {
-    reportDuplicateDirectories(wikiData, {getAllFindSpecs});
+    reportDirectoryErrors(wikiData, {getAllFindSpecs});
     logInfo`No duplicate directories found - nice!`;
     paragraph = false;
 
-    Object.assign(stepStatusSummary.reportDuplicateDirectories, {
+    Object.assign(stepStatusSummary.reportDirectoryErrors, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
     });
@@ -1369,7 +1369,7 @@ async function main() {
     console.log('');
     paragraph = true;
 
-    Object.assign(stepStatusSummary.reportDuplicateDirectories, {
+    Object.assign(stepStatusSummary.reportDirectoryErrors, {
       status: STATUS_FATAL_ERROR,
       annotation: `duplicate directories found`,
       timeEnd: Date.now(),
