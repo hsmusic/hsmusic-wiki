@@ -11,16 +11,26 @@ const {
   FlashAct,
   Thing,
   Track,
+  TrackSection,
 } = thingConstructors;
 
 function stubAlbum(tracks, directory = 'bar') {
   const album = new Album();
   album.directory = directory;
 
-  const trackRefs = tracks.map(t => Thing.getReference(t));
-  album.trackSections = [{tracks: trackRefs}];
+  const trackSection = stubTrackSection(album, tracks);
+  album.trackSections = [trackSection];
 
   return album;
+}
+
+function stubTrackSection(album, tracks, directory = 'baz') {
+  const trackSection = new TrackSection();
+  trackSection.unqualifiedDirectory = directory;
+  trackSection.tracks = tracks.map(t => Thing.getReference(t));
+  trackSection.ownTrackData = tracks;
+  trackSection.ownAlbumData = [album];
+  return trackSection;
 }
 
 function stubTrack(directory = 'foo') {
@@ -81,16 +91,22 @@ t.test(`Track.album`, t => {
   const track2 = stubTrack('track2');
   const album1 = new Album();
   const album2 = new Album();
+  const section1 = new TrackSection();
+  const section2 = new TrackSection();
 
   t.equal(track1.album, null,
     `album #1: defaults to null`);
 
   track1.albumData = [album1, album2];
   track2.albumData = [album1, album2];
-  album1.ownTrackData = [track1, track2];
-  album2.ownTrackData = [track1, track2];
-  album1.trackSections = [{tracks: ['track:track1']}];
-  album2.trackSections = [{tracks: ['track:track2']}];
+  section1.ownTrackData = [track1];
+  section2.ownTrackData = [track2];
+  section1.ownAlbumData = [album1];
+  section2.ownAlbumData = [album2];
+  section1.tracks = ['track:track1'];
+  section2.tracks = ['track:track2'];
+  album1.trackSections = [section1];
+  album2.trackSections = [section2];
 
   t.equal(track1.album, album1,
     `album #2: is album when album's trackSections matches track`);
@@ -105,21 +121,28 @@ t.test(`Track.album`, t => {
   t.equal(track1.album, null,
     `album #4: is null when track missing albumData`);
 
-  album1.ownTrackData = [];
-  track1.albumData = [album1, album2];
-
-  t.equal(track1.album, null,
-    `album #5: is null when album missing ownTrackData`);
-
-  album1.ownTrackData = [track1, track2];
-  album1.trackSections = [{tracks: ['track:track2']}];
+  section1.ownTrackData = [];
 
   // XXX_decacheWikiData
+  album1.trackSections = [];
+  album1.trackSections = [section1];
   track1.albumData = [];
-  track1.albumData = [album1, album2];
+  track1.albumData = [album2, album1];
 
   t.equal(track1.album, null,
-    `album #6: is null when album's trackSections don't match track`);
+    `album #5: is null when album track section missing ownTrackData`);
+
+  section1.ownTrackData = [track2];
+  section1.tracks = ['track:track2'];
+
+  // XXX_decacheWikiData
+  album1.trackSections = [];
+  album1.trackSections = [section1];
+  track1.albumData = [];
+  track1.albumData = [album2, album1];
+
+  t.equal(track1.album, null,
+    `album #6: is null when album track section doesn't match track`);
 });
 
 t.test(`Track.alwaysReferenceByDirectory`, t => {
@@ -285,11 +308,13 @@ t.test(`Track.color`, t => {
   t.equal(track.color, null,
     `color #1: defaults to null`);
 
+  const section = stubTrackSection(album, [track]);
+
   album.color = '#abcdef';
-  album.trackSections = [{
-    color: '#beeeef',
-    tracks: [Thing.getReference(track)],
-  }];
+  section.color = '#beeeef';
+
+  album.trackSections = [section];
+
   XXX_decacheWikiData();
 
   t.equal(track.color, '#beeeef',

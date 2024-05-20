@@ -8,16 +8,26 @@ const {
   Artist,
   ArtTag,
   Track,
+  trackSection,
 } = thingConstructors;
 
 function stubAlbum(tracks, directory = 'bar') {
   const album = new Album();
   album.directory = directory;
 
-  const trackRefs = tracks.map(t => Thing.getReference(t));
-  album.trackSections = [{tracks: trackRefs}];
+  const trackSection = stubTrackSection(album, tracks);
+  album.trackSections = [trackSection];
 
   return album;
+}
+
+function stubTrackSection(album, tracks, directory = 'baz') {
+  const trackSection = new TrackSection();
+  trackSection.unqualifiedDirectory = directory;
+  trackSection.tracks = tracks.map(t => Thing.getReference(t));
+  trackSection.ownTrackData = tracks;
+  trackSection.ownAlbumData = [album];
+  return trackSection;
 }
 
 function stubTrack(directory = 'foo') {
