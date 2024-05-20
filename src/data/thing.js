@@ -5,6 +5,7 @@ import {inspect} from 'node:util';
 
 import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
+import {unique} from '#sugar';
 
 export default class Thing extends CacheableObject {
   static referenceType = Symbol.for('Thing.referenceType');
@@ -19,6 +20,8 @@ export default class Thing extends CacheableObject {
 
   static isThingConstructor = Symbol.for('Thing.isThingConstructor');
   static isThing = Symbol.for('Thing.isThing');
+
+  static selectAll = Symbol.for('Thing.selectAll');
 
   // To detect:
   // Symbol.for('Thing.isThingConstructor') in constructor
@@ -109,4 +112,15 @@ export default class Thing extends CacheableObject {
       ],
     };
   }
+}
+
+export function selectAllThingsFromWikiData({
+  thingConstructors,
+  wikiData,
+}) {
+  return (
+    unique(
+      Object.values(thingConstructors)
+        .flatMap(constructor =>
+          constructor[Thing.selectAll](wikiData))));
 }

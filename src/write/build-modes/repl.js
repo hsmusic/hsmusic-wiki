@@ -38,6 +38,7 @@ import {debugComposite} from '#composite';
 import * as serialize from '#serialize';
 import * as sort from '#sort';
 import * as sugar from '#sugar';
+import Thing, * as thingUtils from '#thing';
 import thingConstructors from '#things';
 import * as wikiDataUtils from '#wiki-data';
 
@@ -57,6 +58,11 @@ export async function getContextAssignments({
   getSizeOfImagePath,
   niceShowAggregate,
 }) {
+  let _;
+
+  let actualThingUtils;
+  ({default: _, ...actualThingUtils} = thingUtils);
+
   let find;
   try {
     find = bindFind(wikiData);
@@ -64,6 +70,19 @@ export async function getContextAssignments({
     console.error(error);
     logWarn`Failed to prepare wikiData-bound find() functions`;
     logWarn`\`find\` variable will be missing`;
+  }
+
+  let allThings;
+  try {
+    allThings =
+      actualThingUtils.selectAllThingsFromWikiData({
+        thingConstructors,
+        wikiData,
+      });
+  } catch (error) {
+    console.error(error);
+    logWarn`Failed to get flat list of all things from wikiData`;
+    logWarn`\`allThings\` variable will be missing`;
   }
 
   const replContext = {
@@ -83,12 +102,18 @@ export async function getContextAssignments({
     ...wikiData,
     WD: wikiData,
 
+    allThings,
+
     ...thingConstructors,
+    thingConstructors,
+
     CacheableObject,
+    Thing,
     debugComposite,
 
     ...sort,
     ...sugar,
+    ...actualThingUtils,
     ...wikiDataUtils,
 
     serialize,

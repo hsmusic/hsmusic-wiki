@@ -187,6 +187,12 @@ export class Album extends Thing {
     ],
   });
 
+  static [Thing.selectAll] = (wikiData) =>
+    wikiData.albumData.flatMap(album => [
+      album,
+      ...album.trackSections,
+    ]);
+
   static [Thing.getSerializeDescriptors] = ({
     serialize: S,
   }) => ({
