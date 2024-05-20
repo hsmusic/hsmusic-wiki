@@ -6,15 +6,17 @@ import {input} from '#composite';
 import find from '#find';
 import {traverse} from '#node-utils';
 import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
-import {empty} from '#sugar';
+import {accumulateSum, empty} from '#sugar';
 import Thing from '#thing';
-import {isDate} from '#validators';
+import {isColor, isDate, validateWikiData} from '#validators';
 import {parseAdditionalFiles, parseContributors, parseDate, parseDimensions}
   from '#yaml';
 
-import {exposeDependency, exposeUpdateValueOrContinue}
+import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
-import {exitWithoutContribs} from '#composite/wiki-data';
+import {withPropertyFromObject} from '#composite/data';
+import {exitWithoutContribs, withDirectory, withResolvedReference}
+  from '#composite/wiki-data';
 
 import {
   additionalFiles,
@@ -31,16 +33,24 @@ import {
   referenceList,
   simpleDate,
   simpleString,
+  singleReference,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
 
-import {withTracks, withTrackSections} from '#composite/things/album';
+import {withTracks} from '#composite/things/album';
+import {withAlbum} from '#composite/things/track-section';
 
 export class Album extends Thing {
   static [Thing.referenceType] = 'album';
 
-  static [Thing.getPropertyDescriptors] = ({ArtTag, Artist, Group, Track}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    ArtTag,
+    Artist,
+    Group,
+    Track,
+    TrackSection,
+  }) => ({
     // Update & expose
 
     name: name('Unnamed Album'),
@@ -111,10 +121,17 @@ export class Album extends Thing {
     commentary: commentary(),
     additionalFiles: additionalFiles(),
 
-    trackSections: [
-      withTrackSections(),
-      exposeDependency({dependency: '#trackSections'}),
-    ],
+    trackSections: {
+      flags: {update: true, expose: true},
+
+      update: {
+        validate:
+          validateWikiData({
+            referenceType:
+              TrackSection[Thing.referenceType],
+          }),
+      },
+    },
 
     artistContribs: contributionList(),
     coverArtistContribs: contributionList(),
@@ -153,13 +170,6 @@ export class Album extends Thing {
 
     groupData: wikiData({
       class: input.value(Group),
-    }),
-
-    // Only the tracks which belong to this album.
-    // Necessary for computing the track list, so provide this statically
-    // or keep it updated.
-    ownTrackData: wikiData({
-      class: input.value(Track),
     }),
 
     // Expose only
@@ -345,7 +355,7 @@ export class Album extends Thing {
     headerDocumentThing: Album,
     entryDocumentThing: document =>
       ('Section' in document
-        ? TrackSectionHelper
+        ? TrackSection
         : Track),
 
     save(results) {
@@ -353,49 +363,49 @@ export class Album extends Thing {
       const trackData = [];
 
       for (const {header: album, entries} of results) {
-        // We can't mutate an array once it's set as a property value,
-        // so prepare the track sections that will show up in a track list
-        // all the way before actually applying them. (It's okay to mutate
-        // an individual section before applying it, since those are just
-        // generic objects; they aren't Things in and of themselves.)
         const trackSections = [];
-        const ownTrackData = [];
 
-        let currentTrackSection = {
+        let currentTrackSection = new TrackSection();
+        let currentTrackSectionTracks = [];
+
+        Object.assign(currentTrackSection, {
           name: `Default Track Section`,
           isDefaultTrackSection: true,
-          tracks: [],
-        };
+        });
 
         const albumRef = Thing.getReference(album);
 
         const closeCurrentTrackSection = () => {
-          if (!empty(currentTrackSection.tracks)) {
-            trackSections.push(currentTrackSection);
+          if (empty(currentTrackSectionTracks)) {
+            return;
           }
+
+          currentTrackSection.tracks =
+            currentTrackSectionTracks
+              .map(track => Thing.getReference(track));
+
+          currentTrackSection.ownTrackData =
+            currentTrackSectionTracks;
+
+          currentTrackSection.ownAlbumData =
+            [album];
+
+          trackSections.push(currentTrackSection);
         };
 
         for (const entry of entries) {
-          if (entry instanceof TrackSectionHelper) {
+          if (entry instanceof TrackSection) {
             closeCurrentTrackSection();
-
-            currentTrackSection = {
-              name: entry.name,
-              color: entry.color,
-              dateOriginallyReleased: entry.dateOriginallyReleased,
-              isDefaultTrackSection: false,
-              tracks: [],
-            };
-
+            currentTrackSection = entry;
+            currentTrackSectionTracks = [];
             continue;
           }
+
+          currentTrackSectionTracks.push(entry);
 
           trackData.push(entry);
 
           entry.dataSourceAlbum = albumRef;
-
-          ownTrackData.push(entry);
-          currentTrackSection.tracks.push(Thing.getReference(entry));
         }
 
         closeCurrentTrackSection();
@@ -403,7 +413,6 @@ export class Album extends Thing {
         albumData.push(album);
 
         album.trackSections = trackSections;
-        album.ownTrackData = ownTrackData;
       }
 
       return {albumData, trackData};
@@ -416,15 +425,97 @@ export class Album extends Thing {
   });
 }
 
-export class TrackSectionHelper extends Thing {
+export class TrackSection extends Thing {
   static [Thing.friendlyName] = `Track Section`;
+  static [Thing.referenceType] = `track-section`;
 
-  static [Thing.getPropertyDescriptors] = () => ({
+  static [Thing.getPropertyDescriptors] = ({Album, Track}) => ({
+    // Update & expose
+
     name: name('Unnamed Track Section'),
-    color: color(),
+
+    unqualifiedDirectory: directory(),
+
+    color: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isColor),
+      }),
+
+      withAlbum(),
+
+      withPropertyFromObject({
+        object: '#album',
+        property: input.value('color'),
+      }),
+
+      exposeDependency({dependency: '#album.color'}),
+    ],
+
     dateOriginallyReleased: simpleDate(),
-    isDefaultTrackGroup: flag(false),
-  })
+
+    isDefaultTrackSection: flag(false),
+
+    album: [
+      withAlbum(),
+      exposeDependency({dependency: '#album'}),
+    ],
+
+    tracks: referenceList({
+      class: input.value(Track),
+      data: 'ownTrackData',
+      find: input.value(find.track),
+    }),
+
+    // Update only
+
+    ownAlbumData: wikiData({
+      class: input.value(Album),
+    }),
+
+    ownTrackData: wikiData({
+      class: input.value(Track),
+    }),
+
+    // Expose only
+
+    startIndex: [
+      withAlbum(),
+
+      withPropertyFromObject({
+        object: '#album',
+        property: input.value('trackSections'),
+      }),
+
+      {
+        dependencies: ['#album.trackSections', input.myself()],
+        compute: (continuation, {
+          ['#album.trackSections']: trackSections,
+          [input.myself()]: myself,
+        }) => continuation({
+          ['#index']:
+            trackSections.indexOf(myself),
+        }),
+      },
+
+      exitWithoutDependency({
+        dependency: '#index',
+        mode: input.value('index'),
+        value: input.value(0),
+      }),
+
+      {
+        dependencies: ['#album.trackSections', '#index'],
+        compute: ({
+          ['#album.trackSections']: trackSections,
+          ['#index']: index,
+        }) =>
+          accumulateSum(
+            trackSections
+              .slice(0, index)
+              .map(section => section.tracks.length)),
+      },
+    ],
+  });
 
   static [Thing.yamlDocumentSpec] = {
     fields: {

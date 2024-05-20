@@ -13,20 +13,20 @@ export function linkAndBindWikiData(wikiData, {
             .map(([key, value]) => [key, value.slice()]))
         : wikiData));
 
-    // If albumData is present, automatically set albums' ownTrackData values
-    // by resolving track sections' references against the full array. This is
-    // just a nicety for working with albums throughout tests.
+    // If albumData is present, automatically set their sections' ownTrackData
+    // by resolving references against the full array. This is just a nicety
+    // for working with albums throughout tests.
     if (inferAlbumsOwnTrackData && wikiData.albumData && wikiData.trackData) {
       for (const album of wikiData.albumData) {
         const trackSections =
           CacheableObject.getUpdateValue(album, 'trackSections');
 
-        const trackRefs =
-          trackSections.flatMap(section => section.tracks);
-
-        album.ownTrackData =
-          trackRefs.map(ref =>
-            find.track(ref, wikiData.trackData, {mode: 'error'}));
+        for (const trackSection of trackSections) {
+          trackSection.ownTrackData =
+            CacheableObject.getUpdateValue(trackSection, 'tracks')
+              .map(ref =>
+                find.track(ref, wikiData.trackData, {mode: 'error'}));
+        }
       }
     }
   }

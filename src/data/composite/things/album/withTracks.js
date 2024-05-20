@@ -1,9 +1,8 @@
 import {input, templateCompositeFrom} from '#composite';
-import find from '#find';
 
 import {exitWithoutDependency, raiseOutputWithoutDependency}
   from '#composite/control-flow';
-import {withResolvedReferenceList} from '#composite/wiki-data';
+import {withFlattenedList, withPropertyFromList} from '#composite/data';
 
 export default templateCompositeFrom({
   annotation: `withTracks`,
@@ -11,41 +10,22 @@ export default templateCompositeFrom({
   outputs: ['#tracks'],
 
   steps: () => [
-    exitWithoutDependency({
-      dependency: 'ownTrackData',
-      value: input.value([]),
-    }),
-
     raiseOutputWithoutDependency({
       dependency: 'trackSections',
-      mode: input.value('empty'),
       output: input.value({
-        ['#tracks']: [],
+        '#tracks': [],
       }),
     }),
 
-    {
-      dependencies: ['trackSections'],
-      compute: (continuation, {trackSections}) =>
-        continuation({
-          '#trackRefs': trackSections
-            .flatMap(section => section.tracks ?? []),
-        }),
-    },
-
-    withResolvedReferenceList({
-      list: '#trackRefs',
-      data: 'ownTrackData',
-      find: input.value(find.track),
+    withPropertyFromList({
+      list: 'trackSections',
+      property: input.value('tracks'),
     }),
 
-    {
-      dependencies: ['#resolvedReferenceList'],
-      compute: (continuation, {
-        ['#resolvedReferenceList']: resolvedReferenceList,
-      }) => continuation({
-        ['#tracks']: resolvedReferenceList,
-      })
-    },
+    withFlattenedList({
+      list: '#trackSections.tracks',
+    }).outputs({
+      ['#flattenedList']: '#tracks',
+    }),
   ],
 });

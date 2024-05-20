@@ -24,6 +24,7 @@
         "#composite/things/flash": "./src/data/composite/things/flash/index.js",
         "#composite/things/flash-act": "./src/data/composite/things/flash-act/index.js",
         "#composite/things/track": "./src/data/composite/things/track/index.js",
+        "#composite/things/track-section": "./src/data/composite/things/track-section/index.js",
         "#content-dependencies": "./src/content/dependencies/index.js",
         "#content-function": "./src/content-function.js",
         "#cli": "./src/util/cli.js",
