@@ -2,22 +2,32 @@
 // almost any data object. Also corresponds to a part of the URL which pages of
 // such objects are visited at.
 
-import {isDirectory} from '#validators';
-import {getKebabCase} from '#wiki-data';
+import {input, templateCompositeFrom} from '#composite';
 
-// TODO: Not templateCompositeFrom.
+import {isDirectory, isName} from '#validators';
 
-export default function() {
-  return {
-    flags: {update: true, expose: true},
-    update: {validate: isDirectory},
-    expose: {
-      dependencies: ['name'],
-      transform(directory, {name}) {
-        if (directory === null && name === null) return null;
-        else if (directory === null) return getKebabCase(name);
-        else return directory;
-      },
-    },
-  };
-}
+import {exposeDependency} from '#composite/control-flow';
+import {withDirectory} from '#composite/wiki-data';
+
+export default templateCompositeFrom({
+  annotation: `directory`,
+
+  compose: false,
+
+  inputs: {
+    name: input({
+      validate: isName,
+      defaultDependency: 'name',
+    }),
+  },
+
+  steps: () => [
+    withDirectory({
+      directory: input.updateValue({validate: isDirectory}),
+    }),
+
+    exposeDependency({
+      dependency: '#directory',
+    }),
+  ],
+});
