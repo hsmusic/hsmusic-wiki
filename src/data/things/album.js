@@ -121,17 +121,11 @@ export class Album extends Thing {
     commentary: commentary(),
     additionalFiles: additionalFiles(),
 
-    trackSections: {
-      flags: {update: true, expose: true},
-
-      update: {
-        validate:
-          validateWikiData({
-            referenceType:
-              TrackSection[Thing.referenceType],
-          }),
-      },
-    },
+    trackSections: referenceList({
+      referenceType: input.value('unqualified-track-section'),
+      data: 'ownTrackSectionData',
+      find: input.value(find.unqualifiedTrackSection),
+    }),
 
     artistContribs: contributionList(),
     coverArtistContribs: contributionList(),
@@ -170,6 +164,10 @@ export class Album extends Thing {
 
     groupData: wikiData({
       class: input.value(Group),
+    }),
+
+    ownTrackSectionData: wikiData({
+      class: input.value(TrackSection),
     }),
 
     // Expose only
@@ -360,6 +358,7 @@ export class Album extends Thing {
 
     save(results) {
       const albumData = [];
+      const trackSectionData = [];
       const trackData = [];
 
       for (const {header: album, entries} of results) {
@@ -376,7 +375,10 @@ export class Album extends Thing {
         const albumRef = Thing.getReference(album);
 
         const closeCurrentTrackSection = () => {
-          if (empty(currentTrackSectionTracks)) {
+          if (
+            currentTrackSection.isDefaultTrackSection &&
+            empty(currentTrackSectionTracks)
+          ) {
             return;
           }
 
@@ -391,6 +393,7 @@ export class Album extends Thing {
             [album];
 
           trackSections.push(currentTrackSection);
+          trackSectionData.push(currentTrackSection);
         };
 
         for (const entry of entries) {
@@ -402,7 +405,6 @@ export class Album extends Thing {
           }
 
           currentTrackSectionTracks.push(entry);
-
           trackData.push(entry);
 
           entry.dataSourceAlbum = albumRef;
@@ -412,10 +414,16 @@ export class Album extends Thing {
 
         albumData.push(album);
 
-        album.trackSections = trackSections;
+        album.trackSections =
+          trackSections
+            .map(trackSection =>
+              `unqualified-track-section:` +
+              trackSection.unqualifiedDirectory);
+
+        album.ownTrackSectionData = trackSections;
       }
 
-      return {albumData, trackData};
+      return {albumData, trackSectionData, trackData};
     },
 
     sort({albumData, trackData}) {
@@ -478,6 +486,34 @@ export class TrackSection extends Thing {
 
     // Expose only
 
+    directory: [
+      withAlbum(),
+
+      exitWithoutDependency({
+        dependency: '#album',
+      }),
+
+      withPropertyFromObject({
+        object: '#album',
+        property: input.value('directory'),
+      }),
+
+      withDirectory({
+        directory: 'unqualifiedDirectory',
+      }).outputs({
+        '#directory': '#unqualifiedDirectory',
+      }),
+
+      {
+        dependencies: ['#album.directory', '#unqualifiedDirectory'],
+        compute: ({
+          ['#album.directory']: albumDirectory,
+          ['#unqualifiedDirectory']: unqualifiedDirectory,
+        }) =>
+          albumDirectory + '/' + unqualifiedDirectory,
+      },
+    ],
+
     startIndex: [
       withAlbum(),
 
@@ -516,6 +552,20 @@ export class TrackSection extends Thing {
       },
     ],
   });
+
+  static [Thing.findSpecs] = {
+    trackSection: {
+      referenceTypes: ['track-section'],
+      bindTo: 'trackSectionData',
+    },
+
+    unqualifiedTrackSection: {
+      referenceTypes: ['unqualified-track-section'],
+
+      getMatchableDirectories: trackSection =>
+        [trackSection.unqualifiedDirectory],
+    },
+  };
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
