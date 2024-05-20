@@ -1,7 +1,10 @@
 export const DATA_ALBUM_DIRECTORY = 'album';
 
 import * as path from 'node:path';
+import {inspect} from 'node:util';
 
+import CacheableObject from '#cacheable-object';
+import {colors} from '#cli';
 import {input} from '#composite';
 import find from '#find';
 import {traverse} from '#node-utils';
@@ -578,4 +581,48 @@ export class TrackSection extends Thing {
       },
     },
   };
+
+  [inspect.custom](depth) {
+    const parts = [];
+
+    parts.push(Thing.prototype[inspect.custom].apply(this));
+
+    if (depth >= 0) {
+      let album = null;
+      try {
+        album = this.album;
+      } catch {}
+
+      let first = null;
+      try {
+        first = this.startIndex;
+      } catch {}
+
+      let length = null;
+      try {
+        length = this.tracks.length;
+      } catch {}
+
+      album ??= CacheableObject.getUpdateValue(this, 'ownAlbumData')?.[0];
+
+      if (album) {
+        const albumName = album.name;
+        const albumIndex = album.trackSections.indexOf(this);
+
+        const num =
+          (albumIndex === -1
+            ? 'indeterminate position'
+            : `#${albumIndex + 1}`);
+
+        const range =
+          (albumIndex >= 0 && first !== null && length !== null
+            ? `: ${first + 1}-${first + length + 1}`
+            : '');
+
+        parts.push(` (${colors.yellow(num + range)} in ${colors.green(albumName)})`);
+      }
+    }
+
+    return parts.join('');
+  }
 }
