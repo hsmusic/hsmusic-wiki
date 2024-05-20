@@ -33,17 +33,36 @@ export default class Thing extends CacheableObject {
     },
   };
 
+  static [Symbol.for('Thing.selectAll')] = _wikiData => [];
+
   // Default custom inspect function, which may be overridden by Thing
   // subclasses. This will be used when displaying aggregate errors and other
   // command-line logging - it's the place to provide information useful in
   // identifying the Thing being presented.
   [inspect.custom]() {
-    const cname = this.constructor.name;
+    const constructorName = this.constructor.name;
+
+    let name;
+    try {
+      if (this.name) {
+        name = colors.green(`"${this.name}"`);
+      }
+    } catch (error) {
+      name = colors.yellow(`couldn't get name`);
+    }
+
+    let reference;
+    try {
+      if (this.directory) {
+        reference = colors.blue(Thing.getReference(this));
+      }
+    } catch (error) {
+      reference = colors.yellow(`couldn't get reference`);
+    }
 
     return (
-      (this.name ? `${cname} ${colors.green(`"${this.name}"`)}` : `${cname}`) +
-      (this.directory ? ` (${colors.blue(Thing.getReference(this))})` : '')
-    );
+      (name ? `${constructorName} ${name}` : `${constructorName}`) +
+      (reference ? ` (${reference})` : ''));
   }
 
   static getReference(thing) {
