@@ -1,10 +1,9 @@
 import {input, templateCompositeFrom} from '#composite';
 
-import find from '#find';
-
-import {exitWithoutDependency} from '#composite/control-flow';
 import {withFlattenedList, withPropertyFromList} from '#composite/data';
 import {withResolvedReferenceList} from '#composite/wiki-data';
+
+import withTrackSections from './withTrackSections.js';
 
 export default templateCompositeFrom({
   annotation: `withTracks`,
@@ -12,13 +11,7 @@ export default templateCompositeFrom({
   outputs: ['#tracks'],
 
   steps: () => [
-    withResolvedReferenceList({
-      list: 'trackSections',
-      data: 'ownTrackSectionData',
-      find: input.value(find.unqualifiedTrackSection),
-    }).outputs({
-      ['#resolvedReferenceList']: '#trackSections',
-    }),
+    withTrackSections(),
 
     withPropertyFromList({
       list: '#trackSections',
