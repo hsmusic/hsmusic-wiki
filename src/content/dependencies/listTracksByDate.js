@@ -15,7 +15,8 @@ export default {
 
       chunks:
         chunkByProperties(
-          sortAlbumsTracksChronologically(trackData.slice()),
+          sortAlbumsTracksChronologically(
+            trackData.filter(track => track.date)),
           ['album', 'date']),
     };
   },
