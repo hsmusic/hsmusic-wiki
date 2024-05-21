@@ -226,7 +226,7 @@ body {
 }
 
 body::before {
-  background-image: url("../media/bg.jpg");
+  background-image: url("../../media/bg.jpg");
   background-position: center;
   background-size: cover;
   opacity: 0.5;
@@ -1348,7 +1348,6 @@ img.pixelate, .pixelate img {
 
   font-size: 1.6em;
   opacity: 0.8;
-  background-image: url("warning.svg");
 }
 
 .reveal-interaction {
