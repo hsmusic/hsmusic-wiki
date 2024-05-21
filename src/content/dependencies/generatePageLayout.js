@@ -598,7 +598,7 @@ export default {
 
             html.tag('link', {
               rel: 'stylesheet',
-              href: to('shared.staticFile', 'site7.css', cachebust),
+              href: to('shared.staticFile', 'site.css', cachebust),
             }),
 
             html.tag('style', [
@@ -638,7 +638,7 @@ export default {
 
               html.tag('script', {
                 type: 'module',
-                src: to('shared.staticFile', 'client4.js', cachebust),
+                src: to('shared.staticFile', 'client.js', cachebust),
               }),
             ]),
         ])
