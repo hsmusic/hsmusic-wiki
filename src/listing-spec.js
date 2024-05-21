@@ -67,7 +67,7 @@ listingSpec.push({
   contentFunction: 'listArtistsByDuration',
 });
 
-// TODO: hide if no groups...
+// TODO: hide if divideTrackListsByGroups empty...
 listingSpec.push({
   directory: 'artists/by-group',
   stringsKey: 'listArtists.byGroup',

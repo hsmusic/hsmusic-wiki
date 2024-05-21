@@ -1,6 +1,11 @@
 import {sortAlphabetically} from '#sort';
-import {empty, filterMultipleArrays, stitchArrays, unique} from '#sugar';
-import {getArtistNumContributions} from '#wiki-data';
+import {
+  empty,
+  filterByCount,
+  filterMultipleArrays,
+  stitchArrays,
+  transposeArrays,
+} from '#sugar';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtist', 'linkGroup'],
@@ -15,29 +20,52 @@ export default {
       sortAlphabetically(
         sprawl.artistData.filter(artist => !artist.isAlias));
 
-    const groups =
+    const interestingGroups =
       sprawl.wikiInfo.divideTrackListsByGroups;
 
-    if (empty(groups)) {
-      return {spec, artists};
+    if (empty(interestingGroups)) {
+      return {spec};
     }
 
-    const artistGroups =
+    // We don't actually care about *which* things belong to each group, only
+    // how many belong to each group. So we'll just compute a list of all the
+    // (interesting) groups that each of each artists' things belongs to.
+    const artistThingGroups =
       artists.map(artist =>
-        unique(
-          unique([
-            ...artist.albumsAsAny,
-            ...artist.tracksAsAny.map(track => track.album),
-          ]).flatMap(album => album.groups)))
+        ([...artist.albumsAsAny.map(album => album.groups),
+          ...artist.tracksAsAny.map(track => track.album.groups)])
+            .map(groups => groups
+              .filter(group => interestingGroups.includes(group))));
 
-    const artistsByGroup =
-      groups.map(group =>
-        artists.filter((artist, index) => artistGroups[index].includes(group)));
+    const [artistsByGroup, countsByGroup] =
+      transposeArrays(interestingGroups.map(group => {
+        const counts =
+          artistThingGroups
+            .map(thingGroups => thingGroups
+              .filter(thingGroups => thingGroups.includes(group))
+              .length);
 
-    filterMultipleArrays(groups, artistsByGroup,
-      (group, artists) => !empty(artists));
+        const filteredArtists = artists.slice();
 
-    return {spec, groups, artistsByGroup};
+        filterByCount(filteredArtists, counts);
+
+        return [filteredArtists, counts];
+      }));
+
+    const groups = interestingGroups;
+
+    filterMultipleArrays(
+      groups,
+      artistsByGroup,
+      countsByGroup,
+      (_group, artists, _counts) => !empty(artists));
+
+    return {
+      spec,
+      groups,
+      artistsByGroup,
+      countsByGroup,
+    };
   },
 
   relations(relation, query) {
@@ -45,12 +73,6 @@ export default {
 
     relations.page =
       relation('generateListingPage', query.spec);
-
-    if (query.artists) {
-      relations.artistLinks =
-        query.artists
-          .map(artist => relation('linkArtist', artist));
-    }
 
     if (query.artistsByGroup) {
       relations.groupLinks =
@@ -69,65 +91,43 @@ export default {
   data(query) {
     const data = {};
 
-    if (query.artists) {
-      data.counts =
-        query.artists
-          .map(artist => getArtistNumContributions(artist));
-    }
-
     if (query.artistsByGroup) {
       data.groupDirectories =
         query.groups
           .map(group => group.directory);
 
       data.countsByGroup =
-        query.artistsByGroup
-          .map(artists => artists
-            .map(artist => getArtistNumContributions(artist)));
+        query.countsByGroup;
     }
 
     return data;
   },
 
-  generate(data, relations, {language}) {
-    return (
-      (relations.artistLinksByGroup
-        ? relations.page.slots({
-            type: 'chunks',
+  generate: (data, relations, {language}) =>
+    relations.page.slots({
+      type: 'chunks',
 
-            showSkipToSection: true,
-            chunkIDs:
-              data.groupDirectories
-                .map(directory => `contributed-to-${directory}`),
+      showSkipToSection: true,
+      chunkIDs:
+        data.groupDirectories
+          .map(directory => `contributed-to-${directory}`),
 
-            chunkTitles:
-              relations.groupLinks.map(groupLink => ({
-                group: groupLink,
-              })),
+      chunkTitles:
+        relations.groupLinks.map(groupLink => ({
+          group: groupLink,
+        })),
 
-            chunkRows:
-              stitchArrays({
-                artistLinks: relations.artistLinksByGroup,
-                counts: data.countsByGroup,
-              }).map(({artistLinks, counts}) =>
-                  stitchArrays({
-                    link: artistLinks,
-                    count: counts,
-                  }).map(({link, count}) => ({
-                      artist: link,
-                      contributions: language.countContributions(count, {unit: true}),
-                    }))),
-          })
-        : relations.page.slots({
-            type: 'rows',
-            rows:
-              stitchArrays({
-                link: relations.artistLinks,
-                count: data.counts,
-              }).map(({link, count}) => ({
-                  artist: link,
-                  contributions: language.countContributions(count, {unit: true}),
-                })),
-          })));
-  },
+      chunkRows:
+        stitchArrays({
+          artistLinks: relations.artistLinksByGroup,
+          counts: data.countsByGroup,
+        }).map(({artistLinks, counts}) =>
+            stitchArrays({
+              link: artistLinks,
+              count: counts,
+            }).map(({link, count}) => ({
+                artist: link,
+                contributions: language.countContributions(count, {unit: true}),
+              }))),
+    }),
 };
