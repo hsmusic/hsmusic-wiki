@@ -6,7 +6,7 @@
 // ephemeral nature.
 
 import {accumulateSum, empty, filterMultipleArrays, stitchArrays}
-  from '../util/sugar.js';
+  from '../shared-util/sugar.js';
 import {fetchWithProgress} from './xhr-util.js';
 
 const clientInfo = window.hsmusicClientInfo = Object.create(null);

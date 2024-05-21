@@ -16,13 +16,23 @@ function getNodeDependencyRootPath(dependencyName) {
 
 export const stationaryCodeRoutes = [
   {
-    from: path.join(codeSrcPath, 'static'),
-    to: ['static.root'],
+    from: path.join(codeSrcPath, 'static', 'css'),
+    to: ['staticCSS.root'],
+  },
+
+  {
+    from: path.join(codeSrcPath, 'static', 'js'),
+    to: ['staticJS.root'],
+  },
+
+  {
+    from: path.join(codeSrcPath, 'static', 'misc'),
+    to: ['staticMisc.root'],
   },
 
   {
     from: path.join(codeSrcPath, 'util'),
-    to: ['util.root'],
+    to: ['staticSharedUtil.root'],
   },
 ];
 

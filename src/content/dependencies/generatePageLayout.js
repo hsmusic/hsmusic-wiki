@@ -596,7 +596,7 @@ export default {
 
             html.tag('link', {
               rel: 'stylesheet',
-              href: to('static.path', 'site.css'),
+              href: to('staticCSS.path', 'site.css'),
             }),
 
             html.tag('style', [
@@ -606,7 +606,7 @@ export default {
             ]),
 
             html.tag('script', {
-              src: to('static.path', 'lazy-loading.js'),
+              src: to('staticJS.path', 'lazy-loading.js'),
             }),
           ]),
 
@@ -636,7 +636,7 @@ export default {
 
               html.tag('script', {
                 type: 'module',
-                src: to('static.path', 'client.js'),
+                src: to('staticJS.path', 'client.js'),
               }),
             ]),
         ])

@@ -37,7 +37,7 @@ export default {
             html.tag('title', platformText),
 
           html.tag('use', {
-            href: to('static.icon', iconId),
+            href: to('staticMisc.icon', iconId),
           }),
         ]),
 

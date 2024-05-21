@@ -170,7 +170,7 @@ export default {
     if (willReveal) {
       reveal = [
         html.tag('img', {class: 'reveal-symbol'},
-          {src: to('static.path', 'warning.svg')}),
+          {src: to('staticMisc.icon', 'warning.svg')}),
 
         html.tag('br'),
 

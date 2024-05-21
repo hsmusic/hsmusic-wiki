@@ -66,6 +66,29 @@ const urlSpec = {
     paths: genericPaths,
   },
 
+  staticCSS: {
+    prefix: 'static/css/',
+    paths: genericPaths,
+  },
+
+  staticJS: {
+    prefix: 'static/js/',
+    paths: genericPaths,
+  },
+
+  staticMisc: {
+    prefix: 'static/misc/',
+    paths: {
+      ...genericPaths,
+      icon: 'icons.svg#icon-<>',
+    },
+  },
+
+  staticSharedUtil: {
+    prefix: 'static/shared-util/',
+    paths: genericPaths,
+  },
+
   media: {
     prefix: 'media/',
 
@@ -87,20 +110,6 @@ const urlSpec = {
 
   thumb: {
     prefix: 'thumb/',
-    paths: genericPaths,
-  },
-
-  static: {
-    prefix: 'static/',
-    paths: {
-      ...genericPaths,
-
-      icon: 'icons.svg#icon-<>',
-    },
-  },
-
-  util: {
-    prefix: 'util/',
     paths: genericPaths,
   },
 };
