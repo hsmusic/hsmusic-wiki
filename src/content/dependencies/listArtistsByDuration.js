@@ -1,5 +1,5 @@
 import {sortAlphabetically, sortByCount} from '#sort';
-import {filterByCount, stitchArrays} from '#sugar';
+import {filterByCount, stitchArrays, unique} from '#sugar';
 import {getTotalDuration} from '#wiki-data';
 
 export default {
@@ -17,10 +17,12 @@ export default {
 
     const durations =
       artists.map(artist =>
-        getTotalDuration([
-          ...(artist.tracksAsArtist ?? []),
-          ...(artist.tracksAsContributor ?? []),
-        ], {originalReleasesOnly: true}));
+        getTotalDuration(
+          unique([
+            ...(artist.tracksAsArtist ?? []),
+            ...(artist.tracksAsContributor ?? []),
+          ]),
+          {originalReleasesOnly: true}));
 
     filterByCount(artists, durations);
     sortByCount(artists, durations, {greatestFirst: true});
