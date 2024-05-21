@@ -337,7 +337,7 @@ export async function go({
     if (!Object.hasOwn(urlToPageMap, pathnameKey)) {
       response.writeHead(404, contentTypePlain);
       response.end(`No page found for: ${pathnameKey}\n`);
-      if (loudResponses) console.log(`${requestHead} [404] ${pathname}`);
+      if (loudResponses) console.log(`${requestHead} [404] ${pathname} (no page)`);
       return;
     }
 
