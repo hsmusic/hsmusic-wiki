@@ -1,5 +1,11 @@
 import {withEntries} from '#sugar';
 
+// Static files are all grouped under a `static-${STATIC_VERSION}` folder as
+// part of a build. This is so that multiple builds of a wiki can coexist
+// served from the same server / file system root: older builds' HTML files
+// refer to earlier values of STATIC_VERSION, avoiding name collisions.
+const STATIC_VERSION = '2a';
+
 const genericPaths = {
   root: '',
   path: '<>',
@@ -67,17 +73,17 @@ const urlSpec = {
   },
 
   staticCSS: {
-    prefix: 'static/css/',
+    prefix: `static-${STATIC_VERSION}/css/`,
     paths: genericPaths,
   },
 
   staticJS: {
-    prefix: 'static/js/',
+    prefix: `static-${STATIC_VERSION}/js/`,
     paths: genericPaths,
   },
 
   staticMisc: {
-    prefix: 'static/misc/',
+    prefix: `static-${STATIC_VERSION}/misc/`,
     paths: {
       ...genericPaths,
       icon: 'icons.svg#icon-<>',
@@ -85,7 +91,7 @@ const urlSpec = {
   },
 
   staticSharedUtil: {
-    prefix: 'static/shared-util/',
+    prefix: `static-${STATIC_VERSION}/shared-util/`,
     paths: genericPaths,
   },
 
