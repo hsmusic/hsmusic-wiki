@@ -115,7 +115,6 @@ export async function go({
   webRoutes,
   wikiData,
 
-  cachebust,
   developersComment: _developersComment,
   getSizeOfAdditionalFile,
   getSizeOfImagePath,
@@ -306,7 +305,6 @@ export async function go({
 
         const bound = bindUtilities({
           absoluteTo,
-          cachebust,
           defaultLanguage,
           getSizeOfAdditionalFile,
           getSizeOfImagePath,

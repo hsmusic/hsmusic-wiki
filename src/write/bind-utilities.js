@@ -19,7 +19,6 @@ import {
 
 export function bindUtilities({
   absoluteTo,
-  cachebust,
   defaultLanguage,
   getSizeOfAdditionalFile,
   getSizeOfImagePath,
@@ -36,7 +35,6 @@ export function bindUtilities({
 
   Object.assign(bound, {
     absoluteTo,
-    cachebust,
     defaultLanguage,
     getSizeOfAdditionalFile,
     getSizeOfImagePath,

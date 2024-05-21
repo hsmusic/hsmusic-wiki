@@ -93,8 +93,6 @@ import * as buildModes from './write/build-modes/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const CACHEBUST = 23;
-
 let COMMIT;
 try {
   COMMIT = execSync('git log --format="%h %B" -n 1 HEAD', {cwd: __dirname}).toString().trim();
@@ -2116,7 +2114,6 @@ async function main() {
       webRoutes,
       wikiData,
 
-      cachebust: '?' + CACHEBUST,
       closeLanguageWatchers,
       developersComment,
       getSizeOfAdditionalFile,

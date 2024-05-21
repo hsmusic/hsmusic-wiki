@@ -63,17 +63,7 @@ const urlSpec = {
   },
 
   shared: {
-    paths: {
-      ...genericPaths,
-
-      utilityRoot: 'util',
-      staticRoot: 'static',
-
-      utilityFile: 'util/<>',
-      staticFile: 'static/<>?<>',
-
-      staticIcon: 'static/icons.svg#icon-<>',
-    },
+    paths: genericPaths,
   },
 
   media: {
@@ -102,7 +92,11 @@ const urlSpec = {
 
   static: {
     prefix: 'static/',
-    paths: genericPaths,
+    paths: {
+      ...genericPaths,
+
+      icon: 'icons.svg#icon-<>',
+    },
   },
 
   util: {

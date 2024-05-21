@@ -52,7 +52,6 @@ export function testContentFunctions(t, message, fn) {
             to,
             urls,
 
-            cachebust: 413,
             pagePath: ['home'],
             appendIndexHTML: false,
             getColors: c => getColors(c, {chroma}),

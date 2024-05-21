@@ -10,7 +10,6 @@ export default {
   ],
 
   extraDependencies: [
-    'cachebust',
     'getColors',
     'html',
     'language',
@@ -209,7 +208,6 @@ export default {
   },
 
   generate(data, relations, slots, {
-    cachebust,
     getColors,
     html,
     language,
@@ -598,7 +596,7 @@ export default {
 
             html.tag('link', {
               rel: 'stylesheet',
-              href: to('shared.staticFile', 'site.css', cachebust),
+              href: to('static.path', 'site.css'),
             }),
 
             html.tag('style', [
@@ -608,7 +606,7 @@ export default {
             ]),
 
             html.tag('script', {
-              src: to('shared.staticFile', 'lazy-loading.js', cachebust),
+              src: to('static.path', 'lazy-loading.js'),
             }),
           ]),
 
@@ -638,7 +636,7 @@ export default {
 
               html.tag('script', {
                 type: 'module',
-                src: to('shared.staticFile', 'client.js', cachebust),
+                src: to('static.path', 'client.js'),
               }),
             ]),
         ])

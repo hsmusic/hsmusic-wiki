@@ -3,7 +3,6 @@ import {empty} from '#sugar';
 
 export default {
   extraDependencies: [
-    'cachebust',
     'checkIfImagePathHasCachedThumbnails',
     'getDimensionsOfImagePath',
     'getSizeOfImagePath',
@@ -82,7 +81,6 @@ export default {
   },
 
   generate(data, relations, slots, {
-    cachebust,
     checkIfImagePathHasCachedThumbnails,
     getDimensionsOfImagePath,
     getSizeOfImagePath,
@@ -172,7 +170,7 @@ export default {
     if (willReveal) {
       reveal = [
         html.tag('img', {class: 'reveal-symbol'},
-          {src: to('shared.staticFile', 'warning.svg', cachebust)}),
+          {src: to('static.path', 'warning.svg')}),
 
         html.tag('br'),
 
