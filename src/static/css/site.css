@@ -578,9 +578,24 @@ summary .group-name {
   display: none;
 }
 
+.wiki-search-result.current-result {
+  background: var(--light-ghost-color);
+  border-top: 1px solid var(--dim-color);
+  border-bottom: 1px solid var(--dim-color);
+}
+
 .wiki-search-result:hover::before {
   display: block;
   background: var(--light-ghost-color);
+}
+
+.wiki-search-result.current-result:hover {
+  background: none;
+  border-color: transparent;
+}
+
+.wiki-search-result.current-result:hover .wiki-search-current-result-text {
+  filter: saturate(0.8) brightness(1.4);
 }
 
 .wiki-search-result-text-area {

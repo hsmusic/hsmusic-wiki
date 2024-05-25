@@ -4342,6 +4342,7 @@ function generateSidebarSearchResultTemplate(slots) {
     const here = location.href.replace(/\/$/, '');
     const there = link.href.replace(/\/$/, '');
     if (here === there) {
+      link.classList.add('current-result');
       accentSpan = document.createElement('span');
       accentSpan.classList.add('wiki-search-current-result-text');
       accentSpan.appendChild(templateContent(info.currentResultString));
