@@ -332,6 +332,25 @@ export async function go({
 
     // Other routes determined by page and URL specs
 
+    const startTiming = () => {
+      if (!showTimings) {
+        return () => '';
+      }
+
+      const timeStart = Date.now();
+
+      return () => {
+        const timeEnd = Date.now();
+        const timeDelta = timeEnd - timeStart;
+
+        if (timeDelta > 100) {
+          return `${(timeDelta / 1000).toFixed(2)}s`;
+        } else {
+          return `${timeDelta}ms`;
+        }
+      };
+    };
+
     // URL to page map expects trailing slash but no leading slash.
     const pathnameKey = pathname.replace(/^\//, '') + (pathname.endsWith('/') ? '' : '/');
 
@@ -395,7 +414,7 @@ export async function go({
         return;
       }
 
-      const timeStart = Date.now();
+      const timing = startTiming();
 
       const bound = bindUtilities({
         absoluteTo,
@@ -423,18 +442,10 @@ export async function go({
 
       const {pageHTML} = html.resolve(topLevelResult);
 
-      const timeEnd = Date.now();
-      const timeDelta = timeEnd - timeStart;
-
-      if (showTimings) {
-        const timeString =
-          (timeDelta > 100
-            ? `${(timeDelta / 1000).toFixed(2)}s`
-            : `${timeDelta}ms`);
-
-        console.log(`${requestHead} [200, ${timeString}] ${pathname} (${colors.blue(`page`)})`);
-      } else if (loudResponses) {
-        console.log(`${requestHead} [200] ${pathname} (${colors.blue(`page`)})`);
+      const timeString = timing();
+      const status = (timeString ? `200 ${timeString}` : `200`);
+      if (showTimings || loudResponses) {
+        console.log(`${requestHead} [${status}] ${pathname} (${colors.blue(`page`)})`);
       }
 
       response.writeHead(200, contentTypeHTML);
