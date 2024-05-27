@@ -150,7 +150,7 @@ export default {
         {width: slots.dimensions[0]},
 
       slots.dimensions?.[1] &&
-        {width: slots.dimensions[1]},
+        {height: slots.dimensions[1]},
     ]);
 
     const isPlaceholder =
