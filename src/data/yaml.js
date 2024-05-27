@@ -370,34 +370,42 @@ export function parseDuration(string) {
   }
 }
 
-export function parseAdditionalFiles(array) {
-  if (!Array.isArray(array)) {
-    // Error will be caught when validating against whatever this value is
-    return array;
-  }
-
-  return array.map((item) => ({
-    title: item['Title'],
-    description: item['Description'] ?? null,
-    files: item['Files'],
-  }));
-}
-
 export const extractAccentRegex =
   /^(?<main>.*?)(?: \((?<accent>.*)\))?$/;
 
 export const extractPrefixAccentRegex =
   /^(?:\((?<accent>.*)\) )?(?<main>.*?)$/;
 
-export function parseContributors(contributionStrings) {
+// TODO: Should this fit better within actual YAML loading infrastructure??
+export function parseArrayEntries(entries, mapFn) {
   // If this isn't something we can parse, just return it as-is.
   // The Thing object's validators will handle the data error better
   // than we're able to here.
-  if (!Array.isArray(contributionStrings)) {
-    return contributionStrings;
+  if (!Array.isArray(entries)) {
+    return entries;
   }
 
-  return contributionStrings.map(item => {
+  // If the array is REALLY ACTUALLY empty (it's represented in YAML
+  // as literally an empty []), that's something we want to reflect.
+  if (empty(entries)) {
+    return entries;
+  }
+
+  const nonNullEntries =
+    entries.filter(value => value !== null);
+
+  // On the other hand, if the array only contains null, it's just
+  // a placeholder, so skip over the field like it's not actually
+  // been put there yet.
+  if (empty(nonNullEntries)) {
+    return null;
+  }
+
+  return entries.map(mapFn);
+}
+
+export function parseContributors(entries) {
+  return parseArrayEntries(entries, item => {
     if (typeof item === 'object' && item['Who'])
       return {
         artist: item['Who'],
@@ -422,12 +430,20 @@ export function parseContributors(contributionStrings) {
   });
 }
 
-export function parseAdditionalNames(additionalNameStrings) {
-  if (!Array.isArray(additionalNameStrings)) {
-    return additionalNameStrings;
-  }
+export function parseAdditionalFiles(entries) {
+  return parseArrayEntries(entries, item => {
+    if (typeof item !== 'object') return item;
 
-  return additionalNameStrings.map(item => {
+    return {
+      title: item['Title'],
+      description: item['Description'] ?? null,
+      files: item['Files'],
+    };
+  });
+}
+
+export function parseAdditionalNames(entries) {
+  return parseArrayEntries(entries, item => {
     if (typeof item === 'object' && item['Name'])
       return {name: item['Name'], annotation: item['Annotation'] ?? null};
 
