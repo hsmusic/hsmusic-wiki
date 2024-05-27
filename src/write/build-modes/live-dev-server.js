@@ -91,6 +91,38 @@ export function getCLIOptions() {
   };
 }
 
+const getContentType = extname => ({
+  // BRB covering all my bases
+  'aac': 'audio/aac',
+  'bmp': 'image/bmp',
+  'css': 'text/css',
+  'csv': 'text/csv',
+  'gif': 'image/gif',
+  'ico': 'image/vnd.microsoft.icon',
+  'jpg': 'image/jpeg',
+  'jpeg': 'image/jpeg',
+  'js': 'text/javascript',
+  'mjs': 'text/javascript',
+  'mp3': 'audio/mpeg',
+  'mp4': 'video/mp4',
+  'oga': 'audio/ogg',
+  'ogg': 'audio/ogg',
+  'ogv': 'video/ogg',
+  'opus': 'audio/opus',
+  'png': 'image/png',
+  'pdf': 'application/pdf',
+  'svg': 'image/svg+xml',
+  'ttf': 'font/ttf',
+  'txt': 'text/plain',
+  'wav': 'audio/wav',
+  'weba': 'audio/webm',
+  'webm': 'video/webm',
+  'woff': 'font/woff',
+  'woff2': 'font/woff2',
+  'xml': 'application/xml',
+  'zip': 'application/zip',
+})[extname];
+
 export async function go({
   cliOptions,
 
@@ -266,38 +298,7 @@ export async function go({
       }
 
       const extname = path.extname(safePath).slice(1).toLowerCase();
-
-      const contentType = {
-        // BRB covering all my bases
-        'aac': 'audio/aac',
-        'bmp': 'image/bmp',
-        'css': 'text/css',
-        'csv': 'text/csv',
-        'gif': 'image/gif',
-        'ico': 'image/vnd.microsoft.icon',
-        'jpg': 'image/jpeg',
-        'jpeg': 'image/jpeg',
-        'js': 'text/javascript',
-        'mjs': 'text/javascript',
-        'mp3': 'audio/mpeg',
-        'mp4': 'video/mp4',
-        'oga': 'audio/ogg',
-        'ogg': 'audio/ogg',
-        'ogv': 'video/ogg',
-        'opus': 'audio/opus',
-        'png': 'image/png',
-        'pdf': 'application/pdf',
-        'svg': 'image/svg+xml',
-        'ttf': 'font/ttf',
-        'txt': 'text/plain',
-        'wav': 'audio/wav',
-        'weba': 'audio/webm',
-        'webm': 'video/webm',
-        'woff': 'font/woff',
-        'woff2': 'font/woff2',
-        'xml': 'application/xml',
-        'zip': 'application/zip',
-      }[extname];
+      const contentType = getContentType(extname);
 
       let fd, size;
       try {
