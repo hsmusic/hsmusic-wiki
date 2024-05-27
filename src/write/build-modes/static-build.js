@@ -230,11 +230,12 @@ export async function go({
   }
 
   const pageWrites = writes.filter(({type}) => type === 'page');
+  const fileWrites = writes.filter(({type}) => type === 'file');
   const dataWrites = writes.filter(({type}) => type === 'data');
   const redirectWrites = writes.filter(({type}) => type === 'redirect');
 
   if (writes.length) {
-    logInfo`Total of ${writes.length} writes returned. (${pageWrites.length} page, ${dataWrites.length} data [currently skipped], ${redirectWrites.length} redirect)`;
+    logInfo`Total of ${writes.length} writes returned. (${pageWrites.length} page, ${fileWrites.length} file, ${dataWrites.length} data [currently skipped], ${redirectWrites.length} redirect)`;
   } else {
     logWarn`No writes returned at all, so exiting early. This is probably a bug!`;
     return false;
@@ -290,6 +291,62 @@ export async function go({
     urls,
     wikiData,
   };
+
+  await progressPromiseAll(`Writing dynamically generated files`, queue(
+    fileWrites.map(file => async () => {
+      const to = urls.from(...file.path);
+      const absoluteTo = urls.from('shared.root');
+
+      const bound = bindUtilities({
+        ...commonUtilities,
+
+        absoluteTo,
+        to,
+        pagePath: file.path,
+      });
+
+      let resolved;
+
+      try {
+        const topLevelResult =
+          quickEvaluate({
+            contentDependencies,
+            extraDependencies: {...bound, appendIndexHTML},
+
+            name: file.contentFunction.name,
+            args: file.contentFunction.args ?? [],
+          });
+
+        resolved = html.resolve(topLevelResult);
+      } catch (error) {
+        logError`\rError generating page: ${urls.from('shared.root').to(file.path)}`;
+        niceShowAggregate(error);
+        errored = true;
+        return;
+      }
+
+      const {content} = resolved;
+
+      const writableContent =
+        (content instanceof html.Tag
+          ? content.toString()
+       : content instanceof Buffer
+          ? content
+       : Array.isArray(content)
+          ? (new html.Tag(null, null, content)).toString()
+       : typeof content === 'string'
+          ? content
+          : null);
+
+      const outputFile =
+        path.join(
+          outputPath,
+          urls.from('shared.root').toDevice(...file.path));
+
+      const outputDirectory = path.dirname(outputFile);
+      await mkdir(outputDirectory, {recursive: true});
+      await writeFile(outputFile, writableContent);
+    })));
 
   const perLanguageFn = async (language, i, entries) => {
     const baseDirectory =
