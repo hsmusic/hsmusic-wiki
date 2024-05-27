@@ -490,6 +490,7 @@ misc:
       coverArt: "{INDEX} cover art by {ARTIST}"
       flash: "{INDEX} flash/game by {ARTIST}"
       track: "{INDEX} track by {ARTIST}"
+      trackArt: "{INDEX} track art by {ARTIST}"
       onlyIndex: "Only"
 
   # external:

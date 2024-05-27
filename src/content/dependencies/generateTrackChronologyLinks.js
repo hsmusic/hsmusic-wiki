@@ -1,5 +1,5 @@
 import {sortAlbumsTracksChronologically} from '#sort';
-import {accumulateSum} from '#sugar';
+import {accumulateSum, stitchArrays} from '#sugar';
 
 import getChronologyRelations from '../util/getChronologyRelations.js';
 
@@ -107,7 +107,7 @@ export default {
   },
 
   generate(relations) {
-    function slotScopedRelations(content) {
+    function slotScopedRelations({content, artworkHeadingString}) {
       return content.chronologyLinks.slots({
         showOnly: true,
         allowCollapsing: false,
@@ -118,7 +118,7 @@ export default {
             contributions: content.artistChronologyContributions,
           },
           {
-            headingString: 'misc.chronology.heading.coverArt',
+            headingString: `misc.chronology.heading.${artworkHeadingString}`,
             contributions: content.coverArtistChronologyContributions,
           },
         ],
@@ -133,6 +133,11 @@ export default {
     const contents = [
       relations.wiki,
       relations.album,
+    ];
+
+    const artworkHeadingStrings = [
+      'coverArt',
+      'trackArt',
     ];
 
     const totalContributionCount =
@@ -150,7 +155,10 @@ export default {
         totalContributionCount <= 5,
 
       contents:
-        contents.map(content => slotScopedRelations(content))
+        stitchArrays({
+          content: contents,
+          artworkHeadingString: artworkHeadingStrings,
+        }).map(slotScopedRelations),
     });
 
     return relations.scopeSwitcher;
