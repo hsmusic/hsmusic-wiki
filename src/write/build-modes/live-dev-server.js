@@ -183,7 +183,7 @@ export async function go({
   logInfo`Will be serving a total of ${pages.length} pages.`;
 
   const urlToPageMap = Object.fromEntries(pages
-    .filter(page => page.type === 'page' || page.type === 'redirect')
+    .filter(({type}) => type === 'page' || type === 'redirect')
     .flatMap(page => {
       let servePath;
       if (page.type === 'page')
@@ -209,6 +209,13 @@ export async function go({
         }];
       });
     }));
+
+  const urlToFileMap = Object.fromEntries(pages
+    .filter(({type}) => type === 'file')
+    .map(file => [
+      urls.from('shared.root').to(...file.path),
+      {file, servePath: file.path},
+    ]));
 
   const server = http.createServer(async (request, response) => {
     const contentTypeHTML = {'Content-Type': 'text/html; charset=utf-8'};
@@ -348,6 +355,76 @@ export async function go({
         }
       };
     };
+
+    if (Object.hasOwn(urlToFileMap, pathname.slice(1))) {
+      const {file, servePath} = urlToFileMap[pathname.slice(1)];
+
+      const to = urls.from(...servePath);
+      const absoluteTo = urls.from('shared.root');
+
+      try {
+        const timing = startTiming();
+
+        const bound = bindUtilities({
+          ...commonUtilities,
+
+          absoluteTo,
+          to,
+          pagePath: servePath,
+        });
+
+        const topLevelResult =
+          quickEvaluate({
+            contentDependencies,
+            extraDependencies: {...bound, appendIndexHTML: false},
+
+            name: file.contentFunction.name,
+            args: file.contentFunction.args ?? [],
+            slots: file.contentFunction.slots ?? null,
+          });
+
+        const resolved = html.resolve(topLevelResult);
+        const {content} = resolved;
+
+        const extname = path.extname(pathname).slice(1).toLowerCase();
+        const contentType = resolved.contentType ?? getContentType(extname);
+
+        const writableContent =
+          (content instanceof html.Tag
+            ? content.toString()
+         : content instanceof Buffer
+            ? content
+         : Array.isArray(content)
+            ? (new html.Tag(null, null, content)).toString()
+         : typeof content === 'string'
+            ? content
+            : null);
+
+        if (writableContent === null) {
+          console.warn(`Unexpected content, got:`, content);
+          throw new Error(`Expected generate function to return tag, buffer, or string`);
+        }
+
+        const timeString = timing();
+        const status = (timeString ? `200 ${timeString}` : `200`);
+        console.log(`${requestHead} [${status}] ${pathname} (${colors.blue(`file (page)`)})`);
+
+        if (typeof content === 'string') {
+          response.writeHead(200, {'Content-Type': `${contentType}; charset=utf-8`});
+        } else {
+          response.writeHead(200, {'Content-Type': contentType});
+        }
+
+        response.end(writableContent);
+      } catch (error) {
+        console.error(`${requestHead} [500] ${pathname}`);
+        showError(error);
+        response.writeHead(500, contentTypePlain);
+        response.end(`Error generating file, view server log for details\n`);
+      }
+
+      return;
+    }
 
     // URL to page map expects trailing slash but no leading slash.
     const pathnameKey = pathname.replace(/^\//, '') + (pathname.endsWith('/') ? '' : '/');
