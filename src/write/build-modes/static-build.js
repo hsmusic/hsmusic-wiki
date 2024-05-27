@@ -280,6 +280,17 @@ export async function go({
     showAggregate: niceShowAggregate,
   });
 
+  const commonUtilities = {
+    defaultLanguage,
+    getSizeOfAdditionalFile,
+    getSizeOfImagePath,
+    languages,
+    missingImagePaths,
+    thumbsCache,
+    urls,
+    wikiData,
+  };
+
   const perLanguageFn = async (language, i, entries) => {
     const baseDirectory =
       language === defaultLanguage ? '' : language.code;
@@ -308,18 +319,12 @@ export async function go({
         });
 
         const bound = bindUtilities({
+          ...commonUtilities,
+
           absoluteTo,
-          defaultLanguage,
-          getSizeOfAdditionalFile,
-          getSizeOfImagePath,
           language,
-          languages,
-          missingImagePaths,
           pagePath,
-          thumbsCache,
           to,
-          urls,
-          wikiData,
         });
 
         let pageHTML, oEmbedJSON;
