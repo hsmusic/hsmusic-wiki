@@ -622,6 +622,9 @@ misc:
   search:
     placeholder: "Search for anything"
 
+    openSearchDescription: >-
+      {WIKI} Quick Search
+
     preparing: "Preparing..."
     loadingData: "Loading data..."
     searching: "Searching..."

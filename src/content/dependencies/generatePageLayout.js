@@ -649,6 +649,13 @@ export default {
                 .slot('mode', 'html'),
 
             html.tag('link', {
+              rel: 'search',
+              type: 'application/opensearchdescription+xml',
+              title: data.wikiName,
+              href: to('shared.openSearchDescription'),
+            }),
+
+            html.tag('link', {
               rel: 'stylesheet',
               href: to('staticCSS.path', 'site.css'),
             }),

@@ -69,7 +69,11 @@ const urlSpec = {
   },
 
   shared: {
-    paths: genericPaths,
+    paths: {
+      ...genericPaths,
+
+      openSearchDescription: 'opensearch.xml',
+    },
   },
 
   staticCSS: {
@@ -91,6 +95,7 @@ const urlSpec = {
     prefix: `static-${STATIC_VERSION}/misc/`,
     paths: {
       ...genericPaths,
+
       icon: 'icons.svg#icon-<>',
     },
   },
