@@ -332,6 +332,17 @@ export async function go({
 
     // Other routes determined by page and URL specs
 
+    const commonUtilities = {
+      defaultLanguage,
+      getSizeOfAdditionalFile,
+      getSizeOfImagePath,
+      languages,
+      missingImagePaths,
+      thumbsCache,
+      urls,
+      wikiData,
+    };
+
     const startTiming = () => {
       if (!showTimings) {
         return () => '';
@@ -417,19 +428,13 @@ export async function go({
       const timing = startTiming();
 
       const bound = bindUtilities({
+        ...commonUtilities,
+
         absoluteTo,
-        defaultLanguage,
-        getSizeOfAdditionalFile,
-        getSizeOfImagePath,
         language,
-        languages,
-        missingImagePaths,
         pagePath: servePath,
         pagePathStringFromRoot: pathname.replace(/^\//, ''),
-        thumbsCache,
         to,
-        urls,
-        wikiData,
       });
 
       const topLevelResult =
