@@ -709,7 +709,7 @@ async function main() {
     });
 
     fallbackStep('identifyWebRoutes', {
-      default: 'skip',
+      default: 'perform',
       buildConfig: 'webRoutes',
     });
 

@@ -51,6 +51,7 @@ export async function getContextAssignments({
   missingImagePaths,
   thumbsCache,
   urls,
+  webRoutes,
   wikiData,
 
   getSizeOfAdditionalFile,
@@ -78,6 +79,7 @@ export async function getContextAssignments({
     missingImagePaths,
     thumbsCache,
     urls,
+    webRoutes,
 
     wikiData,
     ...wikiData,
