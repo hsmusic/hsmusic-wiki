@@ -128,66 +128,100 @@ async function main() {
 
   stepStatusSummary = {
     determineMediaCachePath:
-      {...defaultStepStatus, name: `determine media cache path`},
+      {...defaultStepStatus, name: `determine media cache path`,
+        for: ['thumbs', 'build']},
 
     migrateThumbnails:
-      {...defaultStepStatus, name: `migrate thumbnails`},
+      {...defaultStepStatus, name: `migrate thumbnails`,
+        for: ['thumbs']},
 
     loadThumbnailCache:
-      {...defaultStepStatus, name: `load thumbnail cache file`},
+      {...defaultStepStatus, name: `load thumbnail cache file`,
+        for: ['thumbs', 'build']},
 
     generateThumbnails:
-      {...defaultStepStatus, name: `generate thumbnails`},
+      {...defaultStepStatus, name: `generate thumbnails`,
+        for: ['thumbs']},
 
     loadDataFiles:
-      {...defaultStepStatus, name: `load and process data files`},
+      {...defaultStepStatus, name: `load and process data files`,
+        for: ['build']},
 
     linkWikiDataArrays:
-      {...defaultStepStatus, name: `link wiki data arrays`},
+      {...defaultStepStatus, name: `link wiki data arrays`,
+        for: ['build']},
 
     precacheCommonData:
-      {...defaultStepStatus, name: `precache common data`},
+      {...defaultStepStatus, name: `precache common data`,
+        for: ['build']},
 
     reportDirectoryErrors:
-      {...defaultStepStatus, name: `report directory errors`},
+      {...defaultStepStatus, name: `report directory errors`,
+        for: ['verify']},
 
     filterReferenceErrors:
-      {...defaultStepStatus, name: `filter reference errors`},
+      {...defaultStepStatus, name: `filter reference errors`,
+        for: ['verify']},
 
     reportContentTextErrors:
-      {...defaultStepStatus, name: `report content text errors`},
+      {...defaultStepStatus, name: `report content text errors`,
+        for: ['verify']},
 
     sortWikiDataArrays:
-      {...defaultStepStatus, name: `sort wiki data arrays`},
+      {...defaultStepStatus, name: `sort wiki data arrays`,
+        for: ['build']},
 
     precacheAllData:
-      {...defaultStepStatus, name: `precache nearly all data`},
+      {...defaultStepStatus, name: `precache nearly all data`,
+        for: ['build']},
 
     // TODO: This should be split into load/watch steps.
     loadInternalDefaultLanguage:
-      {...defaultStepStatus, name: `load internal default language`},
+      {...defaultStepStatus, name: `load internal default language`,
+        for: ['build']},
 
     loadLanguageFiles:
-      {...defaultStepStatus, name: `statically load custom language files`},
+      {...defaultStepStatus, name: `statically load custom language files`,
+        for: ['build']},
 
     watchLanguageFiles:
-      {...defaultStepStatus, name: `watch custom language files`},
+      {...defaultStepStatus, name: `watch custom language files`,
+        for: ['build']},
 
     initializeDefaultLanguage:
-      {...defaultStepStatus, name: `initialize default language`},
+      {...defaultStepStatus, name: `initialize default language`,
+        for: ['build']},
 
     verifyImagePaths:
-      {...defaultStepStatus, name: `verify missing/misplaced image paths`},
+      {...defaultStepStatus, name: `verify missing/misplaced image paths`,
+        for: ['verify']},
 
     preloadFileSizes:
-      {...defaultStepStatus, name: `preload file sizes`},
+      {...defaultStepStatus, name: `preload file sizes`,
+        for: ['build']},
 
     identifyWebRoutes:
-      {...defaultStepStatus, name: `identify web routes`},
+      {...defaultStepStatus, name: `identify web routes`,
+        for: ['build']},
 
     performBuild:
-      {...defaultStepStatus, name: `perform selected build mode`},
+      {...defaultStepStatus, name: `perform selected build mode`,
+        for: ['build']},
   };
+
+  const stepsWhich = condition =>
+    Object.entries(stepStatusSummary)
+      .filter(([_key, value]) => condition(value))
+      .map(([key]) => key);
+
+  /* eslint-disable-next-line no-unused-vars */
+  const stepsFor = (...which) =>
+    stepsWhich(step =>
+      which.some(w => step.for?.includes(w)));
+
+  const stepsNotFor = (...which) =>
+    stepsWhich(step =>
+      which.every(w => !step.for?.includes(w)));
 
   const defaultQueueSize = 500;
 
@@ -423,36 +457,7 @@ async function main() {
     ...buildOptions,
   });
 
-  // Most of the time we'll need a build mode specified to do anything useful,
-  // but a few options make it OK to go ahead without (i.e, ones which never
-  // advance to the build). Note that we can only identify this after loading
-  // all options.
-
-  const buildlessOptions = [
-    'help',
-    'migrate-thumbs',
-    'no-build',
-    'thumbs-only',
-  ];
-
-  const buildModeRequired =
-    buildlessOptions.every(option => !cliOptions[option]);
-
-  // If we're going to require a build mode and none is specified,
-  // exit and show what to do.
-
-  if (buildModeRequired && !selectedBuildMode) {
-    showHelpForOptions({
-      heading: `Please specify a build mode:`,
-      options: buildModeFlagOptions,
-    });
-
-    console.log(
-      `(Use ${colors.bright('--help')} for general info and all options, or specify\n` +
-      ` a build mode alongside ${colors.bright('--help')} for that mode's options!`);
-
-    return false;
-  }
+  showStepStatusSummary = cliOptions['show-step-summary'] ?? false;
 
   if (cliOptions['help']) {
     console.log(
@@ -512,6 +517,13 @@ async function main() {
         `about the options for that build mode.`);
     }
 
+    for (const step of Object.values(stepStatusSummary)) {
+      Object.assign(step, {
+        status: STATUS_NOT_APPLICABLE,
+        annotation: `--help provided`,
+      });
+    }
+
     return true;
   }
 
@@ -522,8 +534,6 @@ async function main() {
 
   const thumbsOnly = cliOptions['thumbs-only'] ?? false;
   const noInput = cliOptions['no-input'] ?? false;
-
-  showStepStatusSummary = cliOptions['show-step-summary'] ?? false;
 
   const showAggregateTraces = cliOptions['show-traces'] ?? false;
 
@@ -560,61 +570,86 @@ async function main() {
       status: STATUS_NOT_APPLICABLE,
       annotation: `--no-build provided`,
     });
-  } else {
-    logInfo`Will use specified build mode: ${selectedBuildModeFlag}`;
   }
 
   // Finish setting up defaults by combining information from all options.
 
   const _fallbackStep = (stepKey, {
     default: defaultValue,
-
-    cli: {
-      flag: cliFlag = null,
-      negate: cliFlagNegates = false,
-      warn: cliFlagWarning = null,
-    } = {},
-
-    buildConfig: buildConfigKey,
+    cli: cliArg,
+    buildConfig: buildConfigKey = null,
   }) => {
     const buildConfig = selectedBuildMode?.config?.[buildConfigKey];
     const {[stepKey]: step} = stepStatusSummary;
 
-    if (cliFlag && cliOptions[cliFlag]) {
+    const cliEntries =
+      (cliArg === null || cliArg === undefined
+        ? []
+     : Array.isArray(cliArg)
+        ? cliArg
+        : [cliArg]);
+
+    for (const {
+      flag: cliFlag = null,
+      negate: cliFlagNegates = false,
+      warn: cliFlagWarning = null,
+      disable: cliFlagDisablesSteps = [],
+    } of cliEntries) {
+      if (!cliOptions[cliFlag]) {
+        continue;
+      }
+
       const cliPart = `--` + cliFlag;
       const modePart = `--` + selectedBuildModeFlag;
+
       if (buildConfig?.applicable === false) {
         if (cliFlagNegates) {
           logWarn`${cliPart} provided, but ${modePart} already skips this step`;
           logWarn`Redundant option ${cliPart}`;
+          continue;
         } else {
           logWarn`${cliPart} provided, but this step isn't applicable for ${modePart}`;
           logWarn`Ignoring option ${cliPart}`;
+          continue;
         }
-      } else if (buildConfig?.required === true) {
+      }
+
+      if (buildConfig?.required === true) {
         if (cliFlagNegates) {
           logWarn`${cliPart} provided, but ${modePart} requires this step`;
           logWarn`Ignoring option ${cliPart}`;
+          continue;
         } else {
           logWarn`${cliPart} provided, but ${modePart} already requires this step`;
           logWarn`Redundant option ${cliPart}`;
+          continue;
         }
-      } else {
-        step.status =
-          (cliFlagNegates
-            ? STATUS_NOT_APPLICABLE
-            : STATUS_NOT_STARTED);
-
-        step.annotation = `--${cliFlag} provided`;
-
-        if (cliFlagWarning) {
-          for (const line of cliFlagWarning.split('\n')) {
-            logWarn(line);
-          }
-        }
-
-        return;
       }
+
+      step.status =
+        (cliFlagNegates
+          ? STATUS_NOT_APPLICABLE
+          : STATUS_NOT_STARTED);
+
+      step.annotation = `--${cliFlag} provided`;
+
+      if (cliFlagWarning) {
+        for (const line of cliFlagWarning.split('\n')) {
+          logWarn(line);
+        }
+      }
+
+      for (const step of cliFlagDisablesSteps) {
+        const summary = stepStatusSummary[step];
+        if (summary.status === STATUS_NOT_APPLICABLE && summary.annotation) {
+          stepStatusSummary.performBuild.annotation += `; --${cliFlag} provided`;
+        } else {
+          summary.status = STATUS_NOT_APPLICABLE;
+          summary.annotation = `--${cliFlag} provided`;
+        }
+      }
+
+      return;
     }
 
     if (buildConfig?.required === true) {
@@ -642,12 +677,22 @@ async function main() {
     }
 
     switch (defaultValue) {
-      case 'skip':
+      case 'skip': {
         step.status = STATUS_NOT_APPLICABLE;
-        if (cliFlag && !cliFlagNegates) {
-          step.annotation = `--${cliFlag} not provided`;
+
+        const enablingFlags =
+          cliEntries
+            .filter(({negate}) => !negate)
+            .map(({flag}) => flag);
+
+        if (!empty(enablingFlags)) {
+          step.annotation =
+            enablingFlags.map(flag => `--${flag}`).join(', ') +
+            ` not provided`;
         }
+
         break;
+      }
 
       case 'perform':
         break;
@@ -672,7 +717,6 @@ async function main() {
 
     fallbackStep('filterReferenceErrors', {
       default: 'perform',
-      buildConfig: null,
       cli: {
         flag: 'skip-reference-validation',
         negate: true,
@@ -685,17 +729,20 @@ async function main() {
     fallbackStep('generateThumbnails', {
       default: 'perform',
       buildConfig: 'thumbs',
-      cli: {
-        flag: 'skip-thumbs',
-        negate: true,
-      },
+      cli: [
+        {flag: 'thumbs-only', disable: stepsNotFor('thumbs')},
+        {flag: 'skip-thumbs', negate: true},
+      ],
     });
 
     fallbackStep('migrateThumbnails', {
       default: 'skip',
-      buildConfig: null,
       cli: {
         flag: 'migrate-thumbs',
+        disable: [
+          ...stepsNotFor('thumbs'),
+          'generateThumbnails',
+        ],
       },
     });
 
@@ -753,33 +800,43 @@ async function main() {
     });
   }
 
+  // TODO: These should error if the option was actually provided but
+  // the relevant steps were already disabled for some other reason.
   switch (precacheMode) {
     case 'common':
-      Object.assign(stepStatusSummary.precacheAllData, {
-        status: STATUS_NOT_APPLICABLE,
-        annotation: `--precache-mode is common, not all`,
-      });
+      if (stepStatusSummary.precacheAllData.status === STATUS_NOT_STARTED) {
+        Object.assign(stepStatusSummary.precacheAllData, {
+          status: STATUS_NOT_APPLICABLE,
+          annotation: `--precache-mode is common, not all`,
+        });
+      }
 
       break;
 
     case 'all':
-      Object.assign(stepStatusSummary.precacheCommonData, {
-        status: STATUS_NOT_APPLICABLE,
-        annotation: `--precache-mode is all, not common`,
-      });
+      if (stepStatusSummary.precacheCommonData.status === STATUS_NOT_STARTED) {
+        Object.assign(stepStatusSummary.precacheCommonData, {
+          status: STATUS_NOT_APPLICABLE,
+          annotation: `--precache-mode is all, not common`,
+        });
+      }
 
       break;
 
     case 'none':
-      Object.assign(stepStatusSummary.precacheCommonData, {
-        status: STATUS_NOT_APPLICABLE,
-        annotation: `--precache-mode is none`,
-      });
+      if (stepStatusSummary.precacheCommonData.status === STATUS_NOT_STARTED) {
+        Object.assign(stepStatusSummary.precacheCommonData, {
+          status: STATUS_NOT_APPLICABLE,
+          annotation: `--precache-mode is none`,
+        });
+      }
 
-      Object.assign(stepStatusSummary.precacheAllData, {
-        status: STATUS_NOT_APPLICABLE,
-        annotation: `--precache-mode is none`,
-      });
+      if (stepStatusSummary.precacheAllData.status === STATUS_NOT_STARTED) {
+        Object.assign(stepStatusSummary.precacheAllData, {
+          status: STATUS_NOT_APPLICABLE,
+          annotation: `--precache-mode is none`,
+        });
+      }
 
       break;
   }
@@ -798,6 +855,44 @@ async function main() {
 
   if (stepStatusSummary.generateThumbnails.status === STATUS_NOT_APPLICABLE && thumbsOnly) {
     logInfo`Well, you've put yourself rather between a roc and a hard place, hmmmm?`;
+    return false;
+  }
+
+  // If we're going to require a build mode and none is specified,
+  // exit and show what to do. This must not precede anything that might
+  // disable the build (e.g. changing its status to STATUS_NOT_APPLICABLE).
+
+  if (stepStatusSummary.performBuild.status === STATUS_NOT_STARTED) {
+    if (selectedBuildMode) {
+      logInfo`Will use specified build mode: ${selectedBuildModeFlag}`;
+    } else {
+      showHelpForOptions({
+        heading: `Please specify a build mode:`,
+        options: buildModeFlagOptions,
+      });
+
+      console.log(
+        `(Use ${colors.bright('--help')} for general info and all options, or specify\n` +
+        ` a build mode alongside ${colors.bright('--help')} for that mode's options!`);
+
+      for (const step of Object.values(stepStatusSummary)) {
+        Object.assign(step, {
+          status: STATUS_NOT_APPLICABLE,
+          annotation: `no build mode provided`,
+        });
+      }
+
+      return false;
+    }
+  } else if (selectedBuildMode) {
+    if (stepStatusSummary.performBuild.annotation) {
+      logError`You've specified a build mode, ${selectedBuildModeFlag}, but it won't be used,`;
+      logError`according to the message: ${`"${stepStatusSummary.performBuild.annotation}"`}`;
+    } else {
+      logError`You've specified a build mode, ${selectedBuildModeFlag}, but it won't be used,`;
+      logError`probably because of another option you've provided.`;
+    }
+    logError`Please remove ${'--' + selectedBuildModeFlag} or the conflicting option.`;
     return false;
   }
 
