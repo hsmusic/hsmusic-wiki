@@ -423,6 +423,37 @@ async function main() {
     ...buildOptions,
   });
 
+  // Most of the time we'll need a build mode specified to do anything useful,
+  // but a few options make it OK to go ahead without (i.e, ones which never
+  // advance to the build). Note that we can only identify this after loading
+  // all options.
+
+  const buildlessOptions = [
+    'help',
+    'migrate-thumbs',
+    'no-build',
+    'thumbs-only',
+  ];
+
+  const buildModeRequired =
+    buildlessOptions.every(option => !cliOptions[option]);
+
+  // If we're going to require a build mode and none is specified,
+  // exit and show what to do.
+
+  if (buildModeRequired && !selectedBuildMode) {
+    showHelpForOptions({
+      heading: `Please specify a build mode:`,
+      options: buildModeFlagOptions,
+    });
+
+    console.log(
+      `(Use ${colors.bright('--help')} for general info and all options, or specify\n` +
+      ` a build mode alongside ${colors.bright('--help')} for that mode's options!`);
+
+    return false;
+  }
+
   if (cliOptions['help']) {
     console.log(
       colors.bright(`hsmusic (aka. Homestuck Music Wiki, HSMusic Wiki)\n`) +
@@ -482,19 +513,6 @@ async function main() {
     }
 
     return true;
-  }
-
-  // At this point we need to have a build mode to do anything useful, so exit
-  // and show what to do, if none was specified.
-  if (!selectedBuildMode) {
-    showHelpForOptions({
-      heading: `Please specify a build mode:`,
-      options: buildModeFlagOptions,
-    });
-    console.log(
-      `(Use ${colors.bright('--help')} for general info and all options, or specify\n` +
-      ` a build mode alongside ${colors.bright('--help')} for that mode's options!`);
-    return false;
   }
 
   const dataPath = cliOptions['data-path'] || process.env.HSMUSIC_DATA;
