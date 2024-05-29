@@ -890,17 +890,15 @@ async function main() {
         logError`a new path with ${'--media-cache-path'} or ${'HSMUSIC_MEDIA_CACHE'}.`;
         break;
 
-      case `missing wiki cache to create media cache inside`:
-        console.error('');
-        logError`It looks like you're starting totally fresh, so please`;
-        logError`create a ${'cache'} folder and provide it with ${'--cache-path'}`;
-        logError`or ${'HSMUSIC_CACHE'}. The media cache will automatically be`;
-        logError`generated inside of this folder!`;
-        break;
-
       case `media path not provided`: /* unreachable */
         console.error('');
         logError`It seems a ${'--media-path'} (or ${'HSMUSIC_MEDIA'}) wasn't provided.`;
+        logError`Make sure one of these is actually pointing to a path that exists.`;
+        break;
+
+      case `cache path not provided`: /* unreachable */
+        console.error('');
+        logError`It seems a ${'--cache-path'} (or ${'HSMUSIC_CACHE'}) wasn't provided.`;
         logError`Make sure one of these is actually pointing to a path that exists.`;
         break;
     }
