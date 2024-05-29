@@ -245,7 +245,7 @@ async function main() {
     // and like a jillion other things too. Pretty much everything which
     // makes an individual wiki what it is goes here!
     'data-path': {
-      help: `Specify path to data directory, including YAML files that cover all info about wiki content, layout, and structure\n\nAlways required for wiki building, but may be provided via the HSMUSIC_DATA environment variable instead`,
+      help: `Specify path to data directory, including YAML files that cover all info about wiki content, layout, and structure\n\nAlways required for wiki building; may be provided via the HSMUSIC_DATA environment variable`,
       type: 'value',
     },
 
@@ -253,17 +253,17 @@ async function main() {
     // categorized; check out MEDIA_ALBUM_ART_DIRECTORY and other constants
     // near the top of this file (upd8.js).
     'media-path': {
-      help: `Specify path to media directory, including album artwork and additional files, as well as custom site layout media and other media files for reference or linking in wiki content\n\nAlways required for wiki building, but may be provided via the HSMUSIC_MEDIA environment variable instead`,
+      help: `Specify path to media directory, including album artwork and additional files, as well as custom site layout media and other media files for reference or linking in wiki content\n\nAlways required for wiki building; may be provided via the HSMUSIC_MEDIA environment variable`,
       type: 'value',
     },
 
     'media-cache-path': {
-      help: `Specify path to media cache directory, including automatically generated thumbnails\n\nThis usually doesn't need to be provided, and will be inferred either by loading "media-cache" from --cache-path, or by adding "-cache" to the end of the media directory\n\nAlso may be provided via the HSMUSIC_MEDIA_CACHE environment variable`,
+      help: `Specify path to media cache directory, including automatically generated thumbnails\n\nThis usually doesn't need to be provided, and will be inferred either by loading "media-cache" from --cache-path, or by adding "-cache" to the end of the media directory\n\nMay be provided via the HSMUSIC_MEDIA_CACHE environment variable`,
       type: 'value',
     },
 
     'cache-path': {
-      help: `Specify path to general cache directory, usually containing generated thumbnails and assorted files reused between builds\n\nRequired for some features and may always be required if you're starting a new workspace\n\nAlso may be provided via the HSMUSIC_CACHE environment varaible`,
+      help: `Specify path to general cache directory, usually containing generated thumbnails and assorted files reused between builds\n\nAlways required for wiki building; may be provided via the HSMUSIC_CACHE environment varaible`,
       type: 'value',
     },
 
@@ -528,10 +528,10 @@ async function main() {
   }
 
   if (!wikiCachePath) {
-    logWarn`No --cache-path option nor HSMUSIC_CACHE set; provide for more features`;
+    logError`${`Expected --cache-path option or HSMUSIC_CACHE to be set`}`;
   }
 
-  if (!dataPath || !mediaPath) {
+  if (!dataPath || !mediaPath || !wikiCachePath) {
     return false;
   }
 
