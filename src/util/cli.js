@@ -201,6 +201,79 @@ export async function parseOptions(options, optionDescriptorMap) {
   return result;
 }
 
+// Takes precisely the same sort of structure as `parseOptions` above,
+// and displays associated help messages. Radical!
+//
+// 'indentWrap' should be the function from '#sugar', with its wrap option
+//   already bound.
+//
+// 'sort' should take care of sorting a list of {name, descriptor} entries.
+export function showHelpForOptions({
+  heading,
+  options,
+  indentWrap,
+  sort = entries => entries,
+}) {
+  if (heading) {
+    console.log(colors.bright(heading));
+  }
+
+  const sortedOptions =
+    sort(
+      Object.entries(options)
+        .map(([name, descriptor]) => ({name, descriptor})));
+
+  if (!sortedOptions.length) {
+    console.log(`(No options available)`)
+  }
+
+  let justInsertedPaddingLine = false;
+
+  for (const {name, descriptor} of sortedOptions) {
+    if (descriptor.alias) {
+      continue;
+    }
+
+    const aliases =
+      Object.entries(options)
+        .filter(([_name, {alias}]) => alias === name)
+        .map(([name]) => name);
+
+    let wrappedHelp, wrappedHelpLines = 0;
+    if (descriptor.help) {
+      wrappedHelp = indentWrap(descriptor.help, {spaces: 4});
+      wrappedHelpLines = wrappedHelp.split('\n').length;
+    }
+
+    if (wrappedHelpLines > 0 && !justInsertedPaddingLine) {
+      console.log('');
+    }
+
+    console.log(colors.bright(` --` + name) +
+      (aliases.length
+        ? ` (or: ${aliases.map(alias => colors.bright(`--` + alias)).join(', ')})`
+        : '') +
+      (descriptor.help
+        ? ''
+        : colors.dim('  (no help provided)')));
+
+    if (wrappedHelp) {
+      console.log(wrappedHelp);
+    }
+
+    if (wrappedHelpLines > 1) {
+      console.log('');
+      justInsertedPaddingLine = true;
+    } else {
+      justInsertedPaddingLine = false;
+    }
+  }
+
+  if (!justInsertedPaddingLine) {
+    console.log(``);
+  }
+}
+
 export const handleDashless = Symbol();
 export const handleUnknown = Symbol();
 

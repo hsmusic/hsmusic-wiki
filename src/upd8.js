@@ -48,7 +48,6 @@ import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
 import {isMain, traverse} from '#node-utils';
 import {sortByName} from '#sort';
-import {empty, withEntries} from '#sugar';
 import {generateURLs, urlSpec} from '#urls';
 import {identifyAllWebRoutes} from '#web-routes';
 
@@ -61,6 +60,7 @@ import {
   logError,
   parseOptions,
   progressCallAll,
+  showHelpForOptions as unboundShowHelpForOptions,
 } from '#cli';
 
 import {
@@ -68,6 +68,13 @@ import {
   reportDirectoryErrors,
   reportContentTextErrors,
 } from '#data-checks';
+
+import {
+  bindOpts,
+  empty,
+  indentWrap as unboundIndentWrap,
+  withEntries,
+} from '#sugar';
 
 import genThumbs, {
   CACHE_FILE as thumbsCacheFile,
@@ -198,21 +205,24 @@ async function main() {
     }));
 
   let selectedBuildModeFlag;
-  let usingDefaultBuildMode;
 
   if (empty(selectedBuildModeFlags)) {
-    selectedBuildModeFlag = 'static-build';
-    usingDefaultBuildMode = true;
+    // No build mode selected. This is not a valid state for building the wiki,
+    // but we want to let access to --help, so we'll show a message about what
+    // to do later.
+    selectedBuildModeFlag = null;
   } else if (selectedBuildModeFlags.length > 1) {
     logError`Building multiple modes (${selectedBuildModeFlags.join(', ')}) at once not supported.`;
-    logError`Please specify a maximum of one build mode.`;
+    logError`Please specify one build mode.`;
     return false;
   } else {
     selectedBuildModeFlag = selectedBuildModeFlags[0];
-    usingDefaultBuildMode = false;
   }
 
-  const selectedBuildMode = buildModes[selectedBuildModeFlag];
+  const selectedBuildMode =
+    (selectedBuildModeFlag
+      ? buildModes[selectedBuildModeFlag]
+      : null);
 
   // This is about to get a whole lot more stuff put in it.
   const wikiData = {
@@ -220,7 +230,10 @@ async function main() {
     listingTargetSpec,
   };
 
-  const buildOptions = selectedBuildMode.getCLIOptions();
+  const buildOptions =
+    (selectedBuildMode
+      ? selectedBuildMode.getCLIOptions()
+      : {});
 
   const commonOptions = {
     'help': {
@@ -388,6 +401,18 @@ async function main() {
     },
   };
 
+  const indentWrap =
+    bindOpts(unboundIndentWrap, {
+      wrap,
+    });
+
+  const showHelpForOptions =
+    bindOpts(unboundShowHelpForOptions, {
+      [bindOpts.bindIndex]: 0,
+      indentWrap,
+      sort: sortByName,
+    });
+
   const cliOptions = await parseOptions(process.argv.slice(2), {
     // We don't want to error when we receive these options, so specify them
     // here, even though we won't be doing anything with them later.
@@ -399,91 +424,77 @@ async function main() {
   });
 
   if (cliOptions['help']) {
-    const indentWrap = (spaces, str) => wrap(str, {width: 60 - spaces, indent: ' '.repeat(spaces)});
-
-    const showOptions = (msg, options) => {
-      console.log(colors.bright(msg));
-
-      const entries = Object.entries(options);
-      const sortedOptions = sortByName(entries
-        .map(([name, descriptor]) => ({name, descriptor})));
-
-      if (!sortedOptions.length) {
-        console.log(`(No options available)`)
-      }
-
-      let justInsertedPaddingLine = false;
-
-      for (const {name, descriptor} of sortedOptions) {
-        if (descriptor.alias) {
-          continue;
-        }
-
-        const aliases = entries
-          .filter(([_name, {alias}]) => alias === name)
-          .map(([name]) => name);
-
-        let wrappedHelp, wrappedHelpLines = 0;
-        if (descriptor.help) {
-          wrappedHelp = indentWrap(4, descriptor.help);
-          wrappedHelpLines = wrappedHelp.split('\n').length;
-        }
-
-        if (wrappedHelpLines > 0 && !justInsertedPaddingLine) {
-          console.log('');
-        }
-
-        console.log(colors.bright(` --` + name) +
-          (aliases.length
-            ? ` (or: ${aliases.map(alias => colors.bright(`--` + alias)).join(', ')})`
-            : '') +
-          (descriptor.help
-            ? ''
-            : colors.dim('  (no help provided)')));
-
-        if (wrappedHelp) {
-          console.log(wrappedHelp);
-        }
-
-        if (wrappedHelpLines > 1) {
-          console.log('');
-          justInsertedPaddingLine = true;
-        } else {
-          justInsertedPaddingLine = false;
-        }
-      }
-
-      if (!justInsertedPaddingLine) {
-        console.log(``);
-      }
-    };
-
     console.log(
-      colors.bright(`hsmusic (aka. Homestuck Music Wiki)\n`) +
+      colors.bright(`hsmusic (aka. Homestuck Music Wiki, HSMusic Wiki)\n`) +
       `static wiki software cataloguing collaborative creation\n`);
 
-    console.log(indentWrap(0,
-      `The \`hsmusic\` command provides basic control over all parts of generating user-visible HTML pages and website content/structure from provided data, media, and language directories.\n` +
+    console.log(indentWrap(
+      `The \`hsmusic\` command provides basic control over ` +
+      `all parts of generating user-visible HTML pages ` +
+      `and website content/structure ` +
+      `from provided data, media, and language directories.\n` +
       `\n` +
       `CLI options are divided into three groups:\n`));
-    console.log(` 1) ` + indentWrap(4,
-      `Common options: These are shared by all build modes and always have the same essential behavior`).trim());
-    console.log(` 2) ` + indentWrap(4,
-      `Build mode selection: One build mode may be selected (or else the default, --static-build, is used), and it decides which entire set of behavior to use for providing site content to the user`).trim());
-    console.log(` 3) ` + indentWrap(4,
-      `Build options: Each build mode has a set of unique options which customize behavior for that build mode`).trim());
+
+    console.log(` 1) ` + indentWrap(
+      `Common options: ` +
+      `These are shared by all build modes ` +
+      `and always have the same essential behavior`,
+      {spaces: 4, bullet: true}));
+
+    console.log(` 2) ` + indentWrap(
+      `Build mode selection: ` +
+      `One build mode should be selected, ` +
+      `and it decides the main set of behavior to use ` +
+      `for presenting or interacting with site content`,
+      {spaces: 4, bullet: true}));
+
+    console.log(` 3) ` + indentWrap(
+      `Build options: ` +
+      `Each build mode has a set of unique options ` +
+      `which customize behavior for that build mode`,
+      {spaces: 4, bullet: true}));
+
     console.log(``);
 
-    showOptions(`Common options`, commonOptions);
-    showOptions(`Build mode selection`, buildModeFlagOptions);
+    showHelpForOptions({
+      heading: `Common options`,
+      options: commonOptions,
+      wrap,
+    });
 
-    if (buildOptions) {
-      showOptions(`Build options for --${selectedBuildModeFlag} (${
-        usingDefaultBuildMode ? 'default' : 'selected'
-      })`, buildOptions);
+    showHelpForOptions({
+      heading: `Build mode selection`,
+      options: buildModeFlagOptions,
+      wrap,
+    });
+
+    if (selectedBuildMode) {
+      showHelpForOptions({
+        heading: `Build options for --${selectedBuildModeFlag}`,
+        options: buildOptions,
+        wrap,
+      });
+    } else {
+      console.log(
+        `Specify a build mode and run with ${colors.bright('--help')} again for info\n` +
+        `about the options for that build mode.`);
     }
 
     return true;
+  }
+
+  // At this point we need to have a build mode to do anything useful, so exit
+  // and show what to do, if none was specified.
+  if (!selectedBuildMode) {
+    showHelpForOptions({
+      heading: `Please specify a build mode:`,
+      options: buildModeFlagOptions,
+    });
+    console.log(
+      `(Use ${colors.bright('--help')} for general info and all options, or specify\n` +
+      ` a build mode alongside ${colors.bright('--help')} for that mode's options!`);
+    return false;
   }
 
   const dataPath = cliOptions['data-path'] || process.env.HSMUSIC_DATA;
@@ -532,11 +543,7 @@ async function main() {
       annotation: `--no-build provided`,
     });
   } else {
-    if (usingDefaultBuildMode) {
-      logInfo`No build mode specified, will use default: ${selectedBuildModeFlag}`;
-    } else {
-      logInfo`Will use specified build mode: ${selectedBuildModeFlag}`;
-    }
+    logInfo`Will use specified build mode: ${selectedBuildModeFlag}`;
   }
 
   // Finish setting up defaults by combining information from all options.
@@ -552,7 +559,7 @@ async function main() {
 
     buildConfig: buildConfigKey,
   }) => {
-    const {[buildConfigKey]: buildConfig} = selectedBuildMode.config;
+    const buildConfig = selectedBuildMode?.config?.[buildConfigKey];
     const {[stepKey]: step} = stepStatusSummary;
 
     if (cliFlag && cliOptions[cliFlag]) {

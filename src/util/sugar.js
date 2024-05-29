@@ -315,6 +315,27 @@ export function cutStart(text, length = 40) {
   }
 }
 
+// Wrapper function around wrap(), ha, ha - this requires the Node module
+// 'node-wrap'.
+export function indentWrap(str, {
+  wrap,
+  spaces = 0,
+  width = 60,
+  bullet = false,
+}) {
+  const wrapped =
+    wrap(str, {
+      width: width - spaces,
+      indent: ' '.repeat(spaces),
+    });
+
+  if (bullet) {
+    return wrapped.trimStart();
+  } else {
+    return wrapped;
+  }
+}
+
 // Annotates {index, length} results from another iterator with contextual
 // details, including:
 //
