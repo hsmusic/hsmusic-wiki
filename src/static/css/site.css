@@ -997,6 +997,17 @@ p code {
   margin-bottom: 0;
 }
 
+#content blockquote h2 {
+  font-size: 1em;
+  font-weight: 800;
+}
+
+#content blockquote h3 {
+  font-size: 1em;
+  font-weight: normal;
+  font-style: oblique;
+}
+
 main.long-content {
   --long-content-padding-ratio: 0.10;
 }
