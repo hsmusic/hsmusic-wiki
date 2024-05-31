@@ -3730,7 +3730,7 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   },
 
   settings: {
-    stoppedTyingDelay: 800,
+    stoppedTypingDelay: 800,
 
     maxActiveResultsStorage: 100000,
   },
@@ -3956,7 +3956,7 @@ function addSidebarSearchListeners() {
     state.stoppedTypingTimeout =
       setTimeout(() => {
         activateSidebarSearch(info.searchInput.value);
-      }, settings.stoppedTyingDelay);
+      }, settings.stoppedTypingDelay);
   });
 
   info.endSearchLink.addEventListener('click', domEvent => {
