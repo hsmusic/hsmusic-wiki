@@ -3800,6 +3800,7 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
     searchStage: null,
 
     stoppedTypingTimeout: null,
+    stoppedScrollingTimeout: null,
 
     indexDownloadStatuses: Object.create(null),
   },
@@ -3818,10 +3819,15 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
       type: 'boolean',
       default: false,
     },
+
+    resultsScrollOffset: {
+      type: 'number',
+    },
   },
 
   settings: {
     stoppedTypingDelay: 800,
+    stoppedScrollingDelay: 200,
 
     maxActiveResultsStorage: 100000,
   },
@@ -4056,6 +4062,19 @@ function addSidebarSearchListeners() {
     possiblyHideSearchSidebarColumn();
     restoreSidebarSearchColumn();
   });
+
+  info.resultsContainer.addEventListener('scroll', () => {
+    const {settings, state} = info;
+
+    if (state.stoppedScrollingTimeout) {
+      clearTimeout(state.stoppedScrollingTimeout);
+    }
+
+    state.stoppedScrollingTimeout =
+      setTimeout(() => {
+        saveSidebarSearchResultsScrollOffset();
+      }, settings.stoppedScrollingDelay);
+  });
 }
 
 function initializeSidebarSearchState() {
@@ -4155,6 +4174,7 @@ async function activateSidebarSearch(query) {
 
   session.activeQuery = query;
   session.activeQueryResults = results;
+  session.resultsScrollOffset = 0;
 
   showSidebarSearchResults(results);
 }
@@ -4177,6 +4197,7 @@ function clearSidebarSearch() {
 
   session.activeQuery = null;
   session.activeQueryResults = null;
+  session.resultsScrollOffset = null;
 
   hideSidebarSearchResults();
 }
@@ -4320,6 +4341,8 @@ function showSidebarSearchResults(results) {
 
     tidySidebarSearchColumn();
   }
+
+  restoreSidebarSearchResultsScrollOffset();
 }
 
 function generateSidebarSearchResult(result) {
@@ -4475,6 +4498,10 @@ function generateSidebarSearchResultTemplate(slots) {
 
   link.appendChild(text);
 
+  link.addEventListener('click', () => {
+    saveSidebarSearchResultsScrollOffset();
+  });
+
   return link;
 }
 
@@ -4490,6 +4517,22 @@ function hideSidebarSearchResults() {
 
   cssProp(info.endSearchRule, 'display', 'none');
   cssProp(info.endSearchLine, 'display', 'none');
+}
+
+function saveSidebarSearchResultsScrollOffset() {
+  const info = sidebarSearchInfo;
+  const {session} = info;
+
+  session.resultsScrollOffset = info.resultsContainer.scrollTop;
+}
+
+function restoreSidebarSearchResultsScrollOffset() {
+  const info = sidebarSearchInfo;
+  const {session} = info;
+
+  if (session.resultsScrollOffset) {
+    info.resultsContainer.scrollTop = session.resultsScrollOffset;
+  }
 }
 
 function showSearchSidebarColumn() {
