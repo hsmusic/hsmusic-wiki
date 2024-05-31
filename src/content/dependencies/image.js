@@ -131,15 +131,8 @@ export default {
       !isMissingImageFile &&
       !empty(contentWarnings);
 
-    const hasBothDimensions =
-      !!(slots.dimensions &&
-         slots.dimensions[0] !== null &&
-         slots.dimensions[1] !== null);
-
     const willSquare =
-      (hasBothDimensions
-        ? slots.dimensions[0] === slots.dimensions[1]
-        : slots.square);
+      slots.square;
 
     const imgAttributes = html.attributes([
       {class: 'image'},
