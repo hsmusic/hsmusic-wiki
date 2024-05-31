@@ -13,6 +13,10 @@ export const config = {
     default: 'skip',
   },
 
+  search: {
+    default: 'skip',
+  },
+
   thumbs: {
     applicable: false,
   },
