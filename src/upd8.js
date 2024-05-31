@@ -144,9 +144,6 @@ async function main() {
       {...defaultStepStatus, name: `generate thumbnails`,
         for: ['thumbs']},
 
-    buildSearchIndex:
-      {...defaultStepStatus, name: `generate search index`},
-
     loadDataFiles:
       {...defaultStepStatus, name: `load and process data files`,
         for: ['build']},
@@ -203,6 +200,10 @@ async function main() {
     preloadFileSizes:
       {...defaultStepStatus, name: `preload file sizes`,
         for: ['build']},
+
+    buildSearchIndex:
+      {...defaultStepStatus, name: `generate search index`,
+        for: ['build', 'search']},
 
     identifyWebRoutes:
       {...defaultStepStatus, name: `identify web routes`,
