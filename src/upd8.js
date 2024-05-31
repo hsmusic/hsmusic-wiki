@@ -2306,7 +2306,7 @@ async function main() {
       return false;
     }
 
-    logInfo`Successfully determined web routes.`;
+    logInfo`Successfully determined web routes - nice!`;
     paragraph = false;
 
     Object.assign(stepStatusSummary.identifyWebRoutes, {
