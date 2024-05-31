@@ -43,35 +43,117 @@ function initInfo(infoKey, description) {
   }
 
   if (object.session) {
-    const sessionDefaults = object.session;
+    const sessionSpecs = object.session;
 
     object.session = {};
 
-    for (const [key, defaultValue] of Object.entries(sessionDefaults)) {
+    for (const [key, spec] of Object.entries(sessionSpecs)) {
+      const hasSpec =
+        typeof spec === 'object' && spec !== null;
+
+      const defaultValue =
+        (hasSpec
+          ? spec.default ?? null
+          : spec);
+
+      let formatRead = value => value;
+      let formatWrite = value => value;
+      if (hasSpec && spec.type) {
+        switch (spec.type) {
+          case 'number':
+            formatRead = parseFloat;
+            formatWrite = String;
+            break;
+
+          case 'boolean':
+            formatRead = Boolean;
+            formatWrite = String;
+            break;
+
+          case 'string':
+            formatRead = String;
+            formatWrite = String;
+            break;
+
+          case 'json':
+            formatRead = JSON.parse;
+            formatWrite = JSON.stringify;
+            break;
+
+          default:
+            throw new Error(`Unknown type for session storage spec "${spec.type}"`);
+        }
+      }
+
+      let getMaxLength =
+        (!hasSpec
+          ? () => Infinity
+       : typeof spec.maxLength === 'function'
+          ? (object.settings
+              ? () => spec.maxLength(object.settings)
+              : () => spec.maxLength())
+          : () => spec.maxLength);
+
       const storageKey = `hsmusic.${infoKey}.${key}`;
 
       let fallbackValue = defaultValue;
 
       Object.defineProperty(object.session, key, {
         get: () => {
+          let value;
           try {
-            return sessionStorage.getItem(storageKey) ?? defaultValue;
+            value = sessionStorage.getItem(storageKey) ?? defaultValue;
           } catch (error) {
             if (error instanceof DOMException) {
-              return fallbackValue;
+              value = fallbackValue;
             } else {
               throw error;
             }
           }
+
+          if (value === null) {
+            return null;
+          }
+
+          return formatRead(value);
         },
 
         set: (value) => {
+          if (value !== null && value !== '') {
+            value = formatWrite(value);
+          }
+
+          if (value === null) {
+            value = '';
+          }
+
+          const maxLength = getMaxLength();
+          if (value.length > maxLength) {
+            console.warn(
+              `Requested to set session storage ${storageKey} ` +
+              `beyond maximum length ${maxLength}, ` +
+              `ignoring this value.`);
+            console.trace();
+            return;
+          }
+
+          let operation;
+          if (value === '') {
+            fallbackValue = null;
+            operation = () => {
+              sessionStorage.removeItem(storageKey);
+            };
+          } else {
+            fallbackValue = value;
+            operation = () => {
+              sessionStorage.setItem(storageKey, value);
+            };
+          }
+
           try {
-            sessionStorage.setItem(storageKey, value);
+            operation();
           } catch (error) {
-            if (error instanceof DOMException) {
-              fallbackValue = value;
-            } else {
+            if (!(error instanceof DOMException)) {
               throw error;
             }
           }
@@ -3723,10 +3805,19 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   },
 
   session: {
-    activeQuery: null,
-    activeQueryResults: null,
+    activeQuery: {
+      type: 'string',
+    },
 
-    repeatQueryOnReload: false,
+    activeQueryResults: {
+      type: 'json',
+      maxLength: settings => settings.maxActiveResultsStorage,
+    },
+
+    repeatQueryOnReload: {
+      type: 'boolean',
+      default: false,
+    },
   },
 
   settings: {
@@ -3978,7 +4069,7 @@ function initializeSidebarSearchState() {
     if (session.repeatQueryOnReload) {
       activateSidebarSearch(session.activeQuery);
     } else if (session.activeQueryResults) {
-      showSidebarSearchResults(JSON.parse(session.activeQueryResults));
+      showSidebarSearchResults(session.activeQueryResults);
     }
   }
 }
@@ -4063,11 +4154,7 @@ async function activateSidebarSearch(query) {
   updateSidebarSearchStatus();
 
   session.activeQuery = query;
-
-  const stringifiedResults = JSON.stringify(results);
-  if (stringifiedResults.length < settings.maxActiveResultsStorage) {
-    session.activeQueryResults = JSON.stringify(results);
-  }
+  session.activeQueryResults = results;
 
   showSidebarSearchResults(results);
 }
@@ -4088,8 +4175,8 @@ function clearSidebarSearch() {
 
   state.searchStage = null;
 
-  session.activeQuery = '';
-  session.activeQueryResults = '';
+  session.activeQuery = null;
+  session.activeQueryResults = null;
 
   hideSidebarSearchResults();
 }
