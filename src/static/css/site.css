@@ -259,6 +259,11 @@ body::before {
   font-weight: 800;
 }
 
+#page-container:not(.showing-sidebar-left) #skippers .skipper[data-for=sidebar-left],
+#page-container:not(.showing-sidebar-right) #skippers .skipper[data-for=sidebar-right] {
+  display: none;
+}
+
 #banner {
   background: black;
   background-color: var(--dim-color);

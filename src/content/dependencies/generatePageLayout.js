@@ -424,8 +424,11 @@ export default {
           (condition === undefined
             ? hasID(id)
             : condition))
+
         .map(({id, string}) =>
           html.tag('span', {class: 'skipper'},
+            {'data-for': id},
+
             html.tag('a',
               {href: `#${id}`},
               language.$('misc.skippers', string))));
