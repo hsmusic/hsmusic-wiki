@@ -1491,19 +1491,39 @@ async function main() {
       timeStart: Date.now(),
     });
 
-    await writeSearchData({
-      thumbsCache,
-      urls,
-      wikiCachePath,
-      wikiData,
-    });
+    try {
+      await writeSearchData({
+        thumbsCache,
+        urls,
+        wikiCachePath,
+        wikiData,
+      });
 
-    logInfo`Search data successfully written.`;
+      logInfo`Search data successfully written - nice!`;
+      paragraph = false;
 
-    Object.assign(stepStatusSummary.buildSearchIndex, {
-      status: STATUS_DONE_CLEAN,
-      timeEnd: Date.now(),
-    });
+      Object.assign(stepStatusSummary.buildSearchIndex, {
+        status: STATUS_DONE_CLEAN,
+        timeEnd: Date.now(),
+      });
+    } catch (error) {
+      if (!paragraph) console.log('');
+      niceShowAggregate(error);
+
+      logError`There was an error preparing or writing search data.`;
+      fileIssue();
+      logWarn`Any existing search data will be reused, and search may be`;
+      logWarn`generally dysfunctional. The site should work otherwise, though!`;
+
+      console.log('');
+      paragraph = true;
+
+      Object.assign(stepStatusSummary.buildSearchIndex, {
+        status: STATUS_HAS_WARNINGS,
+        annotation: `see log for details`,
+        timeEnd: Date.now(),
+      });
+    }
   }
 
   // Filter out any things with duplicate directories throughout the data,
