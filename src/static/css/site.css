@@ -172,6 +172,10 @@ body::before {
   flex-grow: 1;
 }
 
+.sidebar-column.initially-hidden {
+  display: none;
+}
+
 .sidebar-multiple {
   display: flex;
   flex-direction: column;
