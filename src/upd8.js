@@ -1485,47 +1485,6 @@ async function main() {
 
   const urls = generateURLs(urlSpec);
 
-  if (stepStatusSummary.buildSearchIndex.status === STATUS_NOT_STARTED) {
-    Object.assign(stepStatusSummary.buildSearchIndex, {
-      status: STATUS_STARTED_NOT_DONE,
-      timeStart: Date.now(),
-    });
-
-    try {
-      await writeSearchData({
-        thumbsCache,
-        urls,
-        wikiCachePath,
-        wikiData,
-      });
-
-      logInfo`Search data successfully written - nice!`;
-      paragraph = false;
-
-      Object.assign(stepStatusSummary.buildSearchIndex, {
-        status: STATUS_DONE_CLEAN,
-        timeEnd: Date.now(),
-      });
-    } catch (error) {
-      if (!paragraph) console.log('');
-      niceShowAggregate(error);
-
-      logError`There was an error preparing or writing search data.`;
-      fileIssue();
-      logWarn`Any existing search data will be reused, and search may be`;
-      logWarn`generally dysfunctional. The site should work otherwise, though!`;
-
-      console.log('');
-      paragraph = true;
-
-      Object.assign(stepStatusSummary.buildSearchIndex, {
-        status: STATUS_HAS_WARNINGS,
-        annotation: `see log for details`,
-        timeEnd: Date.now(),
-      });
-    }
-  }
-
   // Filter out any things with duplicate directories throughout the data,
   // warning about them too.
 
@@ -2177,6 +2136,47 @@ async function main() {
 
       Object.assign(stepStatusSummary.preloadFileSizes, {
         status: STATUS_DONE_CLEAN,
+        timeEnd: Date.now(),
+      });
+    }
+  }
+
+  if (stepStatusSummary.buildSearchIndex.status === STATUS_NOT_STARTED) {
+    Object.assign(stepStatusSummary.buildSearchIndex, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
+
+    try {
+      await writeSearchData({
+        thumbsCache,
+        urls,
+        wikiCachePath,
+        wikiData,
+      });
+
+      logInfo`Search data successfully written - nice!`;
+      paragraph = false;
+
+      Object.assign(stepStatusSummary.buildSearchIndex, {
+        status: STATUS_DONE_CLEAN,
+        timeEnd: Date.now(),
+      });
+    } catch (error) {
+      if (!paragraph) console.log('');
+      niceShowAggregate(error);
+
+      logError`There was an error preparing or writing search data.`;
+      fileIssue();
+      logWarn`Any existing search data will be reused, and search may be`;
+      logWarn`generally dysfunctional. The site should work otherwise, though!`;
+
+      console.log('');
+      paragraph = true;
+
+      Object.assign(stepStatusSummary.buildSearchIndex, {
+        status: STATUS_HAS_WARNINGS,
+        annotation: `see log for details`,
         timeEnd: Date.now(),
       });
     }
