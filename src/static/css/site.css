@@ -751,6 +751,7 @@ a:not([href]):hover {
 
 .external-link.indicate-external::after {
   content: '\00a0➚';
+  font-style: normal;
 }
 
 .external-link.indicate-external:hover::after {
