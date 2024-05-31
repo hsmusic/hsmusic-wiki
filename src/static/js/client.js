@@ -3673,6 +3673,9 @@ async function searchAll(query, options = {}) {
 // Sidebar search box -------------------------------------
 
 const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
+  pageContainer: null,
+
+  searchSidebarColumn: null,
   searchBox: null,
   searchInput: null,
 
@@ -3706,6 +3709,8 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   groupResultKindString: null,
 
   state: {
+    sidebarColumnShownForSearch: null,
+
     workerStatus: null,
     searchStage: null,
 
@@ -3731,11 +3736,21 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
 function getSidebarSearchReferences() {
   const info = sidebarSearchInfo;
 
+  info.pageContainer =
+    document.getElementById('page-container');
+
   info.searchBox =
     document.querySelector('.wiki-search-sidebar-box');
 
+  if (!info.searchBox) {
+    return;
+  }
+
   info.searchInput =
     info.searchBox.querySelector('.wiki-search-input');
+
+  info.searchSidebarColumn =
+    info.searchBox.closest('.sidebar-column');
 
   const findString = classPart =>
     info.searchBox.querySelector(`.wiki-search-${classPart}-string`);
@@ -3944,6 +3959,7 @@ function addSidebarSearchListeners() {
   info.endSearchLink.addEventListener('click', domEvent => {
     domEvent.preventDefault();
     clearSidebarSearch();
+    possiblyHideSearchSidebarColumn();
   });
 }
 
@@ -4168,6 +4184,8 @@ function showSidebarSearchResults(results) {
 
   console.debug(`Showing search results:`, results);
 
+  showSearchSidebarColumn();
+
   const flatResults =
     Object.entries(results)
       .filter(([index]) => index === 'generic')
@@ -4377,6 +4395,50 @@ function hideSidebarSearchResults() {
 
   cssProp(info.endSearchRule, 'display', 'none');
   cssProp(info.endSearchLine, 'display', 'none');
+}
+
+function showSearchSidebarColumn() {
+  const info = sidebarSearchInfo;
+  const {state} = info;
+
+  if (!info.searchSidebarColumn) {
+    return;
+  }
+
+  if (!info.searchSidebarColumn.classList.contains('initially-hidden')) {
+    return;
+  }
+
+  info.searchSidebarColumn.classList.remove('initially-hidden');
+
+  if (info.searchSidebarColumn.id === 'sidebar-left') {
+    info.pageContainer.classList.add('showing-sidebar-left');
+  } else if (info.searchSidebarColumn.id === 'sidebar-right') {
+    info.pageContainer.classList.add('showing-sidebar-right');
+  }
+
+  state.sidebarColumnShownForSearch = true;
+}
+
+function possiblyHideSearchSidebarColumn() {
+  const info = sidebarSearchInfo;
+  const {state} = info;
+
+  if (!info.searchSidebarColumn) {
+    return;
+  }
+
+  if (state.sidebarColumnShownForSearch) {
+    info.searchSidebarColumn.classList.add('initially-hidden');
+
+    if (info.searchSidebarColumn.id === 'sidebar-left') {
+      info.pageContainer.classList.remove('showing-sidebar-left');
+    } else if (info.searchSidebarColumn.id === 'sidebar-right') {
+      info.pageContainer.classList.remove('showing-sidebar-right');
+    }
+  }
+
+  state.sidebarColumnShownForSearch = null;
 }
 
 clientSteps.getPageReferences.push(getSidebarSearchReferences);

@@ -5,6 +5,7 @@ export default {
   contentDependencies: [
     'generateColorStyleRules',
     'generateFooterLocalizationLinks',
+    'generatePageSidebar',
     'generateSearchSidebarBox',
     'generateStickyHeadingContainer',
     'transformContent',
@@ -43,6 +44,9 @@ export default {
 
     relations.stickyHeadingContainer =
       relation('generateStickyHeadingContainer');
+
+    relations.sidebar =
+      relation('generatePageSidebar');
 
     if (sprawl.enableSearch) {
       relations.searchBox =
@@ -384,28 +388,43 @@ export default {
             slots.navContent),
         ]);
 
-    const getSidebar = (side, id) =>
-      (html.isBlank(slots[side])
-        ? html.blank()
-        : slots[side].slots({
-            attributes:
-              slots[side]
-                .getSlotValue('attributes')
-                .with({id}),
-          }));
+    const getSidebar = (side, id, needed) => {
+      const sidebar =
+        (html.isBlank(slots[side])
+          ? (needed
+              ? relations.sidebar.clone()
+              : html.blank())
+          : slots[side]);
+
+      if (html.isBlank(sidebar) && !needed) {
+        return sidebar;
+      }
+
+      return sidebar.slots({
+        attributes:
+          sidebar
+            .getSlotValue('attributes')
+            .with({id}),
+      });
+    }
+
+    const willShowSearch =
+      slots.showSearch && relations.searchBox;
 
     let showingSidebarLeft;
     let showingSidebarRight;
 
-    const leftSidebar = getSidebar('leftSidebar', 'sidebar-left');
-    const rightSidebar = getSidebar('rightSidebar', 'sidebar-right');
+    const leftSidebar = getSidebar('leftSidebar', 'sidebar-left', willShowSearch);
+    const rightSidebar = getSidebar('rightSidebar', 'sidebar-right', false);
 
-    if (
-      slots.showSearch &&
-      relations.searchBox &&
-      !html.isBlank(leftSidebar)
-    ) {
-      leftSidebar.setSlot('boxes',
+    if (willShowSearch) {
+      if (html.isBlank(leftSidebar)) {
+        leftSidebar.setSlot('initiallyHidden', true);
+        showingSidebarLeft = false;
+      }
+
+      leftSidebar.setSlot(
+        'boxes',
         html.tags([
           relations.searchBox,
           leftSidebar.getSlotValue('boxes'),
