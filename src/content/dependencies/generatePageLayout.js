@@ -394,6 +394,9 @@ export default {
                 .with({id}),
           }));
 
+    let showingSidebarLeft;
+    let showingSidebarRight;
+
     const leftSidebar = getSidebar('leftSidebar', 'sidebar-left');
     const rightSidebar = getSidebar('rightSidebar', 'sidebar-right');
 
@@ -411,6 +414,9 @@ export default {
 
     const hasSidebarLeft = !html.isBlank(html.resolve(leftSidebar));
     const hasSidebarRight = !html.isBlank(html.resolve(rightSidebar));
+
+    showingSidebarLeft ??= hasSidebarLeft;
+    showingSidebarRight ??= hasSidebarRight;
 
     const processSkippers = skipperList =>
       skipperList
@@ -662,6 +668,12 @@ export default {
 
                 hasSidebarRight &&
                   {class: 'has-sidebar-right'},
+
+                showingSidebarLeft &&
+                  {class: 'showing-sidebar-left'},
+
+                showingSidebarRight &&
+                  {class: 'showing-sidebar-right'},
 
                 [
                   skippersHTML,
