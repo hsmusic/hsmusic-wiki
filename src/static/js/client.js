@@ -3711,6 +3711,9 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   state: {
     sidebarColumnShownForSearch: null,
 
+    tidiedSidebar: null,
+    collapsedDetailsForTidiness: null,
+
     workerStatus: null,
     searchStage: null,
 
@@ -3960,6 +3963,7 @@ function addSidebarSearchListeners() {
     domEvent.preventDefault();
     clearSidebarSearch();
     possiblyHideSearchSidebarColumn();
+    restoreSidebarSearchColumn();
   });
 }
 
@@ -4224,6 +4228,8 @@ function showSidebarSearchResults(results) {
   if (!empty(flatResults)) {
     cssProp(info.endSearchRule, 'display', 'block');
     cssProp(info.endSearchLine, 'display', 'block');
+
+    tidySidebarSearchColumn();
   }
 }
 
@@ -4428,17 +4434,78 @@ function possiblyHideSearchSidebarColumn() {
     return;
   }
 
-  if (state.sidebarColumnShownForSearch) {
-    info.searchSidebarColumn.classList.add('initially-hidden');
+  if (!state.sidebarColumnShownForSearch) {
+    return;
+  }
 
-    if (info.searchSidebarColumn.id === 'sidebar-left') {
-      info.pageContainer.classList.remove('showing-sidebar-left');
-    } else if (info.searchSidebarColumn.id === 'sidebar-right') {
-      info.pageContainer.classList.remove('showing-sidebar-right');
-    }
+  info.searchSidebarColumn.classList.add('initially-hidden');
+
+  if (info.searchSidebarColumn.id === 'sidebar-left') {
+    info.pageContainer.classList.remove('showing-sidebar-left');
+  } else if (info.searchSidebarColumn.id === 'sidebar-right') {
+    info.pageContainer.classList.remove('showing-sidebar-right');
   }
 
   state.sidebarColumnShownForSearch = null;
+}
+
+// This should be called after results are shown, since it checks the
+// elements added to understand the current search state.
+function tidySidebarSearchColumn() {
+  const info = sidebarSearchInfo;
+  const {state} = info;
+
+  // Don't *re-tidy* the sidebar if we've already tidied it to display
+  // some results. This flag will get cleared if the search is dismissed
+  // altogether (and the pre-tidy state is restored).
+  if (state.tidiedSidebar) {
+    return;
+  }
+
+  const here = location.href.replace(/\/$/, '');
+  const currentPageIsResult =
+    Array.from(info.results.querySelectorAll('a'))
+      .some(link => {
+        const there = link.href.replace(/\/$/, '');
+        return here === there;
+      });
+
+  // Don't tidy the sidebar if you've navigated to some other page than
+  // what's in the current result list.
+  if (!currentPageIsResult) {
+    return;
+  }
+
+  state.tidiedSidebar = true;
+  state.collapsedDetailsForTidiness = [];
+
+  for (const box of info.searchSidebarColumn.querySelectorAll('.sidebar')) {
+    if (box === info.searchBox) {
+      continue;
+    }
+
+    for (const details of box.getElementsByTagName('details')) {
+      if (details.open) {
+        details.removeAttribute('open');
+        state.collapsedDetailsForTidiness.push(details);
+      }
+    }
+  }
+}
+
+function restoreSidebarSearchColumn() {
+  const {state} = sidebarSearchInfo;
+
+  if (!state.tidiedSidebar) {
+    return;
+  }
+
+  for (const details of state.collapsedDetailsForTidiness) {
+    details.setAttribute('open', '');
+  }
+
+  state.collapsedDetailsForTidiness = [];
+  state.tidiedSidebar = null;
 }
 
 clientSteps.getPageReferences.push(getSidebarSearchReferences);
