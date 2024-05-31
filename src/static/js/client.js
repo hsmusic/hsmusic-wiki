@@ -35,7 +35,7 @@ function initInfo(infoKey, description) {
   for (const obj of [
     object,
     object.state,
-    object.setting,
+    object.settings,
     object.event,
   ]) {
     if (!obj) continue;
