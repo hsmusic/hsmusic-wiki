@@ -49,6 +49,10 @@ export const config = {
     default: 'perform',
   },
 
+  search: {
+    default: 'perform',
+  },
+
   thumbs: {
     default: 'perform',
   },
