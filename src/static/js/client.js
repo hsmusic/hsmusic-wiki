@@ -3001,6 +3001,7 @@ clientSteps.addPageListeners.push(addAdditionalNamesBoxListeners);
 // Scoped chronology links --------------------------------
 
 const scopedChronologyLinksInfo = initInfo('scopedChronologyLinksInfo', {
+  switcher: null,
   containers: null,
   switcherLinks: null,
   modes: null,
@@ -3013,18 +3014,18 @@ const scopedChronologyLinksInfo = initInfo('scopedChronologyLinksInfo', {
 function getScopedChronologyLinksReferences() {
   const info = scopedChronologyLinksInfo;
 
-  const switcher =
+  info.switcher =
     document.querySelector('.scoped-chronology-switcher');
 
-  if (!switcher) {
+  if (!info.switcher) {
     return;
   }
 
   info.containers =
-    Array.from(switcher.querySelectorAll(':scope > div'));
+    Array.from(info.switcher.querySelectorAll(':scope > div'));
 
   info.switcherLinks =
-    Array.from(switcher.querySelectorAll('.switcher-link'));
+    Array.from(info.switcher.querySelectorAll('.switcher-link'));
 
   info.modes =
     info.containers
@@ -3037,6 +3038,10 @@ function getScopedChronologyLinksReferences() {
 function addScopedChronologyLinksPageHandlers() {
   const info = scopedChronologyLinksInfo;
   const {session} = scopedChronologyLinksInfo;
+
+  if (!info.switcher) {
+    return;
+  }
 
   for (const [index, {
     container: currentContainer,
@@ -3069,6 +3074,10 @@ function addScopedChronologyLinksPageHandlers() {
 
 function mutateScopedChronologyLinksContent() {
   const info = scopedChronologyLinksInfo;
+
+  if (!info.switcher) {
+    return;
+  }
 
   const {selectedMode} = info.session;
 
