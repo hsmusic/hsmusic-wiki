@@ -161,9 +161,15 @@ export default {
       slots.visible && 'visible',
     ];
 
+    // TODO: It feels pretty awkward that this component is the only one that
+    // has enough knowledge to decide if the sort button is even applicable...
+    const switchingSortPossible =
+      !empty(relations.groupLinksSortedByCount) &&
+      !empty(relations.groupLinksSortedByDuration);
+
     return html.tags([
       html.tag('dt', {class: topLevelClasses},
-        (slots.showSortButton
+        (switchingSortPossible && slots.showSortButton
           ? language.$('artistPage.groupContributions.title.withSortButton', {
               title: slots.title,
               sort:
