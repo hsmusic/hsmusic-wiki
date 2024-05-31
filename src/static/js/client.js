@@ -4082,6 +4082,7 @@ function clearSidebarSearch() {
   }
 
   info.searchBox.classList.remove('showing-results');
+  info.searchSidebarColumn.classList.remove('search-showing-results');
 
   info.searchInput.value = '';
 
@@ -4203,6 +4204,7 @@ function showSidebarSearchResults(results) {
         })));
 
   info.searchBox.classList.add('showing-results');
+  info.searchSidebarColumn.classList.add('search-showing-results');
 
   while (info.results.firstChild) {
     info.results.firstChild.remove();

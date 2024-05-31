@@ -471,6 +471,12 @@ summary .group-name {
   font-weight: normal;
 }
 
+.sidebar-column.search-showing-results {
+  position: sticky;
+  top: 5px;
+  align-self: flex-start !important; /* pls */
+}
+
 .wiki-search-sidebar-box {
   padding: 1px 0 0 0;
 
@@ -490,18 +496,22 @@ summary .group-name {
 }
 
 .wiki-search-sidebar-box.showing-results {
-  position: sticky;
-  top: 5px;
-
   box-shadow:
     0 4px 16px -8px var(--primary-color),
     0 10px 6px var(--bg-black-color),
     0 6px 4px #00000040;
 }
 
+/* This is to say, any sidebar that's *not*
+ * the first sidebar after the search box.
+ */
+.wiki-search-sidebar-box.showing-results + .sidebar ~ .sidebar {
+  margin-top: 5px;
+}
+
 .wiki-search-sidebar-box.showing-results ~ .sidebar:not(:hover) {
-  opacity: 0.6;
-  filter: brightness(0.5);
+  opacity: 0.8;
+  filter: brightness(0.7);
 }
 
 .wiki-search-input {
