@@ -34,7 +34,7 @@
 import '#import-heck';
 
 import {execSync} from 'node:child_process';
-import {readdir, readFile} from 'node:fs/promises';
+import {readdir, readFile, stat} from 'node:fs/promises';
 import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
@@ -126,6 +126,8 @@ let showStepStatusSummary = false;
 
 async function main() {
   Error.stackTraceLimit = Infinity;
+
+  let paragraph = true;
 
   stepStatusSummary = {
     determineMediaCachePath:
@@ -361,8 +363,13 @@ async function main() {
       type: 'flag',
     },
 
+    'refresh-search': {
+      help: `Generate the text search index this build, instead of waiting for the automatic delay`,
+      type: 'flag',
+    },
+
     'skip-search': {
-      help: `Skip creation of the text search file`,
+      help: `Skip creation of the text search index no matter what, even if it'd normally be scheduled for now`,
       type: 'flag',
     },
 
@@ -770,22 +777,92 @@ async function main() {
       buildConfig: 'webRoutes',
     });
 
-    if (wikiCachePath) {
+    decideBuildSearchIndex: {
       fallbackStep('buildSearchIndex', {
-        default: 'perform',
+        default: 'skip',
         buildConfig: 'search',
-        cli: {
-          flag: 'skip-search',
-          negate: true,
-        },
+        cli: [
+          {flag: 'refresh-search'},
+          {flag: 'skip-search', negate: true},
+        ],
       });
-    } else {
-      logInfo`No wiki cache provided, so not writing search index.`;
 
-      Object.assign(stepStatusSummary.buildSearchIndex, {
-        status: STATUS_NOT_APPLICABLE,
-        annotation: `no wiki cache to write into`,
-      });
+      if (cliOptions['refresh-search'] || cliOptions['skip-search']) {
+        if (cliOptions['refresh-search']) {
+          logInfo`${'--refresh-search'} provided, will generate search fresh this build.`;
+        }
+
+        break decideBuildSearchIndex;
+      }
+
+      if (stepStatusSummary.buildSearchIndex.status !== STATUS_NOT_APPLICABLE) {
+        break decideBuildSearchIndex;
+      }
+
+      if (selectedBuildMode?.config?.search?.default === 'skip') {
+        break decideBuildSearchIndex;
+      }
+
+      // TODO: OK this is a little silly.
+      if (stepStatusSummary.buildSearchIndex.annotation?.startsWith('N/A')) {
+        break decideBuildSearchIndex;
+      }
+
+      const indexFile = path.join(wikiCachePath, 'search', 'index.json')
+      let stats;
+      try {
+        stats = await stat(indexFile);
+      } catch (error) {
+        if (error.code === 'ENOENT') {
+          Object.assign(stepStatusSummary.buildSearchIndex, {
+            status: STATUS_NOT_STARTED,
+            annotation: `search/index.json not present, will create`,
+          });
+
+          logInfo`Looks like the search cache doesn't exist.`;
+          logInfo`It'll be generated fresh, this build!`;
+        } else {
+          Object.assign(stepStatusSummary.buildSearchIndex, {
+            status: STATUS_NOT_APPLICABLE,
+            annotation: `error getting search index stats`,
+          });
+
+          if (!paragraph) console.log('');
+          console.error(error);
+
+          logWarn`There was an error checking the search index file, located at:`;
+          logWarn`${indexFile}`;
+          logWarn`You may want to toss out the "search" folder; it'll be generated`;
+          logWarn`anew, if you do, and may fix this error.`;
+        }
+
+        paragraph = false;
+        break decideBuildSearchIndex;
+      }
+
+      const delta = Date.now() - stats.mtimeMs;
+      const minute = 60 * 1000;
+      const delay = 45 * minute;
+
+      const whenst = duration => `~${Math.ceil(duration / minute)} min`;
+
+      if (delta < delay) {
+        logInfo`Search index was generated recently, skipping for this build.`;
+        logInfo`Next scheduled is in ${whenst(delay - delta)}, or by using ${'--refresh-search'}.`;
+        Object.assign(stepStatusSummary.buildSearchIndex, {
+          status: STATUS_NOT_APPLICABLE,
+          annotation: `earlier than scheduled based on file mtime`,
+        });
+      } else {
+        logInfo`Search index hasn't been generated for a little while.`;
+        logInfo`It'll be generated this build, then again in ${whenst(delay)}.`;
+        Object.assign(stepStatusSummary.buildSearchIndex, {
+          status: STATUS_NOT_STARTED,
+          annotation: `past when shceduled based on file mtime`,
+        });
+      }
+
+      paragraph = false;
     }
 
     fallbackStep('verifyImagePaths', {
@@ -1209,8 +1286,6 @@ async function main() {
   if (showInvalidPropertyAccesses) {
     CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES = true;
   }
-
-  let paragraph = false;
 
   Object.assign(stepStatusSummary.loadDataFiles, {
     status: STATUS_STARTED_NOT_DONE,
