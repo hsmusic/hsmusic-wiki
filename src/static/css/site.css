@@ -1108,6 +1108,10 @@ ul.image-details li {
   font-style: oblique;
 }
 
+.commentary-entry-heading time {
+  float: right;
+}
+
 .commentary-art {
   float: right;
   width: 30%;

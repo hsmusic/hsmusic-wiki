@@ -430,12 +430,15 @@ misc:
     entry:
       title:
         _: "{ARTISTS}:"
+
         noArtists: "Unknown artist"
+
         withAccent: "{ARTISTS}: {ACCENT}"
+
         accent:
           withAnnotation: "({ANNOTATION})"
-          withDate: ({DATE})"
-          withAnnotation.withDate: "({ANNOTATION}, {DATE})"
+
+        date: "{DATE}"
 
       seeOriginalRelease: "See {ORIGINAL}!"
 

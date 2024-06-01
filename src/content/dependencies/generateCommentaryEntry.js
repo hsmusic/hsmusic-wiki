@@ -61,19 +61,14 @@ export default {
         relations.annotationContent.slot('mode', 'inline');
     }
 
-    if (data.date) {
-      accentParts.push('withDate');
-      accentOptions.date =
-        language.formatDate(data.date);
-    }
-
     const accent =
       (accentParts.length > 1
         ? html.tag('span', {class: 'commentary-entry-accent'},
             language.$(...accentParts, accentOptions))
         : null);
 
-    const titleParts = ['misc.artistCommentary.entry.title'];
+    const titlePrefix = 'misc.artistCommentary.entry.title';
+    const titleParts = [titlePrefix];
     const titleOptions = {artists: artistsSpan};
 
     if (accent) {
@@ -88,7 +83,16 @@ export default {
     return html.tags([
       html.tag('p', {class: 'commentary-entry-heading'},
         style,
-        language.$(...titleParts, titleOptions)),
+        [
+          data.date &&
+            html.tag('time',
+              language.$(titlePrefix, 'date', {
+                date:
+                  language.formatDate(data.date),
+              })),
+
+          language.$(...titleParts, titleOptions)
+        ]),
 
       html.tag('blockquote', {class: 'commentary-entry-body'},
         style,
