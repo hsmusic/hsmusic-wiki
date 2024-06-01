@@ -74,7 +74,7 @@
     "license": "GPL-3.0",
     "devDependencies": {
         "chokidar": "^3.5.3",
-        "tap": "^18.4.0",
+        "tap": "^19.0.2",
         "tcompare": "^6.0.0"
     },
     "tap": {
