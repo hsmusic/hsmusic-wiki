@@ -16,7 +16,8 @@ function stubAlbum(tracks, directory = 'bar') {
   album.directory = directory;
 
   const trackSection = stubTrackSection(album, tracks);
-  album.trackSections = [trackSection];
+  album.trackSections = [`unqualified-track-section:${trackSection.unqualifiedDirectory}`];
+  album.ownTrackSectionData = [trackSection];
 
   return album;
 }
