@@ -2641,6 +2641,7 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
   }
 
   .sidebar-column {
+    position: static !important;
     max-width: unset !important;
     flex-basis: unset !important;
     margin-right: 0 !important;
