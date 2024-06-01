@@ -388,7 +388,8 @@ export function sortFlashesChronologically(data, {
   getDate,
 } = {}) {
   // Group flashes by act...
-  sortByDirectory(data, {
+  sortAlphabetically(data, {
+    getName: flash => flash.act.name,
     getDirectory: flash => flash.act.directory,
   });
 
