@@ -75,18 +75,6 @@ export default templateCompositeFrom({
       '#contributionsForDuration.thing.duration': '#durationValues',
     }),
 
-    {
-      dependencies: [
-        input('list'),
-        '#contributionsForDuration.thing',
-        '#durationValues',
-      ],
-      compute: (continuation, opts) => {
-        console.log(opts);
-        return continuation();
-      },
-    },
-
     withSum({
       values: '#durationValues',
     }).outputs({
