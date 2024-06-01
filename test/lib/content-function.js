@@ -17,8 +17,23 @@ import mock from './generic-mock.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+function cleanURLSpec(reference) {
+  const prepared = structuredClone(reference);
+
+  for (const spec of Object.values(prepared)) {
+    if (spec.prefix) {
+      // Strip out STATIC_VERSION. This updates fairly regularly and we
+      // don't want it to affect snapshot tests.
+      spec.prefix = spec.prefix
+        .replace(/static-\d+[a-z]\d+/i, 'static');
+    }
+  }
+
+  return prepared;
+}
+
 export function testContentFunctions(t, message, fn) {
-  const urls = generateURLs(urlSpec);
+  const urls = generateURLs(cleanURLSpec(urlSpec));
 
   t.test(message, async t => {
     let loadedContentDependencies;
