@@ -132,7 +132,11 @@ export default class CacheableObject {
         return;
       }
 
-      if ('default' in update) {
+      if (
+        typeof update === 'object' &&
+        update !== null &&
+        'default' in update
+      ) {
         this[property] = update?.default;
       } else {
         this[property] = null;
