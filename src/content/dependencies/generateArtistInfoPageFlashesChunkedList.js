@@ -1,144 +1,52 @@
-import {sortEntryThingPairs, sortFlashesChronologically} from '#sort';
-import {chunkByProperties, stitchArrays} from '#sugar';
+import {sortContributionsChronologically, sortFlashesChronologically}
+  from '#sort';
+import {chunkByConditions, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
-    'generateArtistInfoPageChunk',
-    'generateArtistInfoPageChunkItem',
-    'linkFlash',
+    'generateArtistInfoPageChunkedList',
+    'generateArtistInfoPageFlashesChunk',
   ],
 
-  extraDependencies: ['html', 'language'],
-
   query(artist) {
-    const processFlashEntry = ({flash, contribs}) => ({
-      thing: flash,
-      entry: {
-        flash: flash,
-        act: flash.act,
-        contribs: contribs,
-      },
-    });
+    const query = {};
 
-    const processFlashEntries = ({flashes, contribs}) =>
-      stitchArrays({
-        flash: flashes,
-        contribs: contribs,
-      }).map(processFlashEntry);
-
-    const {flashesAsContributor} = artist;
-
-    const flashesAsContributorContribs =
-      flashesAsContributor
-        .map(flash => flash.contributorContribs);
-
-    const flashesAsContributorEntries =
-      processFlashEntries({
-        flashes: flashesAsContributor,
-        contribs: flashesAsContributorContribs,
-      });
-
-    const entries = [
-      ...flashesAsContributorEntries,
+    const allContributions = [
+      ...artist.flashContributorContributions,
     ];
 
-    sortEntryThingPairs(entries, sortFlashesChronologically);
+    sortContributionsChronologically(
+      allContributions,
+      sortFlashesChronologically);
 
-    const chunks =
-      chunkByProperties(
-        entries.map(({entry}) => entry),
-        ['act']);
+    query.contribs =
+      chunkByConditions(allContributions, [
+        ({thing: flash1}, {thing: flash2}) =>
+          flash1.act !== flash2.act,
+      ]);
 
-    return {chunks};
+    query.flashActs =
+      query.contribs
+        .map(contribs => contribs[0].thing)
+        .map(thing => thing.act);
+
+    return query;
   },
 
-  relations(relation, query) {
-    // Flashes and games can list multiple contributors as collaborative
-    // credits, but we don't display these on the artist page, since they
-    // usually involve many artists crediting a larger team where collaboration
-    // isn't as relevant (without more particular details that aren't tracked
-    // on the wiki).
+  relations: (relation, query, _artist) => ({
+    chunkedList:
+      relation('generateArtistInfoPageChunkedList'),
 
-    return {
-      chunks:
-        query.chunks.map(() => relation('generateArtistInfoPageChunk')),
-
-      actLinks:
-        query.chunks.map(({chunk}) =>
-          relation('linkFlash', chunk[0].flash)),
-
-      items:
-        query.chunks.map(({chunk}) =>
-          chunk.map(() => relation('generateArtistInfoPageChunkItem'))),
-
-      itemFlashLinks:
-        query.chunks.map(({chunk}) =>
-          chunk.map(({flash}) => relation('linkFlash', flash))),
-    };
-  },
-
-  data(query, artist) {
-    return {
-      actNames:
-        query.chunks.map(({act}) => act.name),
-
-      dates:
-        query.chunks.map(({chunk}) =>
-          chunk.map(({flash}) => flash.date)),
-
-      itemContributions:
-        query.chunks.map(({chunk}) =>
-          chunk.map(({contribs}) =>
-            contribs
-              .find(contrib => contrib.artist === artist)
-              .annotation)),
-    };
-  },
-
-  generate(data, relations, {html, language}) {
-    return html.tag('dl',
+    chunks:
       stitchArrays({
-        chunk: relations.chunks,
-        actLink: relations.actLinks,
-        actName: data.actNames,
-        dates: data.dates,
+        flashAct: query.flashActs,
+        contribs: query.contribs,
+      }).map(({flashAct, contribs}) =>
+          relation('generateArtistInfoPageFlashesChunk', flashAct, contribs)),
+  }),
 
-        items: relations.items,
-        itemFlashLinks: relations.itemFlashLinks,
-        itemContributions: data.itemContributions,
-      }).map(({
-          chunk,
-          actLink,
-          actName,
-          dates,
-
-          items,
-          itemFlashLinks,
-          itemContributions,
-        }) =>
-          chunk.slots({
-            mode: 'flash',
-            flashActLink: actLink.slot('content', actName),
-            dates,
-
-            items:
-              stitchArrays({
-                item: items,
-                flashLink: itemFlashLinks,
-                contribution: itemContributions,
-              }).map(({
-                  item,
-                  flashLink,
-                  contribution,
-                }) =>
-                  item.slots({
-                    annotation: contribution,
-
-                    content:
-                      language.$('artistPage.creditList.entry.flash', {
-                        flash: flashLink,
-                      }),
-                  })),
-          })));
-  },
+  generate: (relations) =>
+    relations.chunkedList.slots({
+      chunks: relations.chunks,
+    }),
 };

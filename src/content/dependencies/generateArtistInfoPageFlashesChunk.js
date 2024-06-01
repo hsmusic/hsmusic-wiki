@@ -1,24 +1,24 @@
 export default {
   contentDependencies: [
     'generateArtistInfoPageChunk',
-    'generateArtistInfoPageArtworksChunkItem',
-    'linkAlbum',
+    'generateArtistInfoPageFlashesChunkItem',
+    'linkFlashAct',
   ],
 
-  relations: (relation, album, contribs) => ({
+  relations: (relation, flashAct, contribs) => ({
     template:
       relation('generateArtistInfoPageChunk'),
 
-    albumLink:
-      relation('linkAlbum', album),
+    flashActLink:
+      relation('linkFlashAct', flashAct),
 
     items:
       contribs
         .map(contrib =>
-          relation('generateArtistInfoPageArtworksChunkItem', contrib)),
+          relation('generateArtistInfoPageFlashesChunkItem', contrib)),
   }),
 
-  data: (_album, contribs) => ({
+  data: (_flashAct, contribs) => ({
     dates:
       contribs
         .map(contrib => contrib.date),
@@ -26,8 +26,8 @@ export default {
 
   generate: (data, relations) =>
     relations.template.slots({
-      mode: 'album',
-      albumLink: relations.albumLink,
+      mode: 'flash',
+      flashActLink: relations.flashActLink,
       dates: data.dates,
       items: relations.items,
     }),

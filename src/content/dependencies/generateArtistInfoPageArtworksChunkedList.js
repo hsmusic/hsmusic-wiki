@@ -8,8 +8,6 @@ export default {
     'generateArtistInfoPageArtworksChunk',
   ],
 
-  extraDependencies: ['html', 'language'],
-
   query(artist) {
     const query = {};
 
