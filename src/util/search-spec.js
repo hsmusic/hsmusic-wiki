@@ -89,12 +89,15 @@ export const searchSpec = {
   generic: {
     query: ({
       albumData,
+      artTagData,
       artistData,
       flashData,
       groupData,
       trackData,
     }) => [
       albumData,
+
+      artTagData,
 
       artistData
         .filter(artist => !artist.isAlias),

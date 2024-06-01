@@ -49,6 +49,9 @@ export default {
 
         html.tag('template', {class: 'wiki-search-group-result-kind-string'},
           language.$('misc.search.resultKind.group')),
+
+        html.tag('template', {class: 'wiki-search-tag-result-kind-string'},
+          language.$('misc.search.resultKind.artTag')),
       ],
     }),
 };

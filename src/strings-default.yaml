@@ -644,6 +644,7 @@ misc:
 
     resultKind:
       album: "(album)"
+      artTag: "(art tag)"
       artist: "(artist)"
       group: "(group)"
 

@@ -277,6 +277,7 @@ const getLinkHref = (type, directory) => rebase(`${type}/${directory}`);
 */
 
 const openAlbum = d => rebase(`album/${d}`);
+const openArtTag = d => rebase(`tag/${d}`);
 const openArtist = d => rebase(`artist/${d}`);
 const openFlash = d => rebase(`flash/${d}`);
 const openGroup = d => rebase(`group/${d}`);
@@ -3789,6 +3790,7 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
   albumResultKindString: null,
   artistResultKindString: null,
   groupResultKindString: null,
+  tagResultKindString: null,
 
   state: {
     sidebarColumnShownForSearch: null,
@@ -3884,6 +3886,9 @@ function getSidebarSearchReferences() {
 
   info.groupResultKindString =
     findString('group-result-kind');
+
+  info.tagResultKindString =
+    findString('art-tag-result-kind');
 }
 
 function addSidebarSearchInternalListeners() {
@@ -4393,6 +4398,16 @@ function generateSidebarSearchResult(result) {
     case 'flash': {
       preparedSlots.href =
         openFlash(result.directory);
+
+      break;
+    }
+
+    case 'tag': {
+      preparedSlots.href =
+        openArtTag(result.directory);
+
+      preparedSlots.kindString =
+        info.tagResultKindString;
 
       break;
     }
