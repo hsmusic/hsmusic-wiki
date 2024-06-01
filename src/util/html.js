@@ -658,28 +658,25 @@ export class Tag {
           : null);
 
       if (content) {
-        if (itemIncludesChunkwrapSplit) {
-          if (!seenChunkwrapSplitter) {
-            // The first time we see a chunkwrap splitter, backtrack and wrap
-            // the content *so far* in a chunk.
-            content = `<span class="chunkwrap">` + content;
-          }
-
-          // Close the existing chunk. We'll add the new chunks after the
-          // (normal) joiner.
-          content += `</span>`;
+        if (itemIncludesChunkwrapSplit && !seenChunkwrapSplitter) {
+          // The first time we see a chunkwrap splitter, backtrack and wrap
+          // the content *so far* in a chunk. This will be treated just like
+          // any other open chunkwrap, and closed after the first chunk of
+          // this item! (That means the existing content is part of the same
+          // chunk as the first chunk included in this content, which makes
+          // sense, because that first chink is really just more text that
+          // precedes the first split.)
+          content = `<span class="chunkwrap">` + content;
         }
 
         content += joiner;
-      } else {
+      } else if (itemIncludesChunkwrapSplit) {
         // We've encountered a chunkwrap split before any other content.
         // This means there's no content to wrap, no existing chunkwrap
         // to close, and no reason to add a joiner, but we *do* need to
         // enter a chunkwrap wrapper *now*, so the first chunk of this
         // item will be properly wrapped.
-        if (itemIncludesChunkwrapSplit) {
-          content = `<span class="chunkwrap">`;
-        }
+        content = `<span class="chunkwrap">`;
       }
 
       if (itemIncludesChunkwrapSplit) {
@@ -700,6 +697,10 @@ export class Tag {
         if (itemIncludesChunkwrapSplit) {
           for (const [index, chunk] of chunkwrapChunks.entries()) {
             if (index === 0) {
+              // The first chunk isn't actually a chunk all on its own, it's
+              // text that should be appended to the previous chunk. We will
+              // close this chunk as the first appended content as we process
+              // the next chunk.
               content += chunk;
             } else {
               const whitespace = chunk.match(/^\s+/) ?? '';
