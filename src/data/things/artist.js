@@ -271,6 +271,12 @@ export class Artist extends Thing {
       list: input.value('commentatorArtists'),
     }),
 
+    flashContributorContributions: reverseContributionList({
+      data: 'flashData',
+      list: input.value('contributorContribs'),
+      mode: input.value('contributions'),
+    }),
+
     totalDuration: artistTotalDuration(),
   });
 
