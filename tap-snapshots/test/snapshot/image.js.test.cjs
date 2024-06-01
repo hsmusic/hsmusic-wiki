@@ -12,7 +12,7 @@ exports[`test/snapshot/image.js > TAP > image (snapshot) > content warnings via 
             <img class="image" src="media/album-art/beyond-canon/cover.png">
             <span class="reveal-text-container">
                 <span class="reveal-text">
-                    <img class="reveal-symbol" src="static/warning.svg?413">
+                    <img class="reveal-symbol" src="static/misc/warning.svg">
                     <br>
                     <span class="reveal-warnings">too cool for school</span>
                     <br>
@@ -25,11 +25,11 @@ exports[`test/snapshot/image.js > TAP > image (snapshot) > content warnings via 
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > dimensions 1`] = `
-<div class="image-container"><div class="image-outer-area"><div class="image-inner-area"><img class="image" width="400" src="foobar"></div></div></div>
+<div class="image-container"><div class="image-outer-area"><div class="image-inner-area"><img class="image" width="600" height="400" src="foobar"></div></div></div>
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > dimensions with square 1`] = `
-<div class="image-container"><div class="image-outer-area"><div class="image-inner-area"><img class="image" width="400" src="foobar"></div></div></div>
+<div class="image-container square"><div class="image-outer-area square-content"><div class="image-inner-area"><img class="image" width="600" height="400" src="foobar"></div></div></div>
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > lazy with square 1`] = `

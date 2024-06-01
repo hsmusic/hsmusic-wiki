@@ -8,7 +8,7 @@
 exports[`test/snapshot/generateAlbumReleaseInfo.js > TAP > generateAlbumReleaseInfo (snapshot) > basic behavior 1`] = `
 <p>
     By <span class="contribution nowrap"><a href="artist/toby-fox/">Toby Fox</a> (music probably)</span> and <span class="contribution nowrap"><span class="text-with-tooltip"><span class="hoverable"><a class="text-with-tooltip-interaction-cue" href="artist/tensei/">Tensei</a></span><span class="tooltip icons icons-tooltip"><span class="tooltip-content"><a class="icon has-text" href="https://tenseimusic.bandcamp.com/">
-                        <svg><use href="static/icons.svg#icon-bandcamp"></use></svg>
+                        <svg><use href="static/misc/icons.svg#icon-bandcamp"></use></svg>
                         <span class="icon-text">tenseimusic</span>
                     </a><span class="icon-platform">Bandcamp</span></span></span></span> (hot jams)</span>.
     <br>
