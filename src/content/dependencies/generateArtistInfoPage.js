@@ -31,25 +31,32 @@ export default {
     return {
       // Even if an artist has served as both "artist" (compositional) and
       // "contributor" (instruments, production, etc) on the same track, that
-      // track only counts as one unique contribution.
+      // track only counts as one unique contribution in the list.
       allTracks:
-        unique([...artist.tracksAsArtist, ...artist.tracksAsContributor]),
+        unique(
+          ([
+            artist.trackArtistContributions,
+            artist.trackContributorContributions,
+          ]).flat()
+            .map(({thing}) => thing)),
 
       // Artworks are different, though. We intentionally duplicate album data
       // objects when the artist has contributed some combination of cover art,
       // wallpaper, and banner - these each count as a unique contribution.
-      allArtworks: [
-        ...artist.albumsAsCoverArtist,
-        ...artist.albumsAsWallpaperArtist,
-        ...artist.albumsAsBannerArtist,
-        ...artist.tracksAsCoverArtist,
-      ],
+      allArtworks:
+        ([
+          artist.albumCoverArtistContributions,
+          artist.albumWallpaperArtistContributions,
+          artist.albumBannerArtistContributions,
+          artist.trackCoverArtistContributions,
+        ]).flat()
+          .map(({thing}) => thing),
 
       // Banners and wallpapers don't show up in the artist gallery page, only
       // cover art.
       hasGallery:
-        !empty(artist.albumsAsCoverArtist) ||
-        !empty(artist.tracksAsCoverArtist),
+        !empty(artist.albumCoverArtistContributions) ||
+        !empty(artist.trackCoverArtistContributions),
     };
   },
 
@@ -100,7 +107,7 @@ export default {
       }
     }
 
-    if (sprawl.enableFlashesAndGames && !empty(artist.flashesAsContributor)) {
+    if (sprawl.enableFlashesAndGames && !empty(artist.flashContributorContributions)) {
       const flashes = sections.flashes = {};
       flashes.heading = relation('generateContentHeading');
       flashes.list = relation('generateArtistInfoPageFlashesChunkedList', artist);

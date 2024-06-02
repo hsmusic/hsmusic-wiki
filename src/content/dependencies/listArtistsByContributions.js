@@ -1,6 +1,13 @@
 import {sortAlphabetically, sortByCount} from '#sort';
-import {empty, filterByCount, filterMultipleArrays, stitchArrays, unique}
-  from '#sugar';
+
+import {
+  accumulateSum,
+  empty,
+  filterByCount,
+  filterMultipleArrays,
+  stitchArrays,
+  unique,
+} from '#sugar';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtist'],
@@ -38,26 +45,33 @@ export default {
       'artistsByTrackContributions',
       'countsByTrackContributions',
       artist =>
-        unique([
-          ...artist.tracksAsContributor,
-          ...artist.tracksAsArtist,
-        ]).length);
+        (unique(
+          ([
+            artist.trackArtistContributions,
+            artist.trackContributorContributions,
+          ]).flat()
+            .map(({thing}) => thing)
+        )).length);
 
     queryContributionInfo(
       'artistsByArtworkContributions',
       'countsByArtworkContributions',
       artist =>
-        artist.tracksAsCoverArtist.length +
-        artist.albumsAsCoverArtist.length +
-        artist.albumsAsWallpaperArtist.length +
-        artist.albumsAsBannerArtist.length);
+        accumulateSum(
+          [
+            artist.albumCoverArtistContributions,
+            artist.albumWallpaperArtistContributions,
+            artist.albumBannerArtistContributions,
+            artist.trackCoverArtistContributions,
+          ],
+          contribs => contribs.length));
 
     if (sprawl.enableFlashesAndGames) {
       queryContributionInfo(
         'artistsByFlashContributions',
         'countsByFlashContributions',
         artist =>
-          artist.flashesAsContributor.length);
+          artist.flashContributorContributions.length);
     }
 
     return query;
