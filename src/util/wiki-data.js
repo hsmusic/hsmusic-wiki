@@ -1,6 +1,6 @@
 // Utility functions for interacting with wiki data.
 
-import {accumulateSum, empty} from './sugar.js';
+import {accumulateSum, empty, unique} from './sugar.js';
 import {sortByDate} from './sort.js';
 
 // This is a duplicate binding of filterMultipleArrays that's included purely
@@ -138,11 +138,20 @@ export function getAllTracks(albumData) {
 }
 
 export function getArtistNumContributions(artist) {
-  return (
-    (artist.tracksAsAny?.length ?? 0) +
-    (artist.albumsAsCoverArtist?.length ?? 0) +
-    (artist.flashesAsContributor?.length ?? 0)
-  );
+  return accumulateSum(
+    [
+      unique(
+        ([
+          artist.trackArtistContributions,
+          artist.trackContributorContributions,
+          artist.trackCoverArtistContributions,
+        ]).flat()
+          .map(({thing}) => thing)),
+
+      artist.albumCoverArtistContributions,
+      artist.flashContributorContributions,
+    ],
+    ({length}) => length);
 }
 
 export function getFlashCover(flash, {to}) {

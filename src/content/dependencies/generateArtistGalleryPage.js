@@ -14,10 +14,12 @@ export default {
   extraDependencies: ['html', 'language'],
 
   query(artist) {
-    const things = [
-      ...artist.albumsAsCoverArtist,
-      ...artist.tracksAsCoverArtist,
-    ];
+    const things =
+      ([
+        artist.albumCoverArtistContributions,
+        artist.trackCoverArtistContributions,
+      ]).flat()
+        .map(({thing}) => thing);
 
     sortAlbumsTracksChronologically(things, {
       latestFirst: true,

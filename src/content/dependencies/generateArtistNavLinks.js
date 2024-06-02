@@ -24,8 +24,8 @@ export default {
       relation('linkArtist', artist);
 
     if (
-      !empty(artist.albumsAsCoverArtist) ||
-      !empty(artist.tracksAsCoverArtist)
+      !empty(artist.albumCoverArtistContributions) ||
+      !empty(artist.trackCoverArtistContributions)
     ) {
       relations.artistGalleryLink =
         relation('linkArtistGallery', artist);

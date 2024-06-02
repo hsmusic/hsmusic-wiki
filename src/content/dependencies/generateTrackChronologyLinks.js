@@ -38,9 +38,11 @@ export default {
 
               const things =
                 ([
-                  ...artist.tracksAsArtist,
-                  ...artist.tracksAsContributor,
-                ]).filter(getDate)
+                  artist.trackArtistContributions,
+                  artist.trackContributorContributions,
+                ]).flat()
+                  .map(({thing}) => thing)
+                  .filter(getDate)
                   .filter(albumFilter);
 
               return sortAlbumsTracksChronologically(things, {getDate});
@@ -61,11 +63,20 @@ export default {
             getThings(artist) {
               const getDate = thing => thing.coverArtDate ?? thing.date;
 
+              // Album artwork isn't part of cover artist chronology scoped to
+              // even the same album - we use this list to show "nth track art".
+              const applicableContributions =
+                (album
+                  ? artist.trackCoverArtistContributions
+                  : ([
+                      artist.albumCoverArtistContributions,
+                      artist.trackCoverArtistContributions,
+                    ]).flat());
+
               const things =
-                ([
-                  ...artist.albumsAsCoverArtist,
-                  ...artist.tracksAsCoverArtist,
-                ]).filter(getDate)
+                applicableContributions
+                  .map(({thing}) => thing)
+                  .filter(getDate)
                   .filter(albumFilter);
 
               return sortAlbumsTracksChronologically(things, {getDate});

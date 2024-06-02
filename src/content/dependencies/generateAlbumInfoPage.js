@@ -56,10 +56,13 @@ export default {
         getThings(artist) {
           const getDate = thing => thing.coverArtDate ?? thing.date;
 
-          const things = [
-            ...artist.albumsAsCoverArtist,
-            ...artist.tracksAsCoverArtist,
-          ].filter(getDate);
+          const things =
+            ([
+              artist.albumCoverArtistContributions,
+              artist.trackCoverArtistContributions,
+            ]).flat()
+              .map(({thing}) => thing)
+              .filter(getDate);
 
           return sortAlbumsTracksChronologically(things, {getDate});
         },

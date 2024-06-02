@@ -1,10 +1,12 @@
 import {sortAlphabetically} from '#sort';
+
 import {
   empty,
   filterByCount,
   filterMultipleArrays,
   stitchArrays,
   transposeArrays,
+  unique,
 } from '#sugar';
 
 export default {
@@ -32,10 +34,27 @@ export default {
     // (interesting) groups that each of each artists' things belongs to.
     const artistThingGroups =
       artists.map(artist =>
-        ([...artist.albumsAsAny.map(album => album.groups),
-          ...artist.tracksAsAny.map(track => track.album.groups)])
-            .map(groups => groups
-              .filter(group => interestingGroups.includes(group))));
+        ([
+          (unique(
+            ([
+              artist.albumArtistContributions,
+              artist.albumCoverArtistContributions,
+              artist.albumWallpaperArtistContributions,
+              artist.albumBannerArtistContributions,
+            ]).flat()
+              .map(({thing}) => thing)
+          )).map(album => album.groups),
+          (unique(
+            ([
+              artist.trackArtistContributions,
+              artist.trackContributorContributions,
+              artist.trackCoverArtistContributions,
+            ]).flat()
+              .map(({thing}) => thing)
+          )).map(track => track.album.groups),
+        ]).flat()
+          .map(groups => groups
+            .filter(group => interestingGroups.includes(group))));
 
     const [artistsByGroup, countsByGroup] =
       transposeArrays(interestingGroups.map(group => {
