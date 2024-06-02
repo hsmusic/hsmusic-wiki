@@ -14,7 +14,6 @@ export default templateCompositeFrom({
     withReverseContributionList({
       data: 'trackData',
       list: input.value('artistContribs'),
-      mode: input.value('contributions'),
     }).outputs({
       '#reverseContributionList': '#contributionsAsArtist',
     }),
@@ -22,7 +21,6 @@ export default templateCompositeFrom({
     withReverseContributionList({
       data: 'trackData',
       list: input.value('contributorContribs'),
-      mode: input.value('contributions'),
     }).outputs({
       '#reverseContributionList': '#contributionsAsContributor',
     }),
