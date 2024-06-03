@@ -30,7 +30,6 @@ export default templateCompositeFrom({
 
       compute: (continuation, {
         [input.myself()]: track,
-        [input('notFoundMode')]: notFoundMode,
         ['#album.trackSections']: trackSections,
       }) => continuation({
         ['#trackSection']:
