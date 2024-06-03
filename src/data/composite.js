@@ -1,6 +1,6 @@
 import {inspect} from 'node:util';
 
-import {decorateErrorWithIndex, openAggregate, withAggregate}
+import {annotateError, decorateErrorWithIndex, openAggregate, withAggregate}
   from '#aggregate';
 import {colors} from '#cli';
 import {empty, filterProperties, stitchArrays, typeAppearance, unique}
@@ -497,6 +497,13 @@ templateCompositeFrom.symbol = Symbol();
 export const continuationSymbol = Symbol.for('compositeFrom: continuation symbol');
 export const noTransformSymbol = Symbol.for('compositeFrom: no-transform symbol');
 
+export const compositionalErrorSymbol = Symbol.for('compositeFrom: compositional error marker');
+
+function annotateCompositionalError(error) {
+  error[compositionalErrorSymbol] = true;
+  return error;
+}
+
 export function compositeFrom(description) {
   const {annotation} = description;
   const compositionName = getCompositionName(description);
@@ -758,6 +765,9 @@ export function compositeFrom(description) {
     anyStepsUseUpdateValue ||
     anyStepsUpdate;
 
+  const stepsFirstTimeCalling =
+    Array.from({length: steps.length}).fill(true);
+
   const stepEntries = stitchArrays({
     step: steps,
     stepComposes: stepsCompose,
@@ -872,7 +882,9 @@ export function compositeFrom(description) {
               return tokenValue;
             case 'input.updateValue':
               if (!expectingTransform)
-                throw new Error(`Unexpected input.updateValue() accessed on non-transform call`);
+                throw annotateError(
+                  new Error(`Unexpected input.updateValue() accessed on non-transform call`),
+                  annotateCompositionalError);
               return valueSoFar;
             case 'input.myself':
               return initialDependencies['this'];
@@ -881,7 +893,9 @@ export function compositeFrom(description) {
             case 'input':
               return initialDependencies[token];
             default:
-              throw new TypeError(`Unexpected input shape ${tokenShape}`);
+              throw annotateError(
+                new TypeError(`Unexpected input shape ${tokenShape}`),
+                annotateCompositionalError);
           }
         });
 
@@ -977,8 +991,16 @@ export function compositeFrom(description) {
           (expectingTransform
             ? {[input.updateValue()]: valueSoFar}
             : {}),
-        [input.myself()]: initialDependencies?.['this'] ?? null,
-        [input.thisProperty()]: initialDependencies?.['thisProperty'] ?? null,
+
+        [input.myself()]:
+          (initialDependencies && Object.hasOwn(initialDependencies, 'this')
+            ? initialDependencies.this
+            : null),
+
+        [input.thisProperty()]:
+          (initialDependencies && Object.hasOwn(initialDependencies, 'thisProperty')
+            ? initialDependencies.thisProperty
+            : null),
       };
 
       const selectDependencies =
@@ -1000,7 +1022,9 @@ export function compositeFrom(description) {
             case 'input.updateValue':
               return input.updateValue();
             default:
-              throw new Error(`Unexpected token ${tokenShape} as dependency`);
+              throw annotateError(
+                new Error(`Unexpected token ${tokenShape} as dependency`),
+                annotateCompositionalError);
           }
         })
 
@@ -1028,7 +1052,126 @@ export function compositeFrom(description) {
       const naturalEvaluate = () => {
         const [name, ...argsLayout] = getExpectedEvaluation();
 
-        let args;
+        let args = argsLayout;
+
+        let effectiveDependencies;
+        let reviewAccessedDependencies;
+
+        if (stepsFirstTimeCalling[i]) {
+          const expressedDependencies =
+            selectDependencies;
+
+          const remainingDependencies =
+            new Set(expressedDependencies);
+
+          const unavailableDependencies = [];
+          const accessedDependencies = [];
+
+          effectiveDependencies =
+            new Proxy(filteredDependencies, {
+              get(target, key) {
+                accessedDependencies.push(key);
+                remainingDependencies.delete(key);
+
+                const value = target[key];
+
+                if (value === undefined) {
+                  unavailableDependencies.push(key);
+                }
+
+                return value;
+              },
+            });
+
+          reviewAccessedDependencies = () => {
+            const topAggregate =
+              openAggregate({
+                message:
+                  `Errors in dependencies accessed by step ${i+1}` +
+                  (step.annotation ? ` (${step.annotation})` : ``) +
+                  ` of ${compositionName}`,
+              });
+
+            const showDependency = dependency =>
+              (isInputToken(dependency)
+                ? getInputTokenShape(dependency) +
+                  `(` +
+                  inspect(getInputTokenValue(dependency), {compact: true}) +
+                  ')'
+                : dependency.toString());
+
+            let anyErrors = false;
+
+            for (const dependency of remainingDependencies) {
+              topAggregate.push(new Error(
+                `Expected to access ${showDependency(dependency)}`));
+
+              anyErrors = true;
+            }
+
+            for (const dependency of unavailableDependencies) {
+              const subAggregate =
+                openAggregate({
+                  message:
+                    `Accessed ${showDependency(dependency)}, which is unavailable`,
+                });
+
+              let reason = false;
+
+              if (!expressedDependencies.includes(dependency)) {
+                subAggregate.push(new Error(
+                  `Missing from step's expressed dependencies`));
+                reason = true;
+              }
+
+              if (!filterableDependencies[dependency]) {
+                subAggregate.push(
+                  new Error(
+                    `Not available` +
+                    (isInputToken(dependency)
+                      ? ` in input()-type dependencies`
+                   : dependency.startsWith('#')
+                      ? ` in local dependencies`
+                      : ` on object dependencies`)));
+                reason = true;
+              }
+
+              if (!reason) {
+                subAggregate.push(new Error(
+                  `Not sure why this is unavailable, sorry!`));
+              }
+
+              topAggregate.call(subAggregate.close);
+
+              anyErrors = true;
+            }
+
+            if (anyErrors) {
+              topAggregate.push(new Error(
+                `These dependencies, in total, were accessed:` +
+                (empty(accessedDependencies)
+                  ? ` (none)`
+               : accessedDependencies.length === 1
+                  ? showDependency(accessedDependencies[0])
+                  : `\n` +
+                    accessedDependencies
+                      .map(showDependency)
+                      .map(line => `  - ${line}`)
+                      .join('\n'))));
+            }
+
+            topAggregate.close();
+          };
+        } else {
+          effectiveDependencies = filteredDependencies;
+          reviewAccessedDependencies = null;
+        }
+
+        args =
+          args.map(arg =>
+            (arg === filteredDependencies
+              ? effectiveDependencies
+              : arg));
 
         if (stepComposes) {
           let continuation;
@@ -1037,17 +1180,34 @@ export function compositeFrom(description) {
             _prepareContinuation(callingTransformForThisStep));
 
           args =
-            argsLayout.map(arg =>
+            args.map(arg =>
               (arg === continuationSymbol
                 ? continuation
                 : arg));
         } else {
           args =
-            argsLayout.filter(arg => arg !== continuationSymbol);
+            args.filter(arg => arg !== continuationSymbol);
         }
 
-        return expose[name](...args);
-      }
+        let caughtErrorKind = null;
+        try {
+          return expose[name](...args);
+        } catch (caughtError) {
+          if (caughtError[compositionalErrorSymbol]) {
+            caughtErrorKind = 'compositional';
+          } else {
+            caughtErrorKind = 'generic';
+          }
+          throw caughtError;
+        } finally {
+          if (caughtErrorKind === null || caughtErrorKind === 'generic') {
+            stepsFirstTimeCalling[i] = false;
+            if (reviewAccessedDependencies) {
+              reviewAccessedDependencies();
+            }
+          }
+        }
+      };
 
       switch (step.cache) {
         // Warning! Highly WIP!
@@ -1223,6 +1383,7 @@ export function compositeFrom(description) {
           `Error computing composition` +
           (annotation ? ` ${annotation}` : ''));
         error.cause = thrownError;
+        annotateCompositionalError(error);
         throw error;
       }
     };
