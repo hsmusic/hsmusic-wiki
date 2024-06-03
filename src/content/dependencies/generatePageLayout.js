@@ -678,12 +678,6 @@ export default {
           html.tag('body',
             [
               html.tag('div', {id: 'page-container'},
-                hasSidebarLeft &&
-                  {class: 'has-sidebar-left'},
-
-                hasSidebarRight &&
-                  {class: 'has-sidebar-right'},
-
                 showingSidebarLeft &&
                   {class: 'showing-sidebar-left'},
 
