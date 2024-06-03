@@ -2566,7 +2566,8 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
 /* Layout - Wide (most computers) */
 
 @media (min-width: 900px) {
-  #page-container:not(.has-zero-sidebars) #secondary-nav {
+  #page-container.showing-sidebar-left #secondary-nav,
+  #page-container.showing-sidebar-left #secondary-nav {
     display: none;
   }
 }
@@ -2583,7 +2584,8 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
    * don't apply the similar layout change of widening the long-content area
    * if this page doesn't have a sidebar to hide in the first place.
    */
-  #page-container:not(.has-zero-sidebars) main.long-content {
+  #page-container.showing-sidebar-left main.long-content,
+  #page-container.showing-sidebar-right main.long-content {
     --long-content-padding-ratio: 0.06;
   }
 }
@@ -2615,12 +2617,12 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
     z-index: 2;
   }
 
-  html[data-url-key="localized.home"] #page-container.has-one-sidebar .grid-listing > .grid-item:not(:nth-child(n+7)) {
+  html[data-url-key="localized.home"] #page-container.showing-sidebar-left .grid-listing > .grid-item:not(:nth-child(n+7)) {
     flex-basis: 23%;
     margin: 15px;
   }
 
-  html[data-url-key="localized.home"] #page-container.has-one-sidebar .grid-listing > .grid-item:nth-child(n+7) {
+  html[data-url-key="localized.home"] #page-container.showing-sidebar-left .grid-listing > .grid-item:nth-child(n+7) {
     flex-basis: 18%;
     margin: 10px;
   }
