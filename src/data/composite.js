@@ -1124,7 +1124,7 @@ export function compositeFrom(description) {
                 reason = true;
               }
 
-              if (!filterableDependencies[dependency]) {
+              if (filterableDependencies[dependency] === undefined) {
                 subAggregate.push(
                   new Error(
                     `Not available` +
