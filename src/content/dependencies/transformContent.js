@@ -537,9 +537,9 @@ export default {
           // Expand line breaks which don't follow a list, quote,
           // or <br> / "  ", and which don't precede or follow
           // indented text (by at least two spaces).
-          .replace(/(?<!^ *-.*|^>.*|^  .*\n*|  $|<br>$)\n+(?!  |\n)/gm, '\n\n') /* eslint-disable-line no-regex-spaces */
+          .replace(/(?<!^ *(?:-|\d\.).*|^>.*|^  .*\n*|  $|<br>$)\n+(?!  |\n)/gm, '\n\n') /* eslint-disable-line no-regex-spaces */
           // Expand line breaks which are at the end of a list.
-          .replace(/(?<=^ *-.*)\n+(?!^ *-)/gm, '\n\n')
+          .replace(/(?<=^ *(?:-|\d\.).*)\n+(?!^ *(?:-|\d\.))/gm, '\n\n')
           // Expand line breaks which are at the end of a quote.
           .replace(/(?<=^>.*)\n+(?!^>)/gm, '\n\n');
 
