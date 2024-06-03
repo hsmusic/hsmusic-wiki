@@ -1543,14 +1543,31 @@ async function main() {
       ]),
     };
 
-    for (const [wikiDataKey, properties] of Object.entries(commonDataMap)) {
-      const thingData = wikiData[wikiDataKey];
-      const allProperties = new Set(['name', 'directory', ...properties]);
-      for (const thing of thingData) {
-        for (const property of allProperties) {
-          void thing[property];
+    try {
+      for (const [wikiDataKey, properties] of Object.entries(commonDataMap)) {
+        const thingData = wikiData[wikiDataKey];
+        const allProperties = new Set(['name', 'directory', ...properties]);
+        for (const thing of thingData) {
+          for (const property of allProperties) {
+            void thing[property];
+          }
         }
       }
+    } catch (error) {
+      if (!paragraph) console.log('');
+      niceShowAggregate(error);
+      console.log('');
+
+      logError`There was an error precaching internal data objects.`;
+      fileIssue();
+
+      Object.assign(stepStatusSummary.precacheCommonData, {
+        status: STATUS_FATAL_ERROR,
+        annotation: `see log for details`,
+        timeEnd: Date.now(),
+      });
+
+      return false;
     }
 
     Object.assign(stepStatusSummary.precacheCommonData, {
