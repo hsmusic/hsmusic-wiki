@@ -1149,6 +1149,11 @@ a.align-center, img.align-center {
   margin-right: auto;
 }
 
+center {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
 .content-image {
   display: inline-block !important;
 }
