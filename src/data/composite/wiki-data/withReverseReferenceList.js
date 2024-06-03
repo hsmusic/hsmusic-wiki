@@ -12,9 +12,11 @@
 // so any changes should be reflected there (until these are combined).
 
 import {input, templateCompositeFrom} from '#composite';
+import {stitchArrays} from '#sugar';
 
 import {exitWithoutDependency, raiseOutputWithoutDependency}
   from '#composite/control-flow';
+import {withMappedList} from '#composite/data';
 
 import inputWikiData from './inputWikiData.js';
 
@@ -35,6 +37,8 @@ export default templateCompositeFrom({
   outputs: ['#reverseReferenceList'],
 
   steps: () => [
+    // Common behavior --
+
     // Early exit with an empty array if the data list isn't available.
     exitWithoutDependency({
       dependency: input('data'),
@@ -48,42 +52,119 @@ export default templateCompositeFrom({
       output: input.value({'#reverseReferenceList': []}),
     }),
 
+    // Check for an existing cache record which corresponds to this
+    // input('list') and input('data'). If it exists, query it for the
+    // current thing, and raise that; if it doesn't, create it, put it
+    // where it needs to be, and provide it so the next steps can fill
+    // it in.
     {
-      dependencies: [input.myself(), input('data'), input('list')],
+      dependencies: [input('list'), input('data'), input.myself()],
 
       compute: (continuation, {
-        [input.myself()]: myself,
-        [input('data')]: data,
         [input('list')]: list,
+        [input('data')]: data,
+        [input.myself()]: myself,
       }) => {
         if (!caches.has(list)) {
-          caches.set(list, new WeakMap());
+          const cache = new WeakMap();
+          caches.set(list, cache);
+
+          const cacheRecord = new WeakMap();
+          cache.set(data, cacheRecord);
+
+          return continuation({
+            ['#cacheRecord']: cacheRecord,
+          });
         }
 
         const cache = caches.get(list);
 
         if (!cache.has(data)) {
           const cacheRecord = new WeakMap();
+          cache.set(data, cacheRecord);
 
-          for (const referencingThing of data) {
-            const referenceList = referencingThing[list];
-            for (const referencedThing of referenceList) {
+          return continuation({
+            ['#cacheRecord']: cacheRecord,
+          });
+        }
+
+        return continuation.raiseOutput({
+          ['#reverseReferenceList']:
+            cache.get(data).get(myself) ?? [],
+        });
+      },
+    },
+
+    // Unique behavior for reference lists --
+
+    {
+      dependencies: [input('list')],
+      compute: (continuation, {
+        [input('list')]: list,
+      }) => continuation({
+        ['#referenceMap']:
+          thing => thing[list],
+      }),
+    },
+
+    withMappedList({
+      list: input('data'),
+      map: '#referenceMap',
+    }).outputs({
+      '#mappedList': '#referencedThings',
+    }),
+
+    {
+      dependencies: [input('data')],
+      compute: (continuation, {
+        [input('data')]: data,
+      }) => continuation({
+        ['#referencingThings']:
+          data,
+      }),
+    },
+
+    // Common behavior --
+
+    // Actually fill in the cache record. Since we're building up a *reverse*
+    // reference list, track connections in terms of the referenced thing.
+    // No newly-provided dependencies here since we're mutating the cache
+    // record, which is properly in store and will probably be reused in the
+    // future (and certainly in the next step).
+    {
+      dependencies: ['#cacheRecord', '#referencingThings', '#referencedThings'],
+      compute: (continuation, {
+        ['#cacheRecord']: cacheRecord,
+        ['#referencingThings']: referencingThings,
+        ['#referencedThings']: referencedThings,
+      }) => {
+        stitchArrays({
+          referencingThing: referencingThings,
+          referencedThings: referencedThings,
+        }).forEach(({referencingThing, referencedThings}) => {
+            for (const referencedThing of referencedThings) {
               if (cacheRecord.has(referencedThing)) {
                 cacheRecord.get(referencedThing).push(referencingThing);
               } else {
                 cacheRecord.set(referencedThing, [referencingThing]);
               }
             }
-          }
+          });
 
-          cache.set(data, cacheRecord);
-        }
-
-        return continuation({
-          ['#reverseReferenceList']:
-            cache.get(data).get(myself) ?? [],
-        });
+        return continuation();
       },
+    },
+
+    // Then just pluck out the current object from the now-filled cache record!
+    {
+      dependencies: ['#cacheRecord', input.myself()],
+      compute: (continuation, {
+        ['#cacheRecord']: cacheRecord,
+        [input.myself()]: myself,
+      }) => continuation({
+        ['#reverseReferenceList']:
+          cacheRecord.get(myself) ?? [],
+      }),
     },
   ],
 });
