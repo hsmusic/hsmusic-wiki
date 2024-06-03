@@ -1073,10 +1073,7 @@ export function compositeFrom(description) {
           reviewAccessedDependencies = () => {
             const topAggregate =
               openAggregate({
-                message:
-                  `Errors in dependencies accessed by step ${i+1}` +
-                  (step.annotation ? ` (${step.annotation})` : ``) +
-                  ` of ${compositionName}`,
+                message: `Errors in accessed dependencies`,
               });
 
             const showDependency = dependency =>
@@ -1176,12 +1173,38 @@ export function compositeFrom(description) {
             args.filter(arg => arg !== continuationSymbol);
         }
 
+        let stepError;
         try {
           return expose[name](...args);
+        } catch (error) {
+          stepError = error;
         } finally {
           stepsFirstTimeCalling[i] = false;
+
+          let reviewError;
           if (reviewAccessedDependencies) {
-            reviewAccessedDependencies();
+            try {
+              reviewAccessedDependencies();
+            } catch (error) {
+              reviewError = error;
+            }
+          }
+
+          const stepPart =
+            `step ${i+1}` +
+            (isBase
+              ? ` (base)`
+              : ` of ${steps.length}`) +
+            (step.annotation ? `, ${step.annotation}` : ``);
+
+          if (stepError && reviewError) {
+            throw new AggregateError(
+              [stepError, reviewError],
+              `Errors in ${stepPart}`);
+          } else if (stepError || reviewError) {
+            throw new Error(
+              `Error in ${stepPart}`,
+              {cause: stepError || reviewError});
           }
         }
       };
@@ -1360,6 +1383,7 @@ export function compositeFrom(description) {
           `Error computing composition` +
           (annotation ? ` ${annotation}` : ''));
         error.cause = thrownError;
+        error[Symbol.for('hsmusic.aggregate.translucent')] = true;
         throw error;
       }
     };
