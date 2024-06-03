@@ -1,6 +1,6 @@
 import {inspect} from 'node:util';
 
-import {annotateError, decorateErrorWithIndex, openAggregate, withAggregate}
+import {decorateErrorWithIndex, openAggregate, withAggregate}
   from '#aggregate';
 import {colors} from '#cli';
 import {empty, filterProperties, stitchArrays, typeAppearance, unique}
@@ -497,13 +497,6 @@ templateCompositeFrom.symbol = Symbol();
 export const continuationSymbol = Symbol.for('compositeFrom: continuation symbol');
 export const noTransformSymbol = Symbol.for('compositeFrom: no-transform symbol');
 
-export const compositionalErrorSymbol = Symbol.for('compositeFrom: compositional error marker');
-
-function annotateCompositionalError(error) {
-  error[compositionalErrorSymbol] = true;
-  return error;
-}
-
 export function compositeFrom(description) {
   const {annotation} = description;
   const compositionName = getCompositionName(description);
@@ -882,9 +875,7 @@ export function compositeFrom(description) {
               return tokenValue;
             case 'input.updateValue':
               if (!expectingTransform)
-                throw annotateError(
-                  new Error(`Unexpected input.updateValue() accessed on non-transform call`),
-                  annotateCompositionalError);
+                throw new Error(`Unexpected input.updateValue() accessed on non-transform call`);
               return valueSoFar;
             case 'input.myself':
               return initialDependencies['this'];
@@ -893,9 +884,7 @@ export function compositeFrom(description) {
             case 'input':
               return initialDependencies[token];
             default:
-              throw annotateError(
-                new TypeError(`Unexpected input shape ${tokenShape}`),
-                annotateCompositionalError);
+              throw new TypeError(`Unexpected input shape ${tokenShape}`);
           }
         });
 
@@ -1022,9 +1011,7 @@ export function compositeFrom(description) {
             case 'input.updateValue':
               return input.updateValue();
             default:
-              throw annotateError(
-                new Error(`Unexpected token ${tokenShape} as dependency`),
-                annotateCompositionalError);
+              throw new Error(`Unexpected token ${tokenShape} as dependency`);
           }
         })
 
@@ -1189,22 +1176,12 @@ export function compositeFrom(description) {
             args.filter(arg => arg !== continuationSymbol);
         }
 
-        let caughtErrorKind = null;
         try {
           return expose[name](...args);
-        } catch (caughtError) {
-          if (caughtError[compositionalErrorSymbol]) {
-            caughtErrorKind = 'compositional';
-          } else {
-            caughtErrorKind = 'generic';
-          }
-          throw caughtError;
         } finally {
-          if (caughtErrorKind === null || caughtErrorKind === 'generic') {
-            stepsFirstTimeCalling[i] = false;
-            if (reviewAccessedDependencies) {
-              reviewAccessedDependencies();
-            }
+          stepsFirstTimeCalling[i] = false;
+          if (reviewAccessedDependencies) {
+            reviewAccessedDependencies();
           }
         }
       };
@@ -1383,7 +1360,6 @@ export function compositeFrom(description) {
           `Error computing composition` +
           (annotation ? ` ${annotation}` : ''));
         error.cause = thrownError;
-        annotateCompositionalError(error);
         throw error;
       }
     };
