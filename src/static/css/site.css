@@ -1143,6 +1143,12 @@ ul.image-details li {
   margin-bottom: 1.5em;
 }
 
+a.align-center, img.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .content-image {
   display: inline-block !important;
 }

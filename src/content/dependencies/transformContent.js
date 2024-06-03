@@ -262,6 +262,10 @@ export default {
                   height && {height},
                   style && {style},
 
+                  align === 'center' &&
+                  !link &&
+                    {class: 'align-center'},
+
                   pixelate &&
                     {class: 'pixelate'});
 
@@ -270,6 +274,9 @@ export default {
                   html.tag('a',
                     {href: link},
                     {target: '_blank'},
+
+                    align === 'center' &&
+                      {class: 'align-center'},
 
                     {title:
                       language.$('misc.external.opensInNewTab', {
