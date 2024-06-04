@@ -7,7 +7,14 @@ import {compareDates} from '#sort';
 import {validateWikiData} from '#validators';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
-import {withSortedList, withPropertyFromList} from '#composite/data';
+
+import {
+  withAlignedIndices,
+  withAlignedList,
+  withIndicesFromList,
+  withSortedList,
+  withPropertyFromList,
+} from '#composite/data';
 
 export default templateCompositeFrom({
   annotation: `withThingsSortedChronologically`,
@@ -59,47 +66,20 @@ export default templateCompositeFrom({
       '#unstableSortIndices': '#dateSortIndices',
     }),
 
-    // TODO: No primitive for the next two-three steps, yet...
+    withIndicesFromList({
+      list: input('things'),
+    }),
 
-    {
-      dependencies: [input('things')],
-      compute: (continuation, {
-        [input('things')]: things,
-      }) => continuation({
-        ['#combinedSortIndices']:
-          Array.from(things.keys()),
-      }),
-    },
+    withAlignedIndices({
+      indices: '#indices',
+      alignment: '#dateSortIndices',
+    }),
 
-    {
-      dependencies: [
-        '#combinedSortIndices',
-        '#dateSortIndices',
-      ],
-
-      compute: (continuation, {
-        ['#combinedSortIndices']: combined,
-        ['#dateSortIndices']: date,
-      }) => continuation({
-        ['#combinedSortIndices']:
-          combined.sort((index1, index2) => {
-            if (date[index1] !== date[index2])
-              return date[index1] - date[index2];
-
-            return 0;
-          }),
-      }),
-    },
-
-    {
-      dependencies: [input('things'), '#combinedSortIndices'],
-      compute: (continuation, {
-        [input('things')]: things,
-        ['#combinedSortIndices']: combined,
-      }) => continuation({
-        ['#sortedThings']:
-          combined.map(index => things[index]),
-      }),
-    },
+    withAlignedList({
+      list: input('things'),
+      alignment: '#alignedIndices',
+    }).outputs({
+      '#alignedList': '#sortedThings',
+    }),
   ],
 });
