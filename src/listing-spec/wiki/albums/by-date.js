@@ -1,7 +1,8 @@
 import {input} from '#composite';
-import {sortChronologically} from '#sort';
 
-import {exitWithoutDependency} from '#composite/control-flow';
+import {exposeDependency, exitWithoutDependency}
+  from '#composite/control-flow';
+import {withThingsSortedChronologically} from '#composite/wiki-data';
 
 export default {
   scope: 'wiki',
@@ -21,11 +22,12 @@ export default {
       value: input.value([]),
     }),
 
-    {
-      dependencies: ['albumData'],
-      compute: ({albumData}) =>
-        sortChronologically(
-          albumData.filter(album => album.date)),
-    },
+    withThingsSortedChronologically({
+      things: 'albumData',
+    }),
+
+    exposeDependency({
+      dependency: '#sortedThings',
+    }),
   ],
 };
