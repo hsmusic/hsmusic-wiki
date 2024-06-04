@@ -5,8 +5,11 @@
 
 export {default as excludeFromList} from './excludeFromList.js';
 export {default as fillMissingListItems} from './fillMissingListItems.js';
+export {default as withAlignedIndices} from './withAlignedIndices.js';
+export {default as withAlignedList} from './withAlignedList.js';
 export {default as withFilteredList} from './withFilteredList.js';
 export {default as withFlattenedList} from './withFlattenedList.js';
+export {default as withIndicesFromList} from './withIndicesFromList.js';
 export {default as withMappedList} from './withMappedList.js';
 export {default as withPropertiesFromList} from './withPropertiesFromList.js';
 export {default as withPropertiesFromObject} from './withPropertiesFromObject.js';
