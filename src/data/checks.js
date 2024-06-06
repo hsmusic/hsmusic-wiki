@@ -95,6 +95,7 @@ export function reportDirectoryErrors(wikiData, {
   const seenDuplicateSets = new Map();
   const deduplicateDuplicateSets = [];
 
+  iterateSets:
   for (const set of duplicateSets) {
     if (seenDuplicateSets.has(set.directory)) {
       const placeLists = seenDuplicateSets.get(set.directory);
@@ -106,7 +107,7 @@ export function reportDirectoryErrors(wikiData, {
         // Two artists named Foodog aren't going to match two tracks named
         // Foodog.
         if (compareArrays(places, set.places, {checkOrder: false})) {
-          continue;
+          continue iterateSets;
         }
       }
 
