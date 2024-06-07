@@ -153,7 +153,9 @@ export default {
 
         mainContent: [
           sec.contextNotes && [
-            html.tag('p', language.$('releaseInfo.note')),
+            html.tag('p',
+              language.$('releaseInfo.note')),
+
             html.tag('blockquote',
               sec.contextNotes.content),
           ],

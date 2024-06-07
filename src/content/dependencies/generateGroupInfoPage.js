@@ -69,11 +69,9 @@ export default {
 
     sec.info = {};
 
-    if (!empty(group.urls)) {
-      sec.info.visitLinks =
-        group.urls
-          .map(url => relation('linkExternal', url));
-    }
+    sec.info.visitLinks =
+      group.urls
+        .map(url => relation('linkExternal', url));
 
     if (group.description) {
       sec.info.description =
@@ -131,14 +129,15 @@ export default {
         color: data.color,
 
         mainContent: [
-          sec.info.visitLinks &&
-            html.tag('p',
-              language.$('releaseInfo.visitOn', {
-                links:
-                  language.formatDisjunctionList(
-                    sec.info.visitLinks
-                      .map(link => link.slot('context', 'group'))),
-              })),
+          html.tag('p',
+            {[html.onlyIfContent]: true},
+            language.$('releaseInfo.visitOn', {
+              [language.onlyIfOptions]: ['links'],
+              links:
+                language.formatDisjunctionList(
+                  sec.info.visitLinks
+                    .map(link => link.slot('context', 'group'))),
+            })),
 
           html.tag('blockquote',
             {[html.onlyIfContent]: true},

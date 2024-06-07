@@ -1,5 +1,5 @@
 import {sortChronologically} from '#sort';
-import {atOffset, empty} from '#sugar';
+import {atOffset} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -89,26 +89,31 @@ export default {
           relations.description
             ?.slot('mode', 'multiline'),
 
-        !empty(relations.externalLinks) &&
-          html.tag('p',
-            language.$('releaseInfo.visitOn', {
-              links:
-                language.formatDisjunctionList(
-                  relations.externalLinks
-                    .map(link => link.slot('context', 'group'))),
-            })),
+        html.tag('p',
+          {[html.onlyIfContent]: true},
+
+          language.$('releaseInfo.visitOn', {
+            [language.onlyIfOptions]: ['links'],
+
+            links:
+              language.formatDisjunctionList(
+                relations.externalLinks
+                  .map(link => link.slot('context', 'group'))),
+          })),
 
         slots.mode === 'album' &&
-        relations.nextAlbumLink &&
           html.tag('p', {class: 'group-chronology-link'},
+            {[html.onlyIfContent]: true},
             language.$('albumSidebar.groupBox.next', {
+              [language.onlyIfOptions]: ['album'],
               album: relations.nextAlbumLink,
             })),
 
         slots.mode === 'album' &&
-        relations.previousAlbumLink &&
           html.tag('p', {class: 'group-chronology-link'},
+            {[html.onlyIfContent]: true},
             language.$('albumSidebar.groupBox.previous', {
+              [language.onlyIfOptions]: ['album'],
               album: relations.previousAlbumLink,
             })),
       ],

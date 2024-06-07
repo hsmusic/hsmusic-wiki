@@ -22,10 +22,17 @@ export default {
         html.tag('div', {class: 'content-sticky-heading-row'}, [
           html.tag('h1', slots.title),
 
-          !html.isBlank(slots.cover) &&
-            html.tag('div', {class: 'content-sticky-heading-cover-container'},
-              html.tag('div', {class: 'content-sticky-heading-cover'},
-                slots.cover.slot('mode', 'thumbnail'))),
+          html.tag('div', {class: 'content-sticky-heading-cover-container'},
+            {[html.onlyIfContent]: true},
+
+            html.tag('div', {class: 'content-sticky-heading-cover'},
+              {[html.onlyIfContent]: true},
+
+              // TODO: We shouldn't need to do an isBlank check here,
+              // but a live blank value doesn't have a slot functions, so.
+              (html.isBlank(slots.cover)
+                ? html.blank()
+                : slots.cover.slot('mode', 'thumbnail')))),
         ]),
 
         html.tag('div', {class: 'content-sticky-subheading-row'},

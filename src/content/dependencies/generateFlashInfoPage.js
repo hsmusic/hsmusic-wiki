@@ -19,16 +19,14 @@ export default {
   query(flash) {
     const query = {};
 
-    if (flash.page || !empty(flash.urls)) {
-      query.urls = [];
+    query.urls = [];
 
-      if (flash.page) {
-        query.urls.push(`https://homestuck.com/story/${flash.page}`);
-      }
+    if (flash.page) {
+      query.urls.push(`https://homestuck.com/story/${flash.page}`);
+    }
 
-      if (!empty(flash.urls)) {
-        query.urls.push(...flash.urls);
-      }
+    if (!empty(flash.urls)) {
+      query.urls.push(...flash.urls);
     }
 
     return query;
@@ -44,10 +42,9 @@ export default {
     relations.sidebar =
       relation('generateFlashActSidebar', flash.act, flash);
 
-    if (query.urls) {
-      relations.externalLinks =
-        query.urls.map(url => relation('linkExternal', url));
-    }
+    relations.externalLinks =
+      query.urls
+        .map(url => relation('linkExternal', url));
 
     // TODO: Flashes always have cover art (#175)
     /* eslint-disable-next-line no-constant-condition */
@@ -135,14 +132,15 @@ export default {
             date: language.formatDate(data.date),
           })),
 
-        relations.externalLinks &&
-          html.tag('p',
-            language.$('releaseInfo.playOn', {
-              links:
-                language.formatDisjunctionList(
-                  relations.externalLinks
-                    .map(link => link.slot('context', 'flash'))),
-            })),
+        html.tag('p',
+          {[html.onlyIfContent]: true},
+          language.$('releaseInfo.playOn', {
+            [language.onlyIfOptions]: ['links'],
+            links:
+              language.formatDisjunctionList(
+                relations.externalLinks
+                  .map(link => link.slot('context', 'flash'))),
+          })),
 
         html.tag('p',
           {[html.onlyIfContent]: true},

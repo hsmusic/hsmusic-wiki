@@ -1,4 +1,4 @@
-import {empty, stitchArrays} from '#sugar';
+import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -87,11 +87,13 @@ export default {
 
       mainClasses: ['flash-index'],
       mainContent: [
-        !empty(data.jumpLinkLabels) && [
+        html.tags([
           html.tag('p', {class: 'quick-info'},
+            {[html.onlyIfSiblings]: true},
             language.$('misc.jumpTo')),
 
           html.tag('ul', {class: 'quick-info'},
+            {[html.onlyIfContent]: true},
             stitchArrays({
               colorStyle: relations.jumpLinkColorStyles,
               anchor: data.jumpLinkAnchors,
@@ -102,7 +104,7 @@ export default {
                     {href: '#' + anchor},
                     colorStyle,
                     label)))),
-        ],
+        ]),
 
         stitchArrays({
           colorStyle: relations.actColorStyles,

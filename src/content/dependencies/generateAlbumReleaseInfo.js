@@ -1,4 +1,4 @@
-import {accumulateSum, empty} from '#sugar';
+import {accumulateSum} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -23,11 +23,9 @@ export default {
     relations.bannerArtistContributionsLine =
       relation('generateReleaseInfoContributionsLine', album.bannerArtistContribs);
 
-    if (!empty(album.urls)) {
-      relations.externalLinks =
-        album.urls.map(url =>
-          relation('linkExternal', url));
-    }
+    relations.externalLinks =
+      album.urls.map(url =>
+        relation('linkExternal', url));
 
     return relations;
   },
@@ -70,41 +68,42 @@ export default {
           relations.bannerArtistContributionsLine
             .slots({stringKey: 'releaseInfo.bannerArtBy'}),
 
-          data.date &&
-            language.$('releaseInfo.released', {
-              date: language.formatDate(data.date),
-            }),
+          language.$('releaseInfo.released', {
+            [language.onlyIfOptions]: ['date'],
+            date: language.formatDate(data.date),
+          }),
 
-          data.coverArtDate &&
-            language.$('releaseInfo.artReleased', {
-              date: language.formatDate(data.coverArtDate),
-            }),
+          language.$('releaseInfo.artReleased', {
+            [language.onlyIfOptions]: ['date'],
+            date: language.formatDate(data.coverArtDate),
+          }),
 
-          data.duration &&
-            language.$('releaseInfo.duration', {
-              duration:
-                language.formatDuration(data.duration, {
-                  approximate: data.durationApproximate,
-                }),
-            }),
+          language.$('releaseInfo.duration', {
+            [language.onlyIfOptions]: ['duration'],
+            duration:
+              language.formatDuration(data.duration, {
+                approximate: data.durationApproximate,
+              }),
+          }),
         ]),
 
-      relations.externalLinks &&
-        html.tag('p',
-          language.$('releaseInfo.listenOn', {
-            links:
-              language.formatDisjunctionList(
-                relations.externalLinks
-                  .map(link =>
-                    link.slot('context', [
-                      'album',
-                      (data.numTracks === 0
-                        ? 'albumNoTracks'
-                     : data.numTracks === 1
-                        ? 'albumOneTrack'
-                        : 'albumMultipleTracks'),
-                    ]))),
-          })),
+      html.tag('p',
+        {[html.onlyIfContent]: true},
+        language.$('releaseInfo.listenOn', {
+          [language.onlyIfOptions]: ['links'],
+          links:
+            language.formatDisjunctionList(
+              relations.externalLinks
+                .map(link =>
+                  link.slot('context', [
+                    'album',
+                    (data.numTracks === 0
+                      ? 'albumNoTracks'
+                   : data.numTracks === 1
+                      ? 'albumOneTrack'
+                      : 'albumMultipleTracks'),
+                  ]))),
+        })),
     ]);
   },
 };

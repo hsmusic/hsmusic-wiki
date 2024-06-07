@@ -34,13 +34,15 @@ export default {
       relations.sameTargetListingLinks =
         listing.target.listings
           .map(listing => relation('linkListing', listing));
+    } else {
+      relations.sameTargetListingLinks = [];
     }
 
-    if (!empty(listing.seeAlso)) {
-      relations.seeAlsoLinks =
-        listing.seeAlso
-          .map(listing => relation('linkListing', listing));
-    }
+    relations.seeAlsoLinks =
+      (!empty(listing.seeAlso)
+        ? listing.seeAlso
+            .map(listing => relation('linkListing', listing))
+        : []);
 
     return relations;
   },
@@ -167,33 +169,37 @@ export default {
       headingMode: 'sticky',
 
       mainContent: [
-        relations.sameTargetListingLinks &&
-          html.tag('p',
-            language.$('listingPage.listingsFor', {
-              target:
-                language.$('listingPage.target', data.targetStringsKey),
+        html.tag('p',
+          {[html.onlyIfContent]: true},
+          language.$('listingPage.listingsFor', {
+            [language.onlyIfOptions]: ['listings'],
 
-              listings:
-                language.formatUnitList(
-                  stitchArrays({
-                    link: relations.sameTargetListingLinks,
-                    stringsKey: data.sameTargetListingStringsKeys,
-                  }).map(({link, stringsKey}, index) =>
-                      html.tag('span',
-                        index === data.sameTargetListingsCurrentIndex &&
-                          {class: 'current'},
+            target:
+              language.$('listingPage.target', data.targetStringsKey),
 
-                        link.slots({
-                          attributes: {class: 'nowrap'},
-                          content: language.$('listingPage', stringsKey, 'title.short'),
-                        })))),
-            })),
+            listings:
+              language.formatUnitList(
+                stitchArrays({
+                  link: relations.sameTargetListingLinks,
+                  stringsKey: data.sameTargetListingStringsKeys,
+                }).map(({link, stringsKey}, index) =>
+                    html.tag('span',
+                      index === data.sameTargetListingsCurrentIndex &&
+                        {class: 'current'},
 
-        relations.seeAlsoLinks &&
-          html.tag('p',
-            language.$('listingPage.seeAlso', {
-              listings: language.formatUnitList(relations.seeAlsoLinks),
-            })),
+                      link.slots({
+                        attributes: {class: 'nowrap'},
+                        content: language.$('listingPage', stringsKey, 'title.short'),
+                      })))),
+          })),
+
+        html.tag('p',
+          {[html.onlyIfContent]: true},
+          language.$('listingPage.seeAlso', {
+            [language.onlyIfOptions]: ['listings'],
+            listings:
+              language.formatUnitList(relations.seeAlsoLinks),
+          })),
 
         slots.content,
 

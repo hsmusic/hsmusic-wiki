@@ -1,4 +1,4 @@
-import {empty, stitchArrays} from '#sugar';
+import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: ['image', 'linkArtTag'],
@@ -89,14 +89,15 @@ export default {
             ...sizeSlots,
           }),
 
-          !empty(relations.tagLinks) &&
-            html.tag('ul', {class: 'image-details'},
-              stitchArrays({
-                tagLink: relations.tagLinks,
-                preferShortName: data.preferShortName,
-              }).map(({tagLink, preferShortName}) =>
-                  html.tag('li',
-                    tagLink.slot('preferShortName', preferShortName)))),
+          html.tag('ul', {class: 'image-details'},
+            {[html.onlyIfContent]: true},
+
+            stitchArrays({
+              tagLink: relations.tagLinks,
+              preferShortName: data.preferShortName,
+            }).map(({tagLink, preferShortName}) =>
+                html.tag('li',
+                  tagLink.slot('preferShortName', preferShortName)))),
         ]);
 
       case 'thumbnail':

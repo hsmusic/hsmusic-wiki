@@ -59,20 +59,20 @@ export default {
           relations.coverArtistContributionsLine
             ?.slots({stringKey: 'releaseInfo.coverArtBy'}),
 
-          data.date &&
-            language.$('releaseInfo.released', {
-              date: language.formatDate(data.date),
-            }),
+          language.$('releaseInfo.released', {
+            [language.onlyIfOptions]: ['date'],
+            date: language.formatDate(data.date),
+          }),
 
-          data.coverArtDate &&
-            language.$('releaseInfo.artReleased', {
-              date: language.formatDate(data.coverArtDate),
-            }),
+          language.$('releaseInfo.artReleased', {
+            [language.onlyIfOptions]: ['date'],
+            date: language.formatDate(data.coverArtDate),
+          }),
 
-          data.duration &&
-            language.$('releaseInfo.duration', {
-              duration: language.formatDuration(data.duration),
-            }),
+          language.$('releaseInfo.duration', {
+            [language.onlyIfOptions]: ['duration'],
+            duration: language.formatDuration(data.duration),
+          }),
         ]),
 
       html.tag('p',

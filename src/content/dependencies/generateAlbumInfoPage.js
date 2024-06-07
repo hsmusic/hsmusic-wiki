@@ -213,10 +213,10 @@ export default {
             {[html.joinChildren]: html.tag('br')},
 
             [
-              data.dateAddedToWiki &&
-                language.$('releaseInfo.addedToWiki', {
-                  date: language.formatDate(data.dateAddedToWiki),
-                }),
+              language.$('releaseInfo.addedToWiki', {
+                [language.onlyIfOptions]: ['date'],
+                date: language.formatDate(data.dateAddedToWiki),
+              }),
             ]),
 
           sec.additionalFiles && [

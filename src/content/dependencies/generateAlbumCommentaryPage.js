@@ -1,4 +1,4 @@
-import {empty, stitchArrays} from '#sugar';
+import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -167,16 +167,16 @@ export default {
                 }),
 
               accent:
-                !empty(relations.albumCommentaryListeningLinks) &&
-                  language.$('albumCommentaryPage.entry.title.albumCommentary.accent', {
-                    listeningLinks:
-                      language.formatUnitList(
-                        relations.albumCommentaryListeningLinks
-                          .map(link => link.slots({
-                            context: 'album',
-                            tab: 'separate',
-                          }))),
-                  }),
+                language.$('albumCommentaryPage.entry.title.albumCommentary.accent', {
+                  [language.onlyIfOptions]: ['listeningLinks'],
+                  listeningLinks:
+                    language.formatUnitList(
+                      relations.albumCommentaryListeningLinks
+                        .map(link => link.slots({
+                          context: 'album',
+                          tab: 'separate',
+                        }))),
+                }),
             }),
 
             relations.albumCommentaryCover
@@ -213,13 +213,13 @@ export default {
                   }),
 
                 accent:
-                  !empty(listeningLinks) &&
-                    language.$('albumCommentaryPage.entry.title.trackCommentary.accent', {
-                      listeningLinks:
-                        language.formatUnitList(
-                          listeningLinks.map(link =>
-                            link.slot('tab', 'separate'))),
-                    }),
+                  language.$('albumCommentaryPage.entry.title.trackCommentary.accent', {
+                    [language.onlyIfOptions]: ['listeningLinks'],
+                    listeningLinks:
+                      language.formatUnitList(
+                        listeningLinks.map(link =>
+                          link.slot('tab', 'separate'))),
+                  }),
               }),
 
               cover?.slots({mode: 'commentary'}),

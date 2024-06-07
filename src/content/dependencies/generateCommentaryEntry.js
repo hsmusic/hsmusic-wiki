@@ -84,14 +84,14 @@ export default {
       html.tag('p', {class: 'commentary-entry-heading'},
         style,
         [
-          data.date &&
-            html.tag('time',
-              language.$(titlePrefix, 'date', {
-                date:
-                  language.formatDate(data.date),
-              })),
+          html.tag('time',
+            {[html.onlyIfContent]: true},
+            language.$(titlePrefix, 'date', {
+              [language.onlyIfOptions]: ['date'],
+              date: language.formatDate(data.date),
+            })),
 
-          language.$(...titleParts, titleOptions)
+          language.$(...titleParts, titleOptions),
         ]),
 
       html.tag('blockquote', {class: 'commentary-entry-body'},

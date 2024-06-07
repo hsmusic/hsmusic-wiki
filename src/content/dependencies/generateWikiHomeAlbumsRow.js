@@ -113,10 +113,10 @@ export default {
           image.slots({
             path,
             missingSourceContent:
-              name &&
-                language.$('misc.albumGrid.noCoverArt', {
-                  album: name,
-                }),
+              language.$('misc.albumGrid.noCoverArt', {
+                [language.onlyIfOptions]: ['album'],
+                album: name,
+              }),
             }));
 
     commonSlots.actionLinks =
