@@ -738,8 +738,8 @@ export class Language extends Thing {
   }
 
   #formatListHelper(array, processFn) {
-    // Empty lists are blank content.
-    if (empty(array)) {
+    // Empty lists, null, and undefined are blank content.
+    if (empty(array) || array === null || array === undefined) {
       return html.blank();
     }
 
