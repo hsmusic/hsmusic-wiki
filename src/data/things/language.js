@@ -127,6 +127,13 @@ export class Language extends Thing {
 
     // Expose only
 
+    onlyIfOptions: {
+      flags: {expose: true},
+      expose: {
+        compute: () => Symbol.for(`language.onlyIfOptions`),
+      },
+    },
+
     intl_date: this.#intlHelper(Intl.DateTimeFormat, {full: true}),
     intl_number: this.#intlHelper(Intl.NumberFormat),
     intl_listConjunction: this.#intlHelper(Intl.ListFormat, {type: 'conjunction'}),
@@ -218,6 +225,11 @@ export class Language extends Thing {
       throw new Error(`Invalid key ${key} accessed`);
     }
 
+    const constantCasify = name =>
+      name
+        .replace(/[A-Z]/g, '_$&')
+        .toUpperCase();
+
     // These will be filled up as we iterate over the template, slotting in
     // each option (if it's present).
     const missingOptionNames = new Set();
@@ -226,14 +238,22 @@ export class Language extends Thing {
     // a provided option was *expected,* but its value was null or undefined.
     const valuelessOptionNames = new Set();
 
+    // These *might* be missing, and if they are, that's OK!! Instead of adding
+    // to the valueless set above, we'll just mark to return a blank for the
+    // whole string.
+    const expectedValuelessOptionNames =
+      new Set(
+        (options[this.onlyIfOptions] ?? [])
+          .map(constantCasify));
+
+    let seenExpectedValuelessOption = false;
+
     // And this will have entries deleted as they're encountered in the
     // template. Leftover entries are misplaced.
     const optionsMap =
       new Map(
         Object.entries(options).map(([name, value]) => [
-          name
-            .replace(/[A-Z]/g, '_$&')
-            .toUpperCase(),
+          constantCasify(name),
           value,
         ]));
 
@@ -268,6 +288,15 @@ export class Language extends Thing {
         // valueless. Just like if an option is missing, this cancels forming
         // the rest of the output.
         if (optionValue === null || optionValue === undefined) {
+          // Exceeeept if this option is one of the ones that we're indicated
+          // to *expect* might be valueless! If so, we need to stop forming
+          // the string (and mark a separate flag so that we return a blank),
+          // but it's not a "valueless option" error.
+          if (expectedValuelessOptionNames.has(optionName)) {
+            seenExpectedValuelessOption = true;
+            return undefined;
+          }
+
           valuelessOptionNames.add(optionName);
           return undefined;
         }
@@ -301,6 +330,12 @@ export class Language extends Thing {
           `Unexpected options: ${names(misplacedOptionNames)}`));
       }
     });
+
+    // If an option was valueless as marked to expect, then that indicates
+    // the whole string should be treated as empty.
+    if (seenExpectedValuelessOption) {
+      return html.blank();
+    }
 
     return output;
   }
