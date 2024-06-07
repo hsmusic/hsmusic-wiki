@@ -235,7 +235,8 @@ export class Language extends Thing {
     const missingOptionNames = new Set();
 
     // These will also be filled. It's a bit different of an error, indicating
-    // a provided option was *expected,* but its value was null or undefined.
+    // a provided option was *expected,* but its value was null, undefined, or
+    // blank HTML content.
     const valuelessOptionNames = new Set();
 
     // These *might* be missing, and if they are, that's OK!! Instead of adding
@@ -247,6 +248,12 @@ export class Language extends Thing {
           .map(constantCasify));
 
     let seenExpectedValuelessOption = false;
+
+    const isValueless =
+      value =>
+        value === null ||
+        value === undefined ||
+        html.isBlank(value);
 
     // And this will have entries deleted as they're encountered in the
     // template. Leftover entries are misplaced.
@@ -284,20 +291,19 @@ export class Language extends Thing {
         // already stopped forming the output thanks to missing options.
         optionsMap.delete(optionName);
 
-        // Null and undefined aren't valid option values! These are considered
-        // valueless. Just like if an option is missing, this cancels forming
-        // the rest of the output.
-        if (optionValue === null || optionValue === undefined) {
-          // Exceeeept if this option is one of the ones that we're indicated
-          // to *expect* might be valueless! If so, we need to stop forming
-          // the string (and mark a separate flag so that we return a blank),
-          // but it's not a "valueless option" error.
+        // Just like if an option is missing, a valueless option cancels
+        // forming the rest of the output.
+        if (isValueless(optionValue)) {
+          // It's also an error, *except* if this option is one of the ones
+          // that we're indicated to *expect* might be valueless! In that case,
+          // we still need to stop forming the string (and mark a separate flag
+          // so that we return a blank), but it's not an error.
           if (expectedValuelessOptionNames.has(optionName)) {
             seenExpectedValuelessOption = true;
-            return undefined;
+          } else {
+            valuelessOptionNames.add(optionName);
           }
 
-          valuelessOptionNames.add(optionName);
           return undefined;
         }
 
@@ -332,7 +338,7 @@ export class Language extends Thing {
     });
 
     // If an option was valueless as marked to expect, then that indicates
-    // the whole string should be treated as empty.
+    // the whole string should be treated as blank content.
     if (seenExpectedValuelessOption) {
       return html.blank();
     }
@@ -582,6 +588,12 @@ export class Language extends Thing {
   }
 
   formatDuration(secTotal, {approximate = false, unit = false} = {}) {
+    // Null or undefined duration is blank content.
+    if (secTotal === null || secTotal === undefined) {
+      return html.blank();
+    }
+
+    // Zero duration is a "missing" string.
     if (secTotal === 0) {
       return this.formatString('count.duration.missing');
     }
@@ -619,6 +631,11 @@ export class Language extends Thing {
       throw new TypeError(`externalLinkSpec unavailable`);
     }
 
+    // Null or undefined url is blank content.
+    if (url === null || url === undefined) {
+      return html.blank();
+    }
+
     isExternalLinkContext(context);
 
     if (style === 'all') {
@@ -643,16 +660,31 @@ export class Language extends Thing {
   }
 
   formatIndex(value) {
+    // Null or undefined value is blank content.
+    if (value === null || value === undefined) {
+      return html.blank();
+    }
+
     this.assertIntlAvailable('intl_pluralOrdinal');
     return this.formatString('count.index.' + this.intl_pluralOrdinal.select(value), {index: value});
   }
 
   formatNumber(value) {
+    // Null or undefined value is blank content.
+    if (value === null || value === undefined) {
+      return html.blank();
+    }
+
     this.assertIntlAvailable('intl_number');
     return this.intl_number.format(value);
   }
 
   formatWordCount(value) {
+    // Null or undefined value is blank content.
+    if (value === null || value === undefined) {
+      return html.blank();
+    }
+
     const num = this.formatNumber(
       value > 1000 ? Math.floor(value / 100) / 10 : value
     );
@@ -666,6 +698,11 @@ export class Language extends Thing {
   }
 
   #formatListHelper(array, processFn) {
+    // Empty lists are blank content.
+    if (empty(array)) {
+      return html.blank();
+    }
+
     // Operate on "insertion markers" instead of the actual contents of the
     // array, because the process function (likely an Intl operation) is taken
     // to only operate on strings. We'll insert the contents of the array back
@@ -727,10 +764,22 @@ export class Language extends Thing {
 
   // File sizes: 42.5 kB, 127.2 MB, 4.13 GB, 998.82 TB
   formatFileSize(bytes) {
-    if (!bytes) return '';
+    // Null or undefined bytes is blank content.
+    if (bytes === null || bytes === undefined) {
+      return html.blank();
+    }
+
+    // Zero bytes is blank content.
+    if (bytes === 0) {
+      return html.blank();
+    }
 
     bytes = parseInt(bytes);
-    if (isNaN(bytes)) return '';
+
+    // Non-number bytes is blank content! Wow.
+    if (isNaN(bytes)) {
+      return html.blank();
+    }
 
     const round = (exp) => Math.round(bytes / 10 ** (exp - 1)) / 10;
 
@@ -758,6 +807,11 @@ export class Language extends Thing {
 
 const countHelper = (stringKey, optionName = stringKey) =>
   function(value, {unit = false} = {}) {
+    // Null or undefined value is blank content.
+    if (value === null || value === undefined) {
+      return html.blank();
+    }
+
     return this.formatString(
       unit
         ? `count.${stringKey}.withUnit.` + this.getUnitForm(value)
