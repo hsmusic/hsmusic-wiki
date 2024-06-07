@@ -53,10 +53,17 @@ export const attributeSpec = {
   },
 };
 
-// Pass to tag() as an attributes key to make tag() return a 8lank string if the
+// Pass to tag() as an attributes key to make tag() return a 8lank tag if the
 // provided content is empty. Useful for when you'll only 8e showing an element
 // according to the presence of content that would 8elong there.
 export const onlyIfContent = Symbol();
+
+// Pass to tag() as an attributes key to make tag() return a blank tag if
+// this tag doesn't get shown beside any siblings! (I.e, siblings who don't
+// also have the [html.onlyIfSiblings] attribute.) Since they'd just be blank,
+// tags with [html.onlyIfSiblings] never make the difference in counting as
+// content for [html.onlyIfContent]. Useful for <summary> and such.
+export const onlyIfSiblings = Symbol();
 
 // Pass to tag() as an attributes key to make children be joined together by the
 // provided string. This is handy, for example, for joining lines by <br> tags,
@@ -124,13 +131,18 @@ function isBlankArrayHelper(content) {
   // content of tags marked onlyIfContent) into one array,
   // and templates into another. And if there's anything
   // else, that's a non-blank condition we'll detect now.
+  // We'll flat-out skip items marked onlyIfSiblings,
+  // since they could never count as content alone
+  // (some other item will have to count).
 
   const arrayContent = [];
   const templateContent = [];
 
   for (const item of nonStringContent) {
     if (item instanceof Tag) {
-      if (item.onlyIfContent || item.contentOnly) {
+      if (item.onlyIfSiblings) {
+        continue;
+      } else if (item.onlyIfContent || item.contentOnly) {
         arrayContent.push(item.content);
       } else {
         return false;
@@ -416,6 +428,10 @@ export class Tag {
   }
 
   get blank() {
+    // Tags don't have a reference to their parent, so this only evinces
+    // something about this tag's own content or attributes. It does *not*
+    // account for [html.onlyIfSiblings]!
+
     if (this.onlyIfContent && isBlank(this.content)) {
       return true;
     }
@@ -475,6 +491,14 @@ export class Tag {
 
   get onlyIfContent() {
     return this.#getAttributeFlag(onlyIfContent);
+  }
+
+  set onlyIfSiblings(value) {
+    this.#setAttributeFlag(onlyIfSiblings, value);
+  }
+
+  get onlyIfSiblings() {
+    return this.#getAttributeFlag(onlyIfSiblings);
   }
 
   set joinChildren(value) {
