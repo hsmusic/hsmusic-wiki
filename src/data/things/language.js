@@ -239,32 +239,37 @@ export class Language extends Thing {
       match: languageOptionRegex,
 
       insert: ({name: optionName}, canceledForming) => {
-        if (optionsMap.has(optionName)) {
-          let optionValue;
+        if (!optionsMap.has(optionName)) {
+          missingOptionNames.add(optionName);
 
-          // We'll only need the option's value if we're going to use it as
-          // part of the formed output (see below).
-          if (!canceledForming) {
-            optionValue = optionsMap.get(optionName);
-          }
-
-          // But we always have to delete expected options off the provided
-          // option map, since the leftovers are what will be used to tell
-          // which are misplaced.
-          optionsMap.delete(optionName);
-
-          if (canceledForming) {
-            return undefined;
-          } else {
-            return optionValue;
-          }
-        } else {
           // We don't need to continue forming the output if we've hit a
           // missing option name, since the end result of this formatString
           // call will be a thrown error, and formed output won't be needed.
-          missingOptionNames.add(optionName);
+          // Return undefined to mark canceledForming for the following
+          // iterations (and exit early out of this iteration).
           return undefined;
         }
+
+        let optionValue;
+
+        // We'll only need the option's value if we're going to use it as
+        // part of the formed output (see below). But, we have to do this get
+        // call now, since we'll be deleting it from optionsMap next!
+        if (!canceledForming) {
+          optionValue = optionsMap.get(optionName);
+        }
+
+        // We always have to delete expected options off the provided option
+        // map, since the leftovers are what will be used to tell which are
+        // misplaced - information you want even (or doubly so) if the string
+        // is already invalid thanks to missing options.
+        optionsMap.delete(optionName);
+
+        if (canceledForming) {
+          return undefined;
+        }
+
+        return optionValue;
       },
     });
 
