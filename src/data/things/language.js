@@ -222,6 +222,10 @@ export class Language extends Thing {
     // each option (if it's present).
     const missingOptionNames = new Set();
 
+    // These will also be filled. It's a bit different of an error, indicating
+    // a provided option was *expected,* but its value was null or undefined.
+    const valuelessOptionNames = new Set();
+
     // And this will have entries deleted as they're encountered in the
     // template. Leftover entries are misplaced.
     const optionsMap =
@@ -250,20 +254,23 @@ export class Language extends Thing {
           return undefined;
         }
 
-        let optionValue;
-
-        // We'll only need the option's value if we're going to use it as
-        // part of the formed output (see below). But, we have to do this get
-        // call now, since we'll be deleting it from optionsMap next!
-        if (!canceledForming) {
-          optionValue = optionsMap.get(optionName);
-        }
+        // Even if we're not actually forming the output anymore, we'll still
+        // have to access this option's value to check if it is invalid.
+        const optionValue = optionsMap.get(optionName);
 
         // We always have to delete expected options off the provided option
         // map, since the leftovers are what will be used to tell which are
-        // misplaced - information you want even (or doubly so) if the string
-        // is already invalid thanks to missing options.
+        // misplaced - information you want even (or doubly so) if we've
+        // already stopped forming the output thanks to missing options.
         optionsMap.delete(optionName);
+
+        // Null and undefined aren't valid option values! These are considered
+        // valueless. Just like if an option is missing, this cancels forming
+        // the rest of the output.
+        if (optionValue === null || optionValue === undefined) {
+          valuelessOptionNames.add(optionName);
+          return undefined;
+        }
 
         if (canceledForming) {
           return undefined;
@@ -277,14 +284,21 @@ export class Language extends Thing {
       Array.from(optionsMap.keys());
 
     withAggregate({message: `Errors in options for string "${key}"`}, ({push}) => {
+      const names = set => Array.from(set).join(', ');
+
       if (!empty(missingOptionNames)) {
-        const names = Array.from(missingOptionNames).join(`, `);
-        push(new Error(`Missing options: ${names}`));
+        push(new Error(
+          `Missing options: ${names(missingOptionNames)}`));
+      }
+
+      if (!empty(valuelessOptionNames)) {
+        push(new Error(
+          `Valueless options: ${names(valuelessOptionNames)}`));
       }
 
       if (!empty(misplacedOptionNames)) {
-        const names = Array.from(misplacedOptionNames).join(`, `);
-        push(new Error(`Unexpected options: ${names}`));
+        push(new Error(
+          `Unexpected options: ${names(misplacedOptionNames)}`));
       }
     });
 
