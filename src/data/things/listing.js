@@ -1,3 +1,5 @@
+import {inspect} from 'node:util';
+
 import {input} from '#composite';
 import Thing from '#thing';
 import {isStringNonEmpty} from '#validators';
@@ -69,6 +71,17 @@ export class Listing extends Thing {
     }),
 
     // Expose only
+
+    data: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['this'],
+        compute: ({this: myself}) => {
+          console.warn(`${inspect(myself)} - "data" not implemented yet`);
+          return [];
+        },
+      },
+    },
 
     indexListing: [
       {

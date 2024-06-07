@@ -1,9 +1,14 @@
 import {mapAggregate, withAggregate} from '#aggregate';
+import CacheableObject from '#cacheable-object';
 import listingSpec, {listingTargetSpec} from '#listing-spec';
 import Thing from '#thing';
 import thingConstructors from '#things';
 
 const {Listing} = thingConstructors;
+
+function nameClass(cls, name) {
+  Object.defineProperty(cls, 'name', {value: name});
+}
 
 export function getTargetFromListingSpec(spec) {
   if (!spec.target) {
@@ -15,58 +20,58 @@ export function getTargetFromListingSpec(spec) {
       .find(target => target.target === spec.target));
 }
 
-export function getPropertyDescriptorsFromListingSpec(spec) {
-  const allDescriptors = {};
-
-  const applyDescriptors = ({name, object}) => {
-    if (!object?.[Thing.getPropertyDescriptors]) return;
-
-    const constructorLike = {
-      name,
-
-      [Thing.getPropertyDescriptors]:
-        object[Thing.getPropertyDescriptors],
-    };
-
-    Object.assign(allDescriptors,
-      Thing.computePropertyDescriptors(constructorLike, {
-        thingConstructors,
-      }));
-  };
-
+export function createClassFromListingSpec(spec) {
   const listingName =
     `(listing:${spec.directory})`;
 
   const listingTargetName =
     `(listing-target:${spec.target})`;
 
-  applyDescriptors({
-    name: Listing.name,
-    object: Listing,
-  });
+  let topOfChain = Listing;
 
-  applyDescriptors({
-    name: listingTargetName,
-    object: getTargetFromListingSpec(spec),
-  });
+  const target = getTargetFromListingSpec(spec);
 
-  applyDescriptors({
-    name: listingName,
-    object: spec,
-  });
+  if (target) {
+    const listingTargetClass =
+      class extends topOfChain {
+        static {
+          nameClass(this, listingTargetName);
+        }
 
-  if (spec.data) {
-    applyDescriptors({
-      name: listingName,
-      object: {
-        [Thing.getPropertyDescriptors]: opts => ({
-          data: spec.data(opts),
-        }),
-      },
-    });
+        static [Thing.getPropertyDescriptors](opts) {
+          return target[Thing.getPropertyDescriptors]?.(opts) ?? {};
+        }
+      };
+
+    topOfChain = listingTargetClass;
   }
 
-  return allDescriptors;
+  const listingClass =
+    class extends topOfChain {
+      static {
+        // Note that this'll get deliberately overwritten soon, though only
+        // after we've made the call to Thing.decidePropertyDescriptors.
+        nameClass(this, listingName);
+      }
+
+      static [Thing.getPropertyDescriptors](opts) {
+        const descriptors = {};
+
+        if (spec[Thing.getPropertyDescriptors]) {
+          Object.assign(descriptors, spec[Thing.getPropertyDescriptors](opts));
+        }
+
+        if (spec.data) {
+          descriptors.data = spec.data(opts);
+        }
+
+        return descriptors;
+      }
+    };
+
+  Thing.decidePropertyDescriptors(listingClass, thingConstructors);
+
+  return listingClass;
 }
 
 export function constructListingFromSpec(spec) {
@@ -77,14 +82,14 @@ export function constructListingFromSpec(spec) {
       push(new Error(`Unknown target "${spec.target}"`));
     }
 
-    const listingClass = class extends Listing {
-      static propertyDescriptors =
-        getPropertyDescriptorsFromListingSpec(spec);
-    };
+    const listingClass = createClassFromListingSpec(spec);
 
-    Object.defineProperty(listingClass, 'name', {
-      value: Listing.name,
-    });
+    // Rename the listing after the fact. LOL.
+    // It's useful to give it a custom name so that compositional properties
+    // are easier to identify (they're annotated according to the constructor
+    // name at the time). But when actually presenting the Listing instance
+    // itself, it should be called Listing.
+    nameClass(listingClass, Listing.name);
 
     const listing = new listingClass();
 

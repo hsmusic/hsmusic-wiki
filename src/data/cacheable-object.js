@@ -85,6 +85,8 @@ function inspect(value) {
 export default class CacheableObject {
   static propertyDescriptors = Symbol.for('CacheableObject.propertyDescriptors');
 
+  #propertyDescriptors = null;
+
   #propertyUpdateValues = Object.create(null);
   #propertyUpdateCacheInvalidators = Object.create(null);
 
@@ -97,7 +99,21 @@ export default class CacheableObject {
   // That means initial data must be provided by following up with update()
   // after constructing the new instance of the Thing (sub)class.
 
-  constructor() {
+  // It's possible to provide a different set of property descriptors than the
+  // ones that are just present on the constructor.
+  constructor(standinPropertyDescriptors = null) {
+    this.#propertyDescriptors =
+      (standinPropertyDescriptors
+        ? standinPropertyDescriptors
+        : this.constructor[CacheableObject.propertyDescriptors]);
+
+    if (!this.#propertyDescriptors) {
+      throw new Error(
+        `Expected CacheableObject.propertyDescriptors` +
+        ` on constructor ${this.constructor.name},` +
+        ` or provided directly to CacheableObject`);
+    }
+
     this.#defineProperties();
     this.#initializeUpdatingPropertyValues();
 
@@ -116,11 +132,30 @@ export default class CacheableObject {
   }
 
   #withEachPropertyDescriptor(callback) {
-    const {[CacheableObject.propertyDescriptors]: propertyDescriptors} =
-      this.constructor;
+    const descriptorKeys =
+      this.#keysTilPrototype(this.#propertyDescriptors, Object.prototype);
 
-    for (const property of Reflect.ownKeys(propertyDescriptors)) {
-      callback(property, propertyDescriptors[property]);
+    for (const property of descriptorKeys) {
+      callback(property, this.#propertyDescriptors[property]);
+    }
+  }
+
+  #keysTilPrototype(object, end) {
+    if (object === null) {
+      return new Set();
+    }
+
+    const prototypeKeys =
+      (Object.getPrototypeOf(object) === end
+        ? null
+        : this.#keysTilPrototype(Object.getPrototypeOf(object), end));
+
+    const ownKeys = Reflect.ownKeys(object);
+
+    if (prototypeKeys) {
+      return new Set([...prototypeKeys, ...ownKeys]);
+    } else {
+      return new Set(ownKeys);
     }
   }
 
@@ -145,10 +180,6 @@ export default class CacheableObject {
   }
 
   #defineProperties() {
-    if (!this.constructor[CacheableObject.propertyDescriptors]) {
-      throw new Error(`Expected constructor ${this.constructor.name} to provide CacheableObject.propertyDescriptors`);
-    }
-
     this.#withEachPropertyDescriptor((property, descriptor) => {
       const {flags} = descriptor;
 
@@ -165,7 +196,12 @@ export default class CacheableObject {
         definition.get = this.#getExposeObjectDefinitionGetterFunction(property);
       }
 
-      Object.defineProperty(this, property, definition);
+      try {
+        Object.defineProperty(this, property, definition);
+      } catch (error) {
+        console.log('I am:', this);
+        throw error;
+      }
     });
 
     Object.seal(this);
@@ -206,7 +242,7 @@ export default class CacheableObject {
   }
 
   #getPropertyDescriptor(property) {
-    return this.constructor[CacheableObject.propertyDescriptors][property];
+    return this.#propertyDescriptors[property];
   }
 
   #invalidateCachesDependentUpon(property) {
@@ -331,8 +367,7 @@ export default class CacheableObject {
       return;
     }
 
-    const {[CacheableObject.propertyDescriptors]: propertyDescriptors} =
-      obj.constructor;
+    const propertyDescriptors = obj.#propertyDescriptors;
 
     if (!propertyDescriptors) {
       console.warn('Missing property descriptors:', obj);

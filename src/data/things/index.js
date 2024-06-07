@@ -125,10 +125,7 @@ function evaluatePropertyDescriptors() {
     message: `Errors evaluating Thing class property descriptors`,
 
     op(constructor) {
-      constructor[CacheableObject.propertyDescriptors] =
-        Thing.computePropertyDescriptors(constructor, {
-          thingConstructors: allClasses,
-        });
+      Thing.decidePropertyDescriptors(constructor, allClasses);
     },
 
     showFailedClasses(failedClasses) {

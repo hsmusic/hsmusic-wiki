@@ -99,9 +99,7 @@ export class HomepageLayoutRow extends Thing {
 export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
   static [Thing.friendlyName] = `Homepage Albums Row`;
 
-  static [Thing.getPropertyDescriptors] = (opts, {Album, Group} = opts) => ({
-    ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
-
+  static [Thing.getPropertyDescriptors] = ({Album, Group}) => ({
     // Update & expose
 
     type: {
