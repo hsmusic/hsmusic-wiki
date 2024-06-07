@@ -617,6 +617,8 @@ export class Tag {
     let content = '';
     let blockwrapClosers = '';
 
+    let seenSiblingIndependentContent = false;
+
     const chunkwrapSplitter =
       (this.chunkwrap
         ? this.#getAttributeString('split')
@@ -669,6 +671,10 @@ export class Tag {
 
       if (!itemContent) {
         continue;
+      }
+
+      if (!(item instanceof Tag && item.onlyIfSiblings)) {
+        seenSiblingIndependentContent = true;
       }
 
       const chunkwrapChunks =
@@ -741,6 +747,12 @@ export class Tag {
 
         content += itemContent;
       }
+    }
+
+    // If we've only seen sibling-dependent content (or just no content),
+    // then the content in total is blank.
+    if (!seenSiblingIndependentContent) {
+      return '';
     }
 
     if (chunkwrapSplitter) {
