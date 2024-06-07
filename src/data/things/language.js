@@ -476,11 +476,32 @@ export class Language extends Thing {
   }
 
   formatDate(date) {
+    // Null or undefined date is blank content.
+    if (date === null || date === undefined) {
+      return html.blank();
+    }
+
     this.assertIntlAvailable('intl_date');
     return this.intl_date.format(date);
   }
 
   formatDateRange(startDate, endDate) {
+    // formatDateRange expects both values to be present, but if both are null
+    // or both are undefined, that's just blank content.
+    const hasStart = startDate !== null && startDate !== undefined;
+    const hasEnd = endDate !== null && endDate !== undefined;
+    if (!hasStart || !hasEnd) {
+      if (startDate === endDate) {
+        return html.blank();
+      } else if (hasStart) {
+        throw new Error(`Expected both start and end of date range, got only start`);
+      } else if (hasEnd) {
+        throw new Error(`Expected both start and end of date range, got only end`);
+      } else {
+        throw new Error(`Got mismatched ${startDate}/${endDate} for start and end`);
+      }
+    }
+
     this.assertIntlAvailable('intl_date');
     return this.intl_date.formatRange(startDate, endDate);
   }
@@ -491,6 +512,17 @@ export class Language extends Thing {
     days: numDays = 0,
     approximate = false,
   }) {
+    // Give up if any of years, months, or days is null or undefined.
+    // These default to zero, so something's gone pretty badly wrong to
+    // pass in all or partial missing values.
+    if (
+      numYears === undefined || numYears === null ||
+      numMonths === undefined || numMonths === null ||
+      numDays === undefined || numDays === null
+    ) {
+      throw new Error(`Expected values or default zero for years, months, and days`);
+    }
+
     let basis;
 
     const years = this.countYears(numYears, {unit: true});
@@ -528,6 +560,14 @@ export class Language extends Thing {
     approximate = true,
     absolute = true,
   } = {}) {
+    // Give up if current and/or reference date is null or undefined.
+    if (
+      currentDate === undefined || currentDate === null ||
+      referenceDate === undefined || referenceDate === null
+    ) {
+      throw new Error(`Expected values for currentDate and referenceDate`);
+    }
+
     const currentInstant = toTemporalInstant.apply(currentDate);
     const referenceInstant = toTemporalInstant.apply(referenceDate);
 
