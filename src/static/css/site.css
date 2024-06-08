@@ -1110,6 +1110,15 @@ ul.image-details li {
 
 .commentary-entry-heading time {
   float: right;
+  padding-left: 0.5ch;
+  padding-right: 0.25ch;
+  margin-left: 0.75ch;
+  border-left: 1px dotted transparent;
+  transition: border-left-color 0.15s;
+}
+
+.commentary-entry-heading time:hover {
+  border-left-color: white;
 }
 
 .commentary-art {
