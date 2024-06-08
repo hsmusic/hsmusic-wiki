@@ -7,7 +7,7 @@ import {sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
 import {anyOf, isColor, isContentString, isDirectory, isNumber, isString}
   from '#validators';
-import {parseDate, parseContributors} from '#yaml';
+import {parseContributors, parseDate, parseDimensions} from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
 
@@ -24,6 +24,7 @@ import {
   commentatorArtists,
   contentString,
   contributionList,
+  dimensions,
   directory,
   fileExtension,
   name,
@@ -88,6 +89,8 @@ export class Flash extends Thing {
     date: simpleDate(),
 
     coverArtFileExtension: fileExtension('jpg'),
+
+    coverArtDimensions: dimensions(),
 
     contributorContribs: contributionList(),
 
@@ -170,6 +173,11 @@ export class Flash extends Thing {
       },
 
       'Cover Art File Extension': {property: 'coverArtFileExtension'},
+
+      'Cover Art Dimensions': {
+        property: 'coverArtDimensions',
+        transform: parseDimensions,
+      },
 
       'Featured Tracks': {property: 'featuredTracks'},
 
