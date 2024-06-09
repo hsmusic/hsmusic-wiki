@@ -1,26 +1,4 @@
-import {empty, stitchArrays} from '#sugar';
-
-function groupTracksByGroup(tracks, groups) {
-  const lists = new Map(groups.map(group => [group, []]));
-  lists.set('other', []);
-
-  for (const track of tracks) {
-    const group = groups.find(group => group.albums.includes(track.album));
-    if (group) {
-      lists.get(group).push(track);
-    } else {
-      lists.get('other').push(track);
-    }
-  }
-
-  for (const [key, tracks] of lists.entries()) {
-    if (empty(tracks)) {
-      lists.delete(key);
-    }
-  }
-
-  return lists;
-}
+import {empty, filterMultipleArrays, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -31,49 +9,67 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  query: (tracks, groups) => ({
-    lists:
-      (empty(groups)
-        ? []
-        : groupTracksByGroup(tracks, groups)),
-  }),
+  query(tracks, dividingGroups) {
+    const groupings = new Map();
+    const ungroupedTracks = [];
 
-  relations(relation, query, tracks, groups) {
-    if (empty(tracks)) {
-      return {};
+    // Entry order matters! Add blank lists for each group
+    // in the order that those groups are provided.
+    for (const group of dividingGroups) {
+      groupings.set(group, []);
     }
 
-    if (empty(groups)) {
-      return {
-        flatList:
-          relation('generateTrackList', tracks),
-      };
+    for (const track of tracks) {
+      const firstMatchingGroup =
+        dividingGroups.find(group => group.albums.includes(track.album));
+
+      if (firstMatchingGroup) {
+        groupings.get(firstMatchingGroup).push(track);
+      } else {
+        ungroupedTracks.push(track);
+      }
     }
 
-    return {
-      contentHeading:
-        relation('generateContentHeading'),
+    const groups = Array.from(groupings.keys());
+    const groupedTracks = Array.from(groupings.values());
 
-      groupedLists:
-        Array.from(query.lists.entries())
-          .map(([groupOrOther, tracks]) => ({
-            ...(groupOrOther === 'other'
-                  ? {other: true}
-                  : {groupLink: relation('linkGroup', groupOrOther)}),
+    // Drop the empty lists, so just the groups which
+    // at least a single track matched are left.
+    filterMultipleArrays(
+      groups,
+      groupedTracks,
+      (_group, tracks) => !empty(tracks));
 
-            list:
-              relation('generateTrackList', tracks),
-          })),
-    };
+    return {groups, groupedTracks, ungroupedTracks};
   },
+
+  relations: (relation, query, tracks, groups) => ({
+    flatList:
+      (empty(groups)
+        ? relation('generateTrackList', tracks)
+        : null),
+
+    contentHeading:
+      relation('generateContentHeading'),
+
+    groupLinks:
+      query.groups
+        .map(group => relation('linkGroup', group)),
+
+    groupedTrackLists:
+      query.groupedTracks
+        .map(tracks => relation('generateTrackList', tracks)),
+
+    ungroupedTrackList:
+      (empty(query.ungroupedTracks)
+        ? null
+        : relation('generateTrackList', query.ungroupedTracks)),
+  }),
 
   data: (query) => ({
     groupNames:
-      Array.from(query.lists.keys())
-        .map(groupOrOther =>
-          (groupOrOther === 'group'
-            ? null
-            : groupOrOther.name)),
+      query.groups
+        .map(group => group.name),
   }),
 
   slots: {
@@ -82,45 +78,55 @@ export default {
     },
   },
 
-  generate(data, relations, slots, {html, language}) {
-    if (relations.flatList) {
-      return relations.flatList;
-    }
-
-    return html.tag('dl',
+  generate: (data, relations, slots, {html, language}) =>
+    relations.flatList ??
+    html.tag('dl', [
       stitchArrays({
         groupName: data.groupNames,
-        listEntry: relations.groupedLists
+        groupLink: relations.groupLinks,
+        trackList: relations.groupedTrackLists,
       }).map(({
           groupName,
-          listEntry: {other, groupLink, list},
+          groupLink,
+          trackList,
         }) => [
           (slots.headingString
             ? relations.contentHeading.clone().slots({
                 tag: 'dt',
 
                 title:
-                  (other
-                    ? language.$('trackList.fromOther')
-                    : language.$('trackList.fromGroup', {
-                        group: groupLink
-                      })),
+                  language.$('trackList.fromGroup', {
+                    group: groupLink
+                  }),
 
                 stickyTitle:
-                  (other
-                    ? language.$(slots.headingString, 'sticky', 'fromOther')
-                    : language.$(slots.headingString, 'sticky', 'fromGroup', {
-                        group: groupName,
-                      })),
+                  language.$(slots.headingString, 'sticky', 'fromGroup', {
+                    group: groupName,
+                  }),
               })
             : html.tag('dt',
-                (other
-                  ? language.$('trackList.fromOther')
-                  : language.$('trackList.fromGroup', {
-                      group: groupLink
-                    })))),
+                language.$('trackList.fromGroup', {
+                  group: groupLink
+                }))),
 
-          html.tag('dd', list),
-        ]));
-  },
+          html.tag('dd', trackList),
+        ]),
+
+      relations.ungroupedTrackList && [
+        (slots.headingString
+          ? relations.contentHeading.clone().slots({
+              tag: 'dt',
+
+              title:
+                language.$('trackList.fromOther'),
+
+              stickyTitle:
+                language.$(slots.headingString, 'sticky', 'fromOther'),
+            })
+          : html.tag('dt',
+              language.$('trackList.fromOther'))),
+
+        html.tag('dd', relations.ungroupedTrackList),
+      ],
+    ]),
 };
