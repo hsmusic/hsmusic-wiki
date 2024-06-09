@@ -1,6 +1,26 @@
 import {empty, stitchArrays} from '#sugar';
 
-import groupTracksByGroup from '../util/groupTracksByGroup.js';
+function groupTracksByGroup(tracks, groups) {
+  const lists = new Map(groups.map(group => [group, []]));
+  lists.set('other', []);
+
+  for (const track of tracks) {
+    const group = groups.find(group => group.albums.includes(track.album));
+    if (group) {
+      lists.get(group).push(track);
+    } else {
+      lists.get('other').push(track);
+    }
+  }
+
+  for (const [key, tracks] of lists.entries()) {
+    if (empty(tracks)) {
+      lists.delete(key);
+    }
+  }
+
+  return lists;
+}
 
 export default {
   contentDependencies: [
