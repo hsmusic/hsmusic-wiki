@@ -1345,6 +1345,9 @@ dl dt {
 }
 
 dl dt {
+  /* Heads up, this affects the measurement
+   * for dl dt which are .content-heading!
+   */
   margin-bottom: 2px;
 }
 
@@ -2168,6 +2171,13 @@ html[data-url-key="localized.home"] .carousel-container {
 .content-heading.highlight-hash-link {
   animation: highlight-hash-link 4s;
   animation-delay: 125ms;
+}
+
+dl dt.content-heading {
+  /* Basic margin-bottom for dt is 2px,
+   * so just subtract 3px from that.
+   */
+  margin-bottom: -1px;
 }
 
 h3.content-heading {
