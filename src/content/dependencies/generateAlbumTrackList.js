@@ -149,6 +149,7 @@ export default {
             }) => [
               heading.slots({
                 tag: 'dt',
+
                 title:
                   (duration === 0
                     ? language.$('trackList.section', {
@@ -161,6 +162,11 @@ export default {
                             approximate: durationApproximate,
                           }),
                       })),
+
+                stickyTitle:
+                  language.$('trackList.section.sticky', {
+                    section: name,
+                  }),
               }),
 
               html.tag('dd',

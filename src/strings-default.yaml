@@ -364,6 +364,7 @@ trackList:
   section:
     _: "{SECTION}:"
     withDuration: "{SECTION}: ({DURATION})"
+    sticky: "{SECTION}:"
 
   group:
     _: "From {GROUP}:"
