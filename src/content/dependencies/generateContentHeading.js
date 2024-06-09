@@ -17,6 +17,11 @@ export default {
       mutable: false,
     },
 
+    attributes: {
+      type: 'attributes',
+      mutable: false,
+    },
+
     color: {validate: v => v.isColor},
 
     id: {type: 'string'},
@@ -26,6 +31,8 @@ export default {
   generate: (relations, slots, {html}) =>
     html.tag(slots.tag, {class: 'content-heading'},
       {tabindex: '0'},
+
+      slots.attributes,
 
       slots.id &&
         {id: slots.id},
