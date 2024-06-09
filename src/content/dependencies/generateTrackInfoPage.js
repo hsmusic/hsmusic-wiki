@@ -419,26 +419,40 @@ export default {
             sec.referencedBy.heading
               .slots({
                 attributes: {id: 'referenced-by'},
+
                 title:
                   language.$('releaseInfo.tracksThatReference', {
                     track: html.tag('i', data.name),
                   }),
+
+                stickyTitle:
+                  language.$('releaseInfo.tracksThatReference.sticky'),
               }),
 
-            sec.referencedBy.list,
+            sec.referencedBy.list
+              .slots({
+                headingString: 'releaseInfo.tracksThatReference',
+              }),
           ],
 
           sec.sampledBy && [
             sec.sampledBy.heading
               .slots({
                 attributes: {id: 'referenced-by'},
+
                 title:
                   language.$('releaseInfo.tracksThatSample', {
                     track: html.tag('i', data.name),
                   }),
+
+                stickyTitle:
+                  language.$('releaseInfo.tracksThatSample.sticky'),
               }),
 
-            sec.sampledBy.list,
+            sec.sampledBy.list
+              .slots({
+                headingString: 'releaseInfo.tracksThatSample',
+              }),
           ],
 
           sec.flashesThatFeature && [
