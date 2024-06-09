@@ -907,6 +907,7 @@ albumCommentaryPage:
     title:
       albumCommentary:
         _: "{ALBUM}"
+        sticky: "{ALBUM} (album commentary)"
         accent: "Listen on: {LISTENING_LINKS}"
 
       trackCommentary:

@@ -166,6 +166,11 @@ export default {
                   album: relations.albumCommentaryLink,
                 }),
 
+              stickyTitle:
+                language.$('albumCommentaryPage.entry.title.albumCommentary.sticky', {
+                  album: data.name,
+                }),
+
               accent:
                 language.$('albumCommentaryPage.entry.title.albumCommentary.accent', {
                   [language.onlyIfOptions]: ['listeningLinks'],
