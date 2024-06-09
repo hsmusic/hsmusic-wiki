@@ -16,12 +16,23 @@ export default {
         relation('generateCommentaryEntry', entry)),
   }),
 
-  generate: (relations, {html, language}) =>
+  data: (entries) => ({
+    firstEntryIsDated:
+      (entries[0]
+        ? !!entries[0].date
+        : null),
+  }),
+
+  generate: (data, relations, {html, language}) =>
     html.tags([
       relations.heading
         .slots({
-          attributes: {id: 'artist-commentary'},
           title: language.$('misc.artistCommentary'),
+          attributes: [
+            {id: 'artist-commentary'},
+            data.firstEntryIsDated &&
+              {class: 'first-entry-is-dated'},
+          ],
         }),
 
       relations.entries,
