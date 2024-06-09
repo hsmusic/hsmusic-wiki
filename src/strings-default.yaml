@@ -286,10 +286,15 @@ releaseInfo:
 
   flashesThatFeature:
     _: "Flashes & games that feature {TRACK}:"
+    sticky: "Flashes & games that feature this track:"
+
     item:
       _: "{FLASH}"
       asDifferentRelease: "{FLASH} (as {TRACK})"
 
+  # Note that there's no sticky variant here,
+  # such as "Tracks that this flash features",
+  # because not all flashes are *called* flashes!
   tracksFeatured: "Tracks that {FLASH} features:"
 
   # Actions

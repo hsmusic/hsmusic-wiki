@@ -445,10 +445,14 @@ export default {
             sec.flashesThatFeature.heading
               .slots({
                 attributes: {id: 'featured-in'},
+
                 title:
                   language.$('releaseInfo.flashesThatFeature', {
                     track: html.tag('i', data.name),
                   }),
+
+                stickyTitle:
+                  language.$('releaseInfo.flashesThatFeature.sticky'),
               }),
 
             html.tag('ul', sec.flashesThatFeature.entries.map(({flashLink, trackLink}) =>
