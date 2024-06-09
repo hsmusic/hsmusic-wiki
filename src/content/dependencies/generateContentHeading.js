@@ -12,6 +12,11 @@ export default {
       mutable: false,
     },
 
+    stickyTitle: {
+      type: 'html',
+      mutable: false,
+    },
+
     accent: {
       type: 'html',
       mutable: false,
@@ -43,6 +48,10 @@ export default {
         html.tag('span', {class: 'content-heading-main-title'},
           {[html.onlyIfContent]: true},
           slots.title),
+
+        html.tag('template', {class: 'content-heading-sticky-title'},
+          {[html.onlyIfContent]: true},
+          slots.stickyTitle),
 
         html.tag('span', {class: 'content-heading-accent'},
           {[html.onlyIfContent]: true},

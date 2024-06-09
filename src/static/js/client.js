@@ -2706,9 +2706,9 @@ function updateStickySubheadingContent(index) {
     }
 
     const textContainer =
-      closestHeading.querySelector('.content-heading-main-title')
-        // Just for compatibility with older builds of the site.
-        ?? closestHeading;
+      templateContent(
+        closestHeading.querySelector('.content-heading-sticky-title')) ??
+      closestHeading.querySelector('.content-heading-main-title');
 
     for (const child of textContainer.childNodes) {
       if (child.tagName === 'A') {
