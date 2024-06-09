@@ -385,10 +385,14 @@ export default {
             sec.references.heading
               .slots({
                 attributes: {id: 'references'},
+
                 title:
                   language.$('releaseInfo.tracksReferenced', {
                     track: html.tag('i', data.name),
                   }),
+
+                stickyTitle:
+                  language.$('releaseInfo.tracksReferenced.sticky'),
               }),
 
             sec.references.list,
@@ -398,10 +402,14 @@ export default {
             sec.samples.heading
               .slots({
                 attributes: {id: 'samples'},
+
                 title:
                   language.$('releaseInfo.tracksSampled', {
                     track: html.tag('i', data.name),
                   }),
+
+                stickyTitle:
+                  language.$('releaseInfo.tracksSampled.sticky'),
               }),
 
             sec.samples.list,

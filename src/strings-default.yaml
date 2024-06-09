@@ -273,9 +273,15 @@ releaseInfo:
       _: "{TRACK} ({ALBUM})"
       withYear: "({YEAR}) {TRACK} ({ALBUM})"
 
-  tracksReferenced: "Tracks that {TRACK} references:"
+  tracksReferenced:
+    _: "Tracks that {TRACK} references:"
+    sticky: "Tracks that this one references:"
+
+  tracksSampled:
+    _: "Tracks that {TRACK} samples:"
+    sticky: "Tracks that this one samples:"
+
   tracksThatReference: "Tracks that reference {TRACK}:"
-  tracksSampled: "Tracks that {TRACK} samples:"
   tracksThatSample: "Tracks that sample {TRACK}:"
 
   flashesThatFeature:
