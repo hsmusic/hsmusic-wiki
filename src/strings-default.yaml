@@ -321,7 +321,7 @@ releaseInfo:
     link: "artist commentary"
 
   additionalFiles:
-    heading: "View or download {ADDITIONAL_FILES}:"
+    heading: "View or download additional files:"
 
     entry:
       _: "{TITLE}"

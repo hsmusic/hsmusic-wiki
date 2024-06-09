@@ -492,11 +492,7 @@ export default {
             sec.additionalFiles.heading
               .slots({
                 attributes: {id: 'additional-files'},
-                title:
-                  language.$('releaseInfo.additionalFiles.heading', {
-                    additionalFiles:
-                      language.countAdditionalFiles(data.numAdditionalFiles, {unit: true}),
-                  }),
+                title: language.$('releaseInfo.additionalFiles.heading'),
               }),
 
             sec.additionalFiles.list,
