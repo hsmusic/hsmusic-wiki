@@ -204,7 +204,7 @@ export default {
             }) => [
               heading.slots({
                 tag: 'h3',
-                id: directory,
+                attributes: {id: directory},
                 color,
 
                 title:

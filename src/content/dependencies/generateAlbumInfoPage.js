@@ -222,7 +222,7 @@ export default {
           sec.additionalFiles && [
             sec.additionalFiles.heading
               .slots({
-                id: 'additional-files',
+                attributes: {id: 'additional-files'},
                 title:
                   language.$('releaseInfo.additionalFiles.heading', {
                     additionalFiles:

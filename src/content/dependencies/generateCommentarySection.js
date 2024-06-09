@@ -20,8 +20,8 @@ export default {
     html.tags([
       relations.heading
         .slots({
-          id: 'artist-commentary',
-          title: language.$('misc.artistCommentary')
+          attributes: {id: 'artist-commentary'},
+          title: language.$('misc.artistCommentary'),
         }),
 
       relations.entries,

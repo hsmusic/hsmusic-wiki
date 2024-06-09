@@ -158,7 +158,7 @@ export default {
         sec.featuredTracks && [
           sec.featuredTracks.heading
             .slots({
-              id: 'features',
+              attributes: {id: 'features'},
               title:
                 language.$('releaseInfo.tracksFeatured', {
                   flash: html.tag('i', data.name),
@@ -171,7 +171,7 @@ export default {
         sec.contributors && [
           sec.contributors.heading
             .slots({
-              id: 'contributors',
+              attributes: {id: 'contributors'},
               title: language.$('releaseInfo.contributors'),
             }),
 

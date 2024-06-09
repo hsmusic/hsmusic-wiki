@@ -208,7 +208,7 @@ export default {
             sec.tracks.heading
               .slots({
                 tag: 'h2',
-                id: 'tracks',
+                attributes: {id: 'tracks'},
                 title: language.$('artistPage.trackList.title'),
               }),
 
@@ -253,7 +253,7 @@ export default {
             sec.artworks.heading
               .slots({
                 tag: 'h2',
-                id: 'art',
+                attributes: {id: 'art'},
                 title: language.$('artistPage.artList.title'),
               }),
 
@@ -282,7 +282,7 @@ export default {
             sec.flashes.heading
               .slots({
                 tag: 'h2',
-                id: 'flashes',
+                attributes: {id: 'flashes'},
                 title: language.$('artistPage.flashList.title'),
               }),
 
@@ -293,7 +293,7 @@ export default {
             sec.commentary.heading
               .slots({
                 tag: 'h2',
-                id: 'commentary',
+                attributes: {id: 'commentary'},
                 title: language.$('artistPage.commentaryList.title'),
               }),
 

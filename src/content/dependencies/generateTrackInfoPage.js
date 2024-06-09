@@ -333,7 +333,7 @@ export default {
           sec.otherReleases && [
             sec.otherReleases.heading
               .slots({
-                id: 'also-released-as',
+                attributes: {id: 'also-released-as'},
                 title: language.$('releaseInfo.alsoReleasedAs'),
               }),
 
@@ -374,7 +374,7 @@ export default {
           sec.contributors && [
             sec.contributors.heading
               .slots({
-                id: 'contributors',
+                attributes: {id: 'contributors'},
                 title: language.$('releaseInfo.contributors'),
               }),
 
@@ -384,7 +384,7 @@ export default {
           sec.references && [
             sec.references.heading
               .slots({
-                id: 'references',
+                attributes: {id: 'references'},
                 title:
                   language.$('releaseInfo.tracksReferenced', {
                     track: html.tag('i', data.name),
@@ -397,7 +397,7 @@ export default {
           sec.samples && [
             sec.samples.heading
               .slots({
-                id: 'samples',
+                attributes: {id: 'samples'},
                 title:
                   language.$('releaseInfo.tracksSampled', {
                     track: html.tag('i', data.name),
@@ -410,7 +410,7 @@ export default {
           sec.referencedBy && [
             sec.referencedBy.heading
               .slots({
-                id: 'referenced-by',
+                attributes: {id: 'referenced-by'},
                 title:
                   language.$('releaseInfo.tracksThatReference', {
                     track: html.tag('i', data.name),
@@ -423,7 +423,7 @@ export default {
           sec.sampledBy && [
             sec.sampledBy.heading
               .slots({
-                id: 'referenced-by',
+                attributes: {id: 'referenced-by'},
                 title:
                   language.$('releaseInfo.tracksThatSample', {
                     track: html.tag('i', data.name),
@@ -436,7 +436,7 @@ export default {
           sec.flashesThatFeature && [
             sec.flashesThatFeature.heading
               .slots({
-                id: 'featured-in',
+                attributes: {id: 'featured-in'},
                 title:
                   language.$('releaseInfo.flashesThatFeature', {
                     track: html.tag('i', data.name),
@@ -459,7 +459,7 @@ export default {
           sec.lyrics && [
             sec.lyrics.heading
               .slots({
-                id: 'lyrics',
+                attributes: {id: 'lyrics'},
                 title: language.$('releaseInfo.lyrics'),
               }),
 
@@ -471,7 +471,7 @@ export default {
           sec.sheetMusicFiles && [
             sec.sheetMusicFiles.heading
               .slots({
-                id: 'sheet-music-files',
+                attributes: {id: 'sheet-music-files'},
                 title: language.$('releaseInfo.sheetMusicFiles.heading'),
               }),
 
@@ -481,7 +481,7 @@ export default {
           sec.midiProjectFiles && [
             sec.midiProjectFiles.heading
               .slots({
-                id: 'midi-project-files',
+                attributes: {id: 'midi-project-files'},
                 title: language.$('releaseInfo.midiProjectFiles.heading'),
               }),
 
@@ -491,7 +491,7 @@ export default {
           sec.additionalFiles && [
             sec.additionalFiles.heading
               .slots({
-                id: 'additional-files',
+                attributes: {id: 'additional-files'},
                 title:
                   language.$('releaseInfo.additionalFiles.heading', {
                     additionalFiles:

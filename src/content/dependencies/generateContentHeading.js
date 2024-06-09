@@ -24,8 +24,10 @@ export default {
 
     color: {validate: v => v.isColor},
 
-    id: {type: 'string'},
-    tag: {type: 'string', default: 'p'},
+    tag: {
+      type: 'string',
+      default: 'p',
+    },
   },
 
   generate: (relations, slots, {html}) =>
@@ -33,9 +35,6 @@ export default {
       {tabindex: '0'},
 
       slots.attributes,
-
-      slots.id &&
-        {id: slots.id},
 
       slots.color &&
         relations.colorStyle.slot('color', slots.color),
