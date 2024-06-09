@@ -237,6 +237,10 @@ function cssProp(el, ...args) {
 }
 
 function templateContent(el) {
+  if (el === null) {
+    return null;
+  }
+
   if (el?.nodeName !== 'TEMPLATE') {
     throw new Error(`Expected a <template> element`);
   }
