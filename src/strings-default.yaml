@@ -377,9 +377,8 @@ trackList:
     withDuration: "{SECTION}: ({DURATION})"
     sticky: "{SECTION}:"
 
-  group:
-    _: "From {GROUP}:"
-    fromOther: "From somewhere else:"
+  fromGroup: "From {GROUP}:"
+  fromOther: "From somewhere else:"
 
   item:
     _: "{TRACK}"

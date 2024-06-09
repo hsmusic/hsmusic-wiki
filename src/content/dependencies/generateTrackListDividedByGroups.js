@@ -1,12 +1,24 @@
-import {empty} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 import groupTracksByGroup from '../util/groupTracksByGroup.js';
 
 export default {
-  contentDependencies: ['generateTrackList', 'linkGroup'],
+  contentDependencies: [
+    'generateContentHeading',
+    'generateTrackList',
+    'linkGroup',
+  ],
+
   extraDependencies: ['html', 'language'],
 
-  relations(relation, tracks, groups) {
+  query: (tracks, groups) => ({
+    lists:
+      (empty(groups)
+        ? []
+        : groupTracksByGroup(tracks, groups)),
+  }),
+
+  relations(relation, query, tracks, groups) {
     if (empty(tracks)) {
       return {};
     }
@@ -18,36 +30,77 @@ export default {
       };
     }
 
-    const lists = groupTracksByGroup(tracks, groups);
-
     return {
-      groupedLists:
-        Array.from(lists.entries()).map(([groupOrOther, tracks]) => ({
-          ...(groupOrOther === 'other'
-                ? {other: true}
-                : {groupLink: relation('linkGroup', groupOrOther)}),
+      contentHeading:
+        relation('generateContentHeading'),
 
-          list:
-            relation('generateTrackList', tracks),
-        })),
+      groupedLists:
+        Array.from(query.lists.entries())
+          .map(([groupOrOther, tracks]) => ({
+            ...(groupOrOther === 'other'
+                  ? {other: true}
+                  : {groupLink: relation('linkGroup', groupOrOther)}),
+
+            list:
+              relation('generateTrackList', tracks),
+          })),
     };
   },
 
-  generate(relations, {html, language}) {
+  data: (query) => ({
+    groupNames:
+      Array.from(query.lists.keys())
+        .map(groupOrOther =>
+          (groupOrOther === 'group'
+            ? null
+            : groupOrOther.name)),
+  }),
+
+  slots: {
+    headingString: {
+      type: 'string',
+    },
+  },
+
+  generate(data, relations, slots, {html, language}) {
     if (relations.flatList) {
       return relations.flatList;
     }
 
     return html.tag('dl',
-      relations.groupedLists.map(({other, groupLink, list}) => [
-        html.tag('dt',
-          (other
-            ? language.$('trackList.group.fromOther')
-            : language.$('trackList.group', {
-                group: groupLink
-              }))),
+      stitchArrays({
+        groupName: data.groupNames,
+        listEntry: relations.groupedLists
+      }).map(({
+          groupName,
+          listEntry: {other, groupLink, list},
+        }) => [
+          (slots.headingString
+            ? relations.contentHeading.clone().slots({
+                tag: 'dt',
 
-        html.tag('dd', list),
-      ]));
+                title:
+                  (other
+                    ? language.$('trackList.fromOther')
+                    : language.$('trackList.fromGroup', {
+                        group: groupLink
+                      })),
+
+                stickyTitle:
+                  (other
+                    ? language.$(slots.headingString, 'sticky', 'fromOther')
+                    : language.$(slots.headingString, 'sticky', 'fromGroup', {
+                        group: groupName,
+                      })),
+              })
+            : html.tag('dt',
+                (other
+                  ? language.$('trackList.fromOther')
+                  : language.$('trackList.fromGroup', {
+                      group: groupLink
+                    })))),
+
+          html.tag('dd', list),
+        ]));
   },
 };
