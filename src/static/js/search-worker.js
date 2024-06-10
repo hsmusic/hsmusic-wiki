@@ -409,9 +409,11 @@ function queryGenericIndex(index, query, options) {
   const interestingFields =
     unique(interestingFieldCombinations.flat());
 
-  const terms = query.split(' ');
+  const {genericTerms, queriedKind} =
+    processTerms(query);
 
-  const particles = particulate(terms);
+  const particles =
+    particulate(genericTerms);
 
   const groupedParticles =
     groupArray(particles, ({length}) => length);
@@ -475,7 +477,54 @@ function queryGenericIndex(index, query, options) {
     }
   }
 
-  return boilerplate.constitute(results);
+  const constituted =
+    boilerplate.constitute(results);
+
+  const constitutedAndFiltered =
+    constituted
+      .filter(({id}) =>
+        (queriedKind
+          ? id.split(':')[0] === queriedKind
+          : true));
+
+  return constitutedAndFiltered;
+}
+
+function processTerms(query) {
+  const kindTermSpec = [
+    {kind: 'album', terms: ['album']},
+    {kind: 'artist', terms: ['artist']},
+    {kind: 'flash', terms: ['flash']},
+    {kind: 'group', terms: ['group']},
+    {kind: 'tag', terms: ['art tag', 'tag']},
+    {kind: 'track', terms: ['track']},
+  ];
+
+  const genericTerms = [];
+  let queriedKind = null;
+
+  const termRegexp =
+    new RegExp(
+      String.raw`(?<kind>${kindTermSpec.flatMap(spec => spec.terms).join('|')})` +
+      String.raw`|\S+`,
+      'gi');
+
+  for (const match of query.matchAll(termRegexp)) {
+    const {groups} = match;
+
+    if (groups.kind && !queriedKind) {
+      queriedKind =
+        kindTermSpec
+          .find(({terms}) => terms.includes(groups.kind.toLowerCase()))
+          .kind;
+
+      continue;
+    }
+
+    genericTerms.push(match[0]);
+  }
+
+  return {genericTerms, queriedKind};
 }
 
 function particulate(terms) {
