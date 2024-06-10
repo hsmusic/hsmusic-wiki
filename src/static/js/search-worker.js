@@ -383,20 +383,6 @@ function performSearchAction({query, options}) {
 
 function queryGenericIndex(index, query, options) {
   const interestingFieldCombinations = [
-    ['kind', 'primaryName', 'parentName', 'groups'],
-    ['kind', 'primaryName', 'parentName'],
-    ['kind', 'primaryName', 'groups', 'contributors'],
-    ['kind', 'primaryName', 'groups', 'artTags'],
-    ['kind', 'primaryName', 'groups'],
-    ['kind', 'primaryName', 'contributors'],
-    ['kind', 'primaryName', 'artTags'],
-    ['kind', 'parentName', 'groups', 'artTags'],
-    ['kind', 'parentName', 'artTags'],
-    ['kind', 'groups', 'contributors'],
-    ['kind', 'groups', 'artTags'],
-    ['kind', 'groups'],
-    ['kind', 'contributors'],
-
     ['primaryName', 'parentName', 'groups'],
     ['primaryName', 'parentName'],
     ['primaryName', 'groups', 'contributors'],
