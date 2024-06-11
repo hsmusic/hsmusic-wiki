@@ -141,38 +141,18 @@ function rebase(path) {
   return `/search-data/` + path;
 }
 
-async function main() {
-  let background;
+async function prepareIndexData() {
+  return Promise.all([
+    fetch(rebase('index.json'))
+      .then(resp => resp.json()),
 
-  background =
-    Promise.all([
-      fetch(rebase('index.json'))
-        .then(resp => resp.json()),
+    loadCachedIndexFromIDB(),
+  ]).then(
+      ([indexData, idbIndexData]) =>
+        ({indexData, idbIndexData}));
+}
 
-      loadCachedIndexFromIDB(),
-    ]);
-
-  indexes =
-    withEntries(searchSpec, entries => entries
-      .map(([key, descriptor]) => [
-        key,
-        makeSearchIndex(descriptor, {FlexSearch}),
-      ]));
-
-  const [indexData, idbIndexData] = await background;
-
-  const keysNeedingFetch =
-    (idbIndexData
-      ? Object.keys(indexData)
-          .filter(key =>
-            indexData[key].md5 !==
-            idbIndexData[key]?.md5)
-      : Object.keys(indexData));
-
-  const keysFromCache =
-    Object.keys(indexData)
-      .filter(key => !keysNeedingFetch.includes(key))
-
+function fetchIndexes(keysNeedingFetch) {
   if (!empty(keysNeedingFetch)) {
     postMessage({
       kind: 'download-begun',
@@ -181,7 +161,7 @@ async function main() {
     });
   }
 
-  const fetchPromises =
+  return (
     keysNeedingFetch.map(key =>
       fetchWithProgress(
         rebase(key + '.json.msgpack'),
@@ -200,7 +180,41 @@ async function main() {
             });
 
             return response;
-          }));
+          })));
+}
+
+async function main() {
+  const prepareIndexDataPromise = prepareIndexData();
+
+  indexes =
+    withEntries(searchSpec, entries => entries
+      .map(([key, descriptor]) => [
+        key,
+        makeSearchIndex(descriptor, {FlexSearch}),
+      ]));
+
+  const {indexData, idbIndexData} = await prepareIndexDataPromise;
+
+  const keysNeedingFetch =
+    (idbIndexData
+      ? Object.keys(indexData)
+          .filter(key =>
+            indexData[key].md5 !==
+            idbIndexData[key]?.md5)
+      : Object.keys(indexData));
+
+  const keysFromCache =
+    Object.keys(indexData)
+      .filter(key => !keysNeedingFetch.includes(key))
+
+  const cacheArrayBufferPromises =
+    keysFromCache
+      .map(key => idbIndexData[key])
+      .map(({cachedBinarySource}) =>
+        cachedBinarySource.arrayBuffer());
+
+  const fetchPromises =
+    fetchIndexes(keysNeedingFetch);
 
   const fetchBlobPromises =
     fetchPromises
@@ -211,12 +225,6 @@ async function main() {
     fetchBlobPromises
       .map(promise => promise
         .then(blob => blob.arrayBuffer()));
-
-  const cacheArrayBufferPromises =
-    keysFromCache
-      .map(key => idbIndexData[key])
-      .map(({cachedBinarySource}) =>
-        cachedBinarySource.arrayBuffer());
 
   function arrayBufferToJSON(data) {
     data = new Uint8Array(data);
