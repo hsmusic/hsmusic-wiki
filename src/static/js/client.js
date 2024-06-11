@@ -3893,7 +3893,7 @@ function getSidebarSearchReferences() {
     findString('group-result-kind');
 
   info.tagResultKindString =
-    findString('art-tag-result-kind');
+    findString('tag-result-kind');
 }
 
 function addSidebarSearchInternalListeners() {
