@@ -118,12 +118,15 @@ export const searchSpec = {
       fields.primaryName =
         thing.name;
 
+      const kind =
+        thing.constructor[Symbol.for('Thing.referenceType')];
+
       fields.parentName =
-        (fields.kind === 'track'
+        (kind === 'track'
           ? thing.album.name
-       : fields.kind === 'group'
+       : kind === 'group'
           ? thing.category.name
-       : fields.kind === 'flash'
+       : kind === 'flash'
           ? thing.act.name
           : null);
 
