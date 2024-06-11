@@ -2708,7 +2708,8 @@ function updateStickySubheadingContent(index) {
     const textContainer =
       templateContent(
         closestHeading.querySelector('.content-heading-sticky-title')) ??
-      closestHeading.querySelector('.content-heading-main-title');
+      closestHeading.querySelector('.content-heading-main-title') ??
+      closestHeading;
 
     for (const child of textContainer.childNodes) {
       if (child.tagName === 'A') {
