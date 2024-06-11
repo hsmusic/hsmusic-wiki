@@ -409,6 +409,7 @@ function queryGenericIndex(index, query, options) {
     // flexsearch matching multiple field values in a single query.
     ['artTags', 'artTags'],
 
+    ['contributors', 'parentName'],
     ['contributors', 'groups'],
     ['primaryName', 'contributors'],
     ['primaryName'],
