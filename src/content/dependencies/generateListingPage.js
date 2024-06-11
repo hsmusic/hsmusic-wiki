@@ -249,7 +249,7 @@ export default {
                   .clone()
                   .slots({
                     tag: 'dt',
-                    attributes: {id},
+                    attributes: [id && {id}],
 
                     title:
                       formatListingString({
