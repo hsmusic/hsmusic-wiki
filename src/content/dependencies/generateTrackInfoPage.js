@@ -122,12 +122,8 @@ export default {
 
     // Section: Lyrics
 
-    if (track.lyrics) {
-      const lyrics = sections.lyrics = {};
-
-      lyrics.content =
-        relation('transformContent', track.lyrics);
-    }
+    relations.lyrics =
+      relation('transformContent', track.lyrics);
 
     // Sections: Sheet music files, MIDI/proejct files, additional files
 
@@ -148,10 +144,8 @@ export default {
 
     // Section: Artist commentary
 
-    if (track.commentary) {
-      sections.artistCommentary =
-        relation('generateCommentarySection', track.commentary);
-    }
+    relations.artistCommentarySection =
+      relation('generateCommentarySection', track.commentary);
 
     return relations;
   },
@@ -215,7 +209,7 @@ export default {
                     language.$('releaseInfo.additionalFiles.shortcut.link')),
                 }),
 
-              sec.artistCommentary &&
+              !html.isBlank(relations.artistCommentarySection) &&
                 language.$('releaseInfo.readCommentary', {
                   link: html.tag('a',
                     {href: '#artist-commentary'},
@@ -334,7 +328,7 @@ export default {
             relations.flashesThatFeatureList,
           ]),
 
-          sec.lyrics && [
+          html.tags([
             relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'lyrics'},
@@ -342,9 +336,9 @@ export default {
               }),
 
             html.tag('blockquote',
-              sec.lyrics.content
-                .slot('mode', 'lyrics')),
-          ],
+              {[html.onlyIfContent]: true},
+              relations.lyrics.slot('mode', 'lyrics')),
+          ]),
 
           html.tags([
             relations.contentHeading.clone()
@@ -376,7 +370,7 @@ export default {
             relations.additionalFilesList,
           ]),
 
-          sec.artistCommentary,
+          relations.artistCommentarySection,
         ],
 
         navLinkStyle: 'hierarchical',
