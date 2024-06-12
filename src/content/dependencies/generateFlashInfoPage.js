@@ -32,85 +32,52 @@ export default {
     return query;
   },
 
-  relations(relation, query, flash) {
-    const relations = {};
-    const sections = relations.sections = {};
+  relations: (relation, query, flash) => ({
+    layout:
+      relation('generatePageLayout'),
 
-    relations.layout =
-      relation('generatePageLayout');
+    sidebar:
+      relation('generateFlashActSidebar', flash.act, flash),
 
-    relations.sidebar =
-      relation('generateFlashActSidebar', flash.act, flash);
-
-    relations.externalLinks =
+    externalLinks:
       query.urls
-        .map(url => relation('linkExternal', url));
+        .map(url => relation('linkExternal', url)),
 
-    // TODO: Flashes always have cover art (#175)
-    /* eslint-disable-next-line no-constant-condition */
-    if (true) {
-      relations.cover =
-        relation('generateFlashCoverArtwork', flash);
-    }
+    cover:
+      relation('generateFlashCoverArtwork', flash),
 
-    // Section: navigation bar
+    contentHeading:
+      relation('generateContentHeading'),
 
-    const nav = sections.nav = {};
+    flashActLink:
+      relation('linkFlashAct', flash.act),
 
-    nav.flashActLink =
-      relation('linkFlashAct', flash.act);
+    flashNavAccent:
+      relation('generateFlashNavAccent', flash),
 
-    nav.flashNavAccent =
-      relation('generateFlashNavAccent', flash);
+    featuredTracksList:
+      relation('generateTrackList', flash.featuredTracks),
 
-    // Section: Featured tracks
+    contributorContributionList:
+      relation('generateContributionList', flash.contributorContribs),
 
-    if (!empty(flash.featuredTracks)) {
-      const featuredTracks = sections.featuredTracks = {};
+    artistCommentarySection:
+      relation('generateCommentarySection', flash.commentary),
+  }),
 
-      featuredTracks.heading =
-        relation('generateContentHeading');
+  data: (_query, flash) => ({
+    name:
+      flash.name,
 
-      featuredTracks.list =
-        relation('generateTrackList', flash.featuredTracks);
-    }
+    color:
+      flash.color,
 
-    // Section: Contributors
+    date:
+      flash.date,
+  }),
 
-    if (!empty(flash.contributorContribs)) {
-      const contributors = sections.contributors = {};
-
-      contributors.heading =
-        relation('generateContentHeading');
-
-      contributors.list =
-        relation('generateContributionList', flash.contributorContribs);
-    }
-
-    // Section: Artist commentary
-
-    if (flash.commentary) {
-      sections.artistCommentary =
-        relation('generateCommentarySection', flash.commentary);
-    }
-
-    return relations;
-  },
-
-  data(query, flash) {
-    const data = {};
-
-    data.name = flash.name;
-    data.color = flash.color;
-    data.date = flash.date;
-
-    return data;
-  },
-
-  generate(data, relations, {html, language}) {
-    const {sections: sec} = relations;
-
-    return relations.layout.slots({
+  generate: (data, relations, {html, language}) =>
+    relations.layout.slots({
       title:
         language.$('flashPage.title', {
           flash: data.name,
@@ -147,7 +114,7 @@ export default {
           {[html.joinChildren]: html.tag('br')},
 
           [
-            sec.artistCommentary &&
+            !html.isBlank(relations.artistCommentarySection) &&
               language.$('releaseInfo.readCommentary', {
                 link: html.tag('a',
                   {href: '#artist-commentary'},
@@ -155,8 +122,8 @@ export default {
               }),
           ]),
 
-        sec.featuredTracks && [
-          sec.featuredTracks.heading
+        html.tags([
+          relations.contentHeading.clone()
             .slots({
               attributes: {id: 'features'},
               title:
@@ -165,32 +132,31 @@ export default {
                 }),
             }),
 
-          sec.featuredTracks.list,
-        ],
+          relations.featuredTracksList,
+        ]),
 
-        sec.contributors && [
-          sec.contributors.heading
+        html.tags([
+          relations.contentHeading.clone()
             .slots({
               attributes: {id: 'contributors'},
               title: language.$('releaseInfo.contributors'),
             }),
 
-          sec.contributors.list,
-        ],
+          relations.contributorContributionList,
+        ]),
 
-        sec.artistCommentary,
+        relations.artistCommentarySection,
       ],
 
       navLinkStyle: 'hierarchical',
       navLinks: [
         {auto: 'home'},
-        {html: sec.nav.flashActLink.slot('color', false)},
+        {html: relations.flashActLink.slot('color', false)},
         {auto: 'current'},
       ],
 
-      navBottomRowContent: sec.nav.flashNavAccent,
+      navBottomRowContent: relations.flashNavAccent,
 
       leftSidebar: relations.sidebar,
-    });
-  },
+    }),
 };
