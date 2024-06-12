@@ -83,6 +83,9 @@ export default {
         relation('generateTrackCoverArtwork', track);
     }
 
+    relations.contentHeading =
+      relation('generateContentHeading');
+
     // Section: Release info
 
     relations.releaseInfo =
@@ -92,9 +95,6 @@ export default {
 
     if (!empty(track.otherReleases)) {
       const otherReleases = sections.otherReleases = {};
-
-      otherReleases.heading =
-        relation('generateContentHeading');
 
       otherReleases.colorStyles =
         track.otherReleases
@@ -131,9 +131,6 @@ export default {
     if (!empty(track.contributorContribs)) {
       const contributors = sections.contributors = {};
 
-      contributors.heading =
-        relation('generateContentHeading');
-
       contributors.list =
         relation('generateContributionList', track.contributorContribs);
     }
@@ -142,9 +139,6 @@ export default {
 
     if (!empty(track.referencedTracks)) {
       const references = sections.references = {};
-
-      references.heading =
-        relation('generateContentHeading');
 
       references.list =
         relation('generateTrackList', track.referencedTracks);
@@ -155,9 +149,6 @@ export default {
     if (!empty(track.sampledTracks)) {
       const samples = sections.samples = {};
 
-      samples.heading =
-        relation('generateContentHeading');
-
       samples.list =
         relation('generateTrackList', track.sampledTracks);
     }
@@ -166,9 +157,6 @@ export default {
 
     if (!empty(track.referencedByTracks)) {
       const referencedBy = sections.referencedBy = {};
-
-      referencedBy.heading =
-        relation('generateContentHeading');
 
       referencedBy.list =
         relation('generateTrackListDividedByGroups',
@@ -180,9 +168,6 @@ export default {
 
     if (!empty(track.sampledByTracks)) {
       const sampledBy = sections.sampledBy = {};
-
-      sampledBy.heading =
-        relation('generateContentHeading');
 
       sampledBy.list =
         relation('generateTrackListDividedByGroups',
@@ -209,9 +194,6 @@ export default {
       if (!empty(sortedFeatures)) {
         const flashesThatFeature = sections.flashesThatFeature = {};
 
-        flashesThatFeature.heading =
-          relation('generateContentHeading');
-
         flashesThatFeature.entries =
           sortedFeatures.map(({flash, track: directlyFeaturedTrack}) =>
             (directlyFeaturedTrack === track
@@ -229,9 +211,6 @@ export default {
 
     if (track.lyrics) {
       const lyrics = sections.lyrics = {};
-
-      lyrics.heading =
-        relation('generateContentHeading');
 
       lyrics.content =
         relation('transformContent', track.lyrics);
@@ -331,7 +310,7 @@ export default {
             ]),
 
           sec.otherReleases && [
-            sec.otherReleases.heading
+            relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'also-released-as'},
                 title: language.$('releaseInfo.alsoReleasedAs'),
@@ -372,7 +351,7 @@ export default {
           ],
 
           sec.contributors && [
-            sec.contributors.heading
+            relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'contributors'},
                 title: language.$('releaseInfo.contributors'),
@@ -382,7 +361,7 @@ export default {
           ],
 
           sec.references && [
-            sec.references.heading
+            relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'references'},
 
@@ -399,7 +378,7 @@ export default {
           ],
 
           sec.samples && [
-            sec.samples.heading
+            relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'samples'},
 
@@ -416,7 +395,7 @@ export default {
           ],
 
           sec.referencedBy && [
-            sec.referencedBy.heading
+            relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'referenced-by'},
 
@@ -436,7 +415,7 @@ export default {
           ],
 
           sec.sampledBy && [
-            sec.sampledBy.heading
+            relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'referenced-by'},
 
@@ -456,7 +435,7 @@ export default {
           ],
 
           sec.flashesThatFeature && [
-            sec.flashesThatFeature.heading
+            relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'featured-in'},
 
@@ -483,7 +462,7 @@ export default {
           ],
 
           sec.lyrics && [
-            sec.lyrics.heading
+            relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'lyrics'},
                 title: language.$('releaseInfo.lyrics'),
@@ -495,7 +474,7 @@ export default {
           ],
 
           sec.sheetMusicFiles && [
-            sec.sheetMusicFiles.heading
+            relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'sheet-music-files'},
                 title: language.$('releaseInfo.sheetMusicFiles.heading'),
@@ -505,7 +484,7 @@ export default {
           ],
 
           sec.midiProjectFiles && [
-            sec.midiProjectFiles.heading
+            relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'midi-project-files'},
                 title: language.$('releaseInfo.midiProjectFiles.heading'),
@@ -515,7 +494,7 @@ export default {
           ],
 
           sec.additionalFiles && [
-            sec.additionalFiles.heading
+            relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'additional-files'},
                 title: language.$('releaseInfo.additionalFiles.heading'),
