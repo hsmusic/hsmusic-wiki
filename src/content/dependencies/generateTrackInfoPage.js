@@ -49,7 +49,7 @@ export default {
     albumNavAccent:
       relation('generateAlbumNavAccent', track.album, track),
 
-    trackChronologyLinks:
+    chronologyLinks:
       relation('generateTrackChronologyLinks', track),
 
     secondaryNav:
@@ -369,7 +369,7 @@ export default {
         }),
 
       navContent:
-        relations.trackChronologyLinks,
+        relations.chronologyLinks,
 
       secondaryNav:
         relations.secondaryNav

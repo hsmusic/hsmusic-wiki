@@ -1,7 +1,4 @@
-import {sortAlbumsTracksChronologically} from '#sort';
 import {empty} from '#sugar';
-
-import getChronologyRelations from '../util/getChronologyRelations.js';
 
 export default {
   contentDependencies: [
@@ -15,14 +12,13 @@ export default {
     'generateAlbumSocialEmbed',
     'generateAlbumStyleRules',
     'generateAlbumTrackList',
-    'generateChronologyLinks',
+    'generateAlbumChronologyLinks',
     'generateCommentarySection',
     'generateContentHeading',
     'generatePageLayout',
     'linkAlbum',
     'linkAlbumCommentary',
     'linkAlbumGallery',
-    'linkArtist',
     'linkTrack',
     'transformContent',
   ],
@@ -42,37 +38,11 @@ export default {
     relations.socialEmbed =
       relation('generateAlbumSocialEmbed', album);
 
-    relations.coverArtistChronologyContributions =
-      getChronologyRelations(album, {
-        contributions: album.coverArtistContribs ?? [],
-
-        linkArtist: artist => relation('linkArtist', artist),
-
-        linkThing: trackOrAlbum =>
-          (trackOrAlbum.album
-            ? relation('linkTrack', trackOrAlbum)
-            : relation('linkAlbum', trackOrAlbum)),
-
-        getThings(artist) {
-          const getDate = thing => thing.coverArtDate ?? thing.date;
-
-          const things =
-            ([
-              artist.albumCoverArtistContributions,
-              artist.trackCoverArtistContributions,
-            ]).flat()
-              .map(({thing}) => thing)
-              .filter(getDate);
-
-          return sortAlbumsTracksChronologically(things, {getDate});
-        },
-      });
-
     relations.albumNavAccent =
       relation('generateAlbumNavAccent', album, null);
 
     relations.chronologyLinks =
-      relation('generateChronologyLinks');
+      relation('generateAlbumChronologyLinks', album);
 
     relations.secondaryNav =
       relation('generateAlbumSecondaryNav', album);
@@ -249,14 +219,7 @@ export default {
         ],
 
         navContent:
-          relations.chronologyLinks.slots({
-            chronologyInfoSets: [
-              {
-                headingString: 'misc.chronology.heading.coverArt',
-                contributions: relations.coverArtistChronologyContributions,
-              },
-            ],
-          }),
+          relations.chronologyLinks,
 
         banner: relations.banner ?? null,
         bannerPosition: 'top',
