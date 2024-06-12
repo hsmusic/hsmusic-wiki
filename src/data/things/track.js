@@ -244,6 +244,36 @@ export class Track extends Thing {
       }),
     ],
 
+    writingContributions: [
+      inheritContributionListFromOriginalRelease(),
+
+      withDate(),
+
+      contributionList({
+        date: '#date',
+      }),
+    ],
+
+    performingContributions: [
+      inheritContributionListFromOriginalRelease(),
+
+      withDate(),
+
+      contributionList({
+        date: '#date',
+      }),
+    ],
+
+    engineeringContributions: [
+      inheritContributionListFromOriginalRelease(),
+
+      withDate(),
+
+      contributionList({
+        date: '#date',
+      }),
+    ],
+
     // Cover artists aren't inherited from the original release, since it
     // typically varies by release and isn't defined by the musical qualities
     // of the track.
@@ -496,6 +526,21 @@ export class Track extends Thing {
 
       'Contributors': {
         property: 'contributorContribs',
+        transform: parseContributors,
+      },
+
+      'Writing Contributors': {
+        property: 'writingContributions',
+        transform: parseContributors,
+      },
+
+      'Performing Contributors': {
+        property: 'performingContributions',
+        transform: parseContributors,
+      },
+
+      'Engineering Contributors': {
+        property: 'engineeringContributions',
         transform: parseContributors,
       },
 
