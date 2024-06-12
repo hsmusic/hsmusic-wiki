@@ -1,3 +1,5 @@
+import {empty} from '#sugar';
+
 export default {
   contentDependencies: [
     'transformContent',
@@ -12,15 +14,17 @@ export default {
       relation('generateContentHeading'),
 
     entries:
-      entries.map(entry =>
-        relation('generateCommentaryEntry', entry)),
+      (entries
+        ? entries.map(entry =>
+            relation('generateCommentaryEntry', entry))
+        : []),
   }),
 
   data: (entries) => ({
     firstEntryIsDated:
-      (entries[0]
-        ? !!entries[0].date
-        : null),
+      (empty(entries)
+        ? null
+        : !!entries[0].date),
   }),
 
   generate: (data, relations, {html, language}) =>
