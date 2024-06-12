@@ -2,6 +2,7 @@ import {input} from '#composite';
 
 import {exposeDependency, exitWithoutDependency}
   from '#composite/control-flow';
+import {withFilteredList, withMappedList} from '#composite/data';
 import {withThingsSortedChronologically} from '#composite/wiki-data';
 
 export default {
@@ -22,8 +23,22 @@ export default {
       value: input.value([]),
     }),
 
+    withMappedList({
+      list: 'albumData',
+      map: input.value(album => !!album.date),
+    }).outputs({
+      '#mappedList': '#dateFilter',
+    }),
+
+    withFilteredList({
+      list: 'albumData',
+      filter: '#dateFilter',
+    }).outputs({
+      '#filteredList': '#datedAlbums',
+    }),
+
     withThingsSortedChronologically({
-      things: 'albumData',
+      things: '#datedAlbums',
     }),
 
     exposeDependency({
