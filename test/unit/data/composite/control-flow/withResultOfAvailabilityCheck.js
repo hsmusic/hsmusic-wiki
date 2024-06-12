@@ -177,10 +177,11 @@ t.test(`withResultOfAvailabilityCheck: validate dynamic inputs`, t => {
       mode: 'banana',
     }),
     {message: `Error computing composition`, cause:
-      {message: `Error computing composition withResultOfAvailabilityCheck`, cause:
-        {message: `Errors in input values provided to withResultOfAvailabilityCheck`, errors: [
-          {message: `mode: Expected one of null empty falsy index, got banana`},
-        ]}}});
+      {message: `Error in step 1 of 2, withResultOfAvailabilityCheck`, cause:
+        {message: `Error computing composition withResultOfAvailabilityCheck`, cause:
+          {message: `Errors in input values provided to withResultOfAvailabilityCheck`, errors: [
+            {message: `mode: Expected one of null empty falsy index, got banana`},
+          ]}}}});
 
   t.throws(
     () => composite.expose.compute({
@@ -188,8 +189,9 @@ t.test(`withResultOfAvailabilityCheck: validate dynamic inputs`, t => {
       mode: null,
     }),
     {message: `Error computing composition`, cause:
-      {message: `Error computing composition withResultOfAvailabilityCheck`, cause:
-        {message: `Errors in input values provided to withResultOfAvailabilityCheck`, errors: [
-          {message: `mode: Expected a value, got null`},
-        ]}}});
+      {message: `Error in step 1 of 2, withResultOfAvailabilityCheck`, cause:
+        {message: `Error computing composition withResultOfAvailabilityCheck`, cause:
+          {message: `Errors in input values provided to withResultOfAvailabilityCheck`, errors: [
+            {message: `mode: Expected a value, got null`},
+          ]}}}});
 });
