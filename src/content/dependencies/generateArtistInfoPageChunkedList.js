@@ -13,11 +13,8 @@ export default {
     },
   },
 
-  generate(slots, {html}) {
-    return (
-      html.tag('dl', [
-        slots.groupInfo,
-        slots.chunks,
-      ]));
-  },
+  generate: (slots, {html}) =>
+    html.tag('dl',
+      {[html.onlyIfContent]: true},
+      [slots.groupInfo, slots.chunks]),
 };
