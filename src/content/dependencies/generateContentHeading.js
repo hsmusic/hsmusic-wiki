@@ -38,6 +38,7 @@ export default {
   generate: (relations, slots, {html}) =>
     html.tag(slots.tag, {class: 'content-heading'},
       {tabindex: '0'},
+      {[html.onlyIfSiblings]: true},
 
       slots.attributes,
 
