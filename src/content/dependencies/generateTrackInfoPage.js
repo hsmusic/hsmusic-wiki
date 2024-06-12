@@ -1,5 +1,3 @@
-import {empty} from '#sugar';
-
 export default {
   contentDependencies: [
     'generateAlbumAdditionalFilesList',
@@ -32,382 +30,355 @@ export default {
       wikiInfo.divideTrackListsByGroups,
   }),
 
-  relations(relation, sprawl, track) {
-    const relations = {};
-    const sections = relations.sections = {};
-    const {album} = track;
+  relations: (relation, sprawl, track) => ({
+    layout:
+      relation('generatePageLayout'),
 
-    relations.layout =
-      relation('generatePageLayout');
+    albumStyleRules:
+      relation('generateAlbumStyleRules', track.album, track),
 
-    relations.albumStyleRules =
-      relation('generateAlbumStyleRules', track.album, track);
+    socialEmbed:
+      relation('generateTrackSocialEmbed', track),
 
-    relations.socialEmbed =
-      relation('generateTrackSocialEmbed', track);
+    albumLink:
+      relation('linkAlbum', track.album),
 
-    relations.albumLink =
-      relation('linkAlbum', track.album);
+    trackLink:
+      relation('linkTrack', track),
 
-    relations.trackLink =
-      relation('linkTrack', track);
+    albumNavAccent:
+      relation('generateAlbumNavAccent', track.album, track),
 
-    relations.albumNavAccent =
-      relation('generateAlbumNavAccent', track.album, track);
+    trackChronologyLinks:
+      relation('generateTrackChronologyLinks', track),
 
-    relations.trackChronologyLinks =
-      relation('generateTrackChronologyLinks', track);
+    secondaryNav:
+      relation('generateAlbumSecondaryNav', track.album),
 
-    relations.secondaryNav =
-      relation('generateAlbumSecondaryNav', track.album);
+    sidebar:
+      relation('generateAlbumSidebar', track.album, track),
 
-    relations.sidebar =
-      relation('generateAlbumSidebar', track.album, track);
+    additionalNamesBox:
+      relation('generateTrackAdditionalNamesBox', track),
 
-    // This'll take care of itself being blank if there's nothing to show here.
-    relations.additionalNamesBox =
-      relation('generateTrackAdditionalNamesBox', track);
+    cover:
+      (track.hasUniqueCoverArt || track.album.hasCoverArt
+        ? relation('generateTrackCoverArtwork', track)
+        : null),
 
-    if (track.hasUniqueCoverArt || album.hasCoverArt) {
-      relations.cover =
-        relation('generateTrackCoverArtwork', track);
-    }
+    contentHeading:
+      relation('generateContentHeading'),
 
-    relations.contentHeading =
-      relation('generateContentHeading');
+    releaseInfo:
+      relation('generateTrackReleaseInfo', track),
 
-    // Section: Release info
+    otherReleasesList:
+        relation('generateTrackInfoPageOtherReleasesList', track),
 
-    relations.releaseInfo =
-      relation('generateTrackReleaseInfo', track);
+    contributorContributionList:
+      relation('generateContributionList', track.contributorContribs),
 
-    // Section: Other releases
+    referencedTracksList:
+      relation('generateTrackList', track.referencedTracks),
 
-    relations.otherReleasesList =
-        relation('generateTrackInfoPageOtherReleasesList', track);
+    sampledTracksList:
+      relation('generateTrackList', track.sampledTracks),
 
-    // Section: Contributors
-
-    relations.contributorContributionList =
-      relation('generateContributionList', track.contributorContribs);
-
-    relations.referencedTracksList =
-      relation('generateTrackList', track.referencedTracks);
-
-    // Section: Sampled tracks
-
-    relations.sampledTracksList =
-      relation('generateTrackList', track.sampledTracks);
-
-    // Section: Tracks that reference
-
-    relations.referencedByTracksList =
+    referencedByTracksList:
       relation('generateTrackListDividedByGroups',
         track.referencedByTracks,
-        sprawl.divideTrackListsByGroups);
+        sprawl.divideTrackListsByGroups),
 
-    // Section: Tracks that sample
-
-    relations.sampledByTracksList =
+    sampledByTracksList:
       relation('generateTrackListDividedByGroups',
         track.sampledByTracks,
-        sprawl.divideTrackListsByGroups);
+        sprawl.divideTrackListsByGroups),
 
-    // Section: Flashes that feature
+    flashesThatFeatureList:
+      relation('generateTrackInfoPageFeaturedByFlashesList', track),
 
-    relations.flashesThatFeatureList =
-      relation('generateTrackInfoPageFeaturedByFlashesList', track);
+    lyrics:
+      relation('transformContent', track.lyrics),
 
-    // Section: Lyrics
-
-    relations.lyrics =
-      relation('transformContent', track.lyrics);
-
-    // Sections: Sheet music files, MIDI/proejct files, additional files
-
-    relations.sheetMusicFilesList =
+    sheetMusicFilesList:
       relation('generateAlbumAdditionalFilesList',
-        album,
-        track.sheetMusicFiles);
+        track.album,
+        track.sheetMusicFiles),
 
-    relations.midiProjectFilesList =
+    midiProjectFilesList:
       relation('generateAlbumAdditionalFilesList',
-        album,
-        track.midiProjectFiles);
+        track.album,
+        track.midiProjectFiles),
 
-    relations.additionalFilesList =
+    additionalFilesList:
       relation('generateAlbumAdditionalFilesList',
-        album,
-        track.additionalFiles);
+        track.album,
+        track.additionalFiles),
 
-    // Section: Artist commentary
+    artistCommentarySection:
+      relation('generateCommentarySection', track.commentary),
+  }),
 
-    relations.artistCommentarySection =
-      relation('generateCommentarySection', track.commentary);
+  data: (sprawl, track) => ({
+    name:
+      track.name,
 
-    return relations;
-  },
+    color:
+      track.color,
 
-  data(sprawl, track) {
-    return {
-      name: track.name,
-      color: track.color,
+    hasTrackNumbers:
+      track.album.hasTrackNumbers,
 
-      hasTrackNumbers: track.album.hasTrackNumbers,
-      trackNumber: track.album.tracks.indexOf(track) + 1,
-    };
-  },
+    trackNumber:
+      track.album.tracks.indexOf(track) + 1,
+  }),
 
-  generate(data, relations, {html, language}) {
-    const {sections: sec} = relations;
+  generate: (data, relations, {html, language}) =>
+    relations.layout.slots({
+      title: language.$('trackPage.title', {track: data.name}),
+      headingMode: 'sticky',
 
-    return relations.layout
-      .slots({
-        title: language.$('trackPage.title', {track: data.name}),
-        headingMode: 'sticky',
+      additionalNames: relations.additionalNamesBox,
 
-        additionalNames: relations.additionalNamesBox,
+      color: data.color,
+      styleRules: [relations.albumStyleRules],
 
-        color: data.color,
-        styleRules: [relations.albumStyleRules],
+      cover:
+        (relations.cover
+          ? relations.cover.slots({
+              alt: language.$('misc.alt.trackCover'),
+            })
+          : null),
 
-        cover:
-          (relations.cover
-            ? relations.cover.slots({
-                alt: language.$('misc.alt.trackCover'),
-              })
-            : null),
+      mainContent: [
+        relations.releaseInfo,
 
-        mainContent: [
-          relations.releaseInfo,
+        html.tag('p',
+          {[html.onlyIfContent]: true},
+          {[html.joinChildren]: html.tag('br')},
 
-          html.tag('p',
+          [
+            !html.isBlank(relations.sheetMusicFilesList) &&
+              language.$('releaseInfo.sheetMusicFiles.shortcut', {
+                link: html.tag('a',
+                  {href: '#sheet-music-files'},
+                  language.$('releaseInfo.sheetMusicFiles.shortcut.link')),
+              }),
+
+            !html.isBlank(relations.midiProjectFilesList) &&
+              language.$('releaseInfo.midiProjectFiles.shortcut', {
+                link: html.tag('a',
+                  {href: '#midi-project-files'},
+                  language.$('releaseInfo.midiProjectFiles.shortcut.link')),
+              }),
+
+            !html.isBlank(relations.additionalFilesList) &&
+              language.$('releaseInfo.additionalFiles.shortcut', {
+                link: html.tag('a',
+                  {href: '#midi-project-files'},
+                  language.$('releaseInfo.additionalFiles.shortcut.link')),
+              }),
+
+            !html.isBlank(relations.artistCommentarySection) &&
+              language.$('releaseInfo.readCommentary', {
+                link: html.tag('a',
+                  {href: '#artist-commentary'},
+                  language.$('releaseInfo.readCommentary.link')),
+              }),
+          ]),
+
+        html.tags([
+          relations.contentHeading.clone()
+            .slots({
+              attributes: {id: 'also-released-as'},
+              title: language.$('releaseInfo.alsoReleasedAs'),
+            }),
+
+          relations.otherReleasesList,
+        ]),
+
+        html.tags([
+          relations.contentHeading.clone()
+            .slots({
+              attributes: {id: 'contributors'},
+              title: language.$('releaseInfo.contributors'),
+            }),
+
+          relations.contributorContributionList,
+        ]),
+
+        html.tags([
+          relations.contentHeading.clone()
+            .slots({
+              attributes: {id: 'references'},
+
+              title:
+                language.$('releaseInfo.tracksReferenced', {
+                  track: html.tag('i', data.name),
+                }),
+
+              stickyTitle:
+                language.$('releaseInfo.tracksReferenced.sticky'),
+            }),
+
+          relations.referencedTracksList,
+        ]),
+
+        html.tags([
+          relations.contentHeading.clone()
+            .slots({
+              attributes: {id: 'samples'},
+
+              title:
+                language.$('releaseInfo.tracksSampled', {
+                  track: html.tag('i', data.name),
+                }),
+
+              stickyTitle:
+                language.$('releaseInfo.tracksSampled.sticky'),
+            }),
+
+          relations.sampledTracksList,
+        ]),
+
+        html.tags([
+          relations.contentHeading.clone()
+            .slots({
+              attributes: {id: 'referenced-by'},
+
+              title:
+                language.$('releaseInfo.tracksThatReference', {
+                  track: html.tag('i', data.name),
+                }),
+
+              stickyTitle:
+                language.$('releaseInfo.tracksThatReference.sticky'),
+            }),
+
+          relations.referencedByTracksList
+            .slots({
+              headingString: 'releaseInfo.tracksThatReference',
+            }),
+        ]),
+
+        html.tags([
+          relations.contentHeading.clone()
+            .slots({
+              attributes: {id: 'sampled-by'},
+
+              title:
+                language.$('releaseInfo.tracksThatSample', {
+                  track: html.tag('i', data.name),
+                }),
+
+              stickyTitle:
+                language.$('releaseInfo.tracksThatSample.sticky'),
+            }),
+
+          relations.sampledByTracksList
+            .slots({
+              headingString: 'releaseInfo.tracksThatSample',
+            }),
+        ]),
+
+        html.tags([
+          relations.contentHeading.clone()
+            .slots({
+              attributes: {id: 'featured-in'},
+
+              title:
+                language.$('releaseInfo.flashesThatFeature', {
+                  track: html.tag('i', data.name),
+                }),
+
+              stickyTitle:
+                language.$('releaseInfo.flashesThatFeature.sticky'),
+            }),
+
+          relations.flashesThatFeatureList,
+        ]),
+
+        html.tags([
+          relations.contentHeading.clone()
+            .slots({
+              attributes: {id: 'lyrics'},
+              title: language.$('releaseInfo.lyrics'),
+            }),
+
+          html.tag('blockquote',
             {[html.onlyIfContent]: true},
-            {[html.joinChildren]: html.tag('br')},
+            relations.lyrics.slot('mode', 'lyrics')),
+        ]),
 
-            [
-              !html.isBlank(relations.sheetMusicFilesList) &&
-                language.$('releaseInfo.sheetMusicFiles.shortcut', {
-                  link: html.tag('a',
-                    {href: '#sheet-music-files'},
-                    language.$('releaseInfo.sheetMusicFiles.shortcut.link')),
-                }),
+        html.tags([
+          relations.contentHeading.clone()
+            .slots({
+              attributes: {id: 'sheet-music-files'},
+              title: language.$('releaseInfo.sheetMusicFiles.heading'),
+            }),
 
-              !html.isBlank(relations.midiProjectFilesList) &&
-                language.$('releaseInfo.midiProjectFiles.shortcut', {
-                  link: html.tag('a',
-                    {href: '#midi-project-files'},
-                    language.$('releaseInfo.midiProjectFiles.shortcut.link')),
-                }),
+          relations.sheetMusicFilesList,
+        ]),
 
-              !html.isBlank(relations.additionalFilesList) &&
-                language.$('releaseInfo.additionalFiles.shortcut', {
-                  link: html.tag('a',
-                    {href: '#midi-project-files'},
-                    language.$('releaseInfo.additionalFiles.shortcut.link')),
-                }),
+        html.tags([
+          relations.contentHeading.clone()
+            .slots({
+              attributes: {id: 'midi-project-files'},
+              title: language.$('releaseInfo.midiProjectFiles.heading'),
+            }),
 
-              !html.isBlank(relations.artistCommentarySection) &&
-                language.$('releaseInfo.readCommentary', {
-                  link: html.tag('a',
-                    {href: '#artist-commentary'},
-                    language.$('releaseInfo.readCommentary.link')),
-                }),
-            ]),
+          relations.midiProjectFilesList,
+        ]),
 
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'also-released-as'},
-                title: language.$('releaseInfo.alsoReleasedAs'),
-              }),
+        html.tags([
+          relations.contentHeading.clone()
+            .slots({
+              attributes: {id: 'additional-files'},
+              title: language.$('releaseInfo.additionalFiles.heading'),
+            }),
 
-            relations.otherReleasesList,
-          ]),
+          relations.additionalFilesList,
+        ]),
 
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'contributors'},
-                title: language.$('releaseInfo.contributors'),
-              }),
+        relations.artistCommentarySection,
+      ],
 
-            relations.contributorContributionList,
-          ]),
+      navLinkStyle: 'hierarchical',
+      navLinks: [
+        {auto: 'home'},
+        {html: relations.albumLink.slot('color', false)},
+        {
+          html:
+            (data.hasTrackNumbers
+              ? language.$('trackPage.nav.track.withNumber', {
+                  number: data.trackNumber,
+                  track: relations.trackLink
+                    .slot('attributes', {class: 'current'}),
+                })
+              : language.$('trackPage.nav.track', {
+                  track: relations.trackLink
+                    .slot('attributes', {class: 'current'}),
+                })),
+        },
+      ],
 
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'references'},
+      navBottomRowContent:
+        relations.albumNavAccent.slots({
+          showTrackNavigation: true,
+          showExtraLinks: false,
+        }),
 
-                title:
-                  language.$('releaseInfo.tracksReferenced', {
-                    track: html.tag('i', data.name),
-                  }),
+      navContent:
+        relations.trackChronologyLinks,
 
-                stickyTitle:
-                  language.$('releaseInfo.tracksReferenced.sticky'),
-              }),
+      secondaryNav:
+        relations.secondaryNav
+          .slot('mode', 'track'),
 
-            relations.referencedTracksList,
-          ]),
+      leftSidebar: relations.sidebar,
 
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'samples'},
-
-                title:
-                  language.$('releaseInfo.tracksSampled', {
-                    track: html.tag('i', data.name),
-                  }),
-
-                stickyTitle:
-                  language.$('releaseInfo.tracksSampled.sticky'),
-              }),
-
-            relations.sampledTracksList,
-          ]),
-
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'referenced-by'},
-
-                title:
-                  language.$('releaseInfo.tracksThatReference', {
-                    track: html.tag('i', data.name),
-                  }),
-
-                stickyTitle:
-                  language.$('releaseInfo.tracksThatReference.sticky'),
-              }),
-
-            relations.referencedByTracksList
-              .slots({
-                headingString: 'releaseInfo.tracksThatReference',
-              }),
-          ]),
-
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'sampled-by'},
-
-                title:
-                  language.$('releaseInfo.tracksThatSample', {
-                    track: html.tag('i', data.name),
-                  }),
-
-                stickyTitle:
-                  language.$('releaseInfo.tracksThatSample.sticky'),
-              }),
-
-            relations.sampledByTracksList
-              .slots({
-                headingString: 'releaseInfo.tracksThatSample',
-              }),
-          ]),
-
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'featured-in'},
-
-                title:
-                  language.$('releaseInfo.flashesThatFeature', {
-                    track: html.tag('i', data.name),
-                  }),
-
-                stickyTitle:
-                  language.$('releaseInfo.flashesThatFeature.sticky'),
-              }),
-
-            relations.flashesThatFeatureList,
-          ]),
-
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'lyrics'},
-                title: language.$('releaseInfo.lyrics'),
-              }),
-
-            html.tag('blockquote',
-              {[html.onlyIfContent]: true},
-              relations.lyrics.slot('mode', 'lyrics')),
-          ]),
-
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'sheet-music-files'},
-                title: language.$('releaseInfo.sheetMusicFiles.heading'),
-              }),
-
-            relations.sheetMusicFilesList,
-          ]),
-
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'midi-project-files'},
-                title: language.$('releaseInfo.midiProjectFiles.heading'),
-              }),
-
-            relations.midiProjectFilesList,
-          ]),
-
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'additional-files'},
-                title: language.$('releaseInfo.additionalFiles.heading'),
-              }),
-
-            relations.additionalFilesList,
-          ]),
-
-          relations.artistCommentarySection,
-        ],
-
-        navLinkStyle: 'hierarchical',
-        navLinks: [
-          {auto: 'home'},
-          {html: relations.albumLink.slot('color', false)},
-          {
-            html:
-              (data.hasTrackNumbers
-                ? language.$('trackPage.nav.track.withNumber', {
-                    number: data.trackNumber,
-                    track: relations.trackLink
-                      .slot('attributes', {class: 'current'}),
-                  })
-                : language.$('trackPage.nav.track', {
-                    track: relations.trackLink
-                      .slot('attributes', {class: 'current'}),
-                  })),
-          },
-        ],
-
-        navBottomRowContent:
-          relations.albumNavAccent.slots({
-            showTrackNavigation: true,
-            showExtraLinks: false,
-          }),
-
-        navContent:
-          relations.trackChronologyLinks,
-
-        secondaryNav:
-          relations.secondaryNav
-            .slot('mode', 'track'),
-
-        leftSidebar: relations.sidebar,
-
-        socialEmbed: relations.socialEmbed,
-      });
-  },
+      socialEmbed: relations.socialEmbed,
+    }),
 };
 
 /*
