@@ -93,14 +93,8 @@ export default {
 
     // Section: Contributors
 
-    if (!empty(track.contributorContribs)) {
-      const contributors = sections.contributors = {};
-
-      contributors.list =
-        relation('generateContributionList', track.contributorContribs);
-    }
-
-    // Section: Referenced tracks
+    relations.contributorContributionList =
+      relation('generateContributionList', track.contributorContribs);
 
     relations.referencedTracksList =
       relation('generateTrackList', track.referencedTracks);
@@ -269,15 +263,15 @@ export default {
             relations.otherReleasesList,
           ]),
 
-          sec.contributors && [
+          html.tags([
             relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'contributors'},
                 title: language.$('releaseInfo.contributors'),
               }),
 
-            sec.contributors.list,
-          ],
+            relations.contributorContributionList,
+          ]),
 
           html.tags([
             relations.contentHeading.clone()
