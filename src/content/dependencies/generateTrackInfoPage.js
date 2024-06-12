@@ -67,11 +67,6 @@ export default {
     relations.sidebar =
       relation('generateAlbumSidebar', track.album, track);
 
-    const additionalFilesSection = additionalFiles => ({
-      heading: relation('generateContentHeading'),
-      list: relation('generateAlbumAdditionalFilesList', album, additionalFiles),
-    });
-
     // This'll take care of itself being blank if there's nothing to show here.
     relations.additionalNamesBox =
       relation('generateTrackAdditionalNamesBox', track);
@@ -180,17 +175,20 @@ export default {
 
     // Sections: Sheet music files, MIDI/proejct files, additional files
 
-    if (!empty(track.sheetMusicFiles)) {
-      sections.sheetMusicFiles = additionalFilesSection(track.sheetMusicFiles);
-    }
+    relations.sheetMusicFilesList =
+      relation('generateAlbumAdditionalFilesList',
+        album,
+        track.sheetMusicFiles);
 
-    if (!empty(track.midiProjectFiles)) {
-      sections.midiProjectFiles = additionalFilesSection(track.midiProjectFiles);
-    }
+    relations.midiProjectFilesList =
+      relation('generateAlbumAdditionalFilesList',
+        album,
+        track.midiProjectFiles);
 
-    if (!empty(track.additionalFiles)) {
-      sections.additionalFiles = additionalFilesSection(track.additionalFiles);
-    }
+    relations.additionalFilesList =
+      relation('generateAlbumAdditionalFilesList',
+        album,
+        track.additionalFiles);
 
     // Section: Artist commentary
 
@@ -209,8 +207,6 @@ export default {
 
       hasTrackNumbers: track.album.hasTrackNumbers,
       trackNumber: track.album.tracks.indexOf(track) + 1,
-
-      numAdditionalFiles: track.additionalFiles.length,
     };
   },
 
@@ -242,21 +238,21 @@ export default {
             {[html.joinChildren]: html.tag('br')},
 
             [
-              sec.sheetMusicFiles &&
+              !html.isBlank(relations.sheetMusicFilesList) &&
                 language.$('releaseInfo.sheetMusicFiles.shortcut', {
                   link: html.tag('a',
                     {href: '#sheet-music-files'},
                     language.$('releaseInfo.sheetMusicFiles.shortcut.link')),
                 }),
 
-              sec.midiProjectFiles &&
+              !html.isBlank(relations.midiProjectFilesList) &&
                 language.$('releaseInfo.midiProjectFiles.shortcut', {
                   link: html.tag('a',
                     {href: '#midi-project-files'},
                     language.$('releaseInfo.midiProjectFiles.shortcut.link')),
                 }),
 
-              sec.additionalFiles &&
+              !html.isBlank(relations.additionalFilesList) &&
                 language.$('releaseInfo.additionalFiles.shortcut', {
                   link: html.tag('a',
                     {href: '#midi-project-files'},
@@ -404,35 +400,35 @@ export default {
                 .slot('mode', 'lyrics')),
           ],
 
-          sec.sheetMusicFiles && [
+          html.tags([
             relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'sheet-music-files'},
                 title: language.$('releaseInfo.sheetMusicFiles.heading'),
               }),
 
-            sec.sheetMusicFiles.list,
-          ],
+            relations.sheetMusicFilesList,
+          ]),
 
-          sec.midiProjectFiles && [
+          html.tags([
             relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'midi-project-files'},
                 title: language.$('releaseInfo.midiProjectFiles.heading'),
               }),
 
-            sec.midiProjectFiles.list,
-          ],
+            relations.midiProjectFilesList,
+          ]),
 
-          sec.additionalFiles && [
+          html.tags([
             relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'additional-files'},
                 title: language.$('releaseInfo.additionalFiles.heading'),
               }),
 
-            sec.additionalFiles.list,
-          ],
+            relations.additionalFilesList,
+          ]),
 
           sec.artistCommentary,
         ],
