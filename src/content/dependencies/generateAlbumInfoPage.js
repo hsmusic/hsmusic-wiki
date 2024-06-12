@@ -1,5 +1,3 @@
-import {empty} from '#sugar';
-
 export default {
   contentDependencies: [
     'generateAlbumAdditionalFilesList',
@@ -16,219 +14,187 @@ export default {
     'generateCommentarySection',
     'generateContentHeading',
     'generatePageLayout',
-    'linkAlbum',
     'linkAlbumCommentary',
     'linkAlbumGallery',
-    'linkTrack',
-    'transformContent',
   ],
 
   extraDependencies: ['html', 'language'],
 
-  relations(relation, album) {
-    const relations = {};
-    const sections = relations.sections = {};
+  relations: (relation, album) => ({
+    layout:
+      relation('generatePageLayout'),
 
-    relations.layout =
-      relation('generatePageLayout');
+    albumStyleRules:
+      relation('generateAlbumStyleRules', album, null),
 
-    relations.albumStyleRules =
-      relation('generateAlbumStyleRules', album, null);
+    socialEmbed:
+      relation('generateAlbumSocialEmbed', album),
 
-    relations.socialEmbed =
-      relation('generateAlbumSocialEmbed', album);
+    albumNavAccent:
+      relation('generateAlbumNavAccent', album, null),
 
-    relations.albumNavAccent =
-      relation('generateAlbumNavAccent', album, null);
+    chronologyLinks:
+      relation('generateAlbumChronologyLinks', album),
 
-    relations.chronologyLinks =
-      relation('generateAlbumChronologyLinks', album);
+    secondaryNav:
+      relation('generateAlbumSecondaryNav', album),
 
-    relations.secondaryNav =
-      relation('generateAlbumSecondaryNav', album);
+    sidebar:
+      relation('generateAlbumSidebar', album, null),
 
-    relations.sidebar =
-      relation('generateAlbumSidebar', album, null);
+    cover:
+      (album.hasCoverArt
+        ? relation('generateAlbumCoverArtwork', album)
+        : null),
 
-    if (album.hasCoverArt) {
-      relations.cover =
-        relation('generateAlbumCoverArtwork', album);
-    }
+    banner:
+      (album.hasBannerArt
+        ? relation('generateAlbumBanner', album)
+        : null),
 
-    if (album.hasBannerArt) {
-      relations.banner =
-        relation('generateAlbumBanner', album);
-    }
+    contentHeading:
+      relation('generateContentHeading'),
 
-    // Section: Release info
+    releaseInfo:
+      relation('generateAlbumReleaseInfo', album),
 
-    relations.releaseInfo =
-      relation('generateAlbumReleaseInfo', album);
+    galleryLink:
+      (album.tracks.some(t => t.hasUniqueCoverArt)
+        ? relation('linkAlbumGallery', album)
+        : null),
 
-    // Section: Extra links
+    commentaryLink:
+      (album.commentary || album.tracks.some(t => t.commentary)
+        ? relation('linkAlbumCommentary', album)
+        : null),
 
-    const extra = sections.extra = {};
+    trackList:
+      relation('generateAlbumTrackList', album),
 
-    if (album.tracks.some(t => t.hasUniqueCoverArt)) {
-      extra.galleryLink =
-        relation('linkAlbumGallery', album);
-    }
+    additionalFilesList:
+      relation('generateAlbumAdditionalFilesList',
+        album,
+        album.additionalFiles),
 
-    if (album.commentary || album.tracks.some(t => t.commentary)) {
-      extra.commentaryLink =
-        relation('linkAlbumCommentary', album);
-    }
+    artistCommentarySection:
+      relation('generateCommentarySection', album.commentary),
+  }),
 
-    // Section: Track list
+  data: (album) => ({
+    name:
+      album.name,
 
-    relations.trackList =
-      relation('generateAlbumTrackList', album);
+    color:
+      album.color,
 
-    // Section: Additional files
+    dateAddedToWiki:
+      album.dateAddedToWiki,
+  }),
 
-    if (!empty(album.additionalFiles)) {
-      const additionalFiles = sections.additionalFiles = {};
+  generate: (data, relations, {html, language}) =>
+    relations.layout.slots({
+      title: language.$('albumPage.title', {album: data.name}),
+      headingMode: 'sticky',
 
-      additionalFiles.heading =
-        relation('generateContentHeading');
+      color: data.color,
+      styleRules: [relations.albumStyleRules],
 
-      additionalFiles.additionalFilesList =
-        relation('generateAlbumAdditionalFilesList', album, album.additionalFiles);
-    }
+      cover:
+        relations.cover
+          ?.slots({
+            alt: language.$('misc.alt.albumCover'),
+          })
+          ?? null,
 
-    // Section: Artist commentary
+      mainContent: [
+        relations.releaseInfo,
 
-    if (album.commentary) {
-      sections.artistCommentary =
-        relation('generateCommentarySection', album.commentary);
-    }
+        html.tag('p',
+          {[html.onlyIfContent]: true},
+          {[html.joinChildren]: html.tag('br')},
 
-    return relations;
-  },
-
-  data(album) {
-    const data = {};
-
-    data.name = album.name;
-    data.color = album.color;
-
-    if (!empty(album.additionalFiles)) {
-      data.numAdditionalFiles = album.additionalFiles.length;
-    }
-
-    data.dateAddedToWiki = album.dateAddedToWiki;
-
-    return data;
-  },
-
-  generate(data, relations, {html, language}) {
-    const {sections: sec} = relations;
-
-    return relations.layout
-      .slots({
-        title: language.$('albumPage.title', {album: data.name}),
-        headingMode: 'sticky',
-
-        color: data.color,
-        styleRules: [relations.albumStyleRules],
-
-        cover:
-          relations.cover
-            ?.slots({
-              alt: language.$('misc.alt.albumCover'),
-            })
-            ?? null,
-
-        mainContent: [
-          relations.releaseInfo,
-
-          html.tag('p',
-            {[html.onlyIfContent]: true},
-            {[html.joinChildren]: html.tag('br')},
-
-            [
-              sec.additionalFiles &&
-                language.$('releaseInfo.additionalFiles.shortcut', {
-                  link: html.tag('a',
-                    {href: '#additional-files'},
-                    language.$('releaseInfo.additionalFiles.shortcut.link')),
-                }),
-
-              sec.extra.galleryLink && sec.extra.commentaryLink &&
-                language.$('releaseInfo.viewGalleryOrCommentary', {
-                  gallery:
-                    sec.extra.galleryLink
-                      .slot('content', language.$('releaseInfo.viewGalleryOrCommentary.gallery')),
-                  commentary:
-                    sec.extra.commentaryLink
-                      .slot('content', language.$('releaseInfo.viewGalleryOrCommentary.commentary')),
-                }),
-
-              sec.extra.galleryLink && !sec.extra.commentaryLink &&
-                language.$('releaseInfo.viewGallery', {
-                  link:
-                    sec.extra.galleryLink
-                      .slot('content', language.$('releaseInfo.viewGallery.link')),
-                }),
-
-              !sec.extra.galleryLink && sec.extra.commentaryLink &&
-                language.$('releaseInfo.viewCommentary', {
-                  link:
-                    sec.extra.commentaryLink
-                      .slot('content', language.$('releaseInfo.viewCommentary.link')),
-                }),
-            ]),
-
-          relations.trackList,
-
-          html.tag('p',
-            {[html.onlyIfContent]: true},
-            {[html.joinChildren]: html.tag('br')},
-
-            [
-              language.$('releaseInfo.addedToWiki', {
-                [language.onlyIfOptions]: ['date'],
-                date: language.formatDate(data.dateAddedToWiki),
-              }),
-            ]),
-
-          sec.additionalFiles && [
-            sec.additionalFiles.heading
-              .slots({
-                attributes: {id: 'additional-files'},
-                title: language.$('releaseInfo.additionalFiles.heading'),
+          [
+            !html.isBlank(relations.additionalFilesList) &&
+              language.$('releaseInfo.additionalFiles.shortcut', {
+                link: html.tag('a',
+                  {href: '#additional-files'},
+                  language.$('releaseInfo.additionalFiles.shortcut.link')),
               }),
 
-            sec.additionalFiles.additionalFilesList,
-          ],
-
-          sec.artistCommentary,
-        ],
-
-        navLinkStyle: 'hierarchical',
-        navLinks: [
-          {auto: 'home'},
-          {
-            auto: 'current',
-            accent:
-              relations.albumNavAccent.slots({
-                showTrackNavigation: true,
-                showExtraLinks: true,
+            relations.galleryLink && relations.commentaryLink &&
+              language.$('releaseInfo.viewGalleryOrCommentary', {
+                gallery:
+                  relations.galleryLink
+                    .slot('content', language.$('releaseInfo.viewGalleryOrCommentary.gallery')),
+                commentary:
+                  relations.commentaryLink
+                    .slot('content', language.$('releaseInfo.viewGalleryOrCommentary.commentary')),
               }),
-          },
-        ],
 
-        navContent:
-          relations.chronologyLinks,
+            relations.galleryLink && !relations.commentaryLink &&
+              language.$('releaseInfo.viewGallery', {
+                link:
+                  relations.galleryLink
+                    .slot('content', language.$('releaseInfo.viewGallery.link')),
+              }),
 
-        banner: relations.banner ?? null,
-        bannerPosition: 'top',
+            !relations.galleryLink && relations.commentaryLink &&
+              language.$('releaseInfo.viewCommentary', {
+                link:
+                  relations.commentaryLink
+                    .slot('content', language.$('releaseInfo.viewCommentary.link')),
+              }),
+          ]),
 
-        secondaryNav: relations.secondaryNav,
+        relations.trackList,
 
-        leftSidebar: relations.sidebar,
+        html.tag('p',
+          {[html.onlyIfContent]: true},
+          {[html.joinChildren]: html.tag('br')},
 
-        socialEmbed: relations.socialEmbed,
-      });
-  },
+          [
+            language.$('releaseInfo.addedToWiki', {
+              [language.onlyIfOptions]: ['date'],
+              date: language.formatDate(data.dateAddedToWiki),
+            }),
+          ]),
+
+        html.tags([
+          relations.contentHeading.clone()
+            .slots({
+              attributes: {id: 'additional-files'},
+              title: language.$('releaseInfo.additionalFiles.heading'),
+            }),
+
+          relations.additionalFilesList,
+        ]),
+
+        relations.artistCommentarySection,
+      ],
+
+      navLinkStyle: 'hierarchical',
+      navLinks: [
+        {auto: 'home'},
+        {
+          auto: 'current',
+          accent:
+            relations.albumNavAccent.slots({
+              showTrackNavigation: true,
+              showExtraLinks: true,
+            }),
+        },
+      ],
+
+      navContent:
+        relations.chronologyLinks,
+
+      banner: relations.banner ?? null,
+      bannerPosition: 'top',
+
+      secondaryNav: relations.secondaryNav,
+
+      leftSidebar: relations.sidebar,
+
+      socialEmbed: relations.socialEmbed,
+    }),
 };
