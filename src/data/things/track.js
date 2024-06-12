@@ -277,6 +277,36 @@ export class Track extends Thing {
       }),
     ],
 
+    writingContributions: [
+      inheritContributionListFromMainRelease(),
+
+      withDate(),
+
+      contributionList({
+        date: '#date',
+      }),
+    ],
+
+    performingContributions: [
+      inheritContributionListFromMainRelease(),
+
+      withDate(),
+
+      contributionList({
+        date: '#date',
+      }),
+    ],
+
+    engineeringContributions: [
+      inheritContributionListFromMainRelease(),
+
+      withDate(),
+
+      contributionList({
+        date: '#date',
+      }),
+    ],
+
     coverArtistContribs: [
       exitWithoutUniqueCoverArt({
         value: input.value([]),
@@ -553,6 +583,21 @@ export class Track extends Thing {
 
       'Contributors': {
         property: 'contributorContribs',
+        transform: parseContributors,
+      },
+
+      'Writing Contributors': {
+        property: 'writingContributions',
+        transform: parseContributors,
+      },
+
+      'Performing Contributors': {
+        property: 'performingContributions',
+        transform: parseContributors,
+      },
+
+      'Engineering Contributors': {
+        property: 'engineeringContributions',
         transform: parseContributors,
       },
 
