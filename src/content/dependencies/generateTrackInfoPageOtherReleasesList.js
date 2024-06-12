@@ -44,6 +44,8 @@ export default {
 
   generate: (relations, {html, language}) =>
     html.tag('ul',
+      {[html.onlyIfContent]: true},
+
       stitchArrays({
         trackLink: relations.trackLinks,
         albumLink: relations.albumLinks,
