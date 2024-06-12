@@ -45,7 +45,7 @@ export default {
   sprawl(wikiData, content) {
     const find = bindFind(wikiData);
 
-    const parsedNodes = parseInput(content);
+    const parsedNodes = parseInput(content ?? '');
 
     return {
       nodes: parsedNodes
@@ -512,7 +512,11 @@ export default {
         addText(markedOutput.slice(parseFrom));
       }
 
-      return html.tags(tags, {[html.joinChildren]: ''});
+      return (
+        html.tags(tags, {
+          [html.joinChildren]: '',
+          [html.onlyIfContent]: true,
+        }));
     };
 
     if (slots.mode === 'inline') {
