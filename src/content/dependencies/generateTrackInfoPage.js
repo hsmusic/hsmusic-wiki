@@ -83,10 +83,8 @@ export default {
 
     // Section: Other releases
 
-    if (!empty(track.otherReleases)) {
-      relations.otherReleasesList =
+    relations.otherReleasesList =
         relation('generateTrackInfoPageOtherReleasesList', track);
-    }
 
     // Section: Contributors
 
