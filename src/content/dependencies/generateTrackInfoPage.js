@@ -107,21 +107,13 @@ export default {
 
     // Section: Referenced tracks
 
-    if (!empty(track.referencedTracks)) {
-      const references = sections.references = {};
-
-      references.list =
-        relation('generateTrackList', track.referencedTracks);
-    }
+    relations.referencedTracksList =
+      relation('generateTrackList', track.referencedTracks);
 
     // Section: Sampled tracks
 
-    if (!empty(track.sampledTracks)) {
-      const samples = sections.samples = {};
-
-      samples.list =
-        relation('generateTrackList', track.sampledTracks);
-    }
+    relations.sampledTracksList =
+      relation('generateTrackList', track.sampledTracks);
 
     // Section: Tracks that reference
 
@@ -279,7 +271,7 @@ export default {
                 }),
             ]),
 
-          relations.otherReleasesList && [
+          html.tags([
             relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'also-released-as'},
@@ -287,7 +279,7 @@ export default {
               }),
 
             relations.otherReleasesList,
-          ],
+          ]),
 
           sec.contributors && [
             relations.contentHeading.clone()
@@ -299,7 +291,7 @@ export default {
             sec.contributors.list,
           ],
 
-          sec.references && [
+          html.tags([
             relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'references'},
@@ -313,10 +305,10 @@ export default {
                   language.$('releaseInfo.tracksReferenced.sticky'),
               }),
 
-            sec.references.list,
-          ],
+            relations.referencedTracksList,
+          ]),
 
-          sec.samples && [
+          html.tags([
             relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'samples'},
@@ -330,8 +322,8 @@ export default {
                   language.$('releaseInfo.tracksSampled.sticky'),
               }),
 
-            sec.samples.list,
-          ],
+            relations.sampledTracksList,
+          ]),
 
           sec.referencedBy && [
             relations.contentHeading.clone()
