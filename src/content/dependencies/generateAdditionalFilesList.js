@@ -15,6 +15,8 @@ export default {
 
   generate: (slots, {html}) =>
     html.tag('ul', {class: 'additional-files-list'},
+      {[html.onlyIfContent]: true},
+
       stitchArrays({
         chunk: slots.chunks,
         items: slots.chunkItems,
