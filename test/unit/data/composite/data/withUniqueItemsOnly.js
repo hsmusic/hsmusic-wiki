@@ -1,4 +1,5 @@
 import t from 'tap';
+import {quickCheckCompositeOutputs} from '#test-lib';
 
 import {compositeFrom, input} from '#composite';
 import {exposeDependency} from '#composite/control-flow';
@@ -44,6 +45,8 @@ t.test(`withUniqueItemsOnly: output shapes & values`, t => {
       [8, 8, 7, 6, 6, 5, 'bar', true, true, 5],
   };
 
+  const qcco = quickCheckCompositeOutputs(t, dependencies);
+
   const mapLevel1 = [
     ['list_dependency', {
       '#list_dependency': [1, 2, 3, 4, 'foo', false],
@@ -61,24 +64,6 @@ t.test(`withUniqueItemsOnly: output shapes & values`, t => {
       list: listInput,
     });
 
-    quickCheckOutputs(step, outputDict);
-  }
-
-  function quickCheckOutputs(step, outputDict) {
-    t.same(
-      Object.keys(step.toDescription().outputs),
-      Object.keys(outputDict));
-
-    const composite = compositeFrom({
-      compose: false,
-      steps: [step, {
-        dependencies: Object.keys(outputDict),
-        compute: dependencies => dependencies,
-      }],
-    });
-
-    t.same(
-      composite.expose.compute(dependencies),
-      outputDict);
+    qcco(step, outputDict);
   }
 });

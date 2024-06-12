@@ -1,4 +1,5 @@
 import t from 'tap';
+import {quickCheckCompositeOutputs} from '#test-lib';
 
 import {compositeFrom, input} from '#composite';
 import {exposeDependency} from '#composite/control-flow';
@@ -56,6 +57,8 @@ t.test(`withPropertyFromObject: output shapes & values`, t => {
       'baz',
   };
 
+  const qcco = quickCheckCompositeOutputs(t, dependencies);
+
   const mapLevel1 = [
     ['object_dependency', [
       ['property_dependency', {
@@ -98,25 +101,7 @@ t.test(`withPropertyFromObject: output shapes & values`, t => {
         property: propertyInput,
       });
 
-      quickCheckOutputs(step, outputDict);
+      qcco(step, outputDict);
     }
-  }
-
-  function quickCheckOutputs(step, outputDict) {
-    t.same(
-      Object.keys(step.toDescription().outputs),
-      Object.keys(outputDict));
-
-    const composite = compositeFrom({
-      compose: false,
-      steps: [step, {
-        dependencies: Object.keys(outputDict),
-        compute: dependencies => dependencies,
-      }],
-    });
-
-    t.same(
-      composite.expose.compute(dependencies),
-      outputDict);
   }
 });
