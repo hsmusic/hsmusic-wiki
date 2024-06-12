@@ -1,23 +1,21 @@
 import {sortFlashesChronologically} from '#sort';
-import {empty, stitchArrays} from '#sugar';
+import {empty} from '#sugar';
 
 export default {
   contentDependencies: [
-    'generateAbsoluteDatetimestamp',
     'generateAlbumAdditionalFilesList',
     'generateAlbumNavAccent',
     'generateAlbumSecondaryNav',
     'generateAlbumSidebar',
     'generateAlbumStyleRules',
-    'generateColorStyleAttribute',
     'generateCommentarySection',
     'generateContentHeading',
     'generateContributionList',
     'generatePageLayout',
-    'generateRelativeDatetimestamp',
     'generateTrackAdditionalNamesBox',
     'generateTrackChronologyLinks',
     'generateTrackCoverArtwork',
+    'generateTrackInfoPageOtherReleasesList',
     'generateTrackList',
     'generateTrackListDividedByGroups',
     'generateTrackReleaseInfo',
@@ -94,36 +92,8 @@ export default {
     // Section: Other releases
 
     if (!empty(track.otherReleases)) {
-      const otherReleases = sections.otherReleases = {};
-
-      otherReleases.colorStyles =
-        track.otherReleases
-          .map(track => relation('generateColorStyleAttribute', track.color));
-
-      otherReleases.trackLinks =
-        track.otherReleases
-          .map(track => relation('linkTrack', track));
-
-      otherReleases.albumLinks =
-        track.otherReleases
-          .map(track => relation('linkAlbum', track.album));
-
-      otherReleases.datetimestamps =
-        track.otherReleases.map(track2 =>
-          (track2.date
-            ? (track.date
-                ? relation('generateRelativeDatetimestamp',
-                    track2.date,
-                    track.date)
-                : relation('generateAbsoluteDatetimestamp',
-                    track2.date))
-            : null));
-
-      otherReleases.items =
-        track.otherReleases.map(track => ({
-          trackLink: relation('linkTrack', track),
-          albumLink: relation('linkAlbum', track.album),
-        }));
+      relations.otherReleasesList =
+        relation('generateTrackInfoPageOtherReleasesList', track);
     }
 
     // Section: Contributors
@@ -309,45 +279,14 @@ export default {
                 }),
             ]),
 
-          sec.otherReleases && [
+          relations.otherReleasesList && [
             relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'also-released-as'},
                 title: language.$('releaseInfo.alsoReleasedAs'),
               }),
 
-            html.tag('ul',
-              stitchArrays({
-                trackLink: sec.otherReleases.trackLinks,
-                albumLink: sec.otherReleases.albumLinks,
-                datetimestamp: sec.otherReleases.datetimestamps,
-                colorStyle: sec.otherReleases.colorStyles,
-              }).map(({
-                  trackLink,
-                  albumLink,
-                  datetimestamp,
-                  colorStyle,
-                }) => {
-                  const parts = ['releaseInfo.alsoReleasedAs.item'];
-                  const options = {};
-
-                  options.track = trackLink.slot('color', false);
-                  options.album = albumLink;
-
-                  if (datetimestamp) {
-                    parts.push('withYear');
-                    options.year =
-                      datetimestamp.slots({
-                        style: 'year',
-                        tooltip: true,
-                      });
-                  }
-
-                  return (
-                    html.tag('li',
-                      colorStyle,
-                      language.$(...parts, options)));
-                })),
+            relations.otherReleasesList,
           ],
 
           sec.contributors && [
