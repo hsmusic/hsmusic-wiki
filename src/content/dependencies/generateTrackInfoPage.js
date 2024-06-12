@@ -1,4 +1,3 @@
-import {sortFlashesChronologically} from '#sort';
 import {empty} from '#sugar';
 
 export default {
@@ -15,25 +14,23 @@ export default {
     'generateTrackAdditionalNamesBox',
     'generateTrackChronologyLinks',
     'generateTrackCoverArtwork',
+    'generateTrackInfoPageFeaturedByFlashesList',
     'generateTrackInfoPageOtherReleasesList',
     'generateTrackList',
     'generateTrackListDividedByGroups',
     'generateTrackReleaseInfo',
     'generateTrackSocialEmbed',
     'linkAlbum',
-    'linkFlash',
     'linkTrack',
     'transformContent',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl({wikiInfo}) {
-    return {
-      divideTrackListsByGroups: wikiInfo.divideTrackListsByGroups,
-      enableFlashesAndGames: wikiInfo.enableFlashesAndGames,
-    };
-  },
+  sprawl: ({wikiInfo}) => ({
+    divideTrackListsByGroups:
+      wikiInfo.divideTrackListsByGroups,
+  }),
 
   relations(relation, sprawl, track) {
     const relations = {};
@@ -120,35 +117,8 @@ export default {
 
     // Section: Flashes that feature
 
-    if (sprawl.enableFlashesAndGames) {
-      const sortedFeatures =
-        sortFlashesChronologically(
-          [track, ...track.otherReleases].flatMap(track =>
-            track.featuredInFlashes.map(flash => ({
-              // These aren't going to be exposed directly, they're processed
-              // into the appropriate relations after this sort.
-              flash, track,
-
-              // These properties are only used for the sort.
-              act: flash.act,
-              date: flash.date,
-            }))));
-
-      if (!empty(sortedFeatures)) {
-        const flashesThatFeature = sections.flashesThatFeature = {};
-
-        flashesThatFeature.entries =
-          sortedFeatures.map(({flash, track: directlyFeaturedTrack}) =>
-            (directlyFeaturedTrack === track
-              ? {
-                  flashLink: relation('linkFlash', flash),
-                }
-              : {
-                  flashLink: relation('linkFlash', flash),
-                  trackLink: relation('linkTrack', directlyFeaturedTrack),
-                }));
-      }
-    }
+    relations.flashesThatFeatureList =
+      relation('generateTrackInfoPageFeaturedByFlashesList', track);
 
     // Section: Lyrics
 
@@ -347,7 +317,7 @@ export default {
               }),
           ]),
 
-          sec.flashesThatFeature && [
+          html.tags([
             relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'featured-in'},
@@ -361,18 +331,8 @@ export default {
                   language.$('releaseInfo.flashesThatFeature.sticky'),
               }),
 
-            html.tag('ul', sec.flashesThatFeature.entries.map(({flashLink, trackLink}) =>
-              (trackLink
-                ? html.tag('li', {class: 'rerelease'},
-                    language.$('releaseInfo.flashesThatFeature.item.asDifferentRelease', {
-                      flash: flashLink,
-                      track: trackLink,
-                    }))
-                : html.tag('li',
-                    language.$('releaseInfo.flashesThatFeature.item', {
-                      flash: flashLink,
-                    }))))),
-          ],
+            relations.flashesThatFeatureList,
+          ]),
 
           sec.lyrics && [
             relations.contentHeading.clone()
