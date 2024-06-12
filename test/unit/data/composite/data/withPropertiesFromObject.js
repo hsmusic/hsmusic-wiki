@@ -226,11 +226,12 @@ t.test(`withPropertiesFromObject: validate dynamic inputs`, t => {
       properties: 'onceMore',
     }),
     {message: `Error computing composition`, cause:
-      {message: `Error computing composition withPropertiesFromObject`, cause:
-        {message: `Errors in input values provided to withPropertiesFromObject`, errors: [
-          {message: `object: Expected an object, got string`},
-          {message: `properties: Expected an array, got string`},
-        ]}}});
+      {message: `Error in step 1 of 2, withPropertiesFromObject`, cause:
+        {message: `Error computing composition withPropertiesFromObject`, cause:
+          {message: `Errors in input values provided to withPropertiesFromObject`, errors: [
+            {message: `object: Expected an object, got string`},
+            {message: `properties: Expected an array, got string`},
+          ]}}}});
 
   t.throws(
     () => composite.expose.compute({
@@ -238,17 +239,18 @@ t.test(`withPropertiesFromObject: validate dynamic inputs`, t => {
       properties: ['abc', 'def', 123],
     }),
     {message: `Error computing composition`, cause:
-      {message: `Error computing composition withPropertiesFromObject`, cause:
-        {message: `Errors in input values provided to withPropertiesFromObject`, errors: [
-          {message: `object: Expected an object, got array`},
-          {message: `properties: Errors validating array items`, errors: [
-            {
-              [Symbol.for('hsmusic.annotateError.indexInSourceArray')]: 2,
-              message: `Error at zero-index 2: 123`,
-              cause: {
-                message: `Expected a string, got number`,
+      {message: `Error in step 1 of 2, withPropertiesFromObject`, cause:
+        {message: `Error computing composition withPropertiesFromObject`, cause:
+          {message: `Errors in input values provided to withPropertiesFromObject`, errors: [
+            {message: `object: Expected an object, got array`},
+            {message: `properties: Errors validating array items`, errors: [
+              {
+                [Symbol.for('hsmusic.annotateError.indexInSourceArray')]: 2,
+                message: `Error at zero-index 2: 123`,
+                cause: {
+                  message: `Expected a string, got number`,
+                },
               },
-            },
-          ]},
-        ]}}});
+            ]},
+          ]}}}});
 });
