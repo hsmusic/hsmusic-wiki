@@ -16,7 +16,10 @@ exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList 
 
 exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > basic behavior, with track sections 1`] = `
 <dl class="album-group-list">
-    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">First section: (~1:00)</span></dt>
+    <dt class="content-heading" tabindex="0">
+        <span class="content-heading-main-title">First section: (~1:00)</span>
+        <template class="content-heading-sticky-title">First section:</template>
+    </dt>
     <dd>
         <ul>
             <li>(0:20) <a href="track/t1/">Track 1</a></li>
@@ -24,14 +27,20 @@ exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList 
             <li>(0:40) <a href="track/t3/">Track 3</a></li>
         </ul>
     </dd>
-    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">Second section:</span></dt>
+    <dt class="content-heading" tabindex="0">
+        <span class="content-heading-main-title">Second section:</span>
+        <template class="content-heading-sticky-title">Second section:</template>
+    </dt>
     <dd><ul><li style="--primary-color: #ea2e83">[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t4/">Track 4</a> <span class="by"><span class="chunkwrap">by <a href="artist/apricot/">Apricot</a>,</span> <span class="chunkwrap"><a href="artist/peach/">Peach</a>,</span> <span class="chunkwrap">and <a href="artist/cerise/">Cerise</a></span></span></li></ul></dd>
 </dl>
 `
 
 exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > collapseDurationScope: album 1`] = `
 <dl class="album-group-list">
-    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">First section: (~1:00)</span></dt>
+    <dt class="content-heading" tabindex="0">
+        <span class="content-heading-main-title">First section: (~1:00)</span>
+        <template class="content-heading-sticky-title">First section:</template>
+    </dt>
     <dd>
         <ul>
             <li>(0:20) <a href="track/t1/">Track 1</a></li>
@@ -39,7 +48,10 @@ exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList 
             <li>(0:40) <a href="track/t3/">Track 3</a></li>
         </ul>
     </dd>
-    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">Second section:</span></dt>
+    <dt class="content-heading" tabindex="0">
+        <span class="content-heading-main-title">Second section:</span>
+        <template class="content-heading-sticky-title">Second section:</template>
+    </dt>
     <dd><ul><li style="--primary-color: #ea2e83">[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t4/">Track 4</a> <span class="by"><span class="chunkwrap">by <a href="artist/apricot/">Apricot</a>,</span> <span class="chunkwrap"><a href="artist/peach/">Peach</a>,</span> <span class="chunkwrap">and <a href="artist/cerise/">Cerise</a></span></span></li></ul></dd>
 </dl>
 <ul>
@@ -56,7 +68,10 @@ exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList 
 
 exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > collapseDurationScope: never 1`] = `
 <dl class="album-group-list">
-    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">First section: (~1:00)</span></dt>
+    <dt class="content-heading" tabindex="0">
+        <span class="content-heading-main-title">First section: (~1:00)</span>
+        <template class="content-heading-sticky-title">First section:</template>
+    </dt>
     <dd>
         <ul>
             <li>(0:20) <a href="track/t1/">Track 1</a></li>
@@ -64,7 +79,10 @@ exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList 
             <li>(0:40) <a href="track/t3/">Track 3</a></li>
         </ul>
     </dd>
-    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">Second section:</span></dt>
+    <dt class="content-heading" tabindex="0">
+        <span class="content-heading-main-title">Second section:</span>
+        <template class="content-heading-sticky-title">Second section:</template>
+    </dt>
     <dd><ul><li style="--primary-color: #ea2e83">[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t4/">Track 4</a> <span class="by"><span class="chunkwrap">by <a href="artist/apricot/">Apricot</a>,</span> <span class="chunkwrap"><a href="artist/peach/">Peach</a>,</span> <span class="chunkwrap">and <a href="artist/cerise/">Cerise</a></span></span></li></ul></dd>
 </dl>
 <ul>
@@ -81,7 +99,10 @@ exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList 
 
 exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > collapseDurationScope: section 1`] = `
 <dl class="album-group-list">
-    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">First section: (~1:00)</span></dt>
+    <dt class="content-heading" tabindex="0">
+        <span class="content-heading-main-title">First section: (~1:00)</span>
+        <template class="content-heading-sticky-title">First section:</template>
+    </dt>
     <dd>
         <ul>
             <li>(0:20) <a href="track/t1/">Track 1</a></li>
@@ -89,7 +110,10 @@ exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList 
             <li>(0:40) <a href="track/t3/">Track 3</a></li>
         </ul>
     </dd>
-    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">Second section:</span></dt>
+    <dt class="content-heading" tabindex="0">
+        <span class="content-heading-main-title">Second section:</span>
+        <template class="content-heading-sticky-title">Second section:</template>
+    </dt>
     <dd><ul><li style="--primary-color: #ea2e83"><a href="track/t4/">Track 4</a> <span class="by"><span class="chunkwrap">by <a href="artist/apricot/">Apricot</a>,</span> <span class="chunkwrap"><a href="artist/peach/">Peach</a>,</span> <span class="chunkwrap">and <a href="artist/cerise/">Cerise</a></span></span></li></ul></dd>
 </dl>
 <ul>
@@ -106,7 +130,10 @@ exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList 
 
 exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > collapseDurationScope: track 1`] = `
 <dl class="album-group-list">
-    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">First section: (~1:00)</span></dt>
+    <dt class="content-heading" tabindex="0">
+        <span class="content-heading-main-title">First section: (~1:00)</span>
+        <template class="content-heading-sticky-title">First section:</template>
+    </dt>
     <dd>
         <ul>
             <li>(0:20) <a href="track/t1/">Track 1</a></li>
@@ -114,7 +141,10 @@ exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList 
             <li>(0:40) <a href="track/t3/">Track 3</a></li>
         </ul>
     </dd>
-    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">Second section:</span></dt>
+    <dt class="content-heading" tabindex="0">
+        <span class="content-heading-main-title">Second section:</span>
+        <template class="content-heading-sticky-title">Second section:</template>
+    </dt>
     <dd><ul><li style="--primary-color: #ea2e83"><a href="track/t4/">Track 4</a> <span class="by"><span class="chunkwrap">by <a href="artist/apricot/">Apricot</a>,</span> <span class="chunkwrap"><a href="artist/peach/">Peach</a>,</span> <span class="chunkwrap">and <a href="artist/cerise/">Cerise</a></span></span></li></ul></dd>
 </dl>
 <ul>
