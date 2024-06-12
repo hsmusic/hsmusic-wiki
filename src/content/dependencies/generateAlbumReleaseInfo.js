@@ -1,4 +1,4 @@
-import {accumulateSum} from '#sugar';
+import {accumulateSum, empty} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -41,8 +41,18 @@ export default {
       data.coverArtDate = album.coverArtDate;
     }
 
-    data.duration = accumulateSum(album.tracks, track => track.duration);
-    data.durationApproximate = album.tracks.length > 1;
+    const durationTerms =
+      album.tracks
+        .map(track => track.duration)
+        .filter(value => value > 0);
+
+    if (empty(durationTerms)) {
+      data.duration = null;
+      data.durationApproximate = null;
+    } else {
+      data.duration = accumulateSum(durationTerms);
+      data.durationApproximate = album.tracks.length > 1;
+    }
 
     data.numTracks = album.tracks.length;
 
