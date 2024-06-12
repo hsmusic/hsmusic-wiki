@@ -217,9 +217,17 @@ export function isBlank(content) {
     // could include content. These need to be checked too.
     // Check each of the templates one at a time.
     for (const template of result) {
-      if (!template.blank) {
-        return false;
+      const content = template.content;
+
+      if (content instanceof Tag && content.onlyIfSiblings) {
+        continue;
       }
+
+      if (isBlank(content)) {
+        continue;
+      }
+
+      return false;
     }
 
     // If none of the templates included content either,
