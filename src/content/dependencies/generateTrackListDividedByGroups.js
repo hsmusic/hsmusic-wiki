@@ -80,7 +80,7 @@ export default {
 
   generate: (data, relations, slots, {html, language}) =>
     relations.flatList ??
-    html.tag('dl', [
+    html.tag('dl', {[html.onlyIfContent]: true}, [
       stitchArrays({
         groupName: data.groupNames,
         groupLink: relations.groupLinks,
