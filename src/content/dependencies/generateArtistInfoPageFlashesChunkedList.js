@@ -8,12 +8,22 @@ export default {
     'generateArtistInfoPageFlashesChunk',
   ],
 
-  query(artist) {
+  extraDependencies: ['wikiData'],
+
+  sprawl: ({wikiInfo}) => ({
+    enableFlashesAndGames:
+      wikiInfo.enableFlashesAndGames,
+  }),
+
+  query(sprawl, artist) {
     const query = {};
 
-    const allContributions = [
-      ...artist.flashContributorContributions,
-    ];
+    const allContributions =
+      (sprawl.enableFlashesAndGames
+        ? [
+            ...artist.flashContributorContributions,
+          ]
+      : []);
 
     sortContributionsChronologically(
       allContributions,
@@ -33,7 +43,7 @@ export default {
     return query;
   },
 
-  relations: (relation, query, _artist) => ({
+  relations: (relation, query, _sprawl, _artist) => ({
     chunkedList:
       relation('generateArtistInfoPageChunkedList'),
 
