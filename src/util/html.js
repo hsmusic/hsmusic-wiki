@@ -649,10 +649,12 @@ export class Tag {
     }
 
     for (const [index, item] of contentItems.entries()) {
-      let itemContent;
+      const nonTemplateItem =
+        Template.resolve(item);
 
+      let itemContent;
       try {
-        itemContent = item.toString();
+        itemContent = nonTemplateItem.toString();
       } catch (caughtError) {
         const indexPart = colors.yellow(`child #${index + 1}`);
 
@@ -681,12 +683,12 @@ export class Tag {
         continue;
       }
 
-      if (!(item instanceof Tag && item.onlyIfSiblings)) {
+      if (!(nonTemplateItem instanceof Tag) || !nonTemplateItem.onlyIfSiblings) {
         seenSiblingIndependentContent = true;
       }
 
       const chunkwrapChunks =
-        (typeof item === 'string' && chunkwrapSplitter
+        (typeof nonTemplateItem === 'string' && chunkwrapSplitter
           ? itemContent.split(chunkwrapSplitter)
           : null);
 
@@ -726,7 +728,7 @@ export class Tag {
       // itemContent check. They also never apply at the very start of content,
       // because at that point there aren't any preceding words from which the
       // blockwrap would differentiate its content.
-      if (item instanceof Tag && item.blockwrap && content) {
+      if (nonTemplateItem instanceof Tag && nonTemplateItem.blockwrap && content) {
         content += `<span class="blockwrap">`;
         blockwrapClosers += `</span>`;
       }
