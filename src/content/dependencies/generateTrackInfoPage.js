@@ -112,25 +112,17 @@ export default {
 
     // Section: Tracks that reference
 
-    if (!empty(track.referencedByTracks)) {
-      const referencedBy = sections.referencedBy = {};
-
-      referencedBy.list =
-        relation('generateTrackListDividedByGroups',
-          track.referencedByTracks,
-          sprawl.divideTrackListsByGroups);
-    }
+    relations.referencedByTracksList =
+      relation('generateTrackListDividedByGroups',
+        track.referencedByTracks,
+        sprawl.divideTrackListsByGroups);
 
     // Section: Tracks that sample
 
-    if (!empty(track.sampledByTracks)) {
-      const sampledBy = sections.sampledBy = {};
-
-      sampledBy.list =
-        relation('generateTrackListDividedByGroups',
-          track.sampledByTracks,
-          sprawl.divideTrackListsByGroups);
-    }
+    relations.sampledByTracksList =
+      relation('generateTrackListDividedByGroups',
+        track.sampledByTracks,
+        sprawl.divideTrackListsByGroups);
 
     // Section: Flashes that feature
 
@@ -321,7 +313,7 @@ export default {
             relations.sampledTracksList,
           ]),
 
-          sec.referencedBy && [
+          html.tags([
             relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'referenced-by'},
@@ -335,16 +327,16 @@ export default {
                   language.$('releaseInfo.tracksThatReference.sticky'),
               }),
 
-            sec.referencedBy.list
+            relations.referencedByTracksList
               .slots({
                 headingString: 'releaseInfo.tracksThatReference',
               }),
-          ],
+          ]),
 
-          sec.sampledBy && [
+          html.tags([
             relations.contentHeading.clone()
               .slots({
-                attributes: {id: 'referenced-by'},
+                attributes: {id: 'sampled-by'},
 
                 title:
                   language.$('releaseInfo.tracksThatSample', {
@@ -355,11 +347,11 @@ export default {
                   language.$('releaseInfo.tracksThatSample.sticky'),
               }),
 
-            sec.sampledBy.list
+            relations.sampledByTracksList
               .slots({
                 headingString: 'releaseInfo.tracksThatSample',
               }),
-          ],
+          ]),
 
           sec.flashesThatFeature && [
             relations.contentHeading.clone()
