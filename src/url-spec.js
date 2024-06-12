@@ -4,7 +4,7 @@ import {withEntries} from '#sugar';
 // part of a build. This is so that multiple builds of a wiki can coexist
 // served from the same server / file system root: older builds' HTML files
 // refer to earlier values of STATIC_VERSION, avoiding name collisions.
-const STATIC_VERSION = '3r1';
+const STATIC_VERSION = '3r2';
 
 const genericPaths = {
   root: '',
