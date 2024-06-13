@@ -18,10 +18,13 @@ export default {
   },
 
   generate(slots, {html, language}) {
+    const capsule =
+      language.encapsulate('releaseInfo.additionalFiles.entry');
+
     const summary =
       html.tag('summary',
         html.tag('span',
-          language.$('releaseInfo.additionalFiles.entry', {
+          language.$(capsule, {
             title:
               html.tag('span', {class: 'group-name'},
                 slots.title),
@@ -35,7 +38,7 @@ export default {
     const items =
       (html.isBlank(slots.items)
         ? html.tag('li',
-            language.$('releaseInfo.additionalFiles.entry.noFilesAvailable'))
+            language.$(capsule, 'noFilesAvailable'))
         : slots.items);
 
     const content =
