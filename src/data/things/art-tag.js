@@ -1,19 +1,29 @@
 export const ART_TAG_DATA_FILE = 'tags.yaml';
 
 import {input} from '#composite';
+import find from '#find';
 import {sortAlphabetically, sortAlbumsTracksChronologically} from '#sort';
 import Thing from '#thing';
+import {unique} from '#sugar';
 import {isName} from '#validators';
 
-import {exposeUpdateValueOrContinue} from '#composite/control-flow';
+import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
+  from '#composite/control-flow';
 
 import {
   color,
   directory,
   flag,
+  referenceList,
+  reverseReferenceList,
+  simpleString,
   name,
+  urls,
   wikiData,
 } from '#composite/wiki-properties';
+
+import {withAllDescendantArtTags, withAncestorArtTagBaobabTree}
+  from '#composite/things/art-tag';
 
 export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
@@ -26,6 +36,7 @@ export class ArtTag extends Thing {
     directory: directory(),
     color: color(),
     isContentWarning: flag(false),
+    extraReadingURLs: urls(),
 
     nameShort: [
       exposeUpdateValueOrContinue({
@@ -39,10 +50,22 @@ export class ArtTag extends Thing {
       },
     ],
 
+    description: simpleString(),
+
+    directDescendantArtTags: referenceList({
+      class: input.value(ArtTag),
+      find: input.value(find.artTag),
+      data: 'artTagData',
+    }),
+
     // Update only
 
     albumData: wikiData({
       class: input.value(Album),
+    }),
+
+    artTagData: wikiData({
+      class: input.value(ArtTag),
     }),
 
     trackData: wikiData({
@@ -51,7 +74,20 @@ export class ArtTag extends Thing {
 
     // Expose only
 
-    taggedInThings: {
+    descriptionShort: [
+      exitWithoutDependency({
+        dependency: 'description',
+        mode: input.value('falsy'),
+      }),
+
+      {
+        dependencies: ['description'],
+        compute: ({description}) =>
+          description.split('<hr class="split">')[0],
+      },
+    ],
+
+    directlyTaggedInThings: {
       flags: {expose: true},
 
       expose: {
@@ -63,6 +99,33 @@ export class ArtTag extends Thing {
             {getDate: thing => thing.coverArtDate ?? thing.date}),
       },
     },
+
+    indirectlyTaggedInThings: [
+      withAllDescendantArtTags(),
+
+      {
+        dependencies: ['#allDescendantArtTags'],
+        compute: ({'#allDescendantArtTags': allDescendantArtTags}) =>
+          unique(
+            allDescendantArtTags
+              .flatMap(artTag => artTag.directlyTaggedInThings)),
+      },
+    ],
+
+    allDescendantArtTags: [
+      withAllDescendantArtTags(),
+      exposeDependency({dependency: '#allDescendantArtTags'}),
+    ],
+
+    directAncestorArtTags: reverseReferenceList({
+      data: 'artTagData',
+      list: input.value('directDescendantArtTags'),
+    }),
+
+    ancestorArtTagBaobabTree: [
+      withAncestorArtTagBaobabTree(),
+      exposeDependency({dependency: '#ancestorArtTagBaobabTree'}),
+    ],
   });
 
   static [Thing.findSpecs] = {
@@ -70,10 +133,10 @@ export class ArtTag extends Thing {
       referenceTypes: ['tag'],
       bindTo: 'artTagData',
 
-      getMatchableNames: tag =>
-        (tag.isContentWarning
-          ? [`cw: ${tag.name}`]
-          : [tag.name]),
+      getMatchableNames: artTag =>
+        (artTag.isContentWarning
+          ? [`cw: ${artTag.name}`]
+          : [artTag.name]),
     },
   };
 
@@ -82,9 +145,13 @@ export class ArtTag extends Thing {
       'Tag': {property: 'name'},
       'Short Name': {property: 'nameShort'},
       'Directory': {property: 'directory'},
+      'Description': {property: 'description'},
+      'Extra Reading URLs': {property: 'extraReadingURLs'},
 
       'Color': {property: 'color'},
       'Is CW': {property: 'isContentWarning'},
+
+      'Direct Descendant Tags': {property: 'directDescendantArtTags'},
     },
   };
 

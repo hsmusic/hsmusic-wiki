@@ -1,8 +1,8 @@
-import {sortAlphabetically, sortByCount} from '#sort';
-import {filterByCount, stitchArrays} from '#sugar';
+import {sortAlphabetically} from '#sort';
+import {stitchArrays, unique} from '#sugar';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkArtTag'],
+  contentDependencies: ['generateListingPage', 'linkArtTagGallery'],
   extraDependencies: ['language', 'wikiData'],
 
   sprawl({artTagData}) {
@@ -10,19 +10,14 @@ export default {
   },
 
   query({artTagData}, spec) {
-    const artTags =
-      sortAlphabetically(
-        artTagData
-          .filter(tag => !tag.isContentWarning));
+    return {
+      spec,
 
-    const counts =
-      artTags
-        .map(tag => tag.taggedInThings.length);
-
-    filterByCount(artTags, counts);
-    sortByCount(artTags, counts, {greatestFirst: true});
-
-    return {spec, artTags, counts};
+      artTags:
+        sortAlphabetically(
+          artTagData
+            .filter(artTag => !artTag.isContentWarning)),
+    };
   },
 
   relations(relation, query) {
@@ -31,15 +26,18 @@ export default {
 
       artTagLinks:
         query.artTags
-          .map(tag => relation('linkArtTag', tag)),
+          .map(artTag => relation('linkArtTagGallery', artTag)),
     };
   },
 
   data(query) {
     return {
       counts:
-        query.artTags
-          .map(tag => tag.taggedInThings.length),
+        query.artTags.map(artTag =>
+          unique([
+            ...artTag.indirectlyTaggedInThings,
+            ...artTag.directlyTaggedInThings,
+          ]).length),
     };
   },
 
