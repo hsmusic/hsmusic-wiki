@@ -1242,11 +1242,13 @@ html[data-url-key="localized.home"] #content h1 {
 
 .quick-info {
   text-align: center;
+  padding-left: 12%;
+  padding-right: 12%;
+  line-height: 1.25em;
 }
 
 ul.quick-info {
   list-style: none;
-  padding-left: 0;
 }
 
 ul.quick-info li {
