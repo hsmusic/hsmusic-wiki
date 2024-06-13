@@ -1242,8 +1242,8 @@ html[data-url-key="localized.home"] #content h1 {
 
 .quick-info {
   text-align: center;
-  padding-left: 12%;
-  padding-right: 12%;
+  padding-left: calc(var(--responsive-padding-ratio) * 100%);
+  padding-right: calc(var(--responsive-padding-ratio) * 100%);
   line-height: 1.25em;
 }
 
