@@ -34,8 +34,24 @@ export default {
     hasLongerDescription: query.hasLongerDescription,
   }),
 
-  generate(data, relations, {html, language}) {
+  slots: {
+    extraReadingLinks: {
+      validate: v => v.sparseArrayOf(v.isHTML),
+    },
+  },
+
+  generate(data, relations, slots, {html, language}) {
     const prefix = 'misc.quickDescription';
+
+    const actionsWithoutLongerDescription =
+      (data.hasLongerDescription
+        ? null
+     : slots.extraReadingLinks
+        ? language.$(prefix, 'readMore', {
+            links:
+              language.formatDisjunctionList(slots.extraReadingLinks),
+          })
+        : null);
 
     const wrapExpandCollapseLink = (expandCollapse, content) =>
       html.tag('a', {class: `${expandCollapse}-link`},
@@ -43,7 +59,15 @@ export default {
         content);
 
     const actionsWhenCollapsed =
-      (data.hasLongerDescription
+      (data.hasLongerDescription && slots.extraReadingLinks
+        ? language.$(prefix, 'expandDescription.orReadMore', {
+            links:
+              language.formatDisjunctionList(slots.extraReadingLinks),
+            expand:
+              wrapExpandCollapseLink('expand',
+                language.$(prefix, 'expandDescription.orReadMore.expand')),
+          })
+     : data.hasLongerDescription
         ? language.$(prefix, 'expandDescription', {
             expand:
               wrapExpandCollapseLink('expand',
@@ -52,7 +76,15 @@ export default {
         : null);
 
     const actionsWhenExpanded =
-      (data.hasLongerDescription
+      (data.hasLongerDescription && slots.extraReadingLinks
+        ? language.$(prefix, 'collapseDescription.orReadMore', {
+            links:
+              language.formatDisjunctionList(slots.extraReadingLinks),
+            collapse:
+              wrapExpandCollapseLink('collapse',
+                language.$(prefix, 'collapseDescription.orReadMore.collapse')),
+          })
+     : data.hasLongerDescription
         ? language.$(prefix, 'collapseDescription', {
             collapse:
               wrapExpandCollapseLink('collapse',
@@ -81,13 +113,22 @@ export default {
         data.hasLongerDescription &&
           {class: 'collapsed'},
 
+        !data.hasLongerDescription &&
+        !slots.extraReadingLinks &&
+          {class: 'has-content-only'},
+
+        !data.hasDescription &&
+        slots.extraReadingLinks &&
+          {class: 'has-external-links-only'},
+
         [
           wrapContent(null, relations.description),
           wrapContent({class: 'short'}, relations.descriptionShort),
           wrapContent({class: 'long'}, relations.descriptionLong),
 
+          wrapActions(null, actionsWithoutLongerDescription),
           wrapActions({class: 'when-collapsed'}, actionsWhenCollapsed),
           wrapActions({class: 'when-expanded'}, actionsWhenExpanded),
         ]));
-  }
+  },
 };
