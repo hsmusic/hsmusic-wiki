@@ -208,9 +208,7 @@ export class Language extends Thing {
       args.at(-1) !== null;
 
     const key =
-      (hasOptions ? args.slice(0, -1) : args)
-        .filter(Boolean)
-        .join('.');
+      this.#joinKeyParts(hasOptions ? args.slice(0, -1) : args);
 
     const options =
       (hasOptions
@@ -842,6 +840,33 @@ export class Language extends Thing {
     } else {
       return this.formatString('count.fileSize.bytes', {bytes});
     }
+  }
+
+  // Utility function to quickly provide a useful string key
+  // (generally a prefix) to stuff nested beneath it.
+  encapsulate(...args) {
+    const fn =
+      (typeof args.at(-1) === 'function'
+        ? args.at(-1)
+        : null);
+
+    const parts =
+      (fn
+        ? args.slice(0, -1)
+        : args);
+
+    const capsule =
+      this.#joinKeyParts(parts);
+
+    if (fn) {
+      return fn(capsule);
+    } else {
+      return capsule;
+    }
+  }
+
+  #joinKeyParts(parts) {
+    return parts.filter(Boolean).join('.');
   }
 }
 
