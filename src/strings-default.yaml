@@ -630,6 +630,14 @@ misc:
       _: "({LINK})"
       link: "More info..."
 
+    expandDescription:
+      _: "({EXPAND})"
+      expand: "Expand description..."
+
+    collapseDescription:
+      _: "({COLLAPSE})"
+      collapse: "Collapse description"
+
   # nav:
   #   Generic navigational elements. These usually only appear in the
   #   wiki's nav bar, at the top of the page.
