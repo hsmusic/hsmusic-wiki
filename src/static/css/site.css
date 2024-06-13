@@ -1268,10 +1268,13 @@ ul.quick-info li:not(:last-child)::after {
 }
 
 .quick-description:not(.has-external-links-only) {
-  margin-left: 8%;
-  margin-right: 8%;
-  padding-left: 4%;
-  padding-right: 4%;
+  --clamped-padding-ratio: max(var(--responsive-padding-ratio), 0.06);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: calc(0.40 * var(--clamped-padding-ratio) * 100%);
+  padding-right: calc(0.40 * var(--clamped-padding-ratio) * 100%);
+  max-width: 500px;
+
   padding-top: 0.25em;
   padding-bottom: 0.75em;
   border-left: 1px solid var(--dim-color);
