@@ -1249,6 +1249,8 @@ html[data-url-key="localized.home"] #content h1 {
 
 ul.quick-info {
   list-style: none;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 ul.quick-info li {
