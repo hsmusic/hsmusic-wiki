@@ -1263,16 +1263,25 @@ ul.quick-info li:not(:last-child)::after {
   margin-top: 25px;
 }
 
-.quick-description {
+.quick-description:not(.has-external-links-only) {
   margin-left: 8%;
   margin-right: 8%;
   padding-left: 4%;
   padding-right: 4%;
   padding-top: 0.25em;
-  padding-bottom: 0.5em;
+  padding-bottom: 0.75em;
   border-left: 1px solid var(--dim-color);
   border-right: 1px solid var(--dim-color);
   line-height: 1.25em;
+}
+
+.quick-description.has-external-links-only {
+  padding-left: 12%;
+  padding-right: 12%;
+}
+
+.quick-description.has-content-only {
+  padding-bottom: 0.5em;
 }
 
 .quick-description p {
