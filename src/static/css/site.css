@@ -1258,8 +1258,51 @@ ul.quick-info li:not(:last-child)::after {
   font-weight: 800;
 }
 
-.carousel-container + .quick-info {
+.carousel-container + .quick-info,
+.carousel-container + .quick-description {
   margin-top: 25px;
+}
+
+.quick-description {
+  margin-left: 8%;
+  margin-right: 8%;
+  padding-left: 4%;
+  padding-right: 4%;
+  padding-top: 0.25em;
+  padding-bottom: 0.5em;
+  border-left: 1px solid var(--dim-color);
+  border-right: 1px solid var(--dim-color);
+  line-height: 1.25em;
+}
+
+.quick-description p {
+  text-align: center;
+}
+
+.quick-description .description-content.long hr ~ p {
+  text-align: left;
+}
+
+.quick-description > .description-content :first-child {
+  margin-top: 0;
+}
+
+.quick-description > .quick-description-actions,
+.quick-description.has-content-only .description-content :last-child {
+  margin-bottom: 0;
+}
+
+.quick-description:not(.collapsed) .description-content.short,
+.quick-description:not(.collapsed) .quick-description-actions.when-collapsed,
+.quick-description:not(.expanded) .description-content.long,
+.quick-description:not(.expanded) .quick-description-actions.when-expanded {
+  display: none;
+}
+
+.quick-description .quick-description-actions .expand-link,
+.quick-description .quick-description-actions .collapse-link {
+  text-decoration: underline;
+  text-decoration-style: dotted;
 }
 
 #intro-menu {

@@ -13,7 +13,6 @@ export default {
     'generateQuickDescription',
     'image',
     'linkAlbum',
-    'linkGroup',
     'linkListing',
   ],
 
@@ -59,9 +58,6 @@ export default {
 
     relations.quickDescription =
       relation('generateQuickDescription', group);
-
-    relations.quickDescriptionInfoLink =
-      relation('linkGroup', group);
 
     relations.coverGrid =
       relation('generateCoverGrid');
@@ -136,8 +132,7 @@ export default {
                     image.slot('path', path)),
             }),
 
-          relations.quickDescription
-            .slot('infoPageLink', relations.quickDescriptionInfoLink),
+          relations.quickDescription,
 
           html.tag('p', {class: 'quick-info'},
             language.$('groupGalleryPage.infoLine', {
