@@ -42,49 +42,50 @@ export default {
               additionalFileLinks,
               additionalFileFiles,
             }) =>
-              (additionalFileLinks.length === 1
-                ? html.tag('li',
-                    additionalFileLinks[0].slots({
-                      content:
-                        language.$('listingPage', slots.stringsKey, 'file', {
-                          title: additionalFileTitle,
-                        }),
-                    }))
+              language.encapsulate('listingPage', slots.stringsKey, 'file', capsule =>
+                (additionalFileLinks.length === 1
+                  ? html.tag('li',
+                      additionalFileLinks[0].slots({
+                        content:
+                          language.$(capsule, {
+                            title: additionalFileTitle,
+                          }),
+                      }))
 
-             : additionalFileLinks.length === 0
-                ? html.tag('li',
-                    language.$('listingPage', slots.stringsKey, 'file.withNoFiles', {
-                      title: additionalFileTitle,
-                    }))
+               : additionalFileLinks.length === 0
+                  ? html.tag('li',
+                      language.$(capsule, 'withNoFiles', {
+                        title: additionalFileTitle,
+                      }))
 
-                : html.tag('li', {class: 'has-details'},
-                    html.tag('details', [
-                      html.tag('summary',
-                        html.tag('span',
-                          language.$('listingPage', slots.stringsKey, 'file.withMultipleFiles', {
-                            title:
-                              html.tag('span', {class: 'group-name'},
-                                additionalFileTitle),
+                  : html.tag('li', {class: 'has-details'},
+                      html.tag('details', [
+                        html.tag('summary',
+                          html.tag('span',
+                            language.$(capsule, 'withMultipleFiles', {
+                              title:
+                                html.tag('span', {class: 'group-name'},
+                                  additionalFileTitle),
 
-                            files:
-                              language.countAdditionalFiles(
-                                additionalFileLinks.length,
-                                {unit: true}),
-                          }))),
+                              files:
+                                language.countAdditionalFiles(
+                                  additionalFileLinks.length,
+                                  {unit: true}),
+                            }))),
 
-                      html.tag('ul',
-                        stitchArrays({
-                          additionalFileLink: additionalFileLinks,
-                          additionalFileFile: additionalFileFiles,
-                        }).map(({additionalFileLink, additionalFileFile}) =>
-                            html.tag('li',
-                              additionalFileLink.slots({
-                                content:
-                                  language.$('listingPage', slots.stringsKey, 'file', {
-                                    title: additionalFileFile,
-                                  }),
-                              })))),
-                    ])))))),
+                        html.tag('ul',
+                          stitchArrays({
+                            additionalFileLink: additionalFileLinks,
+                            additionalFileFile: additionalFileFiles,
+                          }).map(({additionalFileLink, additionalFileFile}) =>
+                              html.tag('li',
+                                additionalFileLink.slots({
+                                  content:
+                                    language.$(capsule, {
+                                      title: additionalFileFile,
+                                    }),
+                                })))),
+                      ]))))))),
     ]);
   },
 };
