@@ -20,6 +20,8 @@ export default {
 
   generate: (slots, {html}) =>
     html.tag('div', {class: 'sidebar'},
+      {[html.onlyIfContent]: true},
+
       slots.collapsible &&
         {class: 'collapsible'},
 
