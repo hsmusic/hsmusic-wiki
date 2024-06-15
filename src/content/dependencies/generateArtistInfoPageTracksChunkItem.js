@@ -100,13 +100,16 @@ export default {
           : html.blank()),
 
       content:
-        (data.duration
-          ? language.$('artistPage.creditList.entry.track.withDuration', {
-              track: relations.trackLink,
-              duration: language.formatDuration(data.duration),
-            })
-          : language.$('artistPage.creditList.entry.track', {
-              track: relations.trackLink,
-            })),
+        language.encapsulate('artistPage.creditList.entry.track', capsule => {
+          const options = {track: relations.trackLink};
+
+          if (data.duration) {
+            capsule += '.withDuration';
+            options.duration =
+              language.formatDuration(data.duration);
+          }
+
+          return language.$(capsule, options);
+        }),
     }),
 };

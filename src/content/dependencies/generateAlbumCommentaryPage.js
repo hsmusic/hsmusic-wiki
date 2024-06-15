@@ -130,11 +130,11 @@ export default {
     return data;
   },
 
-  generate(data, relations, {html, language}) {
-    return relations.layout
-      .slots({
+  generate: (data, relations, {html, language}) =>
+    language.encapsulate('albumCommentaryPage', pageCapsule =>
+      relations.layout.slots({
         title:
-          language.$('albumCommentaryPage.title', {
+          language.$(pageCapsule, 'title', {
             album: data.name,
           }),
 
@@ -146,7 +146,7 @@ export default {
         mainClasses: ['long-content'],
         mainContent: [
           html.tag('p',
-            language.$('albumCommentaryPage.infoLine', {
+            language.$(pageCapsule, 'infoLine', {
               words:
                 html.tag('b',
                   language.formatWordCount(data.wordCount, {unit: true})),
@@ -156,39 +156,41 @@ export default {
                   language.countCommentaryEntries(data.entryCount, {unit: true})),
             })),
 
-          relations.albumCommentaryEntries && [
-            relations.albumCommentaryHeading.slots({
-              tag: 'h3',
-              color: data.color,
+          relations.albumCommentaryEntries &&
+            language.encapsulate(pageCapsule, 'entry', entryCapsule => [
+              language.encapsulate(entryCapsule, 'title.albumCommentary', titleCapsule =>
+                relations.albumCommentaryHeading.slots({
+                  tag: 'h3',
+                  color: data.color,
 
-              title:
-                language.$('albumCommentaryPage.entry.title.albumCommentary', {
-                  album: relations.albumCommentaryLink,
-                }),
+                  title:
+                    language.$(titleCapsule, {
+                      album: relations.albumCommentaryLink,
+                    }),
 
-              stickyTitle:
-                language.$('albumCommentaryPage.entry.title.albumCommentary.sticky', {
-                  album: data.name,
-                }),
+                  stickyTitle:
+                    language.$(titleCapsule, 'sticky', {
+                      album: data.name,
+                    }),
 
-              accent:
-                language.$('albumCommentaryPage.entry.title.albumCommentary.accent', {
-                  [language.onlyIfOptions]: ['listeningLinks'],
-                  listeningLinks:
-                    language.formatUnitList(
-                      relations.albumCommentaryListeningLinks
-                        .map(link => link.slots({
-                          context: 'album',
-                          tab: 'separate',
-                        }))),
-                }),
-            }),
+                  accent:
+                    language.$(titleCapsule, 'accent', {
+                      [language.onlyIfOptions]: ['listeningLinks'],
+                      listeningLinks:
+                        language.formatUnitList(
+                          relations.albumCommentaryListeningLinks
+                            .map(link => link.slots({
+                              context: 'album',
+                              tab: 'separate',
+                            }))),
+                    }),
+                })),
 
-            relations.albumCommentaryCover
-              ?.slots({mode: 'commentary'}),
+              relations.albumCommentaryCover
+                ?.slots({mode: 'commentary'}),
 
-            relations.albumCommentaryEntries,
-          ],
+              relations.albumCommentaryEntries,
+            ]),
 
           stitchArrays({
             heading: relations.trackCommentaryHeadings,
@@ -206,31 +208,33 @@ export default {
               cover,
               entries,
               color,
-            }) => [
-              heading.slots({
-                tag: 'h3',
-                attributes: {id: directory},
-                color,
+            }) =>
+              language.encapsulate(pageCapsule, 'entry', entryCapsule => [
+                language.encapsulate(entryCapsule, 'title.trackCommentary', titleCapsule =>
+                  heading.slots({
+                    tag: 'h3',
+                    attributes: {id: directory},
+                    color,
 
-                title:
-                  language.$('albumCommentaryPage.entry.title.trackCommentary', {
-                    track: link,
-                  }),
+                    title:
+                      language.$(titleCapsule, {
+                        track: link,
+                      }),
 
-                accent:
-                  language.$('albumCommentaryPage.entry.title.trackCommentary.accent', {
-                    [language.onlyIfOptions]: ['listeningLinks'],
-                    listeningLinks:
-                      language.formatUnitList(
-                        listeningLinks.map(link =>
-                          link.slot('tab', 'separate'))),
-                  }),
-              }),
+                    accent:
+                      language.$(titleCapsule, 'accent', {
+                        [language.onlyIfOptions]: ['listeningLinks'],
+                        listeningLinks:
+                          language.formatUnitList(
+                            listeningLinks.map(link =>
+                              link.slot('tab', 'separate'))),
+                      }),
+                  })),
 
               cover?.slots({mode: 'commentary'}),
 
               entries.map(entry => entry.slot('color', color)),
-            ]),
+            ])),
         ],
 
         navLinkStyle: 'hierarchical',
@@ -251,6 +255,5 @@ export default {
         ],
 
         leftSidebar: relations.sidebar,
-      });
-  },
+      })),
 };

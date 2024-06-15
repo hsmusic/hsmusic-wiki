@@ -11,7 +11,7 @@ export default {
     'linkFlashIndex',
   ],
 
-  extraDependencies: ['html', 'language'],
+  extraDependencies: ['language'],
 
   relations: (relation, act) => ({
     layout:
@@ -50,42 +50,42 @@ export default {
         ['media.flashArt', flash.directory, flash.coverArtFileExtension])
   }),
 
-  generate(data, relations, {html, language}) {
-    return relations.layout.slots({
-      title:
-        language.$('flashPage.title', {
-          flash: new html.Tag(null, null, data.name),
-        }),
+  generate: (data, relations, {language}) =>
+    language.encapsulate('flashPage', pageCapsule =>
+      relations.layout.slots({
+        title:
+          language.$(pageCapsule, 'title', {
+            flash: data.name,
+          }),
 
-      color: data.color,
-      headingMode: 'static',
+        color: data.color,
+        headingMode: 'static',
 
-      mainClasses: ['flash-index'],
-      mainContent: [
-        relations.coverGrid.slots({
-          links: relations.flashLinks,
-          names: data.flashNames,
-          lazy: 6,
+        mainClasses: ['flash-index'],
+        mainContent: [
+          relations.coverGrid.slots({
+            links: relations.flashLinks,
+            names: data.flashNames,
+            lazy: 6,
 
-          images:
-            stitchArrays({
-              image: relations.coverGridImages,
-              path: data.flashCoverPaths,
-            }).map(({image, path}) =>
-                image.slot('path', path)),
-        }),
-      ],
+            images:
+              stitchArrays({
+                image: relations.coverGridImages,
+                path: data.flashCoverPaths,
+              }).map(({image, path}) =>
+                  image.slot('path', path)),
+          }),
+        ],
 
-      navLinkStyle: 'hierarchical',
-      navLinks: [
-        {auto: 'home'},
-        {html: relations.flashIndexLink},
-        {auto: 'current'},
-      ],
+        navLinkStyle: 'hierarchical',
+        navLinks: [
+          {auto: 'home'},
+          {html: relations.flashIndexLink},
+          {auto: 'current'},
+        ],
 
-      navBottomRowContent: relations.flashActNavAccent,
+        navBottomRowContent: relations.flashActNavAccent,
 
-      leftSidebar: relations.sidebar,
-    });
-  },
+        leftSidebar: relations.sidebar,
+      })),
 };

@@ -57,46 +57,48 @@ export default {
     };
   },
 
-  generate(data, relations, {html, language}) {
-    return relations.layout.slots({
-      title: language.$('commentaryIndex.title'),
+  generate: (data, relations, {html, language}) =>
+    language.encapsulate('commentaryIndex', pageCapsule =>
+      relations.layout.slots({
+        title: language.$(pageCapsule, 'title'),
 
-      headingMode: 'static',
+        headingMode: 'static',
 
-      mainClasses: ['long-content'],
-      mainContent: [
-        html.tag('p', language.$('commentaryIndex.infoLine', {
-          words:
-            html.tag('b',
-              language.formatWordCount(data.totalWordCount, {unit: true})),
+        mainClasses: ['long-content'],
+        mainContent: [
+          html.tag('p', language.$(pageCapsule, 'infoLine', {
+            words:
+              html.tag('b',
+                language.formatWordCount(data.totalWordCount, {unit: true})),
 
-          entries:
-            html.tag('b',
-                language.countCommentaryEntries(data.totalEntryCount, {unit: true})),
-        })),
+            entries:
+              html.tag('b',
+                  language.countCommentaryEntries(data.totalEntryCount, {unit: true})),
+          })),
 
-        html.tag('p',
-          language.$('commentaryIndex.albumList.title')),
+          language.encapsulate(pageCapsule, 'albumList', listCapsule => [
+            html.tag('p',
+              language.$(listCapsule, 'title')),
 
-        html.tag('ul',
-          stitchArrays({
-            albumLink: relations.albumLinks,
-            wordCount: data.wordCounts,
-            entryCount: data.entryCounts,
-          }).map(({albumLink, wordCount, entryCount}) =>
-            html.tag('li',
-              language.$('commentaryIndex.albumList.item', {
-                album: albumLink,
-                words: language.formatWordCount(wordCount, {unit: true}),
-                entries: language.countCommentaryEntries(entryCount, {unit: true}),
-              })))),
-      ],
+            html.tag('ul',
+              stitchArrays({
+                albumLink: relations.albumLinks,
+                wordCount: data.wordCounts,
+                entryCount: data.entryCounts,
+              }).map(({albumLink, wordCount, entryCount}) =>
+                html.tag('li',
+                  language.$(listCapsule, 'item', {
+                    album: albumLink,
+                    words: language.formatWordCount(wordCount, {unit: true}),
+                    entries: language.countCommentaryEntries(entryCount, {unit: true}),
+                  })))),
+          ]),
+        ],
 
-      navLinkStyle: 'hierarchical',
-      navLinks: [
-        {auto: 'home'},
-        {auto: 'current'},
-      ],
-    });
-  },
+        navLinkStyle: 'hierarchical',
+        navLinks: [
+          {auto: 'home'},
+          {auto: 'current'},
+        ],
+      })),
 };

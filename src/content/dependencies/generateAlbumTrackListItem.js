@@ -80,54 +80,51 @@ export default {
     },
   },
 
-  generate(data, relations, slots, {getColors, html, language}) {
-    let colorStyle;
-    if (data.color) {
-      const {primary} = getColors(data.color);
-      colorStyle = {style: `--primary-color: ${primary}`};
-    }
+  generate: (data, relations, slots, {getColors, html, language}) =>
+    language.encapsulate('trackList.item', itemCapsule =>
+      html.tag('li',
+        data.color &&
+          {style: `--primary-color: ${getColors(data.color).primary}`},
 
-    const parts = ['trackList.item'];
-    const options = {};
+        language.encapsulate(itemCapsule, workingCapsule => {
+          const workingOptions = {};
 
-    options.track =
-      relations.trackLink
-        .slot('color', false);
+          workingOptions.track =
+            relations.trackLink
+              .slot('color', false);
 
-    const collapseDuration =
-      (slots.collapseDurationScope === 'track'
-        ? !data.trackHasDuration
-     : slots.collapseDurationScope === 'section'
-        ? !data.sectionHasDuration
-     : slots.collapseDurationScope === 'album'
-        ? !data.albumHasDuration
-        : false);
+          const collapseDuration =
+            (slots.collapseDurationScope === 'track'
+              ? !data.trackHasDuration
+           : slots.collapseDurationScope === 'section'
+              ? !data.sectionHasDuration
+           : slots.collapseDurationScope === 'album'
+              ? !data.albumHasDuration
+              : false);
 
-    if (!collapseDuration) {
-      parts.push('withDuration');
+          if (!collapseDuration) {
+            workingCapsule += '.withDuration';
+            workingOptions.duration =
+              (data.trackHasDuration
+                ? language.$(itemCapsule, 'withDuration.duration', {
+                    duration:
+                      language.formatDuration(data.duration),
+                  })
+                : relations.missingDuration);
+          }
 
-      options.duration =
-        (data.trackHasDuration
-          ? language.$('trackList.item.withDuration.duration', {
-              duration:
-                language.formatDuration(data.duration),
-            })
-          : relations.missingDuration);
-    }
+          if (data.showArtists) {
+            workingCapsule += '.withArtists';
+            workingOptions.by =
+              html.tag('span', {class: 'by'},
+                html.metatag('chunkwrap', {split: ','},
+                  html.resolve(
+                    language.$(itemCapsule, 'withArtists.by', {
+                      artists:
+                        language.formatConjunctionList(relations.contributionLinks),
+                    }))));
+          }
 
-    if (data.showArtists) {
-      parts.push('withArtists');
-      options.by =
-        html.tag('span', {class: 'by'},
-          html.metatag('chunkwrap', {split: ','},
-            html.resolve(
-              language.$('trackList.item.withArtists.by', {
-                artists: language.formatConjunctionList(relations.contributionLinks),
-              }))));
-    }
-
-    return html.tag('li',
-      colorStyle,
-      language.formatString(...parts, options));
-  },
+          return language.$(workingCapsule, workingOptions);
+        }))),
 };

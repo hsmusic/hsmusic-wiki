@@ -41,34 +41,34 @@ export default {
     return data;
   },
 
-  generate(data, relations, {absoluteTo, language, urls}) {
-    return relations.socialEmbed.slots({
-      title:
-        language.$('albumPage.socialEmbed.title', {
-          album: data.albumName,
-        }),
+  generate: (data, relations, {absoluteTo, language, urls}) =>
+    language.encapsulate('albumPage.socialEmbed', embedCapsule =>
+      relations.socialEmbed.slots({
+        title:
+          language.$(embedCapsule, 'title', {
+            album: data.albumName,
+          }),
 
-      description: relations.description,
+        description: relations.description,
 
-      headingContent:
-        (data.hasHeading
-          ? language.$('albumPage.socialEmbed.heading', {
-              group: data.headingGroupName,
-            })
-          : null),
+        headingContent:
+          (data.hasHeading
+            ? language.$(embedCapsule, 'heading', {
+                group: data.headingGroupName,
+              })
+            : null),
 
-      headingLink:
-        (data.hasHeading
-          ? absoluteTo('localized.groupGallery', data.headingGroupDirectory)
-          : null),
+        headingLink:
+          (data.hasHeading
+            ? absoluteTo('localized.groupGallery', data.headingGroupDirectory)
+            : null),
 
-      imagePath:
-        (data.hasImage
-          ? '/' +
-            urls
-              .from('shared.root')
-              .to('media.albumCover', data.coverArtDirectory, data.coverArtFileExtension)
-          : null),
-    });
-  },
+        imagePath:
+          (data.hasImage
+            ? '/' +
+              urls
+                .from('shared.root')
+                .to('media.albumCover', data.coverArtDirectory, data.coverArtFileExtension)
+            : null),
+      })),
 };

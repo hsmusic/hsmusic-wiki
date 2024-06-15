@@ -11,23 +11,25 @@ export default {
   }),
 
   generate: (relations, {html, language}) =>
-    relations.textWithTooltip.slots({
-      attributes: {class: 'missing-duration'},
-      customInteractionCue: true,
+    language.encapsulate('trackList.item.withDuration', itemCapsule =>
+      language.encapsulate(itemCapsule, 'duration', durationCapsule =>
+        relations.textWithTooltip.slots({
+          attributes: {class: 'missing-duration'},
+          customInteractionCue: true,
 
-      text:
-        language.$('trackList.item.withDuration.duration', {
-          duration:
-            html.tag('span', {class: 'text-with-tooltip-interaction-cue'},
-              language.$('trackList.item.withDuration.duration.missing')),
-        }),
+          text:
+            language.$(durationCapsule, {
+              duration:
+                html.tag('span', {class: 'text-with-tooltip-interaction-cue'},
+                  language.$(durationCapsule, 'missing')),
+            }),
 
-      tooltip:
-        relations.tooltip.slots({
-          attributes: {class: 'missing-duration-tooltip'},
+          tooltip:
+            relations.tooltip.slots({
+              attributes: {class: 'missing-duration-tooltip'},
 
-          content:
-            language.$('trackList.item.withDuration.duration.missing.info'),
-        }),
-    }),
+              content:
+                language.$(durationCapsule, 'missing.info'),
+            }),
+        }))),
 };

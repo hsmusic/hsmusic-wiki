@@ -46,16 +46,17 @@ export default {
       annotation: data.annotation,
 
       content:
-        (data.kind === 'track-cover'
-          ? language.$('artistPage.creditList.entry.track', {
-              track: relations.trackLink,
-            })
-          : html.tag('i',
-              language.$('artistPage.creditList.entry.album',
-                {
-                  'wallpaper': 'wallpaperArt',
-                  'banner': 'bannerArt',
-                  'album-cover': 'coverArt',
-                }[data.kind]))),
+        language.encapsulate('artistPage.creditList.entry', capsule =>
+          (data.kind === 'track-cover'
+            ? language.$(capsule, 'track', {
+                track: relations.trackLink,
+              })
+            : html.tag('i',
+                language.encapsulate(capsule, 'album', capsule =>
+                  (data.kind === 'wallpaper'
+                    ? language.$(capsule, 'wallpaperArt')
+                 : data.kind === 'banner'
+                    ? language.$(capsule, 'bannerArt')
+                    : language.$(capsule, 'coverArt')))))),
     }),
 };

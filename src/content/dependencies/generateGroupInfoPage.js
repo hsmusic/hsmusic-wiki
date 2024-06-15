@@ -53,38 +53,41 @@ export default {
   }),
 
   generate: (data, relations, {html, language}) =>
-    relations.layout.slots({
-      title: language.$('groupInfoPage.title', {group: data.name}),
-      headingMode: 'sticky',
-      color: data.color,
+    language.encapsulate('groupInfoPage', pageCapsule =>
+      relations.layout.slots({
+        title: language.$(pageCapsule, 'title', {group: data.name}),
+        headingMode: 'sticky',
+        color: data.color,
 
-      mainContent: [
-        html.tag('p',
-          {[html.onlyIfContent]: true},
-          language.$('releaseInfo.visitOn', {
-            [language.onlyIfOptions]: ['links'],
-            links:
-              language.formatDisjunctionList(
-                relations.visitLinks
-                  .map(link => link.slot('context', 'group'))),
-          })),
+        mainContent: [
+          html.tag('p',
+            {[html.onlyIfContent]: true},
 
-        html.tag('blockquote',
-          {[html.onlyIfContent]: true},
-          relations.description.slot('mode', 'multiline')),
+            language.$('releaseInfo.visitOn', {
+              [language.onlyIfOptions]: ['links'],
 
-        relations.albumSection,
-      ],
+              links:
+                language.formatDisjunctionList(
+                  relations.visitLinks
+                    .map(link => link.slot('context', 'group'))),
+            })),
 
-      leftSidebar:
-        (relations.sidebar
-          ? relations.sidebar
-              .content /* TODO: Kludge. */
-          : null),
+          html.tag('blockquote',
+            {[html.onlyIfContent]: true},
+            relations.description.slot('mode', 'multiline')),
 
-      navLinkStyle: 'hierarchical',
-      navLinks: relations.navLinks.content,
+          relations.albumSection,
+        ],
 
-      secondaryNav: relations.secondaryNav ?? null,
-    }),
+        leftSidebar:
+          (relations.sidebar
+            ? relations.sidebar
+                .content /* TODO: Kludge. */
+            : null),
+
+        navLinkStyle: 'hierarchical',
+        navLinks: relations.navLinks.content,
+
+        secondaryNav: relations.secondaryNav ?? null,
+      })),
 };

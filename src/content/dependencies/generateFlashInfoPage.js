@@ -77,86 +77,91 @@ export default {
   }),
 
   generate: (data, relations, {html, language}) =>
-    relations.layout.slots({
-      title:
-        language.$('flashPage.title', {
-          flash: data.name,
-        }),
+    language.encapsulate('flashPage', pageCapsule =>
+      relations.layout.slots({
+        title:
+          language.$(pageCapsule, 'title', {
+            flash: data.name,
+          }),
 
-      color: data.color,
-      headingMode: 'sticky',
+        color: data.color,
+        headingMode: 'sticky',
 
-      cover:
-        (relations.cover
-          ? relations.cover.slots({
-              alt: language.$('misc.alt.flashArt'),
-            })
-          : null),
+        cover:
+          (relations.cover
+            ? relations.cover.slots({
+                alt: language.$('misc.alt.flashArt'),
+              })
+            : null),
 
-      mainContent: [
-        html.tag('p',
-          language.$('releaseInfo.released', {
-            date: language.formatDate(data.date),
-          })),
+        mainContent: [
+          html.tag('p',
+            language.$('releaseInfo.released', {
+              date: language.formatDate(data.date),
+            })),
 
-        html.tag('p',
-          {[html.onlyIfContent]: true},
-          language.$('releaseInfo.playOn', {
-            [language.onlyIfOptions]: ['links'],
-            links:
-              language.formatDisjunctionList(
-                relations.externalLinks
-                  .map(link => link.slot('context', 'flash'))),
-          })),
+          html.tag('p',
+            {[html.onlyIfContent]: true},
 
-        html.tag('p',
-          {[html.onlyIfContent]: true},
-          {[html.joinChildren]: html.tag('br')},
+            language.$('releaseInfo.playOn', {
+              [language.onlyIfOptions]: ['links'],
 
-          [
-            !html.isBlank(relations.artistCommentarySection) &&
-              language.$('releaseInfo.readCommentary', {
-                link: html.tag('a',
-                  {href: '#artist-commentary'},
-                  language.$('releaseInfo.readCommentary.link')),
+              links:
+                language.formatDisjunctionList(
+                  relations.externalLinks
+                    .map(link => link.slot('context', 'flash'))),
+            })),
+
+          html.tag('p',
+            {[html.onlyIfContent]: true},
+            {[html.joinChildren]: html.tag('br')},
+
+            language.encapsulate('releaseInfo', capsule => [
+              !html.isBlank(relations.artistCommentarySection) &&
+                language.encapsulate(capsule, 'readCommentary', capsule =>
+                  language.$(capsule, {
+                    link:
+                      html.tag('a',
+                        {href: '#artist-commentary'},
+                        language.$(capsule, 'link')),
+                  })),
+            ])),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'features'},
+                title:
+                  language.$('releaseInfo.tracksFeatured', {
+                    flash: html.tag('i', data.name),
+                  }),
               }),
+
+            relations.featuredTracksList,
           ]),
 
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'features'},
-              title:
-                language.$('releaseInfo.tracksFeatured', {
-                  flash: html.tag('i', data.name),
-                }),
-            }),
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'contributors'},
+                title: language.$('releaseInfo.contributors'),
+              }),
 
-          relations.featuredTracksList,
-        ]),
+            relations.contributorContributionList,
+          ]),
 
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'contributors'},
-              title: language.$('releaseInfo.contributors'),
-            }),
+          relations.artistCommentarySection,
+        ],
 
-          relations.contributorContributionList,
-        ]),
+        navLinkStyle: 'hierarchical',
+        navLinks: [
+          {auto: 'home'},
+          {html: relations.flashActLink.slot('color', false)},
+          {auto: 'current'},
+        ],
 
-        relations.artistCommentarySection,
-      ],
+        navBottomRowContent: relations.flashNavAccent,
 
-      navLinkStyle: 'hierarchical',
-      navLinks: [
-        {auto: 'home'},
-        {html: relations.flashActLink.slot('color', false)},
-        {auto: 'current'},
-      ],
-
-      navBottomRowContent: relations.flashNavAccent,
-
-      leftSidebar: relations.sidebar,
-    }),
+        leftSidebar: relations.sidebar,
+      })),
 };

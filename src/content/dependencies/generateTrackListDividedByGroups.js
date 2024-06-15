@@ -80,53 +80,59 @@ export default {
 
   generate: (data, relations, slots, {html, language}) =>
     relations.flatList ??
-    html.tag('dl', {[html.onlyIfContent]: true}, [
-      stitchArrays({
-        groupName: data.groupNames,
-        groupLink: relations.groupLinks,
-        trackList: relations.groupedTrackLists,
-      }).map(({
-          groupName,
-          groupLink,
-          trackList,
-        }) => [
-          (slots.headingString
-            ? relations.contentHeading.clone().slots({
-                tag: 'dt',
 
-                title:
-                  language.$('trackList.fromGroup', {
-                    group: groupLink
-                  }),
+    html.tag('dl',
+      {[html.onlyIfContent]: true},
 
-                stickyTitle:
-                  language.$(slots.headingString, 'sticky', 'fromGroup', {
-                    group: groupName,
-                  }),
-              })
-            : html.tag('dt',
-                language.$('trackList.fromGroup', {
-                  group: groupLink
-                }))),
+      language.encapsulate('trackList', listCapsule => [
+        stitchArrays({
+          groupName: data.groupNames,
+          groupLink: relations.groupLinks,
+          trackList: relations.groupedTrackLists,
+        }).map(({
+            groupName,
+            groupLink,
+            trackList,
+          }) => [
+            language.encapsulate(listCapsule, 'fromGroup', capsule =>
+              (slots.headingString
+                ? relations.contentHeading.clone().slots({
+                    tag: 'dt',
 
-          html.tag('dd', trackList),
-        ]),
+                    title:
+                      language.$(capsule, {
+                        group: groupLink
+                      }),
 
-      relations.ungroupedTrackList && [
-        (slots.headingString
-          ? relations.contentHeading.clone().slots({
-              tag: 'dt',
+                    stickyTitle:
+                      language.$(slots.headingString, 'sticky', 'fromGroup', {
+                        group: groupName,
+                      }),
+                  })
+                : html.tag('dt',
+                    language.$(capsule, {
+                      group: groupLink
+                    })))),
 
-              title:
-                language.$('trackList.fromOther'),
+            html.tag('dd', trackList),
+          ]),
 
-              stickyTitle:
-                language.$(slots.headingString, 'sticky', 'fromOther'),
-            })
-          : html.tag('dt',
-              language.$('trackList.fromOther'))),
+        relations.ungroupedTrackList && [
+          language.encapsulate(listCapsule, 'fromOther', capsule =>
+            (slots.headingString
+              ? relations.contentHeading.clone().slots({
+                  tag: 'dt',
 
-        html.tag('dd', relations.ungroupedTrackList),
-      ],
-    ]),
+                  title:
+                    language.$(capsule),
+
+                  stickyTitle:
+                    language.$(slots.headingString, 'sticky', 'fromOther'),
+                })
+              : html.tag('dt',
+                  language.$(capsule)))),
+
+          html.tag('dd', relations.ungroupedTrackList),
+        ],
+      ])),
 };

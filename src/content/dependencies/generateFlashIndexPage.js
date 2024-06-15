@@ -81,76 +81,77 @@ export default {
   }),
 
   generate: (data, relations, {html, language}) =>
-    relations.layout.slots({
-      title: language.$('flashIndex.title'),
-      headingMode: 'static',
+    language.encapsulate('flashIndex', pageCapsule =>
+      relations.layout.slots({
+        title: language.$(pageCapsule, 'title'),
+        headingMode: 'static',
 
-      mainClasses: ['flash-index'],
-      mainContent: [
-        html.tags([
-          html.tag('p', {class: 'quick-info'},
-            {[html.onlyIfSiblings]: true},
-            language.$('misc.jumpTo')),
+        mainClasses: ['flash-index'],
+        mainContent: [
+          html.tags([
+            html.tag('p', {class: 'quick-info'},
+              {[html.onlyIfSiblings]: true},
+              language.$('misc.jumpTo')),
 
-          html.tag('ul', {class: 'quick-info'},
-            {[html.onlyIfContent]: true},
-            stitchArrays({
-              colorStyle: relations.jumpLinkColorStyles,
-              anchor: data.jumpLinkAnchors,
-              label: data.jumpLinkLabels,
-            }).map(({colorStyle, anchor, label}) =>
-                html.tag('li',
-                  html.tag('a',
-                    {href: '#' + anchor},
-                    colorStyle,
-                    label)))),
-        ]),
-
-        stitchArrays({
-          colorStyle: relations.actColorStyles,
-          actLink: relations.actLinks,
-          anchor: data.actAnchors,
-
-          coverGrid: relations.actCoverGrids,
-          coverGridImages: relations.actCoverGridImages,
-          coverGridLinks: relations.actCoverGridLinks,
-          coverGridNames: data.actCoverGridNames,
-          coverGridPaths: data.actCoverGridPaths,
-        }).map(({
-            colorStyle,
-            actLink,
-            anchor,
-
-            coverGrid,
-            coverGridImages,
-            coverGridLinks,
-            coverGridNames,
-            coverGridPaths,
-          }, index) => [
-            html.tag('h2',
-              {id: anchor},
-              colorStyle,
-              actLink),
-
-            coverGrid.slots({
-              links: coverGridLinks,
-              names: coverGridNames,
-              lazy: index === 0 ? 4 : true,
-
-              images:
-                stitchArrays({
-                  image: coverGridImages,
-                  path: coverGridPaths,
-                }).map(({image, path}) =>
-                    image.slot('path', path)),
-            }),
+            html.tag('ul', {class: 'quick-info'},
+              {[html.onlyIfContent]: true},
+              stitchArrays({
+                colorStyle: relations.jumpLinkColorStyles,
+                anchor: data.jumpLinkAnchors,
+                label: data.jumpLinkLabels,
+              }).map(({colorStyle, anchor, label}) =>
+                  html.tag('li',
+                    html.tag('a',
+                      {href: '#' + anchor},
+                      colorStyle,
+                      label)))),
           ]),
-      ],
 
-      navLinkStyle: 'hierarchical',
-      navLinks: [
-        {auto: 'home'},
-        {auto: 'current'},
-      ],
-    }),
+          stitchArrays({
+            colorStyle: relations.actColorStyles,
+            actLink: relations.actLinks,
+            anchor: data.actAnchors,
+
+            coverGrid: relations.actCoverGrids,
+            coverGridImages: relations.actCoverGridImages,
+            coverGridLinks: relations.actCoverGridLinks,
+            coverGridNames: data.actCoverGridNames,
+            coverGridPaths: data.actCoverGridPaths,
+          }).map(({
+              colorStyle,
+              actLink,
+              anchor,
+
+              coverGrid,
+              coverGridImages,
+              coverGridLinks,
+              coverGridNames,
+              coverGridPaths,
+            }, index) => [
+              html.tag('h2',
+                {id: anchor},
+                colorStyle,
+                actLink),
+
+              coverGrid.slots({
+                links: coverGridLinks,
+                names: coverGridNames,
+                lazy: index === 0 ? 4 : true,
+
+                images:
+                  stitchArrays({
+                    image: coverGridImages,
+                    path: coverGridPaths,
+                  }).map(({image, path}) =>
+                      image.slot('path', path)),
+              }),
+            ]),
+        ],
+
+        navLinkStyle: 'hierarchical',
+        navLinks: [
+          {auto: 'home'},
+          {auto: 'current'},
+        ],
+      })),
 };

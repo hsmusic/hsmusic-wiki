@@ -47,44 +47,47 @@ export default {
   },
 
   generate: (data, relations, {html, language}) =>
-    html.tags([
-      html.tag('p',
-        {[html.onlyIfContent]: true},
-        {[html.joinChildren]: html.tag('br')},
+    language.encapsulate('releaseInfo', capsule =>
+      html.tags([
+        html.tag('p',
+          {[html.onlyIfContent]: true},
+          {[html.joinChildren]: html.tag('br')},
 
-        [
-          relations.artistContributionLinks
-            .slots({stringKey: 'releaseInfo.by'}),
+          [
+            relations.artistContributionLinks
+              .slots({stringKey: capsule + '.by'}),
 
-          relations.coverArtistContributionsLine
-            ?.slots({stringKey: 'releaseInfo.coverArtBy'}),
+            relations.coverArtistContributionsLine
+              ?.slots({stringKey: capsule + '.coverArtBy'}),
 
-          language.$('releaseInfo.released', {
-            [language.onlyIfOptions]: ['date'],
-            date: language.formatDate(data.date),
-          }),
+            language.$(capsule, 'released', {
+              [language.onlyIfOptions]: ['date'],
+              date: language.formatDate(data.date),
+            }),
 
-          language.$('releaseInfo.artReleased', {
-            [language.onlyIfOptions]: ['date'],
-            date: language.formatDate(data.coverArtDate),
-          }),
+            language.$(capsule, 'artReleased', {
+              [language.onlyIfOptions]: ['date'],
+              date: language.formatDate(data.coverArtDate),
+            }),
 
-          language.$('releaseInfo.duration', {
-            [language.onlyIfOptions]: ['duration'],
-            duration: language.formatDuration(data.duration),
-          }),
-        ]),
+            language.$(capsule, 'duration', {
+              [language.onlyIfOptions]: ['duration'],
+              duration: language.formatDuration(data.duration),
+            }),
+          ]),
 
-      html.tag('p',
-        (relations.externalLinks
-          ? language.$('releaseInfo.listenOn', {
-              links:
-                language.formatDisjunctionList(
-                  relations.externalLinks
-                    .map(link => link.slot('context', 'track'))),
-            })
-          : language.$('releaseInfo.listenOn.noLinks', {
-              name: html.tag('i', data.name),
-            }))),
-    ]),
+        html.tag('p',
+          language.encapsulate(capsule, 'listenOn', capsule =>
+            (relations.externalLinks
+              ? language.$(capsule, {
+                  links:
+                    language.formatDisjunctionList(
+                      relations.externalLinks
+                        .map(link => link.slot('context', 'track'))),
+                })
+              : language.$(capsule, 'noLinks', {
+                  name:
+                    html.tag('i', data.name),
+                })))),
+      ])),
 };

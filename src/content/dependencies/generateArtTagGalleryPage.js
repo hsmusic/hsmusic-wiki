@@ -85,11 +85,11 @@ export default {
     return data;
   },
 
-  generate(data, relations, {html, language}) {
-    return relations.layout
-      .slots({
+  generate: (data, relations, {html, language}) =>
+    language.encapsulate('tagPage', pageCapsule =>
+      relations.layout.slots({
         title:
-          language.$('tagPage.title', {
+          language.$(pageCapsule, 'title', {
             tag: data.name,
           }),
 
@@ -100,7 +100,7 @@ export default {
         mainClasses: ['top-index'],
         mainContent: [
           html.tag('p', {class: 'quick-info'},
-            language.$('tagPage.infoLine', {
+            language.$(pageCapsule, 'infoLine', {
               coverArts: language.countCoverArts(data.numArtworks, {
                 unit: true,
               }),
@@ -143,11 +143,10 @@ export default {
 
           {
             html:
-              language.$('tagPage.nav.tag', {
+              language.$(pageCapsule, 'nav.tag', {
                 tag: relations.artTagMainLink,
               }),
           },
         ],
-      });
-  },
+      })),
 };

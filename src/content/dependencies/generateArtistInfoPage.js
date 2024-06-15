@@ -115,185 +115,198 @@ export default {
   }),
 
   generate: (data, relations, {html, language}) =>
-    relations.layout.slots({
-      title: data.name,
-      headingMode: 'sticky',
+    language.encapsulate('artistPage', pageCapsule =>
+      relations.layout.slots({
+        title: data.name,
+        headingMode: 'sticky',
 
-      cover:
-        (relations.cover
-          ? relations.cover.slots({
-              path: [
-                'media.artistAvatar',
-                data.directory,
-                data.avatarFileExtension,
-              ],
-            })
-          : null),
+        cover:
+          (relations.cover
+            ? relations.cover.slots({
+                path: [
+                  'media.artistAvatar',
+                  data.directory,
+                  data.avatarFileExtension,
+                ],
+              })
+            : null),
 
-      mainContent: [
-        html.tags([
-          html.tag('p',
-            {[html.onlyIfSiblings]: true},
-            language.$('releaseInfo.note')),
-
-          html.tag('blockquote',
-            {[html.onlyIfContent]: true},
-            relations.contextNotes),
-        ]),
-
-        html.tag('p',
-          {[html.onlyIfContent]: true},
-          language.$('releaseInfo.visitOn', {
-            [language.onlyIfOptions]: ['links'],
-            links:
-              language.formatDisjunctionList(
-                relations.visitLinks
-                  .map(link => link.slot('context', 'artist'))),
-          })),
-
-        html.tag('p',
-          {[html.onlyIfContent]: true},
-          language.$('artistPage.viewArtGallery', {
-            [language.onlyIfOptions]: ['link'],
-            link:
-              relations.artistGalleryLink?.slots({
-                content: language.$('artistPage.viewArtGallery.link'),
-              }),
-          })),
-
-        html.tag('p',
-          {[html.onlyIfContent]: true},
-          language.$('misc.jumpTo.withLinks', {
-            [language.onlyIfOptions]: ['links'],
-            links:
-              language.formatUnitList([
-                !html.isBlank(relations.tracksChunkedList) &&
-                  html.tag('a',
-                    {href: '#tracks'},
-                    language.$('artistPage.trackList.title')),
-
-                !html.isBlank(relations.artworksChunkedList) &&
-                  html.tag('a',
-                    {href: '#art'},
-                    language.$('artistPage.artList.title')),
-
-                !html.isBlank(relations.flashesChunkedList) &&
-                  html.tag('a',
-                    {href: '#flashes'},
-                    language.$('artistPage.flashList.title')),
-
-                !html.isBlank(relations.commentaryChunkedList) &&
-                  html.tag('a',
-                    {href: '#commentary'},
-                    language.$('artistPage.commentaryList.title')),
-              ].filter(Boolean)),
-          })),
-
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              tag: 'h2',
-              attributes: {id: 'tracks'},
-              title: language.$('artistPage.trackList.title'),
-            }),
-
-          data.totalDuration > 0 &&
+        mainContent: [
+          html.tags([
             html.tag('p',
               {[html.onlyIfSiblings]: true},
-              language.$('artistPage.contributedDurationLine', {
-                artist: data.name,
-                duration:
-                  language.formatDuration(data.totalDuration, {
-                    approximate: data.totalTrackCount > 1,
-                    unit: true,
-                  }),
-              })),
+              language.$('releaseInfo.note')),
 
-          relations.tracksChunkedList.slots({
-            groupInfo: [
-              relations.tracksGroupInfo
-                .clone()
-                .slots({
-                  title: language.$('artistPage.groupContributions.title.music'),
-                  showSortButton: true,
-                  sort: 'count',
-                  countUnit: 'tracks',
-                  visible: true,
-                }),
-
-              relations.tracksGroupInfo
-                .clone()
-                .slots({
-                  title: language.$('artistPage.groupContributions.title.music'),
-                  showSortButton: true,
-                  sort: 'duration',
-                  countUnit: 'tracks',
-                  visible: false,
-                }),
-            ],
-          }),
-        ]),
-
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              tag: 'h2',
-              attributes: {id: 'art'},
-              title: language.$('artistPage.artList.title'),
-            }),
+            html.tag('blockquote',
+              {[html.onlyIfContent]: true},
+              relations.contextNotes),
+          ]),
 
           html.tag('p',
             {[html.onlyIfContent]: true},
-            language.$('artistPage.viewArtGallery.orBrowseList', {
-              [language.onlyIfOptions]: ['link'],
-              link:
-                relations.artistGalleryLink?.slots({
-                  content: language.$('artistPage.viewArtGallery.link'),
-                }),
+
+            language.$('releaseInfo.visitOn', {
+              [language.onlyIfOptions]: ['links'],
+
+              links:
+                language.formatDisjunctionList(
+                  relations.visitLinks
+                    .map(link => link.slot('context', 'artist'))),
             })),
 
-          relations.artworksChunkedList
-            .slots({
-              groupInfo:
-                relations.artworksGroupInfo
-                  .slots({
-                    title: language.$('artistPage.groupContributions.title.artworks'),
-                    showBothColumns: false,
-                    sort: 'count',
-                    countUnit: 'artworks',
+          html.tag('p',
+            {[html.onlyIfContent]: true},
+
+            language.encapsulate(pageCapsule, 'viewArtGallery', capsule =>
+              language.$(capsule, {
+                [language.onlyIfOptions]: ['link'],
+
+                link:
+                  relations.artistGalleryLink?.slots({
+                    content:
+                      language.$(capsule, 'link'),
                   }),
-            }),
-        ]),
+              }))),
 
-        html.tags([
-          relations.contentHeading.clone()
+          html.tag('p',
+            {[html.onlyIfContent]: true},
+
+            language.$('misc.jumpTo.withLinks', {
+              [language.onlyIfOptions]: ['links'],
+
+              links:
+                language.formatUnitList([
+                  !html.isBlank(relations.tracksChunkedList) &&
+                    html.tag('a',
+                      {href: '#tracks'},
+                      language.$(pageCapsule, 'trackList.title')),
+
+                  !html.isBlank(relations.artworksChunkedList) &&
+                    html.tag('a',
+                      {href: '#art'},
+                      language.$(pageCapsule, 'artList.title')),
+
+                  !html.isBlank(relations.flashesChunkedList) &&
+                    html.tag('a',
+                      {href: '#flashes'},
+                      language.$(pageCapsule, 'flashList.title')),
+
+                  !html.isBlank(relations.commentaryChunkedList) &&
+                    html.tag('a',
+                      {href: '#commentary'},
+                      language.$(pageCapsule, 'commentaryList.title')),
+                ].filter(Boolean)),
+            })),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                tag: 'h2',
+                attributes: {id: 'tracks'},
+                title: language.$(pageCapsule, 'trackList.title'),
+              }),
+
+            data.totalDuration > 0 &&
+              html.tag('p',
+                {[html.onlyIfSiblings]: true},
+
+                language.$(pageCapsule, 'contributedDurationLine', {
+                  artist: data.name,
+                  duration:
+                    language.formatDuration(data.totalDuration, {
+                      approximate: data.totalTrackCount > 1,
+                      unit: true,
+                    }),
+                })),
+
+            relations.tracksChunkedList.slots({
+              groupInfo:
+                language.encapsulate(pageCapsule, 'groupContributions', capsule => [
+                  relations.tracksGroupInfo.clone()
+                    .slots({
+                      title: language.$(capsule, 'title.music'),
+                      showSortButton: true,
+                      sort: 'count',
+                      countUnit: 'tracks',
+                      visible: true,
+                    }),
+
+                  relations.tracksGroupInfo.clone()
+                    .slots({
+                      title: language.$(capsule, 'title.music'),
+                      showSortButton: true,
+                      sort: 'duration',
+                      countUnit: 'tracks',
+                      visible: false,
+                    }),
+                ]),
+            }),
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                tag: 'h2',
+                attributes: {id: 'art'},
+                title: language.$(pageCapsule, 'artList.title'),
+              }),
+
+            html.tag('p',
+              {[html.onlyIfContent]: true},
+
+              language.encapsulate(pageCapsule, 'viewArtGallery', capsule =>
+                language.$(capsule, 'orBrowseList', {
+                  [language.onlyIfOptions]: ['link'],
+
+                  link:
+                    relations.artistGalleryLink?.slots({
+                      content: language.$(capsule, 'link'),
+                    }),
+                }))),
+
+            relations.artworksChunkedList
+              .slots({
+                groupInfo:
+                  language.encapsulate(pageCapsule, 'groupContributions', capsule =>
+                    relations.artworksGroupInfo
+                      .slots({
+                        title: language.$(capsule, 'title.artworks'),
+                        showBothColumns: false,
+                        sort: 'count',
+                        countUnit: 'artworks',
+                      })),
+              }),
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                tag: 'h2',
+                attributes: {id: 'flashes'},
+                title: language.$(pageCapsule, 'flashList.title'),
+              }),
+
+            relations.flashesChunkedList,
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                tag: 'h2',
+                attributes: {id: 'commentary'},
+                title: language.$(pageCapsule, 'commentaryList.title'),
+              }),
+
+            relations.commentaryChunkedList,
+          ]),
+        ],
+
+        navLinkStyle: 'hierarchical',
+        navLinks:
+          relations.artistNavLinks
             .slots({
-              tag: 'h2',
-              attributes: {id: 'flashes'},
-              title: language.$('artistPage.flashList.title'),
-            }),
-
-          relations.flashesChunkedList,
-        ]),
-
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              tag: 'h2',
-              attributes: {id: 'commentary'},
-              title: language.$('artistPage.commentaryList.title'),
-            }),
-
-          relations.commentaryChunkedList,
-        ]),
-      ],
-
-      navLinkStyle: 'hierarchical',
-      navLinks:
-        relations.artistNavLinks
-          .slots({
-            showExtraLinks: true,
-          })
-          .content,
-    }),
+              showExtraLinks: true,
+            })
+            .content,
+      })),
 };

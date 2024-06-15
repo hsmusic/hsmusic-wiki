@@ -91,41 +91,41 @@ export default {
     };
   },
 
-  generate(data, relations, {html, language}) {
-    return relations.layout.slots({
-      title:
-        language.$('newsEntryPage.title', {
-          entry: data.name,
-        }),
+  generate: (data, relations, {html, language}) =>
+    language.encapsulate('newsEntryPage', pageCapsule =>
+      relations.layout.slots({
+        title:
+          language.$(pageCapsule, 'title', {
+            entry: data.name,
+          }),
 
-      headingMode: 'sticky',
+        headingMode: 'sticky',
 
-      mainClasses: ['long-content'],
-      mainContent: [
-        html.tag('p',
-          language.$('newsEntryPage.published', {
-            date: language.formatDate(data.date),
-          })),
+        mainClasses: ['long-content'],
+        mainContent: [
+          html.tag('p',
+            language.$(pageCapsule, 'published', {
+              date: language.formatDate(data.date),
+            })),
 
-        relations.content,
-        relations.readAnotherLinks,
-      ],
+          relations.content,
+          relations.readAnotherLinks,
+        ],
 
-      navLinkStyle: 'hierarchical',
-      navLinks: [
-        {auto: 'home'},
-        {html: relations.newsIndexLink},
-        {
-          auto: 'current',
-          accent:
-            (relations.previousNextLinks
-              ? `(${language.formatUnitList(relations.previousNextLinks.slots({
-                  previousLink: relations.previousEntryNavLink ?? null,
-                  nextLink: relations.nextEntryNavLink ?? null,
-                }).content)})`
-              : null),
-        },
-      ],
-    });
-  },
+        navLinkStyle: 'hierarchical',
+        navLinks: [
+          {auto: 'home'},
+          {html: relations.newsIndexLink},
+          {
+            auto: 'current',
+            accent:
+              (relations.previousNextLinks
+                ? `(${language.formatUnitList(relations.previousNextLinks.slots({
+                    previousLink: relations.previousEntryNavLink ?? null,
+                    nextLink: relations.nextEntryNavLink ?? null,
+                  }).content)})`
+                : null),
+          },
+        ],
+      })),
 };

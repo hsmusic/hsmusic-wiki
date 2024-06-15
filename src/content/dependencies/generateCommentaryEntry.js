@@ -43,60 +43,71 @@ export default {
     color: {validate: v => v.isColor},
   },
 
-  generate(data, relations, slots, {html, language}) {
-    const artistsSpan =
-      html.tag('span', {class: 'commentary-entry-artists'},
-        (relations.artistsContent
-          ? relations.artistsContent.slot('mode', 'inline')
-       : relations.artistLinks
-          ? language.formatConjunctionList(relations.artistLinks)
-          : language.$('misc.artistCommentary.entry.title.noArtists')));
+  generate: (data, relations, slots, {html, language}) =>
+    language.encapsulate('misc.artistCommentary.entry', entryCapsule =>
+      html.tags([
+        html.tag('p', {class: 'commentary-entry-heading'},
+          slots.color &&
+            relations.colorStyle.clone()
+              .slot('color', slots.color),
 
-    const accentParts = ['misc.artistCommentary.entry.title.accent'];
-    const accentOptions = {};
+          language.encapsulate(entryCapsule, 'title', titleCapsule => [
+            html.tag('time',
+              {[html.onlyIfContent]: true},
 
-    if (relations.annotationContent) {
-      accentParts.push('withAnnotation');
-      accentOptions.annotation =
-        relations.annotationContent.slot('mode', 'inline');
-    }
+              language.$(titleCapsule, 'date', {
+                [language.onlyIfOptions]: ['date'],
 
-    const accent =
-      (accentParts.length > 1
-        ? html.tag('span', {class: 'commentary-entry-accent'},
-            language.$(...accentParts, accentOptions))
-        : null);
+                date:
+                  language.formatDate(data.date),
+              })),
 
-    const titlePrefix = 'misc.artistCommentary.entry.title';
-    const titleParts = [titlePrefix];
-    const titleOptions = {artists: artistsSpan};
+            language.encapsulate(titleCapsule, workingCapsule => {
+              const workingOptions = {};
 
-    if (accent) {
-      titleParts.push('withAccent');
-      titleOptions.accent = accent;
-    }
+              workingOptions.artists =
+                html.tag('span', {class: 'commentary-entry-artists'},
+                  (relations.artistsContent
+                    ? relations.artistsContent.slot('mode', 'inline')
+                 : relations.artistLinks
+                    ? language.formatConjunctionList(relations.artistLinks)
+                    : language.$(titleCapsule, 'noArtists')));
 
-    const style =
-      slots.color &&
-        relations.colorStyle.slot('color', slots.color);
+              const accent =
+                html.tag('span', {class: 'commentary-entry-accent'},
+                  {[html.onlyIfContent]: true},
 
-    return html.tags([
-      html.tag('p', {class: 'commentary-entry-heading'},
-        style,
-        [
-          html.tag('time',
-            {[html.onlyIfContent]: true},
-            language.$(titlePrefix, 'date', {
-              [language.onlyIfOptions]: ['date'],
-              date: language.formatDate(data.date),
-            })),
+                  language.encapsulate(titleCapsule, 'accent', accentCapsule =>
+                    language.encapsulate(accentCapsule, workingCapsule => {
+                      const workingOptions = {};
 
-          language.$(...titleParts, titleOptions),
-        ]),
+                      if (relations.annotationContent) {
+                        workingCapsule += '.withAnnotation';
+                        workingOptions.annotation =
+                          relations.annotationContent.slot('mode', 'inline');
+                      }
 
-      html.tag('blockquote', {class: 'commentary-entry-body'},
-        style,
-        relations.bodyContent.slot('mode', 'multiline')),
-    ]);
-  },
+                      if (workingCapsule === accentCapsule) {
+                        return html.blank();
+                      } else {
+                        return language.$(workingCapsule, workingOptions);
+                      }
+                    })));
+
+              if (!html.isBlank(accent)) {
+                workingCapsule += '.withAccent';
+                workingOptions.accent = accent;
+              }
+
+              return language.$(workingCapsule, workingOptions);
+            }),
+          ])),
+
+        html.tag('blockquote', {class: 'commentary-entry-body'},
+          slots.color &&
+            relations.colorStyle.clone()
+              .slot('color', slots.color),
+
+          relations.bodyContent.slot('mode', 'multiline')),
+      ])),
 };

@@ -55,10 +55,12 @@ export default {
   },
 
   generate(data, relations, slots, {getColors, html, language}) {
+    const capsule = language.encapsulate('albumSidebar.trackList');
+
     const sectionName =
       html.tag('span', {class: 'group-name'},
         (data.isDefaultTrackSection
-          ? language.$('albumSidebar.trackList.fallbackSectionName')
+          ? language.$(capsule, 'fallbackSectionName')
           : data.name));
 
     let colorStyle;
@@ -78,7 +80,7 @@ export default {
           data.tracksAreMissingCommentary[index] &&
             {class: 'no-commentary'},
 
-          language.$('albumSidebar.trackList.item', {
+          language.$(capsule, 'item', {
             track:
               (slots.mode === 'commentary' && data.tracksAreMissingCommentary[index]
                 ? trackLink.slots({
@@ -117,14 +119,17 @@ export default {
           colorStyle,
 
           html.tag('span',
-            (data.hasTrackNumbers
-              ? language.$('albumSidebar.trackList.group.withRange', {
-                  group: sectionName,
-                  range: `${data.firstTrackNumber}–${data.lastTrackNumber}`
-                })
-              : language.$('albumSidebar.trackList.group', {
-                  group: sectionName,
-                })))),
+            language.encapsulate(capsule, 'group', capsule => {
+              const options = {group: sectionName};
+
+              if (data.hasTrackNumbers) {
+                capsule += '.withRange';
+                options.range =
+                  `${data.firstTrackNumber}–${data.lastTrackNumber}`;
+              }
+
+              return language.$(capsule, options);
+            }))),
 
         (data.hasTrackNumbers
           ? html.tag('ol',

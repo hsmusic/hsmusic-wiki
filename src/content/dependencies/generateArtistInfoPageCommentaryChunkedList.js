@@ -216,53 +216,52 @@ export default {
           itemAnnotations,
           itemTypes,
         }) =>
-          (chunkType === 'album'
-            ? chunk.slots({
-                mode: 'album',
-                albumLink: chunkLink,
-                items:
-                  stitchArrays({
-                    item: items,
-                    link: itemLinks,
-                    annotation: itemAnnotations,
-                    type: itemTypes,
-                  }).map(({item, link, annotation, type}) =>
-                    item.slots({
-                      annotation:
-                        (annotation
-                          ? annotation.slot('mode', 'inline')
-                          : null),
+          language.encapsulate('artistPage.creditList.entry', capsule =>
+            (chunkType === 'album'
+              ? chunk.slots({
+                  mode: 'album',
+                  albumLink: chunkLink,
+                  items:
+                    stitchArrays({
+                      item: items,
+                      link: itemLinks,
+                      annotation: itemAnnotations,
+                      type: itemTypes,
+                    }).map(({item, link, annotation, type}) =>
+                      item.slots({
+                        annotation:
+                          (annotation
+                            ? annotation.slot('mode', 'inline')
+                            : null),
 
-                      content:
-                        (type === 'album'
-                          ? html.tag('i',
-                              language.$('artistPage.creditList.entry.album.commentary'))
-                          : language.$('artistPage.creditList.entry.track', {
-                              track: link,
-                            })),
-                    })),
-              })
-         : chunkType === 'flash-act'
-            ? chunk.slots({
-                mode: 'flash',
-                flashActLink: chunkLink,
-                items:
-                  stitchArrays({
-                    item: items,
-                    link: itemLinks,
-                    annotation: itemAnnotations,
-                  }).map(({item, link, annotation}) =>
-                    item.slots({
-                      annotation:
-                        (annotation
-                          ? annotation.slot('mode', 'inline')
-                          : null),
+                        content:
+                          (type === 'album'
+                            ? html.tag('i',
+                                language.$(capsule, 'album.commentary'))
+                            : language.$(capsule, 'track', {track: link})),
+                      })),
+                })
+           : chunkType === 'flash-act'
+              ? chunk.slots({
+                  mode: 'flash',
+                  flashActLink: chunkLink,
+                  items:
+                    stitchArrays({
+                      item: items,
+                      link: itemLinks,
+                      annotation: itemAnnotations,
+                    }).map(({item, link, annotation}) =>
+                      item.slots({
+                        annotation:
+                          (annotation
+                            ? annotation.slot('mode', 'inline')
+                            : null),
 
-                      content:
-                        language.$('artistPage.creditList.entry.flash', {
-                          flash: link,
-                        }),
-                    })),
-              })
-            : null))),
+                        content:
+                          language.$(capsule, 'flash', {
+                            flash: link,
+                          }),
+                      })),
+                })
+              : null)))),
 };

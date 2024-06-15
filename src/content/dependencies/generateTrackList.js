@@ -31,14 +31,16 @@ export default {
         contributionLinks: relations.contributionLinks,
       }).map(({trackLink, contributionLinks}) =>
           html.tag('li',
-            (empty(contributionLinks)
-              ? trackLink
-              : language.$('trackList.item.withArtists', {
-                  track: trackLink,
-                  by:
+            language.encapsulate('trackList.item', itemCapsule =>
+              language.encapsulate(itemCapsule, workingCapsule => {
+                const workingOptions = {track: trackLink};
+
+                if (!empty(contributionLinks)) {
+                  workingCapsule += '.withArtists';
+                  workingOptions.by =
                     html.tag('span', {class: 'by'},
                       html.metatag('chunkwrap', {split: ','},
-                        language.$('trackList.item.withArtists.by', {
+                        language.$(itemCapsule, 'withArtists.by', {
                           artists:
                             language.formatConjunctionList(
                               contributionLinks.map(link =>
@@ -46,6 +48,9 @@ export default {
                                   showContribution: slots.showContribution,
                                   showIcons: slots.showIcons,
                                 }))),
-                        }))),
-                }))))),
+                        })));
+                }
+
+                return language.$(workingCapsule, workingOptions);
+              }))))),
 };
