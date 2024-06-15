@@ -92,109 +92,120 @@ export default {
   }),
 
   generate: (data, relations, {html, language}) =>
-    relations.layout.slots({
-      title: language.$('albumPage.title', {album: data.name}),
-      headingMode: 'sticky',
+    language.encapsulate('albumPage', pageCapsule =>
+      relations.layout.slots({
+        title:
+          language.$(pageCapsule, 'title', {
+            album: data.name,
+          }),
 
-      color: data.color,
-      styleRules: [relations.albumStyleRules],
+        color: data.color,
+        headingMode: 'sticky',
+        styleRules: [relations.albumStyleRules],
 
-      cover:
-        relations.cover
-          ?.slots({
-            alt: language.$('misc.alt.albumCover'),
-          })
-          ?? null,
+        cover:
+          relations.cover
+            ?.slots({
+              alt: language.$('misc.alt.albumCover'),
+            })
+            ?? null,
 
-      mainContent: [
-        relations.releaseInfo,
+        mainContent: [
+          relations.releaseInfo,
 
-        html.tag('p',
-          {[html.onlyIfContent]: true},
-          {[html.joinChildren]: html.tag('br')},
+          html.tag('p',
+            {[html.onlyIfContent]: true},
+            {[html.joinChildren]: html.tag('br')},
 
-          [
-            !html.isBlank(relations.additionalFilesList) &&
-              language.$('releaseInfo.additionalFiles.shortcut', {
-                link: html.tag('a',
-                  {href: '#additional-files'},
-                  language.$('releaseInfo.additionalFiles.shortcut.link')),
+            language.encapsulate('releaseInfo', capsule => [
+              !html.isBlank(relations.additionalFilesList) &&
+                language.$(capsule, 'additionalFiles.shortcut', {
+                  link: html.tag('a',
+                    {href: '#additional-files'},
+                    language.$(capsule, 'additionalFiles.shortcut.link')),
+                }),
+
+              (relations.galleryLink && relations.commentaryLink
+                ? language.encapsulate(capsule, 'viewGalleryOrCommentary', capsule =>
+                    language.$(capsule, {
+                      gallery:
+                        relations.galleryLink
+                          .slot('content', language.$(capsule, 'gallery')),
+
+                      commentary:
+                        relations.commentaryLink
+                          .slot('content', language.$(capsule, 'commentary')),
+                    }))
+
+             : relations.galleryLink
+                ? language.encapsulate(capsule, 'viewGallery', capsule =>
+                    language.$(capsule, {
+                      link:
+                        relations.galleryLink
+                          .slot('content', language.$(capsule, 'link')),
+                    }))
+
+             : relations.commentaryLink
+                ? language.encapsulate(capsule, 'viewCommentary', capsule =>
+                    language.$(capsule, {
+                      link:
+                        relations.commentaryLink
+                          .slot('content', language.$(capsule, 'link')),
+                    }))
+
+                : html.blank()),
+            ])),
+
+          relations.trackList,
+
+          html.tag('p',
+            {[html.onlyIfContent]: true},
+            {[html.joinChildren]: html.tag('br')},
+
+            language.encapsulate('releaseInfo', capsule => [
+              language.$(capsule, 'addedToWiki', {
+                [language.onlyIfOptions]: ['date'],
+                date: language.formatDate(data.dateAddedToWiki),
               }),
+            ])),
 
-            relations.galleryLink && relations.commentaryLink &&
-              language.$('releaseInfo.viewGalleryOrCommentary', {
-                gallery:
-                  relations.galleryLink
-                    .slot('content', language.$('releaseInfo.viewGalleryOrCommentary.gallery')),
-                commentary:
-                  relations.commentaryLink
-                    .slot('content', language.$('releaseInfo.viewGalleryOrCommentary.commentary')),
+          language.encapsulate('releaseInfo.additionalFiles', capsule =>
+            html.tags([
+              relations.contentHeading.clone()
+                .slots({
+                  attributes: {id: 'additional-files'},
+                  title: language.$(capsule, 'heading'),
+                }),
+
+              relations.additionalFilesList,
+            ])),
+
+          relations.artistCommentarySection,
+        ],
+
+        navLinkStyle: 'hierarchical',
+        navLinks: [
+          {auto: 'home'},
+          {
+            auto: 'current',
+            accent:
+              relations.albumNavAccent.slots({
+                showTrackNavigation: true,
+                showExtraLinks: true,
               }),
+          },
+        ],
 
-            relations.galleryLink && !relations.commentaryLink &&
-              language.$('releaseInfo.viewGallery', {
-                link:
-                  relations.galleryLink
-                    .slot('content', language.$('releaseInfo.viewGallery.link')),
-              }),
+        navContent:
+          relations.chronologyLinks,
 
-            !relations.galleryLink && relations.commentaryLink &&
-              language.$('releaseInfo.viewCommentary', {
-                link:
-                  relations.commentaryLink
-                    .slot('content', language.$('releaseInfo.viewCommentary.link')),
-              }),
-          ]),
+        banner: relations.banner ?? null,
+        bannerPosition: 'top',
 
-        relations.trackList,
+        secondaryNav: relations.secondaryNav,
 
-        html.tag('p',
-          {[html.onlyIfContent]: true},
-          {[html.joinChildren]: html.tag('br')},
+        leftSidebar: relations.sidebar,
 
-          [
-            language.$('releaseInfo.addedToWiki', {
-              [language.onlyIfOptions]: ['date'],
-              date: language.formatDate(data.dateAddedToWiki),
-            }),
-          ]),
-
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'additional-files'},
-              title: language.$('releaseInfo.additionalFiles.heading'),
-            }),
-
-          relations.additionalFilesList,
-        ]),
-
-        relations.artistCommentarySection,
-      ],
-
-      navLinkStyle: 'hierarchical',
-      navLinks: [
-        {auto: 'home'},
-        {
-          auto: 'current',
-          accent:
-            relations.albumNavAccent.slots({
-              showTrackNavigation: true,
-              showExtraLinks: true,
-            }),
-        },
-      ],
-
-      navContent:
-        relations.chronologyLinks,
-
-      banner: relations.banner ?? null,
-      bannerPosition: 'top',
-
-      secondaryNav: relations.secondaryNav,
-
-      leftSidebar: relations.sidebar,
-
-      socialEmbed: relations.socialEmbed,
-    }),
+        socialEmbed: relations.socialEmbed,
+      })),
 };

@@ -160,11 +160,11 @@ export default {
     return data;
   },
 
-  generate(data, relations, {language}) {
-    return relations.layout
-      .slots({
+  generate: (data, relations, {language}) =>
+    language.encapsulate('albumGalleryPage', pageCapsule =>
+      relations.layout.slots({
         title:
-          language.$('albumGalleryPage.title', {
+          language.$(pageCapsule, 'title', {
             album: data.name,
           }),
 
@@ -223,6 +223,5 @@ export default {
         ],
 
         secondaryNav: relations.secondaryNav,
-      });
-  },
+      })),
 };

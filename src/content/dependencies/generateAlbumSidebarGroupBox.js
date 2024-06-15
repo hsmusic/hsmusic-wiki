@@ -77,45 +77,50 @@ export default {
   },
 
   generate: (relations, slots, {html, language}) =>
-    relations.box.slots({
-      attributes: {class: 'individual-group-sidebar-box'},
-      content: [
-        html.tag('h1',
-          language.$('albumSidebar.groupBox.title', {
-            group: relations.groupLink,
-          })),
-
-        slots.mode === 'album' &&
-          relations.description
-            ?.slot('mode', 'multiline'),
-
-        html.tag('p',
-          {[html.onlyIfContent]: true},
-
-          language.$('releaseInfo.visitOn', {
-            [language.onlyIfOptions]: ['links'],
-
-            links:
-              language.formatDisjunctionList(
-                relations.externalLinks
-                  .map(link => link.slot('context', 'group'))),
-          })),
-
-        slots.mode === 'album' &&
-          html.tag('p', {class: 'group-chronology-link'},
-            {[html.onlyIfContent]: true},
-            language.$('albumSidebar.groupBox.next', {
-              [language.onlyIfOptions]: ['album'],
-              album: relations.nextAlbumLink,
+    language.encapsulate('albumSidebar.groupBox', boxCapsule =>
+      relations.box.slots({
+        attributes: {class: 'individual-group-sidebar-box'},
+        content: [
+          html.tag('h1',
+            language.$(boxCapsule, 'title', {
+              group: relations.groupLink,
             })),
 
-        slots.mode === 'album' &&
-          html.tag('p', {class: 'group-chronology-link'},
+          slots.mode === 'album' &&
+            relations.description
+              ?.slot('mode', 'multiline'),
+
+          html.tag('p',
             {[html.onlyIfContent]: true},
-            language.$('albumSidebar.groupBox.previous', {
-              [language.onlyIfOptions]: ['album'],
-              album: relations.previousAlbumLink,
+
+            language.$('releaseInfo.visitOn', {
+              [language.onlyIfOptions]: ['links'],
+
+              links:
+                language.formatDisjunctionList(
+                  relations.externalLinks
+                    .map(link => link.slot('context', 'group'))),
             })),
-      ],
-    }),
+
+          slots.mode === 'album' &&
+            html.tag('p', {class: 'group-chronology-link'},
+              {[html.onlyIfContent]: true},
+
+              language.$(boxCapsule, 'next', {
+                [language.onlyIfOptions]: ['album'],
+
+                album: relations.nextAlbumLink,
+              })),
+
+          slots.mode === 'album' &&
+            html.tag('p', {class: 'group-chronology-link'},
+              {[html.onlyIfContent]: true},
+
+              language.$(boxCapsule, 'previous', {
+                [language.onlyIfOptions]: ['album'],
+
+                album: relations.previousAlbumLink,
+              })),
+        ],
+      })),
 };

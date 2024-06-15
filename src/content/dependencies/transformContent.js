@@ -279,15 +279,16 @@ export default {
                       {class: 'align-center'},
 
                     {title:
-                      language.$('misc.external.opensInNewTab', {
-                        link:
-                          language.formatExternalLink(link, {
-                            style: 'platform',
-                          }),
+                      language.encapsulate('misc.external.opensInNewTab', capsule =>
+                        language.$(capsule, {
+                          link:
+                            language.formatExternalLink(link, {
+                              style: 'platform',
+                            }),
 
-                        annotation:
-                          language.$('misc.external.opensInNewTab.annotation'),
-                      }).toString()},
+                          annotation:
+                            language.$(capsule, 'annotation'),
+                        }).toString())},
 
                     content);
               }

@@ -21,42 +21,38 @@ export default {
     rerelease: {type: 'boolean'},
   },
 
-  generate(slots, {html, language}) {
-    let accentedContent = slots.content;
-
-    accent: {
-      if (slots.rerelease) {
-        accentedContent =
-          language.$('artistPage.creditList.entry.rerelease', {
-            entry: accentedContent,
-          });
-
-        break accent;
-      }
-
-      const parts = ['artistPage.creditList.entry'];
-      const options = {entry: accentedContent};
-
-      if (!empty(slots.otherArtistLinks)) {
-        parts.push('withArtists');
-        options.artists = language.formatConjunctionList(slots.otherArtistLinks);
-      }
-
-      if (!html.isBlank(slots.annotation)) {
-        parts.push('withAnnotation');
-        options.annotation = slots.annotation;
-      }
-
-      if (parts.length === 1) {
-        break accent;
-      }
-
-      accentedContent = language.formatString(...parts, options);
-    }
-
-    return (
+  generate: (slots, {html, language}) =>
+    language.encapsulate('artistPage.creditList.entry', entryCapsule =>
       html.tag('li',
         slots.rerelease && {class: 'rerelease'},
-        accentedContent));
-  },
+
+        language.encapsulate(entryCapsule, workingCapsule => {
+          const workingOptions = {entry: slots.content};
+
+          if (slots.rerelease) {
+            workingCapsule += '.rerelease';
+            return language.$(workingCapsule, workingOptions);
+          }
+
+          let anyAccent = false;
+
+          if (!empty(slots.otherArtistLinks)) {
+            anyAccent = true;
+            workingCapsule += '.withArtists';
+            workingOptions.artists =
+              language.formatConjunctionList(slots.otherArtistLinks);
+          }
+
+          if (!html.isBlank(slots.annotation)) {
+            anyAccent = true;
+            workingCapsule += '.withAnnotation';
+            workingOptions.annotation = slots.annotation;
+          }
+
+          if (anyAccent) {
+            return language.$(workingCapsule, workingOptions);
+          } else {
+            return slots.content;
+          }
+        }))),
 };

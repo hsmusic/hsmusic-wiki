@@ -84,11 +84,11 @@ export default {
     return data;
   },
 
-  generate(data, relations, {html, language}) {
-    return relations.layout
-      .slots({
+  generate: (data, relations, {html, language}) =>
+    language.encapsulate('artistGalleryPage', pageCapsule =>
+      relations.layout.slots({
         title:
-          language.$('artistGalleryPage.title', {
+          language.$(pageCapsule, 'title', {
             artist: data.name,
           }),
 
@@ -97,10 +97,11 @@ export default {
         mainClasses: ['top-index'],
         mainContent: [
           html.tag('p', {class: 'quick-info'},
-            language.$('artistGalleryPage.infoLine', {
-              coverArts: language.countCoverArts(data.numArtworks, {
-                unit: true,
-              }),
+            language.$(pageCapsule, 'infoLine', {
+              coverArts:
+                language.countCoverArts(data.numArtworks, {
+                  unit: true,
+                }),
             })),
 
           relations.coverGrid
@@ -119,6 +120,7 @@ export default {
                       dimensions,
                     })),
 
+              // TODO: Can this be [language.onlyIfOptions]?
               info:
                 data.otherCoverArtists.map(names =>
                   (names === null
@@ -137,6 +139,5 @@ export default {
               currentExtra: 'gallery',
             })
             .content,
-      })
-  },
+      })),
 }

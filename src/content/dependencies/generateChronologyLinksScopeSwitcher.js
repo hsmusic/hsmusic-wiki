@@ -32,18 +32,19 @@ export default {
         {class: 'underline-white'},
 
         html.tag('span',
-          language.$('trackPage.nav.chronology.scope.title', {
-            scope:
-              slots.scopes.map((scope, index) =>
-                html.tag('a', {class: 'switcher-link'},
-                  {href: '#'},
+          language.encapsulate('trackPage.nav.chronology.scope', capsule =>
+            language.$(capsule, 'title', {
+              scope:
+                slots.scopes.map((scope, index) =>
+                  html.tag('a', {class: 'switcher-link'},
+                    {href: '#'},
 
-                  (index === 0
-                    ? {style: 'display: inline'}
-                    : {style: 'display: none'}),
+                    (index === 0
+                      ? {style: 'display: inline'}
+                      : {style: 'display: none'}),
 
-                  language.$('trackPage.nav.chronology.scope', scope))),
-          })));
+                    language.$(capsule, scope))),
+            }))));
 
     const scopeContents =
       stitchArrays({

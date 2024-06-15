@@ -62,18 +62,21 @@ export default {
   },
 
   generate(data, relations, slots, {html, language}) {
+    const albumNavCapsule = language.encapsulate('albumPage.nav');
+    const trackNavCapsule = language.encapsulate('trackPage.nav');
+
     const {content: extraLinks = []} =
       slots.showExtraLinks &&
         {content: [
           (!data.galleryIsStub || slots.currentExtra === 'gallery') &&
             relations.albumGalleryLink?.slots({
               attributes: {class: slots.currentExtra === 'gallery' && 'current'},
-              content: language.$('albumPage.nav.gallery'),
+              content: language.$(albumNavCapsule, 'gallery'),
             }),
 
           relations.albumCommentaryLink?.slots({
             attributes: {class: slots.currentExtra === 'commentary' && 'current'},
-            content: language.$('albumPage.nav.commentary'),
+            content: language.$(albumNavCapsule, 'commentary'),
           }),
         ]};
 
@@ -94,8 +97,8 @@ export default {
           {href: '#', 'data-random': 'track-in-sidebar'},
 
           (data.isTrackPage
-            ? language.$('trackPage.nav.random')
-            : language.$('albumPage.nav.randomTrack')));
+            ? language.$(trackNavCapsule, 'random')
+            : language.$(albumNavCapsule, 'randomTrack')));
 
     const allLinks = [
       ...previousNextLinks,

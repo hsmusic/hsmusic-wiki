@@ -147,27 +147,30 @@ export default {
               durationApproximate,
               startIndex,
             }) => [
-              heading.slots({
-                tag: 'dt',
+              language.encapsulate('trackList.section', capsule =>
+                heading.slots({
+                  tag: 'dt',
 
-                title:
-                  (duration === 0
-                    ? language.$('trackList.section', {
-                        section: name,
-                      })
-                    : language.$('trackList.section.withDuration', {
-                        section: name,
-                        duration:
+                  title:
+                    language.encapsulate(capsule, capsule => {
+                      const options = {section: name};
+
+                      if (duration !== 0) {
+                        capsule += '.withDuration';
+                        options.duration =
                           language.formatDuration(duration, {
                             approximate: durationApproximate,
-                          }),
-                      })),
+                          });
+                      }
 
-                stickyTitle:
-                  language.$('trackList.section.sticky', {
-                    section: name,
-                  }),
-              }),
+                      return language.$(capsule, options);
+                    }),
+
+                  stickyTitle:
+                    language.$(capsule, 'sticky', {
+                      section: name,
+                    }),
+                })),
 
               html.tag('dd',
                 html.tag(listTag,

@@ -39,35 +39,35 @@ export default {
     return data;
   },
 
-  generate(data, relations, {absoluteTo, language, urls}) {
-    return relations.socialEmbed.slots({
-      title:
-        language.$('trackPage.socialEmbed.title', {
-          track: data.trackName,
-        }),
+  generate: (data, relations, {absoluteTo, language, urls}) =>
+    language.encapsulate('trackPage.socialEmbed', embedCapsule =>
+      relations.socialEmbed.slots({
+        title:
+          language.$(embedCapsule, 'title', {
+            track: data.trackName,
+          }),
 
-      headingContent:
-        language.$('trackPage.socialEmbed.heading', {
-          album: data.albumName,
-        }),
+        headingContent:
+          language.$(embedCapsule, 'heading', {
+            album: data.albumName,
+          }),
 
-      headingLink:
-        absoluteTo('localized.album', data.albumDirectory),
+        headingLink:
+          absoluteTo('localized.album', data.albumDirectory),
 
-      imagePath:
-        (data.imageSource === 'album'
-          ? '/' +
-            urls
-              .from('shared.root')
-              .to('media.albumCover', data.albumDirectory, data.coverArtFileExtension)
-       : data.imageSource === 'track'
-          ? '/' +
-            urls
-              .from('shared.root')
-              .to('media.trackCover', data.albumDirectory, data.trackDirectory, data.coverArtFileExtension)
-          : null),
-    });
-  },
+        imagePath:
+          (data.imageSource === 'album'
+            ? '/' +
+              urls
+                .from('shared.root')
+                .to('media.albumCover', data.albumDirectory, data.coverArtFileExtension)
+         : data.imageSource === 'track'
+            ? '/' +
+              urls
+                .from('shared.root')
+                .to('media.trackCover', data.albumDirectory, data.trackDirectory, data.coverArtFileExtension)
+            : null),
+      })),
 };
 
 /*

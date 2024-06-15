@@ -46,37 +46,37 @@ export default {
     },
   },
 
-  generate(data, relations, slots, {html, language}) {
-    return html.tag('details',
-      data.isCurrentCategory &&
-        {class: 'current', open: true},
+  generate: (data, relations, slots, {html, language}) =>
+    language.encapsulate('groupSidebar.groupList', capsule =>
+      html.tag('details',
+        data.isCurrentCategory &&
+          {class: 'current', open: true},
 
-      [
-        html.tag('summary',
-          relations.colorStyle,
+        [
+          html.tag('summary',
+            relations.colorStyle,
 
-          html.tag('span',
-            language.$('groupSidebar.groupList.category', {
-              category:
-                html.tag('span', {class: 'group-name'},
-                  data.name),
-            }))),
+            html.tag('span',
+              language.$(capsule, 'category', {
+                category:
+                  html.tag('span', {class: 'group-name'},
+                    data.name),
+              }))),
 
-        html.tag('ul',
-          stitchArrays(({
-            infoLink: relations.groupInfoLinks,
-            galleryLink: relations.groupGalleryLinks,
-          })).map(({infoLink, galleryLink}, index) =>
-                html.tag('li',
-                  index === data.currentGroupIndex &&
-                    {class: 'current'},
+          html.tag('ul',
+            stitchArrays(({
+              infoLink: relations.groupInfoLinks,
+              galleryLink: relations.groupGalleryLinks,
+            })).map(({infoLink, galleryLink}, index) =>
+                  html.tag('li',
+                    index === data.currentGroupIndex &&
+                      {class: 'current'},
 
-                  language.$('groupSidebar.groupList.item', {
-                    group:
-                      (slots.currentExtra === 'gallery'
-                        ? galleryLink ?? infoLink
-                        : infoLink),
-                  })))),
-      ]);
-  },
+                    language.$(capsule, 'item', {
+                      group:
+                        (slots.currentExtra === 'gallery'
+                          ? galleryLink ?? infoLink
+                          : infoLink),
+                    })))),
+        ])),
 };

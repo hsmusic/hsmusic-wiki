@@ -134,251 +134,278 @@ export default {
   }),
 
   generate: (data, relations, {html, language}) =>
-    relations.layout.slots({
-      title: language.$('trackPage.title', {track: data.name}),
-      headingMode: 'sticky',
+    language.encapsulate('trackPage', pageCapsule =>
+      relations.layout.slots({
+        title:
+          language.$(pageCapsule, 'title', {
+            track: data.name,
+          }),
 
-      additionalNames: relations.additionalNamesBox,
+        headingMode: 'sticky',
 
-      color: data.color,
-      styleRules: [relations.albumStyleRules],
+        additionalNames: relations.additionalNamesBox,
 
-      cover:
-        (relations.cover
-          ? relations.cover.slots({
-              alt: language.$('misc.alt.trackCover'),
-            })
-          : null),
+        color: data.color,
+        styleRules: [relations.albumStyleRules],
 
-      mainContent: [
-        relations.releaseInfo,
+        cover:
+          (relations.cover
+            ? relations.cover.slots({
+                alt: language.$('misc.alt.trackCover'),
+              })
+            : null),
 
-        html.tag('p',
-          {[html.onlyIfContent]: true},
-          {[html.joinChildren]: html.tag('br')},
+        mainContent: [
+          relations.releaseInfo,
 
-          [
-            !html.isBlank(relations.sheetMusicFilesList) &&
-              language.$('releaseInfo.sheetMusicFiles.shortcut', {
-                link: html.tag('a',
-                  {href: '#sheet-music-files'},
-                  language.$('releaseInfo.sheetMusicFiles.shortcut.link')),
+          html.tag('p',
+            {[html.onlyIfContent]: true},
+            {[html.joinChildren]: html.tag('br')},
+
+            language.encapsulate('releaseInfo', capsule => [
+              !html.isBlank(relations.sheetMusicFilesList) &&
+                language.encapsulate(capsule, 'sheetMusicFiles.shortcut', capsule =>
+                  language.$(capsule, {
+                    link:
+                      html.tag('a',
+                        {href: '#sheet-music-files'},
+                        language.$(capsule, 'link')),
+                  })),
+
+              !html.isBlank(relations.midiProjectFilesList) &&
+                language.encapsulate(capsule, 'midiProjectFiles.shortcut', capsule =>
+                  language.$(capsule, {
+                    link:
+                      html.tag('a',
+                        {href: '#midi-project-files'},
+                        language.$(capsule, 'link')),
+                  })),
+
+              !html.isBlank(relations.additionalFilesList) &&
+                language.encapsulate(capsule, 'additionalFiles.shortcut', capsule =>
+                  language.$(capsule, {
+                    link:
+                      html.tag('a',
+                        {href: '#midi-project-files'},
+                        language.$(capsule, 'link')),
+                  })),
+
+              !html.isBlank(relations.artistCommentarySection) &&
+                language.encapsulate(capsule, 'readCommentary', capsule =>
+                  language.$(capsule, {
+                    link:
+                      html.tag('a',
+                        {href: '#artist-commentary'},
+                        language.$(capsule, 'link')),
+                  })),
+            ])),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'also-released-as'},
+                title: language.$('releaseInfo.alsoReleasedAs'),
               }),
 
-            !html.isBlank(relations.midiProjectFilesList) &&
-              language.$('releaseInfo.midiProjectFiles.shortcut', {
-                link: html.tag('a',
-                  {href: '#midi-project-files'},
-                  language.$('releaseInfo.midiProjectFiles.shortcut.link')),
-              }),
-
-            !html.isBlank(relations.additionalFilesList) &&
-              language.$('releaseInfo.additionalFiles.shortcut', {
-                link: html.tag('a',
-                  {href: '#midi-project-files'},
-                  language.$('releaseInfo.additionalFiles.shortcut.link')),
-              }),
-
-            !html.isBlank(relations.artistCommentarySection) &&
-              language.$('releaseInfo.readCommentary', {
-                link: html.tag('a',
-                  {href: '#artist-commentary'},
-                  language.$('releaseInfo.readCommentary.link')),
-              }),
+            relations.otherReleasesList,
           ]),
 
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'also-released-as'},
-              title: language.$('releaseInfo.alsoReleasedAs'),
-            }),
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'contributors'},
+                title: language.$('releaseInfo.contributors'),
+              }),
 
-          relations.otherReleasesList,
-        ]),
+            relations.contributorContributionList,
+          ]),
 
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'contributors'},
-              title: language.$('releaseInfo.contributors'),
-            }),
+          html.tags([
+            language.encapsulate('releaseInfo.tracksReferenced', capsule =>
+              relations.contentHeading.clone()
+                .slots({
+                  attributes: {id: 'references'},
 
-          relations.contributorContributionList,
-        ]),
+                  title:
+                    language.$(capsule, {
+                      track:
+                        html.tag('i', data.name),
+                    }),
 
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'references'},
-
-              title:
-                language.$('releaseInfo.tracksReferenced', {
-                  track: html.tag('i', data.name),
-                }),
-
-              stickyTitle:
-                language.$('releaseInfo.tracksReferenced.sticky'),
-            }),
-
-          relations.referencedTracksList,
-        ]),
-
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'samples'},
-
-              title:
-                language.$('releaseInfo.tracksSampled', {
-                  track: html.tag('i', data.name),
-                }),
-
-              stickyTitle:
-                language.$('releaseInfo.tracksSampled.sticky'),
-            }),
-
-          relations.sampledTracksList,
-        ]),
-
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'referenced-by'},
-
-              title:
-                language.$('releaseInfo.tracksThatReference', {
-                  track: html.tag('i', data.name),
-                }),
-
-              stickyTitle:
-                language.$('releaseInfo.tracksThatReference.sticky'),
-            }),
-
-          relations.referencedByTracksList
-            .slots({
-              headingString: 'releaseInfo.tracksThatReference',
-            }),
-        ]),
-
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'sampled-by'},
-
-              title:
-                language.$('releaseInfo.tracksThatSample', {
-                  track: html.tag('i', data.name),
-                }),
-
-              stickyTitle:
-                language.$('releaseInfo.tracksThatSample.sticky'),
-            }),
-
-          relations.sampledByTracksList
-            .slots({
-              headingString: 'releaseInfo.tracksThatSample',
-            }),
-        ]),
-
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'featured-in'},
-
-              title:
-                language.$('releaseInfo.flashesThatFeature', {
-                  track: html.tag('i', data.name),
-                }),
-
-              stickyTitle:
-                language.$('releaseInfo.flashesThatFeature.sticky'),
-            }),
-
-          relations.flashesThatFeatureList,
-        ]),
-
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'lyrics'},
-              title: language.$('releaseInfo.lyrics'),
-            }),
-
-          html.tag('blockquote',
-            {[html.onlyIfContent]: true},
-            relations.lyrics.slot('mode', 'lyrics')),
-        ]),
-
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'sheet-music-files'},
-              title: language.$('releaseInfo.sheetMusicFiles.heading'),
-            }),
-
-          relations.sheetMusicFilesList,
-        ]),
-
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'midi-project-files'},
-              title: language.$('releaseInfo.midiProjectFiles.heading'),
-            }),
-
-          relations.midiProjectFilesList,
-        ]),
-
-        html.tags([
-          relations.contentHeading.clone()
-            .slots({
-              attributes: {id: 'additional-files'},
-              title: language.$('releaseInfo.additionalFiles.heading'),
-            }),
-
-          relations.additionalFilesList,
-        ]),
-
-        relations.artistCommentarySection,
-      ],
-
-      navLinkStyle: 'hierarchical',
-      navLinks: [
-        {auto: 'home'},
-        {html: relations.albumLink.slot('color', false)},
-        {
-          html:
-            (data.hasTrackNumbers
-              ? language.$('trackPage.nav.track.withNumber', {
-                  number: data.trackNumber,
-                  track: relations.trackLink
-                    .slot('attributes', {class: 'current'}),
-                })
-              : language.$('trackPage.nav.track', {
-                  track: relations.trackLink
-                    .slot('attributes', {class: 'current'}),
+                  stickyTitle:
+                    language.$(capsule, 'sticky'),
                 })),
-        },
-      ],
 
-      navBottomRowContent:
-        relations.albumNavAccent.slots({
-          showTrackNavigation: true,
-          showExtraLinks: false,
-        }),
+            relations.referencedTracksList,
+          ]),
 
-      navContent:
-        relations.chronologyLinks,
+          html.tags([
+            language.encapsulate('releaseInfo.tracksSampled', capsule =>
+              relations.contentHeading.clone()
+                .slots({
+                  attributes: {id: 'samples'},
 
-      secondaryNav:
-        relations.secondaryNav
-          .slot('mode', 'track'),
+                  title:
+                    language.$(capsule, {
+                      track:
+                        html.tag('i', data.name),
+                    }),
 
-      leftSidebar: relations.sidebar,
+                  stickyTitle:
+                    language.$(capsule, 'sticky'),
+                })),
 
-      socialEmbed: relations.socialEmbed,
-    }),
+            relations.sampledTracksList,
+          ]),
+
+          language.encapsulate('releaseInfo.tracksThatReference', capsule =>
+            html.tags([
+              relations.contentHeading.clone()
+                .slots({
+                  attributes: {id: 'referenced-by'},
+
+                  title:
+                    language.$(capsule, {
+                      track: html.tag('i', data.name),
+                    }),
+
+                  stickyTitle:
+                    language.$(capsule, 'sticky'),
+                }),
+
+              relations.referencedByTracksList
+                .slots({
+                  headingString: capsule,
+                }),
+            ])),
+
+          language.encapsulate('releaseInfo.tracksThatSample', capsule =>
+            html.tags([
+              relations.contentHeading.clone()
+                .slots({
+                  attributes: {id: 'sampled-by'},
+
+                  title:
+                    language.$(capsule, {
+                      track: html.tag('i', data.name),
+                    }),
+
+                  stickyTitle:
+                    language.$(capsule, 'sticky'),
+                }),
+
+              relations.sampledByTracksList
+                .slots({
+                  headingString: capsule,
+                }),
+            ])),
+
+          html.tags([
+            language.encapsulate('releaseInfo.flashesThatFeature', capsule =>
+              relations.contentHeading.clone()
+                .slots({
+                  attributes: {id: 'featured-in'},
+
+                  title:
+                    language.$(capsule, {
+                      track: html.tag('i', data.name),
+                    }),
+
+                  stickyTitle:
+                    language.$(capsule, 'sticky'),
+                })),
+
+            relations.flashesThatFeatureList,
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'lyrics'},
+                title: language.$('releaseInfo.lyrics'),
+              }),
+
+            html.tag('blockquote',
+              {[html.onlyIfContent]: true},
+              relations.lyrics.slot('mode', 'lyrics')),
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'sheet-music-files'},
+                title: language.$('releaseInfo.sheetMusicFiles.heading'),
+              }),
+
+            relations.sheetMusicFilesList,
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'midi-project-files'},
+                title: language.$('releaseInfo.midiProjectFiles.heading'),
+              }),
+
+            relations.midiProjectFilesList,
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'additional-files'},
+                title: language.$('releaseInfo.additionalFiles.heading'),
+              }),
+
+            relations.additionalFilesList,
+          ]),
+
+          relations.artistCommentarySection,
+        ],
+
+        navLinkStyle: 'hierarchical',
+
+        navLinks: [
+          {auto: 'home'},
+
+          {html: relations.albumLink.slot('color', false)},
+
+          {
+            html:
+              language.encapsulate(pageCapsule, 'nav.track', capsule => {
+                const options = {};
+
+                options.track =
+                  relations.trackLink
+                    .slot('attributes', {class: 'current'});
+
+                if (data.hasTrackNumbers) {
+                  capsule += '.withNumber';
+                  options.number = data.trackNumber;
+                }
+
+                return language.$(capsule, options);
+              }),
+          },
+        ],
+
+        navBottomRowContent:
+          relations.albumNavAccent.slots({
+            showTrackNavigation: true,
+            showExtraLinks: false,
+          }),
+
+        navContent:
+          relations.chronologyLinks,
+
+        secondaryNav:
+          relations.secondaryNav
+            .slot('mode', 'track'),
+
+        leftSidebar: relations.sidebar,
+
+        socialEmbed: relations.socialEmbed,
+      })),
 };
 
 /*

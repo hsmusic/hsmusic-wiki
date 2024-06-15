@@ -1,4 +1,4 @@
-import {empty, stitchArrays} from '#sugar';
+import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -39,49 +39,48 @@ export default {
         .map(entry => entry.date),
   }),
 
-  generate(data, relations, {html, language}) {
-    if (empty(relations.entryContents)) {
-      return html.blank();
-    }
+  generate: (data, relations, {html, language}) =>
+    language.encapsulate('homepage.news', boxCapsule =>
+      relations.box.slots({
+        attributes: {class: 'latest-news-sidebar-box'},
+        collapsible: false,
 
-    return relations.box.slots({
-      attributes: {class: 'latest-news-sidebar-box'},
-      collapsible: false,
+        content: [
+          html.tag('h1',
+            {[html.onlyIfSiblings]: true},
+            language.$(boxCapsule, 'title')),
 
-      content: [
-        html.tag('h1', language.$('homepage.news.title')),
+          stitchArrays({
+            date: data.entryDates,
+            content: relations.entryContents,
+            mainLink: relations.entryMainLinks,
+            readMoreLink: relations.entryReadMoreLinks,
+          }).map(({
+              date,
+              content,
+              mainLink,
+              readMoreLink,
+            }, index) =>
+              language.encapsulate(boxCapsule, 'entry', entryCapsule =>
+                html.tag('article', {class: 'news-entry'},
+                  index === 0 &&
+                    {class: 'first-news-entry'},
 
-        stitchArrays({
-          date: data.entryDates,
-          content: relations.entryContents,
-          mainLink: relations.entryMainLinks,
-          readMoreLink: relations.entryReadMoreLinks,
-        }).map(({
-            date,
-            content,
-            mainLink,
-            readMoreLink,
-          }, index) =>
-            html.tag('article', {class: 'news-entry'},
-              index === 0 &&
-                {class: 'first-news-entry'},
+                  [
+                    html.tag('h2', [
+                      html.tag('time', language.formatDate(date)),
+                      mainLink,
+                    ]),
 
-              [
-                html.tag('h2', [
-                  html.tag('time', language.formatDate(date)),
-                  mainLink,
-                ]),
+                    content.slot('thumb', 'medium'),
 
-                content.slot('thumb', 'medium'),
-
-                html.tag('p',
-                  {[html.onlyIfContent]: true},
-                  readMoreLink
-                    ?.slots({
-                      content: language.$('homepage.news.entry.viewRest'),
-                    })),
-              ])),
-      ],
-    });
-  },
+                    html.tag('p',
+                      {[html.onlyIfContent]: true},
+                      readMoreLink
+                        ?.slots({
+                          content: language.$(entryCapsule, 'viewRest'),
+                        })),
+                  ]))),
+        ],
+      })),
 };

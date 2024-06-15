@@ -57,37 +57,38 @@ export default {
     };
   },
 
-  generate(data, relations, {html, language}) {
-    return relations.layout.slots({
-      title: language.$('newsIndex.title'),
-      headingMode: 'sticky',
+  generate: (data, relations, {html, language}) =>
+    language.encapsulate('newsIndex', pageCapsule =>
+      relations.layout.slots({
+        title: language.$(pageCapsule, 'title'),
+        headingMode: 'sticky',
 
-      mainClasses: ['long-content', 'news-index'],
-      mainContent:
-        stitchArrays({
-          entryLink: relations.entryLinks,
-          viewRestLink: relations.viewRestLinks,
-          content: relations.entryContents,
-          date: data.entryDates,
-          directory: data.entryDirectories,
-        }).map(({entryLink, viewRestLink, content, date, directory}) =>
-            html.tag('article', {id: directory}, [
-              html.tag('h2', [
-                html.tag('time', language.formatDate(date)),
-                entryLink,
-              ]),
+        mainClasses: ['long-content', 'news-index'],
+        mainContent:
+          stitchArrays({
+            entryLink: relations.entryLinks,
+            viewRestLink: relations.viewRestLinks,
+            content: relations.entryContents,
+            date: data.entryDates,
+            directory: data.entryDirectories,
+          }).map(({entryLink, viewRestLink, content, date, directory}) =>
+              language.encapsulate(pageCapsule, 'entry', entryCapsule =>
+                html.tag('article', {id: directory}, [
+                  html.tag('h2', [
+                    html.tag('time', language.formatDate(date)),
+                    entryLink,
+                  ]),
 
-              content,
+                  content,
 
-              viewRestLink
-                ?.slot('content', language.$('newsIndex.entry.viewRest')),
-            ])),
+                  viewRestLink
+                    ?.slot('content', language.$(entryCapsule, 'viewRest')),
+                ]))),
 
-      navLinkStyle: 'hierarchical',
-      navLinks: [
-        {auto: 'home'},
-        {auto: 'current'},
-      ],
-    });
-  },
+        navLinkStyle: 'hierarchical',
+        navLinks: [
+          {auto: 'home'},
+          {auto: 'current'},
+        ],
+      })),
 };

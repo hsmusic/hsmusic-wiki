@@ -111,10 +111,10 @@ export default {
     return data;
   },
 
-  generate(data, relations, {html, language}) {
-    return relations.layout
-      .slots({
-        title: language.$('groupGalleryPage.title', {group: data.name}),
+  generate: (data, relations, {html, language}) =>
+    language.encapsulate('groupGalleryPage', pageCapsule =>
+      relations.layout.slots({
+        title: language.$(pageCapsule, 'title', {group: data.name}),
         headingMode: 'static',
 
         color: data.color,
@@ -135,7 +135,7 @@ export default {
           relations.quickDescription,
 
           html.tag('p', {class: 'quick-info'},
-            language.$('groupGalleryPage.infoLine', {
+            language.$(pageCapsule, 'infoLine', {
               tracks:
                 html.tag('b',
                   language.countTracks(data.numTracks, {
@@ -199,6 +199,5 @@ export default {
 
         secondaryNav:
           relations.secondaryNav ?? null,
-      });
-  },
+      })),
 };

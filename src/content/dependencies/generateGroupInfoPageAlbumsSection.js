@@ -66,67 +66,71 @@ export default {
   }),
 
   generate: (relations, {html, language}) =>
-    html.tags([
-      relations.contentHeading
-        .slots({
-          tag: 'h2',
-          title: language.$('groupInfoPage.albumList.title'),
-        }),
+    language.encapsulate('groupInfoPage', pageCapsule =>
+      language.encapsulate(pageCapsule, 'albumList', listCapsule =>
+        html.tags([
+          relations.contentHeading
+            .slots({
+              tag: 'h2',
+              title: language.$(listCapsule, 'title'),
+            }),
 
-      html.tag('p',
-        {[html.onlyIfSiblings]: true},
-        language.$('groupInfoPage.viewAlbumGallery', {
-          link:
-            relations.galleryLink
-              .slot('content', language.$('groupInfoPage.viewAlbumGallery.link')),
-        })),
+          html.tag('p',
+            {[html.onlyIfSiblings]: true},
 
-      html.tag('ul',
-        {[html.onlyIfContent]: true},
+            language.encapsulate(pageCapsule, 'viewAlbumGallery', capsule =>
+              language.$(capsule, {
+                link:
+                  relations.galleryLink
+                    .slot('content', language.$(capsule, 'link')),
+              }))),
 
-        stitchArrays({
-          albumLink: relations.albumLinks,
-          otherGroupLinks: relations.otherGroupLinks,
-          datetimestamp: relations.datetimestamps,
-          albumColorStyle: relations.albumColorStyles,
-        }).map(({
-            albumLink,
-            otherGroupLinks,
-            datetimestamp,
-            albumColorStyle,
-          }) => {
-            const prefix = 'groupInfoPage.albumList.item';
-            const parts = [prefix];
-            const options = {};
+          html.tag('ul',
+            {[html.onlyIfContent]: true},
 
-            options.album =
-              albumLink.slot('color', false);
-
-            if (datetimestamp) {
-              parts.push('withYear');
-              options.yearAccent =
-                language.$(prefix, 'yearAccent', {
-                  year:
-                    datetimestamp.slots({style: 'year', tooltip: true}),
-                });
-            }
-
-            if (!empty(otherGroupLinks)) {
-              parts.push('withOtherGroup');
-              options.otherGroupAccent =
-                html.tag('span', {class: 'other-group-accent'},
-                  language.$(prefix, 'otherGroupAccent', {
-                    groups:
-                      language.formatConjunctionList(
-                        otherGroupLinks.map(groupLink =>
-                          groupLink.slot('color', false))),
-                  }));
-            }
-
-            return (
-              html.tag('li',
+            stitchArrays({
+              albumLink: relations.albumLinks,
+              otherGroupLinks: relations.otherGroupLinks,
+              datetimestamp: relations.datetimestamps,
+              albumColorStyle: relations.albumColorStyles,
+            }).map(({
+                albumLink,
+                otherGroupLinks,
+                datetimestamp,
                 albumColorStyle,
-                language.$(...parts, options)));
-          })),
-    ]),
+              }) =>
+                html.tag('li',
+                  albumColorStyle,
+
+                  language.encapsulate(listCapsule, 'item', itemCapsule =>
+                    language.encapsulate(itemCapsule, workingCapsule => {
+                      const workingOptions = {};
+
+                      workingOptions.album =
+                        albumLink.slot('color', false);
+
+                      if (datetimestamp) {
+                        workingCapsule += '.withYear';
+                        workingOptions.yearAccent =
+                          language.$(itemCapsule, 'yearAccent', {
+                            year:
+                              datetimestamp.slots({style: 'year', tooltip: true}),
+                          });
+                      }
+
+                      if (!empty(otherGroupLinks)) {
+                        workingCapsule += '.withOtherGroup';
+                        workingOptions.otherGroupAccent =
+                          html.tag('span', {class: 'other-group-accent'},
+                            language.$(itemCapsule, 'otherGroupAccent', {
+                              groups:
+                                language.formatConjunctionList(
+                                  otherGroupLinks.map(groupLink =>
+                                    groupLink.slot('color', false))),
+                            }));
+                      }
+
+                      return language.$(workingCapsule, workingOptions);
+                    }))))),
+        ]))),
 };

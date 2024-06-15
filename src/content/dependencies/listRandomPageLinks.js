@@ -74,20 +74,22 @@ export default {
   },
 
   generate(data, relations, {html, language}) {
+    const capsule = language.encapsulate('listingPage.other.randomPages');
+
     const miscellaneousChunkRows = [
-      {
+      language.encapsulate(capsule, 'chunk.item.randomArtist', capsule => ({
         stringsKey: 'randomArtist',
 
         mainLink:
           html.tag('a',
             {href: '#', 'data-random': 'artist'},
-            language.$('listingPage.other.randomPages.chunk.item.randomArtist.mainLink')),
+            language.$(capsule, 'mainLink')),
 
         atLeastTwoContributions:
           html.tag('a',
             {href: '#', 'data-random': 'artist-more-than-one-contrib'},
-            language.$('listingPage.other.randomPages.chunk.item.randomArtist.atLeastTwoContributions')),
-      },
+            language.$(capsule, 'atLeastTwoContributions')),
+      })),
 
       {stringsKey: 'randomAlbumWholeSite'},
       {stringsKey: 'randomTrackWholeSite'},
@@ -104,24 +106,25 @@ export default {
 
       content: [
         html.tag('p',
-          language.$('listingPage.other.randomPages.chooseLinkLine', {
-            fromPart:
-              (relations.groupLinks
-                ? language.$('listingPage.other.randomPages.chooseLinkLine.fromPart.dividedByGroups')
-                : language.$('listingPage.other.randomPages.chooseLinkLine.fromPart.notDividedByGroups')),
+          language.encapsulate(capsule, 'chooseLinkLine', capsule =>
+            language.$(capsule, {
+              fromPart:
+                (relations.groupLinks
+                  ? language.$(capsule, 'fromPart.dividedByGroups')
+                  : language.$(capsule, 'fromPart.notDividedByGroups')),
 
-            browserSupportPart:
-              language.$('listingPage.other.randomPages.chooseLinkLine.browserSupportPart'),
-          })),
+              browserSupportPart:
+                language.$(capsule, 'browserSupportPart'),
+            }))),
 
         html.tag('p', {id: 'data-loading-line'},
-          language.$('listingPage.other.randomPages.dataLoadingLine')),
+          language.$(capsule, 'dataLoadingLine')),
 
         html.tag('p', {id: 'data-loaded-line'},
-          language.$('listingPage.other.randomPages.dataLoadedLine')),
+          language.$(capsule, 'dataLoadedLine')),
 
         html.tag('p', {id: 'data-error-line'},
-          language.$('listingPage.other.randomPages.dataErrorLine')),
+          language.$(capsule, 'dataErrorLine')),
       ],
 
       showSkipToSection: true,
@@ -148,17 +151,18 @@ export default {
 
         ...
           (relations.groupLinks
-            ? relations.groupLinks.map(() => ({
-                randomAlbum:
-                  html.tag('a',
-                    {href: '#', 'data-random': 'album-in-group-dl'},
-                    language.$('listingPage.other.randomPages.chunk.title.fromGroup.accent.randomAlbum')),
+            ? relations.groupLinks.map(() =>
+                language.encapsulate(capsule, 'chunk.title.fromGroup.accent', capsule => ({
+                  randomAlbum:
+                    html.tag('a',
+                      {href: '#', 'data-random': 'album-in-group-dl'},
+                      language.$(capsule, 'randomAlbum')),
 
-                randomTrack:
-                  html.tag('a',
-                    {href: '#', 'data-random': 'track-in-group-dl'},
-                    language.$('listingPage.other.randomPages.chunk.title.fromGroup.accent.randomTrack')),
-              }))
+                  randomTrack:
+                    html.tag('a',
+                      {href: '#', 'data-random': 'track-in-group-dl'},
+                      language.$(capsule, 'randomTrack')),
+                })))
             : [null]),
       ],
 
