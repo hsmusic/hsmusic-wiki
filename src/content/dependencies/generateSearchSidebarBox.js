@@ -14,12 +14,14 @@ export default {
         collapsible: false,
 
         content: [
-          html.tag('input', {class: 'wiki-search-input'},
-            {
-              placeholder:
-                language.$(capsule, 'placeholder').toString(),
-            },
-            {type: 'search'}),
+          html.tag('label', {class: 'wiki-search-label'},
+            html.tag('input', {class: 'wiki-search-input'},
+              {type: 'search'},
+
+              {
+                placeholder:
+                  language.$(capsule, 'placeholder').toString(),
+              })),
 
           html.tag('template', {class: 'wiki-search-preparing-string'},
             language.$(capsule, 'preparing')),
