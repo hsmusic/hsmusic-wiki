@@ -52,5 +52,5 @@ exports[`test/snapshot/generateAlbumAdditionalFilesList.js > TAP > generateAlbum
 `
 
 exports[`test/snapshot/generateAlbumAdditionalFilesList.js > TAP > generateAlbumAdditionalFilesList (snapshot) > no additional files 1`] = `
-<ul class="additional-files-list"></ul>
+
 `
