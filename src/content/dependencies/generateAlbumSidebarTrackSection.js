@@ -119,16 +119,16 @@ export default {
           colorStyle,
 
           html.tag('span',
-            language.encapsulate(capsule, 'group', capsule => {
-              const options = {group: sectionName};
+            language.encapsulate(capsule, 'group', workingCapsule => {
+              const workingOptions = {group: sectionName};
 
               if (data.hasTrackNumbers) {
-                capsule += '.withRange';
-                options.range =
+                workingCapsule += '.withRange';
+                workingOptions.range =
                   `${data.firstTrackNumber}–${data.lastTrackNumber}`;
               }
 
-              return language.$(capsule, options);
+              return language.$(workingCapsule, workingOptions);
             }))),
 
         (data.hasTrackNumbers

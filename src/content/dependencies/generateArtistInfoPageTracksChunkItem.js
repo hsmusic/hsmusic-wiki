@@ -100,16 +100,16 @@ export default {
           : html.blank()),
 
       content:
-        language.encapsulate('artistPage.creditList.entry.track', capsule => {
-          const options = {track: relations.trackLink};
+        language.encapsulate('artistPage.creditList.entry.track', workingCapsule => {
+          const workingOptions = {track: relations.trackLink};
 
           if (data.duration) {
-            capsule += '.withDuration';
-            options.duration =
+            workingCapsule += '.withDuration';
+            workingOptions.duration =
               language.formatDuration(data.duration);
           }
 
-          return language.$(capsule, options);
+          return language.$(workingCapsule, workingOptions);
         }),
     }),
 };
