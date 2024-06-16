@@ -3831,6 +3831,7 @@ const sidebarSearchInfo = initInfo('sidebarSearchInfo', {
 
   searchSidebarColumn: null,
   searchBox: null,
+  searchLabel: null,
   searchInput: null,
 
   progressRule: null,
@@ -3918,6 +3919,9 @@ function getSidebarSearchReferences() {
   if (!info.searchBox) {
     return;
   }
+
+  info.searchLabel =
+    info.searchBox.querySelector('.wiki-search-label');
 
   info.searchInput =
     info.searchBox.querySelector('.wiki-search-input');
@@ -4360,6 +4364,7 @@ function showSidebarSearchFailed() {
   cssProp(info.failedRule, 'display', null);
   cssProp(info.failedContainer, 'display', null);
 
+  info.searchLabel.classList.add('disabled');
   info.searchInput.disabled = true;
 
   if (state.stoppedTypingTimeout) {

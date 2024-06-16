@@ -514,21 +514,71 @@ summary .group-name {
   filter: brightness(0.7);
 }
 
-.wiki-search-input {
+.wiki-search-label {
   width: calc(100% - 4px);
   padding: 2px 4px;
   margin: 2px 2px 3px 2px;
   box-sizing: border-box;
 
+  display: flex;
+  flex-direction: row;
+
   background: transparent;
   border: 1px solid var(--dim-color);
   border-radius: 3px;
-  color: inherit;
 }
 
-.wiki-search-input[disabled] {
+.wiki-search-label::before {
+  display: inline-block;
+  padding-left: 3px;
+  padding-right: 3px;
+  margin-right: 3px;
+  width: 1.8em;
+  text-align: center;
+  content: '\1f50d\fe0e';
+}
+
+.wiki-search-input {
+  background: transparent;
+  border: transparent;
+  color: inherit;
+  flex-grow: 1;
+}
+
+.wiki-search-label.disabled {
   opacity: 0.6;
+}
+
+.wiki-search-label.disabled,
+.wiki-search-input[disabled] {
   cursor: not-allowed;
+}
+
+.wiki-search-label:not(.disabled):hover,
+.wiki-search-label:focus-within {
+  background: var(--light-ghost-color);
+}
+
+.wiki-search-label:focus-within {
+  border-color: var(--primary-color);
+}
+
+.wiki-search-label:focus-within::before {
+  opacity: 0.7;
+}
+
+.wiki-search-input:focus {
+  border: none;
+  outline: none;
+}
+
+.wiki-search-input::placeholder {
+  color: var(--primary-color);
+  font-style: oblique;
+}
+
+.wiki-search-input:focus::placeholder {
+  color: var(--dim-color);
 }
 
 .wiki-search-sidebar-box hr {
@@ -692,19 +742,6 @@ summary .group-name {
   opacity: 1;
   background: var(--light-ghost-color);
   border-color: var(--deep-color);
-}
-
-.wiki-search-input:focus {
-  border-color: var(--primary-color);
-}
-
-.wiki-search-input::placeholder {
-  color: var(--primary-color);
-  font-style: oblique;
-}
-
-.wiki-search-input:focus::placeholder {
-  color: var(--dim-color);
 }
 
 #content {
