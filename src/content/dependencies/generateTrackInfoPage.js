@@ -372,19 +372,19 @@ export default {
 
           {
             html:
-              language.encapsulate(pageCapsule, 'nav.track', capsule => {
-                const options = {};
+              language.encapsulate(pageCapsule, 'nav.track', workingCapsule => {
+                const workingOptions = {};
 
-                options.track =
+                workingOptions.track =
                   relations.trackLink
                     .slot('attributes', {class: 'current'});
 
                 if (data.hasTrackNumbers) {
-                  capsule += '.withNumber';
-                  options.number = data.trackNumber;
+                  workingCapsule += '.withNumber';
+                  workingOptions.number = data.trackNumber;
                 }
 
-                return language.$(capsule, options);
+                return language.$(workingCapsule, workingOptions);
               }),
           },
         ],
