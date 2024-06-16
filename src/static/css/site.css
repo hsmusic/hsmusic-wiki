@@ -545,6 +545,10 @@ summary .group-name {
   flex-grow: 1;
 }
 
+.wiki-search-input::-webkit-search-cancel-button {
+  filter: grayscale(1) invert(1);
+}
+
 .wiki-search-label.disabled {
   opacity: 0.6;
 }
