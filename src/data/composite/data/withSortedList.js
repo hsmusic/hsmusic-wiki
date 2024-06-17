@@ -27,12 +27,6 @@
 //  - withFilteredList
 //  - withMappedList
 //
-// More list utilities:
-//  - excludeFromList
-//  - fillMissingListItems
-//  - withFlattenedList, withUnflattenedList
-//  - withPropertyFromList, withPropertiesFromList
-//
 
 import {input, templateCompositeFrom} from '#composite';
 

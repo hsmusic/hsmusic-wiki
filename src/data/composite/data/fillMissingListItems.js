@@ -4,11 +4,6 @@
 // See also:
 //  - excludeFromList
 //
-// More list utilities:
-//  - withFilteredList, withMappedList, withSortedList
-//  - withFlattenedList, withUnflattenedList
-//  - withPropertyFromList, withPropertiesFromList
-//
 
 import {input, templateCompositeFrom} from '#composite';
 

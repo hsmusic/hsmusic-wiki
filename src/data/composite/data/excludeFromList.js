@@ -5,11 +5,6 @@
 // See also:
 //  - fillMissingListItems
 //
-// More list utilities:
-//  - withFilteredList, withMappedList, withSortedList
-//  - withFlattenedList, withUnflattenedList
-//  - withPropertyFromList, withPropertiesFromList
-//
 
 import {input, templateCompositeFrom} from '#composite';
 import {empty} from '#sugar';
