@@ -9,12 +9,6 @@
 //  - withPropertiesFromList
 //  - withPropertyFromObject
 //
-// More list utilities:
-//  - excludeFromList
-//  - fillMissingListItems
-//  - withFilteredList, withMappedList, withSortedList
-//  - withFlattenedList, withUnflattenedList
-//
 
 import {input, templateCompositeFrom} from '#composite';
 

@@ -7,12 +7,6 @@
 // See also:
 //  - withFlattenedList
 //
-// More list utilities:
-//  - excludeFromList
-//  - fillMissingListItems
-//  - withFilteredList, withMappedList, withSortedList
-//  - withPropertyFromList, withPropertiesFromList
-//
 
 import {input, templateCompositeFrom} from '#composite';
 import {isWholeNumber, validateArrayItems} from '#validators';
