@@ -480,10 +480,25 @@ misc:
     # isn't a specially detected web platform.
     noExternalLinkPlatformName: "Other"
 
-    # Displayed in an artist's toolitp, as the symbol
-    # for chronology links.
-    previousSymbol: "←"
-    nextSymbol: "→"
+    chronology:
+      previous:
+        symbol: "←"
+        info:
+          _: "Previous by this artist"
+          withKind: "Previous {KIND} by this artist"
+
+      next:
+        symbol: "→"
+        info:
+          _: "Next by this artist"
+          withKind: "Next {KIND} by this artist"
+
+      kind:
+        album: "album"
+        coverArt: "cover art"
+        flash: "flash"
+        track: "track"
+        trackArt: "track art"
 
   # chronology:
   #

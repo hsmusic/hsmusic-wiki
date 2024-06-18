@@ -40,29 +40,75 @@ export default {
         : null),
   }),
 
-  generate: (data, relations, {html, language}) =>
-    language.encapsulate('misc.artistLink', capsule =>
+  slots: {
+    kind: {
+      validate: v =>
+        v.is(
+          'album',
+          'coverArt',
+          'flash',
+          'track',
+          'trackArt'),
+    },
+  },
+
+  generate: (data, relations, slots, {html, language}) =>
+    language.encapsulate('misc.artistLink.chronology', capsule =>
       html.tags([
-        relations.previousLink?.slots({
-          attributes: {class: 'chronology-link'},
-          content: [
-            html.tag('span', {class: 'chronology-symbol'},
-              language.$(capsule, 'previousSymbol')),
+        html.tags([
+          relations.previousLink?.slots({
+            attributes: {class: 'chronology-link'},
+            content: [
+              html.tag('span', {class: 'chronology-symbol'},
+                language.$(capsule, 'previous.symbol')),
 
-            html.tag('span', {class: 'chronology-text'},
-              language.sanitize(data.previousName)),
-          ],
-        }),
+              html.tag('span', {class: 'chronology-text'},
+                language.sanitize(data.previousName)),
+            ],
+          }),
 
-        relations.nextLink?.slots({
-          attributes: {class: 'chronology-link'},
-          content: [
-            html.tag('span', {class: 'chronology-symbol'},
-              language.$(capsule, 'nextSymbol')),
+          html.tag('span', {class: 'chronology-info'},
+            {[html.onlyIfSiblings]: true},
 
-            html.tag('span', {class: 'chronology-text'},
-              language.sanitize(data.nextName)),
-          ],
-        }),
+            language.encapsulate(capsule, 'previous.info', workingCapsule => {
+              const workingOptions = {};
+
+              if (slots.kind) {
+                workingCapsule += '.withKind';
+                workingOptions.kind =
+                  language.$(capsule, 'kind', slots.kind);
+              }
+
+              return language.$(workingCapsule, workingOptions);
+            })),
+        ]),
+
+        html.tags([
+          relations.nextLink?.slots({
+            attributes: {class: 'chronology-link'},
+            content: [
+              html.tag('span', {class: 'chronology-symbol'},
+                language.$(capsule, 'next.symbol')),
+
+              html.tag('span', {class: 'chronology-text'},
+                language.sanitize(data.nextName)),
+            ],
+          }),
+
+          html.tag('span', {class: 'chronology-info'},
+            {[html.onlyIfSiblings]: true},
+
+            language.encapsulate(capsule, 'next.info', workingCapsule => {
+              const workingOptions = {};
+
+              if (slots.kind) {
+                workingCapsule += '.withKind';
+                workingOptions.kind =
+                  language.$(capsule, 'kind', slots.kind);
+              }
+
+              return language.$(workingCapsule, workingOptions);
+            }))
+        ]),
       ])),
 };
