@@ -1022,8 +1022,10 @@ li:not(:first-child:last-child) .tooltip,
   grid-column-end: platform-end;
 
   --external-platform-opacity: 0.8;
-  padding-right: 4px;
   opacity: 0.8;
+  padding-right: 4px;
+
+  white-space: nowrap;
 }
 
 .contribution-tooltip.show-info .external-platform,
