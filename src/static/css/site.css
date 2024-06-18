@@ -973,10 +973,26 @@ li:not(:first-child:last-child) .tooltip,
 }
 
 .contribution-tooltip .chronology-link {
+  display: grid;
   grid-column-start: icon-start;
   grid-column-end: handle-end;
-  padding-left: 5px;
-  padding-right: 3px;
+  grid-template-columns: subgrid;
+
+  height: 1.2em;
+}
+
+.contribution-tooltip .chronology-symbol {
+  grid-column-start: icon-start;
+  grid-column-end: icon-end;
+
+  text-align: center;
+}
+
+.contribution-tooltip .chronology-text {
+  grid-column-start: handle-start;
+  grid-column-end: handle-end;
+
+  padding-right: 6px;
   font-size: 0.85em;
 }
 
@@ -1015,12 +1031,14 @@ li:not(:first-child:last-child) .tooltip,
   }
 }
 
-.contribution-tooltip .external-link:hover {
+.contribution-tooltip .external-link:hover,
+.contribution-tooltip .chronology-link:hover {
   filter: brightness(1.4);
   text-decoration: none;
 }
 
-.contribution-tooltip .external-link:hover .external-handle {
+.contribution-tooltip .external-link:hover .external-handle,
+.contribution-tooltip .chronology-link:hover .chronology-text {
   text-decoration: underline;
 }
 
