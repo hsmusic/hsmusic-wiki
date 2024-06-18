@@ -25,6 +25,8 @@ export {default as withPropertiesFromList} from './withPropertiesFromList.js';
 export {default as withFlattenedList} from './withFlattenedList.js';
 export {default as withUnflattenedList} from './withUnflattenedList.js';
 
+export {default as withIndexInList} from './withIndexInList.js';
+export {default as withNearbyItemFromList} from './withNearbyItemFromList.js';
 
 // Utilities which act on slightly more particular data forms
 // (probably, containers of particular kinds of values)
