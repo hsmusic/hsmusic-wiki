@@ -26,7 +26,7 @@ export default {
   generate: (relations, slots, {html}) =>
     relations.tooltip.slots({
       attributes:
-        {class: ['icons', 'icons-tooltip']},
+        {class: 'contribution-tooltip'},
 
       contentAttributes: {
         [html.joinChildren]:

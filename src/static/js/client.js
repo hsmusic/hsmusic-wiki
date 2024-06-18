@@ -3465,7 +3465,7 @@ function getArtistExternalLinkTooltipPageReferences() {
   const info = artistExternalLinkTooltipInfo;
 
   info.tooltips =
-    Array.from(document.getElementsByClassName('icons-tooltip'));
+    Array.from(document.getElementsByClassName('contribution-tooltip'));
 
   info.tooltipRows =
     info.tooltips.map(tooltip =>
