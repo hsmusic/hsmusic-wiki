@@ -1271,6 +1271,11 @@ const hoverableTooltipInfo = initInfo('hoverableTooltipInfo', {
     // from causing the current tooltip to be hidden.
     currentTouchIdentifiers: new Set(),
     touchIdentifiersBanishedByScrolling: new Set(),
+
+    // This is a two-item array that tracks the direction we've already
+    // dynamically placed the current tooltip. If we *reposition* the tooltip
+    // (because its dimensions changed), we'll try to follow this anchor first.
+    dynamicTooltipAnchorDirection: null,
   },
 
   event: {
@@ -1731,6 +1736,8 @@ function hideCurrentlyShownTooltip(intendingToReplace = false) {
   state.currentlyShownTooltip = null;
   state.currentlyActiveHoverable = null;
 
+  state.dynamicTooltipAnchorDirection = null;
+
   // Set this for one tick of the event cycle.
   state.tooltipWasJustHidden = true;
   setTimeout(() => {
@@ -1792,9 +1799,22 @@ function peekTooltipClientRect(tooltip) {
   }
 }
 
+function repositionCurrentTooltip() {
+  const {state} = hoverableTooltipInfo;
+  const {currentlyActiveHoverable} = state;
+
+  if (!currentlyActiveHoverable) {
+    throw new Error(`No hoverable active to reposition tooltip from`);
+  }
+
+  positionTooltipFromHoverableWithBrains(currentlyActiveHoverable);
+}
+
 function positionTooltipFromHoverableWithBrains(hoverable) {
   const {state} = hoverableTooltipInfo;
   const {tooltip} = state.registeredHoverables.get(hoverable);
+
+  const anchorDirection = state.dynamicTooltipAnchorDirection;
 
   // Reset before doing anything else. We're going to adapt to
   // its natural placement, adjusted by CSS, which otherwise
@@ -1817,34 +1837,41 @@ function positionTooltipFromHoverableWithBrains(hoverable) {
     return;
   }
 
+  const tryDirection = (dir1, dir2, i) => {
+    selectedRect = opportunities[dir1][dir2][i];
+    return !!selectedRect;
+  };
+
   let selectedRect = null;
-  for (let i = 0; i < numBaselineRects; i++) {
-    selectedRect = opportunities.right.down[i];
-    if (selectedRect) break;
+  selectRect: {
+    if (anchorDirection) {
+      for (let i = 0; i < numBaselineRects; i++) {
+        if (tryDirection(...anchorDirection, i)) {
+          break selectRect;
+        }
+      }
+    }
 
-    selectedRect = opportunities.left.down[i];
-    if (selectedRect) break;
+    for (let i = 0; i < numBaselineRects; i++) {
+      for (const [dir1, dir2] of [
+        ['right', 'down'],
+        ['left', 'down'],
+        ['right', 'up'],
+        ['left', 'up'],
+        ['down', 'right'],
+        ['down', 'left'],
+        ['up', 'right'],
+        ['up', 'left'],
+      ]) {
+        if (tryDirection(dir1, dir2, i)) {
+          state.dynamicTooltipAnchorDirection = [dir1, dir2];
+          break selectRect;
+        }
+      }
+    }
 
-    selectedRect = opportunities.right.up[i];
-    if (selectedRect) break;
-
-    selectedRect = opportunities.left.up[i];
-    if (selectedRect) break;
-
-    selectedRect = opportunities.down.right[i];
-    if (selectedRect) break;
-
-    selectedRect = opportunities.down.left[i];
-    if (selectedRect) break;
-
-    selectedRect = opportunities.up.right[i];
-    if (selectedRect) break;
-
-    selectedRect = opportunities.up.left[i];
-    if (selectedRect) break;
+    selectedRect = baselineRect;
   }
-
-  selectedRect ??= baselineRect;
 
   positionTooltip(tooltip, selectedRect.x, selectedRect.y);
 }
@@ -3577,6 +3604,8 @@ function showArtistExternalLinkTooltipInfo() {
   for (const tooltip of info.tooltips) {
     tooltip.classList.add('show-info');
   }
+
+  repositionCurrentTooltip();
 }
 
 function hideArtistExternalLinkTooltipInfo() {
