@@ -16,33 +16,34 @@ export default {
 
   generate: (data, relations, {html, language}) =>
     language.encapsulate('misc.artistLink', capsule =>
-      stitchArrays({
-        icon: relations.artistIcons,
-        url: data.urls,
-      }).map(({icon, url}) => {
-          icon.setSlots({
-            context: 'artist',
-          });
-
-          let platformText =
-            language.formatExternalLink(url, {
+      html.tags(
+        stitchArrays({
+          icon: relations.artistIcons,
+          url: data.urls,
+        }).map(({icon, url}) => {
+            icon.setSlots({
               context: 'artist',
-              style: 'platform',
             });
 
-          // This is a pretty ridiculous hack, but we currently
-          // don't have a way of telling formatExternalLink to *not*
-          // use the fallback string, which just formats the URL as
-          // its host/domain... so is technically detectable.
-          if (platformText.toString() === (new URL(url)).host) {
-            platformText =
-              language.$(capsule, 'noExternalLinkPlatformName');
-          }
+            let platformText =
+              language.formatExternalLink(url, {
+                context: 'artist',
+                style: 'platform',
+              });
 
-          const platformSpan =
-            html.tag('span', {class: 'icon-platform'},
-              platformText);
+            // This is a pretty ridiculous hack, but we currently
+            // don't have a way of telling formatExternalLink to *not*
+            // use the fallback string, which just formats the URL as
+            // its host/domain... so is technically detectable.
+            if (platformText.toString() === (new URL(url)).host) {
+              platformText =
+                language.$(capsule, 'noExternalLinkPlatformName');
+            }
 
-          return [icon, platformSpan];
-        })),
+            const platformSpan =
+              html.tag('span', {class: 'icon-platform'},
+                platformText);
+
+            return [icon, platformSpan];
+          }))),
 };

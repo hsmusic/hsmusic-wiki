@@ -28,8 +28,10 @@ export default {
       attributes:
         {class: ['icons', 'icons-tooltip']},
 
-      contentAttributes:
-        {[html.joinChildren]: ''},
+      contentAttributes: {
+        [html.joinChildren]:
+          html.tag('span', {class: 'tooltip-divider'}),
+      },
 
       content: [
         slots.showExternalLinks &&

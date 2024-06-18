@@ -958,10 +958,13 @@ li:not(:first-child:last-child) .tooltip,
   font-size: 0.85em;
 }
 
-.icons-tooltip .chronology-link:nth-child(1 of .chronology-link) {
+.icons-tooltip .tooltip-divider {
+  grid-column-start: icon-start;
+  grid-column-end: domain-end;
+
   border-top: 1px dotted var(--primary-color);
-  margin-top: 2px;
-  padding-top: 2px;
+  margin-top: 3px;
+  margin-bottom: 4px;
 }
 
 .icons-tooltip .icon-platform {
