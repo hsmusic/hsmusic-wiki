@@ -5,6 +5,7 @@ export default {
     'generateTextWithTooltip',
     'generateTooltip',
     'linkArtist',
+    'linkAnythingMan',
     'linkExternalAsIcon',
   ],
 
@@ -21,6 +22,26 @@ export default {
 
     relations.tooltip =
       relation('generateTooltip');
+
+    let previous = contribution;
+    while (previous && previous.thing === contribution.thing) {
+      previous = previous.previousBySameArtist;
+    }
+
+    let next = contribution;
+    while (next && next.thing === contribution.thing) {
+      next = next.nextBySameArtist;
+    }
+
+    if (previous) {
+      relations.previousLink =
+        relation('linkAnythingMan', previous.thing);
+    }
+
+    if (next) {
+      relations.nextLink =
+        relation('linkAnythingMan', next.thing);
+    }
 
     if (!empty(contribution.artist.urls)) {
       relations.artistIcons =
@@ -41,6 +62,7 @@ export default {
   slots: {
     showContribution: {type: 'boolean', default: false},
     showIcons: {type: 'boolean', default: false},
+    showChronology: {type: 'boolean', default: false},
     preventWrapping: {type: 'boolean', default: true},
 
     iconMode: {
@@ -92,6 +114,29 @@ export default {
 
             return [icon, platformSpan];
           }));
+    }
+
+    if (slots.showChronology) {
+      tooltipContent.push(
+        language.encapsulate(capsule, 'chronology', capsule => [
+          html.tag('span', {class: 'chronology-link'},
+            {[html.onlyIfContent]: true},
+
+            language.$(capsule, 'previous', {
+              [language.onlyIfOptions]: ['thing'],
+
+              thing: relations.previousLink,
+            })),
+
+          html.tag('span', {class: 'chronology-link'},
+            {[html.onlyIfContent]: true},
+
+            language.$(capsule, 'next', {
+              [language.onlyIfOptions]: ['thing'],
+
+              thing: relations.nextLink,
+            })),
+        ]));
     }
 
     // TODO: It probably shouldn't be necessary to do an isBlank call here.
