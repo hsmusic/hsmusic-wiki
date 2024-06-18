@@ -142,6 +142,7 @@ export class Album extends Thing {
 
     artistContribs: contributionList({
       date: 'date',
+      artistProperty: input.value('albumArtistContributions'),
     }),
 
     coverArtistContribs: [
@@ -151,6 +152,7 @@ export class Album extends Thing {
 
       contributionList({
         date: '#coverArtDate',
+        artistProperty: input.value('albumCoverArtistContributions'),
       }),
     ],
 
@@ -158,6 +160,10 @@ export class Album extends Thing {
       // May be null, indicating cover art was added for tracks on the date
       // each track specifies, or else the track's own release date.
       date: 'trackArtDate',
+
+      // This is the "correct" value, but it gets overwritten - with the same
+      // value - regardless.
+      artistProperty: input.value('trackCoverArtistContributions'),
     }),
 
     wallpaperArtistContribs: [
@@ -167,6 +173,7 @@ export class Album extends Thing {
 
       contributionList({
         date: '#coverArtDate',
+        artistProperty: input.value('albumWallpaperArtistContributions'),
       }),
     ],
 
@@ -177,6 +184,7 @@ export class Album extends Thing {
 
       contributionList({
         date: '#coverArtDate',
+        artistProperty: input.value('albumBannerArtistContributions'),
       }),
     ],
 
