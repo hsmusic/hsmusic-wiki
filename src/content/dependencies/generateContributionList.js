@@ -18,6 +18,7 @@ export default {
             contributionLink.slots({
               showIcons: true,
               showContribution: true,
+              showChronology: true,
               preventWrapping: false,
               iconMode: 'tooltip',
             })))),

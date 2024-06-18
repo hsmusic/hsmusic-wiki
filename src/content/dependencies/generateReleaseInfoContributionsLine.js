@@ -21,6 +21,7 @@ export default {
 
     showContribution: {type: 'boolean', default: true},
     showIcons: {type: 'boolean', default: true},
+    showChronology: {type: 'boolean', default: true},
   },
 
   generate(relations, slots, {html, language}) {
@@ -33,8 +34,9 @@ export default {
         language.formatConjunctionList(
           relations.contributionLinks.map(link =>
             link.slots({
-              showContribution: slots.showContribution,
               showIcons: slots.showIcons,
+              showContribution: slots.showContribution,
+              showChronology: slots.showChronology,
               iconMode: 'tooltip',
             }))),
     });
