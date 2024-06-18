@@ -984,9 +984,21 @@ li:not(:first-child:last-child) .tooltip,
   grid-column-start: handle-start;
   grid-column-end: handle-end;
 
+  width: max-content;
+  max-width: 200px;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.contribution-tooltip .external-handle {
   padding-right: 8px;
 }
 
+.contribution-tooltip .chronology-text {
+  padding-right: 6px;
+}
 
 .contribution-tooltip .chronology-text,
 .contribution-tooltip .chronology-info {
