@@ -486,6 +486,10 @@ misc:
     # isn't a specially detected web platform.
     noExternalLinkPlatformName: "Other"
 
+    chronology:
+      previous: "← {THING}"
+      next: "→ {THING}"
+
   # chronology:
   #
   #   "Chronology links" are a section that appear in the nav bar for
