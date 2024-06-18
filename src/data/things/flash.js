@@ -100,6 +100,7 @@ export class Flash extends Thing {
 
     contributorContribs: contributionList({
       date: 'date',
+      artistProperty: input.value('flashContributorContributions'),
     }),
 
     featuredTracks: referenceList({

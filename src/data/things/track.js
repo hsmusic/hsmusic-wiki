@@ -203,6 +203,7 @@ export class Track extends Thing {
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
         thingProperty: input.thisProperty(),
+        artistProperty: input.value('trackArtistContributions'),
         date: '#date',
       }).outputs({
         '#resolvedContribs': '#artistContribs',
@@ -219,6 +220,7 @@ export class Track extends Thing {
 
       withRecontextualizedContributionList({
         list: '#album.artistContribs',
+        artistProperty: input.value('trackArtistContributions'),
       }),
 
       withRedatedContributionList({
@@ -236,6 +238,7 @@ export class Track extends Thing {
 
       contributionList({
         date: '#date',
+        artistProperty: input.value('trackContributorContributions'),
       }),
     ],
 
@@ -254,6 +257,7 @@ export class Track extends Thing {
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
         thingProperty: input.thisProperty(),
+        artistProperty: input.value('trackCoverArtistContributions'),
         date: '#trackArtDate',
       }).outputs({
         '#resolvedContribs': '#coverArtistContribs',
@@ -270,6 +274,7 @@ export class Track extends Thing {
 
       withRecontextualizedContributionList({
         list: '#album.trackCoverArtistContribs',
+        artistProperty: input.value('trackCoverArtistContributions'),
       }),
 
       withRedatedContributionList({
