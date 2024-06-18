@@ -58,8 +58,10 @@ export default {
                 // don't have a way of telling formatExternalLink to *not*
                 // use the fallback string, which just formats the URL as
                 // its host/domain... so is technically detectable.
-                ((html.resolve(platform, {normalize: 'string'}) ===
-                  (new URL(url)).host)
+                (((new URL(url))
+                    .host
+                    .endsWith(
+                      html.resolve(platform, {normalize: 'string'})))
 
                   ? language.$(capsule, 'noExternalLinkPlatformName')
                   : platform)),
