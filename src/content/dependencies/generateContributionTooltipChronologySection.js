@@ -29,23 +29,24 @@ export default {
   }),
 
   generate: (relations, {html, language}) =>
-    language.encapsulate('misc.artistLink.chronology', capsule => [
-      html.tag('span', {class: 'chronology-link'},
-        {[html.onlyIfContent]: true},
+    language.encapsulate('misc.artistLink.chronology', capsule =>
+      html.tags([
+        html.tag('span', {class: 'chronology-link'},
+          {[html.onlyIfContent]: true},
 
-        language.$(capsule, 'previous', {
-          [language.onlyIfOptions]: ['thing'],
+          language.$(capsule, 'previous', {
+            [language.onlyIfOptions]: ['thing'],
 
-          thing: relations.previousLink,
-        })),
+            thing: relations.previousLink,
+          })),
 
-      html.tag('span', {class: 'chronology-link'},
-        {[html.onlyIfContent]: true},
+        html.tag('span', {class: 'chronology-link'},
+          {[html.onlyIfContent]: true},
 
-        language.$(capsule, 'next', {
-          [language.onlyIfOptions]: ['thing'],
+          language.$(capsule, 'next', {
+            [language.onlyIfOptions]: ['thing'],
 
-          thing: relations.nextLink,
-        })),
-    ]),
+            thing: relations.nextLink,
+          })),
+      ])),
 };
