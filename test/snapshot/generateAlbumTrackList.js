@@ -10,13 +10,13 @@ testContentFunctions(t, 'generateAlbumTrackList (snapshot)', async (t, evaluate)
   });
 
   const contribs1 = [
-    {artist: {name: 'Apricot', directory: 'apricot', urls: null}},
+    {artist: {name: 'Apricot', directory: 'apricot', urls: []}},
   ];
 
   const contribs2 = [
-    {artist: {name: 'Apricot', directory: 'apricot', urls: null}},
+    {artist: {name: 'Apricot', directory: 'apricot', urls: []}},
     {artist: {name: 'Peach', directory: 'peach', urls: ['https://peach.bandcamp.com/']}},
-    {artist: {name: 'Cerise', directory: 'cerise', urls: null}},
+    {artist: {name: 'Cerise', directory: 'cerise', urls: []}},
   ];
 
   const color1 = '#fb07ff';
