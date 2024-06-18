@@ -8,7 +8,11 @@ export default {
         .map(contrib => relation('linkContribution', contrib)),
   }),
 
-  generate: (relations, {html}) =>
+  slots: {
+    chronologyKind: {type: 'string'},
+  },
+
+  generate: (relations, slots, {html}) =>
     html.tag('ul',
       {[html.onlyIfContent]: true},
 
@@ -20,5 +24,6 @@ export default {
               showContribution: true,
               showChronology: true,
               preventWrapping: false,
+              chronologyKind: slots.chronologyKind,
             })))),
 };
