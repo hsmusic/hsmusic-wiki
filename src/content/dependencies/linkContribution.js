@@ -42,22 +42,30 @@ export default {
       language.encapsulate('misc.artistLink', workingCapsule => {
         const workingOptions = {};
 
+        relations.tooltip.setSlots({
+          showExternalLinks: slots.showExternalLinks,
+          showChronology: slots.showChronology,
+          chronologyKind: slots.chronologyKind,
+        });
+
         workingOptions.artist =
-          relations.textWithTooltip.slots({
-            customInteractionCue: true,
+          (html.isBlank(relations.tooltip)
+            ? relations.artistLink
+            : relations.textWithTooltip.slots({
+                customInteractionCue: true,
 
-            text:
-              relations.artistLink.slots({
-                attributes: {class: 'text-with-tooltip-interaction-cue'},
-              }),
+                text:
+                  relations.artistLink.slots({
+                    attributes: {class: 'text-with-tooltip-interaction-cue'},
+                  }),
 
-            tooltip:
-              relations.tooltip.slots({
-                showExternalLinks: slots.showExternalLinks,
-                showChronology: slots.showChronology,
-                chronologyKind: slots.chronologyKind,
-              }),
-          });
+                tooltip:
+                  relations.tooltip.slots({
+                    showExternalLinks: slots.showExternalLinks,
+                    showChronology: slots.showChronology,
+                    chronologyKind: slots.chronologyKind,
+                  }),
+              }));
 
         if (slots.showContribution && data.contribution) {
           workingCapsule += '.withContribution';
