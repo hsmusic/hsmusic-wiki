@@ -36,6 +36,11 @@ export default templateCompositeFrom({
       validate: isStringNonEmpty,
       defaultValue: null,
     }),
+
+    artistProperty: input({
+      validate: isStringNonEmpty,
+      defaultValue: null,
+    }),
   },
 
   outputs: ['#resolvedContribs'],
@@ -103,12 +108,14 @@ export default templateCompositeFrom({
       dependencies: [
         '#details',
         '#thingProperty',
+        input('artistProperty'),
         input.myself(),
       ],
 
       compute: (continuation, {
         ['#details']: details,
         ['#thingProperty']: thingProperty,
+        [input('artistProperty')]: artistProperty,
         [input.myself()]: myself,
       }) => continuation({
         ['#contributions']:
@@ -119,6 +126,7 @@ export default templateCompositeFrom({
               ...details,
               thing: myself,
               thingProperty: thingProperty,
+              artistProperty: artistProperty,
             });
 
             return contrib;
