@@ -1,13 +1,26 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['linkExternalAsIcon'],
+  contentDependencies: [
+    'generateExternalHandle',
+    'generateExternalIcon',
+    'generateExternalPlatform',
+  ],
+
   extraDependencies: ['html', 'language'],
 
   relations: (relation, contribution) => ({
-    artistIcons:
+    icons:
       contribution.artist.urls
-        .map(url => relation('linkExternalAsIcon', url)),
+        .map(url => relation('generateExternalIcon', url)),
+
+    handles:
+      contribution.artist.urls
+        .map(url => relation('generateExternalHandle', url)),
+
+    platforms:
+      contribution.artist.urls
+        .map(url => relation('generateExternalPlatform', url)),
   }),
 
   data: (contribution) => ({
@@ -18,32 +31,39 @@ export default {
     language.encapsulate('misc.artistLink', capsule =>
       html.tags(
         stitchArrays({
-          icon: relations.artistIcons,
+          icon: relations.icons,
+          handle: relations.handles,
+          platform: relations.platforms,
           url: data.urls,
-        }).map(({icon, url}) => {
-            icon.setSlots({
-              context: 'artist',
-            });
-
-            let platformText =
-              language.formatExternalLink(url, {
-                context: 'artist',
-                style: 'platform',
-              });
-
-            // This is a pretty ridiculous hack, but we currently
-            // don't have a way of telling formatExternalLink to *not*
-            // use the fallback string, which just formats the URL as
-            // its host/domain... so is technically detectable.
-            if (platformText.toString() === (new URL(url)).host) {
-              platformText =
-                language.$(capsule, 'noExternalLinkPlatformName');
+        }).map(({icon, handle, platform, url}) => {
+            for (const template of [icon, handle, platform]) {
+              template.setSlot('context', 'artist');
             }
 
-            const platformSpan =
-              html.tag('span', {class: 'icon-platform'},
-                platformText);
+            return [
+              html.tag('a', {class: 'icon'},
+                {href: url},
+                {class: 'has-text'},
 
-            return [icon, platformSpan];
+                [
+                  icon,
+
+                  html.tag('span', {class: 'icon-text'},
+                    (html.isBlank(handle)
+                      ? platform
+                      : handle)),
+                ]),
+
+              html.tag('span', {class: 'icon-platform'},
+                // This is a pretty ridiculous hack, but we currently
+                // don't have a way of telling formatExternalLink to *not*
+                // use the fallback string, which just formats the URL as
+                // its host/domain... so is technically detectable.
+                ((html.resolve(platform, {normalize: 'string'}) ===
+                  (new URL(url)).host)
+
+                  ? language.$(capsule, 'noExternalLinkPlatformName')
+                  : platform)),
+            ];
           }))),
 };
