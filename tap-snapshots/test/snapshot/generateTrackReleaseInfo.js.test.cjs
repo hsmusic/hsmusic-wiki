@@ -7,7 +7,7 @@
 'use strict'
 exports[`test/snapshot/generateTrackReleaseInfo.js > TAP > generateTrackReleaseInfo (snapshot) > basic behavior 1`] = `
 <p>
-    By <a href="artist/toby-fox/">Toby Fox</a>.
+    By <span class="contribution nowrap"><a href="artist/toby-fox/">Toby Fox</a></span>.
     <br>
     Released 11/29/2011.
     <br>
@@ -17,13 +17,13 @@ exports[`test/snapshot/generateTrackReleaseInfo.js > TAP > generateTrackReleaseI
 `
 
 exports[`test/snapshot/generateTrackReleaseInfo.js > TAP > generateTrackReleaseInfo (snapshot) > cover artist contribs, non-unique 1`] = `
-<p>By <a href="artist/toby-fox/">Toby Fox</a>.</p>
+<p>By <span class="contribution nowrap"><a href="artist/toby-fox/">Toby Fox</a></span>.</p>
 <p>This wiki doesn't have any listening links for <i>Suspicious Track</i>.</p>
 `
 
 exports[`test/snapshot/generateTrackReleaseInfo.js > TAP > generateTrackReleaseInfo (snapshot) > cover artist contribs, unique 1`] = `
 <p>
-    By <a href="artist/toby-fox/">Toby Fox</a>.
+    By <span class="contribution nowrap"><a href="artist/toby-fox/">Toby Fox</a></span>.
     <br>
     Cover art by <span class="contribution nowrap"><a href="artist/alpaca/">Alpaca</a> (&#x1F525;)</span>.
 </p>
@@ -31,6 +31,6 @@ exports[`test/snapshot/generateTrackReleaseInfo.js > TAP > generateTrackReleaseI
 `
 
 exports[`test/snapshot/generateTrackReleaseInfo.js > TAP > generateTrackReleaseInfo (snapshot) > reduced details 1`] = `
-<p>By <a href="artist/toby-fox/">Toby Fox</a>.</p>
+<p>By <span class="contribution nowrap"><a href="artist/toby-fox/">Toby Fox</a></span>.</p>
 <p>This wiki doesn't have any listening links for <i>Suspicious Track</i>.</p>
 `
