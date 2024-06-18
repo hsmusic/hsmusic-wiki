@@ -495,10 +495,12 @@ misc:
 
       kind:
         album: "album"
+        bannerArt: "banner art"
         coverArt: "cover art"
         flash: "flash"
         track: "track"
         trackArt: "track art"
+        wallpaperArt: "wallpaper art"
 
   # chronology:
   #

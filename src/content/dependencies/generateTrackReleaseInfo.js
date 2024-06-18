@@ -54,11 +54,15 @@ export default {
           {[html.joinChildren]: html.tag('br')},
 
           [
-            relations.artistContributionLinks
-              .slots({stringKey: capsule + '.by'}),
+            relations.artistContributionLinks.slots({
+              stringKey: capsule + '.by',
+              chronologyKind: 'track',
+            }),
 
-            relations.coverArtistContributionsLine
-              ?.slots({stringKey: capsule + '.coverArtBy'}),
+            relations.coverArtistContributionsLine?.slots({
+              stringKey: capsule + '.coverArtBy',
+              chronologyKind: 'trackArt',
+            }),
 
             language.$(capsule, 'released', {
               [language.onlyIfOptions]: ['date'],

@@ -45,10 +45,12 @@ export default {
       validate: v =>
         v.is(
           'album',
+          'bannerArt',
           'coverArt',
           'flash',
           'track',
-          'trackArt'),
+          'trackArt',
+          'wallpaperArt'),
     },
   },
 
