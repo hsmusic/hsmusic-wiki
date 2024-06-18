@@ -21,10 +21,13 @@ export default {
   generate: (slots, {html}) =>
     html.tag('span', {class: 'tooltip'},
       {[html.noEdgeWhitespace]: true},
+      {[html.onlyIfContent]: true},
       slots.attributes,
 
       html.tag('span', {class: 'tooltip-content'},
         {[html.noEdgeWhitespace]: true},
+        {[html.onlyIfContent]: true},
         slots.contentAttributes,
+
         slots.content)),
 };
