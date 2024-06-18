@@ -1830,6 +1830,18 @@ function positionTooltipFromHoverableWithBrains(hoverable) {
 
     selectedRect = opportunities.left.up[i];
     if (selectedRect) break;
+
+    selectedRect = opportunities.down.right[i];
+    if (selectedRect) break;
+
+    selectedRect = opportunities.down.left[i];
+    if (selectedRect) break;
+
+    selectedRect = opportunities.up.right[i];
+    if (selectedRect) break;
+
+    selectedRect = opportunities.up.left[i];
+    if (selectedRect) break;
   }
 
   selectedRect ??= baselineRect;
@@ -1929,17 +1941,17 @@ function getTooltipFromHoverablePlacementOpportunityAreas(hoverable) {
   const neededVerticalOverlap = 30;
   const neededHorizontalOverlap = 30;
 
+  const upTopDown =
+    WikiRect.beneath(
+      hoverableRect.top + neededVerticalOverlap - tooltipRect.height);
+
+  const downBottomUp =
+    WikiRect.above(
+      hoverableRect.bottom - neededVerticalOverlap + tooltipRect.height);
+
   // Please don't ask us to make this but horizontal?
   const prepareVerticalOrientationRects = (regionRects) => {
     const orientations = {};
-
-    const upTopDown =
-      WikiRect.beneath(
-        hoverableRect.top + neededVerticalOverlap - tooltipRect.height);
-
-    const downBottomUp =
-      WikiRect.above(
-        hoverableRect.bottom - neededVerticalOverlap + tooltipRect.height);
 
     const orientHorizontally = (rect, i) => {
       if (!rect) return null;
@@ -1996,9 +2008,67 @@ function getTooltipFromHoverablePlacementOpportunityAreas(hoverable) {
     return orientations;
   };
 
+  const rightRightLeft =
+    WikiRect.leftOf(
+      hoverableRect.left - neededHorizontalOverlap + tooltipRect.width);
+
+  const leftLeftRight =
+    WikiRect.rightOf(
+      hoverableRect.left + neededHorizontalOverlap - tooltipRect.width);
+
+  // Oops.
+  const prepareHorizontalOrientationRects = (regionRects) => {
+    const orientations = {};
+
+    const orientVertically = (rect, i) => {
+      if (!rect) return null;
+
+      const regionRect = regionRects[i];
+
+      if (regionRect.height > 0) {
+        return rect;
+      } else {
+        return WikiRect.fromRect({
+          x: rect.x,
+          y: regionRect.bottom - tooltipRect.height,
+          width: rect.width,
+          height: rect.height,
+        });
+      }
+    };
+
+    orientations.left =
+      regionRects
+        .map(rect => rect?.intersectionWith(leftLeftRight))
+        .map(orientVertically)
+        .map(keepIfFits);
+
+    orientations.right =
+      regionRects
+        .map(rect => rect?.intersectionWith(rightRightLeft))
+        .map(rect =>
+          (rect
+            ? rect.intersectionWith(WikiRect.fromRect({
+                x: rect.right - tooltipRect.width,
+                y: rect.y,
+                width: rect.width,
+                height: tooltipRect.height,
+              }))
+            : null))
+        .map(orientVertically)
+        .map(keepIfFits);
+
+    // No analogous center because we don't actually use
+    // center alignment...
+
+    return orientations;
+  };
+
   const orientationRects = {
     left: prepareVerticalOrientationRects(regionRects.left),
     right: prepareVerticalOrientationRects(regionRects.right),
+    down: prepareHorizontalOrientationRects(regionRects.bottom),
+    up: prepareHorizontalOrientationRects(regionRects.top),
   };
 
   return {
