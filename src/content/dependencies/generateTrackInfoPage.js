@@ -217,7 +217,9 @@ export default {
                 title: language.$('releaseInfo.contributors'),
               }),
 
-            relations.contributorContributionList,
+            relations.contributorContributionList.slots({
+              chronologyKind: 'trackContribution',
+            }),
           ]),
 
           html.tags([

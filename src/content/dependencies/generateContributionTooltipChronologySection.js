@@ -50,6 +50,7 @@ export default {
           'flash',
           'track',
           'trackArt',
+          'trackContribution',
           'wallpaperArt'),
     },
   },
