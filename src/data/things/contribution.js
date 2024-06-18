@@ -8,7 +8,7 @@ import Thing from '#thing';
 import {isStringNonEmpty, isThing, validateReference} from '#validators';
 
 import {exitWithoutDependency, exposeDependency} from '#composite/control-flow';
-import {withPropertyFromObject} from '#composite/data';
+import {withNearbyItemFromList, withPropertyFromObject} from '#composite/data';
 import {withResolvedReference} from '#composite/wiki-data';
 import {flag, simpleDate} from '#composite/wiki-properties';
 
@@ -16,6 +16,7 @@ import {
   inheritFromContributionPresets,
   thingPropertyMatches,
   thingReferenceTypeMatches,
+  withContainingReverseContributionList,
   withContributionArtist,
   withContributionContext,
   withMatchingContributionPresets,
@@ -160,6 +161,46 @@ export class Contribution extends Thing {
     isForFlash: thingReferenceTypeMatches({
       value: input.value('flash'),
     }),
+
+    previousBySameArtist: [
+      withContainingReverseContributionList().outputs({
+        '#containingReverseContributionList': '#list',
+      }),
+
+      exitWithoutDependency({
+        dependency: '#list',
+      }),
+
+      withNearbyItemFromList({
+        list: '#list',
+        item: input.myself(),
+        offset: input.value(-1),
+      }),
+
+      exposeDependency({
+        dependency: '#nearbyItem',
+      }),
+    ],
+
+    nextBySameArtist: [
+      withContainingReverseContributionList().outputs({
+        '#containingReverseContributionList': '#list',
+      }),
+
+      exitWithoutDependency({
+        dependency: '#list',
+      }),
+
+      withNearbyItemFromList({
+        list: '#list',
+        item: input.myself(),
+        offset: input.value(+1),
+      }),
+
+      exposeDependency({
+        dependency: '#nearbyItem',
+      }),
+    ],
   });
 
   [inspect.custom](depth, options, inspect) {
