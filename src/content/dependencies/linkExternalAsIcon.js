@@ -1,32 +1,42 @@
 import {isExternalLinkContext} from '#external-links';
 
 export default {
-  contentDependencies: ['generateExternalIcon'],
-  extraDependencies: ['html', 'language'],
+  contentDependencies: [
+    'generateExternalHandle',
+    'generateExternalIcon',
+    'generateExternalPlatform',
+  ],
+
+  extraDependencies: ['html'],
 
   relations: (relation, url) => ({
     icon:
       relation('generateExternalIcon', url),
+
+    handle:
+      relation('generateExternalHandle', url),
+
+    platform:
+      relation('generateExternalPlatform', url),
   }),
 
   data: (url) => ({url}),
 
   slots: {
     context: {
-      // This awkward syntax is because the slot descriptor validator can't
-      // differentiate between a function that returns a validator (the usual
-      // syntax) and a function that is itself a validator.
       validate: () => isExternalLinkContext,
       default: 'generic',
     },
   },
 
-  generate(data, relations, slots, {html, language}) {
-    const format = style =>
-      language.formatExternalLink(data.url, {style, context: slots.context});
-
-    const platformText = format('platform');
-    const handleText = format('handle');
+  generate(data, relations, slots, {html}) {
+    for (const template of [
+      relations.icon,
+      relations.handle,
+      relations.platform,
+    ]) {
+      template.setSlot('context', slots.context);
+    }
 
     return (
       html.tag('a', {class: 'icon'},
@@ -37,9 +47,9 @@ export default {
           relations.icon,
 
           html.tag('span', {class: 'icon-text'},
-            (html.isBlank(handleText)
-              ? platformText
-              : handleText)),
+            (html.isBlank(relations.handle)
+              ? relations.platform
+              : relations.handle)),
         ]));
   },
 };
