@@ -7,9 +7,6 @@ export default {
 
   slots: {
     context: {
-      // This awkward syntax is because the slot descriptor validator can't
-      // differentiate between a function that returns a validator (the usual
-      // syntax) and a function that is itself a validator.
       validate: () => isExternalLinkContext,
       default: 'generic',
     },
