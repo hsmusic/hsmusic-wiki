@@ -27,18 +27,20 @@ t.test('generateContributionLinks (unit)', async t => {
   await testContentFunctions(t, 'generateContributionLinks (unit 1)', async (t, evaluate) => {
     const slots = {
       showContribution: true,
-      showIcons: true,
+      showExternalLinks: true,
     };
 
     await evaluate.load({
       mock: evaluate.mock(mock => ({
         linkArtist: {
-          relations: mock.function('linkArtist.relations', () => ({}))
+          relations: mock
+            .function('linkArtist.relations', () => ({}))
             .args([undefined, artist1]).next()
             .args([undefined, artist2]).next()
             .args([undefined, artist3]),
 
-          data: mock.function('linkArtist.data', () => ({}))
+          data: mock
+            .function('linkArtist.data', () => ({}))
             .args([artist1]).next()
             .args([artist2]).next()
             .args([artist3]),
@@ -49,13 +51,18 @@ t.test('generateContributionLinks (unit)', async t => {
             .repeat(3),
         },
 
-        linkExternalAsIcon: {
-          data: mock.function('linkExternalAsIcon.data', () => ({}))
+        generateExternalIcon: {
+          data: mock
+            .function('generateExternalIcon.data', () => ({}))
             .args([artist1.urls[0]]).next()
             .args([artist3.urls[0]]).next()
             .args([artist3.urls[1]]),
 
-          generate: mock.function('linkExternalAsIcon.generate', () => 'icon')
+          generate: mock
+            .function('generateExternalIcon.generate', () => ({
+              toString: () => 'icon',
+              setSlot: () => {},
+            }))
             .repeat(3),
         }
       })),
@@ -75,23 +82,26 @@ t.test('generateContributionLinks (unit)', async t => {
   await testContentFunctions(t, 'generateContributionLinks (unit 2)', async (t, evaluate) => {
     const slots = {
       showContribution: false,
-      showIcons: false,
+      showExternalLinks: false,
     };
 
     await evaluate.load({
       mock: evaluate.mock(mock => ({
         linkArtist: {
-          relations: mock.function('linkArtist.relations', () => ({}))
+          relations: mock
+            .function('linkArtist.relations', () => ({}))
             .args([undefined, artist1]).next()
             .args([undefined, artist2]).next()
             .args([undefined, artist3]),
 
-          data: mock.function('linkArtist.data', () => ({}))
+          data: mock
+            .function('linkArtist.data', () => ({}))
             .args([artist1]).next()
             .args([artist2]).next()
             .args([artist3]),
 
-          generate: mock.function(() => 'artist link')
+          generate: mock
+            .function(() => 'artist link')
             .repeat(3),
         },
 
@@ -99,11 +109,16 @@ t.test('generateContributionLinks (unit)', async t => {
         // tree is the same since whether or not the external icon links are
         // shown is dependent on a slot, which is undefined and arbitrary at
         // relations/data time (it might change on a whim at generate time).
-        linkExternalAsIcon: {
-          data: mock.function('linkExternalAsIcon.data', () => ({}))
+        generateExternalIcon: {
+          data: mock
+            .function('generateExternalIcon.data', () => ({}))
             .repeat(3),
 
-          generate: mock.function('linkExternalAsIcon.generate', () => 'icon')
+          generate: mock
+            .function('generateExternalIcon.generate', () => ({
+              toString: () => 'icon',
+              setSlot: () => {},
+            }))
             .repeat(3),
         },
       })),
