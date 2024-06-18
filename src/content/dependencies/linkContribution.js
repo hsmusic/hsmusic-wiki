@@ -50,15 +50,55 @@ export default {
   },
 
   generate(data, relations, slots, {html, language}) {
+    const capsule = language.encapsulate('misc.artistLink');
+
     const hasContribution = !!(slots.showContribution && data.contribution);
     const hasExternalIcons = !!(slots.showIcons && relations.artistIcons);
 
     const parts = ['misc.artistLink'];
     const options = {};
 
+    const tooltipContent = [];
+
+    if (hasExternalIcons && slots.iconMode === 'tooltip') {
+      tooltipContent.push(
+        stitchArrays({
+          icon: relations.artistIcons,
+          url: data.urls,
+        }).map(({icon, url}) => {
+            icon.setSlots({
+              context: 'artist',
+              withText: true,
+            });
+
+            let platformText =
+              language.formatExternalLink(url, {
+                context: 'artist',
+                style: 'platform',
+              });
+
+            // This is a pretty ridiculous hack, but we currently
+            // don't have a way of telling formatExternalLink to *not*
+            // use the fallback string, which just formats the URL as
+            // its host/domain... so is technically detectable.
+            if (platformText.toString() === (new URL(url)).host) {
+              platformText =
+                language.$(capsule, 'noExternalLinkPlatformName');
+            }
+
+            const platformSpan =
+              html.tag('span', {class: 'icon-platform'},
+                platformText);
+
+            return [icon, platformSpan];
+          }));
+    }
+
+    // TODO: It probably shouldn't be necessary to do an isBlank call here.
     options.artist =
-      (hasExternalIcons && slots.iconMode === 'tooltip'
-        ? relations.textWithTooltip.slots({
+      (html.isBlank(tooltipContent)
+        ? relations.artistLink
+        : relations.textWithTooltip.slots({
             customInteractionCue: true,
 
             text:
@@ -75,39 +115,9 @@ export default {
                   {[html.joinChildren]: ''},
 
                 content:
-                  stitchArrays({
-                    icon: relations.artistIcons,
-                    url: data.urls,
-                  }).map(({icon, url}) => {
-                      icon.setSlots({
-                        context: 'artist',
-                        withText: true,
-                      });
-
-                      let platformText =
-                        language.formatExternalLink(url, {
-                          context: 'artist',
-                          style: 'platform',
-                        });
-
-                      // This is a pretty ridiculous hack, but we currently
-                      // don't have a way of telling formatExternalLink to *not*
-                      // use the fallback string, which just formats the URL as
-                      // its host/domain... so is technically detectable.
-                      if (platformText.toString() === (new URL(url)).host) {
-                        platformText =
-                          language.$('misc.artistLink.noExternalLinkPlatformName');
-                      }
-
-                      const platformSpan =
-                        html.tag('span', {class: 'icon-platform'},
-                          platformText);
-
-                      return [icon, platformSpan];
-                    }),
+                  tooltipContent,
               }),
-          })
-        : relations.artistLink);
+          }));
 
     if (hasContribution) {
       parts.push('withContribution');
