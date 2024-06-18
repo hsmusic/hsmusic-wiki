@@ -33,36 +33,22 @@ testContentFunctions(t, 'linkContribution (snapshot)', async (t, evaluate) => {
       slots,
     });
 
-  quickSnapshot('showContribution & showIcons (inline)', {
+  quickSnapshot('showContribution & showExternalLinks', {
     showContribution: true,
-    showIcons: true,
-    iconMode: 'inline',
-  });
-
-  quickSnapshot('showContribution & showIcons (tooltip)', {
-    showContribution: true,
-    showIcons: true,
-    iconMode: 'tooltip',
+    showExternalLinks: true,
   });
 
   quickSnapshot('only showContribution', {
     showContribution: true,
   });
 
-  quickSnapshot('only showIcons (inline)', {
-    showIcons: true,
-    iconMode: 'inline',
-  });
-
-  quickSnapshot('only showIcons (tooltip)', {
-    showContribution: true,
-    showIcons: true,
-    iconMode: 'tooltip',
+  quickSnapshot('only showExternalLinks', {
+    showExternalLinks: true,
   });
 
   quickSnapshot('no accents', {});
 
-  evaluate.snapshot('loads of links (inline)', {
+  evaluate.snapshot('loads of links', {
     name: 'linkContribution',
     args: [
       {artist: {name: 'Lorem Ipsum Lover', directory: 'lorem-ipsum-lover', urls: [
@@ -76,29 +62,12 @@ testContentFunctions(t, 'linkContribution (snapshot)', async (t, evaluate) => {
         'https://loremipsum.io/#original-source',
       ]}, annotation: null},
     ],
-    slots: {showIcons: true},
-  });
-
-  evaluate.snapshot('loads of links (tooltip)', {
-    name: 'linkContribution',
-    args: [
-      {artist: {name: 'Lorem Ipsum Lover', directory: 'lorem-ipsum-lover', urls: [
-        'https://loremipsum.io',
-        'https://loremipsum.io/generator/',
-        'https://loremipsum.io/#meaning',
-        'https://loremipsum.io/#usage-and-examples',
-        'https://loremipsum.io/#controversy',
-        'https://loremipsum.io/#when-to-use-lorem-ipsum',
-        'https://loremipsum.io/#lorem-ipsum-all-the-things',
-        'https://loremipsum.io/#original-source',
-      ]}, annotation: null},
-    ],
-    slots: {showIcons: true, iconMode: 'tooltip'},
+    slots: {showExternalLinks: true},
   });
 
   quickSnapshot('no preventWrapping', {
     showContribution: true,
-    showIcons: true,
+    showExternalLinks: true,
     preventWrapping: false,
   });
 });
