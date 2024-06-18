@@ -1765,6 +1765,11 @@ function showTooltipFromHoverable(hoverable) {
 
   positionTooltipFromHoverableWithBrains(hoverable);
 
+  // After a tooltip is shown, if we *didn't* specify an anchor,
+  // assume it was shown in its default position - generally presented
+  // as down and to the right. Successive repositioning will base on this.
+  state.dynamicTooltipAnchorDirection ??= ['down', 'right'];
+
   cssProp(tooltip, 'display', 'block');
   tooltip.inert = false;
 
