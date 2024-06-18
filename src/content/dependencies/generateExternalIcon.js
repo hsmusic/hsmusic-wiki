@@ -13,13 +13,14 @@ export default {
   },
 
   generate: (data, slots, {html, language, to}) =>
-    html.tag('svg',
-      html.tag('use', {
-        href:
-          to('staticMisc.icon',
-            language.formatExternalLink(data.url, {
-              style: 'icon-id',
-              context: slots.context,
-            })),
-      })),
+    html.tag('span', {class: 'external-icon'},
+      html.tag('svg',
+        html.tag('use', {
+          href:
+            to('staticMisc.icon',
+              language.formatExternalLink(data.url, {
+                style: 'icon-id',
+                context: slots.context,
+              })),
+        }))),
 };

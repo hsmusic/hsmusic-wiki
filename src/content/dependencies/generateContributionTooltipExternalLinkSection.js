@@ -41,20 +41,19 @@ export default {
             }
 
             return [
-              html.tag('a', {class: 'icon'},
+              html.tag('a', {class: 'external-link'},
                 {href: url},
-                {class: 'has-text'},
 
                 [
                   icon,
 
-                  html.tag('span', {class: 'icon-text'},
+                  html.tag('span', {class: 'external-handle'},
                     (html.isBlank(handle)
                       ? platform
                       : handle)),
                 ]),
 
-              html.tag('span', {class: 'icon-platform'},
+              html.tag('span', {class: 'external-platform'},
                 // This is a pretty ridiculous hack, but we currently
                 // don't have a way of telling formatExternalLink to *not*
                 // use the fallback string, which just formats the URL as

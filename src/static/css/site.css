@@ -910,7 +910,7 @@ li:not(:first-child:last-child) .tooltip,
     0 -2px 4px -2px var(--primary-color) inset;
 }
 
-.icons-tooltip {
+.contribution-tooltip {
   padding: 3px 6px 6px 6px;
   left: -34px;
 }
@@ -931,7 +931,7 @@ li:not(:first-child:last-child) .tooltip,
   margin-right: -120px;
 }
 
-.icons-tooltip .tooltip-content {
+.contribution-tooltip .tooltip-content {
   padding: 6px 2px 2px 2px;
 
   -webkit-user-select: none;
@@ -942,59 +942,84 @@ li:not(:first-child:last-child) .tooltip,
   display: grid;
 
   grid-template-columns:
-    [icon-start] auto [icon-end domain-start] auto [domain-end];
+    [icon-start] auto [icon-end handle-start] auto [handle-end platform-start] auto [platform-end];
 }
 
-.icons-tooltip .icon {
+.contribution-tooltip .external-link {
   grid-column-start: icon-start;
-  grid-column-end: icon-end;
+  grid-column-end: handle-end;
+
+  height: 1.4em;
 }
 
-.icons-tooltip .chronology-link {
+.contribution-tooltip .external-icon {
+  width: 18px;
+}
+
+.contribution-tooltip .external-icon svg {
+  width: 18px;
+  height: 18px;
+  top: -0.1em;
+}
+
+.contribution-tooltip .external-handle {
+  padding-right: 8px;
+}
+
+.contribution-tooltip .chronology-link {
   grid-column-start: icon-start;
-  grid-column-end: domain-end;
+  grid-column-end: handle-end;
   padding-left: 5px;
   padding-right: 3px;
   font-size: 0.85em;
 }
 
-.icons-tooltip .tooltip-divider {
+.contribution-tooltip .tooltip-divider {
   grid-column-start: icon-start;
-  grid-column-end: domain-end;
+  grid-column-end: platform-end;
 
   border-top: 1px dotted var(--primary-color);
   margin-top: 3px;
   margin-bottom: 4px;
 }
 
-.icons-tooltip .icon-platform {
+.contribution-tooltip .external-platform {
   display: none;
 
-  grid-column-start: domain-start;
-  grid-column-end: domain-end;
+  grid-column-start: platform-start;
+  grid-column-end: platform-end;
 
-  --icon-platform-opacity: 0.8;
+  --external-platform-opacity: 0.8;
   padding-right: 4px;
   opacity: 0.8;
 }
 
-.icons-tooltip.show-info .icon-platform {
+.contribution-tooltip.show-info .external-platform {
   display: inline;
-  animation: icon-platform 0.2s forwards linear;
+  animation: external-platform 0.2s forwards linear;
 }
 
-@keyframes icon-platform {
+@keyframes external-platform {
   from {
     opacity: 0;
   }
 
   to {
-    opacity: var(--icon-platform-opacity);
+    opacity: var(--external-platform-opacity);
   }
 }
 
-.icons-tooltip .icon:hover + .icon-platform {
-  --icon-platform-opacity: 1;
+.contribution-tooltip .external-link:hover {
+  filter: brightness(1.4);
+  text-decoration: none;
+}
+
+.contribution-tooltip .external-link:hover .external-handle {
+  text-decoration: underline;
+}
+
+.contribution-tooltip .external-link:hover + .external-platform {
+  --external-platform-opacity: 1;
   text-decoration: underline;
   text-decoration-color: #ffffffaa;
 }
@@ -1010,49 +1035,20 @@ li:not(:first-child:last-child) .tooltip,
   padding: 3px 4.5px;
 }
 
-.icons {
-  font-style: normal;
-  white-space: nowrap;
-}
-
-.icons a:hover {
-  filter: brightness(1.4);
-}
-
-.icons a {
-  padding: 0 3px;
-}
-
-.icon {
+.external-icon {
   display: inline-block;
+  padding: 0 3px;
   width: 24px;
   height: 1em;
   position: relative;
 }
 
-.icon > svg {
+.external-icon svg {
   width: 24px;
   height: 24px;
   top: -0.25em;
   position: absolute;
   fill: var(--primary-color);
-}
-
-.icon.has-text {
-  display: block;
-  width: unset;
-  height: 1.4em;
-}
-
-.icon.has-text > svg {
-  width: 18px;
-  height: 18px;
-  top: -0.1em;
-}
-
-.icon.has-text > .icon-text {
-  margin-left: 24px;
-  padding-right: 8px;
 }
 
 .rerelease,
