@@ -1,12 +1,14 @@
 // Clones all the contributions in a list, with thing and thingProperty both
 // updated to match the current thing. Overwrites the provided dependency.
-// Doesn't do anything if the provided dependency is null.
+// Optionally updates artistProperty as well. Doesn't do anything if
+// the provided dependency is null.
 //
 // See also:
 //  - withRedatedContributionList
 //
 
 import {input, templateCompositeFrom} from '#composite';
+import {isStringNonEmpty} from '#validators';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 import {withClonedThings} from '#composite/wiki-data';
@@ -18,6 +20,11 @@ export default templateCompositeFrom({
     list: input.staticDependency({
       type: 'array',
       acceptsNull: true,
+    }),
+
+    artistProperty: input({
+      validate: isStringNonEmpty,
+      defaultValue: null,
     }),
   },
 
@@ -47,16 +54,25 @@ export default templateCompositeFrom({
     },
 
     {
-      dependencies: [input.myself(), input.thisProperty()],
+      dependencies: [
+        input.myself(),
+        input.thisProperty(),
+        input('artistProperty'),
+      ],
 
       compute: (continuation, {
         [input.myself()]: myself,
         [input.thisProperty()]: thisProperty,
+        [input('artistProperty')]: artistProperty,
       }) => continuation({
-        ['#assignment']: {
-          thing: myself,
-          thingProperty: thisProperty,
-        },
+        ['#assignment']:
+          Object.assign(
+            {thing: myself},
+            {thingProperty: thisProperty},
+
+            (artistProperty
+              ? {artistProperty}
+              : {})),
       }),
     },
 

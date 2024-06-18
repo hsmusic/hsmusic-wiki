@@ -15,7 +15,7 @@
 //
 
 import {input, templateCompositeFrom} from '#composite';
-import {isContributionList, isDate} from '#validators';
+import {isContributionList, isDate, isStringNonEmpty} from '#validators';
 
 import {exposeConstant, exposeDependencyOrContinue} from '#composite/control-flow';
 import {withResolvedContribs} from '#composite/wiki-data';
@@ -30,6 +30,11 @@ export default templateCompositeFrom({
       validate: isDate,
       acceptsNull: true,
     }),
+
+    artistProperty: input({
+      validate: isStringNonEmpty,
+      defaultValue: null,
+    }),
   },
 
   update: {validate: isContributionList},
@@ -38,6 +43,7 @@ export default templateCompositeFrom({
     withResolvedContribs({
       from: input.updateValue(),
       thingProperty: input.thisProperty(),
+      artistProperty: input('artistProperty'),
       date: input('date'),
     }),
 

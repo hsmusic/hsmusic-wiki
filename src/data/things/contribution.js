@@ -35,6 +35,11 @@ export class Contribution extends Thing {
       update: {validate: isStringNonEmpty},
     },
 
+    artistProperty: {
+      flags: {update: true, expose: true},
+      update: {validate: isStringNonEmpty},
+    },
+
     date: simpleDate(),
 
     artist: [
