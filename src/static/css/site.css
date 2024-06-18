@@ -954,7 +954,17 @@ li:not(:first-child:last-child) .tooltip,
   height: 1.4em;
 }
 
-.contribution-tooltip .external-icon {
+.contribution-tooltip .chronology-link {
+  display: grid;
+  grid-column-start: icon-start;
+  grid-column-end: handle-end;
+  grid-template-columns: subgrid;
+
+  height: 1.2em;
+}
+
+.contribution-tooltip .external-icon,
+.contribution-tooltip .chronology-symbol {
   grid-column-start: icon-start;
   grid-column-end: icon-end;
 }
@@ -965,34 +975,21 @@ li:not(:first-child:last-child) .tooltip,
   top: -0.1em;
 }
 
-.contribution-tooltip .external-handle {
+.contribution-tooltip .chronology-symbol {
+  text-align: center;
+}
+
+.contribution-tooltip .external-handle,
+.contribution-tooltip .chronology-text {
   grid-column-start: handle-start;
   grid-column-end: handle-end;
 
   padding-right: 8px;
 }
 
-.contribution-tooltip .chronology-link {
-  display: grid;
-  grid-column-start: icon-start;
-  grid-column-end: handle-end;
-  grid-template-columns: subgrid;
 
-  height: 1.2em;
-}
-
-.contribution-tooltip .chronology-symbol {
-  grid-column-start: icon-start;
-  grid-column-end: icon-end;
-
-  text-align: center;
-}
-
-.contribution-tooltip .chronology-text {
-  grid-column-start: handle-start;
-  grid-column-end: handle-end;
-
-  padding-right: 6px;
+.contribution-tooltip .chronology-text,
+.contribution-tooltip .chronology-info {
   font-size: 0.85em;
 }
 
@@ -1005,7 +1002,8 @@ li:not(:first-child:last-child) .tooltip,
   margin-bottom: 4px;
 }
 
-.contribution-tooltip .external-platform {
+.contribution-tooltip .external-platform,
+.contribution-tooltip .chronology-info {
   display: none;
 
   grid-column-start: platform-start;
@@ -1016,7 +1014,8 @@ li:not(:first-child:last-child) .tooltip,
   opacity: 0.8;
 }
 
-.contribution-tooltip.show-info .external-platform {
+.contribution-tooltip.show-info .external-platform,
+.contribution-tooltip.show-info .chronology-info {
   display: inline;
   animation: external-platform 0.2s forwards linear;
 }
@@ -1042,7 +1041,8 @@ li:not(:first-child:last-child) .tooltip,
   text-decoration: underline;
 }
 
-.contribution-tooltip .external-link:hover + .external-platform {
+.contribution-tooltip .external-link:hover + .external-platform,
+.contribution-tooltip .chronology-link:hover + .chronology-info {
   --external-platform-opacity: 1;
   text-decoration: underline;
   text-decoration-color: #ffffffaa;
