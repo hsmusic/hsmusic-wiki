@@ -20,7 +20,7 @@ export default {
     stringKey: {type: 'string'},
 
     showContribution: {type: 'boolean', default: true},
-    showIcons: {type: 'boolean', default: true},
+    showExternalLinks: {type: 'boolean', default: true},
     showChronology: {type: 'boolean', default: true},
   },
 
@@ -34,10 +34,9 @@ export default {
         language.formatConjunctionList(
           relations.contributionLinks.map(link =>
             link.slots({
-              showIcons: slots.showIcons,
               showContribution: slots.showContribution,
+              showExternalLinks: slots.showExternalLinks,
               showChronology: slots.showChronology,
-              iconMode: 'tooltip',
             }))),
     });
   },

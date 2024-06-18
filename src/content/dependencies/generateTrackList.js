@@ -17,12 +17,7 @@ export default {
             .map(contrib => relation('linkContribution', contrib))),
   }),
 
-  slots: {
-    showContribution: {type: 'boolean', default: false},
-    showIcons: {type: 'boolean', default: false},
-  },
-
-  generate: (relations, slots, {html, language}) =>
+  generate: (relations, {html, language}) =>
     html.tag('ul',
       {[html.onlyIfContent]: true},
 
@@ -42,12 +37,7 @@ export default {
                       html.metatag('chunkwrap', {split: ','},
                         language.$(itemCapsule, 'withArtists.by', {
                           artists:
-                            language.formatConjunctionList(
-                              contributionLinks.map(link =>
-                                link.slots({
-                                  showContribution: slots.showContribution,
-                                  showIcons: slots.showIcons,
-                                }))),
+                            language.formatConjunctionList(contributionLinks),
                         })));
                 }
 
