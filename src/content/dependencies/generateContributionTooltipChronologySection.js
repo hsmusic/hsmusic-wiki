@@ -28,25 +28,41 @@ export default {
         : null),
   }),
 
-  generate: (relations, {html, language}) =>
-    language.encapsulate('misc.artistLink.chronology', capsule =>
+  data: (query, _contribution) => ({
+    previousName:
+      (query.previous
+        ? query.previous.thing.name
+        : null),
+
+    nextName:
+      (query.next
+        ? query.next.thing.name
+        : null),
+  }),
+
+  generate: (data, relations, {html, language}) =>
+    language.encapsulate('misc.artistLink', capsule =>
       html.tags([
-        html.tag('span', {class: 'chronology-link'},
-          {[html.onlyIfContent]: true},
+        relations.previousLink?.slots({
+          attributes: {class: 'chronology-link'},
+          content: [
+            html.tag('span', {class: 'chronology-symbol'},
+              language.$(capsule, 'previousSymbol')),
 
-          language.$(capsule, 'previous', {
-            [language.onlyIfOptions]: ['thing'],
+            html.tag('span', {class: 'chronology-text'},
+              language.sanitize(data.previousName)),
+          ],
+        }),
 
-            thing: relations.previousLink,
-          })),
+        relations.nextLink?.slots({
+          attributes: {class: 'chronology-link'},
+          content: [
+            html.tag('span', {class: 'chronology-symbol'},
+              language.$(capsule, 'nextSymbol')),
 
-        html.tag('span', {class: 'chronology-link'},
-          {[html.onlyIfContent]: true},
-
-          language.$(capsule, 'next', {
-            [language.onlyIfOptions]: ['thing'],
-
-            thing: relations.nextLink,
-          })),
+            html.tag('span', {class: 'chronology-text'},
+              language.sanitize(data.nextName)),
+          ],
+        }),
       ])),
 };

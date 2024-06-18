@@ -480,9 +480,10 @@ misc:
     # isn't a specially detected web platform.
     noExternalLinkPlatformName: "Other"
 
-    chronology:
-      previous: "← {THING}"
-      next: "→ {THING}"
+    # Displayed in an artist's toolitp, as the symbol
+    # for chronology links.
+    previousSymbol: "←"
+    nextSymbol: "→"
 
   # chronology:
   #
