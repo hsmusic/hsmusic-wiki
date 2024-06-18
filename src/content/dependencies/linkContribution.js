@@ -90,7 +90,6 @@ export default {
         }).map(({icon, url}) => {
             icon.setSlots({
               context: 'artist',
-              withText: true,
             });
 
             let platformText =
