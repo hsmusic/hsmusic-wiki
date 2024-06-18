@@ -10,7 +10,6 @@ export default {
     'generateContributionList',
     'generatePageLayout',
     'generateTrackAdditionalNamesBox',
-    'generateTrackChronologyLinks',
     'generateTrackCoverArtwork',
     'generateTrackInfoPageFeaturedByFlashesList',
     'generateTrackInfoPageOtherReleasesList',
@@ -48,9 +47,6 @@ export default {
 
     albumNavAccent:
       relation('generateAlbumNavAccent', track.album, track),
-
-    chronologyLinks:
-      relation('generateTrackChronologyLinks', track),
 
     secondaryNav:
       relation('generateAlbumSecondaryNav', track.album),
@@ -396,9 +392,6 @@ export default {
             showTrackNavigation: true,
             showExtraLinks: false,
           }),
-
-        navContent:
-          relations.chronologyLinks,
 
         secondaryNav:
           relations.secondaryNav

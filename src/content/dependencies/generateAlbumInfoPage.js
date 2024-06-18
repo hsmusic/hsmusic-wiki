@@ -10,7 +10,6 @@ export default {
     'generateAlbumSocialEmbed',
     'generateAlbumStyleRules',
     'generateAlbumTrackList',
-    'generateAlbumChronologyLinks',
     'generateCommentarySection',
     'generateContentHeading',
     'generatePageLayout',
@@ -32,9 +31,6 @@ export default {
 
     albumNavAccent:
       relation('generateAlbumNavAccent', album, null),
-
-    chronologyLinks:
-      relation('generateAlbumChronologyLinks', album),
 
     secondaryNav:
       relation('generateAlbumSecondaryNav', album),
@@ -195,9 +191,6 @@ export default {
               }),
           },
         ],
-
-        navContent:
-          relations.chronologyLinks,
 
         banner: relations.banner ?? null,
         bannerPosition: 'top',

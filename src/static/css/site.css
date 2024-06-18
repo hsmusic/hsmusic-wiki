@@ -817,24 +817,6 @@ a:not([href]):hover {
   content: "\0020/\0020";
 }
 
-#header .chronology .heading,
-#header .chronology .buttons {
-  white-space: nowrap;
-}
-
-#header .scoped-chronology {
-  display: none;
-}
-
-#header .scoped-chronology-switcher .switcher-link {
-  text-decoration: underline;
-  text-decoration-style: dotted;
-}
-
-#header .scoped-chronology-switcher > div {
-  margin-left: 20px;
-}
-
 #secondary-nav {
   text-align: center;
 }
