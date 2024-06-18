@@ -942,18 +942,21 @@ li:not(:first-child:last-child) .tooltip,
   display: grid;
 
   grid-template-columns:
-    [icon-start] auto [icon-end handle-start] auto [handle-end platform-start] auto [platform-end];
+    [icon-start] 26px [icon-end handle-start] auto [handle-end platform-start] auto [platform-end];
 }
 
 .contribution-tooltip .external-link {
+  display: grid;
   grid-column-start: icon-start;
   grid-column-end: handle-end;
+  grid-template-columns: subgrid;
 
   height: 1.4em;
 }
 
 .contribution-tooltip .external-icon {
-  width: 18px;
+  grid-column-start: icon-start;
+  grid-column-end: icon-end;
 }
 
 .contribution-tooltip .external-icon svg {
@@ -963,6 +966,9 @@ li:not(:first-child:last-child) .tooltip,
 }
 
 .contribution-tooltip .external-handle {
+  grid-column-start: handle-start;
+  grid-column-end: handle-end;
+
   padding-right: 8px;
 }
 
