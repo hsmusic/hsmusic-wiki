@@ -21,6 +21,8 @@ export default {
   slots: {
     showExternalLinks: {type: 'boolean'},
     showChronology: {type: 'boolean'},
+
+    chronologyKind: {type: 'string'},
   },
 
   generate: (relations, slots, {html}) =>
@@ -38,7 +40,9 @@ export default {
           relations.externalLinkSection,
 
         slots.showChronology &&
-          relations.chronologySection,
+          relations.chronologySection.slots({
+            kind: slots.chronologyKind,
+          }),
       ],
     }),
 };

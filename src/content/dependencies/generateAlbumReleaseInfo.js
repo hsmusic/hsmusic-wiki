@@ -67,17 +67,25 @@ export default {
           {[html.joinChildren]: html.tag('br')},
 
           [
-            relations.artistContributionsLine
-              .slots({stringKey: capsule + '.by'}),
+            relations.artistContributionsLine.slots({
+              stringKey: capsule + '.by',
+              chronologyKind: 'album',
+            }),
 
-            relations.coverArtistContributionsLine
-              .slots({stringKey: capsule + '.coverArtBy'}),
+            relations.coverArtistContributionsLine.slots({
+              stringKey: capsule + '.coverArtBy',
+              chronologyKind: 'coverArt',
+            }),
 
-            relations.wallpaperArtistContributionsLine
-              .slots({stringKey: capsule + '.wallpaperArtBy'}),
+            relations.wallpaperArtistContributionsLine.slots({
+              stringKey: capsule + '.wallpaperArtBy',
+              chronologyKind: 'wallpaperArt',
+            }),
 
-            relations.bannerArtistContributionsLine
-              .slots({stringKey: capsule + '.bannerArtBy'}),
+            relations.bannerArtistContributionsLine.slots({
+              stringKey: capsule + '.bannerArtBy',
+              chronologyKind: 'bannerArt',
+            }),
 
             language.$(capsule, 'released', {
               [language.onlyIfOptions]: ['date'],

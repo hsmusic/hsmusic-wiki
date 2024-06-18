@@ -29,6 +29,7 @@ export default {
     showChronology: {type: 'boolean', default: false},
 
     preventWrapping: {type: 'boolean', default: true},
+    chronologyKind: {type: 'string'},
   },
 
   generate: (data, relations, slots, {html, language}) =>
@@ -54,6 +55,7 @@ export default {
               relations.tooltip.slots({
                 showExternalLinks: slots.showExternalLinks,
                 showChronology: slots.showChronology,
+                chronologyKind: slots.chronologyKind,
               }),
           });
 

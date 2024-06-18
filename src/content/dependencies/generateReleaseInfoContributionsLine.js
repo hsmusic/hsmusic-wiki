@@ -17,11 +17,12 @@ export default {
   },
 
   slots: {
-    stringKey: {type: 'string'},
-
     showContribution: {type: 'boolean', default: true},
     showExternalLinks: {type: 'boolean', default: true},
     showChronology: {type: 'boolean', default: true},
+
+    stringKey: {type: 'string'},
+    chronologyKind: {type: 'string'},
   },
 
   generate(relations, slots, {html, language}) {
@@ -37,6 +38,7 @@ export default {
               showContribution: slots.showContribution,
               showExternalLinks: slots.showExternalLinks,
               showChronology: slots.showChronology,
+              chronologyKind: slots.chronologyKind,
             }))),
     });
   },
