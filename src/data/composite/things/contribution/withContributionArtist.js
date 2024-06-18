@@ -5,10 +5,13 @@ import {withPropertyFromObject} from '#composite/data';
 import {withResolvedReference} from '#composite/wiki-data';
 
 export default templateCompositeFrom({
-  annotation: `withOwnContributionArtist`,
+  annotation: `withContributionArtist`,
 
   inputs: {
-    ref: input({type: 'string'}),
+    ref: input({
+      type: 'string',
+      defaultDependency: 'artist',
+    }),
   },
 
   outputs: ['#artist'],
