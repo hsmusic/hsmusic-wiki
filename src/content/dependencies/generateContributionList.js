@@ -16,10 +16,9 @@ export default {
         .map(contributionLink =>
           html.tag('li',
             contributionLink.slots({
-              showIcons: true,
+              showExternalLinks: true,
               showContribution: true,
               showChronology: true,
               preventWrapping: false,
-              iconMode: 'tooltip',
             })))),
 };
