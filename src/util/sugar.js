@@ -60,6 +60,11 @@ export function repeat(times, array) {
   return out;
 }
 
+// Gets a random item from an array.
+export function pick(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
 // Gets the item at an index relative to another index.
 export function atOffset(array, index, offset, {
   wrap = false,
