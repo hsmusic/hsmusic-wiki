@@ -673,7 +673,7 @@ export default {
             html.tag('script', {
               blocking: 'render',
               type: 'module',
-              src: to('staticJS.path', 'client.js'),
+              src: to('staticJS.path', 'client/index.js'),
             }),
           ]),
 
