@@ -2,12 +2,15 @@ import * as path from 'node:path';
 
 import {
   copyFile,
+  cp,
   mkdir,
   stat,
   symlink,
   writeFile,
   unlink,
 } from 'node:fs/promises';
+
+import {rimraf} from 'rimraf';
 
 import {quickLoadContentDependencies} from '#content-dependencies';
 import {quickEvaluate} from '#content-function';
@@ -155,6 +158,11 @@ export async function go({
   await mkdir(outputPath, {recursive: true});
 
   await writeWebRouteSymlinks({
+    outputPath,
+    webRoutes,
+  });
+
+  await writeWebRouteCopies({
     outputPath,
     webRoutes,
   });
@@ -438,8 +446,11 @@ function writeWebRouteSymlinks({
   outputPath,
   webRoutes,
 }) {
+  const symlinkRoutes =
+    webRoutes.filter(route => route.statically === 'symlink');
+
   const promises =
-    webRoutes.map(async route => {
+    symlinkRoutes.map(async route => {
       const parts = route.to.split('/');
       const parentDirectoryParts = parts.slice(0, -1);
       const symlinkNamePart = parts.at(-1);
@@ -469,6 +480,113 @@ function writeWebRouteSymlinks({
     });
 
   return progressPromiseAll(`Writing web route symlinks.`, promises);
+}
+
+async function writeWebRouteCopies({
+  outputPath,
+  webRoutes,
+}) {
+  const copyRoutes =
+    webRoutes.filter(route => route.statically === 'copy');
+
+  const promises =
+    copyRoutes.map(async route => {
+      const permissionName = '__hsmusic-ok-for-deletion.txt';
+
+      const parts = route.to.split('/');
+      const parentDirectoryParts = parts.slice(0, -1);
+      const copyNamePart = parts.at(-1);
+
+      const parentDirectory = path.join(outputPath, ...parentDirectoryParts);
+      const copyPath = path.join(parentDirectory, copyNamePart);
+
+      // We're going to do a rimraf call! This is freaking terrifying,
+      // so nope out on a couple important conditions.
+
+      let needsDelete;
+      try {
+        await stat(copyPath);
+        needsDelete = true;
+      } catch (error) {
+        if (error.code === 'ENOENT') {
+          needsDelete = false;
+        } else {
+          throw error;
+        }
+      }
+
+      if (needsDelete) {
+        // First remove it directly, in case it's a symlink.
+        try {
+          await unlink(copyPath);
+          needsDelete = false;
+        } catch (error) {
+          // EPERM is POSIX, but libuv may or may not flat-out just raise
+          // the system error (which is ostensibly EISDIR on Linux).
+          // https://github.com/nodejs/node-v0.x-archive/issues/5791
+          // https://man7.org/linux/man-pages/man2/unlink.2.html
+          //
+          // Both of these indidcate "a directory, probably" and we'll
+          // still check for the deletion permission file where we expect
+          // it before actually touching anything.
+          if (error.code !== 'EPERM' && error.code !== 'EISDIR') {
+            throw error;
+          }
+        }
+      }
+
+      if (needsDelete) {
+        // Then check that the deletion permission file exists
+        // where we expect it.
+        try {
+          await stat(path.join(copyPath, permissionName));
+        } catch (error) {
+          if (error.code === 'ENOENT') {
+            throw new Error(`Couldn't find ${permissionName} in ${copyPath} - please delete or move away this folder manually`);
+          } else {
+            throw error;
+          }
+        }
+
+        // And *then* actually delete that directory.
+        await rimraf(copyPath);
+      }
+
+      // Actually copy the source path where it's wanted.
+      await cp(route.from, copyPath, {recursive: true});
+
+      // And certify that it's OK to delete this path, next time around.
+      await writeFile(path.join(copyPath, permissionName),
+        `The presence of this file (by its name, not its contents)\n` +
+        `indicates hsmusic may delete everything contained in this\n` +
+        `directory (the one which directly contains this file, *not*\n` +
+        `any further-up parent directories).\n` +
+        `\n` +
+        `If you make edits, or add any files, they will be deleted or\n` +
+        `overwritten the next time you run the build.\n` +
+        `\n` +
+        `If you delete *this* file, hsmusic will error during the next\n` +
+        `build, and will ask that you delete the containing directory\n` +
+        `yourself.\n`);
+    });
+
+  const results =
+    await Promise.allSettled(promises);
+
+  const errors =
+    results
+      .filter(({status}) => status === 'rejected')
+      .map(({reason}) => reason)
+      .map(err =>
+        (err.message.startsWith(`Couldn't find`)
+          ? err.message
+          : err));
+
+  if (empty(errors)) {
+    logInfo`Wrote web route copies.`;
+  } else {
+    throw new AggregateError(errors, `Errors copying internal files ("web routes")`);
+  }
 }
 
 async function writeFavicon({

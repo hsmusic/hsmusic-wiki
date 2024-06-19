@@ -68,6 +68,7 @@
         "js-yaml": "^4.1.0",
         "marked": "^10.0.0",
         "msgpackr": "^1.10.2",
+        "rimraf": "^5.0.7",
         "striptags": "^4.0.0-alpha.4",
         "word-wrap": "^1.2.3"
     },

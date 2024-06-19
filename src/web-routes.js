@@ -18,21 +18,25 @@ export const stationaryCodeRoutes = [
   {
     from: path.join(codeSrcPath, 'static', 'css'),
     to: ['staticCSS.root'],
+    statically: 'copy',
   },
 
   {
     from: path.join(codeSrcPath, 'static', 'js'),
     to: ['staticJS.root'],
+    statically: 'copy',
   },
 
   {
     from: path.join(codeSrcPath, 'static', 'misc'),
     to: ['staticMisc.root'],
+    statically: 'copy',
   },
 
   {
     from: path.join(codeSrcPath, 'util'),
     to: ['staticSharedUtil.root'],
+    statically: 'copy',
   },
 ];
 
@@ -50,6 +54,8 @@ function quickNodeDependency({
           : root),
 
       to: ['staticLib.path', name],
+
+      statically: 'copy',
     },
   ];
 }
@@ -86,8 +92,17 @@ export async function identifyDynamicWebRoutes({
 }) {
   const routeFunctions = [
     () => Promise.resolve([
-      {from: path.resolve(mediaPath), to: ['media.root']},
-      {from: path.resolve(mediaCachePath), to: ['thumb.root']},
+      {
+        from: path.resolve(mediaPath),
+        to: ['media.root'],
+        statically: 'symlink',
+      },
+
+      {
+        from: path.resolve(mediaCachePath),
+        to: ['thumb.root'],
+        statically: 'symlink',
+      },
     ]),
 
     () => {
@@ -98,7 +113,12 @@ export async function identifyDynamicWebRoutes({
 
       return (
         readdir(from).then(
-          () => [{from, to: ['searchData.root']}],
+          () => [
+            {
+              from,
+              to: ['searchData.root'],
+              statically: 'copy',
+            }],
           () => []));
     },
   ];
