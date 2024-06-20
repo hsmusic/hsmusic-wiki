@@ -1,5 +1,4 @@
-import {empty} from '#sugar';
-import {stitchArrays} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -59,7 +58,7 @@ export default {
           .map(group => relation('linkGroup', group))),
 
     datetimestamps:
-      group.albums.map(album =>
+      query.albums.map(album =>
         (album.date
           ? relation('generateAbsoluteDatetimestamp', album.date)
           : null)),
