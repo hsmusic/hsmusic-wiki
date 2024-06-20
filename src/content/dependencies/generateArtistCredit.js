@@ -1,4 +1,4 @@
-import {empty} from '#sugar';
+import {compareArrays, empty} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -8,19 +8,47 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  query: (contributions) => ({
-    normalContributions:
-      contributions
-        .filter(contrib => !contrib.annotation?.startsWith(`edits for wiki`)),
+  query: (creditContributions, contextContributions) => {
+    const query = {};
 
-    wikiEditContributions:
-      contributions
-        .filter(contrib => contrib.annotation?.startsWith(`edits for wiki`)),
-  }),
+    const featuringFilter = contribution =>
+      contribution.annotation === 'featuring';
 
-  relations: (relation, query, _contributions) => ({
-    contributionLinks:
+    const wikiEditFilter = contribution =>
+      contribution.annotation?.startsWith('edits for wiki');
+
+    const normalFilter = contribution =>
+      !featuringFilter(contribution) &&
+      !wikiEditFilter(contribution);
+
+    query.normalContributions =
+      creditContributions.filter(normalFilter);
+
+    query.featuringContributions =
+      creditContributions.filter(featuringFilter);
+
+    query.wikiEditContributions =
+      creditContributions.filter(wikiEditFilter);
+
+    const contextNormalContributions =
+      contextContributions.filter(normalFilter);
+
+    query.normalContributionsAreDifferent =
+      !compareArrays(
+        query.normalContributions.map(({artist}) => artist),
+        contextNormalContributions.map(({artist}) => artist),
+        {checkOrder: false});
+
+    return query;
+  },
+
+  relations: (relation, query, _creditContributions, _contextContributions) => ({
+    normalContributionLinks:
       query.normalContributions
+        .map(contrib => relation('linkContribution', contrib)),
+
+    featuringContributionLinks:
+      query.featuringContributions
         .map(contrib => relation('linkContribution', contrib)),
 
     wikiEditsPart:
@@ -28,55 +56,107 @@ export default {
         query.wikiEditContributions),
   }),
 
-  data: (query, _contributions) => ({
+  data: (query, _creditContributions, _contextContributions) => ({
+    normalContributionsAreDifferent:
+      query.normalContributionsAreDifferent,
+
     hasWikiEdits:
       !empty(query.wikiEditContributions),
   }),
 
   slots: {
-    showAnnotation: {type: 'boolean', default: true},
-    showExternalLinks: {type: 'boolean', default: true},
-    showChronology: {type: 'boolean', default: true},
+    // This string is mandatory.
+    normalStringKey: {type: 'string'},
+
+    // This string is optional.
+    // Without it, there's no special behavior for "featuring" credits.
+    normalFeaturingStringKey: {type: 'string'},
+
+    // This string is optional.
+    // Without it, "featuring" credits will always be alongside main credits.
+    // It won't be used if contextContributions isn't provided.
+    featuringStringKey: {type: 'string'},
+
+    showAnnotation: {type: 'boolean', default: false},
+    showExternalLinks: {type: 'boolean', default: false},
+    showChronology: {type: 'boolean', default: false},
+    showWikiEdits: {type: 'boolean', default: false},
 
     trimAnnotation: {type: 'boolean', default: false},
 
     chronologyKind: {type: 'string'},
-
-    stringKey: {type: 'string'},
   },
 
-  generate(data, relations, slots, {language}) {
-    const contributionsList =
-      language.formatConjunctionList(
-        relations.contributionLinks.map(link =>
-          link.slots({
-            showAnnotation: slots.showAnnotation,
-            showExternalLinks: slots.showExternalLinks,
-            showChronology: slots.showChronology,
+  generate(data, relations, slots, {html, language}) {
+    if (!slots.normalStringKey) return html.blank();
 
-            trimAnnotation: slots.trimAnnotation,
+    for (const link of [
+      ...relations.normalContributionLinks,
+      ...relations.featuringContributionLinks,
+    ]) {
+      link.setSlots({
+        showExternalLinks: slots.showExternalLinks,
+        showChronology: slots.showChronology,
+        trimAnnotation: slots.trimAnnotation,
+        chronologyKind: slots.chronologyKind,
+      });
+    }
 
-            chronologyKind: slots.chronologyKind,
-          })));
+    for (const link of relations.normalContributionLinks) {
+      link.setSlots({
+        showAnnotation: slots.showAnnotation,
+      });
+    }
 
-    return language.$(slots.stringKey, {
-      [language.onlyIfOptions]: ['artists'],
+    for (const link of relations.featuringContributionLinks) {
+      link.setSlots({
+        showAnnotation: false,
+      });
+    }
 
-      artists:
-        (data.hasWikiEdits
-          ? language.encapsulate('misc.artistLink.withEditsForWiki', capsule =>
-              language.$(capsule, {
-                // It's nonsense to display "+ edits" without
-                // having any regular contributions, also.
-                [language.onlyIfOptions]: ['artists'],
+    if (empty(relations.normalContributionLinks)) {
+      return html.blank();
+    }
 
-                artists: contributionsList,
-                edits:
-                  relations.wikiEditsPart.slots({
-                    showAnnotation: slots.showAnnotation,
-                  }),
-              }))
-          : contributionsList),
-    });
+    const artistsList =
+      (data.hasWikiEdits && slots.showWikiEdits
+        ? language.$('misc.artistLink.withEditsForWiki', {
+            artists:
+              language.formatConjunctionList(relations.normalContributionLinks),
+
+            edits:
+              relations.wikiEditsPart.slots({
+                showAnnotation: slots.showAnnotation,
+              }),
+          })
+        : language.formatConjunctionList(relations.normalContributionLinks));
+
+    const featuringList =
+      language.formatConjunctionList(relations.featuringContributionLinks);
+
+    const everyoneList =
+      language.formatConjunctionList([
+        ...relations.normalContributionLinks,
+        ...relations.featuringContributionLinks,
+      ]);
+
+    if (empty(relations.featuringContributionLinks)) {
+      if (data.normalContributionsAreDifferent) {
+        return language.$(slots.normalStringKey, {artists: artistsList});
+      } else {
+        return html.blank();
+      }
+    }
+
+    if (data.normalContributionsAreDifferent && slots.normalFeaturingStringKey) {
+      return language.$(slots.normalFeaturingStringKey, {
+        artists: artistsList,
+        featuring: featuringList,
+      });
+    } else if (slots.featuringStringKey) {
+      return language.$(slots.featuringStringKey, {artists: featuringList});
+    } else {
+      return language.$(slots.normalStringKey, {artists: everyoneList});
+    }
   },
 };

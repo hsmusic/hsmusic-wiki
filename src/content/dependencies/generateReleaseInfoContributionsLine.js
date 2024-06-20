@@ -4,11 +4,13 @@ export default {
 
   relations: (relation, contributions) => ({
     credit:
-      relation('generateArtistCredit', contributions),
+      relation('generateArtistCredit', contributions, []),
   }),
 
   slots: {
     stringKey: {type: 'string'},
+    featuringStringKey: {type: 'string'},
+
     chronologyKind: {type: 'string'},
   },
 
@@ -17,11 +19,13 @@ export default {
       showAnnotation: true,
       showExternalLinks: true,
       showChronology: true,
+      showWikiEdits: true,
 
       trimAnnotation: false,
 
-      stringKey: slots.stringKey,
-
       chronologyKind: slots.chronologyKind,
+
+      normalStringKey: slots.stringKey,
+      normalFeaturingStringKey: slots.featuringStringKey,
     }),
 };

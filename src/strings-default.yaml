@@ -249,7 +249,10 @@ releaseInfo:
 
   # Descriptions
 
-  by: "By {ARTISTS}."
+  by:
+    _: "By {ARTISTS}."
+    featuring: "By {ARTISTS}, featuring {FEATURING}."
+
   from: "From {ALBUM}."
 
   coverArtBy: "Cover art by {ARTISTS}."
@@ -399,18 +402,29 @@ trackList:
 
   item:
     _: "{TRACK}"
-    withDuration: "{DURATION} {TRACK}"
-    withArtists: "{TRACK} {BY}"
-    withDuration.withArtists: "{DURATION} {TRACK} {BY}"
 
-    withDuration.duration:
-      _: "({DURATION})"
-      missing: "_:__"
-      missing.info: "no duration provided; treated as zero seconds long"
+    withDuration:
+      _: >-
+        {DURATION} {TRACK}
 
-    withArtists.by: "by {ARTISTS}"
+      duration:
+        _: "({DURATION})"
+        missing: "_:__"
+        missing.info: "no duration provided; treated as zero seconds long"
 
-    rerelease: "{TRACK} (rerelease)"
+    withArtists:
+      _: >-
+        {TRACK} {BY}
+
+      by: "by {ARTISTS}"
+      featuring: "feat. {ARTISTS}"
+      by.featuring: "by {ARTISTS} feat. {FEATURING}"
+
+    withDuration.withArtists: >-
+      {DURATION} {TRACK} {BY}
+
+    rerelease: >-
+      {TRACK} (rerelease)
 
 #
 # misc:
@@ -479,6 +493,16 @@ misc:
         date.throughout.range: "throughout {DATE_RANGE}"
 
       seeOriginalRelease: "See {ORIGINAL}!"
+
+  artistCredit:
+    withNormalArtists: >-
+      {NORMAL}
+
+    withFeaturingArtists: >-
+      feat. {FEATURING}
+
+    withNormalArtists.withFeaturingArtists: >-
+      {NORMAL} feat. {FEATURING}
 
   # artistLink:
   #   Artist links have special accents which are made conditionally

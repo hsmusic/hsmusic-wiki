@@ -3,7 +3,7 @@ import {compareArrays, empty} from '#sugar';
 export default {
   contentDependencies: [
     'generateAlbumTrackListMissingDuration',
-    'linkContribution',
+    'generateArtistCredit',
     'linkTrack',
   ],
 
@@ -31,11 +31,10 @@ export default {
   relations(relation, query, track) {
     const relations = {};
 
-    if (!empty(track.artistContribs)) {
-      relations.contributionLinks =
-        track.artistContribs
-          .map(contrib => relation('linkContribution', contrib));
-    }
+    relations.credit =
+      relation('generateArtistCredit',
+        track.artistContribs,
+        track.album.artistContribs);
 
     relations.trackLink =
       relation('linkTrack', track);
@@ -113,16 +112,25 @@ export default {
                 : relations.missingDuration);
           }
 
-          if (data.showArtists) {
+          const artistCapsule = language.encapsulate(itemCapsule, 'withArtists');
+
+          relations.credit.setSlots({
+            normalStringKey:
+              artistCapsule + '.by',
+
+            featuringStringKey:
+              artistCapsule + '.featuring',
+
+            normalFeaturingStringKey:
+              artistCapsule + '.by.featuring',
+          });
+
+          if (!html.isBlank(relations.credit)) {
             workingCapsule += '.withArtists';
             workingOptions.by =
               html.tag('span', {class: 'by'},
                 html.metatag('chunkwrap', {split: ','},
-                  html.resolve(
-                    language.$(itemCapsule, 'withArtists.by', {
-                      artists:
-                        language.formatConjunctionList(relations.contributionLinks),
-                    }))));
+                  html.resolve(relations.credit)));
           }
 
           return language.$(workingCapsule, workingOptions);

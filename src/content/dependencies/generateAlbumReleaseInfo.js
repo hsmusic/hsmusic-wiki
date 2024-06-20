@@ -69,6 +69,7 @@ export default {
           [
             relations.artistContributionsLine.slots({
               stringKey: capsule + '.by',
+              featuringStringKey: capsule + '.by.featuring',
               chronologyKind: 'album',
             }),
 
