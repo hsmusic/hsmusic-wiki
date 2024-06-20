@@ -5,7 +5,7 @@ export default {
     'linkContribution',
   ],
 
-  extraDependencies: ['language'],
+  extraDependencies: ['html', 'language'],
 
   relations: (relation, contributions) => ({
     textWithTooltip:
@@ -19,7 +19,11 @@ export default {
         .map(contrib => relation('linkContribution', contrib)),
   }),
 
-  generate: (relations, {language}) =>
+  slots: {
+    showAnnotation: {type: 'boolean', default: true},
+  },
+
+  generate: (relations, slots, {language}) =>
     language.encapsulate('misc.artistLink.withEditsForWiki', capsule =>
       relations.textWithTooltip.slots({
         attributes:
@@ -41,7 +45,7 @@ export default {
                   language.formatConjunctionList(
                     relations.contributionLinks.map(link =>
                       link.slots({
-                        showAnnotation: true,
+                        showAnnotation: slots.showAnnotation,
                         trimAnnotation: true,
                         preventTooltip: true,
                       }))),
