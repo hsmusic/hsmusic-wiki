@@ -142,6 +142,24 @@ export default templateCompositeFrom({
     }),
 
     {
+      dependencies: ['#entries.annotation'],
+      compute: (continuation, {
+        ['#entries.annotation']: annotation,
+      }) => continuation({
+        ['#entries.webArchiveDate']:
+          annotation
+            .map(text => text?.match(/https?:\/\/web.archive.org\/web\/([0-9]{8,8})[0-9]*\//))
+            .map(match => match?.[1])
+            .map(dateText =>
+              (dateText
+                ? dateText.slice(0, 4) + '/' +
+                  dateText.slice(4, 6) + '/' +
+                  dateText.slice(6, 8)
+                : null)),
+      }),
+    },
+
+    {
       dependencies: ['#entries.date'],
       compute: (continuation, {
         ['#entries.date']: date,
@@ -152,19 +170,35 @@ export default templateCompositeFrom({
     },
 
     {
-      dependencies: ['#entries.accessDate'],
+      dependencies: ['#entries.accessDate', '#entries.webArchiveDate'],
       compute: (continuation, {
         ['#entries.accessDate']: accessDate,
+        ['#entries.webArchiveDate']: webArchiveDate,
       }) => continuation({
         ['#entries.accessDate']:
-          accessDate.map(date => date ? new Date(date) : null),
+          stitchArrays({accessDate, webArchiveDate})
+            .map(({accessDate, webArchiveDate}) =>
+              accessDate ??
+              webArchiveDate ??
+              null)
+            .map(date => date ? new Date(date) : date),
       }),
     },
 
-    fillMissingListItems({
-      list: '#entries.accessKind',
-      fill: input.value(null),
-    }),
+    {
+      dependencies: ['#entries.accessKind', '#entries.webArchiveDate'],
+      compute: (continuation, {
+        ['#entries.accessKind']: accessKind,
+        ['#entries.webArchiveDate']: webArchiveDate,
+      }) => continuation({
+        ['#entries.accessKind']:
+          stitchArrays({accessKind, webArchiveDate})
+            .map(({accessKind, webArchiveDate}) =>
+              accessKind ??
+              (webArchiveDate && 'captured') ??
+              null),
+      }),
+    },
 
     {
       dependencies: [
