@@ -170,6 +170,7 @@ export class Track extends Thing {
     ],
 
     commentary: commentary(),
+    creditSources: commentary(),
 
     lyrics: [
       inheritFromOriginalRelease(),
@@ -459,6 +460,7 @@ export class Track extends Thing {
 
       'Lyrics': {property: 'lyrics'},
       'Commentary': {property: 'commentary'},
+      'Credit Sources': {property: 'creditSources'},
 
       'Additional Files': {
         property: 'additionalFiles',
