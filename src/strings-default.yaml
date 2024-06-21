@@ -547,6 +547,9 @@ misc:
       trackArt: "{INDEX} track art by {ARTIST}"
       onlyIndex: "Only"
 
+  creditSources:
+    _: "Crediting sources:"
+
   # external:
   #   Links which will generally bring you somewhere off of the wiki.
   #   The list of sites is hard-coded into the wiki software, so it

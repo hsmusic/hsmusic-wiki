@@ -113,6 +113,9 @@ export default {
 
     artistCommentarySection:
       relation('generateCommentarySection', track.commentary),
+
+    creditSourcesSection:
+      relation('generateCommentarySection', track.creditSources),
   }),
 
   data: (sprawl, track) => ({
@@ -359,6 +362,11 @@ export default {
           ]),
 
           relations.artistCommentarySection,
+
+          relations.creditSourcesSection.slots({
+            title:
+              language.$('misc.creditSources'),
+          }),
         ],
 
         navLinkStyle: 'hierarchical',

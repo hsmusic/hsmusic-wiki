@@ -27,11 +27,19 @@ export default {
         : !!entries[0].date),
   }),
 
-  generate: (data, relations, {html, language}) =>
+  slots: {
+    title: {type: 'html', mutable: false},
+  },
+
+  generate: (data, relations, slots, {html, language}) =>
     html.tags([
       relations.heading
         .slots({
-          title: language.$('misc.artistCommentary'),
+          title:
+            (html.isBlank(slots.title)
+              ? language.$('misc.artistCommentary')
+              : slots.title),
+
           attributes: [
             {id: 'artist-commentary'},
             data.firstEntryIsDated &&
