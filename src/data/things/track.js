@@ -251,6 +251,7 @@ export class Track extends Thing {
 
       contributionList({
         date: '#date',
+        artistProperty: input.value('trackWritingContributions'),
       }),
     ],
 
@@ -261,6 +262,7 @@ export class Track extends Thing {
 
       contributionList({
         date: '#date',
+        artistProperty: input.value('performingContributions'),
       }),
     ],
 
@@ -271,6 +273,7 @@ export class Track extends Thing {
 
       contributionList({
         date: '#date',
+        artistProperty: input.value('engineeringContributions'),
       }),
     ],
 
