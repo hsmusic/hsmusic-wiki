@@ -59,6 +59,7 @@ import {
 } from '#composite/wiki-properties';
 
 import {
+  exitIfSecondaryRelease,
   exitWithoutUniqueCoverArt,
   inheritContributionListFromMainRelease,
   inheritFromMainRelease,
@@ -267,7 +268,9 @@ export class Track extends Thing {
     ],
 
     contributorContribs: [
-      inheritContributionListFromMainRelease(),
+      exitIfSecondaryRelease({
+        value: input.value([]),
+      }),
 
       withDate(),
 
@@ -278,7 +281,9 @@ export class Track extends Thing {
     ],
 
     writingContributions: [
-      inheritContributionListFromMainRelease(),
+      exitIfSecondaryRelease({
+        value: input.value([]),
+      }),
 
       withDate(),
 
@@ -289,7 +294,9 @@ export class Track extends Thing {
     ],
 
     performingContributions: [
-      inheritContributionListFromMainRelease(),
+      exitIfSecondaryRelease({
+        value: input.value([]),
+      }),
 
       withDate(),
 
