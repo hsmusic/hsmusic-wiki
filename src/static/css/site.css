@@ -1179,7 +1179,8 @@ ul.image-details li {
 
 .commentary-entry-heading {
   margin-left: 15px;
-  padding-left: 5px;
+  padding-left: calc(5px + 1.25ch);
+  text-indent: -1.25ch;
   max-width: 625px;
   padding-bottom: 0.2em;
   border-bottom: 1px dotted var(--primary-color);
