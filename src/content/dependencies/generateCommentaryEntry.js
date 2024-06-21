@@ -45,6 +45,9 @@ export default {
 
   data: (entry) => ({
     date: entry.date,
+    secondDate: entry.secondDate,
+    dateKind: entry.dateKind,
+
     accessDate: entry.accessDate,
     accessKind: entry.accessKind,
   }),
@@ -113,11 +116,36 @@ export default {
                   {class: 'text-with-tooltip-interaction-cue'},
                   {[html.onlyIfContent]: true},
 
-                  language.$(titleCapsule, 'date', {
-                    [language.onlyIfOptions]: ['date'],
+                  language.encapsulate(titleCapsule, 'date', workingCapsule => {
+                    const workingOptions = {};
 
-                    date:
-                      language.formatDate(data.date),
+                    if (!data.date) {
+                      return html.blank();
+                    }
+
+                    const rangeNeeded =
+                      data.dateKind === 'sometime' ||
+                      data.dateKind === 'throughout';
+
+                    if (rangeNeeded && !data.secondDate) {
+                      workingOptions.date = language.formatDate(data.date);
+                      return language.$(workingCapsule, workingOptions);
+                    }
+
+                    if (data.dateKind) {
+                      workingCapsule += '.' + data.dateKind;
+                    }
+
+                    if (data.secondDate) {
+                      workingCapsule += '.range';
+                      workingOptions.dateRange =
+                        language.formatDateRange(data.date, data.secondDate);
+                    } else {
+                      workingOptions.date =
+                        language.formatDate(data.date);
+                    }
+
+                    return language.$(workingCapsule, workingOptions);
                   })),
 
               tooltip:

@@ -463,8 +463,16 @@ misc:
           withAnnotation: "({ANNOTATION})"
 
         date: "{DATE}"
+        date.range: "{DATE_RANGE}"
+
         date.accessed: "accessed {DATE}"
         date.captured: "captured {DATE}"
+
+        date.around: "around {DATE}"
+        date.around.range: "around {DATE_RANGE}"
+
+        date.sometime.range: "sometime {DATE_RANGE}"
+        date.throughout.range: "throughout {DATE_RANGE}"
 
       seeOriginalRelease: "See {ORIGINAL}!"
 
