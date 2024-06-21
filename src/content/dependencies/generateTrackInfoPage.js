@@ -74,6 +74,15 @@ export default {
     contributorContributionList:
       relation('generateContributionList', track.contributorContribs),
 
+    writingContributionList:
+      relation('generateContributionList', track.writingContributions),
+
+    performingContributionList:
+      relation('generateContributionList', track.performingContributions),
+
+    engineeringContributionList:
+      relation('generateContributionList', track.engineeringContributions),
+
     referencedTracksList:
       relation('generateTrackList', track.referencedTracks),
 
@@ -216,6 +225,42 @@ export default {
               }),
 
             relations.otherReleasesList,
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'writing-contributors'},
+                title: language.$('releaseInfo.writingContributors'),
+              }),
+
+            relations.writingContributionList.slots({
+              chronologyKind: 'writingContribution',
+            }),
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'performing-contributors'},
+                title: language.$('releaseInfo.performingContributors'),
+              }),
+
+            relations.performingContributionList.slots({
+              chronologyKind: 'performingContribution',
+            }),
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'engineering-contributors'},
+                title: language.$('releaseInfo.engineeringContributors'),
+              }),
+
+            relations.engineeringContributionList.slots({
+              chronologyKind: 'engineeringContribution',
+            }),
           ]),
 
           html.tags([
