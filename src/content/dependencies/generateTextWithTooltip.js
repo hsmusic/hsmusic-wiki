@@ -36,6 +36,7 @@ export default {
     if (hasTooltip) {
       attributes = attributes.clone();
       attributes.add({
+        [html.onlyIfContent]: true,
         [html.joinChildren]: '',
         [html.noEdgeWhitespace]: true,
         class: 'text-with-tooltip',
