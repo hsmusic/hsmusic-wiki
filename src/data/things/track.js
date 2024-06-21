@@ -284,6 +284,7 @@ export class Track extends Thing {
 
       contributionList({
         date: '#date',
+        artistProperty: input.value('trackWritingContributions'),
       }),
     ],
 
@@ -294,6 +295,7 @@ export class Track extends Thing {
 
       contributionList({
         date: '#date',
+        artistProperty: input.value('trackPerformingContributions'),
       }),
     ],
 
@@ -304,6 +306,7 @@ export class Track extends Thing {
 
       contributionList({
         date: '#date',
+        artistProperty: input.value('trackEngineeringContributions'),
       }),
     ],
 
@@ -726,6 +729,15 @@ export class Track extends Thing {
 
     trackContributorContributionsBy:
       soupyReverse.contributionsBy('trackData', 'contributorContribs'),
+
+    trackWritingContributionsBy:
+      soupyReverse.contributionsBy('trackData', 'writingContributions'),
+
+    trackPerformingContributionsBy:
+      soupyReverse.contributionsBy('trackData', 'performingContributions'),
+
+    trackEngineeringContributionsBy:
+      soupyReverse.contributionsBy('trackData', 'engineeringContributions'),
 
     trackCoverArtistContributionsBy:
       soupyReverse.contributionsBy('trackData', 'coverArtistContribs'),

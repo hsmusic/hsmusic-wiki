@@ -75,6 +75,18 @@ export class Artist extends Thing {
       reverse: soupyReverse.input('trackCoverArtistContributionsBy'),
     }),
 
+    trackWritingContributions: reverseReferenceList({
+      reverse: soupyReverse.input('trackWritingContributionsBy'),
+    }),
+
+    trackPerformingContributions: reverseReferenceList({
+      reverse: soupyReverse.input('trackPerformingContributionsBy'),
+    }),
+
+    trackEngineeringContributions: reverseReferenceList({
+      reverse: soupyReverse.input('trackEngineeringContributionsBy'),
+    }),
+
     tracksAsCommentator: reverseReferenceList({
       reverse: soupyReverse.input('tracksWithCommentaryBy'),
     }),
