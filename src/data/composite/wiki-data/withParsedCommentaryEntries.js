@@ -95,6 +95,8 @@ export default templateCompositeFrom({
         'artistDisplayText',
         'annotation',
         'date',
+        'accessDate',
+        'accessKind',
       ]),
     }),
 
@@ -150,11 +152,28 @@ export default templateCompositeFrom({
     },
 
     {
+      dependencies: ['#entries.accessDate'],
+      compute: (continuation, {
+        ['#entries.accessDate']: accessDate,
+      }) => continuation({
+        ['#entries.accessDate']:
+          accessDate.map(date => date ? new Date(date) : null),
+      }),
+    },
+
+    fillMissingListItems({
+      list: '#entries.accessKind',
+      fill: input.value(null),
+    }),
+
+    {
       dependencies: [
         '#entries.artists',
         '#entries.artistDisplayText',
         '#entries.annotation',
         '#entries.date',
+        '#entries.accessDate',
+        '#entries.accessKind',
         '#entries.body',
       ],
 
@@ -163,6 +182,8 @@ export default templateCompositeFrom({
         ['#entries.artistDisplayText']: artistDisplayText,
         ['#entries.annotation']: annotation,
         ['#entries.date']: date,
+        ['#entries.accessDate']: accessDate,
+        ['#entries.accessKind']: accessKind,
         ['#entries.body']: body,
       }) => continuation({
         ['#parsedCommentaryEntries']:
@@ -171,6 +192,8 @@ export default templateCompositeFrom({
             artistDisplayText,
             annotation,
             date,
+            accessDate,
+            accessKind,
             body,
           }),
       }),
