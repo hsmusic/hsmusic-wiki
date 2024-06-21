@@ -41,18 +41,7 @@ export default {
   }),
 
   slots: {
-    kind: {
-      validate: v =>
-        v.is(
-          'album',
-          'bannerArt',
-          'coverArt',
-          'flash',
-          'track',
-          'trackArt',
-          'trackContribution',
-          'wallpaperArt'),
-    },
+    kind: {type: 'string'},
   },
 
   generate: (data, relations, slots, {html, language}) =>
