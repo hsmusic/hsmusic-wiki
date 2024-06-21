@@ -65,8 +65,11 @@ export default {
             relations.textWithTooltip.slots({
               attributes: {class: 'commentary-date'},
 
+              customInteractionCue: true,
+
               text:
                 html.tag('time',
+                  {class: 'text-with-tooltip-interaction-cue'},
                   {[html.onlyIfContent]: true},
 
                   language.$(titleCapsule, 'date', {

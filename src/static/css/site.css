@@ -1193,7 +1193,7 @@ ul.image-details li {
   float: right;
 }
 
-.commentary-entry-heading .commentary-date .hoverable {
+.commentary-entry-heading .commentary-date time {
   padding-left: 0.5ch;
   padding-right: 0.25ch;
   margin-left: 0.75ch;
@@ -1201,8 +1201,8 @@ ul.image-details li {
   transition: border-left-color 0.15s;
 }
 
-.commentary-entry-heading .commentary-date .hoverable:hover,
-.commentary-entry-heading .commentary-date .hoverable.has-visible-tooltip {
+.commentary-entry-heading .commentary-date time:hover,
+.commentary-entry-heading .commentary-date .hoverable.has-visible-tooltip time {
   border-left-color: white;
 }
 
