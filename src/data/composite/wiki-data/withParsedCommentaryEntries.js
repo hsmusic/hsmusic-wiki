@@ -95,6 +95,8 @@ export default templateCompositeFrom({
         'artistDisplayText',
         'annotation',
         'date',
+        'secondDate',
+        'dateKind',
         'accessDate',
         'accessKind',
       ]),
@@ -165,9 +167,26 @@ export default templateCompositeFrom({
         ['#entries.date']: date,
       }) => continuation({
         ['#entries.date']:
-          date.map(date => date ? new Date(date) : null),
+          date
+            .map(date => date ? new Date(date) : null),
       }),
     },
+
+    {
+      dependencies: ['#entries.secondDate'],
+      compute: (continuation, {
+        ['#entries.secondDate']: secondDate,
+      }) => continuation({
+        ['#entries.secondDate']:
+          secondDate
+            .map(date => date ? new Date(date) : null),
+      }),
+    },
+
+    fillMissingListItems({
+      list: '#entries.dateKind',
+      fill: input.value(null),
+    }),
 
     {
       dependencies: ['#entries.accessDate', '#entries.webArchiveDate'],
@@ -206,6 +225,8 @@ export default templateCompositeFrom({
         '#entries.artistDisplayText',
         '#entries.annotation',
         '#entries.date',
+        '#entries.secondDate',
+        '#entries.dateKind',
         '#entries.accessDate',
         '#entries.accessKind',
         '#entries.body',
@@ -216,6 +237,8 @@ export default templateCompositeFrom({
         ['#entries.artistDisplayText']: artistDisplayText,
         ['#entries.annotation']: annotation,
         ['#entries.date']: date,
+        ['#entries.secondDate']: secondDate,
+        ['#entries.dateKind']: dateKind,
         ['#entries.accessDate']: accessDate,
         ['#entries.accessKind']: accessKind,
         ['#entries.body']: body,
@@ -226,6 +249,8 @@ export default templateCompositeFrom({
             artistDisplayText,
             annotation,
             date,
+            secondDate,
+            dateKind,
             accessDate,
             accessKind,
             body,

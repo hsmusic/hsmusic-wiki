@@ -94,7 +94,7 @@ const dateRegex = groupName =>
   String.raw`(?<${groupName}>[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,4}[-/][0-9]{1,4}[-/][0-9]{1,4})`;
 
 const commentaryRegexRaw =
-  String.raw`^<i>(?<artistReferences>.+?)(?:\|(?<artistDisplayText>.+))?:<\/i>(?: \((?<annotation>(?:.*?(?=,|\)[^)]*$))*?)(?:,? ?${dateRegex('date')}(?: (?<accessKind>captured|accessed) ${dateRegex('accessDate')})?)?\))?`;
+  String.raw`^<i>(?<artistReferences>.+?)(?:\|(?<artistDisplayText>.+))?:<\/i>(?: \((?<annotation>(?:.*?(?=,|\)[^)]*$))*?)(?:,? ?(?:(?<dateKind>sometime|throughout|around) )?${dateRegex('date')}(?: ?- ?${dateRegex('secondDate')})?(?: (?<accessKind>captured|accessed) ${dateRegex('accessDate')})?)?\))?`;
 export const commentaryRegexCaseInsensitive =
   new RegExp(commentaryRegexRaw, 'gmi');
 export const commentaryRegexCaseSensitive =
