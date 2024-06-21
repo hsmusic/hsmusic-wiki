@@ -544,6 +544,7 @@ export function reportContentTextErrors(wikiData, {
     ['trackData', {
       additionalFiles: additionalFileShape,
       commentary: commentaryShape,
+      creditSources: commentaryShape,
       lyrics: '_content',
       midiProjectFiles: additionalFileShape,
       sheetMusicFiles: additionalFileShape,
