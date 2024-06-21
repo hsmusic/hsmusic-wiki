@@ -844,7 +844,8 @@ a:not([href]):hover {
 }
 
 .text-with-tooltip.datetimestamp .text-with-tooltip-interaction-cue,
-.text-with-tooltip.missing-duration .text-with-tooltip-interaction-cue {
+.text-with-tooltip.missing-duration .text-with-tooltip-interaction-cue,
+.text-with-tooltip.commentary-date .text-with-tooltip-interaction-cue {
   cursor: default;
 }
 
@@ -898,7 +899,8 @@ li:not(:first-child:last-child) .tooltip,
 }
 
 .datetimestamp-tooltip,
-.missing-duration-tooltip {
+.missing-duration-tooltip,
+.commentary-date-tooltip {
   padding: 3px 4px 2px 2px;
   left: -10px;
 }
@@ -1045,7 +1047,8 @@ li:not(:first-child:last-child) .tooltip,
 }
 
 .datetimestamp-tooltip .tooltip-content,
-.missing-duration-tooltip .tooltip-content {
+.missing-duration-tooltip .tooltip-content,
+.commentary-date-tooltip .tooltip-content {
   padding: 5px 6px;
   white-space: nowrap;
   font-size: 0.9em;
@@ -1186,8 +1189,11 @@ ul.image-details li {
   font-style: oblique;
 }
 
-.commentary-entry-heading time {
+.commentary-entry-heading .commentary-date {
   float: right;
+}
+
+.commentary-entry-heading .commentary-date .hoverable {
   padding-left: 0.5ch;
   padding-right: 0.25ch;
   margin-left: 0.75ch;
@@ -1195,7 +1201,8 @@ ul.image-details li {
   transition: border-left-color 0.15s;
 }
 
-.commentary-entry-heading time:hover {
+.commentary-entry-heading .commentary-date .hoverable:hover,
+.commentary-entry-heading .commentary-date .hoverable.has-visible-tooltip {
   border-left-color: white;
 }
 

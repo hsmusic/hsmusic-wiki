@@ -3,6 +3,8 @@ import {empty} from '#sugar';
 export default {
   contentDependencies: [
     'generateColorStyleAttribute',
+    'generateTextWithTooltip',
+    'generateTooltip',
     'linkArtist',
     'transformContent',
   ],
@@ -33,10 +35,18 @@ export default {
 
     colorStyle:
       relation('generateColorStyleAttribute'),
+
+    textWithTooltip:
+      relation('generateTextWithTooltip'),
+
+    tooltip:
+      relation('generateTooltip'),
   }),
 
   data: (entry) => ({
     date: entry.date,
+    accessDate: entry.accessDate,
+    accessKind: entry.accessKind,
   }),
 
   slots: {
@@ -52,15 +62,32 @@ export default {
               .slot('color', slots.color),
 
           language.encapsulate(entryCapsule, 'title', titleCapsule => [
-            html.tag('time',
-              {[html.onlyIfContent]: true},
+            relations.textWithTooltip.slots({
+              attributes: {class: 'commentary-date'},
 
-              language.$(titleCapsule, 'date', {
-                [language.onlyIfOptions]: ['date'],
+              text:
+                html.tag('time',
+                  {[html.onlyIfContent]: true},
 
-                date:
-                  language.formatDate(data.date),
-              })),
+                  language.$(titleCapsule, 'date', {
+                    [language.onlyIfOptions]: ['date'],
+
+                    date:
+                      language.formatDate(data.date),
+                  })),
+
+              tooltip:
+                data.accessKind &&
+                  relations.tooltip.slots({
+                    attributes: {class: 'commentary-date-tooltip'},
+
+                    content:
+                      language.$(titleCapsule, 'date', data.accessKind, {
+                        date:
+                          language.formatDate(data.accessDate),
+                      }),
+                  }),
+            }),
 
             language.encapsulate(titleCapsule, workingCapsule => {
               const workingOptions = {};
