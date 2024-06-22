@@ -891,6 +891,8 @@ li:not(:first-child:last-child) .tooltip,
   box-shadow:
     0 3px 4px 4px #000000aa,
     0 -2px 4px -2px var(--primary-color) inset;
+
+  text-indent: 0;
 }
 
 .contribution-tooltip {
