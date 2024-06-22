@@ -1194,12 +1194,13 @@ ul.image-details li {
 
 .commentary-entry-heading .commentary-date {
   float: right;
+  text-indent: 0;
+  margin-left: 0.75ch;
 }
 
 .commentary-entry-heading .commentary-date time {
   padding-left: 0.5ch;
   padding-right: 0.25ch;
-  margin-left: 0.75ch;
   border-left: 1px dotted transparent;
   transition: border-left-color 0.15s;
 }
