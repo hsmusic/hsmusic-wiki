@@ -1211,17 +1211,10 @@ ul.image-details li {
 .commentary-entry-heading .commentary-date time {
   padding-left: 0.5ch;
   padding-right: 0.25ch;
-  border-left: 1px dotted transparent;
-  transition: border-left-color 0.15s;
 }
 
 .commentary-entry-heading .hoverable {
   box-shadow: 1px 2px 6px 5px #04040460;
-}
-
-.commentary-entry-heading .commentary-date time:hover,
-.commentary-entry-heading .commentary-date .hoverable.has-visible-tooltip time {
-  border-left-color: white;
 }
 
 .commentary-art {
