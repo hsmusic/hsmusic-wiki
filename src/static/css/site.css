@@ -1180,12 +1180,21 @@ ul.image-details li {
 }
 
 .commentary-entry-heading {
+  display: flex;
+  flex-direction: row;
+
   margin-left: 15px;
-  padding-left: calc(5px + 1.25ch);
-  text-indent: -1.25ch;
+  padding-left: 5px;
   max-width: 625px;
   padding-bottom: 0.2em;
+
   border-bottom: 1px solid var(--dim-color);
+}
+
+.commentary-entry-heading-text {
+  flex-grow: 1;
+  padding-left: 1.25ch;
+  text-indent: -1.25ch;
 }
 
 .commentary-entry-accent {
@@ -1193,9 +1202,10 @@ ul.image-details li {
 }
 
 .commentary-entry-heading .commentary-date {
-  float: right;
-  text-indent: 0;
+  flex-shrink: 0;
+
   margin-left: 0.75ch;
+  align-self: flex-end;
 }
 
 .commentary-entry-heading .commentary-date time {

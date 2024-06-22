@@ -62,6 +62,47 @@ export default {
               .slot('color', slots.color),
 
           language.encapsulate(entryCapsule, 'title', titleCapsule => [
+            html.tag('span', {class: 'commentary-entry-heading-text'},
+              language.encapsulate(titleCapsule, workingCapsule => {
+                const workingOptions = {};
+
+                workingOptions.artists =
+                  html.tag('span', {class: 'commentary-entry-artists'},
+                    (relations.artistsContent
+                      ? relations.artistsContent.slot('mode', 'inline')
+                   : relations.artistLinks
+                      ? language.formatConjunctionList(relations.artistLinks)
+                      : language.$(titleCapsule, 'noArtists')));
+
+                const accent =
+                  html.tag('span', {class: 'commentary-entry-accent'},
+                    {[html.onlyIfContent]: true},
+
+                    language.encapsulate(titleCapsule, 'accent', accentCapsule =>
+                      language.encapsulate(accentCapsule, workingCapsule => {
+                        const workingOptions = {};
+
+                        if (relations.annotationContent) {
+                          workingCapsule += '.withAnnotation';
+                          workingOptions.annotation =
+                            relations.annotationContent.slot('mode', 'inline');
+                        }
+
+                        if (workingCapsule === accentCapsule) {
+                          return html.blank();
+                        } else {
+                          return language.$(workingCapsule, workingOptions);
+                        }
+                      })));
+
+                if (!html.isBlank(accent)) {
+                  workingCapsule += '.withAccent';
+                  workingOptions.accent = accent;
+                }
+
+                return language.$(workingCapsule, workingOptions);
+              })),
+
             relations.textWithTooltip.slots({
               attributes: {class: 'commentary-date'},
 
@@ -90,46 +131,6 @@ export default {
                           language.formatDate(data.accessDate),
                       }),
                   }),
-            }),
-
-            language.encapsulate(titleCapsule, workingCapsule => {
-              const workingOptions = {};
-
-              workingOptions.artists =
-                html.tag('span', {class: 'commentary-entry-artists'},
-                  (relations.artistsContent
-                    ? relations.artistsContent.slot('mode', 'inline')
-                 : relations.artistLinks
-                    ? language.formatConjunctionList(relations.artistLinks)
-                    : language.$(titleCapsule, 'noArtists')));
-
-              const accent =
-                html.tag('span', {class: 'commentary-entry-accent'},
-                  {[html.onlyIfContent]: true},
-
-                  language.encapsulate(titleCapsule, 'accent', accentCapsule =>
-                    language.encapsulate(accentCapsule, workingCapsule => {
-                      const workingOptions = {};
-
-                      if (relations.annotationContent) {
-                        workingCapsule += '.withAnnotation';
-                        workingOptions.annotation =
-                          relations.annotationContent.slot('mode', 'inline');
-                      }
-
-                      if (workingCapsule === accentCapsule) {
-                        return html.blank();
-                      } else {
-                        return language.$(workingCapsule, workingOptions);
-                      }
-                    })));
-
-              if (!html.isBlank(accent)) {
-                workingCapsule += '.withAccent';
-                workingOptions.accent = accent;
-              }
-
-              return language.$(workingCapsule, workingOptions);
             }),
           ])),
 
