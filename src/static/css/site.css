@@ -1185,7 +1185,7 @@ ul.image-details li {
   text-indent: -1.25ch;
   max-width: 625px;
   padding-bottom: 0.2em;
-  border-bottom: 1px dotted var(--primary-color);
+  border-bottom: 1px solid var(--dim-color);
 }
 
 .commentary-entry-accent {
