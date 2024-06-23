@@ -327,28 +327,26 @@ export default {
                 if (cur.html) {
                   content = cur.html;
                 } else {
+                  const attributes = html.attributes();
                   let title;
-                  let href;
 
                   switch (cur.auto) {
                     case 'home':
                       title = data.wikiName;
-                      href = to('localized.home');
+                      attributes.set('href', to('localized.home'));
                       break;
                     case 'current':
                       title = slots.title;
-                      href = '';
+                      attributes.set('href', '');
                       break;
                     case null:
                     case undefined:
                       title = cur.title;
-                      href = to(...cur.path);
+                      attributes.set('href', to(...cur.path));
                       break;
                   }
 
-                  content = html.tag('a',
-                    {href},
-                    title);
+                  content = html.tag('a', attributes, title);
                 }
 
                 const showAsCurrent =
