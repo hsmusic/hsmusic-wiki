@@ -197,6 +197,15 @@ export default {
                         {href: '#artist-commentary'},
                         language.$(capsule, 'link')),
                   })),
+
+              !html.isBlank(relations.creditSourcesSection) &&
+                language.encapsulate(capsule, 'readCreditSources', capsule =>
+                  language.$(capsule, {
+                    link:
+                      html.tag('a',
+                        {href: '#credit-sources'},
+                        language.$(capsule, 'link')),
+                  })),
             ])),
 
           html.tags([
