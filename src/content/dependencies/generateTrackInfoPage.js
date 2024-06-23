@@ -364,8 +364,8 @@ export default {
           relations.artistCommentarySection,
 
           relations.creditSourcesSection.slots({
-            title:
-              language.$('misc.creditSources'),
+            id: 'credit-sources',
+            title: language.$('misc.creditSources'),
           }),
         ],
 

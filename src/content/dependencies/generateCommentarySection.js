@@ -29,6 +29,7 @@ export default {
 
   slots: {
     title: {type: 'html', mutable: false},
+    id: {type: 'string', default: 'artist-commentary'},
   },
 
   generate: (data, relations, slots, {html, language}) =>
@@ -41,7 +42,7 @@ export default {
               : slots.title),
 
           attributes: [
-            {id: 'artist-commentary'},
+            {id: slots.id},
             data.firstEntryIsDated &&
               {class: 'first-entry-is-dated'},
           ],
