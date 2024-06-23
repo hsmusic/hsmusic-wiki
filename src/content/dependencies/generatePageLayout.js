@@ -495,6 +495,7 @@ export default {
               {id: 'additional-files', string: 'additionalFiles'},
               {id: 'commentary', string: 'commentary'},
               {id: 'artist-commentary', string: 'artistCommentary'},
+              {id: 'credit-sources', string: 'creditSources'},
             ])),
         ]);
 

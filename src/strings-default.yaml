@@ -752,11 +752,17 @@ misc:
       left: "Sidebar (left)"
       right: "Sidebar (right)"
 
+    # Displayed on various info pages.
+
+    artistCommentary: "Artist commentary"
+    creditSources: "Crediting sources"
+
     # Displayed on artist info page.
 
     tracks: "Tracks"
     artworks: "Artworks"
     flashes: "Flashes & Games"
+    commentary: "Commentary"
 
     # Displayed on track and flash info pages.
 
@@ -778,9 +784,6 @@ misc:
 
     # Displayed on track and album info pages.
 
-    commentary: "Commentary"
-
-    artistCommentary: "Commentary"
     additionalFiles: "Additional files"
 
   # socialEmbed:
