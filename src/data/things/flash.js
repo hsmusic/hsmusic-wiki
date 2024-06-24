@@ -112,6 +112,7 @@ export class Flash extends Thing {
     urls: urls(),
 
     commentary: commentary(),
+    creditSources: commentary(),
 
     // Update only
 
@@ -200,6 +201,7 @@ export class Flash extends Thing {
       },
 
       'Commentary': {property: 'commentary'},
+      'Credit Sources': {property: 'creditSources'},
 
       'Review Points': {ignore: true},
     },

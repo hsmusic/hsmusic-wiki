@@ -132,6 +132,7 @@ export class Album extends Thing {
     isListedInGalleries: flag(true),
 
     commentary: commentary(),
+    creditSources: commentary(),
     additionalFiles: additionalFiles(),
 
     trackSections: referenceList({
@@ -366,6 +367,7 @@ export class Album extends Thing {
       },
 
       'Commentary': {property: 'commentary'},
+      'Credit Sources': {property: 'creditSources'},
 
       'Additional Files': {
         property: 'additionalFiles',
