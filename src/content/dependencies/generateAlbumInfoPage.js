@@ -74,6 +74,9 @@ export default {
 
     artistCommentarySection:
       relation('generateCommentarySection', album.commentary),
+
+    creditSourcesSection:
+      relation('generateCommentarySection', album.creditSources),
   }),
 
   data: (album) => ({
@@ -150,6 +153,15 @@ export default {
                     }))
 
                 : html.blank()),
+
+              !html.isBlank(relations.creditSourcesSection) &&
+                language.encapsulate(capsule, 'readCreditSources', capsule =>
+                  language.$(capsule, {
+                    link:
+                      html.tag('a',
+                        {href: '#credit-sources'},
+                        language.$(capsule, 'link')),
+                  })),
             ])),
 
           relations.trackList,
@@ -177,6 +189,11 @@ export default {
             ])),
 
           relations.artistCommentarySection,
+
+          relations.creditSourcesSection.slots({
+            id: 'credit-sources',
+            title: language.$('misc.creditSources'),
+          }),
         ],
 
         navLinkStyle: 'hierarchical',

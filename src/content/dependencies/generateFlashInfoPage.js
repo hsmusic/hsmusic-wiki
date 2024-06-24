@@ -63,6 +63,9 @@ export default {
 
     artistCommentarySection:
       relation('generateCommentarySection', flash.commentary),
+
+    creditSourcesSection:
+      relation('generateCommentarySection', flash.creditSources),
   }),
 
   data: (_query, flash) => ({
@@ -125,6 +128,15 @@ export default {
                         {href: '#artist-commentary'},
                         language.$(capsule, 'link')),
                   })),
+
+              !html.isBlank(relations.creditSourcesSection) &&
+                language.encapsulate(capsule, 'readCreditSources', capsule =>
+                  language.$(capsule, {
+                    link:
+                      html.tag('a',
+                        {href: '#credit-sources'},
+                        language.$(capsule, 'link')),
+                  })),
             ])),
 
           html.tags([
@@ -152,7 +164,10 @@ export default {
             }),
           ]),
 
-          relations.artistCommentarySection,
+          relations.creditSourcesSection.slots({
+            id: 'credit-sources',
+            title: language.$('misc.creditSources'),
+          }),
         ],
 
         navLinkStyle: 'hierarchical',
