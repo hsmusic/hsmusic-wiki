@@ -2,9 +2,8 @@ import {empty} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateCommentaryEntryDate',
     'generateColorStyleAttribute',
-    'generateTextWithTooltip',
-    'generateTooltip',
     'linkArtist',
     'transformContent',
   ],
@@ -36,27 +35,15 @@ export default {
     colorStyle:
       relation('generateColorStyleAttribute'),
 
-    textWithTooltip:
-      relation('generateTextWithTooltip'),
-
-    tooltip:
-      relation('generateTooltip'),
-  }),
-
-  data: (entry) => ({
-    date: entry.date,
-    secondDate: entry.secondDate,
-    dateKind: entry.dateKind,
-
-    accessDate: entry.accessDate,
-    accessKind: entry.accessKind,
+    date:
+      relation('generateCommentaryEntryDate', entry),
   }),
 
   slots: {
     color: {validate: v => v.isColor},
   },
 
-  generate: (data, relations, slots, {html, language}) =>
+  generate: (relations, slots, {html, language}) =>
     language.encapsulate('misc.artistCommentary.entry', entryCapsule =>
       html.tags([
         html.tag('p', {class: 'commentary-entry-heading'},
@@ -106,60 +93,7 @@ export default {
                 return language.$(workingCapsule, workingOptions);
               })),
 
-            relations.textWithTooltip.slots({
-              attributes: {class: 'commentary-date'},
-
-              customInteractionCue: true,
-
-              text:
-                html.tag('time',
-                  {class: 'text-with-tooltip-interaction-cue'},
-                  {[html.onlyIfContent]: true},
-
-                  language.encapsulate(titleCapsule, 'date', workingCapsule => {
-                    const workingOptions = {};
-
-                    if (!data.date) {
-                      return html.blank();
-                    }
-
-                    const rangeNeeded =
-                      data.dateKind === 'sometime' ||
-                      data.dateKind === 'throughout';
-
-                    if (rangeNeeded && !data.secondDate) {
-                      workingOptions.date = language.formatDate(data.date);
-                      return language.$(workingCapsule, workingOptions);
-                    }
-
-                    if (data.dateKind) {
-                      workingCapsule += '.' + data.dateKind;
-                    }
-
-                    if (data.secondDate) {
-                      workingCapsule += '.range';
-                      workingOptions.dateRange =
-                        language.formatDateRange(data.date, data.secondDate);
-                    } else {
-                      workingOptions.date =
-                        language.formatDate(data.date);
-                    }
-
-                    return language.$(workingCapsule, workingOptions);
-                  })),
-
-              tooltip:
-                data.accessKind &&
-                  relations.tooltip.slots({
-                    attributes: {class: 'commentary-date-tooltip'},
-
-                    content:
-                      language.$(titleCapsule, 'date', data.accessKind, {
-                        date:
-                          language.formatDate(data.accessDate),
-                      }),
-                  }),
-            }),
+            relations.date,
           ])),
 
         html.tag('blockquote', {class: 'commentary-entry-body'},
