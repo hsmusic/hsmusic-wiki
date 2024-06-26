@@ -10,6 +10,7 @@
 // is used, a fresh cache will always be created.
 
 import {input, templateCompositeFrom} from '#composite';
+import {sortByDate} from '#sort';
 import {stitchArrays} from '#sugar';
 
 import {exitWithoutDependency, raiseOutputWithoutDependency}
@@ -129,9 +130,10 @@ export default templateCompositeFrom({
 
     // Actually fill in the cache record. Since we're building up a *reverse*
     // reference list, track connections in terms of the referenced thing.
-    // No newly-provided dependencies here since we're mutating the cache
-    // record, which is properly in store and will probably be reused in the
-    // future (and certainly in the next step).
+    // Although we gather all referenced things into a set and provide that
+    // for sorting purposes in the next step, we *don't* reprovide the cache
+    // record, because we're mutating that in-place - we'll just reuse its
+    // existing '#cacheRecord' dependency.
     {
       dependencies: ['#cacheRecord', '#referencingThings', '#referencedThings'],
       compute: (continuation, {
@@ -139,6 +141,8 @@ export default templateCompositeFrom({
         ['#referencingThings']: referencingThings,
         ['#referencedThings']: referencedThings,
       }) => {
+        const allReferencedThings = new Set();
+
         stitchArrays({
           referencingThing: referencingThings,
           referencedThings: referencedThings,
@@ -148,9 +152,35 @@ export default templateCompositeFrom({
                 cacheRecord.get(referencedThing).push(referencingThing);
               } else {
                 cacheRecord.set(referencedThing, [referencingThing]);
+                allReferencedThings.add(referencedThing);
               }
             }
           });
+
+        return continuation({
+          ['#allReferencedThings']:
+            allReferencedThings,
+        });
+      },
+    },
+
+    // Sort the entries in the cache records, too, just by date - the rest of
+    // sorting should be handled outside of withReverseContributionList, either
+    // preceding (changing the 'data' input) or following (sorting the output).
+    // Again we're mutating in place, so no need to reprovide '#cacheRecord'
+    // here.
+    {
+      dependencies: ['#cacheRecord', '#allReferencedThings'],
+      compute: (continuation, {
+        ['#cacheRecord']: cacheRecord,
+        ['#allReferencedThings']: allReferencedThings,
+      }) => {
+        for (const referencedThing of allReferencedThings) {
+          if (cacheRecord.has(referencedThing)) {
+            const referencingThings = cacheRecord.get(referencedThing);
+            sortByDate(referencingThings);
+          }
+        }
 
         return continuation();
       },
