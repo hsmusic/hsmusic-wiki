@@ -26,10 +26,6 @@ const lyricsMarked = new Marked({
   ...commonMarkedOptions,
 });
 
-function getPlaceholder(node, content) {
-  return {type: 'text', data: content.slice(node.i, node.iEnd)};
-}
-
 export default {
   contentDependencies: [
     ...(
@@ -54,8 +50,6 @@ export default {
             return node;
           }
 
-          const placeholder = getPlaceholder(node, content);
-
           const replacerKeyImplied = !node.data.replacerKey;
           const replacerKey = replacerKeyImplied ? 'track' : node.data.replacerKey.data;
 
@@ -66,7 +60,7 @@ export default {
           const spec = replacerSpec[replacerKey];
 
           if (!spec) {
-            return placeholder;
+            return node.placeholder;
           }
 
           if (spec.link) {
@@ -93,7 +87,7 @@ export default {
 
               // Nothing was found: this is unexpected, so return placeholder.
               if (!thing) {
-                return placeholder;
+                return node.placeholder;
               }
 
               // Something was found: the link operates on that thing.
@@ -133,10 +127,8 @@ export default {
     };
   },
 
-  data(sprawl, content) {
+  data(sprawl, _content) {
     return {
-      content,
-
       nodes:
         sprawl.nodes
           .map(node => {
@@ -159,7 +151,7 @@ export default {
     };
   },
 
-  relations(relation, sprawl, content) {
+  relations(relation, sprawl, _content) {
     const {nodes} = sprawl;
 
     const relationOrPlaceholder =
@@ -170,7 +162,9 @@ export default {
               label: node.data.label,
               hash: node.data.hash,
             }
-          : getPlaceholder(node, content));
+       : node.placeholder
+          ? node.placeholder
+          : {type: 'text', data: '(invalid node with no placeholder)'});
 
     return {
       internalLinks:
@@ -403,7 +397,7 @@ export default {
             const spec = replacerSpec[replacerKey];
 
             if (!spec) {
-              return getPlaceholder(node, data.content);
+              return node.placeholder;
             }
 
             const {value: valueFn, html: htmlFn} = spec;
@@ -422,7 +416,7 @@ export default {
           }
 
           default:
-            return getPlaceholder(node, data.content);
+            return node.placeholder ?? {type: 'text', data: '(invalid node type)'};
         }
       });
 

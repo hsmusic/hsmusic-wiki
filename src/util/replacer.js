@@ -396,6 +396,8 @@ function parseNodes(input, i, stopAt, textOnly) {
         args.push({key, value});
       }
 
+      // Label
+
       let label;
 
       if (stop_literal === tagLabel) {
@@ -413,6 +415,13 @@ function parseNodes(input, i, stopAt, textOnly) {
         iEnd: i,
         type: 'tag',
         data: {replacerKey, replacerValue, hash, args, label},
+
+        placeholder: {
+          i: iTag,
+          iEnd: i,
+          type: 'text',
+          data: input.slice(iTag, i),
+        },
       });
 
       continue;
@@ -444,7 +453,7 @@ export function cleanRawText(text) {
   return text;
 }
 
-export function postprocessImages(inputNodes) {
+export function postprocessImages(inputNodes, input) {
   const outputNodes = [];
 
   let atStartOfLine = true;
@@ -463,16 +472,32 @@ export function postprocessImages(inputNodes) {
       while (match = imageRegexp.exec(node.data)) {
         const previousText = node.data.slice(parseFrom, match.index);
 
-        outputNodes.push({
-          type: 'text',
-          data: previousText,
-          i: node.i + parseFrom,
-          iEnd: node.i + parseFrom + match.index,
-        });
+        {
+          const i = node.i + parseFrom;
+          const iEnd = i + match.index;
+          outputNodes.push({
+            i, iEnd,
+            type: 'text',
+            data: previousText,
+          });
+        }
 
         parseFrom = match.index + match[0].length;
 
-        const imageNode = {type: 'image'};
+        const i = match.index;
+        const iEnd = parseFrom;
+
+        const imageNode = {
+          i, iEnd,
+          type: 'image',
+
+          placeholder: {
+            i, iEnd,
+            type: 'text',
+            data: input.slice(i, iEnd),
+          },
+        };
+
         const attributes = html.parseAttributes(match[1]);
 
         // TODO: All the properties we're adding directly onto the node here
@@ -564,7 +589,7 @@ export function postprocessImages(inputNodes) {
   return outputNodes;
 }
 
-export function postprocessHeadings(inputNodes) {
+export function postprocessHeadings(inputNodes, _input) {
   const outputNodes = [];
 
   for (const node of inputNodes) {
@@ -581,6 +606,8 @@ export function postprocessHeadings(inputNodes) {
     while (match = headingRegexp.exec(node.data)) {
       textContent += node.data.slice(parseFrom, match.index);
       parseFrom = match.index + match[0].length;
+      // No need to bother with tracking i/iEnd here, because we're mutating
+      // replacing current text node where it is, just with updated text.
 
       const attributes = html.parseAttributes(match[1]);
       attributes.push('class', 'content-heading');
@@ -605,7 +632,7 @@ export function postprocessHeadings(inputNodes) {
   return outputNodes;
 }
 
-export function postprocessExternalLinks(inputNodes) {
+export function postprocessExternalLinks(inputNodes, input) {
   const outputNodes = [];
 
   for (const node of inputNodes) {
@@ -646,11 +673,19 @@ export function postprocessExternalLinks(inputNodes) {
         const offset = plausibleMatch.index + definiteMatch.index;
         const length = definiteMatch[0].length;
 
+        const i = node.i + offset;
+        const iEnd = i + length;
+
         outputNodes.push({
-          i: node.i + offset,
-          iEnd: node.i + offset + length,
+          i, iEnd,
           type: 'external-link',
           data: {label, href},
+
+          placeholder: {
+            i, iEnd,
+            type: 'text',
+            data: input.slice(i, iEnd),
+          },
         });
 
         parseFrom = offset + length;
@@ -678,9 +713,11 @@ export function parseInput(input) {
 
   try {
     let output = parseNodes(input, 0);
-    output = postprocessImages(output);
-    output = postprocessHeadings(output);
-    output = postprocessExternalLinks(output);
+
+    output = postprocessImages(output, input);
+    output = postprocessHeadings(output, input);
+    output = postprocessExternalLinks(output, input);
+
     return output;
   } catch (errorNode) {
     if (errorNode.type !== 'error') {
