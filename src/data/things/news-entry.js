@@ -4,7 +4,10 @@ import {sortChronologically} from '#sort';
 import Thing from '#thing';
 import {parseDate} from '#yaml';
 
-import {contentString, directory, name, simpleDate}
+import {exitWithoutDependency, exposeDependency}
+  from '#composite/control-flow';
+import {withParsedContentStringNodes} from '#composite/wiki-data';
+import {contentString, contentUntilSplit, directory, name, simpleDate}
   from '#composite/wiki-properties';
 
 export class NewsEntry extends Thing {
@@ -22,15 +25,7 @@ export class NewsEntry extends Thing {
 
     // Expose only
 
-    contentShort: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['content'],
-
-        compute: ({content}) => content.split('<hr class="split">')[0],
-      },
-    },
+    contentShort: contentUntilSplit(),
   });
 
   static [Thing.findSpecs] = {

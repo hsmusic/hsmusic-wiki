@@ -38,13 +38,15 @@ export default {
 
   extraDependencies: ['html', 'language', 'to', 'wikiData'],
 
-  sprawl(wikiData, content) {
+  sprawl(wikiData, contentNodes) {
+    if (!contentNodes) {
+      return {nodes: []};
+    }
+
     const find = bindFind(wikiData);
 
-    const parsedNodes = parseInput(content ?? '');
-
     return {
-      nodes: parsedNodes
+      nodes: contentNodes
         .map(node => {
           if (node.type !== 'tag') {
             return node;
@@ -131,7 +133,7 @@ export default {
     };
   },
 
-  data(sprawl, _content) {
+  data(sprawl, _contentNodes) {
     return {
       nodes:
         sprawl.nodes
@@ -155,7 +157,7 @@ export default {
     };
   },
 
-  relations(relation, sprawl, _content) {
+  relations(relation, sprawl, _contentNodes) {
     const {nodes} = sprawl;
 
     const relationOrPlaceholder =

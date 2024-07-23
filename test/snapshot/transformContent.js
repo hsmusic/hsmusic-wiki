@@ -1,4 +1,6 @@
 import t from 'tap';
+
+import {parseInput} from '#replacer';
 import {testContentFunctions} from '#test-lib';
 
 testContentFunctions(t, 'transformContent (snapshot)', async (t, evaluate) => {
@@ -21,7 +23,7 @@ testContentFunctions(t, 'transformContent (snapshot)', async (t, evaluate) => {
   const quickSnapshot = (message, content, slots) =>
     evaluate.snapshot(message, {
       name: 'transformContent',
-      args: [content],
+      args: [parseInput(content)],
       extraDependencies,
       slots,
     });

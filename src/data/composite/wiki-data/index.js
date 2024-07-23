@@ -11,7 +11,10 @@ export {default as withContributionListSums} from './withContributionListSums.js
 export {default as withCoverArtDate} from './withCoverArtDate.js';
 export {default as withDirectory} from './withDirectory.js';
 export {default as withDirectoryFromName} from './withDirectoryFromName.js';
+export {default as withParsedAdditionalFiles} from './withParsedAdditionalFiles.js';
 export {default as withParsedCommentaryEntries} from './withParsedCommentaryEntries.js';
+export {default as withParsedContentStringNodes} from './withParsedContentStringNodes.js';
+export {default as withParsedContentStringNodesFromList} from './withParsedContentStringNodesFromList.js';
 export {default as withRecontextualizedContributionList} from './withRecontextualizedContributionList.js';
 export {default as withRedatedContributionList} from './withRedatedContributionList.js';
 export {default as withResolvedContribs} from './withResolvedContribs.js';

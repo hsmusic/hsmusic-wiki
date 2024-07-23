@@ -1,5 +1,6 @@
 import t from 'tap';
 
+import {parseInput} from '#replacer';
 import {testContentFunctions} from '#test-lib';
 import thingConstructors from '#things';
 
@@ -47,6 +48,7 @@ testContentFunctions(t, 'generateAlbumAdditionalFilesList (snapshot)', async (t,
         [
           {
             title: 'SBURB Wallpaper',
+            description: null,
             files: [
               'sburbwp_1280x1024.jpg',
               'sburbwp_1440x900.jpg',
@@ -55,7 +57,7 @@ testContentFunctions(t, 'generateAlbumAdditionalFilesList (snapshot)', async (t,
           },
           {
             title: 'Fake Section',
-            description: 'No sizes for these files',
+            description: parseInput('No sizes for these files'),
             files: [
               'oops.mp3',
               'Internet Explorer.gif',
@@ -64,11 +66,12 @@ testContentFunctions(t, 'generateAlbumAdditionalFilesList (snapshot)', async (t,
           },
           {
             title: `Empty Section`,
-            description: `These files haven't been made available.`,
+            description: parseInput(`These files haven't been made available.`),
+            files: [],
           },
           {
             title: 'Alternate Covers',
-            description: 'This is just an example description.',
+            description: parseInput('This is just an example description.'),
             files: [
               'Homestuck_Vol4_alt1.jpg',
               'Homestuck_Vol4_alt2.jpg',

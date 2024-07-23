@@ -10,6 +10,7 @@ import {anyOf, isColor, isContentString, isDirectory, isNumber, isString}
 import {parseContributors, parseDate, parseDimensions} from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
+import {withParsedContentStringNodes} from '#composite/wiki-data';
 
 import {
   exposeConstant,
@@ -220,8 +221,15 @@ export class FlashAct extends Thing {
     color: color(),
 
     listTerminology: [
-      exposeUpdateValueOrContinue({
-        validate: input.value(isContentString),
+      withParsedContentStringNodes({
+        from: input.updateValue({
+          validate: isContentString,
+        }),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#parsedContentStringNodes',
+        mode: input.value('empty'),
       }),
 
       withFlashSide(),

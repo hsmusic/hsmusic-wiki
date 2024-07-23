@@ -7,6 +7,7 @@ import Thing from '#thing';
 import {
   color,
   contentString,
+  contentUntilSplit,
   directory,
   name,
   referenceList,
@@ -45,17 +46,9 @@ export class Group extends Thing {
 
     // Expose only
 
-    descriptionShort: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['description'],
-        compute: ({description}) =>
-          (description
-            ? description.split('<hr class="split">')[0]
-            : null),
-      },
-    },
+    descriptionShort: contentUntilSplit({
+      content: 'description',
+    }),
 
     albums: {
       flags: {expose: true},

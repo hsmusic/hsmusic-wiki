@@ -7,8 +7,8 @@ import Thing from '#thing';
 import {
   anyOf,
   is,
+  isContentString,
   isCountingNumber,
-  isString,
   isStringNonEmpty,
   validateArrayItems,
   validateInstanceOf,
@@ -16,8 +16,9 @@ import {
 } from '#validators';
 
 import {exposeDependency} from '#composite/control-flow';
-import {withResolvedReference} from '#composite/wiki-data';
-import {color, contentString, name, referenceList, wikiData}
+import {withParsedContentStringNodesFromList, withResolvedReference}
+  from '#composite/wiki-data';
+import {color, contentString, contentStringList, name, referenceList, wikiData}
   from '#composite/wiki-properties';
 
 export class HomepageLayout extends Thing {
@@ -27,11 +28,7 @@ export class HomepageLayout extends Thing {
     // Update & expose
 
     sidebarContent: contentString(),
-
-    navbarLinks: {
-      flags: {update: true, expose: true},
-      update: {validate: validateArrayItems(isStringNonEmpty)},
-    },
+    navbarLinks: contentStringList(),
 
     rows: {
       flags: {update: true, expose: true},
@@ -169,10 +166,7 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       update: {validate: isCountingNumber},
     },
 
-    actionLinks: {
-      flags: {update: true, expose: true},
-      update: {validate: validateArrayItems(isString)},
-    },
+    actionLinks: contentStringList(),
   });
 
   static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(HomepageLayoutRow, {
