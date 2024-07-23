@@ -234,7 +234,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
     {
       artists: [artist3],
       artistDisplayText: null,
-      annotation: '', // TODO: This should be null, but the regex isn't structured for that, at the moment.
+      annotation: null,
       body: `It's goin' twice.`,
       date: new Date('10/25/2011'),
       secondDate: new Date('10/28/2011'),
@@ -304,7 +304,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
     {
       artists: [artist3],
       artistDisplayText: null,
-      annotation: '', // TODO: This should be null, but the regex isn't structured for that, at the moment.
+      annotation: null,
       body: `It's goin' twice.`,
       date: new Date('10/25/2011'),
       secondDate: new Date('10/28/2011'),

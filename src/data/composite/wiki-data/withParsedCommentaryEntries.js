@@ -7,6 +7,7 @@ import {commentaryRegexCaseSensitive} from '#wiki-data';
 import {
   fillMissingListItems,
   withFlattenedList,
+  withMappedList,
   withPropertiesFromList,
   withUnflattenedList,
 } from '#composite/data';
@@ -160,6 +161,16 @@ export default templateCompositeFrom({
                 : null)),
       }),
     },
+
+    // For an extremely unpleasant regex reason, it's possible for an entry's
+    // annotation to be a blank string instead of null. Patch over this by
+    // just... replacing those with null. Yippee!
+    withMappedList({
+      list: '#entries.annotation',
+      map: input.value(x => x === '' ? null : x),
+    }).outputs({
+      '#mappedList': '#entries.annotation',
+    }),
 
     {
       dependencies: ['#entries.date'],
