@@ -475,6 +475,9 @@ export function postprocessImages(inputNodes) {
         const imageNode = {type: 'image'};
         const attributes = html.parseAttributes(match[1]);
 
+        // TODO: All the properties we're adding directly onto the node here
+        // should actually go on the node's `data`.
+
         imageNode.src = attributes.get('src');
 
         if (previousText.endsWith('\n')) {
@@ -483,16 +486,20 @@ export function postprocessImages(inputNodes) {
           atStartOfLine = false;
         }
 
-        imageNode.inline = (() => {
+        determineInline: {
           // Images can force themselves to be rendered inline using a custom
           // attribute - this style just works better for certain embeds,
           // usually jokes or small images.
-          if (attributes.get('inline')) return true;
+          if (attributes.get('inline')) {
+            imageNode.inline = true;
+            break determineInline;
+          }
 
           // If we've already determined we're in the middle of a line,
           // we're inline. (Of course!)
           if (!atStartOfLine) {
-            return true;
+            imageNode.inline = true;
+            break determineInline;
           }
 
           // If there's more text to go in this text node, and what's
@@ -501,7 +508,8 @@ export function postprocessImages(inputNodes) {
             parseFrom !== node.data.length &&
             node.data[parseFrom] !== '\n'
           ) {
-            return true;
+            imageNode.inline = true;
+            break determineInline;
           }
 
           // If we're at the end of this text node, but this text node
@@ -510,12 +518,13 @@ export function postprocessImages(inputNodes) {
             parseFrom === node.data.length &&
             node !== lastNode
           ) {
-            return true;
+            imageNode.inline = true;
+            break determineInline;
           }
 
           // If no other condition matches, this image is on its own line.
-          return false;
-        })();
+          imageNode.inline = false;
+        }
 
         if (attributes.get('link')) imageNode.link = attributes.get('link');
         if (attributes.get('style')) imageNode.style = attributes.get('style');
