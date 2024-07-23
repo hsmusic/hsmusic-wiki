@@ -718,6 +718,8 @@ export function parseInput(input) {
     output = postprocessHeadings(output, input);
     output = postprocessExternalLinks(output, input);
 
+    output[parseInput.input] = input;
+
     return output;
   } catch (errorNode) {
     if (errorNode.type !== 'error') {
@@ -754,3 +756,5 @@ export function parseInput(input) {
     ].join('\n'));
   }
 }
+
+parseInput.input = Symbol.for('parseInput.input');

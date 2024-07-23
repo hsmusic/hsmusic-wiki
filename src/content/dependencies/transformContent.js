@@ -102,10 +102,14 @@ export default {
             const enteredHash = node.data.hash?.data;
 
             data.label =
-              enteredLabel ??
-                (transformName && data.thing.name
-                  ? transformName(data.thing.name, node, content)
-                  : null);
+              (enteredLabel
+                ? enteredLabel
+             : transformName && data.thing.name
+                ? transformName(
+                    data.thing.name,
+                    node,
+                    contentNodes[parseInput.input])
+                : null);
 
             data.hash = enteredHash ?? null;
 
