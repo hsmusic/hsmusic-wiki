@@ -559,6 +559,12 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domains: ['store.steampowered.com', 'steamcommunity.com']},
+    platform: 'steam',
+    icon: 'steam',
+  },
+
+  {
     match: {domain: 'tiktok.com'},
 
     platform: 'tiktok',
