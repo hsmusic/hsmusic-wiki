@@ -288,65 +288,85 @@ export function isColor(color) {
   throw new TypeError(`Unknown color format`);
 }
 
-export function isCommentary(commentaryText) {
-  isContentString(commentaryText);
+export function validateContentEntries({
+  headingPhrase,
+  entryPhrase,
 
-  const rawMatches =
-    Array.from(commentaryText.matchAll(commentaryRegexCaseInsensitive));
+  caseInsensitiveRegex,
+  caseSensitiveOneShotRegex,
+}) {
+  return content => {
+    isContentString(content);
 
-  if (empty(rawMatches)) {
-    throw new TypeError(`Expected at least one commentary heading`);
-  }
+    const rawMatches =
+      Array.from(content.matchAll(caseInsensitiveRegex));
 
-  const niceMatches =
-    rawMatches.map(match => ({
-      position: match.index,
-      length: match[0].length,
-    }));
-
-  validateArrayItems(({position, length}, index) => {
-    if (index === 0 && position > 0) {
-      throw new TypeError(`Expected first commentary heading to be at top`);
+    if (empty(rawMatches)) {
+      throw new TypeError(`Expected at least one ${headingPhrase}`);
     }
 
-    const ownInput = commentaryText.slice(position, position + length);
-    const restOfInput = commentaryText.slice(position + length);
+    const niceMatches =
+      rawMatches.map(match => ({
+        position: match.index,
+        length: match[0].length,
+      }));
 
-    const upToNextLineBreak =
-      (restOfInput.includes('\n')
-        ? restOfInput.slice(0, restOfInput.indexOf('\n'))
-        : restOfInput);
+    validateArrayItems(({position, length}, index) => {
+      if (index === 0 && position > 0) {
+        throw new TypeError(`Expected first ${headingPhrase} to be at top`);
+      }
 
-    if (/\S/.test(upToNextLineBreak)) {
-      throw new TypeError(
-        `Expected commentary heading to occupy entire line, got extra text:\n` +
-        `${colors.green(`"${cut(ownInput, 40)}"`)} (<- heading)\n` +
-        `(extra on same line ->) ${colors.red(`"${cut(upToNextLineBreak, 30)}"`)}\n` +
-        `(Check for missing "|-" in YAML, or a misshapen annotation)`);
-    }
+      const ownInput = content.slice(position, position + length);
+      const restOfInput = content.slice(position + length);
 
-    if (!commentaryRegexCaseSensitiveOneShot.test(ownInput)) {
-      throw new TypeError(
-        `Miscapitalization in commentary heading:\n` +
-        `${colors.red(`"${cut(ownInput, 60)}"`)}\n` +
-        `(Check for ${colors.red(`"<I>"`)} instead of ${colors.green(`"<i>"`)})`);
-    }
+      const upToNextLineBreak =
+        (restOfInput.includes('\n')
+          ? restOfInput.slice(0, restOfInput.indexOf('\n'))
+          : restOfInput);
 
-    const nextHeading =
-      (index === niceMatches.length - 1
-        ? commentaryText.length
-        : niceMatches[index + 1].position);
+      if (/\S/.test(upToNextLineBreak)) {
+        throw new TypeError(
+          `Expected ${headingPhrase} to occupy entire line, got extra text:\n` +
+          `${colors.green(`"${cut(ownInput, 40)}"`)} (<- heading)\n` +
+          `(extra on same line ->) ${colors.red(`"${cut(upToNextLineBreak, 30)}"`)}\n` +
+          `(Check for missing "|-" in YAML, or a misshapen annotation)`);
+      }
 
-    const upToNextHeading =
-      commentaryText.slice(position + length, nextHeading);
+      if (!caseSensitiveOneShotRegex.test(ownInput)) {
+        throw new TypeError(
+          `Miscapitalization in ${headingPhrase}:\n` +
+          `${colors.red(`"${cut(ownInput, 60)}"`)}\n` +
+          `(Check for ${colors.red(`"<I>"`)} instead of ${colors.green(`"<i>"`)})`);
+      }
 
-    if (!/\S/.test(upToNextHeading)) {
-      throw new TypeError(
-        `Expected commentary entry to have body text, only got a heading`);
-    }
+      const nextHeading =
+        (index === niceMatches.length - 1
+          ? content.length
+          : niceMatches[index + 1].position);
+
+      const upToNextHeading =
+        content.slice(position + length, nextHeading);
+
+      if (!/\S/.test(upToNextHeading)) {
+        throw new TypeError(
+          `Expected ${entryPhrase} to have body text, only got a heading`);
+      }
+
+      return true;
+    })(niceMatches);
 
     return true;
-  })(niceMatches);
+  };
+}
+
+export const isCommentary =
+  validateContentEntries({
+    headingPhrase: `commentary heading`,
+    entryPhrase: `commentary entry`,
+
+    caseInsensitiveRegex: commentaryRegexCaseInsensitive,
+    caseSensitiveOneShotRegex: commentaryRegexCaseSensitiveOneShot,
+  });
 
   return true;
 }
