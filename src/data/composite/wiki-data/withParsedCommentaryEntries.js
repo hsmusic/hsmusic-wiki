@@ -11,6 +11,7 @@ import {
 } from '#composite/data';
 
 import inputSoupyFind from './inputSoupyFind.js';
+import withParsedContentEntries from './withParsedContentEntries.js';
 import withResolvedReferenceList from './withResolvedReferenceList.js';
 
 export default templateCompositeFrom({
@@ -23,72 +24,13 @@ export default templateCompositeFrom({
   outputs: ['#parsedCommentaryEntries'],
 
   steps: () => [
-    {
-      dependencies: [input('from')],
-
-      compute: (continuation, {
-        [input('from')]: commentaryText,
-      }) => continuation({
-        ['#rawMatches']:
-          Array.from(commentaryText.matchAll(commentaryRegexCaseSensitive)),
-      }),
-    },
-
-    withPropertiesFromList({
-      list: '#rawMatches',
-      properties: input.value([
-        '0', // The entire match as a string.
-        'groups',
-        'index',
-      ]),
-    }).outputs({
-      '#rawMatches.0': '#rawMatches.text',
-      '#rawMatches.groups': '#rawMatches.groups',
-      '#rawMatches.index': '#rawMatches.startIndex',
+    withParsedContentEntries({
+      from: input('from'),
+      caseSensitiveRegex: input.value(commentaryRegexCaseSensitive),
     }),
 
-    {
-      dependencies: [
-        '#rawMatches.text',
-        '#rawMatches.startIndex',
-      ],
-
-      compute: (continuation, {
-        ['#rawMatches.text']: text,
-        ['#rawMatches.startIndex']: startIndex,
-      }) => continuation({
-        ['#rawMatches.endIndex']:
-          stitchArrays({text, startIndex})
-            .map(({text, startIndex}) => startIndex + text.length),
-      }),
-    },
-
-    {
-      dependencies: [
-        input('from'),
-        '#rawMatches.startIndex',
-        '#rawMatches.endIndex',
-      ],
-
-      compute: (continuation, {
-        [input('from')]: commentaryText,
-        ['#rawMatches.startIndex']: startIndex,
-        ['#rawMatches.endIndex']: endIndex,
-      }) => continuation({
-        ['#entries.body']:
-          stitchArrays({startIndex, endIndex})
-            .map(({endIndex}, index, stitched) =>
-              (index === stitched.length - 1
-                ? commentaryText.slice(endIndex)
-                : commentaryText.slice(
-                    endIndex,
-                    stitched[index + 1].startIndex)))
-            .map(body => body.trim()),
-      }),
-    },
-
     withPropertiesFromList({
-      list: '#rawMatches.groups',
+      list: '#parsedContentEntryHeadings',
       prefix: input.value('#entries'),
       properties: input.value([
         'artistReferences',
@@ -228,7 +170,7 @@ export default templateCompositeFrom({
         '#entries.dateKind',
         '#entries.accessDate',
         '#entries.accessKind',
-        '#entries.body',
+        '#parsedContentEntryBodies',
       ],
 
       compute: (continuation, {
@@ -240,7 +182,7 @@ export default templateCompositeFrom({
         ['#entries.dateKind']: dateKind,
         ['#entries.accessDate']: accessDate,
         ['#entries.accessKind']: accessKind,
-        ['#entries.body']: body,
+        ['#parsedContentEntryBodies']: body,
       }) => continuation({
         ['#parsedCommentaryEntries']:
           stitchArrays({
