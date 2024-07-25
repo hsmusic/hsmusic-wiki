@@ -2,6 +2,7 @@ import {bindFind} from '#find';
 import {replacerSpec, parseInput} from '#replacer';
 
 import {Marked} from 'marked';
+import striptags from 'striptags';
 
 const commonMarkedOptions = {
   headerIds: false,
@@ -184,6 +185,8 @@ export default {
               link: relation(name, arg),
               label: node.data.label,
               hash: node.data.hash,
+              name: arg?.name,
+              shortName: arg?.shortName ?? arg?.nameShort,
             }
           : getPlaceholder(node, content));
 
@@ -239,6 +242,11 @@ export default {
     absorbPunctuationFollowingExternalLinks: {
       type: 'boolean',
       default: true,
+    },
+
+    textOnly: {
+      type: 'boolean',
+      default: false,
     },
 
     thumb: {
@@ -452,7 +460,17 @@ export default {
                 nodeFromRelations.link,
                 {slots: ['content', 'hash']});
 
-            const {label, hash} = nodeFromRelations;
+            const {label, hash, shortName, name} = nodeFromRelations;
+
+            if (slots.textOnly) {
+              if (label) {
+                return {type: 'text', data: label};
+              } else if (slots.preferShortLinkNames) {
+                return {type: 'text', data: shortName ?? name};
+              } else {
+                return {type: 'text', data: name};
+              }
+            }
 
             // These are removed from the typical combined slots({})-style
             // because we don't want to override slots that were already set
@@ -506,6 +524,10 @@ export default {
             const {label} = node.data;
             const externalLink = relations.externalLinks[externalLinkIndex++];
 
+            if (slots.textOnly) {
+              return {type: 'text', data: label};
+            }
+
             externalLink.setSlots({
               content: label,
               fromContent: true,
@@ -542,12 +564,19 @@ export default {
                 ? valueFn(replacerValue)
                 : replacerValue);
 
-            const contents =
+            const content =
               (htmlFn
                 ? htmlFn(value, {html, language})
                 : value);
 
-            return {type: 'text', data: contents.toString()};
+            const contentText =
+              html.resolve(content, {normalize: 'string'});
+
+            if (slots.textOnly) {
+              return {type: 'text', data: striptags(contentText)};
+            } else {
+              return {type: 'text', data: contentText};
+            }
           }
 
           default:

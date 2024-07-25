@@ -1,19 +1,21 @@
-// Artist commentary! Generally present on tracks and albums.
+// Lyrics! This comes in two styles - "old", where there's just one set of
+// lyrics, or the newer/standard one, with multiple sets that are each
+// annotated, credited, etc.
 
 import {input, templateCompositeFrom} from '#composite';
-import {isCommentary} from '#validators';
+import {isLyrics} from '#validators';
 
 import {exitWithoutDependency, exposeDependency}
   from '#composite/control-flow';
-import {withParsedCommentaryEntries} from '#composite/wiki-data';
+import {withParsedLyricsEntries} from '#composite/wiki-data';
 
 export default templateCompositeFrom({
-  annotation: `commentary`,
+  annotation: `lyrics`,
 
   compose: false,
 
   update: {
-    validate: isCommentary,
+    validate: isLyrics,
   },
 
   steps: () => [
@@ -23,12 +25,12 @@ export default templateCompositeFrom({
       value: input.value([]),
     }),
 
-    withParsedCommentaryEntries({
+    withParsedLyricsEntries({
       from: input.updateValue(),
     }),
 
     exposeDependency({
-      dependency: '#parsedCommentaryEntries',
+      dependency: '#parsedLyricsEntries',
     }),
   ],
 });

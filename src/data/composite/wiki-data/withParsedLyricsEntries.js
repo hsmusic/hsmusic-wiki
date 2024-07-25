@@ -1,6 +1,7 @@
 import {input, templateCompositeFrom} from '#composite';
+import find from '#find';
 import {stitchArrays} from '#sugar';
-import {isCommentary} from '#validators';
+import {isLyrics} from '#validators';
 import {commentaryRegexCaseSensitive} from '#wiki-data';
 
 import {
@@ -10,19 +11,18 @@ import {
   withUnflattenedList,
 } from '#composite/data';
 
-import inputSoupyFind from './inputSoupyFind.js';
 import processContentEntryDates from './processContentEntryDates.js';
 import withParsedContentEntries from './withParsedContentEntries.js';
 import withResolvedReferenceList from './withResolvedReferenceList.js';
 
 export default templateCompositeFrom({
-  annotation: `withParsedCommentaryEntries`,
+  annotation: `withParsedLyricsEntries`,
 
   inputs: {
-    from: input({validate: isCommentary}),
+    from: input({validate: isLyrics}),
   },
 
-  outputs: ['#parsedCommentaryEntries'],
+  outputs: ['#parsedLyricsEntries'],
 
   steps: () => [
     withParsedContentEntries({
@@ -65,7 +65,8 @@ export default templateCompositeFrom({
 
     withResolvedReferenceList({
       list: '#flattenedList',
-      find: inputSoupyFind.input('artist'),
+      data: 'artistData',
+      find: input.value(find.artist),
       notFoundMode: input.value('null'),
     }),
 
@@ -111,7 +112,7 @@ export default templateCompositeFrom({
         ['#entries.accessKind']: accessKind,
         ['#parsedContentEntryBodies']: body,
       }) => continuation({
-        ['#parsedCommentaryEntries']:
+        ['#parsedLyricsEntries']:
           stitchArrays({
             artists,
             artistDisplayText,

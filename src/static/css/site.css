@@ -1610,6 +1610,19 @@ p.content-heading:has(+ .commentary-entry-heading.dated) {
   box-shadow: 0 0 4px 5px rgba(0, 0, 0, 0.25) !important;
 }
 
+.lyrics-switcher {
+  padding-left: 20px;
+}
+
+.lyrics-switcher > span:not(:first-child)::before {
+  content: "\0020\00b7\0020";
+  font-weight: 800;
+}
+
+.lyrics-entry {
+  padding-left: 40px;
+}
+
 .js-hide,
 .js-show-once-data,
 .js-hide-once-data {

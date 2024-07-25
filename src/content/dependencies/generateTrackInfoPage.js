@@ -9,6 +9,7 @@ export default {
     'generateCommentaryEntry',
     'generateContentHeading',
     'generateContributionList',
+    'generateLyricsSection',
     'generatePageLayout',
     'generateTrackArtistCommentarySection',
     'generateTrackArtworkColumn',
@@ -90,8 +91,8 @@ export default {
     flashesThatFeatureList:
       relation('generateTrackInfoPageFeaturedByFlashesList', track),
 
-    lyrics:
-      relation('transformContent', track.lyrics),
+    lyricsSection:
+      relation('generateLyricsSection', track.lyrics),
 
     sheetMusicFilesList:
       relation('generateAlbumAdditionalFilesList',
@@ -308,17 +309,19 @@ export default {
             relations.flashesThatFeatureList,
           ]),
 
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'lyrics'},
-                title: language.$('releaseInfo.lyrics'),
-              }),
+          relations.lyricsSection,
 
-            html.tag('blockquote',
-              {[html.onlyIfContent]: true},
-              relations.lyrics.slot('mode', 'lyrics')),
-          ]),
+          // html.tags([
+          //   relations.contentHeading.clone()
+          //     .slots({
+          //       attributes: {id: 'lyrics'},
+          //       title: language.$('releaseInfo.lyrics'),
+          //     }),
+
+          //   html.tag('blockquote',
+          //     {[html.onlyIfContent]: true},
+          //     relations.lyrics.slot('mode', 'lyrics')),
+          // ]),
 
           html.tags([
             relations.contentHeading.clone()

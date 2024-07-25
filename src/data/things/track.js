@@ -46,6 +46,7 @@ import {
   directory,
   duration,
   flag,
+  lyrics,
   name,
   referenceList,
   referencedArtworkList,
@@ -220,7 +221,7 @@ export class Track extends Thing {
 
     lyrics: [
       inheritFromMainRelease(),
-      contentString(),
+      lyrics(),
     ],
 
     additionalFiles: additionalFiles(),

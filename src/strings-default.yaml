@@ -286,7 +286,12 @@ releaseInfo:
   duration: "Duration: {DURATION}."
 
   contributors: "Contributors:"
-  lyrics: "Lyrics:"
+
+  lyrics:
+    _: "Lyrics:"
+
+    switcher: "({ENTRIES})"
+
   note: "Context notes:"
 
   alsoReleasedOn: "Also released on {ALBUMS}."

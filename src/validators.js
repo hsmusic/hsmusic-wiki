@@ -368,8 +368,27 @@ export const isCommentary =
     caseSensitiveOneShotRegex: commentaryRegexCaseSensitiveOneShot,
   });
 
+export function isOldStyleLyrics(content) {
+  isContentString(content);
+
+  if (/^<i>/m.test(content)) {
+    throw new TypeError(
+      `Expected old-style lyrics block not to include <i> at start of any line`);
+  }
+
   return true;
 }
+
+export const isLyrics =
+  anyOf(
+    isOldStyleLyrics,
+    validateContentEntries({
+      headingPhrase: `lyrics heading`,
+      entryPhrase: `lyrics entry`,
+
+      caseInsensitiveRegex: commentaryRegexCaseInsensitive,
+      caseSensitiveOneShotRegex: commentaryRegexCaseSensitiveOneShot,
+    }));
 
 const isArtistRef = validateReference('artist');
 
