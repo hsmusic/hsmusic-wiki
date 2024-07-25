@@ -72,30 +72,22 @@ function getInputTokenValue(token) {
   }
 }
 
-function getStaticInputMetadata(inputOptions) {
+function getStaticInputMetadata(inputMapping) {
   const metadata = {};
 
-  for (const [name, token] of Object.entries(inputOptions)) {
-    if (typeof token === 'string') {
-      metadata[input.staticDependency(name)] = token;
-      metadata[input.staticValue(name)] = null;
-    } else if (isInputToken(token)) {
-      const tokenShape = getInputTokenShape(token);
-      const tokenValue = getInputTokenValue(token);
+  for (const [name, token] of Object.entries(inputMapping)) {
+    const tokenShape = getInputTokenShape(token);
+    const tokenValue = getInputTokenValue(token);
 
-      metadata[input.staticDependency(name)] =
-        (tokenShape === 'input.dependency'
-          ? tokenValue
-          : null);
+    metadata[input.staticDependency(name)] =
+      (tokenShape === 'input.dependency'
+        ? tokenValue
+        : null);
 
-      metadata[input.staticValue(name)] =
-        (tokenShape === 'input.value'
-          ? tokenValue
-          : null);
-    } else {
-      metadata[input.staticDependency(name)] = null;
-      metadata[input.staticValue(name)] = null;
-    }
+    metadata[input.staticValue(name)] =
+      (tokenShape === 'input.value'
+        ? tokenValue
+        : null);
   }
 
   return metadata;
@@ -350,6 +342,8 @@ export function templateCompositeFrom(description) {
           if (typeof inputOptions[name] === 'string') {
             inputMapping[name] = input.dependency(inputOptions[name]);
           } else {
+            // This is always an input token, since only a string or
+            // an input token is a valid input option (asserted above).
             inputMapping[name] = inputOptions[name];
           }
         } else if (tokenValue.defaultValue) {
