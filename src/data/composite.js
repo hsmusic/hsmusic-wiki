@@ -526,7 +526,10 @@ export function compositeFrom(description) {
         ? compositeFrom(step.toResolvedComposition())
         : step));
 
-  const inputMetadata = getStaticInputMetadata(description.inputMapping ?? {});
+  const inputMetadata =
+    (description.inputMapping
+      ? getStaticInputMetadata(description.inputMapping)
+      : {});
 
   function _mapDependenciesToOutputs(providedDependencies) {
     if (!description.outputs) {
