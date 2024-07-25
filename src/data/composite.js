@@ -342,7 +342,27 @@ export function templateCompositeFrom(description) {
       }
     });
 
-    const inputMetadata = getStaticInputMetadata(inputOptions);
+    const inputMapping = {};
+    if ('inputs' in description) {
+      for (const [name, token] of Object.entries(description.inputs)) {
+        const tokenValue = getInputTokenValue(token);
+        if (name in inputOptions) {
+          if (typeof inputOptions[name] === 'string') {
+            inputMapping[name] = input.dependency(inputOptions[name]);
+          } else {
+            inputMapping[name] = inputOptions[name];
+          }
+        } else if (tokenValue.defaultValue) {
+          inputMapping[name] = input.value(tokenValue.defaultValue);
+        } else if (tokenValue.defaultDependency) {
+          inputMapping[name] = input.dependency(tokenValue.defaultDependency);
+        } else {
+          inputMapping[name] = input.value(null);
+        }
+      }
+    }
+
+    const inputMetadata = getStaticInputMetadata(inputMapping);
 
     const expectedOutputNames =
       (Array.isArray(description.outputs)
@@ -414,25 +434,6 @@ export function templateCompositeFrom(description) {
         }
 
         if ('inputs' in description) {
-          const inputMapping = {};
-
-          for (const [name, token] of Object.entries(description.inputs)) {
-            const tokenValue = getInputTokenValue(token);
-            if (name in inputOptions) {
-              if (typeof inputOptions[name] === 'string') {
-                inputMapping[name] = input.dependency(inputOptions[name]);
-              } else {
-                inputMapping[name] = inputOptions[name];
-              }
-            } else if (tokenValue.defaultValue) {
-              inputMapping[name] = input.value(tokenValue.defaultValue);
-            } else if (tokenValue.defaultDependency) {
-              inputMapping[name] = input.dependency(tokenValue.defaultDependency);
-            } else {
-              inputMapping[name] = input.value(null);
-            }
-          }
-
           finalDescription.inputMapping = inputMapping;
           finalDescription.inputDescriptions = description.inputs;
         }
