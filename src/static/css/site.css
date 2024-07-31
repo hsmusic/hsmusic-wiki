@@ -1528,6 +1528,20 @@ ul > li.has-details {
   margin-left: 0;
 }
 
+.album-group-list blockquote {
+  max-width: 540px;
+  margin-bottom: 9px;
+  margin-top: 3px;
+}
+
+.album-group-list blockquote p:first-child {
+  margin-top: 0;
+}
+
+.album-group-list blockquote p:last-child {
+  margin-bottom: 0;
+}
+
 .group-chronology-link {
   font-style: oblique;
 }

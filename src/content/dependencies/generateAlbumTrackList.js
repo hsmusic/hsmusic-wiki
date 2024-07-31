@@ -35,7 +35,12 @@ function getDisplayMode(album) {
 }
 
 export default {
-  contentDependencies: ['generateAlbumTrackListItem', 'generateContentHeading'],
+  contentDependencies: [
+    'generateAlbumTrackListItem',
+    'generateContentHeading',
+    'transformContent',
+  ],
+
   extraDependencies: ['html', 'language'],
 
   query(album) {
@@ -52,6 +57,10 @@ export default {
         relations.trackSectionHeadings =
           album.trackSections.map(() =>
             relation('generateContentHeading'));
+
+        relations.trackSectionDescriptions =
+          album.trackSections.map(section =>
+            relation('transformContent', section.description));
 
         relations.trackSectionItems =
           album.trackSections.map(section =>
@@ -132,6 +141,7 @@ export default {
         return html.tag('dl', {class: 'album-group-list'},
           stitchArrays({
             heading: relations.trackSectionHeadings,
+            description: relations.trackSectionDescriptions,
             items: relations.trackSectionItems,
 
             name: data.trackSectionNames,
@@ -140,6 +150,7 @@ export default {
             startIndex: data.trackSectionStartIndices,
           }).map(({
               heading,
+              description,
               items,
 
               name,
@@ -172,12 +183,17 @@ export default {
                     }),
                 })),
 
-              html.tag('dd',
+              html.tag('dd', [
+                html.tag('blockquote',
+                  {[html.onlyIfContent]: true},
+                  description),
+
                 html.tag(listTag,
                   data.hasTrackNumbers &&
                     {start: startIndex + 1},
 
-                  slotItems(items))),
+                  slotItems(items)),
+              ]),
             ]));
 
       case 'tracks':
