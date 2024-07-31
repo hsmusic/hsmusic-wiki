@@ -31,6 +31,7 @@ import {
   commentary,
   color,
   commentatorArtists,
+  contentString,
   contribsPresent,
   contributionList,
   dimensions,
@@ -524,6 +525,8 @@ export class TrackSection extends Thing {
 
     isDefaultTrackSection: flag(false),
 
+    description: contentString(),
+
     album: [
       withAlbum(),
       exposeDependency({dependency: '#album'}),
@@ -637,6 +640,8 @@ export class TrackSection extends Thing {
         property: 'dateOriginallyReleased',
         transform: parseDate,
       },
+
+      'Description': {property: 'description'},
     },
   };
 
