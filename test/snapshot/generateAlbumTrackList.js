@@ -6,6 +6,9 @@ testContentFunctions(t, 'generateAlbumTrackList (snapshot)', async (t, evaluate)
     mock: {
       generateAlbumTrackListMissingDuration:
         evaluate.stubContentFunction('generateAlbumTrackListMissingDuration'),
+
+      image:
+        evaluate.stubContentFunction('image'),
     },
   });
 
@@ -46,6 +49,16 @@ testContentFunctions(t, 'generateAlbumTrackList (snapshot)', async (t, evaluate)
     tracks,
   };
 
+  const albumWithTrackSectionDescriptions = {
+    color: color1,
+    artistContribs: contribs1,
+    trackSections: [
+      {name: 'First section', tracks: tracks.slice(0, 3), description: `Why yes!`},
+      {name: 'Second section', tracks: tracks.slice(3), description: `How *contentful,* this is.`},
+    ],
+    tracks,
+  };
+
   const albumWithNoDuration = {
     color: color1,
     artistContribs: contribs1,
@@ -61,6 +74,11 @@ testContentFunctions(t, 'generateAlbumTrackList (snapshot)', async (t, evaluate)
   evaluate.snapshot(`basic behavior, default track section`, {
     name: 'generateAlbumTrackList',
     args: [albumWithoutTrackSections],
+  });
+
+  evaluate.snapshot(`basic behavior, with descriptions`, {
+    name: 'generateAlbumTrackList',
+    args: [albumWithTrackSectionDescriptions],
   });
 
   evaluate.snapshot(`collapseDurationScope: never`, {

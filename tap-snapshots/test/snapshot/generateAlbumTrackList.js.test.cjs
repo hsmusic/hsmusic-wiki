@@ -14,6 +14,31 @@ exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList 
 </ul>
 `
 
+exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > basic behavior, with descriptions 1`] = `
+<dl class="album-group-list">
+    <dt class="content-heading" tabindex="0">
+        <span class="content-heading-main-title">First section: (~1:00)</span>
+        <template class="content-heading-sticky-title">First section:</template>
+    </dt>
+    <dd>
+        <blockquote><p>Why yes!</p></blockquote>
+        <ul>
+            <li>(0:20) <a href="track/t1/">Track 1</a></li>
+            <li>[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t2/">Track 2</a></li>
+            <li>(0:40) <a href="track/t3/">Track 3</a></li>
+        </ul>
+    </dd>
+    <dt class="content-heading" tabindex="0">
+        <span class="content-heading-main-title">Second section:</span>
+        <template class="content-heading-sticky-title">Second section:</template>
+    </dt>
+    <dd>
+        <blockquote><p>How <em>contentful,</em> this is.</p></blockquote>
+        <ul><li style="--primary-color: #ea2e83">[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t4/">Track 4</a> <span class="by"><span class="chunkwrap">by <span class="contribution nowrap"><a href="artist/apricot/">Apricot</a></span>,</span> <span class="chunkwrap"><span class="contribution nowrap"><a href="artist/peach/">Peach</a></span>,</span> <span class="chunkwrap">and <span class="contribution nowrap"><a href="artist/cerise/">Cerise</a></span></span></span></li></ul>
+    </dd>
+</dl>
+`
+
 exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > basic behavior, with track sections 1`] = `
 <dl class="album-group-list">
     <dt class="content-heading" tabindex="0">
