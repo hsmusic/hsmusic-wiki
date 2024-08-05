@@ -82,6 +82,7 @@ export class Track extends Thing {
     ArtTag,
     Artist,
     Flash,
+    TrackSection,
     WikiInfo,
   }) => ({
     // Update & expose
@@ -342,6 +343,10 @@ export class Track extends Thing {
 
     trackData: wikiData({
       class: input.value(Track),
+    }),
+
+    trackSectionData: wikiData({
+      class: input.value(TrackSection),
     }),
 
     wikiInfo: thing({

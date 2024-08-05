@@ -1,11 +1,8 @@
 // Gets the track section containing this track from its album's track list.
 
 import {input, templateCompositeFrom} from '#composite';
-import {is} from '#validators';
 
-import {raiseOutputWithoutDependency} from '#composite/control-flow';
-
-import withPropertyFromAlbum from './withPropertyFromAlbum.js';
+import {withUniqueReferencingThing} from '#composite/wiki-data';
 
 export default templateCompositeFrom({
   annotation: `withContainingTrackSection`,
@@ -13,29 +10,11 @@ export default templateCompositeFrom({
   outputs: ['#trackSection'],
 
   steps: () => [
-    withPropertyFromAlbum({
-      property: input.value('trackSections'),
+    withUniqueReferencingThing({
+      data: 'trackSectionData',
+      list: input.value('tracks'),
+    }).outputs({
+      ['#uniqueReferencingThing']: '#trackSection',
     }),
-
-    raiseOutputWithoutDependency({
-      dependency: '#album.trackSections',
-      output: input.value({'#trackSection': null}),
-    }),
-
-    {
-      dependencies: [
-        input.myself(),
-        '#album.trackSections',
-      ],
-
-      compute: (continuation, {
-        [input.myself()]: track,
-        ['#album.trackSections']: trackSections,
-      }) => continuation({
-        ['#trackSection']:
-          trackSections.find(({tracks}) => tracks.includes(track))
-            ?? null,
-      }),
-    },
   ],
 });

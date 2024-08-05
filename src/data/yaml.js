@@ -1203,6 +1203,7 @@ export function linkWikiDataArrays(wikiData) {
       'artistData',
       'flashData',
       'trackData',
+      'trackSectionData',
       'wikiInfo',
     ]],
 
