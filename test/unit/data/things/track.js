@@ -19,8 +19,7 @@ function stubAlbum(tracks, directory = 'bar') {
   album.directory = directory;
 
   const trackSection = stubTrackSection(album, tracks);
-  album.trackSections = [`unqualified-track-section:${trackSection.unqualifiedDirectory}`];
-  album.ownTrackSectionData = [trackSection];
+  album.trackSections = [trackSection];
 
   return album;
 }
@@ -96,8 +95,6 @@ t.test(`Track.album`, t => {
   const section2 = new TrackSection();
   section1.unqualifiedDirectory = 'section1';
   section2.unqualifiedDirectory = 'section2';
-  const section1_ref = `unqualified-track-section:section1`;
-  const section2_ref = `unqualified-track-section:section2`;
 
   t.equal(track1.album, null,
     `album #1: defaults to null`);
@@ -110,10 +107,8 @@ t.test(`Track.album`, t => {
   section2.ownAlbumData = [album2];
   section1.tracks = ['track:track1'];
   section2.tracks = ['track:track2'];
-  album1.trackSections = [section1_ref];
-  album2.trackSections = [section2_ref];
-  album1.ownTrackSectionData = [section1];
-  album2.ownTrackSectionData = [section2];
+  album1.trackSections = [section1];
+  album2.trackSections = [section2];
 
   t.equal(track1.album, album1,
     `album #2: is album when album's trackSections matches track`);
@@ -132,7 +127,7 @@ t.test(`Track.album`, t => {
 
   // XXX_decacheWikiData
   album1.trackSections = [];
-  album1.trackSections = [section1_ref];
+  album1.trackSections = [section1];
   track1.albumData = [];
   track1.albumData = [album2, album1];
 
@@ -144,7 +139,7 @@ t.test(`Track.album`, t => {
 
   // XXX_decacheWikiData
   album1.trackSections = [];
-  album1.trackSections = [section1_ref];
+  album1.trackSections = [section1];
   track1.albumData = [];
   track1.albumData = [album2, album1];
 
@@ -320,8 +315,7 @@ t.test(`Track.color`, t => {
   album.color = '#abcdef';
   section.color = '#beeeef';
 
-  album.trackSections = [`unqualified-track-section:section`];
-  album.ownTrackSectionData = [section];
+  album.trackSections = [section];
 
   XXX_decacheWikiData();
 

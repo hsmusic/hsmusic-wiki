@@ -262,13 +262,6 @@ t.test(`Album.tracks`, t => {
   const section6 = stubTrackSection(album, [], 'section6');
   const sections = [section1, section2, section3, section4, section5, section6];
 
-  const section1_ref = `unqualified-track-section:section1`;
-  const section2_ref = `unqualified-track-section:section2`;
-  const section3_ref = `unqualified-track-section:section3`;
-  const section4_ref = `unqualified-track-section:section4`;
-  const section5_ref = `unqualified-track-section:section5`;
-  const section6_ref = `unqualified-track-section:section6`;
-
   for (const track of tracks) {
     track.albumData = [album];
   }
@@ -283,8 +276,7 @@ t.test(`Album.tracks`, t => {
   section1.tracks = ['track:track1', 'track:track2', 'track:track3'];
   section1.ownTrackData = [track1, track2, track3];
 
-  album.trackSections = [section1_ref];
-  album.ownTrackSectionData = [section1];
+  album.trackSections = [section1];
 
   t.same(album.tracks, [track1, track2, track3],
     `Album.tracks #2: pulls tracks from one track section`);
@@ -295,8 +287,7 @@ t.test(`Album.tracks`, t => {
   section1.ownTrackData = [track1];
   section2.ownTrackData = [track2, track3];
 
-  album.trackSections = [section1_ref, section2_ref];
-  album.ownTrackSectionData = [section1, section2];
+  album.trackSections = [section1, section2];
 
   t.same(album.tracks, [track1, track2, track3],
     `Album.tracks #3: pulls tracks from multiple track sections`);
@@ -311,8 +302,7 @@ t.test(`Album.tracks`, t => {
   section3.ownTrackData = [];
   section4.ownTrackData = [track3];
 
-  album.trackSections = [section1_ref, section2_ref, section3_ref, section4_ref];
-  album.ownTrackSectionData = [section1, section2, section3, section4];
+  album.trackSections = [section1, section2, section3, section4];
 
   t.same(album.tracks, [track1, track2, track3],
     `Album.tracks #4: filters out references without matches`);
@@ -331,8 +321,7 @@ t.test(`Album.tracks`, t => {
   section5.ownTrackData = [];
   section6.ownTrackData = [track3];
 
-  album.trackSections = [section1_ref, section2_ref, section3_ref, section4_ref, section5_ref, section6_ref];
-  album.ownTrackSectionData = [section1, section2, section3, section4, section5, section6];
+  album.trackSections = [section1, section2, section3, section4, section5, section6];
 
   t.same(album.tracks, [track1, track2, track3],
     `Album.tracks #5: skips empty track sections`);
@@ -372,8 +361,7 @@ t.test(`Album.trackSections`, t => {
   section1.ownTrackData = [track1, track2];
   section2.ownTrackData = [track3, track4];
 
-  album.trackSections = [section1_ref, section2_ref];
-  album.ownTrackSectionData = [section1, section2];
+  album.trackSections = [section1, section2];
 
   t.match(album.trackSections, [
     {tracks: [track1, track2]},
@@ -396,8 +384,7 @@ t.test(`Album.trackSections`, t => {
   section1.name = 'First section';
   section2.name = 'Second section';
 
-  album.trackSections = [section1_ref, section2_ref, section3_ref];
-  album.ownTrackSectionData = [section1, section2, section3];
+  album.trackSections = [section1, section2, section3];
 
   t.match(album.trackSections, [
     {name: 'First section', tracks: [track1]},
@@ -411,7 +398,7 @@ t.test(`Album.trackSections`, t => {
 
   // XXX_decacheWikiData
   album.trackSections = [];
-  album.trackSections = [section1_ref, section2_ref, section3_ref];
+  album.trackSections = [section1, section2, section3];
 
   t.match(album.trackSections, [
     {tracks: [track1], color: '#123456'},
@@ -423,7 +410,7 @@ t.test(`Album.trackSections`, t => {
 
   // XXX_decacheWikiData
   album.trackSections = [];
-  album.trackSections = [section1_ref, section2_ref, section3_ref];
+  album.trackSections = [section1, section2, section3];
 
   t.match(album.trackSections, [
     {tracks: [track1], dateOriginallyReleased: null},
@@ -436,7 +423,7 @@ t.test(`Album.trackSections`, t => {
 
   // XXX_decacheWikiData
   album.trackSections = [];
-  album.trackSections = [section1_ref, section2_ref, section3_ref];
+  album.trackSections = [section1, section2, section3];
 
   t.match(album.trackSections, [
     {tracks: [track1], isDefaultTrackSection: true},
@@ -462,8 +449,7 @@ t.test(`Album.trackSections`, t => {
   section4.color = '#556677';
   section5.color = '#778899';
 
-  album.trackSections = [section1_ref, section2_ref, section3_ref, section4_ref, section5_ref];
-  album.ownTrackSectionData = [section1, section2, section3, section4, section5];
+  album.trackSections = [section1, section2, section3, section4, section5];
 
   t.match(album.trackSections, [
     {tracks: [track1, track2], color: '#112233'},

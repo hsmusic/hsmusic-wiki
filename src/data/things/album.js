@@ -44,6 +44,7 @@ import {
   simpleString,
   singleReference,
   thing,
+  thingList,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -136,10 +137,8 @@ export class Album extends Thing {
     creditSources: commentary(),
     additionalFiles: additionalFiles(),
 
-    trackSections: referenceList({
-      referenceType: input.value('unqualified-track-section'),
-      data: 'ownTrackSectionData',
-      find: input.value(find.unqualifiedTrackSection),
+    trackSections: thingList({
+      class: input.value(TrackSection),
     }),
 
     artistContribs: contributionList({
@@ -221,10 +220,6 @@ export class Album extends Thing {
 
     groupData: wikiData({
       class: input.value(Group),
-    }),
-
-    ownTrackSectionData: wikiData({
-      class: input.value(TrackSection),
     }),
 
     wikiInfo: thing({
@@ -476,13 +471,7 @@ export class Album extends Thing {
 
         albumData.push(album);
 
-        album.trackSections =
-          trackSections
-            .map(trackSection =>
-              `unqualified-track-section:` +
-              trackSection.unqualifiedDirectory);
-
-        album.ownTrackSectionData = trackSections;
+        album.trackSections = trackSections;
       }
 
       return {albumData, trackSectionData, trackData};
