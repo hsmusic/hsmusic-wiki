@@ -440,14 +440,7 @@ export class Album extends Thing {
           }
 
           currentTrackSection.tracks =
-            currentTrackSectionTracks
-              .map(track => Thing.getReference(track));
-
-          currentTrackSection.ownTrackData =
             currentTrackSectionTracks;
-
-          currentTrackSection.ownAlbumData =
-            [album];
 
           trackSections.push(currentTrackSection);
           trackSectionData.push(currentTrackSection);
@@ -521,20 +514,14 @@ export class TrackSection extends Thing {
       exposeDependency({dependency: '#album'}),
     ],
 
-    tracks: referenceList({
+    tracks: thingList({
       class: input.value(Track),
-      data: 'ownTrackData',
-      find: input.value(find.track),
     }),
 
     // Update only
 
-    ownAlbumData: wikiData({
+    albumData: wikiData({
       class: input.value(Album),
-    }),
-
-    ownTrackData: wikiData({
-      class: input.value(Track),
     }),
 
     // Expose only
@@ -654,8 +641,6 @@ export class TrackSection extends Thing {
       try {
         length = this.tracks.length;
       } catch {}
-
-      album ??= CacheableObject.getUpdateValue(this, 'ownAlbumData')?.[0];
 
       if (album) {
         const albumName = album.name;

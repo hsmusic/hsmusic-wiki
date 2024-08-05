@@ -38,9 +38,8 @@ function stubTrack(directory = 'foo') {
 function stubTrackSection(album, tracks, directory = 'baz') {
   const trackSection = new TrackSection();
   trackSection.unqualifiedDirectory = directory;
-  trackSection.tracks = tracks.map(t => Thing.getReference(t));
-  trackSection.ownTrackData = tracks;
-  trackSection.ownAlbumData = [album];
+  trackSection.tracks = tracks;
+  trackSection.albumData = [album];
   return trackSection;
 }
 
@@ -244,7 +243,7 @@ t.test(`Album.coverArtFileExtension`, t => {
 });
 
 t.test(`Album.tracks`, t => {
-  t.plan(5);
+  t.plan(4);
 
   const album = new Album();
   album.directory = 'foo';
@@ -267,64 +266,38 @@ t.test(`Album.tracks`, t => {
   }
 
   for (const section of sections) {
-    section.ownAlbumData = [album];
+    section.albumData = [album];
   }
 
   t.same(album.tracks, [],
     `Album.tracks #1: defaults to empty array`);
 
-  section1.tracks = ['track:track1', 'track:track2', 'track:track3'];
-  section1.ownTrackData = [track1, track2, track3];
+  section1.tracks = [track1, track2, track3];
 
   album.trackSections = [section1];
 
   t.same(album.tracks, [track1, track2, track3],
     `Album.tracks #2: pulls tracks from one track section`);
 
-  section1.tracks = ['track:track1'];
-  section2.tracks = ['track:track2', 'track:track3'];
-
-  section1.ownTrackData = [track1];
-  section2.ownTrackData = [track2, track3];
+  section1.tracks = [track1];
+  section2.tracks = [track2, track3];
 
   album.trackSections = [section1, section2];
 
   t.same(album.tracks, [track1, track2, track3],
     `Album.tracks #3: pulls tracks from multiple track sections`);
 
-  section1.tracks = ['track:track1', 'track:does-not-exist'];
-  section2.tracks = ['track:this-one-neither', 'track:track2'];
-  section3.tracks = ['track:effectively-empty-section'];
-  section4.tracks = ['track:track3'];
-
-  section1.ownTrackData = [track1];
-  section2.ownTrackData = [track2];
-  section3.ownTrackData = [];
-  section4.ownTrackData = [track3];
-
-  album.trackSections = [section1, section2, section3, section4];
-
-  t.same(album.tracks, [track1, track2, track3],
-    `Album.tracks #4: filters out references without matches`);
-
-  section1.tracks = ['track:track1'];
+  section1.tracks = [track1];
   section2.tracks = [];
-  section3.tracks = ['track:track2'];
+  section3.tracks = [track2];
   section4.tracks = [];
   section5.tracks = [];
-  section6.tracks = ['track:track3'];
-
-  section1.ownTrackData = [track1];
-  section2.ownTrackData = [];
-  section3.ownTrackData = [track2];
-  section4.ownTrackData = [];
-  section5.ownTrackData = [];
-  section6.ownTrackData = [track3];
+  section6.tracks = [track3];
 
   album.trackSections = [section1, section2, section3, section4, section5, section6];
 
   t.same(album.tracks, [track1, track2, track3],
-    `Album.tracks #5: skips empty track sections`);
+    `Album.tracks #4: skips empty track sections`);
 });
 
 t.test(`Album.trackSections`, t => {
@@ -345,21 +318,12 @@ t.test(`Album.trackSections`, t => {
   const section5 = stubTrackSection(album, [], 'section5');
   const sections = [section1, section2, section3, section4, section5];
 
-  const section1_ref = `unqualified-track-section:section1`;
-  const section2_ref = `unqualified-track-section:section2`;
-  const section3_ref = `unqualified-track-section:section3`;
-  const section4_ref = `unqualified-track-section:section4`;
-  const section5_ref = `unqualified-track-section:section5`;
-
   for (const track of tracks) {
     track.albumData = [album];
   }
 
-  section1.tracks = ['track:track1', 'track:track2'];
-  section2.tracks = ['track:track3', 'track:track4'];
-
-  section1.ownTrackData = [track1, track2];
-  section2.ownTrackData = [track3, track4];
+  section1.tracks = [track1, track2];
+  section2.tracks = [track3, track4];
 
   album.trackSections = [section1, section2];
 
@@ -373,13 +337,9 @@ t.test(`Album.trackSections`, t => {
     {tracks: [track3, track4], startIndex: 2},
   ], `Album.trackSections #2: exposes startIndex`);
 
-  section1.tracks = ['track:track1'];
-  section2.tracks = ['track:track2'];
-  section3.tracks = ['track:track3'];
-
-  section1.ownTrackData = [track1];
-  section2.ownTrackData = [track2];
-  section3.ownTrackData = [track3];
+  section1.tracks = [track1];
+  section2.tracks = [track2];
+  section3.tracks = [track3];
 
   section1.name = 'First section';
   section2.name = 'Second section';
@@ -431,17 +391,11 @@ t.test(`Album.trackSections`, t => {
     {tracks: [track3], isDefaultTrackSection: false},
   ], `Album.trackSections #6: exposes isDefaultTrackSection, defaults to false`);
 
-  section1.tracks = ['track:track1', 'track:track2', 'track:snooping'];
-  section2.tracks = ['track:track3', 'track:as-usual'];
+  section1.tracks = [track1, track2];
+  section2.tracks = [track3];
   section3.tracks = [];
-  section4.tracks = ['track:icy', 'track:chilly', 'track:frigid'];
-  section5.tracks = ['track:track4'];
-
-  section1.ownTrackData = [track1, track2];
-  section2.ownTrackData = [track3];
-  section3.ownTrackData = [];
-  section4.ownTrackData = [];
-  section5.ownTrackData = [track4];
+  section4.tracks = [];
+  section5.tracks = [track4];
 
   section1.color = '#112233';
   section2.color = '#334455';
@@ -457,7 +411,7 @@ t.test(`Album.trackSections`, t => {
     {tracks: [],               color: '#bbbbba'},
     {tracks: [],               color: '#556677'},
     {tracks: [track4],         color: '#778899'},
-  ], `Album.trackSections #7: filters out references without matches, keeps empty sections`);
+  ], `Album.trackSections #7: keeps empty sections`);
 });
 
 t.test(`Album.wallpaperFileExtension`, t => {

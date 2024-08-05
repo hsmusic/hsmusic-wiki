@@ -1206,6 +1206,10 @@ export function linkWikiDataArrays(wikiData) {
       'wikiInfo',
     ]],
 
+    [wikiData.trackSectionData, [
+      'albumData',
+    ]],
+
     [[wikiData.wikiInfo], [
       'groupData',
     ]],

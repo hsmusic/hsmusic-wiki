@@ -25,9 +25,8 @@ function stubAlbum(tracks, directory = 'bar') {
 function stubTrackSection(album, tracks, directory = 'baz') {
   const trackSection = new TrackSection();
   trackSection.unqualifiedDirectory = directory;
-  trackSection.tracks = tracks.map(t => Thing.getReference(t));
-  trackSection.ownTrackData = tracks;
-  trackSection.ownAlbumData = [album];
+  trackSection.tracks = tracks;
+  trackSection.albumData = [album];
   return trackSection;
 }
 

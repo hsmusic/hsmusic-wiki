@@ -1,6 +1,4 @@
-// Gets the track section's album. This will early exit if ownAlbumData is
-// missing. If there's no album whose list of track sections includes this one,
-// the output dependency will be null.
+// Gets the track section's album.
 
 import {input, templateCompositeFrom} from '#composite';
 
@@ -13,7 +11,7 @@ export default templateCompositeFrom({
 
   steps: () => [
     withUniqueReferencingThing({
-      data: 'ownAlbumData',
+      data: 'albumData',
       list: input.value('trackSections'),
     }).outputs({
       ['#uniqueReferencingThing']: '#album',

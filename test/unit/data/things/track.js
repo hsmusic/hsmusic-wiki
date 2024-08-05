@@ -27,9 +27,8 @@ function stubAlbum(tracks, directory = 'bar') {
 function stubTrackSection(album, tracks, directory = 'baz') {
   const trackSection = new TrackSection();
   trackSection.unqualifiedDirectory = directory;
-  trackSection.tracks = tracks.map(t => Thing.getReference(t));
-  trackSection.ownTrackData = tracks;
-  trackSection.ownAlbumData = [album];
+  trackSection.tracks = tracks;
+  trackSection.albumData = [album];
   return trackSection;
 }
 
@@ -101,12 +100,10 @@ t.test(`Track.album`, t => {
 
   track1.albumData = [album1, album2];
   track2.albumData = [album1, album2];
-  section1.ownTrackData = [track1];
-  section2.ownTrackData = [track2];
-  section1.ownAlbumData = [album1];
-  section2.ownAlbumData = [album2];
-  section1.tracks = ['track:track1'];
-  section2.tracks = ['track:track2'];
+  section1.tracks = [track1];
+  section2.tracks = [track2];
+  section1.albumData = [album1];
+  section2.albumData = [album2];
   album1.trackSections = [section1];
   album2.trackSections = [section2];
 
@@ -123,7 +120,7 @@ t.test(`Track.album`, t => {
   t.equal(track1.album, null,
     `album #4: is null when track missing albumData`);
 
-  section1.ownTrackData = [];
+  section1.tracks = [];
 
   // XXX_decacheWikiData
   album1.trackSections = [];
@@ -132,10 +129,9 @@ t.test(`Track.album`, t => {
   track1.albumData = [album2, album1];
 
   t.equal(track1.album, null,
-    `album #5: is null when album track section missing ownTrackData`);
+    `album #5: is null when album track section missing tracks`);
 
-  section1.ownTrackData = [track2];
-  section1.tracks = ['track:track2'];
+  section1.tracks = [track2];
 
   // XXX_decacheWikiData
   album1.trackSections = [];
