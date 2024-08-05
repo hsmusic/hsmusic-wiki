@@ -3,6 +3,9 @@
 import {input, templateCompositeFrom} from '#composite';
 import {isThingClass, validateThing} from '#validators';
 
+import {exposeConstant, exposeUpdateValueOrContinue}
+  from '#composite/control-flow';
+
 export default templateCompositeFrom({
   annotation: `wikiData`,
 
@@ -27,5 +30,11 @@ export default templateCompositeFrom({
       }),
   }),
 
-  steps: () => [],
+  steps: () => [
+    exposeUpdateValueOrContinue(),
+
+    exposeConstant({
+      value: input.value(null),
+    }),
+  ],
 });
