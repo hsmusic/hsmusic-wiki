@@ -10,6 +10,9 @@ testContentFunctions(t, 'generateAlbumTrackList (unit)', async (t, evaluate) => 
         generate: (name, {html}) =>
           html.tag('li', `Item: ${name}`),
       },
+
+      image:
+        evaluate.stubContentFunction('image'),
     },
   });
 
