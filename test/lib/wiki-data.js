@@ -1,6 +1,8 @@
 import CacheableObject from '#cacheable-object';
 import find from '#find';
 import {withEntries} from '#sugar';
+import Thing from '#thing';
+import thingConstructors from '#things';
 import {linkWikiDataArrays} from '#yaml';
 
 export function linkAndBindWikiData(wikiData, {
@@ -52,4 +54,100 @@ export function linkAndBindWikiData(wikiData, {
       customLinkWikiDataArrays
         .bind(null, wikiData, {XXX_decacheWikiData: true}),
   };
+}
+
+export function stubWikiData() {
+  return {
+    albumData: [],
+    artistData: [],
+    artTagData: [],
+    flashData: [],
+    flashActData: [],
+    flashSideData: [],
+    groupData: [],
+    groupCategoryData: [],
+    newsData: [],
+    staticPageData: [],
+    trackData: [],
+    trackSectionData: [],
+  };
+}
+
+export function stubThing(wikiData, constructor, properties = {}) {
+  const thing = Reflect.construct(constructor, []);
+  Object.assign(thing, properties);
+
+  const wikiDataSpec = {
+    Album: 'albumData',
+    Artist: 'artistData',
+    ArtTag: 'artTagData',
+    Flash: 'flashData',
+    FlashAct: 'flashActData',
+    FlashSide: 'flashSideData',
+    Group: 'groupData',
+    GroupCategory: 'groupCategoryData',
+    NewsEntry: 'newsData',
+    StaticPage: 'staticPageData',
+    Track: 'trackData',
+    TrackSection: 'trackSectionData',
+  };
+
+  const wikiDataMap =
+    new Map(
+      Object.entries(wikiDataSpec)
+        .map(([thingKey, wikiDataKey]) => [
+          thingConstructors[thingKey],
+          wikiData[wikiDataKey],
+        ]));
+
+  const wikiDataArray =
+    wikiDataMap.get(constructor);
+
+  wikiDataArray.push(thing);
+
+  return thing;
+}
+
+export function stubTrackAndAlbum(wikiData, trackDirectory = null, albumDirectory = null) {
+  const {Track, TrackSection, Album} = thingConstructors;
+
+  const track =
+    stubThing(wikiData, Track, {directory: trackDirectory});
+
+  const section =
+    stubThing(wikiData, TrackSection, {tracks: [track]});
+
+  const album =
+    stubThing(wikiData, Album, {directory: albumDirectory, trackSections: [section]});
+
+  return {track, album, section};
+}
+
+export function stubArtistAndContribs(wikiData, artistName = `Test Artist`) {
+  const {Artist} = thingConstructors;
+
+  const artist =
+    stubThing(wikiData, Artist, {name: artistName});
+
+  const contribs =
+    [{artist: artistName, annotation: null}];
+
+  const badContribs =
+    [{artist: `Figment of Your Imagination`, annotation: null}];
+
+  return {artist, contribs, badContribs};
+}
+
+export function stubFlashAndAct(wikiData, flashDirectory = null) {
+  const {Flash, FlashAct} = thingConstructors;
+
+  const flash =
+    stubThing(wikiData, Flash, {directory: flashDirectory});
+
+  const flashAct =
+    stubThing(wikiData, FlashAct, {
+      flashes: [Thing.getReference(flash)],
+    });
+
+  return {flash, flashAct};
 }

@@ -1,39 +1,24 @@
 import t from 'tap';
 
-import {linkAndBindWikiData} from '#test-lib';
 import thingConstructors from '#things';
 
-const {
-  Flash,
-  FlashAct,
-  Thing,
-} = thingConstructors;
-
-function stubFlash(directory = 'foo') {
-  const flash = new Flash();
-  flash.directory = directory;
-
-  return flash;
-}
-
-function stubFlashAct(flashes, directory = 'bar') {
-  const flashAct = new FlashAct();
-  flashAct.directory = directory;
-  flashAct.flashes = flashes.map(flash => Thing.getReference(flash));
-
-  return flashAct;
-}
+import {
+  linkAndBindWikiData,
+  stubThing,
+  stubWikiData,
+} from '#test-lib';
 
 t.test(`Flash.color`, t => {
+  const {Flash, FlashAct} = thingConstructors;
+
   t.plan(4);
 
-  const flash = stubFlash();
-  const flashAct = stubFlashAct([flash]);
+  const wikiData = stubWikiData();
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    flashData: [flash],
-    flashActData: [flashAct],
-  });
+  const flash = stubThing(wikiData, Flash, {directory: 'my-flash'});
+  const flashAct = stubThing(wikiData, FlashAct, {flashes: ['flash:my-flash']});
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   t.equal(flash.color, null,
     `color #1: defaults to null`);

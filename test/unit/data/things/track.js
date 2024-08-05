@@ -1,84 +1,19 @@
 import t from 'tap';
 
-import {linkAndBindWikiData} from '#test-lib';
 import thingConstructors from '#things';
 
-const {
-  Album,
-  ArtTag,
-  Artist,
-  Flash,
-  FlashAct,
-  Thing,
-  Track,
-  TrackSection,
-} = thingConstructors;
-
-function stubAlbum(tracks, directory = 'bar') {
-  const album = new Album();
-  album.directory = directory;
-
-  const trackSection = stubTrackSection(album, tracks);
-  album.trackSections = [trackSection];
-
-  return album;
-}
-
-function stubTrackSection(album, tracks, directory = 'baz') {
-  const trackSection = new TrackSection();
-  trackSection.unqualifiedDirectory = directory;
-  trackSection.tracks = tracks;
-  trackSection.albumData = [album];
-  return trackSection;
-}
-
-function stubTrack(directory = 'foo') {
-  const track = new Track();
-  track.directory = directory;
-
-  return track;
-}
-
-function stubTrackAndAlbum(trackDirectory = 'foo', albumDirectory = 'bar') {
-  const track = stubTrack(trackDirectory);
-  const album = stubAlbum([track], albumDirectory);
-
-  return {track, album};
-}
-
-function stubArtist(artistName = `Test Artist`) {
-  const artist = new Artist();
-  artist.name = artistName;
-
-  return artist;
-}
-
-function stubArtistAndContribs(artistName = `Test Artist`) {
-  const artist = stubArtist(artistName);
-  const contribs = [{artist: artistName, annotation: null}];
-  const badContribs = [{artist: `Figment of Your Imagination`, annotation: null}];
-
-  return {artist, contribs, badContribs};
-}
-
-function stubArtTag(tagName = `Test Art Tag`) {
-  const tag = new ArtTag();
-  tag.name = tagName;
-
-  return tag;
-}
-
-function stubFlashAndAct(directory = 'zam') {
-  const flash = new Flash();
-  flash.directory = directory;
-
-  const flashAct = new FlashAct();
-  flashAct.flashes = [Thing.getReference(flash)];
-
-  return {flash, flashAct};
-}
+import {
+  linkAndBindWikiData,
+  stubArtistAndContribs,
+  stubFlashAndAct,
+  stubThing,
+  stubTrackAndAlbum,
+  stubWikiData,
+} from '#test-lib';
 
 t.test(`Track.album`, t => {
+  const {Album, Track, TrackSection} = thingConstructors;
+
   t.plan(6);
 
   // Note: These asserts use manual albumData/trackData relationships
@@ -86,14 +21,16 @@ t.test(`Track.album`, t => {
   // be relevant for this case. Other properties use the same underlying
   // get-album behavior as Track.album so aren't tested as aggressively.
 
-  const track1 = stubTrack('track1');
-  const track2 = stubTrack('track2');
-  const album1 = new Album();
-  const album2 = new Album();
-  const section1 = new TrackSection();
-  const section2 = new TrackSection();
-  section1.unqualifiedDirectory = 'section1';
-  section2.unqualifiedDirectory = 'section2';
+  let wikiData = stubWikiData();
+
+  const track1 = stubThing(wikiData, Track, {directory: 'track1'});
+  const track2 = stubThing(wikiData, Track, {directory: 'track2'});
+  const album1 = stubThing(wikiData, Album);
+  const album2 = stubThing(wikiData, Album);
+  const section1 = stubThing(wikiData, TrackSection, {unqualifiedDirectory: 'section1'});
+  const section2 = stubThing(wikiData, TrackSection, {unqualifiedDirectory: 'section2'});
+
+  wikiData = null;
 
   t.equal(track1.album, null,
     `album #1: defaults to null`);
@@ -146,11 +83,13 @@ t.test(`Track.album`, t => {
 t.test(`Track.alwaysReferenceByDirectory`, t => {
   t.plan(7);
 
-  const {track: originalTrack, album: originalAlbum} =
-    stubTrackAndAlbum('original-track', 'original-album');
+  const wikiData = stubWikiData();
+
+  const {track: originalTrack} =
+    stubTrackAndAlbum(wikiData, 'original-track', 'original-album');
 
   const {track: rereleaseTrack, album: rereleaseAlbum} =
-    stubTrackAndAlbum('rerelease-track', 'rerelease-album');
+    stubTrackAndAlbum(wikiData, 'rerelease-track', 'rerelease-album');
 
   originalTrack.name = 'Cowabunga';
   rereleaseTrack.name = 'Cowabunga';
@@ -160,10 +99,7 @@ t.test(`Track.alwaysReferenceByDirectory`, t => {
 
   rereleaseTrack.originalReleaseTrack = 'track:original-track';
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [originalAlbum, rereleaseAlbum],
-    trackData: [originalTrack, rereleaseTrack],
-  });
+  const {XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   t.equal(originalTrack.alwaysReferenceByDirectory, false,
     `alwaysReferenceByDirectory #1: defaults to false`);
@@ -199,19 +135,22 @@ t.test(`Track.alwaysReferenceByDirectory`, t => {
 });
 
 t.test(`Track.artTags`, t => {
+  const {ArtTag} = thingConstructors;
+
   t.plan(6);
 
-  const {track, album} = stubTrackAndAlbum();
-  const {artist, contribs} = stubArtistAndContribs();
-  const tag1 = stubArtTag(`Tag 1`);
-  const tag2 = stubArtTag(`Tag 2`);
+  const wikiData = stubWikiData();
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist],
-    artTagData: [tag1, tag2],
-    trackData: [track],
-  });
+  const {track, album} = stubTrackAndAlbum(wikiData);
+  const {contribs} = stubArtistAndContribs(wikiData);
+
+  const tag1 =
+    stubThing(wikiData, ArtTag, {name: `Tag 1`});
+
+  const tag2 =
+    stubThing(wikiData, ArtTag, {name: `Tag 2`});
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   t.same(track.artTags, [],
     `artTags #1: defaults to empty array`);
@@ -249,17 +188,28 @@ t.test(`Track.artTags`, t => {
 });
 
 t.test(`Track.artistContribs`, t => {
+  const {Album, Artist, Track, TrackSection} = thingConstructors;
+
   t.plan(4);
 
-  const {track, album} = stubTrackAndAlbum();
-  const artist1 = stubArtist(`Artist 1`);
-  const artist2 = stubArtist(`Artist 2`);
+  const wikiData = stubWikiData();
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist1, artist2],
-    trackData: [track],
-  });
+  const track =
+    stubThing(wikiData, Track);
+
+  const section =
+    stubThing(wikiData, TrackSection, {tracks: [track]});
+
+  const album =
+    stubThing(wikiData, Album, {trackSections: [section]});
+
+  const artist1 =
+    stubThing(wikiData, Artist, {name: `Artist 1`});
+
+  const artist2 =
+    stubThing(wikiData, Artist, {name: `Artist 2`});
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   t.same(track.artistContribs, [],
     `artistContribs #1: defaults to empty array`);
@@ -294,19 +244,16 @@ t.test(`Track.artistContribs`, t => {
 });
 
 t.test(`Track.color`, t => {
-  t.plan(5);
+  t.plan(4);
 
-  const {track, album} = stubTrackAndAlbum();
+  const wikiData = stubWikiData();
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album],
-    trackData: [track],
-  });
+  const {track, album, section} = stubTrackAndAlbum(wikiData);
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   t.equal(track.color, null,
     `color #1: defaults to null`);
-
-  const section = stubTrackSection(album, [track], 'section');
 
   album.color = '#abcdef';
   section.color = '#beeeef';
@@ -318,48 +265,29 @@ t.test(`Track.color`, t => {
   t.equal(track.color, '#beeeef',
     `color #2: inherits from track section before album`);
 
-  // Replace the album with a completely fake one. This isn't realistic, since
-  // in correct data, Album.tracks depends on Albums.trackSections and so the
-  // track's album will always have a corresponding track section. But if that
-  // connection breaks for some future reason (with the album still present),
-  // Track.color should still inherit directly from the album.
-  track.albumData = [
-    {
-      constructor: {[Thing.referenceType]: 'album'},
-      [Thing.isThing]: true,
-      color: '#abcdef',
-      tracks: [track],
-      trackSections: [
-        {color: '#baaaad', tracks: []},
-      ],
-    },
-  ];
-
-  t.equal(track.color, '#abcdef',
-    `color #3: inherits from album without matching track section`);
-
   track.color = '#123456';
 
   t.equal(track.color, '#123456',
-    `color #4: is own value`);
+    `color #3: is own value`);
 
   t.throws(() => { track.color = '#aeiouw'; },
     {cause: TypeError},
-    `color #5: must be set to valid color`);
+    `color #4: must be set to valid color`);
 });
 
 t.test(`Track.commentatorArtists`, t => {
+  const {Artist, Track} = thingConstructors;
+
   t.plan(8);
 
-  const track = new Track();
-  const artist1 = stubArtist(`SnooPING`);
-  const artist2 = stubArtist(`ASUsual`);
-  const artist3 = stubArtist(`Icy`);
+  const wikiData = stubWikiData();
 
-  linkAndBindWikiData({
-    trackData: [track],
-    artistData: [artist1, artist2, artist3],
-  });
+  const track = stubThing(wikiData, Track);
+  const artist1 = stubThing(wikiData, Artist, {name: `SnooPING`});
+  const artist2 = stubThing(wikiData, Artist, {name: `ASUsual`});
+  const artist3 = stubThing(wikiData, Artist, {name: `Icy`});
+
+  linkAndBindWikiData(wikiData);
 
   // Keep track of the last commentary string in a separate value, since
   // the track.commentary property exposes as a completely different format
@@ -425,17 +353,17 @@ t.test(`Track.commentatorArtists`, t => {
 });
 
 t.test(`Track.coverArtistContribs`, t => {
+  const {Artist} = thingConstructors;
+
   t.plan(5);
 
-  const {track, album} = stubTrackAndAlbum();
-  const artist1 = stubArtist(`Artist 1`);
-  const artist2 = stubArtist(`Artist 2`);
+  const wikiData = stubWikiData();
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist1, artist2],
-    trackData: [track],
-  });
+  const {track, album} = stubTrackAndAlbum(wikiData);
+  const artist1 = stubThing(wikiData, Artist, {name: `Artist 1`});
+  const artist2 = stubThing(wikiData, Artist, {name: `Artist 2`});
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   t.same(track.coverArtistContribs, [],
     `coverArtistContribs #1: defaults to empty array`);
@@ -477,14 +405,12 @@ t.test(`Track.coverArtistContribs`, t => {
 t.test(`Track.coverArtDate`, t => {
   t.plan(8);
 
-  const {track, album} = stubTrackAndAlbum();
-  const {artist, contribs, badContribs} = stubArtistAndContribs();
+  const wikiData = stubWikiData();
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist],
-    trackData: [track],
-  });
+  const {track, album} = stubTrackAndAlbum(wikiData);
+  const {contribs, badContribs} = stubArtistAndContribs(wikiData);
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   track.coverArtistContribs = contribs;
 
@@ -537,14 +463,12 @@ t.test(`Track.coverArtDate`, t => {
 t.test(`Track.coverArtFileExtension`, t => {
   t.plan(8);
 
-  const {track, album} = stubTrackAndAlbum();
-  const {artist, contribs} = stubArtistAndContribs();
+  const wikiData = stubWikiData();
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist],
-    trackData: [track],
-  });
+  const {track, album} = stubTrackAndAlbum(wikiData);
+  const {contribs} = stubArtistAndContribs(wikiData);
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   t.equal(track.coverArtFileExtension, null,
     `coverArtFileExtension #1: defaults to null`);
@@ -597,12 +521,11 @@ t.test(`Track.coverArtFileExtension`, t => {
 t.test(`Track.date`, t => {
   t.plan(3);
 
-  const {track, album} = stubTrackAndAlbum();
+  const wikiData = stubWikiData();
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album],
-    trackData: [track],
-  });
+  const {track, album} = stubTrackAndAlbum(wikiData);
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   t.equal(track.date, null,
     `date #1: defaults to null`);
@@ -622,17 +545,13 @@ t.test(`Track.date`, t => {
 t.test(`Track.featuredInFlashes`, t => {
   t.plan(2);
 
-  const {track, album} = stubTrackAndAlbum('track1');
+  const wikiData = stubWikiData();
 
-  const {flash: flash1, flashAct: flashAct1} = stubFlashAndAct('flash1');
-  const {flash: flash2, flashAct: flashAct2} = stubFlashAndAct('flash2');
+  const {track} = stubTrackAndAlbum(wikiData, 'track1');
+  const {flash: flash1} = stubFlashAndAct(wikiData, 'flash1');
+  const {flash: flash2} = stubFlashAndAct(wikiData, 'flash2');
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album],
-    trackData: [track],
-    flashData: [flash1, flash2],
-    flashActData: [flashAct1, flashAct2],
-  });
+  const {XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   t.same(track.featuredInFlashes, [],
     `featuredInFlashes #1: defaults to empty array`);
@@ -648,14 +567,12 @@ t.test(`Track.featuredInFlashes`, t => {
 t.test(`Track.hasUniqueCoverArt`, t => {
   t.plan(7);
 
-  const {track, album} = stubTrackAndAlbum();
-  const {artist, contribs, badContribs} = stubArtistAndContribs();
+  const wikiData = stubWikiData();
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist],
-    trackData: [track],
-  });
+  const {track, album} = stubTrackAndAlbum(wikiData);
+  const {contribs, badContribs} = stubArtistAndContribs(wikiData);
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   t.equal(track.hasUniqueCoverArt, false,
     `hasUniqueCoverArt #1: defaults to false`);
@@ -700,13 +617,12 @@ t.test(`Track.hasUniqueCoverArt`, t => {
 t.test(`Track.originalReleaseTrack`, t => {
   t.plan(3);
 
-  const {track: track1, album: album1} = stubTrackAndAlbum('track1');
-  const {track: track2, album: album2} = stubTrackAndAlbum('track2');
+  const wikiData = stubWikiData();
 
-  const {wikiData, linkWikiDataArrays, XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album1, album2],
-    trackData: [track1, track2],
-  });
+  const {track: track1} = stubTrackAndAlbum(wikiData, 'track1');
+  const {track: track2} = stubTrackAndAlbum(wikiData, 'track2');
+
+  linkAndBindWikiData(wikiData);
 
   t.equal(track2.originalReleaseTrack, null,
     `originalReleaseTrack #1: defaults to null`);
@@ -725,15 +641,14 @@ t.test(`Track.originalReleaseTrack`, t => {
 t.test(`Track.otherReleases`, t => {
   t.plan(6);
 
-  const {track: track1, album: album1} = stubTrackAndAlbum('track1');
-  const {track: track2, album: album2} = stubTrackAndAlbum('track2');
-  const {track: track3, album: album3} = stubTrackAndAlbum('track3');
-  const {track: track4, album: album4} = stubTrackAndAlbum('track4');
+  const wikiData = stubWikiData();
 
-  const {wikiData, linkWikiDataArrays, XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album1, album2, album3, album4],
-    trackData: [track1, track2, track3, track4],
-  });
+  const {track: track1} = stubTrackAndAlbum(wikiData, 'track1');
+  const {track: track2} = stubTrackAndAlbum(wikiData, 'track2');
+  const {track: track3} = stubTrackAndAlbum(wikiData, 'track3');
+  const {track: track4} = stubTrackAndAlbum(wikiData, 'track4');
+
+  const {linkWikiDataArrays, XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   t.same(track1.otherReleases, [],
     `otherReleases #1: defaults to empty array`);
@@ -768,15 +683,14 @@ t.test(`Track.otherReleases`, t => {
 t.test(`Track.referencedByTracks`, t => {
   t.plan(4);
 
-  const {track: track1, album: album1} = stubTrackAndAlbum('track1');
-  const {track: track2, album: album2} = stubTrackAndAlbum('track2');
-  const {track: track3, album: album3} = stubTrackAndAlbum('track3');
-  const {track: track4, album: album4} = stubTrackAndAlbum('track4');
+  const wikiData = stubWikiData();
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album1, album2, album3, album4],
-    trackData: [track1, track2, track3, track4],
-  });
+  const {track: track1} = stubTrackAndAlbum(wikiData, 'track1');
+  const {track: track2} = stubTrackAndAlbum(wikiData, 'track2');
+  const {track: track3} = stubTrackAndAlbum(wikiData, 'track3');
+  const {track: track4} = stubTrackAndAlbum(wikiData, 'track4');
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   t.same(track1.referencedByTracks, [],
     `referencedByTracks #1: defaults to empty array`);
@@ -804,15 +718,14 @@ t.test(`Track.referencedByTracks`, t => {
 t.test(`Track.sampledByTracks`, t => {
   t.plan(4);
 
-  const {track: track1, album: album1} = stubTrackAndAlbum('track1');
-  const {track: track2, album: album2} = stubTrackAndAlbum('track2');
-  const {track: track3, album: album3} = stubTrackAndAlbum('track3');
-  const {track: track4, album: album4} = stubTrackAndAlbum('track4');
+  const wikiData = stubWikiData();
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album1, album2, album3, album4],
-    trackData: [track1, track2, track3, track4],
-  });
+  const {track: track1} = stubTrackAndAlbum(wikiData, 'track1');
+  const {track: track2} = stubTrackAndAlbum(wikiData, 'track2');
+  const {track: track3} = stubTrackAndAlbum(wikiData, 'track3');
+  const {track: track4} = stubTrackAndAlbum(wikiData, 'track4');
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData(wikiData);
 
   t.same(track1.sampledByTracks, [],
     `sampledByTracks #1: defaults to empty array`);

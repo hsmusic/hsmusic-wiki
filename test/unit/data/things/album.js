@@ -1,61 +1,27 @@
 import t from 'tap';
 
-import {linkAndBindWikiData} from '#test-lib';
 import thingConstructors from '#things';
 
-const {
-  Album,
-  ArtTag,
-  Artist,
-  Track,
-  TrackSection,
-} = thingConstructors;
-
-function stubArtTag(tagName = `Test Art Tag`) {
-  const tag = new ArtTag();
-  tag.name = tagName;
-
-  return tag;
-}
-
-function stubArtistAndContribs() {
-  const artist = new Artist();
-  artist.name = `Test Artist`;
-
-  const contribs = [{artist: `Test Artist`, annotation: null}];
-  const badContribs = [{artist: `Figment of Your Imagination`, annotation: null}];
-
-  return {artist, contribs, badContribs};
-}
-
-function stubTrack(directory = 'foo') {
-  const track = new Track();
-  track.directory = directory;
-
-  return track;
-}
-
-function stubTrackSection(album, tracks, directory = 'baz') {
-  const trackSection = new TrackSection();
-  trackSection.unqualifiedDirectory = directory;
-  trackSection.tracks = tracks;
-  trackSection.albumData = [album];
-  return trackSection;
-}
+import {
+  linkAndBindWikiData,
+  stubArtistAndContribs,
+  stubThing,
+  stubWikiData,
+} from '#test-lib';
 
 t.test(`Album.artTags`, t => {
+  const {Album, ArtTag} = thingConstructors;
+
   t.plan(3);
 
-  const {artist, contribs} = stubArtistAndContribs();
-  const album = new Album();
-  const tag1 = stubArtTag(`Tag 1`);
-  const tag2 = stubArtTag(`Tag 2`);
+  const wikiData = stubWikiData();
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist],
-    artTagData: [tag1, tag2],
-  });
+  const {contribs} = stubArtistAndContribs(wikiData);
+  const album = stubThing(wikiData, Album);
+  const tag1 = stubThing(wikiData, ArtTag, {name: `Tag 1`});
+  const tag2 = stubThing(wikiData, ArtTag, {name: `Tag 2`});
+
+  linkAndBindWikiData(wikiData);
 
   t.same(album.artTags, [],
     `artTags #1: defaults to empty array`);
@@ -72,15 +38,16 @@ t.test(`Album.artTags`, t => {
 });
 
 t.test(`Album.bannerDimensions`, t => {
+  const {Album} = thingConstructors;
+
   t.plan(4);
 
-  const album = new Album();
-  const {artist, contribs, badContribs} = stubArtistAndContribs();
+  const wikiData = stubWikiData();
 
-  linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist],
-  });
+  const album = stubThing(wikiData, Album);
+  const {contribs, badContribs} = stubArtistAndContribs(wikiData);
+
+  linkAndBindWikiData(wikiData);
 
   t.equal(album.bannerDimensions, null,
     `Album.bannerDimensions #1: defaults to null`);
@@ -102,15 +69,16 @@ t.test(`Album.bannerDimensions`, t => {
 });
 
 t.test(`Album.bannerFileExtension`, t => {
+  const {Album} = thingConstructors;
+
   t.plan(5);
 
-  const album = new Album();
-  const {artist, contribs, badContribs} = stubArtistAndContribs();
+  const wikiData = stubWikiData();
 
-  linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist],
-  });
+  const album = stubThing(wikiData, Album);
+  const {contribs, badContribs} = stubArtistAndContribs(wikiData);
+
+  linkAndBindWikiData(wikiData);
 
   t.equal(album.bannerFileExtension, null,
     `Album.bannerFileExtension #1: defaults to null`);
@@ -137,15 +105,16 @@ t.test(`Album.bannerFileExtension`, t => {
 });
 
 t.test(`Album.bannerStyle`, t => {
+  const {Album} = thingConstructors;
+
   t.plan(4);
 
-  const album = new Album();
-  const {artist, contribs, badContribs} = stubArtistAndContribs();
+  const wikiData = stubWikiData();
 
-  linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist],
-  });
+  const album = stubThing(wikiData, Album);
+  const {contribs, badContribs} = stubArtistAndContribs(wikiData);
+
+  linkAndBindWikiData(wikiData);
 
   t.equal(album.bannerStyle, null,
     `Album.bannerStyle #1: defaults to null`);
@@ -167,15 +136,16 @@ t.test(`Album.bannerStyle`, t => {
 });
 
 t.test(`Album.coverArtDate`, t => {
+  const {Album} = thingConstructors;
+
   t.plan(6);
 
-  const album = new Album();
-  const {artist, contribs, badContribs} = stubArtistAndContribs();
+  const wikiData = stubWikiData();
 
-  linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist],
-  });
+  const album = stubThing(wikiData, Album);
+  const {contribs, badContribs} = stubArtistAndContribs(wikiData);
+
+  linkAndBindWikiData(wikiData);
 
   t.equal(album.coverArtDate, null,
     `Album.coverArtDate #1: defaults to null`);
@@ -207,15 +177,16 @@ t.test(`Album.coverArtDate`, t => {
 });
 
 t.test(`Album.coverArtFileExtension`, t => {
+  const {Album} = thingConstructors;
+
   t.plan(5);
 
-  const album = new Album();
-  const {artist, contribs, badContribs} = stubArtistAndContribs();
+  const wikiData = stubWikiData();
 
-  linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist],
-  });
+  const album = stubThing(wikiData, Album);
+  const {contribs, badContribs} = stubArtistAndContribs(wikiData);
+
+  linkAndBindWikiData(wikiData);
 
   t.equal(album.coverArtFileExtension, null,
     `Album.coverArtFileExtension #1: is null if coverArtistContribs empty (1/2)`);
@@ -243,23 +214,29 @@ t.test(`Album.coverArtFileExtension`, t => {
 });
 
 t.test(`Album.tracks`, t => {
+  const {Album, Track, TrackSection} = thingConstructors;
+
   t.plan(4);
 
-  const album = new Album();
+  let wikiData = stubWikiData();
+
+  const album = stubThing(wikiData, Album);
   album.directory = 'foo';
 
-  const track1 = stubTrack('track1');
-  const track2 = stubTrack('track2');
-  const track3 = stubTrack('track3');
+  const track1 = stubThing(wikiData, Track, {directory: 'track1'});
+  const track2 = stubThing(wikiData, Track, {directory: 'track2'});
+  const track3 = stubThing(wikiData, Track, {directory: 'track3'});
   const tracks = [track1, track2, track3];
 
-  const section1 = stubTrackSection(album, [], 'section1');
-  const section2 = stubTrackSection(album, [], 'section2');
-  const section3 = stubTrackSection(album, [], 'section3');
-  const section4 = stubTrackSection(album, [], 'section4');
-  const section5 = stubTrackSection(album, [], 'section5');
-  const section6 = stubTrackSection(album, [], 'section6');
+  const section1 = stubThing(wikiData, TrackSection, {unqualifiedDirectory: 'section1'});
+  const section2 = stubThing(wikiData, TrackSection, {unqualifiedDirectory: 'section2'});
+  const section3 = stubThing(wikiData, TrackSection, {unqualifiedDirectory: 'section3'});
+  const section4 = stubThing(wikiData, TrackSection, {unqualifiedDirectory: 'section4'});
+  const section5 = stubThing(wikiData, TrackSection, {unqualifiedDirectory: 'section5'});
+  const section6 = stubThing(wikiData, TrackSection, {unqualifiedDirectory: 'section6'});
   const sections = [section1, section2, section3, section4, section5, section6];
+
+  wikiData = null;
 
   for (const track of tracks) {
     track.albumData = [album];
@@ -301,25 +278,35 @@ t.test(`Album.tracks`, t => {
 });
 
 t.test(`Album.trackSections`, t => {
+  const {Album, Track, TrackSection} = thingConstructors;
+
   t.plan(7);
 
-  const album = new Album();
+  let wikiData = stubWikiData();
 
-  const track1 = stubTrack('track1');
-  const track2 = stubTrack('track2');
-  const track3 = stubTrack('track3');
-  const track4 = stubTrack('track4');
+  const album = stubThing(wikiData, Album);
+
+  const track1 = stubThing(wikiData, Track, {directory: 'track1'});
+  const track2 = stubThing(wikiData, Track, {directory: 'track2'});
+  const track3 = stubThing(wikiData, Track, {directory: 'track3'});
+  const track4 = stubThing(wikiData, Track, {directory: 'track4'});
   const tracks = [track1, track2, track3, track4];
 
-  const section1 = stubTrackSection(album, [], 'section1');
-  const section2 = stubTrackSection(album, [], 'section2');
-  const section3 = stubTrackSection(album, [], 'section3');
-  const section4 = stubTrackSection(album, [], 'section4');
-  const section5 = stubTrackSection(album, [], 'section5');
+  const section1 = stubThing(wikiData, TrackSection, {unqualifiedDirectory: 'section1'});
+  const section2 = stubThing(wikiData, TrackSection, {unqualifiedDirectory: 'section2'});
+  const section3 = stubThing(wikiData, TrackSection, {unqualifiedDirectory: 'section3'});
+  const section4 = stubThing(wikiData, TrackSection, {unqualifiedDirectory: 'section4'});
+  const section5 = stubThing(wikiData, TrackSection, {unqualifiedDirectory: 'section5'});
   const sections = [section1, section2, section3, section4, section5];
+
+  wikiData = null;
 
   for (const track of tracks) {
     track.albumData = [album];
+  }
+
+  for (const section of sections) {
+    section.albumData = [album];
   }
 
   section1.tracks = [track1, track2];
@@ -415,15 +402,16 @@ t.test(`Album.trackSections`, t => {
 });
 
 t.test(`Album.wallpaperFileExtension`, t => {
+  const {Album} = thingConstructors;
+
   t.plan(5);
 
-  const album = new Album();
-  const {artist, contribs, badContribs} = stubArtistAndContribs();
+  const wikiData = stubWikiData();
 
-  linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist],
-  });
+  const album = stubThing(wikiData, Album);
+  const {contribs, badContribs} = stubArtistAndContribs(wikiData);
+
+  linkAndBindWikiData(wikiData);
 
   t.equal(album.wallpaperFileExtension, null,
     `Album.wallpaperFileExtension #1: defaults to null`);
@@ -450,15 +438,16 @@ t.test(`Album.wallpaperFileExtension`, t => {
 });
 
 t.test(`Album.wallpaperStyle`, t => {
+  const {Album} = thingConstructors;
+
   t.plan(4);
 
-  const album = new Album();
-  const {artist, contribs, badContribs} = stubArtistAndContribs();
+  const wikiData = stubWikiData();
 
-  linkAndBindWikiData({
-    albumData: [album],
-    artistData: [artist],
-  });
+  const album = stubThing(wikiData, Album);
+  const {contribs, badContribs} = stubArtistAndContribs(wikiData);
+
+  linkAndBindWikiData(wikiData);
 
   t.equal(album.wallpaperStyle, null,
     `Album.wallpaperStyle #1: defaults to null`);
