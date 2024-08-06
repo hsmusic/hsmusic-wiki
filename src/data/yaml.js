@@ -1116,7 +1116,25 @@ export function saveThingsFromDataSteps(thingLists, dataSteps) {
     })
     .filter(Boolean)
     .forEach(saveResult => {
-      Object.assign(wikiData, saveResult);
+      for (const [saveKey, saveValue] of Object.entries(saveResult)) {
+        if (Object.hasOwn(wikiData, saveKey)) {
+          if (Array.isArray(wikiData[saveKey])) {
+            if (Array.isArray(saveValue)) {
+              wikiData[saveKey].push(...saveValue);
+            } else {
+              throw new Error(`${saveKey} already present, expected array of items to push`);
+            }
+          } else {
+            if (Array.isArray(saveValue)) {
+              throw new Error(`${saveKey} already present and not an array, refusing to overwrite`);
+            } else {
+              throw new Error(`${saveKey} already present, refusing to overwrite`);
+            }
+          }
+        } else {
+          wikiData[saveKey] = saveValue;
+        }
+      }
     });
 
   return {aggregate, result: wikiData};
