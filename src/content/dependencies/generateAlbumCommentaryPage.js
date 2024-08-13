@@ -161,6 +161,7 @@ export default {
               language.encapsulate(entryCapsule, 'title.albumCommentary', titleCapsule =>
                 relations.albumCommentaryHeading.slots({
                   tag: 'h3',
+                  attributes: {id: 'album-commentary'},
                   color: data.color,
 
                   title:

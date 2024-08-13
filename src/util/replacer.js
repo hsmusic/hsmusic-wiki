@@ -13,7 +13,7 @@ import {escapeRegex, typeAppearance} from '#sugar';
 export const replacerSpec = {
   'album': {
     find: 'album',
-    link: 'linkAlbum',
+    link: 'linkAlbumDynamically',
   },
 
   'album-commentary': {

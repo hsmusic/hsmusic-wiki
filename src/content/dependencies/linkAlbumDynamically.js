@@ -7,8 +7,24 @@ export default {
     infoLink: relation('linkAlbum', album),
   }),
 
-  generate: (relations, {pagePath}) =>
-    (pagePath[0] === 'albumGallery'
+  data: (album) => ({
+    albumDirectory:
+      album.directory,
+
+    albumHasCommentary:
+      !!album.commentary,
+  }),
+
+  generate: (data, relations, {pagePath}) =>
+    (pagePath[0] === 'albumCommentary' &&
+     pagePath[1] === data.albumDirectory &&
+     data.albumHasCommentary
+      ? relations.infoLink.slots({
+          anchor: true,
+          hash: 'album-commentary',
+        })
+
+   : pagePath[0] === 'albumGallery'
       ? relations.galleryLink
       : relations.infoLink),
 };
