@@ -1,8 +1,10 @@
-import {empty} from '#sugar';
+import {atOffset} from '#sugar';
 
 export default {
   contentDependencies: [
-    'generatePreviousNextLinks',
+    'generateInterpageDotSwitcher',
+    'generateNextLink',
+    'generatePreviousLink',
     'linkTrack',
     'linkAlbumCommentary',
     'linkAlbumGallery',
@@ -10,47 +12,70 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  relations(relation, album, track) {
-    const relations = {};
+  query(album, track) {
+    const query = {};
 
-    relations.previousNextLinks =
-      relation('generatePreviousNextLinks');
+    const index =
+      (track
+        ? album.tracks.indexOf(track)
+        : null);
 
-    relations.previousTrackLink = null;
-    relations.nextTrackLink = null;
+    query.previousTrack =
+      (track
+        ? atOffset(album.tracks, index, -1)
+        : null);
 
-    if (track) {
-      const index = album.tracks.indexOf(track);
+    query.nextTrack =
+      (track
+        ? atOffset(album.tracks, index, +1)
+        : null);
 
-      if (index > 0) {
-        relations.previousTrackLink =
-          relation('linkTrack', album.tracks[index - 1]);
-      }
+    query.albumHasAnyCommentary =
+      !!(album.commentary ||
+         album.tracks.some(t => t.commentary));
 
-      if (index < album.tracks.length - 1) {
-        relations.nextTrackLink =
-          relation('linkTrack', album.tracks[index + 1]);
-      }
-    }
-
-    relations.albumGalleryLink =
-      relation('linkAlbumGallery', album);
-
-    if (album.commentary || album.tracks.some(t => t.commentary)) {
-      relations.albumCommentaryLink =
-        relation('linkAlbumCommentary', album);
-    }
-
-    return relations;
+    return query;
   },
 
-  data(album, track) {
-    return {
-      hasMultipleTracks: album.tracks.length > 1,
-      galleryIsStub: album.tracks.every(t => !t.hasUniqueCoverArt),
-      isTrackPage: !!track,
-    };
-  },
+  relations: (relation, query, album, _track) => ({
+    switcher:
+      relation('generateInterpageDotSwitcher'),
+
+    previousLink:
+      relation('generatePreviousLink'),
+
+    nextLink:
+      relation('generateNextLink'),
+
+    previousTrackLink:
+      (query.previousTrack
+        ? relation('linkTrack', query.previousTrack)
+        : null),
+
+    nextTrackLink:
+      (query.nextTrack
+        ? relation('linkTrack', query.nextTrack)
+        : null),
+
+    albumGalleryLink:
+      relation('linkAlbumGallery', album),
+
+    albumCommentaryLink:
+      (query.albumHasAnyCommentary
+        ? relation('linkAlbumCommentary', album)
+        : null),
+  }),
+
+  data: (query, album, track) => ({
+    hasMultipleTracks:
+      album.tracks.length > 1,
+
+    galleryIsStub:
+      album.tracks.every(t => !t.hasUniqueCoverArt),
+
+    isTrackPage:
+      !!track,
+  }),
 
   slots: {
     showTrackNavigation: {type: 'boolean', default: false},
@@ -65,32 +90,28 @@ export default {
     const albumNavCapsule = language.encapsulate('albumPage.nav');
     const trackNavCapsule = language.encapsulate('trackPage.nav');
 
-    const {content: extraLinks = []} =
-      slots.showExtraLinks &&
-        {content: [
-          (!data.galleryIsStub || slots.currentExtra === 'gallery') &&
-            relations.albumGalleryLink?.slots({
-              attributes: {class: slots.currentExtra === 'gallery' && 'current'},
-              content: language.$(albumNavCapsule, 'gallery'),
-            }),
-
-          relations.albumCommentaryLink?.slots({
-            attributes: {class: slots.currentExtra === 'commentary' && 'current'},
-            content: language.$(albumNavCapsule, 'commentary'),
-          }),
-        ]};
-
-    const {content: previousNextLinks = []} =
-      slots.showTrackNavigation &&
+    const previousLink =
       data.isTrackPage &&
-      data.hasMultipleTracks &&
-        relations.previousNextLinks.slots({
-          previousLink: relations.previousTrackLink,
-          nextLink: relations.nextTrackLink,
+        relations.previousLink.slot('link', relations.previousTrackLink);
+
+    const nextLink =
+      data.isTrackPage &&
+        relations.nextLink.slot('link', relations.nextTrackLink);
+
+    const galleryLink =
+      (!data.galleryIsStub || slots.currentExtra === 'gallery') &&
+        relations.albumGalleryLink.slots({
+          attributes: {class: slots.currentExtra === 'gallery' && 'current'},
+          content: language.$(albumNavCapsule, 'gallery'),
         });
 
+    const commentaryLink =
+      relations.albumCommentaryLink?.slots({
+        attributes: {class: slots.currentExtra === 'commentary' && 'current'},
+        content: language.$(albumNavCapsule, 'commentary'),
+      });
+
     const randomLink =
-      slots.showTrackNavigation &&
       data.hasMultipleTracks &&
         html.tag('a',
           {id: 'random-button'},
@@ -100,16 +121,23 @@ export default {
             ? language.$(trackNavCapsule, 'random')
             : language.$(albumNavCapsule, 'randomTrack')));
 
-    const allLinks = [
-      ...previousNextLinks,
-      ...extraLinks,
-      randomLink,
-    ].filter(Boolean);
+    return relations.switcher.slots({
+      links: [
+        slots.showTrackNavigation &&
+          previousLink,
 
-    if (empty(allLinks)) {
-      return html.blank();
-    }
+        slots.showTrackNavigation &&
+          nextLink,
 
-    return `(${language.formatUnitList(allLinks)})`;
+        slots.showExtraLinks &&
+          galleryLink,
+
+        slots.showExtraLinks &&
+          commentaryLink,
+
+        slots.showTrackNavigation &&
+          randomLink,
+      ],
+    });
   },
 };
