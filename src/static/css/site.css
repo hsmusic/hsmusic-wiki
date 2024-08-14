@@ -821,6 +821,11 @@ a:not([href]):hover {
   text-align: center;
 }
 
+.page-nav-links span:not(:last-child)::after {
+  content: " \00b7 ";
+  font-weight: 800;
+}
+
 .nowrap {
   white-space: nowrap;
 }
