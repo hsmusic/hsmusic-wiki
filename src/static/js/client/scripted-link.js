@@ -190,11 +190,16 @@ export function mutatePageContent() {
 }
 
 function mutateNavigationLinkContent() {
-  const prependTitle = (el, prepend) =>
-    el?.setAttribute('title',
+  const prependTitle = (el, prepend) => {
+    if (!el) return;
+    if (!el.hasAttribute('href')) return;
+
+    el?.setAttribute(
+      'title',
       (el.hasAttribute('title')
         ? prepend + ' ' + el.getAttribute('title')
         : prepend));
+  };
 
   prependTitle(info.nextNavLink, '(Shift+N)');
   prependTitle(info.previousNavLink, '(Shift+P)');
