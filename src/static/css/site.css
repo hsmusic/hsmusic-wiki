@@ -870,6 +870,10 @@ a:not([href]):hover {
   text-align: center;
 }
 
+.inert-previous-next-link {
+  opacity: 0.7;
+}
+
 .nowrap {
   white-space: nowrap;
 }
