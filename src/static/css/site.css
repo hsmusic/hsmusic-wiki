@@ -845,7 +845,8 @@ a:not([href]):hover {
 
 .text-with-tooltip.datetimestamp .text-with-tooltip-interaction-cue,
 .text-with-tooltip.missing-duration .text-with-tooltip-interaction-cue,
-.text-with-tooltip.commentary-date .text-with-tooltip-interaction-cue {
+.text-with-tooltip.commentary-date .text-with-tooltip-interaction-cue,
+.text-with-tooltip.wiki-edits .text-with-tooltip-interaction-cue {
   cursor: default;
 }
 
@@ -907,15 +908,21 @@ li:not(:first-child:last-child) .tooltip,
   left: -10px;
 }
 
-.thing-name-tooltip {
+.thing-name-tooltip,
+.wiki-edits-tooltip {
   padding: 3px 4px 2px 2px;
   left: -6px !important;
-
-  /* Terrifying?
-   * https://stackoverflow.com/a/64424759/4633828
-   */
-  margin-right: -120px;
 }
+
+.wiki-edits-tooltip {
+  font-size: 0.85em;
+}
+
+/* Terrifying?
+ * https://stackoverflow.com/a/64424759/4633828
+ */
+.thing-name-tooltip { margin-right: -120px; }
+.wiki-edits-tooltip { margin-right: -200px; }
 
 .contribution-tooltip .tooltip-content {
   padding: 6px 2px 2px 2px;
@@ -1056,7 +1063,8 @@ li:not(:first-child:last-child) .tooltip,
   font-size: 0.9em;
 }
 
-.thing-name-tooltip .tooltip-content {
+.thing-name-tooltip .tooltip-content,
+.wiki-edits-tooltip .tooltip-content {
   padding: 3px 4.5px;
 }
 

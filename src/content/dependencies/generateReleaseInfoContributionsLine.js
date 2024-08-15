@@ -1,20 +1,37 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: ['linkContribution'],
+  contentDependencies: [
+    'generateReleaseInfoContributionsLineWikiEditsPart',
+    'linkContribution',
+  ],
+
   extraDependencies: ['html', 'language'],
 
-  relations(relation, contributions) {
-    if (empty(contributions)) {
-      return {};
-    }
+  query: (contributions) => ({
+    normalContributions:
+      contributions
+        .filter(contrib => contrib.annotation !== 'edits for wiki'),
 
-    return {
-      contributionLinks:
-        contributions
-          .map(contrib => relation('linkContribution', contrib)),
-    };
-  },
+    wikiEditContributions:
+      contributions
+        .filter(contrib => contrib.annotation === 'edits for wiki'),
+  }),
+
+  relations: (relation, query, _contributions) => ({
+    contributionLinks:
+      query.normalContributions
+        .map(contrib => relation('linkContribution', contrib)),
+
+    wikiEditsPart:
+      relation('generateReleaseInfoContributionsLineWikiEditsPart',
+        query.wikiEditContributions),
+  }),
+
+  data: (query, _contributions) => ({
+    hasWikiEdits:
+      !empty(query.wikiEditContributions),
+  }),
 
   slots: {
     showContribution: {type: 'boolean', default: true},
@@ -25,21 +42,32 @@ export default {
     chronologyKind: {type: 'string'},
   },
 
-  generate(relations, slots, {html, language}) {
-    if (!relations.contributionLinks) {
-      return html.blank();
-    }
+  generate(data, relations, slots, {language}) {
+    const contributionsList =
+      language.formatConjunctionList(
+        relations.contributionLinks.map(link =>
+          link.slots({
+            showContribution: slots.showContribution,
+            showExternalLinks: slots.showExternalLinks,
+            showChronology: slots.showChronology,
+            chronologyKind: slots.chronologyKind,
+          })));
 
     return language.$(slots.stringKey, {
+      [language.onlyIfOptions]: ['artists'],
+
       artists:
-        language.formatConjunctionList(
-          relations.contributionLinks.map(link =>
-            link.slots({
-              showContribution: slots.showContribution,
-              showExternalLinks: slots.showExternalLinks,
-              showChronology: slots.showChronology,
-              chronologyKind: slots.chronologyKind,
-            }))),
+        (data.hasWikiEdits
+          ? language.encapsulate('misc.artistLink.withEditsForWiki', capsule =>
+              language.$(capsule, {
+                // It's nonsense to display "+ edits" without
+                // having any regular contributions, also.
+                [language.onlyIfOptions]: ['artists'],
+
+                artists: contributionsList,
+                edits: relations.wikiEditsPart,
+              }))
+          : contributionsList),
     });
   },
 };

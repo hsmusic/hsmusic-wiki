@@ -490,6 +490,14 @@ misc:
     # Contribution to a track, artwork, or other thing.
     withContribution: "{ARTIST} ({CONTRIB})"
 
+    # Contributions that are annotated "edits for wiki" are
+    # displayed differently from normal contributions, in a
+    # tooltip next to the rest of the credits on that line.
+    withEditsForWiki:
+      _: "{ARTISTS} ({EDITS})"
+      edits: "+ edits"
+      editsLine: "Edits for wiki by {ARTIST}"
+
     # Displayed in an artist's tooltip, if one of their URLs
     # isn't a specially detected web platform.
     noExternalLinkPlatformName: "Other"
