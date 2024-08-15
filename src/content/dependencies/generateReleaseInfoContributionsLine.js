@@ -11,11 +11,11 @@ export default {
   query: (contributions) => ({
     normalContributions:
       contributions
-        .filter(contrib => contrib.annotation !== 'edits for wiki'),
+        .filter(contrib => !contrib.annotation?.startsWith(`edits for wiki`)),
 
     wikiEditContributions:
       contributions
-        .filter(contrib => contrib.annotation === 'edits for wiki'),
+        .filter(contrib => contrib.annotation?.startsWith(`edits for wiki`)),
   }),
 
   relations: (relation, query, _contributions) => ({

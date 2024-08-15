@@ -496,7 +496,7 @@ misc:
     withEditsForWiki:
       _: "{ARTISTS} ({EDITS})"
       edits: "+ edits"
-      editsLine: "Edits for wiki by {ARTIST}"
+      editsLine: "Edits for wiki by {ARTISTS}"
 
     # Displayed in an artist's tooltip, if one of their URLs
     # isn't a specially detected web platform.

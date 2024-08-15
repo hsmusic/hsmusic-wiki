@@ -5,7 +5,7 @@ export default {
     'linkContribution',
   ],
 
-  extraDependencies: ['html', 'language'],
+  extraDependencies: ['language'],
 
   relations: (relation, contributions) => ({
     textWithTooltip:
@@ -19,7 +19,7 @@ export default {
         .map(contrib => relation('linkContribution', contrib)),
   }),
 
-  generate: (relations, {html, language}) =>
+  generate: (relations, {language}) =>
     language.encapsulate('misc.artistLink.withEditsForWiki', capsule =>
       relations.textWithTooltip.slots({
         attributes:
@@ -34,18 +34,18 @@ export default {
               {class: 'wiki-edits-tooltip'},
 
             content:
-              html.tags(
-                relations.contributionLinks.map(link =>
-                  language.$(capsule, 'editsLine', {
-                    artist:
+              language.$(capsule, 'editsLine', {
+                [language.onlyIfOptions]: ['artists'],
+
+                artists:
+                  language.formatConjunctionList(
+                    relations.contributionLinks.map(link =>
                       link.slots({
                         showAnnotation: true,
                         trimAnnotation: true,
                         preventTooltip: true,
-                      }),
-                  })),
-
-                {[html.joinChildren]: html.tag('br')}),
+                      }))),
+                }),
           }),
       })),
 };
