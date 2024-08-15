@@ -3,7 +3,7 @@ import {atOffset} from '#sugar';
 export default {
   contentDependencies: [
     'generateColorStyleAttribute',
-    'generatePreviousNextLinks',
+    'generateSecondaryNavParentSiblingsPart',
     'linkAlbumDynamically',
     'linkGroup',
   ],
@@ -29,14 +29,14 @@ export default {
   },
 
   relations: (relation, query, series, _album) => ({
+    parentSiblingsPart:
+      relation('generateSecondaryNavParentSiblingsPart'),
+
     groupLink:
       relation('linkGroup', series.group),
 
     colorStyle:
       relation('generateColorStyleAttribute', series.group.color),
-
-    previousNextLinks:
-      relation('generatePreviousNextLinks'),
 
     previousAlbumLink:
       (query.previousAlbum
@@ -60,40 +60,24 @@ export default {
     },
   },
 
-  generate: (data, relations, slots, {html, language}) =>
-    html.tag('span',
-      {class: 'nav-link'},
-      {class: 'series-nav-link'},
+  generate: (data, relations, slots, {language}) =>
+    relations.parentSiblingsPart.slots({
+      mode: slots.mode,
 
-      relations.colorStyle
-        .slot('context', 'primary-only'),
+      attributes: {class: 'series-nav-link'},
 
-      language.encapsulate('albumSecondaryNav.series', workingCapsule => {
-        const workingOptions = {};
+      colorStyle: relations.colorStyle,
 
-        workingOptions.series =
-          relations.groupLink.slots({
-            attributes: {class: 'series'},
-            color: false,
-            content: language.sanitize(data.name),
-          });
+      mainLink:
+        relations.groupLink.slots({
+          attributes: {class: 'series'},
+          content: language.sanitize(data.name),
+        }),
 
-        if (slots.mode === 'album') {
-          const {previousNextLinks} = relations;
+      previousLink: relations.previousAlbumLink,
+      nextLink: relations.nextAlbumLink,
 
-          previousNextLinks.setSlots({
-            previousLink: relations.previousAlbumLink,
-            nextLink: relations.nextAlbumLink,
-            id: false,
-          });
-
-          if (!html.isBlank(previousNextLinks)) {
-            workingCapsule += '.withPreviousNext';
-            workingOptions.previousNext =
-              language.formatUnitList(previousNextLinks.content);
-          }
-        }
-
-        return language.$(workingCapsule, workingOptions);
-      })),
+      stringsKey: 'albumSecondaryNav.series',
+      mainLinkOption: 'series',
+    }),
 };

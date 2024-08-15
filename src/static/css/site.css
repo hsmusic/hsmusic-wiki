@@ -842,7 +842,7 @@ a:not([href]):hover {
   content: "\0020/\0020";
 }
 
-.nav-links-groups .series-nav-link:not(:first-child)::before {
+.series-nav-link:not(:first-child)::before {
   content: "\0020»\0020";
   font-weight: normal;
 }
@@ -868,6 +868,33 @@ a:not([href]):hover {
 
 #secondary-nav {
   text-align: center;
+
+  /* Default to visible. It'll automatically be hidden
+   * in layouts where the sidebar is visible.
+   */
+  display: block;
+}
+
+#secondary-nav.album-secondary-nav.with-previous-next {
+  display: flex;
+  justify-content: space-around;
+  padding-left: 15% !important;
+  padding-right: 15% !important;
+  flex-wrap: wrap;
+  line-height: 1.4;
+}
+
+#secondary-nav.album-secondary-nav.with-previous-next .group-with-series {
+  width: 100%;
+}
+
+#secondary-nav.album-secondary-nav.with-previous-next > * {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+#secondary-nav.album-secondary-nav .dot-switcher {
+  white-space: nowrap;
 }
 
 .inert-previous-next-link {
@@ -2920,10 +2947,6 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
   .sidebar-box-joiner.collapsible,
   .sidebar-column.all-boxes-collapsible {
     display: none;
-  }
-
-  #secondary-nav {
-    display: block;
   }
 
   .layout-columns {

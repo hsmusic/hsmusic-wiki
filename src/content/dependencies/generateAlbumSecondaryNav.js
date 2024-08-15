@@ -4,6 +4,7 @@ export default {
   contentDependencies: [
     'generateAlbumSecondaryNavGroupPart',
     'generateAlbumSecondaryNavSeriesPart',
+    'generateDotSwitcherTemplate',
     'generateSecondaryNav',
   ],
 
@@ -28,6 +29,12 @@ export default {
     secondaryNav:
       relation('generateSecondaryNav'),
 
+    // Just use a generic dot switcher here. We want the common behavior,
+    // but the "options" may each contain multiple links (group + series),
+    // so this is a different use than typical interpage dot switchers.
+    switcher:
+      relation('generateDotSwitcherTemplate'),
+
     groupParts:
       query.groups
         .map(group =>
@@ -51,18 +58,37 @@ export default {
     },
   },
 
-  generate: (relations, slots) =>
-    relations.secondaryNav.slots({
-      class: 'nav-links-groups',
-      content:
-        stitchArrays({
-          groupPart: relations.groupParts,
-          seriesParts: relations.seriesParts,
-        }).map(({groupPart, seriesParts}) => [
-            groupPart.slot('mode', slots.mode),
+  generate(relations, slots, {html}) {
+    const allParts =
+      stitchArrays({
+        groupPart: relations.groupParts,
+        seriesParts: relations.seriesParts,
+      }).map(({groupPart, seriesParts}) => {
+          for (const part of [groupPart, ...seriesParts]) {
+            part.setSlot('mode', slots.mode);
+          }
 
-            seriesParts
-              .map(part => part.slot('mode', slots.mode)),
-          ]),
-    }),
+          if (html.isBlank(seriesParts)) {
+            return groupPart;
+          } else {
+            return (
+              html.tag('span', {class: 'group-with-series'},
+                [groupPart, ...seriesParts]));
+          }
+        });
+
+    return relations.secondaryNav.slots({
+      class: [
+        'album-secondary-nav',
+
+        slots.mode === 'album' &&
+          'with-previous-next',
+      ],
+
+      content:
+        (slots.mode === 'album'
+          ? allParts
+          : relations.switcher.slot('options', allParts)),
+    });
+  },
 };

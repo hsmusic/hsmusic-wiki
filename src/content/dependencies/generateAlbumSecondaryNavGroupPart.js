@@ -4,12 +4,12 @@ import {atOffset} from '#sugar';
 export default {
   contentDependencies: [
     'generateColorStyleAttribute',
-    'generatePreviousNextLinks',
+    'generateSecondaryNavParentSiblingsPart',
     'linkAlbumDynamically',
     'linkGroup',
   ],
 
-  extraDependencies: ['html', 'language'],
+  extraDependencies: ['html'],
 
   query(group, album) {
     const query = {};
@@ -38,14 +38,14 @@ export default {
   },
 
   relations: (relation, query, group, _album) => ({
+    parentSiblingsPart:
+      relation('generateSecondaryNavParentSiblingsPart'),
+
     groupLink:
       relation('linkGroup', group),
 
     colorStyle:
       relation('generateColorStyleAttribute', group.color),
-
-    previousNextLinks:
-      relation('generatePreviousNextLinks'),
 
     previousAlbumLink:
       (query.previousAlbum
@@ -65,34 +65,16 @@ export default {
     },
   },
 
-  generate: (relations, slots, {html, language}) =>
-    html.tag('span', {class: 'nav-link'},
-      relations.colorStyle
-        .slot('context', 'primary-only'),
+  generate: (relations, slots) =>
+    relations.parentSiblingsPart.slots({
+      mode: slots.mode,
 
-      language.encapsulate('albumSecondaryNav.group', workingCapsule => {
-        const workingOptions = {};
+      colorStyle: relations.colorStyle,
+      mainLink: relations.groupLink,
+      previousLink: relations.previousAlbumLink,
+      nextLink: relations.nextAlbumLink,
 
-        workingOptions.group =
-          relations.groupLink
-            .slot('color', false);
-
-        if (slots.mode === 'album') {
-          const {previousNextLinks} = relations;
-
-          previousNextLinks.setSlots({
-            previousLink: relations.previousAlbumLink,
-            nextLink: relations.nextAlbumLink,
-            id: false,
-          });
-
-          if (!html.isBlank(previousNextLinks)) {
-            workingCapsule += '.withPreviousNext';
-            workingOptions.previousNext =
-              language.formatUnitList(previousNextLinks.content);
-          }
-        }
-
-        return language.$(workingCapsule, workingOptions);
-      })),
+      stringsKey: 'albumSecondaryNav.group',
+      mainLinkOption: 'group',
+    }),
 };
