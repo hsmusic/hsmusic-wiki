@@ -19,6 +19,7 @@ export default {
         artist.albumCoverArtistContributions,
         artist.trackCoverArtistContributions,
       ]).flat()
+        .filter(({annotation}) => !annotation?.startsWith(`edits for wiki`))
         .map(({thing}) => thing);
 
     sortAlbumsTracksChronologically(things, {
