@@ -146,9 +146,9 @@ export class Contribution extends Thing {
         }) => continuation({
           ['#likeContributionsFilter']:
             contributionAnnotations.map(mappingAnnotation =>
-              (annotation === 'edits for wiki'
-                ? mappingAnnotation === annotation
-                : mappingAnnotation !== 'edits for wiki')),
+              (annotation?.startsWith(`edits for wiki`)
+                ? mappingAnnotation?.startsWith(`edits for wiki`)
+                : !mappingAnnotation?.startsWith(`edits for wiki`))),
         }),
       },
 
