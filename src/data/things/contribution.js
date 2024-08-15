@@ -8,9 +8,15 @@ import Thing from '#thing';
 import {isStringNonEmpty, isThing, validateReference} from '#validators';
 
 import {exitWithoutDependency, exposeDependency} from '#composite/control-flow';
-import {withNearbyItemFromList, withPropertyFromObject} from '#composite/data';
 import {withResolvedReference} from '#composite/wiki-data';
 import {flag, simpleDate} from '#composite/wiki-properties';
+
+import {
+  withFilteredList,
+  withNearbyItemFromList,
+  withPropertyFromList,
+  withPropertyFromObject,
+} from '#composite/data';
 
 import {
   inheritFromContributionPresets,
@@ -123,10 +129,38 @@ export class Contribution extends Thing {
       withPropertyFromObject({
         object: 'thing',
         property: 'thingProperty',
+      }).outputs({
+        '#value': '#contributions',
+      }),
+
+      withPropertyFromList({
+        list: '#contributions',
+        property: input.value('annotation'),
+      }),
+
+      {
+        dependencies: ['#contributions.annotation', 'annotation'],
+        compute: (continuation, {
+          ['#contributions.annotation']: contributionAnnotations,
+          ['annotation']: annotation,
+        }) => continuation({
+          ['#likeContributionsFilter']:
+            contributionAnnotations.map(mappingAnnotation =>
+              (annotation === 'edits for wiki'
+                ? mappingAnnotation === annotation
+                : mappingAnnotation !== 'edits for wiki')),
+        }),
+      },
+
+      withFilteredList({
+        list: '#contributions',
+        filter: '#likeContributionsFilter',
+      }).outputs({
+        '#filteredList': '#contributions',
       }),
 
       exposeDependency({
-        dependency: '#value',
+        dependency: '#contributions',
       }),
     ],
 
