@@ -1713,6 +1713,10 @@ export class Template {
       if (providedValue instanceof Tag || providedValue instanceof Template) {
         return providedValue.toString();
       }
+
+      if (isBlank(providedValue)) {
+        return null;
+      }
     }
 
     if (providedValue !== null) {
