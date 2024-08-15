@@ -29,6 +29,7 @@ export default {
     showChronology: {type: 'boolean', default: false},
 
     preventWrapping: {type: 'boolean', default: true},
+    preventTooltip: {type: 'boolean', default: false},
     chronologyKind: {type: 'string'},
   },
 
@@ -52,7 +53,7 @@ export default {
         });
 
         workingOptions.artist =
-          (html.isBlank(relations.tooltip)
+          (html.isBlank(relations.tooltip) || slots.preventTooltip
             ? relations.artistLink
             : relations.textWithTooltip.slots({
                 customInteractionCue: true,
