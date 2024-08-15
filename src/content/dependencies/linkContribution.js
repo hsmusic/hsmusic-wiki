@@ -28,8 +28,11 @@ export default {
     showExternalLinks: {type: 'boolean', default: false},
     showChronology: {type: 'boolean', default: false},
 
+    trimAnnotation: {type: 'boolean', default: false},
+
     preventWrapping: {type: 'boolean', default: true},
     preventTooltip: {type: 'boolean', default: false},
+
     chronologyKind: {type: 'string'},
   },
 
@@ -67,10 +70,14 @@ export default {
                   relations.tooltip,
               }));
 
-        if (slots.showAnnotation && data.annotation) {
+        const annotation =
+          (slots.trimAnnotation
+            ? data.annotation?.replace(/^edits for wiki(: )?/, '')
+            : data.annotation);
+
+        if (slots.showAnnotation && annotation) {
           workingCapsule += '.withContribution';
-          workingOptions.contrib =
-            data.annotation;
+          workingOptions.contrib = annotation;
         }
 
         return language.formatString(workingCapsule, workingOptions);
