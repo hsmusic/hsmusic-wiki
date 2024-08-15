@@ -155,7 +155,7 @@ export default {
         content: navLinkContents,
         colorStyle: relations.colorStyles,
       }).map(({content, colorStyle}) =>
-          html.tag('span', {class: 'nav-link'},
+          html.tag('span',
             colorStyle.slot('context', 'primary-only'),
 
             content));
@@ -165,7 +165,7 @@ export default {
         'album-secondary-nav',
 
         slots.mode === 'track' &&
-          'nav-links-groups',
+          'page-nav-links',
 
         slots.mode === 'album' &&
           'with-previous-next',
