@@ -9,16 +9,18 @@ export default {
       mutable: false,
     },
 
-    annotation: {
-      type: 'html',
-      mutable: false,
-    },
+    annotation: {type: 'string'},
 
     otherArtistLinks: {
       validate: v => v.strictArrayOf(v.isHTML),
     },
 
     rerelease: {type: 'boolean'},
+
+    trimAnnotation: {
+      type: 'boolean',
+      default: false,
+    },
   },
 
   generate: (slots, {html, language}) =>
@@ -43,10 +45,15 @@ export default {
               language.formatConjunctionList(slots.otherArtistLinks);
           }
 
-          if (!html.isBlank(slots.annotation)) {
+          const annotation =
+            (slots.trimAnnotation
+              ? slots.annotation?.replace(/^edits for wiki(: )?/, '')
+              : slots.annotation);
+
+          if (annotation) {
             anyAccent = true;
             workingCapsule += '.withAnnotation';
-            workingOptions.annotation = slots.annotation;
+            workingOptions.annotation = annotation;
           }
 
           if (anyAccent) {
