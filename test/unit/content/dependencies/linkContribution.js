@@ -26,7 +26,7 @@ t.test('generateContributionLinks (unit)', async t => {
 
   await testContentFunctions(t, 'generateContributionLinks (unit 1)', async (t, evaluate) => {
     const slots = {
-      showContribution: true,
+      showAnnotation: true,
       showExternalLinks: true,
     };
 
@@ -81,7 +81,7 @@ t.test('generateContributionLinks (unit)', async t => {
 
   await testContentFunctions(t, 'generateContributionLinks (unit 2)', async (t, evaluate) => {
     const slots = {
-      showContribution: false,
+      showAnnotation: false,
       showExternalLinks: false,
     };
 

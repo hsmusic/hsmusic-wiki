@@ -19,12 +19,12 @@ export default {
   }),
 
   data: (contribution) => ({
-    contribution: contribution.annotation,
+    annotation: contribution.annotation,
     urls: contribution.artist.urls,
   }),
 
   slots: {
-    showContribution: {type: 'boolean', default: false},
+    showAnnotation: {type: 'boolean', default: false},
     showExternalLinks: {type: 'boolean', default: false},
     showChronology: {type: 'boolean', default: false},
 
@@ -67,10 +67,10 @@ export default {
                   relations.tooltip,
               }));
 
-        if (slots.showContribution && data.contribution) {
+        if (slots.showAnnotation && data.annotation) {
           workingCapsule += '.withContribution';
           workingOptions.contrib =
-            data.contribution;
+            data.annotation;
         }
 
         return language.formatString(workingCapsule, workingOptions);

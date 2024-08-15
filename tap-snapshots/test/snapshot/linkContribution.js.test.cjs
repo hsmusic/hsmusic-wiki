@@ -73,7 +73,7 @@ exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) >
                 <span class="external-platform">Other</span></span></span></span> (Arrangement)</span>
 `
 
-exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) > only showContribution 1`] = `
+exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) > only showAnnotation 1`] = `
 <span class="contribution nowrap"><a href="artist/clark-powell/">Clark Powell</a></span>
 <span class="contribution nowrap"><a href="artist/the-big-baddies/">Grounder &amp; Scratch</a> (Snooping)</span>
 <span class="contribution nowrap"><a href="artist/toby-fox/">Toby Fox</a> (Arrangement)</span>
@@ -98,7 +98,7 @@ exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) >
                 <span class="external-platform">Other</span></span></span></span></span>
 `
 
-exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) > showContribution & showExternalLinks 1`] = `
+exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) > showAnnotation & showExternalLinks 1`] = `
 <span class="contribution nowrap"><span class="text-with-tooltip"><span class="hoverable"><a class="text-with-tooltip-interaction-cue" href="artist/clark-powell/">Clark Powell</a></span><span class="tooltip contribution-tooltip"><span class="tooltip-content"><a class="external-link" href="https://soundcloud.com/plazmataz">
                     <span class="external-icon"><svg><use href="static/misc/icons.svg#icon-soundcloud"></use></svg></span>
                     <span class="external-handle">plazmataz</span>

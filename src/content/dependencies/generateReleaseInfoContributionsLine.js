@@ -34,7 +34,7 @@ export default {
   }),
 
   slots: {
-    showContribution: {type: 'boolean', default: true},
+    showAnnotation: {type: 'boolean', default: true},
     showExternalLinks: {type: 'boolean', default: true},
     showChronology: {type: 'boolean', default: true},
 
@@ -47,7 +47,7 @@ export default {
       language.formatConjunctionList(
         relations.contributionLinks.map(link =>
           link.slots({
-            showContribution: slots.showContribution,
+            showAnnotation: slots.showAnnotation,
             showExternalLinks: slots.showExternalLinks,
             showChronology: slots.showChronology,
             chronologyKind: slots.chronologyKind,

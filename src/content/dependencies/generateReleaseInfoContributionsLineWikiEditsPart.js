@@ -39,9 +39,8 @@ export default {
                   language.$(capsule, 'editsLine', {
                     artist:
                       link.slots({
-                        showContribution: false,
-                        showExternalLinks: false,
-                        showChronology: false,
+                        showAnnotation: true,
+                        trimAnnotation: true,
                         preventTooltip: true,
                       }),
                   })),

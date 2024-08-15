@@ -33,13 +33,13 @@ testContentFunctions(t, 'linkContribution (snapshot)', async (t, evaluate) => {
       slots,
     });
 
-  quickSnapshot('showContribution & showExternalLinks', {
-    showContribution: true,
+  quickSnapshot('showAnnotation & showExternalLinks', {
+    showAnnotation: true,
     showExternalLinks: true,
   });
 
-  quickSnapshot('only showContribution', {
-    showContribution: true,
+  quickSnapshot('only showAnnotation', {
+    showAnnotation: true,
   });
 
   quickSnapshot('only showExternalLinks', {
@@ -66,7 +66,7 @@ testContentFunctions(t, 'linkContribution (snapshot)', async (t, evaluate) => {
   });
 
   quickSnapshot('no preventWrapping', {
-    showContribution: true,
+    showAnnotation: true,
     showExternalLinks: true,
     preventWrapping: false,
   });
