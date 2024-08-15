@@ -1153,6 +1153,9 @@ artistPage:
     orBrowseList: "View {LINK}! Or browse the list:"
     link: "art gallery"
 
+  wikiEditArtworks: >-
+    {ARTIST} has edited these artworks for this wiki:
+
 #
 # artistGalleryPage:
 #   The artist gallery page shows a neat grid of all of the album and

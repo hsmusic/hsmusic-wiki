@@ -8,7 +8,7 @@ export default {
     'generateArtistInfoPageArtworksChunk',
   ],
 
-  query(artist) {
+  query(artist, filterEditsForWiki) {
     const query = {};
 
     const allContributions = [
@@ -18,12 +18,19 @@ export default {
       ...artist.trackCoverArtistContributions,
     ];
 
+    const filteredContributions =
+      allContributions
+        .filter(({annotation}) =>
+          (filterEditsForWiki
+            ? annotation?.startsWith(`edits for wiki`)
+            : !annotation?.startsWith(`edits for wiki`)));
+
     sortContributionsChronologically(
-      allContributions,
+      filteredContributions,
       sortAlbumsTracksChronologically);
 
     query.contribs =
-      chunkByConditions(allContributions, [
+      chunkByConditions(filteredContributions, [
         ({date: date1}, {date: date2}) =>
           +date1 !== +date2,
         ({thing: thing1}, {thing: thing2}) =>
@@ -39,7 +46,7 @@ export default {
     return query;
   },
 
-  relations: (relation, query, _artist) => ({
+  relations: (relation, query, _artist, _filterEditsForWiki) => ({
     chunkedList:
       relation('generateArtistInfoPageChunkedList'),
 
@@ -51,8 +58,22 @@ export default {
           relation('generateArtistInfoPageArtworksChunk', album, contribs)),
   }),
 
-  generate: (relations) =>
+  data: (_query, _artist, filterEditsForWiki) => ({
+    filterEditsForWiki,
+  }),
+
+  generate: (data, relations) =>
     relations.chunkedList.slots({
-      chunks: relations.chunks,
+      chunks:
+        relations.chunks.map(chunk => {
+          if (data.filterEditsForWiki) {
+            chunk.setSlots({
+              trimAnnotations: true,
+              dates: [],
+            });
+          }
+
+          return chunk;
+        }),
     }),
 };

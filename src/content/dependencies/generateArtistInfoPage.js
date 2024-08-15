@@ -40,6 +40,7 @@ export default {
         artist.albumBannerArtistContributions,
         artist.trackCoverArtistContributions,
       ]).flat()
+        .filter(({annotation}) => !annotation?.startsWith('edits for wiki'))
         .map(({thing}) => thing),
 
     // Banners and wallpapers don't show up in the artist gallery page, only
@@ -78,7 +79,10 @@ export default {
       relation('generateArtistGroupContributionsInfo', query.allTracks),
 
     artworksChunkedList:
-      relation('generateArtistInfoPageArtworksChunkedList', artist),
+      relation('generateArtistInfoPageArtworksChunkedList', artist, false),
+
+    editsForWikiArtworksChunkedList:
+      relation('generateArtistInfoPageArtworksChunkedList', artist, true),
 
     artworksGroupInfo:
       relation('generateArtistGroupContributionsInfo', query.allArtworks),
@@ -181,10 +185,11 @@ export default {
                       {href: '#tracks'},
                       language.$(pageCapsule, 'trackList.title')),
 
-                  !html.isBlank(relations.artworksChunkedList) &&
-                    html.tag('a',
-                      {href: '#art'},
-                      language.$(pageCapsule, 'artList.title')),
+                  (!html.isBlank(relations.artworksChunkedList) ||
+                   !html.isBlank(relations.editsForWikiArtworksChunkedList)) &&
+                      html.tag('a',
+                        {href: '#art'},
+                        language.$(pageCapsule, 'artList.title')),
 
                   !html.isBlank(relations.flashesChunkedList) &&
                     html.tag('a',
@@ -276,6 +281,17 @@ export default {
                         countUnit: 'artworks',
                       })),
               }),
+
+            html.tags([
+              html.tag('p',
+                {[html.onlyIfSiblings]: true},
+
+                language.$(pageCapsule, 'wikiEditArtworks', {
+                  artist: data.name,
+                })),
+
+              relations.editsForWikiArtworksChunkedList,
+            ]),
           ]),
 
           html.tags([
