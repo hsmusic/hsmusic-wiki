@@ -4,7 +4,8 @@ import {atOffset, stitchArrays} from '#sugar';
 export default {
   contentDependencies: [
     'generateColorStyleAttribute',
-    'generatePreviousNextLinks',
+    'generateNextLink',
+    'generatePreviousLink',
     'generateSecondaryNav',
     'linkAlbumDynamically',
     'linkGroup',
@@ -67,14 +68,13 @@ export default {
         .map(group => relation('generateColorStyleAttribute', group.color));
 
     if (album.date) {
-      relations.previousNextLinks =
-        stitchArrays({
-          previousAlbum: query.groupPreviousAlbum,
-          nextAlbum: query.groupNextAlbum
-        }).map(({previousAlbum, nextAlbum}) =>
-            (previousAlbum || nextAlbum
-              ? relation('generatePreviousNextLinks')
-              : null));
+      relations.previousLinks =
+        query.groupPreviousAlbum
+          .map(() => relation('generatePreviousLink'));
+
+      relations.nextLinks =
+        query.groupNextAlbum
+          .map(() => relation('generateNextLink'));
 
       relations.previousAlbumLinks =
         query.groupPreviousAlbum.map(previousAlbum =>
@@ -100,35 +100,38 @@ export default {
   },
 
   generate(relations, slots, {html, language}) {
-    const navLinksShouldShowPreviousNext =
-      (slots.mode === 'track'
-        ? Array.from(relations.previousNextLinks ?? [], () => false)
-        : stitchArrays({
-            previousAlbumLink: relations.previousAlbumLinks ?? null,
-            nextAlbumLink: relations.nextAlbumLinks ?? null,
-          }).map(({previousAlbumLink, nextAlbumLink}) =>
-              previousAlbumLink ||
-              nextAlbumLink));
-
     const navLinkPreviousNextLinks =
       stitchArrays({
-        showPreviousNext: navLinksShouldShowPreviousNext,
-        previousNextLinks: relations.previousNextLinks ?? null,
+        previousLink: relations.previousLinks ?? null,
+        nextLink: relations.nextLinks ?? null,
         previousAlbumLink: relations.previousAlbumLinks ?? null,
         nextAlbumLink: relations.nextAlbumLinks ?? null,
       }).map(({
-          showPreviousNext,
-          previousNextLinks,
-          previousAlbumLink,
-          nextAlbumLink,
-        }) =>
-          (showPreviousNext
-            ? previousNextLinks.slots({
-                previousLink: previousAlbumLink,
-                nextLink: nextAlbumLink,
-                id: false,
-              })
-            : null));
+          previousLink, nextLink,
+          previousAlbumLink, nextAlbumLink,
+        }) => ({
+          previousLink:
+            previousLink.slot('link', previousAlbumLink),
+
+          nextLink:
+            nextLink.slot('link', nextAlbumLink),
+        }))
+        .map(({previousLink, nextLink}) =>
+          html.tag('span', {class: 'page-nav-links'},
+            {[html.onlyIfContent]: true},
+
+            language.$('albumPage.secondaryNav.groupNavAccent', {
+              [language.onlyIfOptions]: ['links'],
+
+              links:
+                html.tags(
+                  ([previousLink, nextLink])
+                    .map(link =>
+                      html.tag('span',
+                        {[html.onlyIfContent]: true},
+                        link.slot('id', false))),
+                  {[html.joinChildren]: ' '}),
+            })));
 
     for (const groupLink of relations.groupLinks) {
       groupLink.setSlot('color', false);
@@ -143,8 +146,8 @@ export default {
             group: groupLink,
           }),
 
-          previousNextLinks &&
-            `(${language.formatUnitList(previousNextLinks.content)})`,
+          slots.mode === 'album' &&
+            previousNextLinks,
         ]);
 
     const navLinks =
@@ -158,7 +161,16 @@ export default {
             content));
 
     return relations.secondaryNav.slots({
-      class: 'nav-links-groups',
+      class: [
+        'album-secondary-nav',
+
+        slots.mode === 'track' &&
+          'nav-links-groups',
+
+        slots.mode === 'album' &&
+          'with-previous-next',
+      ],
+
       content: navLinks,
     });
   },

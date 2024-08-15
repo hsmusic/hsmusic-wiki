@@ -819,6 +819,18 @@ a:not([href]):hover {
 
 #secondary-nav {
   text-align: center;
+
+  /* Default to visible. It'll automatically be hidden
+   * in layouts where the sidebar is visible.
+   */
+  display: block;
+}
+
+#secondary-nav.album-secondary-nav.with-previous-next {
+  display: flex;
+  justify-content: space-around;
+  padding-left: 15% !important;
+  padding-right: 15% !important;
 }
 
 .page-nav-links span:not(:last-child)::after {
@@ -2846,10 +2858,6 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
   .sidebar.collapsible,
   .sidebar-column.all-boxes-collapsible {
     display: none;
-  }
-
-  #secondary-nav {
-    display: block;
   }
 
   .layout-columns {

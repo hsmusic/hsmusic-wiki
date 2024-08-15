@@ -933,6 +933,9 @@ albumPage:
     gallery: "Gallery"
     commentary: "Commentary"
 
+  secondaryNav:
+    groupNavAccent: "({LINKS})"
+
   socialEmbed:
     heading: "{GROUP}"
     title: "{ALBUM}"
