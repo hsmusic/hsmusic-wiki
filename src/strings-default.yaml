@@ -265,8 +265,13 @@ releaseInfo:
 
   duration: "Duration: {DURATION}."
 
-  contributors: "Contributors:"
+  contributors: "General contributors:"
+  writingContributors: "Writing contributors:"
+  performingContributors: "Performing contributors:"
+  engineeringContributors: "Engineering contributors:"
+
   lyrics: "Lyrics:"
+
   note: "Context notes:"
 
   alsoReleasedAs:
@@ -543,11 +548,14 @@ misc:
         album: "album"
         bannerArt: "banner art"
         coverArt: "cover art"
+        engineeringContribution: "engineering contribution"
         flash: "flash"
+        performingContribution: "performing contribution"
         track: "track"
         trackArt: "track art"
-        trackContribution: "track contribution"
+        trackContribution: "general contribution"
         wallpaperArt: "wallpaper art"
+        writingContribution: "writing contribution"
 
   # chronology:
   #
@@ -803,9 +811,13 @@ misc:
 
     # Displayed on track and flash info pages.
 
-    contributors: "Contributors"
+    contributors: "General contributors"
 
     # Displayed on track info page.
+
+    writingContributors: "Writing contributors"
+    performingContributors: "Performing contributors"
+    engineeringContributors: "Engineering contributors"
 
     references: "References..."
     referencedBy: "Referenced by..."

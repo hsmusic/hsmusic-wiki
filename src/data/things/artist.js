@@ -95,6 +95,21 @@ export class Artist extends Thing {
       list: input.value('coverArtistContribs'),
     }),
 
+    trackWritingContributions: reverseContributionList({
+      data: 'trackData',
+      list: input.value('writingContributions'),
+    }),
+
+    trackPerformingContributions: reverseContributionList({
+      data: 'trackData',
+      list: input.value('performingContributions'),
+    }),
+
+    trackEngineeringContributions: reverseContributionList({
+      data: 'trackData',
+      list: input.value('engineeringContributions'),
+    }),
+
     tracksAsCommentator: reverseReferenceList({
       data: 'trackData',
       list: input.value('commentatorArtists'),

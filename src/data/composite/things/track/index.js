@@ -1,3 +1,4 @@
+export {default as exitIfRerelease} from './exitIfRerelease.js';
 export {default as exitWithoutUniqueCoverArt} from './exitWithoutUniqueCoverArt.js';
 export {default as inferredAdditionalNameList} from './inferredAdditionalNameList.js';
 export {default as inheritContributionListFromOriginalRelease} from './inheritContributionListFromOriginalRelease.js';

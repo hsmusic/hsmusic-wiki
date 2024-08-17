@@ -57,6 +57,7 @@ import {
 } from '#composite/wiki-properties';
 
 import {
+  exitIfRerelease,
   exitWithoutUniqueCoverArt,
   inferredAdditionalNameList,
   inheritContributionListFromOriginalRelease,
@@ -234,13 +235,46 @@ export class Track extends Thing {
     ],
 
     contributorContribs: [
-      inheritContributionListFromOriginalRelease(),
-
       withDate(),
 
       contributionList({
         date: '#date',
         artistProperty: input.value('trackContributorContributions'),
+      }),
+    ],
+
+    writingContributions: [
+      exitIfRerelease({
+        value: input.value([]),
+      }),
+
+      withDate(),
+
+      contributionList({
+        date: '#date',
+        artistProperty: input.value('trackWritingContributions'),
+      }),
+    ],
+
+    performingContributions: [
+      exitIfRerelease({
+        value: input.value([]),
+      }),
+
+      withDate(),
+
+      contributionList({
+        date: '#date',
+        artistProperty: input.value('performingContributions'),
+      }),
+    ],
+
+    engineeringContributions: [
+      withDate(),
+
+      contributionList({
+        date: '#date',
+        artistProperty: input.value('engineeringContributions'),
       }),
     ],
 
@@ -499,6 +533,21 @@ export class Track extends Thing {
         transform: parseContributors,
       },
 
+      'Writing Contributors': {
+        property: 'writingContributions',
+        transform: parseContributors,
+      },
+
+      'Performing Contributors': {
+        property: 'performingContributions',
+        transform: parseContributors,
+      },
+
+      'Engineering Contributors': {
+        property: 'engineeringContributions',
+        transform: parseContributors,
+      },
+
       'Cover Artists': {
         property: 'coverArtistContribs',
         transform: parseContributors,
@@ -525,9 +574,14 @@ export class Track extends Thing {
         'Artists',
       ]},
 
-      {message: `Rereleases inherit contributors from the original`, fields: [
+      {message: `Rereleases don't have writing contributors`, fields: [
         'Originally Released As',
-        'Contributors',
+        'Writing Contributors',
+      ]},
+
+      {message: `Rereleases don't have performing contributors`, fields: [
+        'Originally Released As',
+        'Performing Contributors',
       ]},
 
       {message: `Rereleases inherit lyrics from the original`, fields: [
