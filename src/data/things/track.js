@@ -574,9 +574,14 @@ export class Track extends Thing {
         'Artists',
       ]},
 
-      {message: `Rereleases inherit contributors from the original`, fields: [
+      {message: `Rereleases don't have writing contributors`, fields: [
         'Originally Released As',
-        'Contributors',
+        'Writing Contributors',
+      ]},
+
+      {message: `Rereleases don't have performing contributors`, fields: [
+        'Originally Released As',
+        'Performing Contributors',
       ]},
 
       {message: `Rereleases inherit lyrics from the original`, fields: [
