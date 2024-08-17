@@ -5,11 +5,34 @@
 //
 // This type adapts validation for single- and multiline content.
 
+import {input, templateCompositeFrom} from '#composite';
 import {isContentString} from '#validators';
 
-export default function() {
-  return {
-    flags: {update: true, expose: true},
-    update: {validate: isContentString},
-  };
-}
+import {exitWithoutDependency, exposeDependency}
+  from '#composite/control-flow';
+import {withParsedContentStringNodes} from '#composite/wiki-data';
+
+export default templateCompositeFrom({
+  annotation: `contentString`,
+
+  compose: false,
+
+  update: {
+    validate: isContentString,
+  },
+
+  steps: () => [
+    exitWithoutDependency({
+      dependency: input.updateValue(),
+      mode: input.value('falsy'),
+    }),
+
+    withParsedContentStringNodes({
+      from: input.updateValue(),
+    }),
+
+    exposeDependency({
+      dependency: '#parsedContentStringNodes',
+    }),
+  ],
+});

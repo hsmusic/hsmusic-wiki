@@ -14,17 +14,31 @@
 //   ]
 //
 
+import {input, templateCompositeFrom} from '#composite';
 import {isAdditionalFileList} from '#validators';
 
-// TODO: Not templateCompositeFrom.
+import {exitWithoutDependency, exposeDependency}
+  from '#composite/control-flow';
+import {withParsedAdditionalFiles} from '#composite/wiki-data';
 
-export default function() {
-  return {
-    flags: {update: true, expose: true},
-    update: {validate: isAdditionalFileList},
-    expose: {
-      transform: (additionalFiles) =>
-        additionalFiles ?? [],
-    },
-  };
-}
+export default templateCompositeFrom({
+  annotation: `additionalFiles`,
+
+  compose: false,
+
+  steps: () => [
+    exitWithoutDependency({
+      dependency: input.updateValue({validate: isAdditionalFileList}),
+      mode: input.value('empty'),
+      value: input.value([]),
+    }),
+
+    withParsedAdditionalFiles({
+      from: input.updateValue(),
+    }),
+
+    exposeDependency({
+      dependency: '#parsedAdditionalFiles',
+    }),
+  ],
+});

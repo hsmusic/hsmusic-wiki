@@ -1,6 +1,7 @@
 import t from 'tap';
 
 import {compositeFrom, input} from '#composite';
+import {parseInput} from '#replacer';
 import thingConstructors from '#things';
 
 import {exposeDependency} from '#composite/control-flow';
@@ -36,19 +37,46 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
 
   const artistData = [artist1, artist2, artist3];
 
+  const clean = result => {
+    if (result[Symbol.iterator]) {
+      for (const entry of result) {
+        if (entry && typeof entry === 'object') {
+          for (const property of [
+            'artistDisplayText',
+            'annotation',
+            'body',
+          ]) {
+            if (entry[property] && typeof entry[property] === 'object') {
+              entry[property] =
+                entry[property][parseInput.input] ??
+                `<missing parseInput.input>`;
+            }
+          }
+        }
+      }
+    }
+
+    return result;
+  };
+
+  const quickSame = (dependencies, result) =>
+    t.same(
+      clean(composite.expose.compute(dependencies)),
+      result);
+
   t.match(composite, {
     expose: {
       dependencies: ['from', 'artistData'],
     },
   });
 
-  t.same(composite.expose.compute({
+  quickSame({
     artistData,
     from:
       `<i>Mobius Trip:</i>\n` +
       `Some commentary.\n` +
       `Very cool.\n`,
-  }), [
+  }, [
     {
       artists: [artist1],
       artistDisplayText: null,
@@ -62,7 +90,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
     },
   ]);
 
-  t.same(composite.expose.compute({
+  quickSame({
     artistData,
     from:
       `<i>Mobius Trip|Moo-bius Trip:</i> (music, art, 12 January 2015)\n` +
@@ -74,7 +102,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
       `Oh no.. Oh dear...\n` +
       `<i>Mobius Trip, Hadron Kaleido:</i>\n` +
       `And back around we go.`,
-  }), [
+  }, [
     {
       artists: [artist1],
       artistDisplayText: `Moo-bius Trip`,
@@ -121,7 +149,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
     },
   ]);
 
-  t.same(composite.expose.compute({
+  quickSame({
     artistData,
     from:
       `<i>Homestuck:</i> ([Bandcamp credits blurb](https://web.archive.org/web/20201024170202/https://homestuck.bandcamp.com/track/sburban-countdown-3) on "Homestuck Vol. 1-4 (with Midnight Crew: Drawing Dead)", 10/25/2019)\n` +
@@ -137,7 +165,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
       `\n` +
       `<i>Homestuck:</i> ([fake](https://web.archive.org/web/20201024170202/https://homestuck.bandcamp.com/fake), 7/20/2019 accessed 4/13/2024)\n` +
       `Not this one, neither!\n`
-  }), [
+  }, [
     {
       artists: [artist3],
       artistDisplayText: null,
@@ -186,7 +214,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
     },
   ]);
 
-  t.same(composite.expose.compute({
+  quickSame({
     artistData,
     from:
       `<i>Homestuck:</i> ([MSPA sound credits](https://web.archive.org/web/20120805031705/http://www.mspaintadventures.com:80/soundcredits.html), sometime 6/21/2012 - 8/5/2012)\n` +
@@ -204,7 +232,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
       `\n` +
       `<i>Homestuck:</i> ([fake](https://web.archive.org/web/20201024170202/https://homestuck.bandcamp.com/fake), 7/20/2019 - 7/20/2022 accessed 4/13/2024)\n` +
       `It's goin' thrice!\n`
-  }), [
+  }, [
     {
       artists: [artist3],
       artistDisplayText: null,
@@ -234,7 +262,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
     {
       artists: [artist3],
       artistDisplayText: null,
-      annotation: '', // TODO: This should be null, but the regex isn't structured for that, at the moment.
+      annotation: null,
       body: `It's goin' twice.`,
       date: new Date('10/25/2011'),
       secondDate: new Date('10/28/2011'),
@@ -256,7 +284,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
     },
   ]);
 
-  t.same(composite.expose.compute({
+  quickSame({
     artistData,
     from:
       `<i>Homestuck:</i> ([MSPA sound credits](https://web.archive.org/web/20120805031705/http://www.mspaintadventures.com:80/soundcredits.html), sometime 6/21/2012 - 8/5/2012)\n` +
@@ -274,7 +302,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
       `\n` +
       `<i>Homestuck:</i> ([fake](https://web.archive.org/web/20201024170202/https://homestuck.bandcamp.com/fake), 7/20/2019 - 7/20/2022 accessed 4/13/2024)\n` +
       `It's goin' thrice!\n`
-  }), [
+  }, [
     {
       artists: [artist3],
       artistDisplayText: null,
@@ -304,7 +332,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
     {
       artists: [artist3],
       artistDisplayText: null,
-      annotation: '', // TODO: This should be null, but the regex isn't structured for that, at the moment.
+      annotation: null,
       body: `It's goin' twice.`,
       date: new Date('10/25/2011'),
       secondDate: new Date('10/28/2011'),
@@ -326,7 +354,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
     },
   ]);
 
-  t.same(composite.expose.compute({
+  quickSame({
     artistData,
     from:
       `<i>Homestuck:</i> ([Homestuck sound credits](https://web.archive.org/web/20180717171235/https://www.homestuck.com/credits/sound), excerpt, around 4/3/2018)\n` +
@@ -335,7 +363,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
       `Snoopin', snoopin', snoo,\n` +
       `<i>Homestuck:</i> ([fake](https://web.archive.org/web/20201024170202/https://homestuck.bandcamp.com/fake), throughout 7/20/2019 - 7/20/2022 accessed 4/13/2024)\n` +
       `~ pingas ~\n`
-  }), [
+  }, [
     {
       artists: [artist3],
       artistDisplayText: null,

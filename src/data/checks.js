@@ -5,8 +5,6 @@ import {colors, ENABLE_COLOR} from '#cli';
 
 import CacheableObject from '#cacheable-object';
 import {replacerSpec, parseInput} from '#replacer';
-import {compareArrays, cut, cutStart, empty, getNestedProp, iterateMultiline}
-  from '#sugar';
 import Thing from '#thing';
 import thingConstructors from '#things';
 import {commentaryRegexCaseSensitive} from '#wiki-data';
@@ -19,6 +17,16 @@ import {
   openAggregate,
   withAggregate,
 } from '#aggregate';
+
+import {
+  compareArrays,
+  cut,
+  cutStart,
+  empty,
+  getNestedProp,
+  iterateMultiline,
+  typeAppearance,
+} from '#sugar';
 
 function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
@@ -559,10 +567,8 @@ export function reportContentTextErrors(wikiData, {
   const boundFind = bindFind(wikiData, {mode: 'error'});
   const findArtistOrAlias = bindFindArtistOrAlias(boundFind);
 
-  function* processContent(input) {
-    const nodes = parseInput(input);
-
-    for (const node of nodes) {
+  function* processContent(contentNodes) {
+    for (const node of contentNodes) {
       const index = node.i;
       const length = node.iEnd - node.i;
 
@@ -637,12 +643,22 @@ export function reportContentTextErrors(wikiData, {
   }) {
     const processContentIterator =
       nest({message}, ({call}) =>
-        call(processContent, value));
+        call(() => {
+          if (!Array.isArray(value)) {
+            throw new Error(`Expected an array of content nodes, got ${typeAppearance(value)}`);
+          }
+
+          if (!value[parseInput.input]) {
+            throw new Error(`Expected a direct result from parseInput, got another array`);
+          }
+
+          return processContent(value);
+        }));
 
     if (!processContentIterator) return;
 
     const multilineIterator =
-      iterateMultiline(value, processContentIterator, {
+      iterateMultiline(value[parseInput.input], processContentIterator, {
         formatWhere: true,
         getContainingLine: true,
       });

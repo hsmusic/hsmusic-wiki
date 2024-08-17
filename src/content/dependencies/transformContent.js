@@ -26,10 +26,6 @@ const lyricsMarked = new Marked({
   ...commonMarkedOptions,
 });
 
-function getPlaceholder(node, content) {
-  return {type: 'text', data: content.slice(node.i, node.iEnd)};
-}
-
 export default {
   contentDependencies: [
     ...(
@@ -42,19 +38,19 @@ export default {
 
   extraDependencies: ['html', 'language', 'to', 'wikiData'],
 
-  sprawl(wikiData, content) {
+  sprawl(wikiData, contentNodes) {
+    if (!contentNodes) {
+      return {nodes: []};
+    }
+
     const find = bindFind(wikiData);
 
-    const parsedNodes = parseInput(content ?? '');
-
     return {
-      nodes: parsedNodes
+      nodes: contentNodes
         .map(node => {
           if (node.type !== 'tag') {
             return node;
           }
-
-          const placeholder = getPlaceholder(node, content);
 
           const replacerKeyImplied = !node.data.replacerKey;
           const replacerKey = replacerKeyImplied ? 'track' : node.data.replacerKey.data;
@@ -66,7 +62,7 @@ export default {
           const spec = replacerSpec[replacerKey];
 
           if (!spec) {
-            return placeholder;
+            return node.placeholder;
           }
 
           if (spec.link) {
@@ -93,7 +89,7 @@ export default {
 
               // Nothing was found: this is unexpected, so return placeholder.
               if (!thing) {
-                return placeholder;
+                return node.placeholder;
               }
 
               // Something was found: the link operates on that thing.
@@ -108,10 +104,14 @@ export default {
             const enteredHash = node.data.hash?.data;
 
             data.label =
-              enteredLabel ??
-                (transformName && data.thing.name
-                  ? transformName(data.thing.name, node, content)
-                  : null);
+              (enteredLabel
+                ? enteredLabel
+             : transformName && data.thing.name
+                ? transformName(
+                    data.thing.name,
+                    node,
+                    contentNodes[parseInput.input])
+                : null);
 
             data.hash = enteredHash ?? null;
 
@@ -133,10 +133,8 @@ export default {
     };
   },
 
-  data(sprawl, content) {
+  data(sprawl, _contentNodes) {
     return {
-      content,
-
       nodes:
         sprawl.nodes
           .map(node => {
@@ -159,7 +157,7 @@ export default {
     };
   },
 
-  relations(relation, sprawl, content) {
+  relations(relation, sprawl, _contentNodes) {
     const {nodes} = sprawl;
 
     const relationOrPlaceholder =
@@ -170,7 +168,9 @@ export default {
               label: node.data.label,
               hash: node.data.hash,
             }
-          : getPlaceholder(node, content));
+       : node.placeholder
+          ? node.placeholder
+          : {type: 'text', data: '(invalid node with no placeholder)'});
 
     return {
       internalLinks:
@@ -403,7 +403,7 @@ export default {
             const spec = replacerSpec[replacerKey];
 
             if (!spec) {
-              return getPlaceholder(node, data.content);
+              return node.placeholder;
             }
 
             const {value: valueFn, html: htmlFn} = spec;
@@ -422,7 +422,7 @@ export default {
           }
 
           default:
-            return getPlaceholder(node, data.content);
+            return node.placeholder ?? {type: 'text', data: '(invalid node type)'};
         }
       });
 

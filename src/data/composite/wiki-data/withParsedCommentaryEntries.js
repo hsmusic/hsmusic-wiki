@@ -7,10 +7,12 @@ import {commentaryRegexCaseSensitive} from '#wiki-data';
 import {
   fillMissingListItems,
   withFlattenedList,
+  withMappedList,
   withPropertiesFromList,
   withUnflattenedList,
 } from '#composite/data';
 
+import withParsedContentStringNodesFromList from './withParsedContentStringNodesFromList.js';
 import withResolvedReferenceList from './withResolvedReferenceList.js';
 
 export default templateCompositeFrom({
@@ -138,6 +140,12 @@ export default templateCompositeFrom({
       fill: input.value(null),
     }),
 
+    withParsedContentStringNodesFromList({
+      list: '#entries.artistDisplayText',
+    }).outputs({
+      '#parsedContentStringNodes': '#entries.artistDisplayText',
+    }),
+
     fillMissingListItems({
       list: '#entries.annotation',
       fill: input.value(null),
@@ -160,6 +168,22 @@ export default templateCompositeFrom({
                 : null)),
       }),
     },
+
+    // For an extremely unpleasant regex reason, it's possible for an entry's
+    // annotation to be a blank string instead of null. Patch over this by
+    // just... replacing those with null. Yippee!
+    withMappedList({
+      list: '#entries.annotation',
+      map: input.value(x => x === '' ? null : x),
+    }).outputs({
+      '#mappedList': '#entries.annotation',
+    }),
+
+    withParsedContentStringNodesFromList({
+      list: '#entries.annotation',
+    }).outputs({
+      '#parsedContentStringNodes': '#entries.annotation',
+    }),
 
     {
       dependencies: ['#entries.date'],
@@ -218,6 +242,12 @@ export default templateCompositeFrom({
               null),
       }),
     },
+
+    withParsedContentStringNodesFromList({
+      list: '#entries.body',
+    }).outputs({
+      '#parsedContentStringNodes': '#entries.body',
+    }),
 
     {
       dependencies: [
