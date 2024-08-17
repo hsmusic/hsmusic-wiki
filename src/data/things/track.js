@@ -631,9 +631,14 @@ export class Track extends Thing {
         'Artists',
       ]},
 
-      {message: `Secondary releases inherit contributors from the main one`, fields: [
-        'Main Release',
-        'Contributors',
+      {message: `Secondary releases don't have writing contributors`, fields: [
+        'Originally Released As',
+        'Writing Contributors',
+      ]},
+
+      {message: `Secondary releases don't have performing contributors`, fields: [
+        'Originally Released As',
+        'Performing Contributors',
       ]},
 
       {message: `Secondary releases inherit lyrics from the main one`, fields: [
