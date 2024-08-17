@@ -235,10 +235,6 @@ export class Track extends Thing {
     ],
 
     contributorContribs: [
-      exitIfRerelease({
-        value: input.value([]),
-      }),
-
       withDate(),
 
       contributionList({
