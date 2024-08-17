@@ -110,7 +110,10 @@ export default {
 
     for (const link of relations.featuringContributionLinks) {
       link.setSlots({
-        showAnnotation: false,
+        showAnnotation:
+          (slots.featuringStringKey
+            ? false
+            : slots.showAnnotation),
       });
     }
 
