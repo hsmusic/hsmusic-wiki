@@ -307,8 +307,6 @@ export class Track extends Thing {
     ],
 
     engineeringContributions: [
-      inheritContributionListFromMainRelease(),
-
       withDate(),
 
       contributionList({
