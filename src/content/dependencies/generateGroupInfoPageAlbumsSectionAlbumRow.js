@@ -40,7 +40,14 @@ export default {
         : null),
   }),
 
-  generate: (relations, {html, language}) =>
+  slots: {
+    showDatetimestamp: {
+      type: 'boolean',
+      default: true,
+    },
+  },
+
+  generate: (relations, slots, {html, language}) =>
     language.encapsulate('groupInfoPage.albumList.item', itemCapsule =>
       html.tag('li',
         relations.colorStyle,
@@ -51,7 +58,7 @@ export default {
             workingOptions.album =
               relations.albumLink.slot('color', false);
 
-            if (relations.datetimestamp) {
+            if (slots.showDatetimestamp && relations.datetimestamp) {
               workingCapsule += '.withYear';
               workingOptions.yearAccent =
                 language.$(itemCapsule, 'yearAccent', {
