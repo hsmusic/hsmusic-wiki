@@ -1286,6 +1286,11 @@ groupInfoPage:
   albumList:
     title: "Albums"
 
+    yearChunk:
+      title:
+        _: "{YEAR}"
+        sticky: "Albums — {YEAR}"
+
     item:
       _: >-
         {ALBUM}

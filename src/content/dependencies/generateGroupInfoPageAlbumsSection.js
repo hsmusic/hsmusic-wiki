@@ -73,7 +73,7 @@ export default {
     language.encapsulate('groupInfoPage', pageCapsule =>
       language.encapsulate(pageCapsule, 'albumList', listCapsule =>
         html.tags([
-          relations.contentHeading
+          relations.contentHeading.clone()
             .slots({
               tag: 'h2',
               title: language.$(listCapsule, 'title'),
@@ -98,7 +98,18 @@ export default {
             year: data.albumDividedYears,
             albumRows: relations.albumRowsDividedYearly,
           }).map(({year, albumRows}) => [
-              html.tag('h3', year),
+              language.encapsulate(listCapsule, 'yearChunk.title', titleCapsule =>
+                relations.contentHeading.clone()
+                  .slots({
+                    tag: 'h3',
+
+                    title:
+                      language.$(titleCapsule, {year}),
+
+                    stickyTitle:
+                      language.$(titleCapsule, 'sticky', {year}),
+                  })),
+
               html.tag('ul',
                 albumRows.map(albumRow =>
                   albumRow.slots({
