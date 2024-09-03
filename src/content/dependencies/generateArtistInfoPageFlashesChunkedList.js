@@ -1,6 +1,6 @@
 import {sortContributionsChronologically, sortFlashesChronologically}
   from '#sort';
-import {chunkByConditions, stitchArrays} from '#sugar';
+import {chunkByCondition, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -30,10 +30,9 @@ export default {
       sortFlashesChronologically);
 
     query.contribs =
-      chunkByConditions(allContributions, [
+      chunkByCondition(allContributions,
         ({thing: flash1}, {thing: flash2}) =>
-          flash1.act !== flash2.act,
-      ]);
+          flash1.act !== flash2.act);
 
     query.flashActs =
       query.contribs

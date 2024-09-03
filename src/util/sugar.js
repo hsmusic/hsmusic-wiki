@@ -676,6 +676,10 @@ export function chunkByConditions(array, conditions) {
   return out;
 }
 
+export function chunkByCondition(array, condition) {
+  return chunkByConditions(array, [condition]);
+}
+
 export function chunkByProperties(array, properties) {
   return chunkByConditions(
     array,

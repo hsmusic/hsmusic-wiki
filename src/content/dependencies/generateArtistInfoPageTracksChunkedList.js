@@ -1,6 +1,6 @@
 import {sortAlbumsTracksChronologically, sortContributionsChronologically}
   from '#sort';
-import {chunkByConditions, stitchArrays} from '#sugar';
+import {chunkByCondition, chunkByConditions, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -30,10 +30,9 @@ export default {
       ]).map(contribs =>
           // Then, *within* the boundaries of the existing chunks,
           // chunk contributions to the same thing together.
-          chunkByConditions(contribs, [
+          chunkByCondition(contribs,
             ({thing: thing1}, {thing: thing2}) =>
-              thing1 !== thing2,
-          ]));
+              thing1 !== thing2));
 
     query.albums =
       query.contribs
