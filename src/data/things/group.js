@@ -8,6 +8,7 @@ import {
   color,
   contentString,
   directory,
+  flag,
   name,
   referenceList,
   urls,
@@ -32,6 +33,8 @@ export class Group extends Thing {
       find: input.value(find.album),
       data: 'albumData',
     }),
+
+    divideAlbumListsYearly: flag(false),
 
     // Update only
 
@@ -101,6 +104,9 @@ export class Group extends Thing {
     fields: {
       'Group': {property: 'name'},
       'Directory': {property: 'directory'},
+
+      'Divide Album Lists Yearly': {property: 'divideAlbumListsYearly'},
+
       'Description': {property: 'description'},
       'URLs': {property: 'urls'},
 
