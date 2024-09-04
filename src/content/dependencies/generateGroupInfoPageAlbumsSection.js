@@ -1,16 +1,20 @@
-import {chunkByCondition, stitchArrays} from '#sugar';
+import {chunkByCondition, groupArray, stitchArrays} from '#sugar';
 import {sortChronologically} from '#sort';
 
 export default {
   contentDependencies: [
     'generateContentHeading',
     'generateGroupInfoPageAlbumsSectionAlbumRow',
+    'generateGroupInfoPageAlbumsSectionYearHeading',
     'linkGroupGallery',
   ],
 
-  extraDependencies: ['html', 'language'],
+  extraDependencies: ['html', 'language', 'wikiData'],
 
-  query(group) {
+  sprawl: ({lengthClassificationData}) =>
+    ({lengthClassificationData}),
+
+  query(sprawl, group) {
     // Typically, a latestFirst: false (default) chronological sort would be
     // appropriate here, but navigation between adjacent albums in a group is a
     // rather "essential" movement or relationship in the wiki, and we consider
@@ -21,53 +25,119 @@ export default {
       sortChronologically(group.albums.slice(), {latestFirst: true})
         .reverse();
 
+    const differentYears =
+      (firstDate, secondDate) =>
+        firstDate.getFullYear() !== secondDate.getFullYear();
+
     if (group.divideAlbumListAnnually) {
       const albumsDividedAnnually =
         chunkByCondition(albums,
           ({date: firstDate}, {date: secondDate}) =>
-            firstDate.getFullYear() !== secondDate.getFullYear());
+            differentYears(firstDate, secondDate));
 
       const albumYears =
         albumsDividedAnnually
           .map(([album]) => album.date.getFullYear());
 
-      return {albumsDividedAnnually, albumYears};
-    }
+      if (group.divideAlbumListLengthly) {
+        const lengthClassifications = sprawl.lengthClassificationData;
 
-    return {albums};
+        const albumsDividedAnnuallyLengthly =
+          albumsDividedAnnually
+            .map(albumsThisYear =>
+              groupArray(albumsThisYear, album => album.lengthClassification))
+            .map(mapThisYear =>
+              lengthClassifications
+                .map(lengthClassification =>
+                  mapThisYear.get(lengthClassification) ?? []));
+
+        return {
+          albumsDividedAnnuallyLengthly,
+          albumYears,
+          lengthClassifications,
+        };
+      } else {
+        const albumsDividedAnnually =
+          chunkByCondition(albums,
+            ({date: firstDate}, {date: secondDate}) =>
+              differentYears(firstDate, secondDate));
+
+        const albumYears =
+          albumsDividedAnnually
+            .map(([album]) => album.date.getFullYear());
+
+        return {albumsDividedAnnually, albumYears};
+      }
+    } else if (group.divideAlbumListLengthly) {
+      return {};
+    } else {
+      return {albums};
+    }
   },
 
-  relations: (relation, query, group) => ({
-    contentHeading:
-      relation('generateContentHeading'),
+  relations(relation, query, _sprawl, group) {
+    const relations = {};
 
-    galleryLink:
-      relation('linkGroupGallery', group),
+    relations.contentHeading =
+      relation('generateContentHeading');
 
-    albumRows:
-      (query.albums
-        ? query.albums
+    relations.yearHeading =
+      relation('generateGroupInfoPageAlbumsSectionYearHeading');
+
+    relations.galleryLink =
+      relation('linkGroupGallery', group);
+
+    if (group.divideAlbumListAnnually && group.divideAlbumListLengthly) {
+      relations.albumRowsDividedAnnuallyLengthly =
+        query.albumsDividedAnnuallyLengthly
+          .map(albumsDividedLengthly => albumsDividedLengthly
+            .map(albums => albums
+              .map(album => relation('generateGroupInfoPageAlbumsSectionAlbumRow',
+                album,
+                group))));
+    } else if (group.divideAlbumListAnnually) {
+      relations.albumRowsDividedAnnually =
+        query.albumsDividedAnnually
+          .map(albums => albums
             .map(album =>
               relation('generateGroupInfoPageAlbumsSectionAlbumRow',
                 album,
-                group))
-        : []),
+                group)));
+    } else if (group.divideAlbumListLengthly) {
+    } else {
+      relations.albumRows =
+        query.albums
+          .map(album =>
+            relation('generateGroupInfoPageAlbumsSectionAlbumRow',
+              album,
+              group));
+    }
 
-    albumRowsDividedAnnually:
-      (query.albumsDividedAnnually
-        ? query.albumsDividedAnnually
-            .map(albums => albums
-              .map(album =>
-                relation('generateGroupInfoPageAlbumsSectionAlbumRow',
-                  album,
-                  group)))
-        : []),
-  }),
+    return relations;
+  },
 
-  data: (query) => ({
-    albumDividedYears:
-      query.albumYears ?? [],
-  }),
+  data(query, _sprawl, group) {
+    const data = {};
+
+    data.divideAlbumListAnnually =
+      group.divideAlbumListAnnually;
+
+    data.divideAlbumListLengthly =
+      group.divideAlbumListLengthly;
+
+    if (group.divideAlbumListAnnually) {
+      data.albumDividedYears =
+        query.albumYears;
+    }
+
+    if (group.divideAlbumListLengthly) {
+      data.lengthClassificationNames =
+        query.lengthClassifications
+          .map(lengthClassification => lengthClassification.name);
+    }
+
+    return data;
+  },
 
   generate: (data, relations, {html, language}) =>
     language.encapsulate('groupInfoPage', pageCapsule =>
@@ -89,32 +159,57 @@ export default {
                     .slot('content', language.$(capsule, 'link')),
               }))),
 
-          html.tag('ul',
-            {[html.onlyIfContent]: true},
+          (data.divideAlbumListAnnually && data.divideAlbumListLengthly
+            ? stitchArrays({
+                year: data.albumDividedYears,
+                albumRowsDividedLengthly: relations.albumRowsDividedAnnuallyLengthly,
+              }).map(({year, albumRowsDividedLengthly}) => [
+                  relations.yearHeading.clone()
+                    .slot('year', year),
 
-            relations.albumRows),
+                  html.tag('dl',
+                    stitchArrays({
+                      lengthClassificationName: data.lengthClassificationNames,
+                      albumRows: albumRowsDividedLengthly,
+                    }).map(({lengthClassificationName, albumRows}) =>
+                        html.tags([
+                          html.tag('dt',
+                            {[html.onlyIfSiblings]: true},
+                            language.sanitize(lengthClassificationName)),
 
-          stitchArrays({
-            year: data.albumDividedYears,
-            albumRows: relations.albumRowsDividedAnnually,
-          }).map(({year, albumRows}) => [
-              language.encapsulate(listCapsule, 'yearChunk.title', titleCapsule =>
-                relations.contentHeading.clone()
-                  .slots({
-                    tag: 'h3',
+                          html.tag('dd',
+                            {[html.onlyIfContent]: true},
+                            html.tag('ul',
+                              {[html.onlyIfContent]: true},
+                              albumRows.map(albumRow =>
+                                albumRow.slots({
+                                  showDatetimestamp: false,
+                                })))),
+                        ]))),
+                ])
 
-                    title:
-                      language.$(titleCapsule, {year}),
+         : data.divideAlbumListAnnually
+            ? data.divideAlbumListLengthly &&
+                stitchArrays({
+                  year: data.albumDividedYears,
+                  albumRows: relations.albumRowsDividedAnnually,
+                }).map(({year, albumRows}) => [
+                    relations.yearHeading.clone()
+                      .slot('year', year),
 
-                    stickyTitle:
-                      language.$(titleCapsule, 'sticky', {year}),
-                  })),
+                    html.tag('ul',
+                      albumRows.map(albumRow =>
+                        albumRow.slots({
+                          showDatetimestamp: false,
+                        }))),
+                  ])
 
-              html.tag('ul',
-                albumRows.map(albumRow =>
-                  albumRow.slots({
-                    showDatetimestamp: false,
-                  }))),
-            ]),
+         : data.divideAlbumListLengthly
+            ? null
+
+            : html.tag('ul',
+                {[html.onlyIfContent]: true},
+
+                relations.albumRows)),
         ]))),
 };
