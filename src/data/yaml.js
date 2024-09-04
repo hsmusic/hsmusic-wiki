@@ -1169,6 +1169,7 @@ export function linkWikiDataArrays(wikiData) {
     [wikiData.albumData, [
       'artTagData',
       'artistData',
+      'lengthClassificationData',
       'groupData',
       'wikiInfo',
     ]],
@@ -1213,6 +1214,10 @@ export function linkWikiDataArrays(wikiData) {
     [wikiData.homepageLayout?.rows, [
       'albumData',
       'groupData',
+    ]],
+
+    [wikiData.lengthClassificationData, [
+      'albumData',
     ]],
 
     [wikiData.trackData, [

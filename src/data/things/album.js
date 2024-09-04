@@ -11,13 +11,19 @@ import {traverse} from '#node-utils';
 import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {accumulateSum, empty} from '#sugar';
 import Thing from '#thing';
-import {isColor, isDate, validateWikiData} from '#validators';
+import {isColor, isDate, validateReference, validateWikiData}
+  from '#validators';
 import {parseAdditionalFiles, parseContributors, parseDate, parseDimensions}
   from '#yaml';
 
-import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
-  from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
+
+import {
+  exitWithoutDependency,
+  exposeDependency,
+  exposeDependencyOrContinue,
+  exposeUpdateValueOrContinue,
+} from '#composite/control-flow';
 
 import {
   exitWithoutContribs,
@@ -59,6 +65,7 @@ export class Album extends Thing {
     ArtTag,
     Artist,
     Group,
+    LengthClassification,
     Track,
     TrackSection,
     WikiInfo,
@@ -208,6 +215,36 @@ export class Album extends Thing {
       }),
     ],
 
+    lengthClassification: [
+      exitWithoutDependency({
+        dependency: 'lengthClassificationData',
+      }),
+
+      withResolvedReference({
+        ref: input.updateValue({
+          validate: validateReference('length-classification'),
+        }),
+
+        data: 'lengthClassificationData',
+        find: input.value(find.lengthClassification),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#resolvedReference',
+      }),
+
+      {
+        dependencies: ['lengthClassificationData', input.myself()],
+        compute: ({
+          ['lengthClassificationData']: lengthClassificationData,
+          [input.myself()]: myself,
+        }) =>
+          lengthClassificationData
+            .find(lengthClassification =>
+              lengthClassification.locallyIncludes(myself)),
+      },
+    ],
+
     // Update only
 
     artistData: wikiData({
@@ -220,6 +257,10 @@ export class Album extends Thing {
 
     groupData: wikiData({
       class: input.value(Group),
+    }),
+
+    lengthClassificationData: wikiData({
+      class: input.value(LengthClassification),
     }),
 
     wikiInfo: thing({
@@ -317,6 +358,8 @@ export class Album extends Thing {
       'Has Track Numbers': {property: 'hasTrackNumbers'},
       'Listed on Homepage': {property: 'isListedOnHomepage'},
       'Listed in Galleries': {property: 'isListedInGalleries'},
+
+      'Length Classification': {property: 'lengthClassification'},
 
       'Cover Art Date': {
         property: 'coverArtDate',
