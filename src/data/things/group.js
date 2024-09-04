@@ -34,7 +34,7 @@ export class Group extends Thing {
       data: 'albumData',
     }),
 
-    divideAlbumListsYearly: flag(false),
+    divideAlbumListAnnually: flag(false),
 
     // Update only
 
@@ -105,7 +105,7 @@ export class Group extends Thing {
       'Group': {property: 'name'},
       'Directory': {property: 'directory'},
 
-      'Divide Album Lists Yearly': {property: 'divideAlbumListsYearly'},
+      'Divide Album List Annually': {property: 'divideAlbumListAnnually'},
 
       'Description': {property: 'description'},
       'URLs': {property: 'urls'},

@@ -21,17 +21,17 @@ export default {
       sortChronologically(group.albums.slice(), {latestFirst: true})
         .reverse();
 
-    if (group.divideAlbumListsYearly) {
-      const albumsDividedYearly =
+    if (group.divideAlbumListAnnually) {
+      const albumsDividedAnnually =
         chunkByCondition(albums,
           ({date: firstDate}, {date: secondDate}) =>
             firstDate.getFullYear() !== secondDate.getFullYear());
 
       const albumYears =
-        albumsDividedYearly
+        albumsDividedAnnually
           .map(([album]) => album.date.getFullYear());
 
-      return {albumsDividedYearly, albumYears};
+      return {albumsDividedAnnually, albumYears};
     }
 
     return {albums};
@@ -53,9 +53,9 @@ export default {
                 group))
         : []),
 
-    albumRowsDividedYearly:
-      (query.albumsDividedYearly
-        ? query.albumsDividedYearly
+    albumRowsDividedAnnually:
+      (query.albumsDividedAnnually
+        ? query.albumsDividedAnnually
             .map(albums => albums
               .map(album =>
                 relation('generateGroupInfoPageAlbumsSectionAlbumRow',
@@ -96,7 +96,7 @@ export default {
 
           stitchArrays({
             year: data.albumDividedYears,
-            albumRows: relations.albumRowsDividedYearly,
+            albumRows: relations.albumRowsDividedAnnually,
           }).map(({year, albumRows}) => [
               language.encapsulate(listCapsule, 'yearChunk.title', titleCapsule =>
                 relations.contentHeading.clone()
