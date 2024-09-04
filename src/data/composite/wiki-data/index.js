@@ -19,5 +19,6 @@ export {default as withResolvedReference} from './withResolvedReference.js';
 export {default as withResolvedReferenceList} from './withResolvedReferenceList.js';
 export {default as withReverseContributionList} from './withReverseContributionList.js';
 export {default as withReverseReferenceList} from './withReverseReferenceList.js';
+export {default as withReverseSingleReferenceList} from './withReverseSingleReferenceList.js';
 export {default as withThingsSortedAlphabetically} from './withThingsSortedAlphabetically.js';
 export {default as withUniqueReferencingThing} from './withUniqueReferencingThing.js';
