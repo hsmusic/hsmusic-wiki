@@ -1,4 +1,4 @@
-import {chunkByCondition, groupArray, stitchArrays} from '#sugar';
+import {chunkByCondition, empty, groupArray, stitchArrays} from '#sugar';
 import {sortChronologically} from '#sort';
 
 export default {
@@ -167,25 +167,45 @@ export default {
                   relations.yearHeading.clone()
                     .slot('year', year),
 
-                  html.tag('dl',
-                    stitchArrays({
-                      lengthClassificationName: data.lengthClassificationNames,
-                      albumRows: albumRowsDividedLengthly,
-                    }).map(({lengthClassificationName, albumRows}) =>
-                        html.tags([
-                          html.tag('dt',
-                            {[html.onlyIfSiblings]: true},
-                            language.sanitize(lengthClassificationName)),
+                  html.tag('div', {class: 'group-series-content'},
+                    html.tag('dl', {class: 'group-series-list'},
+                      // IIFE :roll:
+                      {class: (() => {
+                        const num =
+                          albumRowsDividedLengthly
+                            .filter(rows => !empty(rows))
+                            .length;
 
-                          html.tag('dd',
-                            {[html.onlyIfContent]: true},
-                            html.tag('ul',
+                        if (num === 1) {
+                          return 'has-one-series';
+                        } else if (num === 2) {
+                          return 'has-two-series';
+                        } else {
+                          return 'has-many-series';
+                        }
+                      })()},
+
+                      stitchArrays({
+                        lengthClassificationName: data.lengthClassificationNames,
+                        albumRows: albumRowsDividedLengthly,
+                      }).map(({lengthClassificationName, albumRows}) =>
+                          html.tags([
+                            html.tag('dt',
+                              {[html.onlyIfSiblings]: true},
+
+                              language.$(listCapsule, 'seriesChunk.title.lengthClassification', {
+                                series: lengthClassificationName,
+                              })),
+
+                            html.tag('dd',
                               {[html.onlyIfContent]: true},
-                              albumRows.map(albumRow =>
-                                albumRow.slots({
-                                  showDatetimestamp: false,
-                                })))),
-                        ]))),
+                              html.tag('ul',
+                                {[html.onlyIfContent]: true},
+                                albumRows.map(albumRow =>
+                                  albumRow.slots({
+                                    showDatetimestamp: false,
+                                  })))),
+                          ])))),
                 ])
 
          : data.divideAlbumListAnnually

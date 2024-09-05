@@ -1288,8 +1288,13 @@ groupInfoPage:
 
     yearChunk:
       title:
-        _: "{YEAR}"
-        sticky: "Albums — {YEAR}"
+        _: "Albums from {YEAR}:"
+        sticky: "Albums from {YEAR}:"
+
+    seriesChunk:
+      title:
+        _: "{SERIES}:"
+        lengthClassification: "{SERIES}:"
 
     item:
       _: >-
