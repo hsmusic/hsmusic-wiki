@@ -632,7 +632,6 @@ summary .group-name {
   position: relative;
   display: flex;
   padding: 4px 3px 4px 6px;
-  outline: none;
 }
 
 .wiki-search-result:hover {
