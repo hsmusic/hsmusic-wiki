@@ -301,14 +301,19 @@ export function mutatePageContent() {
 export function addPageListeners() {
   if (!info.searchInput) return;
 
+  let prevValue = null;
   info.searchInput.addEventListener('change', _domEvent => {
-    if (info.searchInput.value) {
+    if (info.searchInput.value && info.searchInput.value !== prevValue) {
       activateSidebarSearch(info.searchInput.value);
     }
+    prevValue = info.searchInput.value;
   });
 
   info.searchInput.addEventListener('input', _domEvent => {
     const {settings, state} = info;
+
+    if (prevValue === info.searchInput.value) return;
+    prevValue = info.searchInput.value;
 
     if (!info.searchInput.value) {
       clearSidebarSearch();
