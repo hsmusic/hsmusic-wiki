@@ -59,6 +59,12 @@ export class WikiInfo extends Thing {
     canonicalBase: {
       flags: {update: true, expose: true},
       update: {validate: isURL},
+      expose: {
+        transform: (value) =>
+          (value.endsWith('/')
+            ? value
+            : value + '/'),
+      },
     },
 
     divideTrackListsByGroups: referenceList({
