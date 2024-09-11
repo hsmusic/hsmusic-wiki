@@ -16,25 +16,24 @@ export default {
     'html',
     'language',
     'pagePath',
+    'pagePathStringFromRoot',
     'to',
     'wikiData',
   ],
 
-  sprawl({wikiInfo}) {
-    return {
-      enableSearch: wikiInfo.enableSearch,
-      footerContent: wikiInfo.footerContent,
-      wikiColor: wikiInfo.color,
-      wikiName: wikiInfo.nameShort,
-    };
-  },
+  sprawl: ({wikiInfo}) => ({
+    enableSearch: wikiInfo.enableSearch,
+    footerContent: wikiInfo.footerContent,
+    wikiColor: wikiInfo.color,
+    wikiName: wikiInfo.nameShort,
+    canonicalBase: wikiInfo.canonicalBase,
+  }),
 
-  data({wikiColor, wikiName}) {
-    return {
-      wikiColor,
-      wikiName,
-    };
-  },
+  data: (sprawl) => ({
+    wikiColor: sprawl.wikiColor,
+    wikiName: sprawl.wikiName,
+    canonicalBase: sprawl.canonicalBase,
+  }),
 
   relations(relation, sprawl) {
     const relations = {};
@@ -228,6 +227,7 @@ export default {
     html,
     language,
     pagePath,
+    pagePathStringFromRoot,
     to,
   }) {
     const colors = getColors(slots.color ?? data.wikiColor);
@@ -240,6 +240,13 @@ export default {
     // later, mainly for: https://github.com/hsmusic/hsmusic-wiki/issues/434
     const mainContentHTML = html.tags([slots.mainContent]).toString();
     const hasID = id => mainContentHTML.includes(`id="${id}"`);
+
+    const oEmbedJSONHref =
+      (hasSocialEmbed && data.canonicalBase
+        ? data.canonicalBase +
+          pagePathStringFromRoot +
+          'oembed.json'
+        : null);
 
     const titleContentsHTML =
       (html.isBlank(slots.title)
@@ -648,6 +655,12 @@ export default {
               slots.socialEmbed
                 .clone()
                 .slot('mode', 'html'),
+
+            oEmbedJSONHref &&
+              html.tag('link', {
+                type: 'application/json+oembed',
+                href: oEmbedJSONHref,
+              }),
 
             html.tag('link', {
               rel: 'stylesheet',
