@@ -325,6 +325,16 @@ export function addPageListeners() {
       }, settings.stoppedTypingDelay);
   });
 
+  info.searchInput.addEventListener('keydown', domEvent => {
+    if (domEvent.key === 'ArrowDown' && info.searchInput.value.length === info.searchInput.selectionStart) {
+      const elem = info.results?.firstChild;
+      if (elem && !elem.classList.contains('wiki-search-no-results')) {
+        domEvent.preventDefault();
+        elem.focus();
+      }
+    }
+  });
+
   info.endSearchLink.addEventListener('click', domEvent => {
     domEvent.preventDefault();
     clearSidebarSearch();
@@ -589,7 +599,7 @@ function showSidebarSearchResults(results) {
   }
 
   for (const result of flatResults) {
-    const el = generateSidebarSearchResult(result);
+    const el = generateSidebarSearchResult(result, info);
     if (!el) continue;
 
     info.results.appendChild(el);
@@ -605,7 +615,7 @@ function showSidebarSearchResults(results) {
   restoreSidebarSearchResultsScrollOffset();
 }
 
-function generateSidebarSearchResult(result) {
+function generateSidebarSearchResult(result, info) {
   const preparedSlots = {
     color:
       result.data.color ?? null,
@@ -676,7 +686,7 @@ function generateSidebarSearchResult(result) {
       return null;
   }
 
-  return generateSidebarSearchResultTemplate(preparedSlots);
+  return generateSidebarSearchResultTemplate(preparedSlots, info);
 }
 
 function getSearchResultImageSource(result) {
@@ -689,7 +699,7 @@ function getSearchResultImageSource(result) {
       'rebaseThumb'));
 }
 
-function generateSidebarSearchResultTemplate(slots) {
+function generateSidebarSearchResultTemplate(slots, info) {
   const link = document.createElement('a');
   link.classList.add('wiki-search-result');
 
@@ -769,6 +779,24 @@ function generateSidebarSearchResultTemplate(slots) {
 
   link.addEventListener('click', () => {
     saveSidebarSearchResultsScrollOffset();
+  });
+
+  link.addEventListener('keydown', domEvent => {
+    if (domEvent.key === 'ArrowDown') {
+      const elem = link.nextElementSibling;
+      if (elem) {
+        domEvent.preventDefault();
+        elem.focus();
+      }
+    } else if (domEvent.key === 'ArrowUp') {
+      domEvent.preventDefault();
+      const elem = link.previousElementSibling;
+      if (elem) {
+        elem.focus();
+      } else {
+        info.searchInput.focus();
+      }
+    }
   });
 
   return link;
