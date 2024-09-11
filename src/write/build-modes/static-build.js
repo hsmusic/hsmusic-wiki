@@ -324,6 +324,7 @@ export async function go({
           languages,
           missingImagePaths,
           pagePath,
+          pagePathStringFromRoot: pathname,
           thumbsCache,
           to,
           urls,

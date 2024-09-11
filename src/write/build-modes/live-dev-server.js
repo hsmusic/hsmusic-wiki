@@ -405,6 +405,7 @@ export async function go({
         languages,
         missingImagePaths,
         pagePath: servePath,
+        pagePathStringFromRoot: pathname.replace(/^\//, ''),
         thumbsCache,
         to,
         urls,
