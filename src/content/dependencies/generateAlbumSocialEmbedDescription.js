@@ -3,46 +3,39 @@ import {accumulateSum} from '#sugar';
 export default {
   extraDependencies: ['language'],
 
-  data(album) {
-    const data = {};
+  data: (album) => ({
+    duration:
+      accumulateSum(album.tracks, track => track.duration),
 
-    const duration = accumulateSum(album.tracks, track => track.duration);
+    tracks:
+      album.tracks.length,
 
-    data.hasDuration = duration > 0;
-    data.hasTracks = album.tracks.length > 0;
-    data.hasDate = !!album.date;
-    data.hasAny = (data.hasDuration || data.hasTracks || data.hasDuration);
+    date:
+      album.date,
+  }),
 
-    if (!data.hasAny)
-      return data;
+  generate: (data, {language}) =>
+    language.encapsulate('albumPage.socialEmbed.body', workingCapsule => {
+      const workingOptions = {};
 
-    if (data.hasDuration)
-      data.duration = duration;
+      if (data.duration > 0) {
+        workingCapsule += '.withDuration';
+        workingOptions.duration =
+          language.formatDuration(data.duration);
+      }
 
-    if (data.hasTracks)
-      data.tracks = album.tracks.length;
+      if (data.tracks > 0) {
+        workingCapsule += '.withTracks';
+        workingOptions.tracks =
+          language.countTracks(data.tracks, {unit: true});
+      }
 
-    if (data.hasDate)
-      data.date = album.date;
+      if (data.date) {
+        workingCapsule += '.withReleaseDate';
+        workingOptions.date =
+          language.formatDate(data.date);
+      }
 
-    return data;
-  },
-
-  generate(data, {language}) {
-    return language.formatString(
-      'albumPage.socialEmbed.body' + [
-        data.hasDuration && '.withDuration',
-        data.hasTracks && '.withTracks',
-        data.hasDate && '.withReleaseDate',
-      ].filter(Boolean).join(''),
-
-      Object.fromEntries([
-        data.hasDuration &&
-          ['duration', language.formatDuration(data.duration)],
-        data.hasTracks &&
-          ['tracks', language.countTracks(data.tracks, {unit: true})],
-        data.hasDate &&
-          ['date', language.formatDate(data.date)],
-      ].filter(Boolean)));
-  },
+      return language.$(workingCapsule, workingOptions);
+    }),
 };
