@@ -25,7 +25,7 @@ export default {
 
     if (data.hasHeading) {
       const firstGroup = album.groups[0];
-      data.headingGroupName = firstGroup.directory;
+      data.headingGroupName = firstGroup.name;
       data.headingGroupDirectory = firstGroup.directory;
     }
 
