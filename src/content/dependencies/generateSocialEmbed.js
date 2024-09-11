@@ -47,10 +47,12 @@ export default {
         return JSON.stringify({
           author_name:
             (slots.headingContent
-              ? language.$('misc.socialEmbed.heading', {
-                  wikiName: data.shortWikiName,
-                  heading: slots.headingContent,
-                })
+              ? html.resolve(
+                  language.$('misc.socialEmbed.heading', {
+                    wikiName: data.shortWikiName,
+                    heading: slots.headingContent,
+                  }),
+                  {normalize: 'string'})
               : undefined),
 
           author_url:
