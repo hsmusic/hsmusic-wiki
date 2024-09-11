@@ -47,6 +47,9 @@ export default {
             track: data.trackName,
           }),
 
+        description:
+          relations.description,
+
         headingContent:
           language.$(embedCapsule, 'heading', {
             album: data.albumName,
@@ -69,18 +72,3 @@ export default {
             : null),
       })),
 };
-
-/*
-        socialEmbed: {
-          heading: language.$('trackPage.socialEmbed.heading', {
-            album: track.album.name,
-          }),
-          headingLink: absoluteTo('localized.album', album.directory),
-          title: language.$('trackPage.socialEmbed.title', {
-            track: track.name,
-          }),
-          description: getSocialEmbedDescription({getArtistString, language}),
-          image: '/' + getTrackCover(track, {to: urls.from('shared.root').to}),
-          color: track.color,
-        },
-*/
