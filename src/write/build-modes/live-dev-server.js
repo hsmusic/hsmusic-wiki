@@ -167,6 +167,8 @@ export async function go({
   contentDependenciesWatcher.on('error', () => {});
   await new Promise(resolve => contentDependenciesWatcher.once('ready', resolve));
 
+  const commonUtilities = {...universalUtilities};
+
   let targetSpecPairs = getPageSpecsWithTargets({wikiData});
   const pages = progressCallAll(`Computing page data & paths for ${targetSpecPairs.length} targets.`,
     targetSpecPairs.flatMap(({
@@ -331,17 +333,6 @@ export async function go({
     }
 
     // Other routes determined by page and URL specs
-
-    const commonUtilities = {
-      defaultLanguage,
-      getSizeOfAdditionalFile,
-      getSizeOfImagePath,
-      languages,
-      missingImagePaths,
-      thumbsCache,
-      urls,
-      wikiData,
-    };
 
     const startTiming = () => {
       if (!showTimings) {

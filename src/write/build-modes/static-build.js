@@ -288,16 +288,7 @@ export async function go({
     showAggregate: niceShowAggregate,
   });
 
-  const commonUtilities = {
-    defaultLanguage,
-    getSizeOfAdditionalFile,
-    getSizeOfImagePath,
-    languages,
-    missingImagePaths,
-    thumbsCache,
-    urls,
-    wikiData,
-  };
+  const commonUtilities = {...universalUtilities};
 
   const perLanguageFn = async (language, i, entries) => {
     const baseDirectory =

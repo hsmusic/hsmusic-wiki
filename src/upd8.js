@@ -2382,29 +2382,37 @@ async function main() {
   logInfo`Passing control over to build mode: ${selectedBuildModeFlag}`;
   console.log('');
 
+  const universalUtilities = {
+    getSizeOfAdditionalFile,
+    getSizeOfImagePath,
+
+    defaultLanguage: finalDefaultLanguage,
+    developersComment,
+    languages,
+    missingImagePaths,
+    thumbsCache,
+    urlSpec,
+    urls,
+    wikiData,
+  };
+
   try {
     buildModeResult = await selectedBuildMode.go({
       cliOptions,
+      queueSize,
+
+      universalUtilities,
+      ...universalUtilities,
+
       dataPath,
       mediaPath,
       mediaCachePath,
       wikiCachePath,
-      queueSize,
       srcRootPath: __dirname,
 
-      defaultLanguage: finalDefaultLanguage,
-      languages,
-      missingImagePaths,
-      thumbsCache,
-      urls,
-      urlSpec,
       webRoutes: preparedWebRoutes,
-      wikiData,
 
       closeLanguageWatchers,
-      developersComment,
-      getSizeOfAdditionalFile,
-      getSizeOfImagePath,
       niceShowAggregate,
     });
   } catch (error) {
