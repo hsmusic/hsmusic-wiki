@@ -50,17 +50,12 @@ export async function getContextAssignments({
   mediaPath,
   mediaCachePath,
 
+  universalUtilities,
+
   defaultLanguage,
-  languages,
-  missingImagePaths,
-  thumbsCache,
-  urls,
-  webRoutes,
   wikiData,
 
-  getSizeOfAdditionalFile,
-  getSizeOfImagePath,
-  niceShowAggregate,
+  niceShowAggregate: showAggregate,
 }) {
   let find;
   try {
@@ -72,18 +67,14 @@ export async function getContextAssignments({
   }
 
   const replContext = {
+    universalUtilities,
+    ...universalUtilities,
+
     dataPath,
     mediaPath,
     mediaCachePath,
 
-    languages,
-    defaultLanguage,
     language: defaultLanguage,
-
-    missingImagePaths,
-    thumbsCache,
-    urls,
-    webRoutes,
 
     wikiData,
     ...wikiData,
@@ -104,9 +95,7 @@ export async function getContextAssignments({
     find,
     bindFind,
 
-    getSizeOfAdditionalFile,
-    getSizeOfImagePath,
-    showAggregate: niceShowAggregate,
+    showAggregate,
   };
 
   replContext.replContext = replContext;
