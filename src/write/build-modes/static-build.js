@@ -333,6 +333,7 @@ export async function go({
 
               name: page.contentFunction.name,
               args: page.contentFunction.args ?? [],
+              slots: page.contentFunction.slots ?? null,
             });
 
           ({pageHTML, oEmbedJSON} = html.resolve(topLevelResult));

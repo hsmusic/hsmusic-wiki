@@ -431,6 +431,7 @@ export async function go({
 
           name: page.contentFunction.name,
           args: page.contentFunction.args ?? [],
+          slots: page.contentFunction.slots ?? null,
         });
 
       const {pageHTML} = html.resolve(topLevelResult);
