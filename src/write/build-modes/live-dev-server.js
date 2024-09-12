@@ -126,18 +126,14 @@ const getContentType = extname => ({
 export async function go({
   cliOptions,
 
+  universalUtilities,
+
   defaultLanguage,
   languages,
-  missingImagePaths,
-  srcRootPath,
-  thumbsCache,
   urls,
   webRoutes,
   wikiData,
 
-  developersComment: _developersComment,
-  getSizeOfAdditionalFile,
-  getSizeOfImagePath,
   niceShowAggregate,
 }) {
   const showError = (error) => {

@@ -110,21 +110,18 @@ export function getCLIOptions() {
 
 export async function go({
   cliOptions,
-  mediaPath,
   queueSize,
+
+  universalUtilities,
+
+  mediaPath,
 
   defaultLanguage,
   languages,
-  missingImagePaths,
-  srcRootPath,
-  thumbsCache,
   urls,
   webRoutes,
   wikiData,
 
-  developersComment: _developersComment,
-  getSizeOfAdditionalFile,
-  getSizeOfImagePath,
   niceShowAggregate,
 }) {
   const outputPath = cliOptions['out-path'] || process.env.HSMUSIC_OUT;
