@@ -369,16 +369,11 @@ export async function go({
     if (Object.hasOwn(urlToFileMap, pathname.slice(1))) {
       const {file, writePath: servePath} = urlToFileMap[pathname.slice(1)];
 
-      const to = getURLsFrom({
-        baseDirectory,
-        pagePath: servePath,
-        urls,
-      });
+      const to =
+        getURLsFrom(servePath, {baseDirectory, urls});
 
-      const absoluteTo = getURLsFromRoot({
-        baseDirectory,
-        urls,
-      });
+      const absoluteTo =
+        getURLsFromRoot({baseDirectory, urls});
 
       try {
         const timing = startTiming();
@@ -475,16 +470,11 @@ export async function go({
       writePath: servePath,
     } = urlToPageMap[pathnameKey];
 
-    const to = getURLsFrom({
-      baseDirectory,
-      pagePath: servePath,
-      urls,
-    });
+    const to =
+      getURLsFrom(servePath, {baseDirectory, urls});
 
-    const absoluteTo = getURLsFromRoot({
-      baseDirectory,
-      urls,
-    });
+    const absoluteTo =
+      getURLsFromRoot({baseDirectory, urls});
 
     try {
       if (page.type === 'redirect') {

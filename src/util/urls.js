@@ -176,13 +176,9 @@ export const thumb = {
 
 // Makes the generally-used and wiki-specialized "to" page utility.
 // "to" returns a relative path from the current page to the target.
-export function getURLsFrom({
-  baseDirectory,
-  pagePath,
-  urls,
-}) {
-  const pageSubKey = pagePath[0];
-  const subdirectoryPrefix = getPageSubdirectoryPrefix({pagePath});
+export function getURLsFrom(path, {baseDirectory, urls}) {
+  const pageSubKey = path[0];
+  const subdirectoryPrefix = getPathSubdirectoryPrefix(path);
 
   return (targetFullKey, ...args) => {
     const [groupKey, subKey] = targetFullKey.split('.');
@@ -247,13 +243,13 @@ export function getURLsFromRoot({
 
 // Needed for the rare path arguments which themselves contains one or more
 // slashes, e.g. for listings, with arguments like 'albums/by-name'.
-export function getPageSubdirectoryPrefix({
-  pagePath,
-}) {
-  const timesNestedDeeply = (pagePath
-    .slice(1) // skip URL key, only check arguments
-    .join('/')
-    .split('/')
-    .length - 1);
+export function getPathSubdirectoryPrefix(path) {
+  const timesNestedDeeply =
+    path
+      .slice(1) // skip URL key, only check arguments
+      .join('/')
+      .split('/')
+      .length - 1;
+
   return '../'.repeat(timesNestedDeeply);
 }

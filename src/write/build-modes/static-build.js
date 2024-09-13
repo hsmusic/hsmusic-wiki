@@ -285,16 +285,11 @@ export async function go({
 
   await progressPromiseAll(`Writing dynamically generated files`, queue(
     fileWrites.map(file => async () => {
-      const to = getURLsFrom({
-        baseDirectory,
-        pagePath: file.path,
-        urls,
-      });
+      const to =
+        getURLsFrom(path, {baseDirectory, urls});
 
-      const absoluteTo = getURLsFromRoot({
-        baseDirectory,
-        urls,
-      });
+      const absoluteTo =
+        getURLsFromRoot({baseDirectory, urls});
 
       const bound = bindUtilities({
         ...commonUtilities,
@@ -365,16 +360,11 @@ export async function go({
             .from('shared.root')
             .toLocalized(pagePath, {baseDirectory});
 
-        const to = getURLsFrom({
-          baseDirectory,
-          pagePath,
-          urls,
-        });
+        const to =
+          getURLsFrom(pagePath, {baseDirectory, urls});
 
-        const absoluteTo = getURLsFromRoot({
-          baseDirectory,
-          urls,
-        });
+        const absoluteTo =
+          getURLsFromRoot({baseDirectory, urls});
 
         const bound = bindUtilities({
           ...commonUtilities,
@@ -419,11 +409,8 @@ export async function go({
       ...redirectWrites.map(({fromPath, toPath, title, getTitle}) => () => {
         title ??= getTitle?.({language});
 
-        const to = getURLsFrom({
-          baseDirectory,
-          pagePath: fromPath,
-          urls,
-        });
+        const to =
+          getURLsFrom(fromPath, {baseDirectory, urls});
 
         const target = to('localized.' + toPath[0], ...toPath.slice(1));
         const pageHTML = generateRedirectHTML(title, target, {language});
