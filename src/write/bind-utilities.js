@@ -8,7 +8,7 @@ import {getColors} from '#colors';
 import {bindFind} from '#find';
 import * as html from '#html';
 import {bindOpts} from '#sugar';
-import {thumb} from '#urls';
+import {getURLsFrom, getURLsFromRoot, thumb} from '#urls';
 
 import {
   checkIfImagePathHasCachedThumbnails,
@@ -17,8 +17,39 @@ import {
   getThumbnailsAvailableForDimensions,
 } from '#thumbs';
 
+export function bindLanguageAndPathUtilities({
+  defaultLanguage,
+  language,
+  languages,
+  pagePath,
+  pagePathStringFromRoot,
+  urls,
+}) {
+  const bound = {
+    defaultLanguage,
+    language,
+    languages,
+    pagePath,
+    pagePathStringFromRoot,
+    thumb,
+    urls,
+  };
+
+  const baseDirectory =
+    (language === defaultLanguage
+      ? ''
+      : language.code);
+
+  bound.to =
+    getURLsFrom(pagePath, {baseDirectory, urls});
+
+  bound.absoluteTo =
+    getURLsFromRoot({baseDirectory, urls});
+
+  return bound;
+}
+
 export function bindUtilities({
-  absoluteTo,
   defaultLanguage,
   getSizeOfAdditionalFile,
   getSizeOfImagePath,
@@ -28,34 +59,36 @@ export function bindUtilities({
   pagePath,
   pagePathStringFromRoot,
   thumbsCache,
-  to,
   urls,
   wikiData,
 }) {
-  const bound = {};
+  const bound = {
+    ...bindLanguageAndPathUtilities({
+      defaultLanguage,
+      language,
+      languages,
+      pagePath,
+      pagePathStringFromRoot,
+      urls,
+    }),
 
-  Object.assign(bound, {
-    absoluteTo,
-    defaultLanguage,
+    html,
+
+    missingImagePaths,
+
+    wikiData,
+    wikiInfo: wikiData.wikiInfo,
+
     getSizeOfAdditionalFile,
     getSizeOfImagePath,
     getThumbnailsAvailableForDimensions,
-    html,
-    language,
-    languages,
-    missingImagePaths,
-    pagePath,
-    pagePathStringFromRoot,
-    thumb,
-    to,
-    urls,
-    wikiData,
-    wikiInfo: wikiData.wikiInfo,
-  });
+  };
 
-  bound.getColors = bindOpts(getColors, {chroma});
+  bound.getColors =
+    bindOpts(getColors, {chroma});
 
-  bound.find = bindFind(wikiData, {mode: 'warn'});
+  bound.find =
+    bindFind(wikiData, {mode: 'warn'});
 
   bound.checkIfImagePathHasCachedThumbnails =
     (imagePath) =>

@@ -369,20 +369,12 @@ export async function go({
     if (Object.hasOwn(urlToFileMap, pathname.slice(1))) {
       const {file, writePath: servePath} = urlToFileMap[pathname.slice(1)];
 
-      const to =
-        getURLsFrom(servePath, {baseDirectory, urls});
-
-      const absoluteTo =
-        getURLsFromRoot({baseDirectory, urls});
-
       try {
         const timing = startTiming();
 
         const bound = bindUtilities({
           ...commonUtilities,
 
-          absoluteTo,
-          to,
           pagePath: servePath,
         });
 
@@ -470,19 +462,17 @@ export async function go({
       writePath: servePath,
     } = urlToPageMap[pathnameKey];
 
-    const to =
-      getURLsFrom(servePath, {baseDirectory, urls});
-
-    const absoluteTo =
-      getURLsFromRoot({baseDirectory, urls});
-
     try {
       if (page.type === 'redirect') {
         const title =
           page.title ??
           page.getTitle?.({language});
 
-        const target = to('localized.' + page.toPath[0], ...page.toPath.slice(1));
+        const to =
+          getURLsFrom(servePath, {baseDirectory, urls});
+
+        const target =
+          to('localized.' + page.toPath[0], ...page.toPath.slice(1));
 
         response.writeHead(301, {
           ...contentTypeHTML,
@@ -502,11 +492,9 @@ export async function go({
       const bound = bindUtilities({
         ...commonUtilities,
 
-        absoluteTo,
         language,
         pagePath: servePath,
         pagePathStringFromRoot: pathname.replace(/^\//, ''),
-        to,
       });
 
       const topLevelResult =

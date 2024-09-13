@@ -285,17 +285,9 @@ export async function go({
 
   await progressPromiseAll(`Writing dynamically generated files`, queue(
     fileWrites.map(file => async () => {
-      const to =
-        getURLsFrom(path, {baseDirectory, urls});
-
-      const absoluteTo =
-        getURLsFromRoot({baseDirectory, urls});
-
       const bound = bindUtilities({
         ...commonUtilities,
 
-        absoluteTo,
-        to,
         pagePath: file.path,
       });
 
@@ -360,20 +352,12 @@ export async function go({
             .from('shared.root')
             .toLocalized(pagePath, {baseDirectory});
 
-        const to =
-          getURLsFrom(pagePath, {baseDirectory, urls});
-
-        const absoluteTo =
-          getURLsFromRoot({baseDirectory, urls});
-
         const bound = bindUtilities({
           ...commonUtilities,
 
-          absoluteTo,
           language,
           pagePath,
           pagePathStringFromRoot: pathname,
-          to,
         });
 
         let pageHTML, oEmbedJSON;
