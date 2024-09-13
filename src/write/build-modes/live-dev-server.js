@@ -369,8 +369,16 @@ export async function go({
     if (Object.hasOwn(urlToFileMap, pathname.slice(1))) {
       const {file, writePath: servePath} = urlToFileMap[pathname.slice(1)];
 
-      const to = urls.from(...servePath);
-      const absoluteTo = urls.from('shared.root');
+      const to = getURLsFrom({
+        baseDirectory,
+        pagePath: servePath,
+        urls,
+      });
+
+      const absoluteTo = getURLsFromRoot({
+        baseDirectory,
+        urls,
+      });
 
       try {
         const timing = startTiming();

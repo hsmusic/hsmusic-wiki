@@ -285,8 +285,16 @@ export async function go({
 
   await progressPromiseAll(`Writing dynamically generated files`, queue(
     fileWrites.map(file => async () => {
-      const to = urls.from(...file.path);
-      const absoluteTo = urls.from('shared.root');
+      const to = getURLsFrom({
+        baseDirectory,
+        pagePath: file.path,
+        urls,
+      });
+
+      const absoluteTo = getURLsFromRoot({
+        baseDirectory,
+        urls,
+      });
 
       const bound = bindUtilities({
         ...commonUtilities,
