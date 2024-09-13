@@ -182,40 +182,57 @@ export async function go({
 
   logInfo`Will be serving a total of ${pages.length} pages.`;
 
-  const urlToPageMap = Object.fromEntries(pages
-    .filter(({type}) => type === 'page' || type === 'redirect')
-    .flatMap(page => {
-      let servePath;
-      if (page.type === 'page')
-        servePath = page.path;
-      else if (page.type === 'redirect')
-        servePath = page.fromPath;
+  const getLocalizedWritePathEntries = writePath =>
+    Object.values(languages).map(language => {
+      const baseDirectory =
+        (language === defaultLanguage
+          ? ''
+          : language.code);
 
-      return Object.values(languages).map(language => {
-        const baseDirectory =
-          language === defaultLanguage ? '' : language.code;
-
-        const pathname = getPagePathname({
+      const pathname =
+        getPagePathname({
           baseDirectory,
-          pagePath: servePath,
+          pagePath: writePath,
           urls,
         });
 
-        return [pathname, {
-          baseDirectory,
-          language,
-          page,
-          servePath,
-        }];
-      });
-    }));
+      const entry = {
+        baseDirectory,
+        language,
+        writePath,
+      };
 
-  const urlToFileMap = Object.fromEntries(pages
-    .filter(({type}) => type === 'file')
-    .map(file => [
-      urls.from('shared.root').to(...file.path),
-      {file, servePath: file.path},
-    ]));
+      return [pathname, entry];
+    });
+
+  const urlToPageMap =
+    Object.fromEntries(
+      pages
+        .filter(write =>
+          write.type === 'page' ||
+          write.type === 'redirect')
+        .flatMap(write =>
+          getLocalizedWritePathEntries(
+            (write.type === 'page'
+              ? write.path
+           : write.type === 'redirect'
+              ? write.fromPath
+              : null))
+            .map(([pathname, value]) => [
+              pathname,
+              {...value, page: write},
+            ])));
+
+  const urlToFileMap =
+    Object.fromEntries(
+      pages
+        .filter(({type}) => type === 'file')
+        .map(file => [
+          urls
+            .from('shared.root')
+            .to(...file.path),
+          {file, writePath: file.path},
+        ]));
 
   const server = http.createServer(async (request, response) => {
     const contentTypeHTML = {'Content-Type': 'text/html; charset=utf-8'};
@@ -357,7 +374,7 @@ export async function go({
     };
 
     if (Object.hasOwn(urlToFileMap, pathname.slice(1))) {
-      const {file, servePath} = urlToFileMap[pathname.slice(1)];
+      const {file, writePath: servePath} = urlToFileMap[pathname.slice(1)];
 
       const to = urls.from(...servePath);
       const absoluteTo = urls.from('shared.root');
@@ -454,7 +471,7 @@ export async function go({
       baseDirectory,
       language,
       page,
-      servePath,
+      writePath: servePath,
     } = urlToPageMap[pathnameKey];
 
     const to = getURLsFrom({

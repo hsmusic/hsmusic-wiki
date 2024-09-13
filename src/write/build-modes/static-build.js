@@ -347,7 +347,9 @@ export async function go({
 
   const perLanguageFn = async (language, i, entries) => {
     const baseDirectory =
-      language === defaultLanguage ? '' : language.code;
+      (language === defaultLanguage
+        ? ''
+        : language.code);
 
     console.log(`\x1b[34;1m${`[${i + 1}/${entries.length}] ${language.code} (-> /${baseDirectory}) `.padEnd(60, '-')}\x1b[0m`);
 
