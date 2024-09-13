@@ -120,9 +120,30 @@ export function generateURLs(urlSpec) {
         return result;
       };
 
+    const to =
+      toHelper({device: false});
+
+    const toDevice =
+      toHelper({device: true});
+
+    const toLocalizedHelper =
+      ({to}) =>
+      (path, {baseDirectory = ''} = {}) =>
+        (baseDirectory
+          ? to('localizedWithBaseDirectory.' + path[0], baseDirectory, ...path.slice(1))
+          : to('localized.' + path[0], ...path.slice(1)));
+
+    const toLocalized =
+      toLocalizedHelper({to: to});
+
+    const toDeviceLocalized =
+      toLocalizedHelper({to: toDevice});
+
     return {
-      to: toHelper({device: false}),
-      toDevice: toHelper({device: true}),
+      to,
+      toDevice,
+      toLocalized,
+      toDeviceLocalized,
     };
   };
 
@@ -222,19 +243,6 @@ export function getURLsFromRoot({
         : to(targetFullKey, ...args))
     );
   };
-}
-
-export function getPagePathname({
-  baseDirectory,
-  device = false,
-  pagePath,
-  urls,
-}) {
-  const {[device ? 'toDevice' : 'to']: to} = urls.from('shared.root');
-
-  return (baseDirectory
-    ? to('localizedWithBaseDirectory.' + pagePath[0], baseDirectory, ...pagePath.slice(1))
-    : to('localized.' + pagePath[0], ...pagePath.slice(1)));
 }
 
 // Needed for the rare path arguments which themselves contains one or more

@@ -11,12 +11,7 @@ import {quickEvaluate} from '#content-function';
 import * as html from '#html';
 import * as pageSpecs from '#page-specs';
 import {serializeThings} from '#serialize';
-
-import {
-  getPagePathname,
-  getURLsFrom,
-  getURLsFromRoot,
-} from '#urls';
+import {getURLsFrom, getURLsFromRoot} from '#urls';
 
 import {bindUtilities} from '../bind-utilities.js';
 import {generateRandomLinkDataJSON, generateRedirectHTML} from '../common-templates.js';
@@ -190,11 +185,9 @@ export async function go({
           : language.code);
 
       const pathname =
-        getPagePathname({
-          baseDirectory,
-          pagePath: writePath,
-          urls,
-        });
+        urls
+          .from('shared.root')
+          .toLocalized(writePath, {baseDirectory});
 
       const entry = {
         baseDirectory,

@@ -17,6 +17,7 @@ import {quickEvaluate} from '#content-function';
 import * as html from '#html';
 import * as pageSpecs from '#page-specs';
 import {empty, queue, withEntries} from '#sugar';
+import {getURLsFrom, getURLsFromRoot} from '#urls';
 
 import {
   fileIssue,
@@ -25,12 +26,6 @@ import {
   logWarn,
   progressPromiseAll,
 } from '#cli';
-
-import {
-  getPagePathname,
-  getURLsFrom,
-  getURLsFromRoot,
-} from '#urls';
 
 import {bindUtilities} from '../bind-utilities.js';
 import {generateRedirectHTML, generateRandomLinkDataJSON} from '../common-templates.js';
@@ -357,11 +352,10 @@ export async function go({
       ...pageWrites.map(page => () => {
         const pagePath = page.path;
 
-        const pathname = getPagePathname({
-          baseDirectory,
-          pagePath,
-          urls,
-        });
+        const pathname =
+          urls
+            .from('shared.root')
+            .toLocalized(pagePath, {baseDirectory});
 
         const to = getURLsFrom({
           baseDirectory,
@@ -404,16 +398,14 @@ export async function go({
           return;
         }
 
-        return writePage({
-          pageHTML,
-          oEmbedJSON,
-          outputDirectory: path.join(outputPath, getPagePathname({
-            baseDirectory,
-            device: true,
-            pagePath,
-            urls,
-          })),
-        });
+        const outputDirectory =
+          path.join(
+            outputPath,
+            urls
+              .from('shared.root')
+              .toDeviceLocalized(pagePath, {baseDirectory}));
+
+        return writePage({pageHTML, oEmbedJSON, outputDirectory});
       }),
 
       ...redirectWrites.map(({fromPath, toPath, title, getTitle}) => () => {
@@ -428,15 +420,14 @@ export async function go({
         const target = to('localized.' + toPath[0], ...toPath.slice(1));
         const pageHTML = generateRedirectHTML(title, target, {language});
 
-        return writePage({
-          pageHTML,
-          outputDirectory: path.join(outputPath, getPagePathname({
-            baseDirectory,
-            device: true,
-            pagePath: fromPath,
-            urls,
-          })),
-        });
+        const outputDirectory =
+          path.join(
+            outputPath,
+            urls
+              .from('shared.root')
+              .toDeviceLocalized(fromPath, {baseDirectory}));
+
+        return writePage({pageHTML, outputDirectory});
       }),
     ], queueSize));
   };
