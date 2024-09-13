@@ -61,7 +61,9 @@ export class WikiInfo extends Thing {
       update: {validate: isURL},
       expose: {
         transform: (value) =>
-          (value.endsWith('/')
+          (value === null
+            ? null
+         : value.endsWith('/')
             ? value
             : value + '/'),
       },
