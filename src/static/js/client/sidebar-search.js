@@ -345,7 +345,7 @@ export function addPageListeners() {
   info.searchInput.addEventListener('keydown', domEvent => {
     if (domEvent.key === 'ArrowDown') {
       const elem = info.results.firstChild;
-      if (elem?.classList?.contains?.('wiki-search-result')) {
+      if (elem?.classList.contains('wiki-search-result')) {
         domEvent.preventDefault();
         elem.focus({focusVisible: true});
       }
