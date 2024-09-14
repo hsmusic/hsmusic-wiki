@@ -74,6 +74,8 @@ export const info = {
     stoppedScrollingTimeout: null,
 
     indexDownloadStatuses: Object.create(null),
+
+    currentValue: null,
   },
 
   session: {
@@ -298,22 +300,32 @@ export function mutatePageContent() {
   info.searchBox.appendChild(info.endSearchLine);
 }
 
+function trackSidebarSearchInputChanged() {
+  const {state} = info;
+
+  const newValue = info.searchInput.value;
+
+  if (newValue === state.currentValue) {
+    return false;
+  } else {
+    state.currentValue = newValue;
+    return !!newValue;
+  }
+}
+
 export function addPageListeners() {
   if (!info.searchInput) return;
 
-  let prevValue = null;
   info.searchInput.addEventListener('change', _domEvent => {
-    if (info.searchInput.value && info.searchInput.value !== prevValue) {
+    if (trackSidebarSearchInputChanged()) {
       activateSidebarSearch(info.searchInput.value);
     }
-    prevValue = info.searchInput.value;
   });
 
   info.searchInput.addEventListener('input', _domEvent => {
     const {settings, state} = info;
 
-    if (prevValue === info.searchInput.value) return;
-    prevValue = info.searchInput.value;
+    trackSidebarSearchInputChanged();
 
     if (!info.searchInput.value) {
       clearSidebarSearch();
@@ -604,7 +616,7 @@ function showSidebarSearchResults(results) {
   }
 
   for (const result of flatResults) {
-    const el = generateSidebarSearchResult(result, info);
+    const el = generateSidebarSearchResult(result);
     if (!el) continue;
 
     info.results.appendChild(el);
@@ -620,7 +632,7 @@ function showSidebarSearchResults(results) {
   restoreSidebarSearchResultsScrollOffset();
 }
 
-function generateSidebarSearchResult(result, info) {
+function generateSidebarSearchResult(result) {
   const preparedSlots = {
     color:
       result.data.color ?? null,
@@ -691,7 +703,7 @@ function generateSidebarSearchResult(result, info) {
       return null;
   }
 
-  return generateSidebarSearchResultTemplate(preparedSlots, info);
+  return generateSidebarSearchResultTemplate(preparedSlots);
 }
 
 function getSearchResultImageSource(result) {
@@ -704,7 +716,7 @@ function getSearchResultImageSource(result) {
       'rebaseThumb'));
 }
 
-function generateSidebarSearchResultTemplate(slots, info) {
+function generateSidebarSearchResultTemplate(slots) {
   const link = document.createElement('a');
   link.classList.add('wiki-search-result');
 
