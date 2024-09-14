@@ -67,6 +67,8 @@ export const info = {
     tidiedSidebar: null,
     collapsedDetailsForTidiness: null,
 
+    currentValue: null,
+
     workerStatus: null,
     searchStage: null,
 
@@ -74,8 +76,6 @@ export const info = {
     stoppedScrollingTimeout: null,
 
     indexDownloadStatuses: Object.create(null),
-
-    currentValue: null,
   },
 
   session: {
@@ -344,8 +344,8 @@ export function addPageListeners() {
 
   info.searchInput.addEventListener('keydown', domEvent => {
     if (domEvent.key === 'ArrowDown') {
-      const elem = info.results?.firstChild;
-      if (elem && !elem.classList.contains('wiki-search-no-results')) {
+      const elem = info.results.firstChild;
+      if (elem?.classList?.contains?.('wiki-search-result')) {
         domEvent.preventDefault();
         elem.focus({focusVisible: true});
       }

@@ -657,7 +657,8 @@ summary .group-name {
   border-bottom: 1px solid var(--dim-color);
 }
 
-.wiki-search-result:hover::before, .wiki-search-result:focus::before {
+.wiki-search-result:hover::before,
+.wiki-search-result:focus::before {
   display: block;
   background: var(--light-ghost-color);
 }
