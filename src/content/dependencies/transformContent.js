@@ -6,6 +6,21 @@ import {Marked} from 'marked';
 const commonMarkedOptions = {
   headerIds: false,
   mangle: false,
+
+  tokenizer: {
+    url(src) {
+      // Don't link emails
+      const cap = this.rules.inline.url.exec(src);
+      if (cap?.[2] === '@') return;
+
+      // Use normal tokenizer url behavior otherwise
+      // Note that super.url doesn't work here because marked is binding or
+      // applying this function on the tokenizer instance - super.prop would
+      // just read the prototype of the containing object literal, not the
+      // rebound tokenizer. (Thanks MDN.)
+      return Object.getPrototypeOf(this).url.call(this, src);
+    },
+  },
 };
 
 const multilineMarked = new Marked({
