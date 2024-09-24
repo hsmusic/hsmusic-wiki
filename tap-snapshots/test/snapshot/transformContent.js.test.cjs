@@ -14,6 +14,11 @@ exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) >
 <p>Very nice: <time datetime="Fri, 25 Oct 2413 03:00:00 GMT">10/25/2413</time></p>
 `
 
+exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > emails 1`] = `
+<p>Email cute dogs to qznebula@protonmail.com please.</p>
+<p>Just kidding... <a class="external-link from-content indicate-external" href="mailto:qznebula@protonmail.com" title="External (opens in new tab)" target="_blank">unless?</a></p>
+`
+
 exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > escape end of tag 1`] = `
 <p>My favorite album is <a style="--primary-color: #123456" href="to-localized.album/cool-album">[Tactical Omission]</a>.</p>
 <p>Your favorite album is <a style="--primary-color: #123456" href="to-localized.album/cool-album">[Tactical Wha-Huh-Now</a>].</p>

@@ -156,6 +156,11 @@ testContentFunctions(t, 'transformContent (snapshot)', async (t, evaluate) => {
       `[[date:13 April 2004]], and don't ye forget it`,
       {mode: 'lyrics'});
 
+  quickSnapshot(
+    'emails',
+      `Email cute dogs to qznebula@protonmail.com please.\n` +
+      `Just kidding... [unless?](mailto:qznebula@protonmail.com)`);
+
   // TODO: Snapshots for mode: inline
   // TODO: Snapshots for mode: single-link
 });
