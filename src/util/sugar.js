@@ -93,6 +93,18 @@ export function atOffset(array, index, offset, {
   return array[index + offset];
 }
 
+// Gets the index of the first item that satisfies the provided function,
+// or, if none does, returns the length of the array (the index just past the
+// final item).
+export function findIndexOrEnd(array, fn) {
+  const index = array.findIndex(fn);
+  if (index >= 0) {
+    return index;
+  } else {
+    return array.length;
+  }
+}
+
 // Sums the values in an array, optionally taking a function which maps each
 // item to a number (handy for accessing a certain property on an array of like
 // objects). This also coalesces null values to zero, so if the mapping function
