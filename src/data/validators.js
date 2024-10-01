@@ -468,7 +468,7 @@ const trimWhitespaceNearEndRegexp =
   / +$/gm;
 
 export function isContentString(content) {
-  isStringNonEmpty(content);
+  isString(content);
 
   const mainAggregate = openAggregate({
     message: `Errors validating content string`,
