@@ -12,8 +12,14 @@ import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {accumulateSum, empty} from '#sugar';
 import Thing from '#thing';
 import {isColor, isDate, validateWikiData} from '#validators';
-import {parseAdditionalFiles, parseContributors, parseDate, parseDimensions}
-  from '#yaml';
+
+import {
+  parseAdditionalFiles,
+  parseAdditionalNames,
+  parseContributors,
+  parseDate,
+  parseDimensions,
+} from '#yaml';
 
 import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
@@ -28,6 +34,7 @@ import {
 
 import {
   additionalFiles,
+  additionalNameList,
   commentary,
   color,
   commentatorArtists,
@@ -71,6 +78,8 @@ export class Album extends Thing {
     urls: urls(),
 
     alwaysReferenceTracksByDirectory: flag(false),
+
+    additionalNames: additionalNameList(),
 
     bandcampAlbumIdentifier: simpleString(),
     bandcampArtworkIdentifier: simpleString(),
@@ -294,6 +303,11 @@ export class Album extends Thing {
 
       'Always Reference Tracks By Directory': {
         property: 'alwaysReferenceTracksByDirectory',
+      },
+
+      'Additional Names': {
+        property: 'additionalNames',
+        transform: parseAdditionalNames,
       },
 
       'Bandcamp Album ID': {

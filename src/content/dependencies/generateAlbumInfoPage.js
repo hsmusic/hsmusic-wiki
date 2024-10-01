@@ -1,5 +1,6 @@
 export default {
   contentDependencies: [
+    'generateAdditionalNamesBox',
     'generateAlbumAdditionalFilesList',
     'generateAlbumBanner',
     'generateAlbumCoverArtwork',
@@ -37,6 +38,9 @@ export default {
 
     sidebar:
       relation('generateAlbumSidebar', album, null),
+
+    additionalNamesBox:
+      relation('generateAdditionalNamesBox', album.additionalNames),
 
     cover:
       (album.hasCoverArt
@@ -101,6 +105,8 @@ export default {
         color: data.color,
         headingMode: 'sticky',
         styleRules: [relations.albumStyleRules],
+
+        additionalNames: relations.additionalNamesBox,
 
         cover:
           relations.cover
