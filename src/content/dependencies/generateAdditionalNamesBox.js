@@ -9,12 +9,19 @@ export default {
   }),
 
   generate: (relations, {html, language}) =>
-    html.tag('div', {id: 'additional-names-box'}, [
-      html.tag('p',
-        language.$('misc.additionalNames.title')),
+    html.tag('div', {id: 'additional-names-box'},
+      {[html.onlyIfContent]: true},
 
-      html.tag('ul',
-        relations.items
-          .map(item => html.tag('li', item))),
-    ]),
+      [
+        html.tag('p',
+          {[html.onlyIfSiblings]: true},
+
+          language.$('misc.additionalNames.title')),
+
+        html.tag('ul',
+          {[html.onlyIfContent]: true},
+
+          relations.items
+            .map(item => html.tag('li', item))),
+      ]),
 };
