@@ -447,7 +447,7 @@ export function parseAdditionalFiles(entries) {
 
 export function parseAdditionalNames(entries) {
   return parseArrayEntries(entries, item => {
-    if (typeof item === 'object' && item['Name'])
+    if (typeof item === 'object' && typeof item['Name'] === 'string')
       return {name: item['Name'], annotation: item['Annotation'] ?? null};
 
     if (typeof item !== 'string') return item;
