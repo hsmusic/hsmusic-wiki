@@ -918,7 +918,7 @@ export function validateWikiData({
 }
 
 export const isAdditionalName = validateProperties({
-  name: isName,
+  name: isContentString,
   annotation: optional(isContentString),
 
   // TODO: This only allows indicating sourcing from a track.
