@@ -236,6 +236,11 @@ export default {
       default: true,
     },
 
+    absorbPunctuationFollowingExternalLinks: {
+      type: 'boolean',
+      default: true,
+    },
+
     thumb: {
       validate: v => v.is('small', 'medium', 'large'),
       default: 'large',
@@ -247,11 +252,20 @@ export default {
     let internalLinkIndex = 0;
     let externalLinkIndex = 0;
 
+    let offsetTextNode = 0;
+
     const contentFromNodes =
-      data.nodes.map(node => {
+      data.nodes.map((node, index) => {
+        const nextNode = data.nodes[index + 1];
+
         switch (node.type) {
-          case 'text':
-            return {type: 'text', data: node.data};
+          case 'text': {
+            const text = node.data.slice(offsetTextNode);
+
+            offsetTextNode = 0;
+
+            return {type: 'text', data: text};
+          }
 
           case 'image': {
             const src =
@@ -400,6 +414,16 @@ export default {
               content: label,
               fromContent: true,
             });
+
+            if (slots.absorbPunctuationFollowingExternalLinks && nextNode?.type === 'text') {
+              const text = nextNode.data;
+              const match = text.match(/^[.,;:?!…]+/);
+              const suffix = match?.[0];
+              if (suffix) {
+                externalLink.setSlot('suffixNormalContent', suffix);
+                offsetTextNode = suffix.length;
+              }
+            }
 
             if (slots.indicateExternalLinks) {
               externalLink.setSlots({
