@@ -75,7 +75,10 @@ export default {
                         if (relations.annotationContent) {
                           workingCapsule += '.withAnnotation';
                           workingOptions.annotation =
-                            relations.annotationContent.slot('mode', 'inline');
+                            relations.annotationContent.slots({
+                              mode: 'inline',
+                              absorbPunctuationFollowingExternalLinks: false,
+                            });
                         }
 
                         if (workingCapsule === accentCapsule) {
