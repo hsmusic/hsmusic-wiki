@@ -168,6 +168,8 @@ export default {
             id: 'credit-sources',
             title: language.$('misc.creditSources'),
           }),
+
+          relations.artistCommentarySection,
         ],
 
         navLinkStyle: 'hierarchical',
