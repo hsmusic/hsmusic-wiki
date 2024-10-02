@@ -799,6 +799,10 @@ a:not([href]):hover {
   color: white;
 }
 
+.external-link .normal-content {
+  color: white;
+}
+
 .nav-main-links .nav-link.current > span.nav-link-content > a {
   font-weight: 800;
 }

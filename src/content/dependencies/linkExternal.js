@@ -11,6 +11,11 @@ export default {
       mutable: false,
     },
 
+    suffixNormalContent: {
+      type: 'html',
+      mutable: false,
+    },
+
     style: {
       // This awkward syntax is because the slot descriptor validator can't
       // differentiate between a function that returns a validator (the usual
@@ -129,6 +134,16 @@ export default {
 
     if (urlIsValid && slots.tab === 'separate') {
       linkAttributes.set('target', '_blank');
+    }
+
+    if (!html.isBlank(slots.suffixNormalContent)) {
+      linkContent =
+        html.tags([
+          linkContent,
+
+          html.tag('span', {class: 'normal-content'},
+            slots.suffixNormalContent),
+        ], {[html.joinChildren]: ''});
     }
 
     return html.tag('a', linkAttributes, linkContent);
