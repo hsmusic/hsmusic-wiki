@@ -164,12 +164,12 @@ export default {
             }),
           ]),
 
+          relations.artistCommentarySection,
+
           relations.creditSourcesSection.slots({
             id: 'credit-sources',
             title: language.$('misc.creditSources'),
           }),
-
-          relations.artistCommentarySection,
         ],
 
         navLinkStyle: 'hierarchical',
