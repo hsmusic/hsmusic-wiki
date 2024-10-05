@@ -5,6 +5,11 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
+exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > absorb punctuation 1`] = `
+<p>Don&#39;t you think this is an <a class="external-link from-content indicate-external" href="https://github.com/hsmusic/hsmusic-wiki/pull/567" title="github.com (opens in new tab)" target="_blank">interesting pull request<span class="normal-content">,</span></a> Steve?</p>
+<p>Aren&#39;t you <a class="external-link from-content indicate-external" href="https://github.com/hsmusic/hsmusic-wiki/pull/567" title="github.com (opens in new tab)" target="_blank">interested<span class="normal-content">...</span></a> in <a class="external-link from-content indicate-external" href="https://github.com/hsmusic/hsmusic-wiki/pull/567" title="github.com (opens in new tab)" target="_blank">checking it out<span class="normal-content">?!!</span></a></p>
+`
+
 exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > basic markdown 1`] = `
 <p>Hello <em>world!</em> This is <strong>SO COOL.</strong></p>
 `

@@ -161,6 +161,11 @@ testContentFunctions(t, 'transformContent (snapshot)', async (t, evaluate) => {
       `Email cute dogs to qznebula@protonmail.com please.\n` +
       `Just kidding... [unless?](mailto:qznebula@protonmail.com)`);
 
+  quickSnapshot(
+    `absorb punctuation`,
+      `Don't you think this is an [interesting pull request](https://github.com/hsmusic/hsmusic-wiki/pull/567), Steve?\n` +
+      `Aren't you [interested](https://github.com/hsmusic/hsmusic-wiki/pull/567)... in [checking it out](https://github.com/hsmusic/hsmusic-wiki/pull/567)?!!`);
+
   // TODO: Snapshots for mode: inline
   // TODO: Snapshots for mode: single-link
 });
