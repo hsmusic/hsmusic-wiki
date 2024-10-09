@@ -321,7 +321,16 @@ export async function go({
         'Content-Length': size,
       });
 
-      await pipeline(fd.createReadStream(), response);
+      try {
+        await pipeline(fd.createReadStream(), response);
+      } catch (error) {
+        if (error.code === 'ERR_STREAM_PREMATURE_CLOSE') {
+          // Connection was dropped, this is OK.
+          return;
+        } else {
+          throw error;
+        }
+      }
 
       if (loudResponses) console.log(`${requestHead} [200] ${pathname} (${colors.magenta(`web route`)})`);
 
