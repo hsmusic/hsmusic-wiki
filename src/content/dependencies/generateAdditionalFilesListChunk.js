@@ -29,8 +29,7 @@ export default {
               html.tag('span',
                 language.$(capsule, {
                   title:
-                    html.tag('span', {class: 'group-name'},
-                      slots.title),
+                    html.tag('b', slots.title),
                 }))),
 
             html.tag('ul', [

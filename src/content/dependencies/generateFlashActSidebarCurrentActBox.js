@@ -44,10 +44,11 @@ export default {
 
           [
             html.tag('summary',
-              html.tag('span', {class: 'group-name'},
-                (data.customListTerminology
-                  ? language.sanitize(data.customListTerminology)
-                  : language.$('flashSidebar.flashList.entriesInThisSection')))),
+              html.tag('span',
+                html.tag('b',
+                  (data.customListTerminology
+                    ? language.sanitize(data.customListTerminology)
+                    : language.$('flashSidebar.flashList.entriesInThisSection'))))),
 
             html.tag('ul',
               relations.flashLinks

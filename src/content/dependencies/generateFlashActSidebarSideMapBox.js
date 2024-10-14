@@ -68,8 +68,8 @@ export default {
 
               [
                 html.tag('summary',
-                  html.tag('span', {class: 'group-name'},
-                    sideName)),
+                  html.tag('span',
+                    html.tag('b', sideName))),
 
                 html.tag('ul',
                   actLinks.map((actLink, actIndex) =>

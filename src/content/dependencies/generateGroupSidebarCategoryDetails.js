@@ -59,8 +59,7 @@ export default {
             html.tag('span',
               language.$(capsule, 'category', {
                 category:
-                  html.tag('span', {class: 'group-name'},
-                    data.name),
+                  html.tag('b', data.name),
               }))),
 
           html.tag('ul',

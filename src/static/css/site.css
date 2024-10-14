@@ -397,6 +397,11 @@ body::before {
   padding-left: 5px;
 }
 
+summary > span b {
+  font-weight: normal;
+  color: var(--primary-color);
+}
+
 summary > span:hover {
   cursor: pointer;
   text-decoration: underline;
@@ -431,10 +436,6 @@ summary.underline-white > span:hover {
  */
 summary.underline-white > span:hover a:not(:hover) {
   text-decoration-color: white;
-}
-
-summary .group-name {
-  color: var(--primary-color);
 }
 
 .sidebar > details ul,

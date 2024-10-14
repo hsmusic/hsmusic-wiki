@@ -64,8 +64,7 @@ export default {
                           html.tag('span',
                             language.$(capsule, 'withMultipleFiles', {
                               title:
-                                html.tag('span', {class: 'group-name'},
-                                  additionalFileTitle),
+                                html.tag('b', additionalFileTitle),
 
                               files:
                                 language.countAdditionalFiles(

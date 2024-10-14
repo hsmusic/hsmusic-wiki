@@ -58,7 +58,7 @@ export default {
     const capsule = language.encapsulate('albumSidebar.trackList');
 
     const sectionName =
-      html.tag('span', {class: 'group-name'},
+      html.tag('b',
         (data.isDefaultTrackSection
           ? language.$(capsule, 'fallbackSectionName')
           : data.name));

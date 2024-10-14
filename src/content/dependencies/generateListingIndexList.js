@@ -107,8 +107,8 @@ export default {
 
                 [
                   html.tag('summary',
-                    html.tag('span', {class: 'group-name'},
-                      targetTitle)),
+                    html.tag('span',
+                      html.tag('b', targetTitle))),
 
                   listingLinkList,
                 ])));
