@@ -713,6 +713,14 @@ export const isTrackSection = validateProperties({
 
 export const isTrackSectionList = validateArrayItems(isTrackSection);
 
+export const isSeries = validateProperties({
+  name: isName,
+  description: optional(isContentString),
+  albums: optional(validateReferenceList('album')),
+});
+
+export const isSeriesList = validateArrayItems(isSeries);
+
 export function isDimensions(dimensions) {
   isArray(dimensions);
 

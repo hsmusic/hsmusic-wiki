@@ -3,6 +3,7 @@ export const GROUP_DATA_FILE = 'groups.yaml';
 import {input} from '#composite';
 import find from '#find';
 import Thing from '#thing';
+import {parseSerieses} from '#yaml';
 
 import {
   color,
@@ -10,6 +11,7 @@ import {
   directory,
   name,
   referenceList,
+  seriesList,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -32,6 +34,8 @@ export class Group extends Thing {
       find: input.value(find.album),
       data: 'albumData',
     }),
+
+    serieses: seriesList(),
 
     // Update only
 
@@ -105,6 +109,11 @@ export class Group extends Thing {
       'URLs': {property: 'urls'},
 
       'Featured Albums': {property: 'featuredAlbums'},
+
+      'Series': {
+        property: 'serieses',
+        transform: parseSerieses,
+      },
 
       'Review Points': {ignore: true},
     },

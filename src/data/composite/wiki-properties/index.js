@@ -22,6 +22,7 @@ export {default as referenceList} from './referenceList.js';
 export {default as reverseContributionList} from './reverseContributionList.js';
 export {default as reverseReferenceList} from './reverseReferenceList.js';
 export {default as reverseSingleReferenceList} from './reverseSingleReferenceList.js';
+export {default as seriesList} from './seriesList.js';
 export {default as simpleDate} from './simpleDate.js';
 export {default as simpleString} from './simpleString.js';
 export {default as singleReference} from './singleReference.js';

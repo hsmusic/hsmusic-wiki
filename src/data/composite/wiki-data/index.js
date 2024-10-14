@@ -17,6 +17,7 @@ export {default as withRedatedContributionList} from './withRedatedContributionL
 export {default as withResolvedContribs} from './withResolvedContribs.js';
 export {default as withResolvedReference} from './withResolvedReference.js';
 export {default as withResolvedReferenceList} from './withResolvedReferenceList.js';
+export {default as withResolvedSeriesList} from './withResolvedSeriesList.js';
 export {default as withReverseContributionList} from './withReverseContributionList.js';
 export {default as withReverseReferenceList} from './withReverseReferenceList.js';
 export {default as withReverseSingleReferenceList} from './withReverseSingleReferenceList.js';

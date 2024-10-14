@@ -462,6 +462,18 @@ export function parseAdditionalNames(entries) {
   });
 }
 
+export function parseSerieses(entries) {
+  return parseArrayEntries(entries, item => {
+    if (typeof item !== 'object') return item;
+
+    return {
+      name: item['Name'],
+      description: item['Description'] ?? null,
+      albums: item['Albums'] ?? null,
+    };
+  });
+}
+
 export function parseDimensions(string) {
   // It's technically possible to pass an array like [30, 40] through here.
   // That's not really an issue because if it isn't of the appropriate shape,
