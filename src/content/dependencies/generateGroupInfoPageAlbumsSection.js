@@ -2,6 +2,7 @@ export default {
   contentDependencies: [
     'generateContentHeading',
     'generateGroupInfoPageAlbumsListByDate',
+    'generateGroupInfoPageAlbumsListBySeries',
     'linkGroupGallery',
   ],
 
@@ -16,6 +17,9 @@ export default {
 
     albumsListByDate:
       relation('generateGroupInfoPageAlbumsListByDate', group),
+
+    albumsListBySeries:
+      relation('generateGroupInfoPageAlbumsListBySeries', group),
   }),
 
   generate: (relations, {html, language}) =>
@@ -39,5 +43,6 @@ export default {
               }))),
 
           relations.albumsListByDate,
+          relations.albumsListBySeries,
         ]))),
 };

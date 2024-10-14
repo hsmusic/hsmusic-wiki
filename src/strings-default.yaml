@@ -1286,6 +1286,10 @@ groupInfoPage:
   albumList:
     title: "Albums"
 
+    series:
+      _: >-
+        {SERIES}:
+
     item:
       _: >-
         {ALBUM}

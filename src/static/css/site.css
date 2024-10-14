@@ -1540,12 +1540,14 @@ ul > li.has-details {
   margin-left: -17px;
 }
 
-.album-group-list dt {
+.album-group-list dt,
+.group-series-list dt {
   font-style: oblique;
   padding-left: 0;
 }
 
-.album-group-list dd {
+.album-group-list dd,
+.group-series-list dd {
   margin-left: 0;
 }
 
