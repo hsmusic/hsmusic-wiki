@@ -5,6 +5,8 @@ export default {
     'linkAlbum',
   ],
 
+  extraDependencies: ['html'],
+
   relations: (relation, album, contribs) => ({
     template:
       relation('generateArtistInfoPageChunk'),
@@ -24,11 +26,25 @@ export default {
         .map(contrib => contrib.date),
   }),
 
-  generate: (data, relations) =>
+  slots: {
+    filterEditsForWiki: {
+      type: 'boolean',
+      default: false,
+    },
+  },
+
+  generate: (data, relations, slots) =>
     relations.template.slots({
       mode: 'album',
       albumLink: relations.albumLink,
-      dates: data.dates,
-      items: relations.items,
+
+      dates:
+        (slots.filterEditsForWiki
+          ? Array.from({length: data.dates}, () => null)
+          : data.dates),
+
+      items:
+        relations.items.map(item =>
+          item.slot('filterEditsForWiki', slots.filterEditsForWiki)),
     }),
 };

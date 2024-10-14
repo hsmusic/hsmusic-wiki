@@ -29,11 +29,6 @@ export default {
 
     duration: {validate: v => v.isDuration},
     durationApproximate: {type: 'boolean'},
-
-    trimAnnotations: {
-      type: 'boolean',
-      default: false,
-    },
   },
 
   generate(slots, {html, language}) {
@@ -107,10 +102,7 @@ export default {
       html.tag('dt', accentedLink),
       html.tag('dd',
         html.tag('ul',
-          slots.items
-            .map(item => item.slots({
-              trimAnnotation: slots.trimAnnotations,
-            })))),
+          slots.items)),
     ]);
   },
 };

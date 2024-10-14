@@ -65,15 +65,7 @@ export default {
   generate: (data, relations) =>
     relations.chunkedList.slots({
       chunks:
-        relations.chunks.map(chunk => {
-          if (data.filterEditsForWiki) {
-            chunk.setSlots({
-              trimAnnotations: true,
-              dates: [],
-            });
-          }
-
-          return chunk;
-        }),
+        relations.chunks.map(chunk =>
+          chunk.slot('filterEditsForWiki', data.filterEditsForWiki)),
     }),
 };

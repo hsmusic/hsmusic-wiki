@@ -39,11 +39,21 @@ export default {
       contrib.annotation,
   }),
 
-  generate: (data, relations, {html, language}) =>
+  slots: {
+    filterEditsForWiki: {
+      type: 'boolean',
+      default: false,
+    },
+  },
+
+  generate: (data, relations, slots, {html, language}) =>
     relations.template.slots({
       otherArtistLinks: relations.otherArtistLinks,
 
-      annotation: data.annotation,
+      annotation:
+        (slots.filterEditsForWiki
+          ? data.annotation?.replace(/^edits for wiki(: )?/, '')
+          : data.annotation),
 
       content:
         language.encapsulate('artistPage.creditList.entry', capsule =>
