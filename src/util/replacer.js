@@ -614,10 +614,15 @@ export function postprocessSummaries(inputNodes) {
       textContent += node.data.slice(parseFrom, match.index);
       parseFrom = match.index + match[0].length;
 
-      // We're wrapping the contents of the <summary> with a <span>.
-      // This means we have to add the closing </span> where the summary ends.
+      const colorizeWholeSummary = !match[1].includes('<b>');
+
+      // We're wrapping the contents of the <summary> with a <span>, and
+      // possibly with a <b>, too. This means we have to add the closing tags
+      // where the summary ends.
       textContent += `<summary><span>`;
+      textContent += (colorizeWholeSummary ? `<b>` : ``);
       textContent += match[1];
+      textContent += (colorizeWholeSummary ? `</b>` : ``);
       textContent += `</span></summary>`;
     }
 
