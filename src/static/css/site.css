@@ -1227,6 +1227,14 @@ ul.image-details li {
   box-shadow: 1px 2px 6px 5px #04040460;
 }
 
+.commentary-entry-body summary {
+  list-style-position: outside;
+}
+
+.commentary-entry-body summary > span {
+  color: var(--primary-color);
+}
+
 .commentary-art {
   float: right;
   width: 30%;

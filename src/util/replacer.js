@@ -596,6 +596,46 @@ export function postprocessHeadings(inputNodes) {
   return outputNodes;
 }
 
+export function postprocessSummaries(inputNodes) {
+  const outputNodes = [];
+
+  for (const node of inputNodes) {
+    if (node.type !== 'text') {
+      outputNodes.push(node);
+      continue;
+    }
+
+    const summaryRegexp = /<summary>(.*)<\/summary>/g;
+
+    let textContent = '';
+
+    let match = null, parseFrom = 0;
+    while (match = summaryRegexp.exec(node.data)) {
+      textContent += node.data.slice(parseFrom, match.index);
+      parseFrom = match.index + match[0].length;
+
+      // We're wrapping the contents of the <summary> with a <span>.
+      // This means we have to add the closing </span> where the summary ends.
+      textContent += `<summary><span>`;
+      textContent += match[1];
+      textContent += `</span></summary>`;
+    }
+
+    if (parseFrom !== node.data.length) {
+      textContent += node.data.slice(parseFrom);
+    }
+
+    outputNodes.push({
+      type: 'text',
+      data: textContent,
+      i: node.i,
+      iEnd: node.iEnd,
+    });
+  }
+
+  return outputNodes;
+}
+
 export function postprocessExternalLinks(inputNodes) {
   const outputNodes = [];
 
@@ -671,6 +711,7 @@ export function parseInput(input) {
     let output = parseNodes(input, 0);
     output = postprocessImages(output);
     output = postprocessHeadings(output);
+    output = postprocessSummaries(output);
     output = postprocessExternalLinks(output);
     return output;
   } catch (errorNode) {
