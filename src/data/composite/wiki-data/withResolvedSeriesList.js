@@ -3,6 +3,8 @@ import find from '#find';
 import {stitchArrays} from '#sugar';
 import {isSeriesList} from '#validators';
 
+import {raiseOutputWithoutDependency} from '#composite/control-flow';
+
 import {
   fillMissingListItems,
   withFlattenedList,
@@ -16,12 +18,23 @@ export default templateCompositeFrom({
   annotation: `withResolvedSeriesList`,
 
   inputs: {
-    list: input({validate: isSeriesList}),
+    list: input({
+      validate: isSeriesList,
+      acceptsNull: true,
+    }),
   },
 
   outputs: ['#resolvedSeriesList'],
 
   steps: () => [
+    raiseOutputWithoutDependency({
+      dependency: input('list'),
+      mode: input.value('empty'),
+      output: input.value({
+        ['#resolvedSeriesList']: [],
+      }),
+    }),
+
     withPropertiesFromList({
       list: input('list'),
       prefix: input.value('#serieses'),
