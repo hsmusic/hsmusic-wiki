@@ -67,6 +67,8 @@ export const info = {
     tidiedSidebar: null,
     collapsedDetailsForTidiness: null,
 
+    currentValue: null,
+
     workerStatus: null,
     searchStage: null,
 
@@ -298,17 +300,32 @@ export function mutatePageContent() {
   info.searchBox.appendChild(info.endSearchLine);
 }
 
+function trackSidebarSearchInputChanged() {
+  const {state} = info;
+
+  const newValue = info.searchInput.value;
+
+  if (newValue === state.currentValue) {
+    return false;
+  } else {
+    state.currentValue = newValue;
+    return !!newValue;
+  }
+}
+
 export function addPageListeners() {
   if (!info.searchInput) return;
 
   info.searchInput.addEventListener('change', _domEvent => {
-    if (info.searchInput.value) {
+    if (trackSidebarSearchInputChanged()) {
       activateSidebarSearch(info.searchInput.value);
     }
   });
 
   info.searchInput.addEventListener('input', _domEvent => {
     const {settings, state} = info;
+
+    trackSidebarSearchInputChanged();
 
     if (!info.searchInput.value) {
       clearSidebarSearch();
@@ -323,6 +340,16 @@ export function addPageListeners() {
       setTimeout(() => {
         activateSidebarSearch(info.searchInput.value);
       }, settings.stoppedTypingDelay);
+  });
+
+  info.searchInput.addEventListener('keydown', domEvent => {
+    if (domEvent.key === 'ArrowDown') {
+      const elem = info.results.firstChild;
+      if (elem?.classList.contains('wiki-search-result')) {
+        domEvent.preventDefault();
+        elem.focus({focusVisible: true});
+      }
+    }
   });
 
   info.endSearchLink.addEventListener('click', domEvent => {
@@ -769,6 +796,24 @@ function generateSidebarSearchResultTemplate(slots) {
 
   link.addEventListener('click', () => {
     saveSidebarSearchResultsScrollOffset();
+  });
+
+  link.addEventListener('keydown', domEvent => {
+    if (domEvent.key === 'ArrowDown') {
+      const elem = link.nextElementSibling;
+      if (elem) {
+        domEvent.preventDefault();
+        elem.focus({focusVisible: true});
+      }
+    } else if (domEvent.key === 'ArrowUp') {
+      domEvent.preventDefault();
+      const elem = link.previousElementSibling;
+      if (elem) {
+        elem.focus({focusVisible: true});
+      } else {
+        info.searchInput.focus();
+      }
+    }
   });
 
   return link;

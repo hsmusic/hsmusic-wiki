@@ -658,7 +658,8 @@ summary.underline-white > span:hover a:not(:hover) {
   border-bottom: 1px solid var(--dim-color);
 }
 
-.wiki-search-result:hover::before {
+.wiki-search-result:hover::before,
+.wiki-search-result:focus::before {
   display: block;
   background: var(--light-ghost-color);
 }
