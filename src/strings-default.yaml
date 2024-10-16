@@ -944,10 +944,10 @@ albumSecondaryNav:
     {GROUP} ({PREVIOUS_NEXT})
 
   series: >-
-    Series: {SERIES}
+    {SERIES}
 
   series.withPreviousNext: >-
-    Series: {SERIES} ({PREVIOUS_NEXT})
+    {SERIES} ({PREVIOUS_NEXT})
 
 #
 # albumPage:

@@ -63,6 +63,7 @@ export default {
   generate: (data, relations, slots, {html, language}) =>
     html.tag('span',
       {class: 'nav-link'},
+      {class: 'series-nav-link'},
 
       relations.colorStyle
         .slot('context', 'primary-only'),

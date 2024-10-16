@@ -9,6 +9,8 @@ export default {
     'generatePageSidebarConjoinedBox',
   ],
 
+  extraDependencies: ['html'],
+
   query(album) {
     const query = {};
 
@@ -50,20 +52,33 @@ export default {
     isAlbumPage: !track,
   }),
 
-  generate(data, relations) {
+  generate(data, relations, {html}) {
+    for (const box of [
+      ...relations.groupBoxes,
+      ...relations.seriesBoxes.flat(),
+    ]) {
+      box.setSlot('mode',
+        data.isAlbumPage ? 'album' : 'track');
+    }
+
     const groupAndSeriesBoxes =
       stitchArrays({
         groupBox: relations.groupBoxes,
         seriesBoxes: relations.seriesBoxes,
       }).map(({groupBox, seriesBoxes}) =>
-          [groupBox, ...seriesBoxes])
+          [groupBox].concat(
+            seriesBoxes.map(seriesBox => [
+              html.tag('div',
+                {class: 'sidebar-box-joiner'},
+                {class: 'collapsible'}),
+              seriesBox,
+            ])))
         .flat();
 
     return relations.sidebar.slots({
       boxes: [
         data.isAlbumPage &&
-          groupAndSeriesBoxes
-            .map(box => box.slot('mode', 'album')),
+          groupAndSeriesBoxes,
 
         relations.trackListBox,
 
@@ -72,7 +87,6 @@ export default {
             attributes: {class: 'conjoined-group-sidebar-box'},
             boxes:
               groupAndSeriesBoxes
-                .map(box => box.slot('mode', 'track'))
                 .map(box => box.content), /* TODO: Kludge. */
           }),
       ],

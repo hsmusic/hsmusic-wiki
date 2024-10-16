@@ -478,6 +478,18 @@ summary.underline-white > span:hover a:not(:hover) {
   align-self: flex-start !important; /* pls */
 }
 
+.sidebar-box-joiner {
+  width: 0;
+  margin-left: auto;
+  margin-right: auto;
+  border-right: 1px dashed var(--primary-color);
+  height: 10px;
+}
+
+.sidebar-box-joiner + .sidebar {
+  margin-top: 0 !important;
+}
+
 .wiki-search-sidebar-box {
   padding: 1px 0 0 0;
 
@@ -828,6 +840,11 @@ a:not([href]):hover {
 
 .nav-links-hierarchical .nav-link:not(:first-child)::before {
   content: "\0020/\0020";
+}
+
+.nav-links-groups .series-nav-link:not(:first-child)::before {
+  content: "\0020»\0020";
+  font-weight: normal;
 }
 
 .dot-switcher > span:not(:first-child)::before {
@@ -2887,6 +2904,7 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
 
 @media (max-width: 899.98px) {
   .sidebar.collapsible,
+  .sidebar-box-joiner.collapsible,
   .sidebar-column.all-boxes-collapsible {
     display: none;
   }
