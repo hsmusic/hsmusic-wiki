@@ -804,6 +804,10 @@ a:not([href]):hover {
   color: white;
 }
 
+.nav-link {
+  display: inline-block;
+}
+
 .nav-link a.series {
   font-style: oblique;
 }
