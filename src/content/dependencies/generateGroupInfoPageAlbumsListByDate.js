@@ -26,8 +26,19 @@ export default {
             group)),
   }),
 
-  generate: (relations, {html}) =>
+  slots: {
+    hidden: {
+      type: 'boolean',
+      default: false,
+    },
+  },
+
+  generate: (relations, slots, {html}) =>
     html.tag('ul',
+      {id: 'group-album-list-by-date'},
+
+      slots.hidden && {style: 'display: none'},
+
       {[html.onlyIfContent]: true},
 
       relations.items),

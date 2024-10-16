@@ -3,6 +3,7 @@ export default {
     'generateContentHeading',
     'generateGroupInfoPageAlbumsListByDate',
     'generateGroupInfoPageAlbumsListBySeries',
+    'generateIntrapageDotSwitcher',
     'linkGroupGallery',
   ],
 
@@ -20,6 +21,9 @@ export default {
 
     albumsListBySeries:
       relation('generateGroupInfoPageAlbumsListBySeries', group),
+
+    viewSwitcher:
+      relation('generateIntrapageDotSwitcher'),
   }),
 
   generate: (relations, {html, language}) =>
@@ -35,14 +39,55 @@ export default {
           html.tag('p',
             {[html.onlyIfSiblings]: true},
 
-            language.encapsulate(pageCapsule, 'viewAlbumGallery', capsule =>
-              language.$(capsule, {
-                link:
+            language.encapsulate(pageCapsule, 'viewAlbumGallery', viewAlbumGalleryCapsule =>
+              language.encapsulate(viewAlbumGalleryCapsule, workingCapsule => {
+                const workingOptions = {};
+
+                workingOptions.link =
                   relations.galleryLink
-                    .slot('content', language.$(capsule, 'link')),
+                    .slot('content',
+                      language.$(viewAlbumGalleryCapsule, 'link'));
+
+                if (
+                  !html.isBlank(relations.albumsListByDate) &&
+                  !html.isBlank(relations.albumsListBySeries)
+                ) {
+                  workingCapsule += '.withViewSwitcher';
+                  workingOptions.viewSwitcher =
+                    html.tag('span', {class: 'group-view-switcher'},
+                      language.encapsulate(pageCapsule, 'viewSwitcher', switcherCapsule =>
+                        language.$(switcherCapsule, {
+                          options:
+                            relations.viewSwitcher.slots({
+                              initialOptionIndex: 0,
+
+                              titles: [
+                                language.$(switcherCapsule, 'bySeries'),
+                                language.$(switcherCapsule, 'byDate'),
+                              ],
+
+                              targetIDs: [
+                                'group-album-list-by-series',
+                                'group-album-list-by-date',
+                              ],
+                            }),
+                        })));
+                }
+
+                return language.$(workingCapsule, workingOptions);
               }))),
 
-          relations.albumsListByDate,
-          relations.albumsListBySeries,
+          ((!html.isBlank(relations.albumsListByDate) &&
+            !html.isBlank(relations.albumsListBySeries))
+
+            ? [
+                relations.albumsListBySeries,
+                relations.albumsListByDate.slot('hidden', true),
+              ]
+
+            : [
+                relations.albumsListBySeries,
+                relations.albumsListByDate,
+              ]),
         ]))),
 };

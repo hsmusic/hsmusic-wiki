@@ -1588,6 +1588,10 @@ ul > li.has-details {
   font-style: oblique;
 }
 
+.group-view-switcher {
+  margin-left: 1ch;
+}
+
 #content hr {
   border: 1px inset #808080;
   width: 100%;

@@ -30,7 +30,10 @@ export default {
 
   generate: (data, relations, {html, language}) =>
     language.encapsulate('groupInfoPage.albumList', listCapsule =>
-      html.tag('dl', {class: 'group-series-list'},
+      html.tag('dl',
+        {id: 'group-album-list-by-series'},
+        {class: 'group-series-list'},
+
         {[html.onlyIfContent]: true},
 
         stitchArrays({

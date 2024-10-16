@@ -1275,8 +1275,20 @@ groupInfoPage:
   title: "{GROUP}"
 
   viewAlbumGallery:
-    _: "View {LINK}! Or browse the list:"
+    _: >-
+      View {LINK}! Or browse the list:
+
     link: "album gallery"
+
+    withViewSwitcher:
+      _: >-
+        View {LINK}! Or browse the list: {VIEW_SWITCHER}
+
+  viewSwitcher:
+    _: "({OPTIONS})"
+
+    bySeries: "By series"
+    byDate: "By date"
 
   # albumList:
   #   Many albums are present under multiple groups, and these get an
