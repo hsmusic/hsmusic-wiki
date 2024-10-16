@@ -822,6 +822,25 @@ a:not([href]):hover {
   content: "\0020/\0020";
 }
 
+.dot-switcher > span:not(:first-child)::before {
+  content: "\0020\00b7\0020";
+  font-weight: 800;
+}
+
+.dot-switcher > span.current {
+  font-weight: 800;
+}
+
+.dot-switcher > span:not(.current) a {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.dot-switcher > span.current a {
+  /* Keeping cursor: pointer (the default) is intentional here. */
+  text-decoration: none !important;
+}
+
 #secondary-nav {
   text-align: center;
 }
