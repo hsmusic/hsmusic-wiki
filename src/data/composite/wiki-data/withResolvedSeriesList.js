@@ -1,7 +1,7 @@
 import {input, templateCompositeFrom} from '#composite';
 import find from '#find';
 import {stitchArrays} from '#sugar';
-import {isSeriesList} from '#validators';
+import {isSeriesList, validateThing} from '#validators';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 
@@ -18,6 +18,10 @@ export default templateCompositeFrom({
   annotation: `withResolvedSeriesList`,
 
   inputs: {
+    group: input({
+      validate: validateThing({referenceType: 'group'}),
+    }),
+
     list: input({
       validate: isSeriesList,
       acceptsNull: true,
@@ -84,12 +88,30 @@ export default templateCompositeFrom({
         ['#serieses.description']: description,
         ['#serieses.albums']: albums,
       }) => continuation({
-        ['#resolvedSeriesList']:
+        ['#seriesProperties']:
           stitchArrays({
             name,
             description,
             albums,
-          }),
+          }).map(properties => ({
+              ...properties,
+              group: input
+            }))
+      }),
+    },
+
+    {
+      dependencies: ['#seriesProperties', input('group')],
+      compute: (continuation, {
+        ['#seriesProperties']: seriesProperties,
+        [input('group')]: group,
+      }) => continuation({
+        ['#resolvedSeriesList']:
+          seriesProperties
+            .map(properties => ({
+              ...properties,
+              group,
+            })),
       }),
     },
   ],

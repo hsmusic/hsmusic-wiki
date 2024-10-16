@@ -1,5 +1,5 @@
 import {input, templateCompositeFrom} from '#composite';
-import {isSeriesList} from '#validators';
+import {isSeriesList, validateThing} from '#validators';
 
 import {exposeDependency} from '#composite/control-flow';
 import {withResolvedSeriesList} from '#composite/wiki-data';
@@ -9,8 +9,16 @@ export default templateCompositeFrom({
 
   compose: false,
 
+  inputs: {
+    group: input({
+      validate: validateThing({referenceType: 'group'}),
+    }),
+  },
+
   steps: () => [
     withResolvedSeriesList({
+      group: input('group'),
+
       list: input.updateValue({
         validate: isSeriesList,
       }),

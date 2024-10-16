@@ -35,7 +35,9 @@ export class Group extends Thing {
       data: 'albumData',
     }),
 
-    serieses: seriesList(),
+    serieses: seriesList({
+      group: input.myself(),
+    }),
 
     // Update only
 
