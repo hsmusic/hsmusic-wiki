@@ -10,6 +10,7 @@ import * as cssCompatibilityAssistantModule from './css-compatibility-assistant.
 import * as datetimestampTooltipModule from './datetimestamp-tooltip.js';
 import * as hashLinkModule from './hash-link.js';
 import * as hoverableTooltipModule from './hoverable-tooltip.js';
+import * as intrapageDotSwitcherModule from './intrapage-dot-switcher.js';
 import * as liveMousePositionModule from './live-mouse-position.js';
 import * as quickDescriptionModule from './quick-description.js';
 import * as scriptedLinkModule from './scripted-link.js';
@@ -27,6 +28,7 @@ export const modules = [
   datetimestampTooltipModule,
   hashLinkModule,
   hoverableTooltipModule,
+  intrapageDotSwitcherModule,
   liveMousePositionModule,
   quickDescriptionModule,
   scriptedLinkModule,
