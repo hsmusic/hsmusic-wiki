@@ -779,6 +779,10 @@ a.current {
   font-weight: 800;
 }
 
+a.series {
+  font-style: oblique;
+}
+
 a:not([href]) {
   cursor: default;
 }
@@ -806,10 +810,6 @@ a:not([href]):hover {
 
 .nav-link {
   display: inline-block;
-}
-
-.nav-link a.series {
-  font-style: oblique;
 }
 
 .nav-main-links .nav-link.current > span.nav-link-content > a {
@@ -1592,8 +1592,14 @@ ul > li.has-details {
   margin-bottom: 0;
 }
 
-.group-chronology-link {
+.group-chronology-link,
+.series-chronology-link {
   font-style: oblique;
+}
+
+.group-chronology-link a,
+.series-chronology-link a {
+  font-style: normal;
 }
 
 .group-view-switcher {

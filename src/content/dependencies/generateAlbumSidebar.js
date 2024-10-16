@@ -1,12 +1,30 @@
+import {stitchArrays} from '#sugar';
+
 export default {
   contentDependencies: [
     'generateAlbumSidebarGroupBox',
+    'generateAlbumSidebarSeriesBox',
     'generateAlbumSidebarTrackListBox',
     'generatePageSidebar',
     'generatePageSidebarConjoinedBox',
   ],
 
-  relations: (relation, album, track) => ({
+  query(album) {
+    const query = {};
+
+    query.groups =
+      album.groups;
+
+    query.groupSerieses =
+      query.groups
+        .map(group =>
+          group.serieses
+            .filter(series => series.albums.includes(album)));
+
+    return query;
+  },
+
+  relations: (relation, query, album, track) => ({
     sidebar:
       relation('generatePageSidebar'),
 
@@ -17,19 +35,34 @@ export default {
       relation('generateAlbumSidebarTrackListBox', album, track),
 
     groupBoxes:
-      album.groups.map(group =>
-        relation('generateAlbumSidebarGroupBox', album, group)),
+      query.groups
+        .map(group =>
+          relation('generateAlbumSidebarGroupBox', album, group)),
+
+    seriesBoxes:
+      query.groupSerieses
+        .map(serieses => serieses
+          .map(series =>
+            relation('generateAlbumSidebarSeriesBox', album, series))),
   }),
 
-  data: (album, track) => ({
+  data: (_query, _album, track) => ({
     isAlbumPage: !track,
   }),
 
-  generate: (data, relations) =>
-    relations.sidebar.slots({
+  generate(data, relations) {
+    const groupAndSeriesBoxes =
+      stitchArrays({
+        groupBox: relations.groupBoxes,
+        seriesBoxes: relations.seriesBoxes,
+      }).map(({groupBox, seriesBoxes}) =>
+          [groupBox, ...seriesBoxes])
+        .flat();
+
+    return relations.sidebar.slots({
       boxes: [
         data.isAlbumPage &&
-          relations.groupBoxes
+          groupAndSeriesBoxes
             .map(box => box.slot('mode', 'album')),
 
         relations.trackListBox,
@@ -38,10 +71,11 @@ export default {
           relations.conjoinedBox.slots({
             attributes: {class: 'conjoined-group-sidebar-box'},
             boxes:
-              relations.groupBoxes
+              groupAndSeriesBoxes
                 .map(box => box.slot('mode', 'track'))
                 .map(box => box.content), /* TODO: Kludge. */
           }),
       ],
-    }),
+    });
+  }
 };
