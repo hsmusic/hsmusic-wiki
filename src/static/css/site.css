@@ -804,6 +804,10 @@ a:not([href]):hover {
   color: white;
 }
 
+.nav-link a.series {
+  font-style: oblique;
+}
+
 .nav-main-links .nav-link.current > span.nav-link-content > a {
   font-weight: 800;
 }
