@@ -931,6 +931,19 @@ albumSidebar:
     previous: "Previous: {ALBUM}"
 
 #
+# albumSecondaryNav:
+#   The secondary nav bar is shown in medium and thin layouts,
+#   and provides access to the same navigational features present
+#   in the sidebar (with a more compact view).
+#
+albumSecondaryNav:
+  group: >-
+    {GROUP}
+
+  group.withPreviousNext: >-
+    {GROUP} ({PREVIOUS_NEXT})
+
+#
 # albumPage:
 #
 #   Albums group together tracks and provide quick access to each of
