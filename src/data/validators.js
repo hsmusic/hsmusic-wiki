@@ -717,6 +717,8 @@ export const isSeries = validateProperties({
   name: isName,
   description: optional(isContentString),
   albums: optional(validateReferenceList('album')),
+
+  showAlbumArtists: optional(isBoolean),
 });
 
 export const isSeriesList = validateArrayItems(isSeries);

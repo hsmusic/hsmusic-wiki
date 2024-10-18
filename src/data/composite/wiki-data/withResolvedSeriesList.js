@@ -46,6 +46,8 @@ export default templateCompositeFrom({
         'name',
         'description',
         'albums',
+
+        'showAlbumArtists',
       ]),
     }),
 
@@ -76,23 +78,34 @@ export default templateCompositeFrom({
       fill: input.value(null),
     }),
 
+    fillMissingListItems({
+      list: '#serieses.showAlbumArtists',
+      fill: input.value(null),
+    }),
+
     {
       dependencies: [
         '#serieses.name',
         '#serieses.description',
         '#serieses.albums',
+
+        '#serieses.showAlbumArtists',
       ],
 
       compute: (continuation, {
         ['#serieses.name']: name,
         ['#serieses.description']: description,
         ['#serieses.albums']: albums,
+
+        ['#serieses.showAlbumArtists']: showAlbumArtists,
       }) => continuation({
         ['#seriesProperties']:
           stitchArrays({
             name,
             description,
             albums,
+
+            showAlbumArtists,
           }).map(properties => ({
               ...properties,
               group: input
