@@ -1725,6 +1725,15 @@ html[data-url-key="localized.albumCommentary"] .content-heading-accent {
   display: inline-block;
 }
 
+html[data-url-key="localized.groupInfo"] .by {
+  opacity: 0.7;
+  font-style: oblique;
+}
+
+html[data-url-key="localized.groupInfo"] .by a {
+  color: var(--page-primary-color);
+}
+
 html[data-url-key="localized.listing"][data-url-value0="random"] #data-loading-line,
 html[data-url-key="localized.listing"][data-url-value0="random"] #data-loaded-line,
 html[data-url-key="localized.listing"][data-url-value0="random"] #data-error-line {

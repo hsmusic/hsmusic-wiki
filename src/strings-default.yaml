@@ -1325,17 +1325,31 @@ groupInfoPage:
       _: >-
         {ALBUM}
 
-      withYear: >-
-        {YEAR_ACCENT} {ALBUM}
+      withYear:
+        _: >-
+          {YEAR_ACCENT} {ALBUM}
 
-      withOtherGroup: >-
-        {ALBUM} {OTHER_GROUP_ACCENT}
+        accent: "({YEAR})"
+
+      withOtherGroup:
+        _: >-
+          {ALBUM} {OTHER_GROUP_ACCENT}
+
+        accent: "(from {GROUPS})"
+
+      withArtists:
+        _: >-
+          {ALBUM} {BY}
+
+        by: "by {ARTISTS}"
+        featuring: "feat. {ARTISTS}"
+        by.featuring: "by {ARTISTS} feat. {FEATURING}"
 
       withYear.withOtherGroup: >-
         {YEAR_ACCENT} {ALBUM} {OTHER_GROUP_ACCENT}
 
-      yearAccent: "({YEAR})"
-      otherGroupAccent:  "(from {GROUPS})"
+      withYear.withArtists: >-
+        {YEAR_ACCENT} {ALBUM} {BY}
 
 #
 # groupGalleryPage:

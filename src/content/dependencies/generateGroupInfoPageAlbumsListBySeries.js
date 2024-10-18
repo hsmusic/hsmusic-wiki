@@ -26,6 +26,10 @@ export default {
     seriesNames:
       group.serieses
         .map(series => series.name),
+
+    seriesShowAlbumArtists:
+      group.serieses
+        .map(series => series.showAlbumArtists),
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -38,9 +42,15 @@ export default {
 
         stitchArrays({
           name: data.seriesNames,
+          showAlbumArtists: data.seriesShowAlbumArtists,
           heading: relations.seriesHeadings,
           items: relations.seriesItems,
-        }).map(({heading, name, items}) =>
+        }).map(({
+            name,
+            showAlbumArtists,
+            heading,
+            items,
+          }) =>
             html.tags([
               heading.slots({
                 tag: 'dt',
@@ -52,6 +62,10 @@ export default {
 
               html.tag('dd',
                 html.tag('ul',
-                  items)),
+                  items.map(item =>
+                    item.slots({
+                      accentMode:
+                        (showAlbumArtists ? 'artists' : null),
+                    })))),
             ])))),
 };
