@@ -856,12 +856,12 @@ a:not([href]):hover {
   font-weight: 800;
 }
 
-.dot-switcher > span:not(.current) a {
+.dot-switcher.intrapage > span:not(.current) a {
   text-decoration: underline;
   text-decoration-style: dotted;
 }
 
-.dot-switcher > span.current a {
+.dot-switcher.intrapage > span.current a {
   /* Keeping cursor: pointer (the default) is intentional here. */
   text-decoration: none !important;
 }
