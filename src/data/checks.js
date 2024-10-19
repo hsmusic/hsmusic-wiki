@@ -208,6 +208,10 @@ export function filterReferenceErrors(wikiData, {
       flashes: 'flash',
     }],
 
+    ['groupData', {
+      serieses: '_serieses',
+    }],
+
     ['trackData', {
       artistContribs: '_contrib',
       contributorContribs: '_contrib',
@@ -258,6 +262,15 @@ export function filterReferenceErrors(wikiData, {
                 // need writing, humm...)
                 writeProperty = false;
                 break;
+
+              case '_serieses':
+                if (value) {
+                  // Doesn't report on which series has the error, but...
+                  value = value.flatMap(series => series.albums);
+                }
+
+                writeProperty = false;
+                break;
             }
 
             if (value === undefined) {
@@ -292,6 +305,10 @@ export function filterReferenceErrors(wikiData, {
 
                   return boundFind.group(groupRef);
                 };
+                break;
+
+              case '_serieses':
+                findFn = boundFind.album;
                 break;
 
               case '_trackNotRerelease':
