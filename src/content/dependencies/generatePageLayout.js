@@ -379,14 +379,23 @@ export default {
                         content),
 
                       html.tag('span', {class: 'nav-link-accent'},
+                        {[html.noEdgeWhitespace]: true},
                         {[html.onlyIfContent]: true},
-                        cur.accent),
+
+                        language.$('misc.navAccent', {
+                          [language.onlyIfOptions]: ['links'],
+                          links: cur.accent,
+                        })),
                     ]));
               })),
 
           html.tag('div', {class: 'nav-bottom-row'},
             {[html.onlyIfContent]: true},
-            slots.navBottomRowContent),
+
+            language.$('misc.navAccent', {
+              [language.onlyIfOptions]: ['links'],
+              links: slots.navBottomRowContent,
+            })),
 
           html.tag('div', {class: 'nav-content'},
             {[html.onlyIfContent]: true},

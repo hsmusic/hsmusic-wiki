@@ -692,6 +692,12 @@ misc:
 
   missingLinkContent: "(Missing link content)"
 
+  # navAccent:
+  #   Accent shown in the nav bar for navigating to pages that are
+  #   related to the current one.
+
+  navAccent: "({LINKS})"
+
   # quickDescription:
   #   Toggleable display where a shorter blurb from a description is
   #   initially visible, and a button can be clicked to display the
