@@ -1,5 +1,5 @@
 export default {
-  extraDependencies: ['html', 'language'],
+  extraDependencies: ['html'],
 
   slots: {
     attributes: {
@@ -14,16 +14,20 @@ export default {
     initialOptionIndex: {type: 'number'},
   },
 
-  generate: (slots, {html, language}) =>
+  generate: (slots, {html}) =>
     html.tag('span', {class: 'dot-switcher'},
+      {[html.noEdgeWhitespace]: true},
+      {[html.joinChildren]: ''},
+
       slots.attributes,
 
-      language.formatListWithoutSeparator(
-        slots.options
-          .map((option, index) =>
-            html.tag('span',
-              index === slots.initialOptionIndex &&
-                {class: 'current'},
+      slots.options
+        .map((option, index) =>
+          html.tag('span',
+            {[html.onlyIfContent]: true},
 
-              option)))),
+            index === slots.initialOptionIndex &&
+              {class: 'current'},
+
+            option))),
 };
