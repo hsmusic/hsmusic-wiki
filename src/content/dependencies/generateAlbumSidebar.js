@@ -61,24 +61,21 @@ export default {
         data.isAlbumPage ? 'album' : 'track');
     }
 
-    const groupAndSeriesBoxes =
-      stitchArrays({
-        groupBox: relations.groupBoxes,
-        seriesBoxes: relations.seriesBoxes,
-      }).map(({groupBox, seriesBoxes}) =>
-          [groupBox].concat(
-            seriesBoxes.map(seriesBox => [
-              html.tag('div',
-                {class: 'sidebar-box-joiner'},
-                {class: 'collapsible'}),
-              seriesBox,
-            ])))
-        .flat();
-
     return relations.sidebar.slots({
       boxes: [
         data.isAlbumPage &&
-          groupAndSeriesBoxes,
+          stitchArrays({
+            groupBox: relations.groupBoxes,
+            seriesBoxes: relations.seriesBoxes,
+          }).map(({groupBox, seriesBoxes}) => [
+              groupBox,
+              seriesBoxes.map(seriesBox => [
+                html.tag('div',
+                  {class: 'sidebar-box-joiner'},
+                  {class: 'collapsible'}),
+                seriesBox,
+              ]),
+            ]),
 
         relations.trackListBox,
 
@@ -86,7 +83,11 @@ export default {
           relations.conjoinedBox.slots({
             attributes: {class: 'conjoined-group-sidebar-box'},
             boxes:
-              groupAndSeriesBoxes
+              stitchArrays({
+                groupBox: relations.groupBoxes,
+                seriesBoxes: relations.seriesBoxes,
+              }).map(({groupBox, seriesBoxes}) => [groupBox, ...seriesBoxes])
+                .flat()
                 .map(box => box.content), /* TODO: Kludge. */
           }),
       ],
