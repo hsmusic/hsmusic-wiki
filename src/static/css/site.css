@@ -1110,6 +1110,7 @@ s.spoiler {
   text-decoration-color: white;
   text-decoration-style: dashed;
   text-decoration-skip: none;
+  text-decoration-skip-ink: none;
 }
 
 s.spoiler::selection {
