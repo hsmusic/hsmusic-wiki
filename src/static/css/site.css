@@ -842,6 +842,10 @@ a:not([href]):hover {
   content: "\0020/\0020";
 }
 
+.series-nav-link {
+  display: inline-block;
+}
+
 .series-nav-link:not(:first-child)::before {
   content: "\0020»\0020";
   font-weight: normal;
