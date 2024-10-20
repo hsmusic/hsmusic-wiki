@@ -1,7 +1,7 @@
-import {empty, stitchArrays} from '#sugar';
+import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['linkTrack', 'linkContribution'],
+  contentDependencies: ['generateArtistCredit', 'linkTrack'],
 
   extraDependencies: ['html', 'language'],
 
@@ -10,11 +10,10 @@ export default {
       tracks
         .map(track => relation('linkTrack', track)),
 
-    contributionLinks:
+    artistCredits:
       tracks
         .map(track =>
-          track.artistContribs
-            .map(contrib => relation('linkContribution', contrib))),
+          relation('generateArtistCredit', track.artistContribs, [])),
   }),
 
   generate: (relations, {html, language}) =>
@@ -23,22 +22,32 @@ export default {
 
       stitchArrays({
         trackLink: relations.trackLinks,
-        contributionLinks: relations.contributionLinks,
-      }).map(({trackLink, contributionLinks}) =>
+        artistCredit: relations.artistCredits,
+      }).map(({trackLink, artistCredit}) =>
           html.tag('li',
             language.encapsulate('trackList.item', itemCapsule =>
               language.encapsulate(itemCapsule, workingCapsule => {
                 const workingOptions = {track: trackLink};
 
-                if (!empty(contributionLinks)) {
+                const artistCapsule = language.encapsulate(itemCapsule, 'withArtists');
+
+                artistCredit.setSlots({
+                  normalStringKey:
+                    artistCapsule + '.by',
+
+                  featuringStringKey:
+                    artistCapsule + '.featuring',
+
+                  normalFeaturingStringKey:
+                    artistCapsule + '.by.featuring',
+                });
+
+                if (!html.isBlank(artistCredit)) {
                   workingCapsule += '.withArtists';
                   workingOptions.by =
                     html.tag('span', {class: 'by'},
                       html.metatag('chunkwrap', {split: ','},
-                        language.$(itemCapsule, 'withArtists.by', {
-                          artists:
-                            language.formatConjunctionList(contributionLinks),
-                        })));
+                        html.resolve(artistCredit)));
                 }
 
                 return language.$(workingCapsule, workingOptions);
