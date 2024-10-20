@@ -1,55 +1,21 @@
-import {stitchArrays} from '#sugar';
-
 export default {
-  contentDependencies: ['generateArtistCredit', 'linkTrack'],
-
-  extraDependencies: ['html', 'language'],
+  contentDependencies: ['generateTrackListItem'],
+  extraDependencies: ['html'],
 
   relations: (relation, tracks) => ({
-    trackLinks:
+    items:
       tracks
-        .map(track => relation('linkTrack', track)),
-
-    artistCredits:
-      tracks
-        .map(track =>
-          relation('generateArtistCredit', track.artistContribs, [])),
+        .map(track => relation('generateTrackListItem', track, [])),
   }),
 
-  generate: (relations, {html, language}) =>
+  generate: (relations, {html}) =>
     html.tag('ul',
       {[html.onlyIfContent]: true},
 
-      stitchArrays({
-        trackLink: relations.trackLinks,
-        artistCredit: relations.artistCredits,
-      }).map(({trackLink, artistCredit}) =>
-          html.tag('li',
-            language.encapsulate('trackList.item', itemCapsule =>
-              language.encapsulate(itemCapsule, workingCapsule => {
-                const workingOptions = {track: trackLink};
-
-                const artistCapsule = language.encapsulate(itemCapsule, 'withArtists');
-
-                artistCredit.setSlots({
-                  normalStringKey:
-                    artistCapsule + '.by',
-
-                  featuringStringKey:
-                    artistCapsule + '.featuring',
-
-                  normalFeaturingStringKey:
-                    artistCapsule + '.by.featuring',
-                });
-
-                if (!html.isBlank(artistCredit)) {
-                  workingCapsule += '.withArtists';
-                  workingOptions.by =
-                    html.tag('span', {class: 'by'},
-                      html.metatag('chunkwrap', {split: ','},
-                        html.resolve(artistCredit)));
-                }
-
-                return language.$(workingCapsule, workingOptions);
-              }))))),
+      relations.items.map(item =>
+        item.slots({
+          showArtists: true,
+          showDuration: false,
+          color: true,
+        }))),
 };
