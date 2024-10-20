@@ -27,6 +27,11 @@ export default {
       default: true,
     },
 
+    id: {
+      type: 'boolean',
+      default: false,
+    },
+
     attributes: {
       type: 'attributes',
       mutable: false,
@@ -92,12 +97,12 @@ export default {
             relations.switcher.slots({
               links: [
                 relations.previousLink.slots({
-                  id: false,
+                  id: slots.id,
                   link: slots.previousLink,
                 }),
 
                 relations.nextLink.slots({
-                  id: false,
+                  id: slots.id,
                   link: slots.nextLink,
                 }),
               ],
