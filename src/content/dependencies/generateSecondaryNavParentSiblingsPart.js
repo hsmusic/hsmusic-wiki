@@ -22,9 +22,9 @@ export default {
   }),
 
   slots: {
-    mode: {
-      validate: v => v.is('album', 'track'),
-      default: 'album',
+    showPreviousNext: {
+      type: 'boolean',
+      default: true,
     },
 
     attributes: {
@@ -82,7 +82,7 @@ export default {
             : slots.mainLink
                 .slot('color', false));
 
-        if (slots.mode === 'album') addPreviousNext: {
+        if (slots.showPreviousNext) addPreviousNext: {
           if (html.isBlank(slots.previousLink) && html.isBlank(slots.nextLink)) {
             break addPreviousNext;
           }
