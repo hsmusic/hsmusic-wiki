@@ -1,16 +1,17 @@
-import {atOffset, empty} from '#sugar';
+import {atOffset} from '#sugar';
 
 export default {
   contentDependencies: [
-    'generatePreviousNextLinks',
+    'generateInterpageDotSwitcher',
+    'generateNextLink',
+    'generatePreviousLink',
     'linkFlashAct',
   ],
 
-  extraDependencies: ['html', 'language', 'wikiData'],
+  extraDependencies: ['wikiData'],
 
-  sprawl({flashActData}) {
-    return {flashActData};
-  },
+  sprawl: ({flashActData}) =>
+    ({flashActData}),
 
   query(sprawl, flashAct) {
     // Like with generateFlashNavAccent, don't sort chronologically here.
@@ -29,43 +30,35 @@ export default {
     return {previousFlashAct, nextFlashAct};
   },
 
-  relations(relation, query) {
-    const relations = {};
+  relations: (relation, query) => ({
+    switcher:
+      relation('generateInterpageDotSwitcher'),
 
-    if (query.previousFlashAct || query.nextFlashAct) {
-      relations.previousNextLinks =
-        relation('generatePreviousNextLinks');
+    previousLink:
+      relation('generatePreviousLink'),
 
-      relations.previousFlashActLink =
-        (query.previousFlashAct
-          ? relation('linkFlashAct', query.previousFlashAct)
-          : null);
+    nextLink:
+      relation('generateNextLink'),
 
-      relations.nextFlashActLink =
-        (query.nextFlashAct
-          ? relation('linkFlashAct', query.nextFlashAct)
-          : null);
-    }
+    previousFlashActLink:
+      (query.previousFlashAct
+        ? relation('linkFlashAct', query.previousFlashAct)
+        : null),
 
-    return relations;
-  },
+    nextFlashActLink:
+      (query.nextFlashAct
+        ? relation('linkFlashAct', query.nextFlashAct)
+        : null),
+  }),
 
-  generate(relations, {html, language}) {
-    const {content: previousNextLinks = []} =
-      relations.previousNextLinks &&
-        relations.previousNextLinks.slots({
-          previousLink: relations.previousFlashActLink,
-          nextLink: relations.nextFlashActLink,
-        });
+  generate: (relations) =>
+    relations.switcher.slots({
+      links: [
+        relations.previousLink
+          .slot('link', relations.previousFlashActLink),
 
-    const allLinks = [
-      ...previousNextLinks,
-    ].filter(Boolean);
-
-    if (empty(allLinks)) {
-      return html.blank();
-    }
-
-    return `(${language.formatUnitList(allLinks)})`;
-  },
+        relations.nextLink
+          .slot('link', relations.nextFlashActLink),
+      ],
+    }),
 };
