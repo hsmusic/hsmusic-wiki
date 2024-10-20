@@ -1103,6 +1103,20 @@ li:not(:first-child:last-child) .tooltip,
   color: var(--page-primary-color);
 }
 
+s.spoiler {
+  display: inline-block;
+  color: transparent;
+  text-decoration: underline;
+  text-decoration-color: white;
+  text-decoration-style: dashed;
+  text-decoration-skip: none;
+}
+
+s.spoiler::selection {
+  color: black;
+  background: white;
+}
+
 progress {
   accent-color: var(--primary-color);
 }
