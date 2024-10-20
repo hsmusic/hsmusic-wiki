@@ -33,7 +33,10 @@ export default {
     const contextNormalContributions =
       contextContributions.filter(normalFilter);
 
-    query.normalContributionsAreDifferent =
+    // Note that the normal contributions will implicitly *always*
+    // "differ from context" if no context contributions are given,
+    // as in release info lines.
+    query.normalContributionsDifferFromContext =
       !compareArrays(
         query.normalContributions.map(({artist}) => artist),
         contextNormalContributions.map(({artist}) => artist),
@@ -57,8 +60,8 @@ export default {
   }),
 
   data: (query, _creditContributions, _contextContributions) => ({
-    normalContributionsAreDifferent:
-      query.normalContributionsAreDifferent,
+    normalContributionsDifferFromContext:
+      query.normalContributionsDifferFromContext,
 
     hasWikiEdits:
       !empty(query.wikiEditContributions),
@@ -111,7 +114,7 @@ export default {
     for (const link of relations.featuringContributionLinks) {
       link.setSlots({
         showAnnotation:
-          (slots.featuringStringKey
+          (slots.featuringStringKey || slots.normalFeaturingStringKey
             ? false
             : slots.showAnnotation),
       });
@@ -144,14 +147,14 @@ export default {
       ]);
 
     if (empty(relations.featuringContributionLinks)) {
-      if (data.normalContributionsAreDifferent) {
+      if (data.normalContributionsDifferFromContext) {
         return language.$(slots.normalStringKey, {artists: artistsList});
       } else {
         return html.blank();
       }
     }
 
-    if (data.normalContributionsAreDifferent && slots.normalFeaturingStringKey) {
+    if (data.normalContributionsDifferFromContext && slots.normalFeaturingStringKey) {
       return language.$(slots.normalFeaturingStringKey, {
         artists: artistsList,
         featuring: featuringList,
