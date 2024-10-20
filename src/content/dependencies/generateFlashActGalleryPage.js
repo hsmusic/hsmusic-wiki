@@ -1,5 +1,7 @@
 import {stitchArrays} from '#sugar';
 
+import striptags from 'striptags';
+
 export default {
   contentDependencies: [
     'generateCoverGrid',
@@ -8,6 +10,7 @@ export default {
     'generatePageLayout',
     'image',
     'linkFlash',
+    'linkFlashAct',
     'linkFlashIndex',
   ],
 
@@ -19,6 +22,9 @@ export default {
 
     flashIndexLink:
       relation('linkFlashIndex'),
+
+    flashActNavLink:
+      relation('linkFlashAct', act),
 
     flashActNavAccent:
       relation('generateFlashActNavAccent', act),
@@ -55,7 +61,7 @@ export default {
       relations.layout.slots({
         title:
           language.$(pageCapsule, 'title', {
-            flash: data.name,
+            flash: striptags(data.name),
           }),
 
         color: data.color,
@@ -81,7 +87,7 @@ export default {
         navLinks: [
           {auto: 'home'},
           {html: relations.flashIndexLink},
-          {auto: 'current'},
+          {html: relations.flashActNavLink},
         ],
 
         navBottomRowContent: relations.flashActNavAccent,
