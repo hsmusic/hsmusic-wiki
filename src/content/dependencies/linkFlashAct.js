@@ -1,14 +1,22 @@
 export default {
-  contentDependencies: ['linkThing'],
-  extraDependencies: ['html'],
+  contentDependencies: ['generateUnsafeMunchy', 'linkThing'],
 
-  relations: (relation, flashAct) =>
-    ({link: relation('linkThing', 'localized.flashActGallery', flashAct)}),
+  relations: (relation, flashAct) => ({
+    unsafeMunchy:
+      relation('generateUnsafeMunchy'),
 
-  data: (flashAct) =>
-    ({name: flashAct.name}),
+    link:
+      relation('linkThing', 'localized.flashActGallery', flashAct),
+  }),
 
-  generate: (data, relations, {html}) =>
-    relations.link
-      .slot('content', new html.Tag(null, null, data.name)),
+  data: (flashAct) => ({
+    name: flashAct.name,
+  }),
+
+  generate: (data, relations) =>
+    relations.link.slots({
+      content:
+        relations.unsafeMunchy
+          .slot('contentSource', data.name),
+    }),
 };
