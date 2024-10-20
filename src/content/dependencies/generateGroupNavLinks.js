@@ -1,48 +1,25 @@
-import {empty} from '#sugar';
-
 export default {
-  contentDependencies: [
-    'linkGroup',
-    'linkGroupGallery',
-  ],
-
+  contentDependencies: ['generateGroupNavAccent', 'linkGroup'],
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl({groupCategoryData, wikiInfo}) {
-    return {
-      groupCategoryData,
-      enableGroupUI: wikiInfo.enableGroupUI,
-      enableListings: wikiInfo.enableListings,
-    };
-  },
+  sprawl: ({groupCategoryData, wikiInfo}) => ({
+    groupCategoryData,
+    enableGroupUI: wikiInfo.enableGroupUI,
+    enableListings: wikiInfo.enableListings,
+  }),
 
-  relations(relation, sprawl, group) {
-    if (!sprawl.enableGroupUI) {
-      return {};
-    }
+  relations: (relation, _sprawl, group) => ({
+    mainLink:
+      relation('linkGroup', group),
 
-    const relations = {};
+    accent:
+      relation('generateGroupNavAccent', group),
+  }),
 
-    relations.mainLink =
-      relation('linkGroup', group);
-
-    relations.infoLink =
-      relation('linkGroup', group);
-
-    if (!empty(group.albums)) {
-      relations.galleryLink =
-        relation('linkGroupGallery', group);
-    }
-
-    return relations;
-  },
-
-  data(sprawl) {
-    return {
-      enableGroupUI: sprawl.enableGroupUI,
-      enableListings: sprawl.enableListings,
-    };
-  },
+  data: (sprawl, _group) => ({
+    enableGroupUI: sprawl.enableGroupUI,
+    enableListings: sprawl.enableListings,
+  }),
 
   slots: {
     showExtraLinks: {type: 'boolean', default: false},
@@ -52,53 +29,31 @@ export default {
     },
   },
 
-  generate(data, relations, slots, {language}) {
-    if (!data.enableGroupUI) {
-      return [
-        {auto: 'home'},
-        {auto: 'current'},
-      ];
-    }
+  generate: (data, relations, slots, {language}) =>
+    (data.enableGroupUI
+      ? [
+          {auto: 'home'},
 
-    const infoLink =
-      relations.infoLink.slots({
-        attributes: {class: slots.currentExtra === null && 'current'},
-        content: language.$('misc.nav.info'),
-      });
+          data.enableListings &&
+            {
+              path: ['localized.listingIndex'],
+              title: language.$('listingIndex.title'),
+            },
 
-    const extraLinks = [
-      relations.galleryLink?.slots({
-        attributes: {class: slots.currentExtra === 'gallery' && 'current'},
-        content: language.$('misc.nav.gallery'),
-      }),
-    ];
+          {
+            html:
+              language.$('groupPage.nav.group', {
+                group: relations.mainLink,
+              }),
 
-    const extrasPart =
-      (empty(extraLinks)
-        ? ''
-        : language.formatUnitList([infoLink, ...extraLinks]));
+            accent:
+              relations.accent
+                .slot('currentExtra', slots.currentExtra),
+          },
+        ].filter(Boolean)
 
-    const accent =
-      (extrasPart
-        ? `(${extrasPart})`
-        : null);
-
-    return [
-      {auto: 'home'},
-
-      data.enableListings &&
-        {
-          path: ['localized.listingIndex'],
-          title: language.$('listingIndex.title'),
-        },
-
-      {
-        accent,
-        html:
-          language.$('groupPage.nav.group', {
-            group: relations.mainLink,
-          }),
-      },
-    ].filter(Boolean);
-  },
+      : [
+          {auto: 'home'},
+          {auto: 'current'},
+        ]),
 };
