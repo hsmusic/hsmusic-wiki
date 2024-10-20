@@ -882,8 +882,8 @@ a:not([href]):hover {
 #secondary-nav.album-secondary-nav.with-previous-next {
   display: flex;
   justify-content: space-around;
-  padding-left: 15% !important;
-  padding-right: 15% !important;
+  padding-left: 7.5% !important;
+  padding-right: 7.5% !important;
   flex-wrap: wrap;
   line-height: 1.4;
 }
