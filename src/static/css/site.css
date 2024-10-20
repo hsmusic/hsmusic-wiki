@@ -1117,6 +1117,11 @@ s.spoiler::selection {
   background: white;
 }
 
+s.spoiler::-moz-selection {
+  color: black;
+  background: white;
+}
+
 progress {
   accent-color: var(--primary-color);
 }
