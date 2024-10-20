@@ -63,6 +63,8 @@ export default {
 
   generate: (relations, slots, {html, language}) =>
     html.tag('span',
+      {[html.onlyIfContent]: true},
+
       slots.attributes,
 
       !html.isBlank(slots.colorStyle) &&
@@ -70,11 +72,15 @@ export default {
           .slot('context', 'primary-only'),
 
       language.encapsulate(slots.stringsKey, workingCapsule => {
-        const workingOptions = {};
+        const workingOptions = {
+          [language.onlyIfOptions]: [slots.mainLinkOption],
+        };
 
         workingOptions[slots.mainLinkOption] =
-          slots.mainLink
-            .slot('color', false);
+          (html.isBlank(slots.mainLink)
+            ? null
+            : slots.mainLink
+                .slot('color', false));
 
         if (slots.mode === 'album') addPreviousNext: {
           if (html.isBlank(slots.previousLink) && html.isBlank(slots.nextLink)) {
