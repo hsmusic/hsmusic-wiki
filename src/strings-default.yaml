@@ -1291,6 +1291,13 @@ groupPage:
   nav:
     group: "Group: {GROUP}"
 
+  secondaryNav:
+    category: >-
+      {CATEGORY}
+
+    category.withPreviousNext: >-
+      {CATEGORY} ({PREVIOUS_NEXT})
+
 #
 # groupInfoPage:
 #   The group info page shows visiting links, the group's full

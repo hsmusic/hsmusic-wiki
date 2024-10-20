@@ -1,104 +1,20 @@
-import {atOffset} from '#sugar';
-
 export default {
   contentDependencies: [
-    'generateColorStyleAttribute',
-    'generatePreviousNextLinks',
     'generateSecondaryNav',
-    'linkGroupDynamically',
-    'linkListing',
+    'generateGroupSecondaryNavCategoryPart',
   ],
 
-  extraDependencies: ['html', 'language', 'wikiData'],
+  relations: (relation, group) => ({
+    secondaryNav:
+      relation('generateSecondaryNav'),
 
-  sprawl: ({listingSpec, wikiInfo}) => ({
-    groupsByCategoryListing:
-      (wikiInfo.enableListings
-        ? listingSpec
-            .find(l => l.directory === 'groups/by-category')
-        : null),
+    categoryPart:
+      relation('generateGroupSecondaryNavCategoryPart', group.category, group),
   }),
 
-  query(sprawl, group) {
-    const groups = group.category.groups;
-    const index = groups.indexOf(group);
-
-    return {
-      previousGroup:
-        atOffset(groups, index, -1),
-
-      nextGroup:
-        atOffset(groups, index, +1),
-    };
-  },
-
-  relations(relation, query, sprawl, group) {
-    const relations = {};
-
-    relations.secondaryNav =
-      relation('generateSecondaryNav');
-
-    if (sprawl.groupsByCategoryListing) {
-      relations.categoryLink =
-        relation('linkListing', sprawl.groupsByCategoryListing);
-    }
-
-    relations.colorStyle =
-      relation('generateColorStyleAttribute', group.category.color);
-
-    if (query.previousGroup || query.nextGroup) {
-      relations.previousNextLinks =
-        relation('generatePreviousNextLinks');
-    }
-
-    relations.previousGroupLink =
-      (query.previousGroup
-        ? relation('linkGroupDynamically', query.previousGroup)
-        : null);
-
-    relations.nextGroupLink =
-      (query.nextGroup
-        ? relation('linkGroupDynamically', query.nextGroup)
-        : null);
-
-    return relations;
-  },
-
-  data: (query, sprawl, group) => ({
-    categoryName: group.category.name,
-  }),
-
-  generate(data, relations, {html, language}) {
-    const previousNextPart =
-      (relations.previousNextLinks
-        ? relations.previousNextLinks
-            .slots({
-              previousLink: relations.previousGroupLink,
-              nextLink: relations.nextGroupLink,
-              id: true,
-            })
-            .content /* TODO: Kludge. */
-        : null);
-
-    const {categoryLink} = relations;
-
-    categoryLink?.setSlot('content', data.categoryName);
-
-    return relations.secondaryNav.slots({
+  generate: (relations) =>
+    relations.secondaryNav.slots({
       class: 'nav-links-groups',
-      content:
-        (previousNextPart
-          ? html.tag('span', {class: 'nav-link'},
-              relations.colorStyle.slot('context', 'primary-only'),
-
-              [
-                categoryLink?.slot('color', false),
-                `(${language.formatUnitList(previousNextPart)})`,
-              ])
-       : categoryLink
-          ? html.tag('span', {class: 'nav-link'},
-              categoryLink)
-          : html.blank()),
-    });
-  },
+      content: relations.categoryPart,
+    }),
 };
