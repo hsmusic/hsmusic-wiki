@@ -3,10 +3,9 @@ import {atOffset} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateNewsEntryNavAccent',
     'generateNewsEntryReadAnotherLinks',
     'generatePageLayout',
-    'generatePreviousNextLinks',
-    'linkNewsEntry',
     'linkNewsIndex',
     'transformContent',
   ],
@@ -31,65 +30,46 @@ export default {
     return {previousEntry, nextEntry};
   },
 
-  relations(relation, query, sprawl, newsEntry) {
-    const relations = {};
+  relations: (relation, query, sprawl, newsEntry) => ({
+    layout:
+      relation('generatePageLayout'),
 
-    relations.layout =
-      relation('generatePageLayout');
+    content:
+      relation('transformContent', newsEntry.content),
 
-    relations.content =
-      relation('transformContent', newsEntry.content);
+    newsIndexLink:
+      relation('linkNewsIndex'),
 
-    relations.newsIndexLink =
-      relation('linkNewsIndex');
+    readAnotherLinks:
+      relation('generateNewsEntryReadAnotherLinks',
+        newsEntry,
+        query.previousEntry,
+        query.nextEntry),
 
-    relations.currentEntryLink =
-      relation('linkNewsEntry', newsEntry);
+    navAccent:
+      relation('generateNewsEntryNavAccent',
+        query.previousEntry,
+        query.nextEntry),
+  }),
 
-    if (query.previousEntry || query.nextEntry) {
-      relations.previousNextLinks =
-        relation('generatePreviousNextLinks');
+  data: (query, sprawl, newsEntry) => ({
+    name: newsEntry.name,
+    date: newsEntry.date,
 
-      relations.readAnotherLinks =
-        relation('generateNewsEntryReadAnotherLinks',
-          newsEntry,
-          query.previousEntry,
-          query.nextEntry);
+    daysSincePreviousEntry:
+      query.previousEntry &&
+        Math.round((newsEntry.date - query.previousEntry.date) / 86400000),
 
-      if (query.previousEntry) {
-        relations.previousEntryNavLink =
-          relation('linkNewsEntry', query.previousEntry);
-      }
+    daysUntilNextEntry:
+      query.nextEntry &&
+        Math.round((query.nextEntry.date - newsEntry.date) / 86400000),
 
-      if (query.nextEntry) {
-        relations.nextEntryNavLink =
-          relation('linkNewsEntry', query.nextEntry);
-      }
-    }
+    previousEntryDate:
+      query.previousEntry?.date,
 
-    return relations;
-  },
-
-  data(query, sprawl, newsEntry) {
-    return {
-      name: newsEntry.name,
-      date: newsEntry.date,
-
-      daysSincePreviousEntry:
-        query.previousEntry &&
-          Math.round((newsEntry.date - query.previousEntry.date) / 86400000),
-
-      daysUntilNextEntry:
-        query.nextEntry &&
-          Math.round((query.nextEntry.date - newsEntry.date) / 86400000),
-
-      previousEntryDate:
-        query.previousEntry?.date,
-
-      nextEntryDate:
-        query.nextEntry?.date,
-    };
-  },
+    nextEntryDate:
+      query.nextEntry?.date,
+  }),
 
   generate: (data, relations, {html, language}) =>
     language.encapsulate('newsEntryPage', pageCapsule =>
@@ -118,13 +98,7 @@ export default {
           {html: relations.newsIndexLink},
           {
             auto: 'current',
-            accent:
-              (relations.previousNextLinks
-                ? `(${language.formatUnitList(relations.previousNextLinks.slots({
-                    previousLink: relations.previousEntryNavLink ?? null,
-                    nextLink: relations.nextEntryNavLink ?? null,
-                  }).content)})`
-                : null),
+            accent: relations.navAccent,
           },
         ],
       })),
