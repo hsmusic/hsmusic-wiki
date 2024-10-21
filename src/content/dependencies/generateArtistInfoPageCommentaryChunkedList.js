@@ -197,6 +197,8 @@ export default {
 
   generate: (data, relations, {html, language}) =>
     html.tag('dl',
+      {[html.onlyIfContent]: true},
+
       stitchArrays({
         chunk: relations.chunks,
         chunkLink: relations.chunkLinks,
