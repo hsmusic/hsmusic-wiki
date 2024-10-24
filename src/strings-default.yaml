@@ -698,6 +698,8 @@ misc:
   #   rest. May also display "read more" links (to external sites).
 
   quickDescription:
+    readMore: "Read more on {LINKS}."
+
     moreInfo:
       _: "({LINK})"
       link: "More info..."
