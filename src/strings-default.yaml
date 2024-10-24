@@ -57,6 +57,16 @@ count:
       many: ""
       other: "{ALBUMS} albums"
 
+  artTags:
+    _: "{TAGS}"
+    withUnit:
+      zero: ""
+      one: "{TAGS} tag"
+      two: ""
+      few: ""
+      many: ""
+      other: "{TAGS} tags"
+
   artworks:
     _: "{ARTWORKS}"
     withUnit:
@@ -1195,6 +1205,103 @@ artistGalleryPage:
     Contributed to {COVER_ARTS}.
 
 #
+# artTagPage:
+#   Stuff that's common between art tag pages.
+#
+artTagPage:
+  nav:
+    tag: "Tag: {TAG}"
+
+  sidebar:
+    otherTagsExempt: "(…another {TAGS}…)"
+
+#
+# artTagInfoPage:
+#   The art tag info page displays general information about a tag,
+#   including details about how it's networked with other tags in
+#   particular.
+#
+artTagInfoPage:
+  title: "{TAG}"
+
+  viewArtGallery:
+    _: "View this tag's {LINK}!"
+    link: "art gallery"
+
+  readMoreOn: "Read more about {TAG} on {LINKS}."
+
+  featuredIn:
+    notFeatured: >-
+      This tag hasn't been featured in any artworks yet.
+
+    directlyOnly: >-
+      This tag is featured in {ARTWORKS}.
+
+    indirectlyOnly: >-
+      This tag is featured in {ARTWORKS}, but only indirectly - have a look at its descendant tags!
+
+    directlyAndIndirectly: >-
+      This tag is directly featured in {ARTWORKS_DIRECTLY}, and indirectly in {ARTWORKS_INDIRECTLY} more, for a total of {ARTWORKS_TOTAL}.
+
+  descendsFromTags:
+    _: "Tags that {TAG} descends from:"
+    item: "{TAG}"
+
+  descendantTags:
+    _: "Tags that descend from {TAG}:"
+
+    item:
+      _: "{TAG}"
+      withGallery:
+        _: "{TAG} ({GALLERY})"
+        gallery: "Gallery"
+
+#
+# artTagGalleryPage:
+#   The tag gallery page displays all the artworks that a tag has
+#   been featured in, in one neat grid, with each artwork displaying
+#   its illustrators, as well as a short info line that indicates
+#   how many artworks the tag's been featured in, whether directly,
+#   indirectly (via descendant tags), both, or neither. If a tag's
+#   been featured both directly and indirectly, there are buttons
+#   to switch what's being shown.
+#
+artTagGalleryPage:
+  title: "{TAG}"
+
+  descendsFrom: "Descends from {TAGS}."
+  descendants: "Direct descendants: {TAGS}."
+
+  featuredLine:
+    all: >-
+      Featured in {COVER_ARTS}.
+
+    direct: >-
+      Featured directly in {COVER_ARTS}.
+
+    indirect: >-
+      Featured indirectly in {COVER_ARTS}.
+
+    notFeatured:
+      _: >-
+        This tag hasn't been featured in any artworks yet.
+
+      callToAction: >-
+        Maybe your track will be the first!
+
+  showingLine:
+    _: "({SHOWING})"
+
+    all: >-
+      Showing all artworks.
+
+    indirect: >-
+      Showing artworks where this tag is only featured indirectly.
+
+    direct: >-
+      Showing artworks where this tag is featured directly.
+
+#
 # commentaryIndex:
 #   The commentary index page shows a summary of all the commentary
 #   across the entire wiki, with a list linking to each album's
@@ -1443,6 +1550,79 @@ listingPage:
       chunk:
         title: "{DATE}"
         item: "{ALBUM}"
+
+  listArtTags:
+
+    # listArtTags.byName:
+    #   List art tags alphabetically without sorting or chunking by
+    #   any other criteria. Also displays the number of times each
+    #   art tag has been featured.
+
+    byName:
+      title: "Tags - by Name"
+      title.short: "...by Name"
+      item: "{TAG} ({TIMES_USED})"
+
+    # listArtTags.byUses:
+    #   List art tags by number of times used, falling back to an
+    #   alphabetical sort if two art tags have been featured the same
+    #   number of times. Art tags which haven't haven't been featured
+    #   at all yet are totally excluded from the list.
+
+    byUses:
+      title: "Tags - by Uses"
+      title.short: "...by Uses"
+      item: "{TAG} ({TIMES_USED})"
+
+    # listArtTags.network:
+    #   List art tags in a custom networked fashion, showing all
+    #   connections between ancestors and descendants. Each top-level
+    #   tag gets one section. Descendants are generally nested directly
+    #   under their ancestors, except if they have two or more direct
+    #   ancestors *and* at least one direct descendant, in which case
+    #   they're moved to a dedicated section further down the page.
+    #   "Orphan" art tags, if any - tags which don't have any ancestors
+    #   nor any descendants - are displayed in a section at the bottom.
+
+    network:
+      title: "Art Tag Network"
+      title.short: "Art Tag Network"
+
+      jumpToRoot:
+        title: "Jump to one of the upper-most tags:"
+        item: "{TAG}"
+
+      statLine:
+        _: "Displaying tag info: {STAT}"
+        none: "name only"
+        totalUses: "uses (total)"
+        directUses: "uses (direct only)"
+        descendants: "descendants (total)"
+        leaves: "descendants (leaves only)"
+
+      root:
+        _: "{TAG}"
+
+      root.jumpToTop:
+        _: "{TAG} ({LINK})"
+        link: "Jump back to top"
+
+      root.withAncestors:
+        _: "{TAG} (descends from {ANCESTORS})"
+
+      tag:
+        _: "{TAG}"
+
+        jumpToRoot: "Jump to: {TAG}"
+
+        withStat:
+          _: "{STAT} {TAG}"
+          stat: "({STAT})"
+          notApplicable: "-"
+
+      orphanArtTags:
+        title: "These tags don't have any descendants or ancestors:"
+        item: "{TAG}"
 
   listArtists:
 
@@ -1771,29 +1951,6 @@ listingPage:
         title.withDate: "{ALBUM} ({DATE})"
         item: "{TRACK}"
 
-  listTags:
-
-    # listTags.byName:
-    #   List art tags alphabetically without sorting or chunking by
-    #   any other criteria. Also displays the number of times each
-    #   art tag has been featured.
-
-    byName:
-      title: "Tags - by Name"
-      title.short: "...by Name"
-      item: "{TAG} ({TIMES_USED})"
-
-    # listTags.byUses:
-    #   List art tags by number of times used, falling back to an
-    #   alphabetical sort if two art tags have been featured the same
-    #   number of times. Art tags which haven't haven't been featured
-    #   at all yet are totally excluded from the list.
-
-    byUses:
-      title: "Tags - by Uses"
-      title.short: "...by Uses"
-      item: "{TAG} ({TIMES_USED})"
-
   other:
 
     # other.allSheetMusic:
@@ -1960,22 +2117,6 @@ redirectPage:
 
   infoLine: >-
     This page has been moved to {TARGET}.
-
-#
-# tagPage:
-#   The tag gallery page displays all the artworks that a tag has
-#   been featured in, in one neat grid, with each artwork displaying
-#   its illustrators, as well as a short info line that indicates
-#   how many artworks the tag's part of.
-#
-tagPage:
-  title: "{TAG}"
-
-  nav:
-    tag: "Tag: {TAG}"
-
-  infoLine: >-
-    Appears in {COVER_ARTS}.
 
 #
 # trackPage:

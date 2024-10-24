@@ -137,7 +137,12 @@ export const replacerSpec = {
 
   'tag': {
     find: 'artTag',
-    link: 'linkArtTag',
+    link: 'linkArtTagDynamically',
+  },
+
+  'tag-info': {
+    find: 'artTag',
+    link: 'linkArtTagInfo',
   },
 
   'track': {
