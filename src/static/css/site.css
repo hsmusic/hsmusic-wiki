@@ -228,6 +228,10 @@ body::before, .wallpaper-part {
 
 /* Design & Appearance - Layout elements */
 
+:root {
+  color-scheme: dark;
+}
+
 body {
   background: black;
 }
