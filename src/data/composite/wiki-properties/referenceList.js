@@ -11,7 +11,8 @@ import {input, templateCompositeFrom} from '#composite';
 import {validateReferenceList} from '#validators';
 
 import {exposeDependency} from '#composite/control-flow';
-import {inputWikiData, withResolvedReferenceList} from '#composite/wiki-data';
+import {inputSoupyFind, inputWikiData, withResolvedReferenceList}
+  from '#composite/wiki-data';
 
 import {referenceListInputDescriptions, referenceListUpdateDescription}
   from './helpers/reference-list-helpers.js';
@@ -25,7 +26,7 @@ export default templateCompositeFrom({
     ...referenceListInputDescriptions(),
 
     data: inputWikiData({allowMixedTypes: true}),
-    find: input({type: 'function'}),
+    find: inputSoupyFind(),
   },
 
   update:

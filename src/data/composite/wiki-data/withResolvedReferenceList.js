@@ -14,7 +14,9 @@ import {
   withAvailabilityFilter,
 } from '#composite/control-flow';
 
+import gobbleSoupyFind from './gobbleSoupyFind.js';
 import inputNotFoundMode from './inputNotFoundMode.js';
+import inputSoupyFind from './inputSoupyFind.js';
 import inputWikiData from './inputWikiData.js';
 import raiseResolvedReferenceList from './raiseResolvedReferenceList.js';
 
@@ -28,7 +30,7 @@ export default templateCompositeFrom({
     }),
 
     data: inputWikiData({allowMixedTypes: true}),
-    find: input({type: 'function'}),
+    find: inputSoupyFind(),
 
     notFoundMode: inputNotFoundMode(),
   },
@@ -44,11 +46,15 @@ export default templateCompositeFrom({
       }),
     }),
 
+    gobbleSoupyFind({
+      find: input('find'),
+    }),
+
     {
-      dependencies: [input('data'), input('find')],
+      dependencies: [input('data'), '#find'],
       compute: (continuation, {
         [input('data')]: data,
-        [input('find')]: findFunction,
+        ['#find']: findFunction,
       }) => continuation({
         ['#map']:
           (data
