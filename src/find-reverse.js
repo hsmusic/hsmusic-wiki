@@ -108,20 +108,24 @@ export function bind(wikiData, opts1, {
     if (!spec.bindTo) continue;
 
     const behavior = prepareBehavior(spec);
-    const thingData = wikiData[spec.bindTo];
+
+    const data =
+      (spec.bindTo === 'wikiData'
+        ? wikiData
+        : wikiData[spec.bindTo]);
 
     bound[key] =
       (opts1
         ? (ref, opts2) =>
             (opts2
-              ? behavior(ref, thingData, {...opts1, ...opts2})
-              : behavior(ref, thingData, opts1))
+              ? behavior(ref, data, {...opts1, ...opts2})
+              : behavior(ref, data, opts1))
         : (ref, opts2) =>
             (opts2
-              ? behavior(ref, thingData, opts2)
-              : behavior(ref, thingData)));
+              ? behavior(ref, data, opts2)
+              : behavior(ref, data)));
 
-    bound[key][boundData] = thingData;
+    bound[key][boundData] = data;
     bound[key][boundOptions] = opts1 ?? {};
   }
 

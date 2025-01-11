@@ -22,7 +22,9 @@ function reverseHelper(spec) {
     // one reverse spec is different from another.
 
     const referencingThings =
-      data.flatMap(thing => spec.referencing(thing));
+      (spec.bindTo === 'wikiData'
+        ? spec.referencing(data)
+        : data.flatMap(thing => spec.referencing(thing)));
 
     const referencedThings =
       referencingThings.map(thing => spec.referenced(thing));
