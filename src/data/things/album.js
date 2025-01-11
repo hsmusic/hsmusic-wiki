@@ -54,6 +54,7 @@ import {
   simpleDate,
   simpleString,
   singleReference,
+  soupyFind,
   thing,
   thingList,
   urls,
@@ -269,6 +270,8 @@ export class Album extends Thing {
     ],
 
     // Update only
+
+    find: soupyFind(),
 
     albumData: wikiData({
       class: input.value(Album),

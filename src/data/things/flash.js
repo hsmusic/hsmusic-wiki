@@ -30,6 +30,7 @@ import {
   name,
   referenceList,
   simpleDate,
+  soupyFind,
   thing,
   urls,
   wikiData,
@@ -115,6 +116,8 @@ export class Flash extends Thing {
     creditSources: commentary(),
 
     // Update only
+
+    find: soupyFind(),
 
     artistData: wikiData({
       class: input.value(Artist),
@@ -248,6 +251,8 @@ export class FlashAct extends Thing {
 
     // Update only
 
+    find: soupyFind(),
+
     flashData: wikiData({
       class: input.value(Flash),
     }),
@@ -303,6 +308,8 @@ export class FlashSide extends Thing {
     }),
 
     // Update only
+
+    find: soupyFind(),
 
     flashActData: wikiData({
       class: input.value(FlashAct),
