@@ -69,9 +69,6 @@ export function tokenProxy({
 
   handle: customHandle =
     (_key) => undefined,
-
-  decorate =
-    (_token, _key) => {},
 }) {
   return new Proxy({}, {
     get: (store, key) => {
@@ -91,10 +88,12 @@ export function tokenProxy({
         };
 
         store[key] = (...args) => behavior(...args);
-        decorate(store[key], key);
+        store[key][tokenKey] = key;
       }
 
       return store[key];
     },
-    });
+  });
 }
+
+export const tokenKey = Symbol.for('find.tokenKey');

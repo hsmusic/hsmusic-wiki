@@ -7,6 +7,12 @@ import {isFunction, validateArrayItems} from '#validators';
 
 import * as fr from './find-reverse.js';
 
+import {
+  tokenKey as findTokenKey,
+} from './find-reverse.js';
+
+export {findTokenKey};
+
 function warnOrThrow(mode, message) {
   if (mode === 'error') {
     throw new Error(message);
@@ -278,7 +284,6 @@ export function findFindSpec(key) {
   return fr.findSpec(key, findReverseHelperConfig);
 }
 
-export const findTokenKey = Symbol.for('find.findTokenKey');
 export const boundFindData = Symbol.for('find.boundFindData');
 export const boundFindOptions = Symbol.for('find.boundFindOptions');
 
@@ -402,10 +407,6 @@ export default fr.tokenProxy({
     if (key === 'mixed') {
       return findMixed;
     }
-  },
-
-  decorate(token, key) {
-    token[findTokenKey] = key;
   },
 });
 
