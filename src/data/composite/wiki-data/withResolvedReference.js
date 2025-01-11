@@ -1,7 +1,6 @@
 // Resolves a reference by using the provided find function to match it
-// within the provided thingData dependency. This will early exit if the
-// data dependency is null. Otherwise, the data object is provided on the
-// output dependency, or null, if the reference doesn't match anything or
+// within the provided thingData dependency. The data object is provided on
+// the output dependency, or null, if the reference doesn't match anything or
 // itself was null to begin with.
 
 import {input, templateCompositeFrom} from '#composite';
@@ -11,6 +10,8 @@ import {
   raiseOutputWithoutDependency,
 } from '#composite/control-flow';
 
+import gobbleSoupyFind from './gobbleSoupyFind.js';
+import inputSoupyFind from './inputSoupyFind.js';
 import inputWikiData from './inputWikiData.js';
 
 export default templateCompositeFrom({
@@ -20,7 +21,7 @@ export default templateCompositeFrom({
     ref: input({type: 'string', acceptsNull: true}),
 
     data: inputWikiData({allowMixedTypes: false}),
-    find: input({type: 'function'}),
+    find: inputSoupyFind(),
   },
 
   outputs: ['#resolvedReference'],
@@ -33,24 +34,26 @@ export default templateCompositeFrom({
       }),
     }),
 
-    exitWithoutDependency({
-      dependency: input('data'),
+    gobbleSoupyFind({
+      find: input('find'),
     }),
 
     {
       dependencies: [
         input('ref'),
         input('data'),
-        input('find'),
+        '#find',
       ],
 
       compute: (continuation, {
         [input('ref')]: ref,
         [input('data')]: data,
-        [input('find')]: findFunction,
+        ['#find']: findFunction,
       }) => continuation({
         ['#resolvedReference']:
-          findFunction(ref, data, {mode: 'quiet'}) ?? null,
+          (data
+            ? findFunction(ref, data, {mode: 'quiet'}) ?? null
+            : findFunction(ref, {mode: 'quiet'}) ?? null),
       }),
     },
   ],

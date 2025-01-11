@@ -11,7 +11,8 @@ import {input, templateCompositeFrom} from '#composite';
 import {isThingClass, validateReference} from '#validators';
 
 import {exposeDependency} from '#composite/control-flow';
-import {inputWikiData, withResolvedReference} from '#composite/wiki-data';
+import {inputSoupyFind, inputWikiData, withResolvedReference}
+  from '#composite/wiki-data';
 
 export default templateCompositeFrom({
   annotation: `singleReference`,
@@ -21,8 +22,7 @@ export default templateCompositeFrom({
   inputs: {
     class: input.staticValue({validate: isThingClass}),
 
-    find: input({type: 'function'}),
-
+    find: inputSoupyFind(),
     data: inputWikiData({allowMixedTypes: false}),
   },
 
