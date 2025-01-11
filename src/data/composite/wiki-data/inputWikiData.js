@@ -12,6 +12,6 @@ export default function inputWikiData({
 } = {}) {
   return input({
     validate: validateWikiData({referenceType, allowMixedTypes}),
-    acceptsNull: true,
+    defaultValue: null,
   });
 }
