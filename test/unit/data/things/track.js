@@ -1,5 +1,6 @@
 import t from 'tap';
 
+import {bindFind} from '#find';
 import thingConstructors from '#things';
 
 import {
@@ -662,13 +663,13 @@ t.test(`Track.otherReleases`, t => {
     `otherReleases #2: otherReleases of original release are its rereleases`);
 
   wikiData.trackData = [track1, track3, track2, track4];
-  linkWikiDataArrays();
+  linkWikiDataArrays({bindFind});
 
   t.same(track1.otherReleases, [track3, track2, track4],
     `otherReleases #3: otherReleases matches trackData order`);
 
   wikiData.trackData = [track3, track2, track1, track4];
-  linkWikiDataArrays();
+  linkWikiDataArrays({bindFind});
 
   t.same(track2.otherReleases, [track1, track3, track4],
     `otherReleases #4: otherReleases of rerelease are original track then other rereleases (1/3)`);

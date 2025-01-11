@@ -1225,7 +1225,7 @@ export async function loadAndProcessDataDocuments(dataSteps, {dataPath}) {
 // Data linking! Basically, provide (portions of) wikiData to the Things which
 // require it - they'll expose dynamically computed properties as a result (many
 // of which are required for page HTML generation and other expected behavior).
-export function linkWikiDataArrays(wikiData) {
+export function linkWikiDataArrays(wikiData, {bindFind}) {
   const linkWikiDataSpec = new Map([
     [wikiData.albumData, [
       'albumData',
@@ -1299,19 +1299,37 @@ export function linkWikiDataArrays(wikiData) {
     ]],
   ]);
 
+  const constructorHasFindMap = new Map();
+  const boundFind = bindFind(wikiData);
+
   for (const [things, keys] of linkWikiDataSpec.entries()) {
     if (things === undefined) continue;
+
     for (const thing of things) {
       if (thing === undefined) continue;
+
+      let hasFind;
+      if (constructorHasFindMap.has(thing.constructor)) {
+        hasFind = constructorHasFindMap.get(thing.constructor);
+      } else {
+        hasFind = 'find' in thing;
+        constructorHasFindMap.set(thing.constructor, hasFind);
+      }
+
+      if (hasFind) {
+        thing.find = boundFind;
+      }
+
       for (const key of keys) {
         if (!(key in wikiData)) continue;
+
         thing[key] = wikiData[key];
       }
     }
   }
 }
 
-export function sortWikiDataArrays(dataSteps, wikiData) {
+export function sortWikiDataArrays(dataSteps, wikiData, {bindFind}) {
   for (const [key, value] of Object.entries(wikiData)) {
     if (!Array.isArray(value)) continue;
     wikiData[key] = value.slice();
@@ -1327,7 +1345,7 @@ export function sortWikiDataArrays(dataSteps, wikiData) {
   // slices instead of the original arrays) - this is so that the object
   // caching system understands that it's working with a new ordering.
   // We still need to actually provide those updated arrays over again!
-  linkWikiDataArrays(wikiData);
+  linkWikiDataArrays(wikiData, {bindFind});
 }
 
 // Utility function for loading all wiki data from the provided YAML data
@@ -1363,7 +1381,7 @@ export async function quickLoadAllFromYAML(dataPath, {
     }
   }
 
-  linkWikiDataArrays(wikiData);
+  linkWikiDataArrays(wikiData, {bindFind});
 
   try {
     reportDirectoryErrors(wikiData, {getAllFindSpecs});
@@ -1389,7 +1407,7 @@ export async function quickLoadAllFromYAML(dataPath, {
     logWarn`Content text errors found.`;
   }
 
-  sortWikiDataArrays(dataSteps, wikiData);
+  sortWikiDataArrays(dataSteps, wikiData, {bindFind});
 
   return wikiData;
 }

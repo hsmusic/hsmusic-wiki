@@ -1526,7 +1526,7 @@ async function main() {
     timeStart: Date.now(),
   });
 
-  linkWikiDataArrays(wikiData);
+  linkWikiDataArrays(wikiData, {bindFind});
 
   Object.assign(stepStatusSummary.linkWikiDataArrays, {
     status: STATUS_DONE_CLEAN,
@@ -1740,7 +1740,7 @@ async function main() {
     timeStart: Date.now(),
   });
 
-  sortWikiDataArrays(yamlDataSteps, wikiData);
+  sortWikiDataArrays(yamlDataSteps, wikiData, {bindFind});
 
   Object.assign(stepStatusSummary.sortWikiDataArrays, {
     status: STATUS_DONE_CLEAN,
