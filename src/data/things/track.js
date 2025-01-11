@@ -653,6 +653,22 @@ export class Track extends Thing {
     },
   };
 
+  static [Thing.reverseSpecs] = {
+    tracksWhichReference: {
+      bindTo: 'trackData',
+
+      referencing: track => [track],
+      referenced: track => track.sampledTracks,
+    },
+
+    tracksWhichSample: {
+      bindTo: 'trackData',
+
+      referencing: track => [track],
+      referenced: track => track.sampledTracks,
+    },
+  };
+
   // Track YAML loading is handled in album.js.
   static [Thing.getYamlLoadingSpec] = null;
 
