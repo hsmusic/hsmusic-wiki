@@ -1,6 +1,8 @@
 import {input} from '#composite';
 import {isObject} from '#validators';
 
+import {inputSoupyFind} from '#composite/wiki-data';
+
 function soupyFind() {
   return {
     flags: {update: true},
@@ -8,7 +10,6 @@ function soupyFind() {
   };
 }
 
-soupyFind.input = key =>
-  input.value('_soupyFind:' + key);
+soupyFind.input = inputSoupyFind.input;
 
 export default soupyFind;

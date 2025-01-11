@@ -1,8 +1,8 @@
 import {input} from '#composite';
 import {anyOf, isFunction, isString} from '#validators';
 
-export default () =>
-  input({
+function inputSoupyFind() {
+  return input({
     validate:
       anyOf(
         isFunction,
@@ -16,6 +16,12 @@ export default () =>
           return true;
         }),
   });
+}
+
+inputSoupyFind.input = key =>
+  input.value('_soupyFind:' + key);
+
+export default inputSoupyFind;
 
 export function getSoupyFindInputKey(value) {
   return value.slice('_soupyFind:'.length);
