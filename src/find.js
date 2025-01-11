@@ -5,7 +5,7 @@ import {compareObjects, stitchArrays, typeAppearance} from '#sugar';
 import thingConstructors from '#things';
 import {isFunction, validateArrayItems} from '#validators';
 
-import {findSpec, getAllSpecs, tokenProxy} from './find-reverse.js';
+import * as fr from './find-reverse.js';
 
 function warnOrThrow(mode, message) {
   if (mode === 'error') {
@@ -271,11 +271,11 @@ export function postprocessFindSpec(spec, {thingConstructor}) {
 }
 
 export function getAllFindSpecs() {
-  return getAllSpecs(findReverseHelperConfig);
+  return fr.getAllSpecs(findReverseHelperConfig);
 }
 
 export function findFindSpec(key) {
-  return findSpec(key, findReverseHelperConfig);
+  return fr.findSpec(key, findReverseHelperConfig);
 }
 
 export const findTokenKey = Symbol.for('find.findTokenKey');
@@ -394,7 +394,7 @@ export function findMixed(config) {
   return findMixedStore.get(config);
 }
 
-export default tokenProxy({
+export default fr.tokenProxy({
   findSpec: findFindSpec,
   prepareBehavior: findHelper,
 

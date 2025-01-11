@@ -1,4 +1,4 @@
-import {findSpec, getAllSpecs, tokenProxy} from './find-reverse.js';
+import * as fr from './find-reverse.js';
 
 const hardcodedReverseSpecs = {};
 
@@ -19,14 +19,14 @@ export function postprocessReverseSpec(spec, {thingConstructor}) {
 }
 
 export function getAllReverseSpecs() {
-  return getAllSpecs(findReverseHelperConfig);
+  return fr.getAllSpecs(findReverseHelperConfig);
 }
 
 export function findReverseSpec(key) {
-  return findSpec(key, findReverseHelperConfig);
+  return fr.findSpec(key, findReverseHelperConfig);
 }
 
-export default tokenProxy({
+export default fr.tokenProxy({
   findSpec: findReverseSpec,
   prepareBehavior: spec => from => ({spec, from}),
 });
