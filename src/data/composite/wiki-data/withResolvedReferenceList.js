@@ -1,8 +1,7 @@
 // Resolves a list of references, with each reference matched with provided
-// data in the same way as withResolvedReference. This will early exit if the
-// data dependency is null (even if the reference list is empty). By default
-// it will filter out references which don't match, but this can be changed
-// to early exit ({notFoundMode: 'exit'}) or leave null in place ('null').
+// data in the same way as withResolvedReference. By default it will filter
+// out references which don't match, but this can be changed to early exit
+// ({notFoundMode: 'exit'}) or leave null in place ('null').
 
 import {input, templateCompositeFrom} from '#composite';
 import {isString, validateArrayItems} from '#validators';
@@ -37,11 +36,6 @@ export default templateCompositeFrom({
   outputs: ['#resolvedReferenceList'],
 
   steps: () => [
-    exitWithoutDependency({
-      dependency: input('data'),
-      value: input.value([]),
-    }),
-
     raiseOutputWithoutDependency({
       dependency: input('list'),
       mode: input.value('empty'),
@@ -57,7 +51,9 @@ export default templateCompositeFrom({
         [input('find')]: findFunction,
       }) => continuation({
         ['#map']:
-          ref => findFunction(ref, data, {mode: 'quiet'}),
+          (data
+            ? ref => findFunction(ref, data, {mode: 'quiet'})
+            : ref => findFunction(ref, {mode: 'quiet'})),
       }),
     },
 
