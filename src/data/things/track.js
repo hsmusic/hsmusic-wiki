@@ -330,14 +330,9 @@ export class Track extends Thing {
         notFoundValue: input.value([]),
       }),
 
-      withPropertyFromObject({
-        object: 'find',
-        property: input.value('track'),
-      }),
-
       referenceList({
         class: input.value(Track),
-        find: '#find.track',
+        find: soupyFind.input('track'),
       }),
     ],
 
@@ -346,14 +341,9 @@ export class Track extends Thing {
         notFoundValue: input.value([]),
       }),
 
-      withPropertyFromObject({
-        object: 'find',
-        property: input.value('track'),
-      }),
-
       referenceList({
         class: input.value(Track),
-        find: '#find.track',
+        find: soupyFind.input('track'),
       }),
     ],
 
