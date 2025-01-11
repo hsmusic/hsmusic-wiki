@@ -1,5 +1,13 @@
 import * as fr from './find-reverse.js';
 
+function reverseHelper(spec) {
+  const cache = new WeakMap();
+
+  return (thing, data) => {
+    return ({spec, from: thing, data: data.length});
+  };
+}
+
 const hardcodedReverseSpecs = {};
 
 const findReverseHelperConfig = {
@@ -28,5 +36,12 @@ export function findReverseSpec(key) {
 
 export default fr.tokenProxy({
   findSpec: findReverseSpec,
-  prepareBehavior: spec => from => ({spec, from}),
+  prepareBehavior: reverseHelper,
 });
+
+export function bindReverse(wikiData, opts) {
+  return fr.bind(wikiData, opts, {
+    getAllSpecs: getAllReverseSpecs,
+    prepareBehavior: reverseHelper,
+  });
+}

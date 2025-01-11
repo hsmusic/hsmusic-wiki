@@ -9,9 +9,11 @@ import * as fr from './find-reverse.js';
 
 import {
   tokenKey as findTokenKey,
+  boundData as boundFindData,
+  boundOptions as boundFindOptions,
 } from './find-reverse.js';
 
-export {findTokenKey};
+export {findTokenKey, boundFindData, boundFindOptions};
 
 function warnOrThrow(mode, message) {
   if (mode === 'error') {
@@ -284,9 +286,6 @@ export function findFindSpec(key) {
   return fr.findSpec(key, findReverseHelperConfig);
 }
 
-export const boundFindData = Symbol.for('find.boundFindData');
-export const boundFindOptions = Symbol.for('find.boundFindOptions');
-
 function findMixedHelper(config) {
   const
     keys = Object.keys(config),
@@ -415,33 +414,13 @@ export default fr.tokenProxy({
 // function. Note that this caches the arrays read from wikiData right when it's
 // called, so if their values change, you'll have to continue with a fresh call
 // to bindFind.
-export function bindFind(wikiData, opts1) {
-  const findSpecs = getAllFindSpecs();
+export function bindFind(wikiData, opts) {
+  const boundFind = fr.bind(wikiData, opts, {
+    getAllSpecs: getAllFindSpecs,
+    prepareBehavior: findHelper,
+  });
 
-  const boundFindFns = {};
+  boundFind.mixed = findMixed;
 
-  for (const [key, spec] of Object.entries(findSpecs)) {
-    if (!spec.bindTo) continue;
-
-    const findFn = findHelper(spec);
-    const thingData = wikiData[spec.bindTo];
-
-    boundFindFns[key] =
-      (opts1
-        ? (ref, opts2) =>
-            (opts2
-              ? findFn(ref, thingData, {...opts1, ...opts2})
-              : findFn(ref, thingData, opts1))
-        : (ref, opts2) =>
-            (opts2
-              ? findFn(ref, thingData, opts2)
-              : findFn(ref, thingData)));
-
-    boundFindFns[key][boundFindData] = thingData;
-    boundFindFns[key][boundFindOptions] = opts1 ?? {};
-  }
-
-  boundFindFns.mixed = findMixed;
-
-  return boundFindFns;
+  return boundFind;
 }

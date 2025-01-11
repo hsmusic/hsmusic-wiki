@@ -96,4 +96,38 @@ export function tokenProxy({
   });
 }
 
+export function bind(wikiData, opts1, {
+  getAllSpecs,
+  prepareBehavior,
+}) {
+  const specs = getAllSpecs();
+
+  const bound = {};
+
+  for (const [key, spec] of Object.entries(specs)) {
+    if (!spec.bindTo) continue;
+
+    const behavior = prepareBehavior(spec);
+    const thingData = wikiData[spec.bindTo];
+
+    bound[key] =
+      (opts1
+        ? (ref, opts2) =>
+            (opts2
+              ? behavior(ref, thingData, {...opts1, ...opts2})
+              : behavior(ref, thingData, opts1))
+        : (ref, opts2) =>
+            (opts2
+              ? behavior(ref, thingData, opts2)
+              : behavior(ref, thingData)));
+
+    bound[key][boundData] = thingData;
+    bound[key][boundOptions] = opts1 ?? {};
+  }
+
+  return bound;
+}
+
 export const tokenKey = Symbol.for('find.tokenKey');
+export const boundData = Symbol.for('find.boundData');
+export const boundOptions = Symbol.for('find.boundOptions');

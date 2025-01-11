@@ -36,7 +36,7 @@ import * as path from 'node:path';
 import * as repl from 'node:repl';
 
 import _find, {bindFind} from '#find';
-import _reverse from '#reverse';
+import _reverse, {bindReverse} from '#reverse';
 import CacheableObject from '#cacheable-object';
 import {logWarn} from '#cli';
 import {debugComposite} from '#composite';
@@ -65,6 +65,15 @@ export async function getContextAssignments({
     console.error(error);
     logWarn`Failed to prepare wikiData-bound find() functions`;
     logWarn`\`find\` variable will be missing`;
+  }
+
+  let reverse;
+  try {
+    reverse = bindReverse(wikiData);
+  } catch (error) {
+    console.error(error);
+    logWarn`Failed to prepare wikiData-bound reverse() functions`;
+    logWarn`\`reverse\` variable will be missing`;
   }
 
   const replContext = {
@@ -97,6 +106,8 @@ export async function getContextAssignments({
     bindFind,
 
     _reverse,
+    reverse,
+    bindReverse,
 
     showAggregate,
   };
