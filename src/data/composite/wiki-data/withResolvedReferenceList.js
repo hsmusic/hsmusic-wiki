@@ -7,6 +7,8 @@
 import {input, templateCompositeFrom} from '#composite';
 import {isString, validateArrayItems} from '#validators';
 
+import {withMappedList} from '#composite/data';
+
 import {
   exitWithoutDependency,
   raiseOutputWithoutDependency,
@@ -49,16 +51,22 @@ export default templateCompositeFrom({
     }),
 
     {
-      dependencies: [input('list'), input('data'), input('find')],
+      dependencies: [input('data'), input('find')],
       compute: (continuation, {
-        [input('list')]: list,
         [input('data')]: data,
         [input('find')]: findFunction,
-      }) =>
-        continuation({
-          '#matches': list.map(ref => findFunction(ref, data, {mode: 'quiet'})),
-        }),
+      }) => continuation({
+        ['#map']:
+          ref => findFunction(ref, data, {mode: 'quiet'}),
+      }),
     },
+
+    withMappedList({
+      list: input('list'),
+      map: '#map',
+    }).outputs({
+      '#mappedList': '#matches',
+    }),
 
     withAvailabilityFilter({
       from: '#matches',
