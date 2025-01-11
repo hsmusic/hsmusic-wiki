@@ -74,7 +74,28 @@ function reverseHelper(spec) {
   };
 }
 
-const hardcodedReverseSpecs = {};
+const hardcodedReverseSpecs = {
+  // Artworks aren't Thing objects.
+  // This spec operates on albums and tracks alike!
+  artworksWhichReference: {
+    bindTo: 'wikiData',
+
+    referencing: ({albumData, trackData}) =>
+      [...albumData, ...trackData]
+        .flatMap(referencingThing =>
+          referencingThing.referencedArtworks
+            .map(({thing: referencedThing, ...referenceDetails}) => ({
+              referencingThing,
+              referencedThing,
+              referenceDetails,
+            }))),
+
+    referenced: ({referencedThing}) => [referencedThing],
+
+    tidy: ({referencingThing, referenceDetails}) =>
+      ({thing: referencingThing, ...referenceDetails}),
+  },
+};
 
 const findReverseHelperConfig = {
   word: `reverse`,
