@@ -5,7 +5,9 @@
 //
 
 export {default as exitWithoutContribs} from './exitWithoutContribs.js';
+export {default as gobbleSoupyFind} from './gobbleSoupyFind.js';
 export {default as inputNotFoundMode} from './inputNotFoundMode.js';
+export {default as inputSoupyFind} from './inputSoupyFind.js';
 export {default as inputWikiData} from './inputWikiData.js';
 export {default as withClonedThings} from './withClonedThings.js';
 export {default as withContributionListSums} from './withContributionListSums.js';
