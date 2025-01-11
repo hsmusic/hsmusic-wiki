@@ -36,6 +36,7 @@ import * as path from 'node:path';
 import * as repl from 'node:repl';
 
 import _find, {bindFind} from '#find';
+import _reverse from '#reverse';
 import CacheableObject from '#cacheable-object';
 import {logWarn} from '#cli';
 import {debugComposite} from '#composite';
@@ -94,6 +95,8 @@ export async function getContextAssignments({
     _find,
     find,
     bindFind,
+
+    _reverse,
 
     showAggregate,
   };

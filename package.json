@@ -40,6 +40,7 @@
         "#node-utils": "./src/util/node-utils.js",
         "#repl": "./src/write/build-modes/repl.js",
         "#replacer": "./src/util/replacer.js",
+        "#reverse": "./src/reverse.js",
         "#search": "./src/search.js",
         "#search-spec": "./src/util/search-spec.js",
         "#serialize": "./src/data/serialize.js",

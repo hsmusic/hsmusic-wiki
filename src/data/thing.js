@@ -16,6 +16,8 @@ export default class Thing extends CacheableObject {
   static findSpecs = Symbol.for('Thing.findSpecs');
   static findThisThingOnly = Symbol.for('Thing.findThisThingOnly');
 
+  static reverseSpecs = Symbol.for('Thing.reverseSpecs');
+
   static yamlDocumentSpec = Symbol.for('Thing.yamlDocumentSpec');
   static getYamlLoadingSpec = Symbol.for('Thing.getYamlLoadingSpec');
 

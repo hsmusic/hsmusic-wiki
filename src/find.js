@@ -5,6 +5,8 @@ import {compareObjects, stitchArrays, typeAppearance} from '#sugar';
 import thingConstructors from '#things';
 import {isFunction, validateArrayItems} from '#validators';
 
+import {findSpec, getAllSpecs, tokenProxy} from './find-reverse.js';
+
 function warnOrThrow(mode, message) {
   if (mode === 'error') {
     throw new Error(message);
@@ -240,6 +242,14 @@ const hardcodedFindSpecs = {
   },
 };
 
+const findReverseHelperConfig = {
+  word: `find`,
+  constructorKey: Symbol.for('Thing.findSpecs'),
+
+  hardcodedSpecs: hardcodedFindSpecs,
+  postprocessSpec: postprocessFindSpec,
+};
+
 export function postprocessFindSpec(spec, {thingConstructor}) {
   const newSpec = {...spec};
 
@@ -261,52 +271,11 @@ export function postprocessFindSpec(spec, {thingConstructor}) {
 }
 
 export function getAllFindSpecs() {
-  try {
-    thingConstructors;
-  } catch (error) {
-    throw new Error(`Thing constructors aren't ready yet, can't get all find specs`);
-  }
-
-  const findSpecs = {...hardcodedFindSpecs};
-
-  for (const thingConstructor of Object.values(thingConstructors)) {
-    const thingFindSpecs = thingConstructor[Symbol.for('Thing.findSpecs')];
-    if (!thingFindSpecs) continue;
-
-    for (const [key, spec] of Object.entries(thingFindSpecs)) {
-      findSpecs[key] =
-        postprocessFindSpec(spec, {
-          thingConstructor,
-        });
-    }
-  }
-
-  return findSpecs;
+  return getAllSpecs(findReverseHelperConfig);
 }
 
 export function findFindSpec(key) {
-  if (Object.hasOwn(hardcodedFindSpecs, key)) {
-    return hardcodedFindSpecs[key];
-  }
-
-  try {
-    thingConstructors;
-  } catch (error) {
-    throw new Error(`Thing constructors aren't ready yet, can't check if "find.${key}" available`);
-  }
-
-  for (const thingConstructor of Object.values(thingConstructors)) {
-    const thingFindSpecs = thingConstructor[Symbol.for('Thing.findSpecs')];
-    if (!thingFindSpecs) continue;
-
-    if (Object.hasOwn(thingFindSpecs, key)) {
-      return postprocessFindSpec(thingFindSpecs[key], {
-        thingConstructor,
-      });
-    }
-  }
-
-  throw new Error(`"find.${key}" isn't available`);
+  return findSpec(key, findReverseHelperConfig);
 }
 
 export const findTokenKey = Symbol.for('find.findTokenKey');
@@ -425,27 +394,18 @@ export function findMixed(config) {
   return findMixedStore.get(config);
 }
 
-export default new Proxy({}, {
-  get: (store, key) => {
+export default tokenProxy({
+  findSpec: findFindSpec,
+  prepareBehavior: findHelper,
+
+  handle(key) {
     if (key === 'mixed') {
       return findMixed;
     }
+  },
 
-    if (!Object.hasOwn(store, key)) {
-      let behavior = (...args) => {
-        // This will error if the find spec isn't available...
-        const findSpec = findFindSpec(key);
-
-        // ...or, if it is available, replace this function with the
-        // ready-for-use find function made out of that find spec.
-        return (behavior = findHelper(findSpec))(...args);
-      };
-
-      store[key] = (...args) => behavior(...args);
-      store[key][findTokenKey] = key;
-    }
-
-    return store[key];
+  decorate(token, key) {
+    token[findTokenKey] = key;
   },
 });
 
