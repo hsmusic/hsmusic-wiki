@@ -19,15 +19,22 @@ function reverseHelper(spec) {
     cache.set(data, cacheRecord);
 
     // Get the referencing and referenced things. This is the meat of how
-    // one reverse spec is different from another.
+    // one reverse spec is different from another. If the spec includes a
+    // 'tidy' step, use that to finalize the referencing things, the way
+    // they'll be recorded as results.
 
-    const referencingThings =
+    const interstitialReferencingThings =
       (spec.bindTo === 'wikiData'
         ? spec.referencing(data)
         : data.flatMap(thing => spec.referencing(thing)));
 
     const referencedThings =
-      referencingThings.map(thing => spec.referenced(thing));
+      interstitialReferencingThings.map(thing => spec.referenced(thing));
+
+    const referencingThings =
+      (spec.tidy
+        ? interstitialReferencingThings.map(thing => spec.tidy(thing))
+        : interstitialReferencingThings);
 
     // Actually fill in the cache record. Since we're building up a *reverse*
     // reference list, track connections in terms of the referenced thing.
