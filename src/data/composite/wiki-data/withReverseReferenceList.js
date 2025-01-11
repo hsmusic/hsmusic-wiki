@@ -14,13 +14,6 @@ export default withReverseList_template({
   outputName: '#reverseReferenceList',
 
   customCompositionSteps: () => [
-    withPropertyFromList({
-      list: input('data'),
-      property: input('list'),
-    }).outputs({
-      '#values': '#referencedThings',
-    }),
-
     {
       dependencies: [input('data')],
       compute: (continuation, {
@@ -30,5 +23,12 @@ export default withReverseList_template({
           data,
       }),
     },
+
+    withPropertyFromList({
+      list: '#referencingThings',
+      property: input('list'),
+    }).outputs({
+      '#values': '#referencedThings',
+    }),
   ],
 });

@@ -27,9 +27,14 @@ export default withReverseList_template({
       '#flattenedList': '#referencingThings',
     }),
 
-    withMappedList({
+    withPropertyFromList({
       list: '#referencingThings',
-      map: input.value(contrib => [contrib.artist]),
+      property: input.value('artist'),
+    }),
+
+    withMappedList({
+      list: '#referencingThings.artist',
+      map: input.value(artist => [artist]),
     }).outputs({
       '#mappedList': '#referencedThings',
     }),

@@ -6,7 +6,8 @@ import withReverseList_template from './helpers/withReverseList-template.js';
 
 import {input} from '#composite';
 
-import {withMappedList} from '#composite/data';
+import {withAvailabilityFilter} from '#composite/control-flow';
+import {withMappedList, withPropertyFromList} from '#composite/data';
 
 export default withReverseList_template({
   annotation: `withReverseSingleReferenceList`,
@@ -25,24 +26,23 @@ export default withReverseList_template({
       }),
     },
 
+    withPropertyFromList({
+      list: '#referencingThings',
+      property: input('ref'),
+    }).outputs({
+      '#values': '#individualReferencedThings',
+    }),
+
+    withAvailabilityFilter({
+      from: '#individualReferencedThings',
+    }),
+
     // This map wraps each referenced thing in a single-item array.
     // Each referencing thing references exactly one thing, if any.
-    {
-      dependencies: [input('ref')],
-      compute: (continuation, {
-        [input('ref')]: ref,
-      }) => continuation({
-        ['#singleReferenceMap']:
-          thing =>
-            (thing[ref]
-              ? [thing[ref]]
-              : []),
-      }),
-    },
-
     withMappedList({
-      list: '#referencingThings',
-      map: '#singleReferenceMap',
+      list: '#individualReferencedThings',
+      filter: '#availabilityFilter',
+      map: input.value(thing => [thing]),
     }).outputs({
       '#mappedList': '#referencedThings',
     }),
