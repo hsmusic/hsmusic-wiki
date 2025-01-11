@@ -30,6 +30,7 @@ export {default as seriesList} from './seriesList.js';
 export {default as simpleDate} from './simpleDate.js';
 export {default as simpleString} from './simpleString.js';
 export {default as singleReference} from './singleReference.js';
+export {default as soupyFind} from './soupyFind.js';
 export {default as thing} from './thing.js';
 export {default as thingList} from './thingList.js';
 export {default as urls} from './urls.js';
