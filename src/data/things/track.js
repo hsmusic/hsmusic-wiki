@@ -54,6 +54,7 @@ import {
   simpleDate,
   simpleString,
   singleReference,
+  soupyFind,
   thing,
   urls,
   wikiData,
@@ -329,10 +330,14 @@ export class Track extends Thing {
         notFoundValue: input.value([]),
       }),
 
+      withPropertyFromObject({
+        object: 'find',
+        property: input.value('track'),
+      }),
+
       referenceList({
         class: input.value(Track),
-        find: input.value(find.track),
-        data: 'trackData',
+        find: '#find.track',
       }),
     ],
 
@@ -341,10 +346,14 @@ export class Track extends Thing {
         notFoundValue: input.value([]),
       }),
 
+      withPropertyFromObject({
+        object: 'find',
+        property: input.value('track'),
+      }),
+
       referenceList({
         class: input.value(Track),
-        find: input.value(find.track),
-        data: 'trackData',
+        find: '#find.track',
       }),
     ],
 
@@ -375,6 +384,8 @@ export class Track extends Thing {
     ],
 
     // Update only
+
+    find: soupyFind(),
 
     albumData: wikiData({
       class: input.value(Album),
