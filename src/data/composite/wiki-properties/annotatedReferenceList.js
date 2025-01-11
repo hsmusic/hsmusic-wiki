@@ -12,7 +12,7 @@ import {
 } from '#validators';
 
 import {exposeDependency} from '#composite/control-flow';
-import {inputWikiData, withResolvedAnnotatedReferenceList}
+import {inputSoupyFind, inputWikiData, withResolvedAnnotatedReferenceList}
   from '#composite/wiki-data';
 
 import {referenceListInputDescriptions, referenceListUpdateDescription}
@@ -27,7 +27,7 @@ export default templateCompositeFrom({
     ...referenceListInputDescriptions(),
 
     data: inputWikiData({allowMixedTypes: true}),
-    find: input({type: 'function'}),
+    find: inputSoupyFind(),
 
     date: input({
       validate: isDate,

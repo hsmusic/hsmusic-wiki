@@ -10,6 +10,7 @@ import {
   withAvailabilityFilter,
 } from '#composite/control-flow';
 
+import inputSoupyFind from './inputSoupyFind.js';
 import inputNotFoundMode from './inputNotFoundMode.js';
 import inputWikiData from './inputWikiData.js';
 import raiseResolvedReferenceList from './raiseResolvedReferenceList.js';
@@ -34,7 +35,7 @@ export default templateCompositeFrom({
     thing: input({type: 'string', defaultValue: 'thing'}),
 
     data: inputWikiData({allowMixedTypes: true}),
-    find: input({type: 'function'}),
+    find: inputSoupyFind(),
 
     notFoundMode: inputNotFoundMode(),
   },
@@ -42,11 +43,6 @@ export default templateCompositeFrom({
   outputs: ['#resolvedAnnotatedReferenceList'],
 
   steps: () => [
-    exitWithoutDependency({
-      dependency: input('data'),
-      value: input.value([]),
-    }),
-
     raiseOutputWithoutDependency({
       dependency: input('list'),
       mode: input.value('empty'),
