@@ -657,14 +657,14 @@ export class Track extends Thing {
     tracksWhichReference: {
       bindTo: 'trackData',
 
-      referencing: track => [track],
-      referenced: track => track.sampledTracks,
+      referencing: track => track.isOriginalRelease ? [track] : [],
+      referenced: track => track.referencedTracks,
     },
 
     tracksWhichSample: {
       bindTo: 'trackData',
 
-      referencing: track => [track],
+      referencing: track => track.isOriginalRelease ? [track] : [],
       referenced: track => track.sampledTracks,
     },
   };
