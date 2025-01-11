@@ -41,10 +41,12 @@ export class ArtTag extends Thing {
 
     // Update only
 
+    // used for taggedInThings (reverse)
     albumData: wikiData({
       class: input.value(Album),
     }),
 
+    // used for taggedInThings (reverse)
     trackData: wikiData({
       class: input.value(Track),
     }),

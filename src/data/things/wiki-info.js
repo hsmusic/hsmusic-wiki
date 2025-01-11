@@ -15,7 +15,7 @@ import {
 } from '#validators';
 
 import {exitWithoutDependency} from '#composite/control-flow';
-import {contentString, flag, name, referenceList, wikiData}
+import {contentString, flag, name, referenceList, soupyFind}
   from '#composite/wiki-properties';
 
 export class WikiInfo extends Thing {
@@ -71,8 +71,7 @@ export class WikiInfo extends Thing {
 
     divideTrackListsByGroups: referenceList({
       class: input.value(Group),
-      find: input.value(find.group),
-      data: 'groupData',
+      find: soupyFind.input('group'),
     }),
 
     contributionPresets: {
@@ -99,6 +98,8 @@ export class WikiInfo extends Thing {
 
     // Update only
 
+    find: soupyFind(),
+
     searchDataAvailable: {
       flags: {update: true},
       update: {
@@ -106,10 +107,6 @@ export class WikiInfo extends Thing {
         default: false,
       },
     },
-
-    groupData: wikiData({
-      class: input.value(Group),
-    }),
   });
 
   static [Thing.yamlDocumentSpec] = {

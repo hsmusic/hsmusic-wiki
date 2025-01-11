@@ -1227,11 +1227,11 @@ export async function loadAndProcessDataDocuments(dataSteps, {dataPath}) {
 // of which are required for page HTML generation and other expected behavior).
 export function linkWikiDataArrays(wikiData, {bindFind}) {
   const linkWikiDataSpec = new Map([
+    // entries must be present here even without any properties to explicitly
+    // link if the 'find' property will be implicitly linked
+
     [wikiData.albumData, [
       'albumData',
-      'artTagData',
-      'artistData',
-      'groupData',
       'trackData',
       'wikiInfo',
     ]],
@@ -1243,47 +1243,33 @@ export function linkWikiDataArrays(wikiData, {bindFind}) {
 
     [wikiData.artistData, [
       'albumData',
-      'artistData',
       'flashData',
       'groupData',
       'trackData',
     ]],
 
     [wikiData.flashData, [
-      'artistData',
       'flashActData',
-      'trackData',
       'wikiInfo',
     ]],
 
     [wikiData.flashActData, [
-      'flashData',
       'flashSideData',
     ]],
 
-    [wikiData.flashSideData, [
-      'flashActData',
-    ]],
+    [wikiData.flashSideData, [/* find */]],
 
     [wikiData.groupData, [
       'albumData',
-      'artistData',
       'groupCategoryData',
     ]],
 
-    [wikiData.groupCategoryData, [
-      'groupData',
-    ]],
+    [wikiData.groupCategoryData, [/* find */]],
 
-    [wikiData.homepageLayout?.rows, [
-      'albumData',
-      'groupData',
-    ]],
+    [wikiData.homepageLayout.rows, [/* find */]],
 
     [wikiData.trackData, [
       'albumData',
-      'artTagData',
-      'artistData',
       'flashData',
       'trackData',
       'trackSectionData',
@@ -1294,13 +1280,13 @@ export function linkWikiDataArrays(wikiData, {bindFind}) {
       'albumData',
     ]],
 
-    [[wikiData.wikiInfo], [
-      'groupData',
-    ]],
+    [[wikiData.wikiInfo], [/* find */]],
   ]);
 
   const constructorHasFindMap = new Map();
   const boundFind = bindFind(wikiData);
+
+  for (const thing of Object.values(wikiData).flat());
 
   for (const [things, keys] of linkWikiDataSpec.entries()) {
     if (things === undefined) continue;

@@ -12,6 +12,7 @@ import {
   withPropertiesFromList,
 } from '#composite/data';
 
+import inputSoupyFind from './inputSoupyFind.js';
 import withResolvedReferenceList from './withResolvedReferenceList.js';
 
 export default templateCompositeFrom({
@@ -62,8 +63,7 @@ export default templateCompositeFrom({
 
     withResolvedReferenceList({
       list: '#flattenedList',
-      data: 'albumData',
-      find: input.value(find.album),
+      find: inputSoupyFind.input('album'),
       notFoundMode: input.value('null'),
     }),
 

@@ -17,7 +17,7 @@ import {
 
 import {exposeDependency} from '#composite/control-flow';
 import {withResolvedReference} from '#composite/wiki-data';
-import {color, contentString, name, referenceList, wikiData}
+import {color, contentString, name, referenceList, soupyFind}
   from '#composite/wiki-properties';
 
 export class HomepageLayout extends Thing {
@@ -74,17 +74,7 @@ export class HomepageLayoutRow extends Thing {
 
     // Update only
 
-    // These wiki data arrays aren't necessarily used by every subclass, but
-    // to the convenience of providing these, the superclass accepts all wiki
-    // data arrays depended upon by any subclass.
-
-    albumData: wikiData({
-      class: input.value(Album),
-    }),
-
-    groupData: wikiData({
-      class: input.value(Group),
-    }),
+    find: soupyFind(),
   });
 
   static [Thing.yamlDocumentSpec] = {
@@ -151,8 +141,7 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
 
       withResolvedReference({
         ref: input.updateValue(),
-        data: 'groupData',
-        find: input.value(find.group),
+        find: soupyFind.input('group'),
       }),
 
       exposeDependency({dependency: '#resolvedReference'}),
@@ -160,8 +149,7 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
 
     sourceAlbums: referenceList({
       class: input.value(Album),
-      find: input.value(find.album),
-      data: 'albumData',
+      find: soupyFind.input('album'),
     }),
 
     countAlbumsFromGroup: {

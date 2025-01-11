@@ -11,18 +11,13 @@ import {validateWikiData} from '#validators';
 import {exitWithoutDependency, withResultOfAvailabilityCheck}
   from '#composite/control-flow';
 import {withResolvedReference} from '#composite/wiki-data';
+import {soupyFind} from '#composite/wiki-properties';
 
 export default templateCompositeFrom({
   annotation: `withOriginalRelease`,
 
   inputs: {
     selfIfOriginal: input({type: 'boolean', defaultValue: false}),
-
-    data: input({
-      validate: validateWikiData({referenceType: 'track'}),
-      defaultDependency: 'trackData',
-    }),
-
     notFoundValue: input({defaultValue: null}),
   },
 
@@ -55,8 +50,7 @@ export default templateCompositeFrom({
 
     withResolvedReference({
       ref: 'originalReleaseTrack',
-      data: input('data'),
-      find: input.value(find.track),
+      find: soupyFind.input('track'),
     }),
 
     exitWithoutDependency({

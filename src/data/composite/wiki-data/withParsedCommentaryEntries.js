@@ -11,6 +11,7 @@ import {
   withUnflattenedList,
 } from '#composite/data';
 
+import inputSoupyFind from './inputSoupyFind.js';
 import withResolvedReferenceList from './withResolvedReferenceList.js';
 
 export default templateCompositeFrom({
@@ -122,8 +123,7 @@ export default templateCompositeFrom({
 
     withResolvedReferenceList({
       list: '#flattenedList',
-      data: 'artistData',
-      find: input.value(find.artist),
+      find: inputSoupyFind.input('artist'),
       notFoundMode: input.value('null'),
     }),
 

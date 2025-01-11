@@ -222,8 +222,7 @@ export class Track extends Thing {
 
     originalReleaseTrack: singleReference({
       class: input.value(Track),
-      find: input.value(find.track),
-      data: 'trackData',
+      find: soupyFind.input('track'),
     }),
 
     // Internal use only - for directly identifying an album inside a track's
@@ -231,8 +230,7 @@ export class Track extends Thing {
     // included in an album's track list).
     dataSourceAlbum: singleReference({
       class: input.value(Album),
-      find: input.value(find.album),
-      data: 'albumData',
+      find: soupyFind.input('album'),
     }),
 
     artistContribs: [
@@ -354,8 +352,7 @@ export class Track extends Thing {
 
       referenceList({
         class: input.value(ArtTag),
-        find: input.value(find.artTag),
-        data: 'artTagData',
+        find: soupyFind.input('artTag'),
       }),
     ],
 
@@ -377,30 +374,29 @@ export class Track extends Thing {
 
     find: soupyFind(),
 
+    // used for referencedArtworkList (mixedFind)
+    // used for withAlbum (reverse)
     albumData: wikiData({
       class: input.value(Album),
     }),
 
-    artistData: wikiData({
-      class: input.value(Artist),
-    }),
-
-    artTagData: wikiData({
-      class: input.value(ArtTag),
-    }),
-
+    // used for featuredInFlashes (reverse)
     flashData: wikiData({
       class: input.value(Flash),
     }),
 
+    // used for referencedArtworkList (mixedFind)
+    // used for trackReverseReferenceList (reverse)
     trackData: wikiData({
       class: input.value(Track),
     }),
 
+    // used for withContainingTrackSection (reverse)
     trackSectionData: wikiData({
       class: input.value(TrackSection),
     }),
 
+    // used for withMatchingContributionPresets (indirectly by Contribution)
     wikiInfo: thing({
       class: input.value(WikiInfo),
     }),

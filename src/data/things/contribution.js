@@ -9,7 +9,7 @@ import {isStringNonEmpty, isThing, validateReference} from '#validators';
 
 import {exitWithoutDependency, exposeDependency} from '#composite/control-flow';
 import {withResolvedReference} from '#composite/wiki-data';
-import {flag, simpleDate} from '#composite/wiki-properties';
+import {flag, simpleDate, soupyFind} from '#composite/wiki-properties';
 
 import {
   withFilteredList,
@@ -81,6 +81,10 @@ export class Contribution extends Thing {
 
       flag(true),
     ],
+
+    // Update only
+
+    find: soupyFind(),
 
     // Expose only
 

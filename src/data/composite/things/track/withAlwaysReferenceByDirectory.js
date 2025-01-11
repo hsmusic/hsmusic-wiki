@@ -9,6 +9,7 @@ import {isBoolean} from '#validators';
 
 import {withPropertyFromObject} from '#composite/data';
 import {withResolvedReference} from '#composite/wiki-data';
+import {soupyFind} from '#composite/wiki-properties';
 
 import {
   exitWithoutDependency,
@@ -31,8 +32,7 @@ export default templateCompositeFrom({
     // recurse back into alwaysReferenceByDirectory!
     withResolvedReference({
       ref: 'dataSourceAlbum',
-      data: 'albumData',
-      find: input.value(find.album),
+      find: soupyFind.input('album'),
     }).outputs({
       '#resolvedReference': '#album',
     }),

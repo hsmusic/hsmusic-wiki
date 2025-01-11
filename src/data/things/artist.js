@@ -25,6 +25,7 @@ import {
   reverseContributionList,
   reverseReferenceList,
   singleReference,
+  soupyFind,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -57,28 +58,29 @@ export class Artist extends Thing {
 
     aliasedArtist: singleReference({
       class: input.value(Artist),
-      find: input.value(find.artist),
-      data: 'artistData',
+      find: soupyFind.input('artist'),
     }),
 
     // Update only
 
+    find: soupyFind(),
+
+    // used for reverse contribution lists
     albumData: wikiData({
       class: input.value(Album),
     }),
 
-    artistData: wikiData({
-      class: input.value(Artist),
-    }),
-
+    // used for reverse contribution lists
     flashData: wikiData({
       class: input.value(Flash),
     }),
 
+    // used for closelyLinkedGroups
     groupData: wikiData({
       class: input.value(Group),
     }),
 
+    // used for reverse contribution lists
     trackData: wikiData({
       class: input.value(Track),
     }),

@@ -230,8 +230,7 @@ export class Album extends Thing {
 
     groups: referenceList({
       class: input.value(Group),
-      find: input.value(find.group),
-      data: 'groupData',
+      find: soupyFind.input('group'),
     }),
 
     artTags: [
@@ -242,8 +241,7 @@ export class Album extends Thing {
 
       referenceList({
         class: input.value(ArtTag),
-        find: input.value(find.artTag),
-        data: 'artTagData',
+        find: soupyFind.input('artTag'),
       }),
     ],
 
@@ -273,26 +271,17 @@ export class Album extends Thing {
 
     find: soupyFind(),
 
+    // used for referencedArtworkList (mixedFind)
     albumData: wikiData({
       class: input.value(Album),
     }),
 
-    artistData: wikiData({
-      class: input.value(Artist),
-    }),
-
-    artTagData: wikiData({
-      class: input.value(ArtTag),
-    }),
-
-    groupData: wikiData({
-      class: input.value(Group),
-    }),
-
+    // used for referencedArtworkList (mixedFind)
     trackData: wikiData({
       class: input.value(Track),
     }),
 
+    // used for withMatchingContributionPresets (indirectly by Contribution)
     wikiInfo: thing({
       class: input.value(WikiInfo),
     }),
@@ -643,6 +632,7 @@ export class TrackSection extends Thing {
 
     // Update only
 
+    // used for withAlbum
     albumData: wikiData({
       class: input.value(Album),
     }),

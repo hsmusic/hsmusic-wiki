@@ -106,8 +106,7 @@ export class Flash extends Thing {
 
     featuredTracks: referenceList({
       class: input.value(Track),
-      find: input.value(find.track),
-      data: 'trackData',
+      find: soupyFind.input('track'),
     }),
 
     urls: urls(),
@@ -119,18 +118,12 @@ export class Flash extends Thing {
 
     find: soupyFind(),
 
-    artistData: wikiData({
-      class: input.value(Artist),
-    }),
-
-    trackData: wikiData({
-      class: input.value(Track),
-    }),
-
+    // used for withFlashAct (reverse)
     flashActData: wikiData({
       class: input.value(FlashAct),
     }),
 
+    // used for withMatchingContributionPresets (indirectly by Contribution)
     wikiInfo: thing({
       class: input.value(WikiInfo),
     }),
@@ -245,18 +238,14 @@ export class FlashAct extends Thing {
 
     flashes: referenceList({
       class: input.value(Flash),
-      find: input.value(find.flash),
-      data: 'flashData',
+      find: soupyFind.input('flash'),
     }),
 
     // Update only
 
     find: soupyFind(),
 
-    flashData: wikiData({
-      class: input.value(Flash),
-    }),
-
+    // used for withFlashSide
     flashSideData: wikiData({
       class: input.value(FlashSide),
     }),
@@ -303,17 +292,12 @@ export class FlashSide extends Thing {
 
     acts: referenceList({
       class: input.value(FlashAct),
-      find: input.value(find.flashAct),
-      data: 'flashActData',
+      find: soupyFind.input('flashAct'),
     }),
 
     // Update only
 
     find: soupyFind(),
-
-    flashActData: wikiData({
-      class: input.value(FlashAct),
-    }),
   });
 
   static [Thing.yamlDocumentSpec] = {

@@ -13,6 +13,7 @@ import {
   name,
   referenceList,
   seriesList,
+  soupyFind,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -32,8 +33,7 @@ export class Group extends Thing {
 
     closelyLinkedArtists: annotatedReferenceList({
       class: input.value(Artist),
-      find: input.value(find.artist),
-      data: 'artistData',
+      find: soupyFind.input('artist'),
 
       date: input.value(null),
 
@@ -43,8 +43,7 @@ export class Group extends Thing {
 
     featuredAlbums: referenceList({
       class: input.value(Album),
-      find: input.value(find.album),
-      data: 'albumData',
+      find: soupyFind.input('album'),
     }),
 
     serieses: seriesList({
@@ -53,14 +52,15 @@ export class Group extends Thing {
 
     // Update only
 
+    find: soupyFind(),
+
+    // used for albums (reverse)
     albumData: wikiData({
       class: input.value(Album),
     }),
 
-    artistData: wikiData({
-      class: input.value(Artist),
-    }),
-
+    // used for category (reverse)
+    // used for color (reverse)
     groupCategoryData: wikiData({
       class: input.value(GroupCategory),
     }),
@@ -210,15 +210,12 @@ export class GroupCategory extends Thing {
 
     groups: referenceList({
       class: input.value(Group),
-      find: input.value(find.group),
-      data: 'groupData',
+      find: soupyFind.input('group'),
     }),
 
     // Update only
 
-    groupData: wikiData({
-      class: input.value(Group),
-    }),
+    find: soupyFind(),
   });
 
   static [Thing.yamlDocumentSpec] = {
