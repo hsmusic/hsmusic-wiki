@@ -1082,6 +1082,7 @@ async function main() {
           status: STATUS_FATAL_ERROR,
           annotation: `--new-thumbs provided but regeneration not needed`,
           timeEnd: Date.now(),
+          memory: process.memoryUsage(),
         });
 
         return false;
@@ -1097,6 +1098,7 @@ async function main() {
           status: STATUS_FATAL_ERROR,
           annotation: mediaCachePathAnnotation,
           timeEnd: Date.now(),
+          memory: process.memoryUsage(),
         });
 
         return false;
@@ -1163,6 +1165,7 @@ async function main() {
       status: STATUS_FATAL_ERROR,
       annotation: mediaCachePathAnnotation,
       timeEnd: Date.now(),
+      memory: process.memoryUsage(),
     });
 
     return false;
@@ -1174,6 +1177,7 @@ async function main() {
     status: STATUS_DONE_CLEAN,
     annotation: mediaCachePathAnnotation,
     timeEnd: Date.now(),
+    memory: process.memoryUsage(),
   });
 
   if (stepStatusSummary.migrateThumbnails.status === STATUS_NOT_STARTED) {
@@ -1193,6 +1197,7 @@ async function main() {
         status: STATUS_FATAL_ERROR,
         annotation: `view log for details`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
 
       return false;
@@ -1204,6 +1209,7 @@ async function main() {
     Object.assign(stepStatusSummary.migrateThumbnails, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
+      memory: process.memoryUsage(),
     });
 
     return true;
@@ -1247,6 +1253,7 @@ async function main() {
           status: STATUS_FATAL_ERROR,
           annotation: `cache does not exist`,
           timeEnd: Date.now(),
+          memory: process.memoryUsage(),
         });
 
         return false;
@@ -1264,6 +1271,7 @@ async function main() {
           status: STATUS_FATAL_ERROR,
           annotation: `cache malformed or unreadable`,
           timeEnd: Date.now(),
+          memory: process.memoryUsage(),
         });
 
         return false;
@@ -1275,6 +1283,7 @@ async function main() {
     Object.assign(stepStatusSummary.loadThumbnailCache, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
+      memory: process.memoryUsage(),
     });
 
     logInfo`Skipping thumbnail generation.`;
@@ -1302,6 +1311,7 @@ async function main() {
         status: STATUS_FATAL_ERROR,
         annotation: `view log for details`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
 
       return false;
@@ -1310,6 +1320,7 @@ async function main() {
     Object.assign(stepStatusSummary.generateThumbnails, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
+      memory: process.memoryUsage(),
     });
 
     if (thumbsOnly) {
@@ -1347,6 +1358,7 @@ async function main() {
         status: STATUS_FATAL_ERROR,
         annotation: `javascript error - view log for details`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
 
       return false;
@@ -1386,6 +1398,7 @@ async function main() {
         status: STATUS_FATAL_ERROR,
         annotation: `error loading data files`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
 
       return false;
@@ -1488,6 +1501,7 @@ async function main() {
         status: STATUS_FATAL_ERROR,
         annotation: `wiki info object not available`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
 
       return false;
@@ -1500,6 +1514,7 @@ async function main() {
       Object.assign(stepStatusSummary.loadDataFiles, {
         status: STATUS_DONE_CLEAN,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     } else {
       logWarn`This might indicate some fields in the YAML data weren't formatted`;
@@ -1514,6 +1529,7 @@ async function main() {
         status: STATUS_HAS_WARNINGS,
         annotation: `view log for details`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     }
   }
@@ -1532,6 +1548,7 @@ async function main() {
   Object.assign(stepStatusSummary.linkWikiDataArrays, {
     status: STATUS_DONE_CLEAN,
     timeEnd: Date.now(),
+    memory: process.memoryUsage(),
   });
 
   if (precacheMode === 'common') {
@@ -1603,6 +1620,7 @@ async function main() {
         status: STATUS_FATAL_ERROR,
         annotation: `see log for details`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
 
       return false;
@@ -1611,6 +1629,7 @@ async function main() {
     Object.assign(stepStatusSummary.precacheCommonData, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
+      memory: process.memoryUsage(),
     });
   }
 
@@ -1633,6 +1652,7 @@ async function main() {
       Object.assign(stepStatusSummary.reportDirectoryErrors, {
         status: STATUS_DONE_CLEAN,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     } catch (aggregate) {
       if (!paragraph) console.log('');
@@ -1650,6 +1670,7 @@ async function main() {
         status: STATUS_FATAL_ERROR,
         annotation: `duplicate directories found`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
 
       return false;
@@ -1677,6 +1698,7 @@ async function main() {
       Object.assign(stepStatusSummary.filterReferenceErrors, {
         status: STATUS_DONE_CLEAN,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     } catch (error) {
       if (!paragraph) console.log('');
@@ -1694,6 +1716,7 @@ async function main() {
         status: STATUS_HAS_WARNINGS,
         annotation: `view log for details`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     }
   }
@@ -1713,6 +1736,7 @@ async function main() {
       Object.assign(stepStatusSummary.reportContentTextErrors, {
         status: STATUS_DONE_CLEAN,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     } catch (error) {
       if (!paragraph) console.log('');
@@ -1729,6 +1753,7 @@ async function main() {
         status: STATUS_HAS_WARNINGS,
         annotation: `view log for details`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     }
   }
@@ -1746,6 +1771,7 @@ async function main() {
   Object.assign(stepStatusSummary.sortWikiDataArrays, {
     status: STATUS_DONE_CLEAN,
     timeEnd: Date.now(),
+    memory: process.memoryUsage(),
   });
 
   if (precacheMode === 'all') {
@@ -1769,6 +1795,7 @@ async function main() {
     Object.assign(stepStatusSummary.precacheAllData, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
+      memory: process.memoryUsage(),
     });
   }
 
@@ -1842,6 +1869,7 @@ async function main() {
       status: STATUS_FATAL_ERROR,
       annotation: `see log for details`,
       timeEnd: Date.now(),
+      memory: process.memoryUsage(),
     });
 
     return false;
@@ -1855,6 +1883,7 @@ async function main() {
   Object.assign(stepStatusSummary.loadInternalDefaultLanguage, {
     status: STATUS_DONE_CLEAN,
     timeEnd: Date.now(),
+    memory: process.memoryUsage(),
   });
 
   let customLanguageWatchers;
@@ -1934,6 +1963,7 @@ async function main() {
             status: STATUS_FATAL_ERROR,
             annotation: `see log for details`,
             timeEnd: Date.now(),
+            memory: process.memoryUsage(),
           });
 
           errorLoadingCustomLanguages = true;
@@ -1965,6 +1995,7 @@ async function main() {
       Object.assign(stepStatusSummary.watchLanguageFiles, {
         status: STATUS_DONE_CLEAN,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     } else {
       languages = {};
@@ -1988,11 +2019,13 @@ async function main() {
           status: STATUS_FATAL_ERROR,
           annotation: `see log for details`,
           timeEnd: Date.now(),
+          memory: process.memoryUsage(),
         });
       } else {
         Object.assign(stepStatusSummary.loadLanguageFiles, {
           status: STATUS_DONE_CLEAN,
           timeEnd: Date.now(),
+          memory: process.memoryUsage(),
         });
       }
     }
@@ -2030,6 +2063,7 @@ async function main() {
         status: STATUS_FATAL_ERROR,
         annotation: `wiki specifies default language whose file is not available`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
 
       return false;
@@ -2123,6 +2157,7 @@ async function main() {
     status: STATUS_DONE_CLEAN,
     annotation: finalDefaultLanguageAnnotation,
     timeEnd: Date.now(),
+    memory: process.memoryUsage(),
   });
 
   let missingImagePaths;
@@ -2145,24 +2180,28 @@ async function main() {
       Object.assign(stepStatusSummary.verifyImagePaths, {
         status: STATUS_DONE_CLEAN,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     } else if (empty(missingImagePaths)) {
       Object.assign(stepStatusSummary.verifyImagePaths, {
         status: STATUS_HAS_WARNINGS,
         annotation: `misplaced images detected`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     } else if (empty(misplacedImagePaths)) {
       Object.assign(stepStatusSummary.verifyImagePaths, {
         status: STATUS_HAS_WARNINGS,
         annotation: `missing images detected`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     } else {
       Object.assign(stepStatusSummary.verifyImagePaths, {
         status: STATUS_HAS_WARNINGS,
         annotation: `missing and misplaced images detected`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     }
   }
@@ -2262,6 +2301,7 @@ async function main() {
         status: STATUS_HAS_WARNINGS,
         annotation: `see log for details`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     } else {
       logInfo`Done preloading filesizes without any errors - nice!`;
@@ -2270,6 +2310,7 @@ async function main() {
       Object.assign(stepStatusSummary.preloadFileSizes, {
         status: STATUS_DONE_CLEAN,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     }
   }
@@ -2294,6 +2335,7 @@ async function main() {
       Object.assign(stepStatusSummary.buildSearchIndex, {
         status: STATUS_DONE_CLEAN,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     } catch (error) {
       if (!paragraph) console.log('');
@@ -2311,6 +2353,7 @@ async function main() {
         status: STATUS_HAS_WARNINGS,
         annotation: `see log for details`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
     }
   }
@@ -2358,6 +2401,7 @@ async function main() {
         status: STATUS_FATAL_ERROR,
         message: `JavaScript error - view log for details`,
         timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
 
       return false;
@@ -2369,6 +2413,7 @@ async function main() {
     Object.assign(stepStatusSummary.identifyWebRoutes, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
+      memory: process.memoryUsage(),
     });
   }
 
@@ -2465,6 +2510,7 @@ async function main() {
       status: STATUS_FATAL_ERROR,
       message: `javascript error - view log for details`,
       timeEnd: Date.now(),
+      memory: process.memoryUsage(),
     });
 
     return false;
@@ -2475,6 +2521,7 @@ async function main() {
       status: STATUS_HAS_WARNINGS,
       annotation: `may not have completed - view log for details`,
       timeEnd: Date.now(),
+      memory: process.memoryUsage(),
     });
 
     return false;
@@ -2483,6 +2530,7 @@ async function main() {
   Object.assign(stepStatusSummary.performBuild, {
     status: STATUS_DONE_CLEAN,
     timeEnd: Date.now(),
+    memory: process.memoryUsage(),
   });
 
   return true;
@@ -2570,6 +2618,14 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
       const longestDurationLength =
         Math.max(...stepDurations.map(duration => duration.length));
 
+      const stepMemories =
+        stepDetails.map(({memory}) =>
+          (memory
+            ? Math.round(memory["heapUsed"] / 1024 / 1024) + "MB"
+            : "-"));
+
+      const longestMemoryLength = 7;
+
       for (let index = 0; index < stepDetails.length; index++) {
         const {name, status, annotation} = stepDetails[index];
         const duration = stepDurations[index];
@@ -2579,7 +2635,8 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
             ? `!! `
             : ` - `);
 
-        message += `(${duration})`.padStart(longestDurationLength + 2, ' ');
+        message += `(${duration} `.padStart(longestDurationLength + 2, ' ');
+        message += ` ${stepMemories[index]})`.padStart(longestMemoryLength + 2, ' ');
         message += ` `;
         message += `${name}: `.padEnd(longestNameLength + 4, '.');
         message += ` `;
