@@ -34,7 +34,7 @@ export function processAvailableMatchesByName(data, {
   include = _thing => true,
 
   getMatchableNames = thing =>
-    (Object.hasOwn(thing, 'name')
+    (thing.constructor.hasPropertyDescriptor('name')
       ? [thing.name]
       : []),
 
@@ -72,7 +72,7 @@ export function processAvailableMatchesByDirectory(data, {
   include = _thing => true,
 
   getMatchableDirectories = thing =>
-    (Object.hasOwn(thing, 'directory')
+    (thing.constructor.hasPropertyDescriptor('directory')
       ? [thing.directory]
       : [null]),
 

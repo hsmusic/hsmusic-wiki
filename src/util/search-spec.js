@@ -134,14 +134,14 @@ export const searchSpec = {
         thing.color;
 
       fields.artTags =
-        (Object.hasOwn(thing, 'artTags')
+        (thing.constructor.hasPropertyDescriptor('artTags')
           ? thing.artTags.map(artTag => artTag.nameShort)
           : []);
 
       fields.additionalNames =
-        (Object.hasOwn(thing, 'additionalNames')
+        (thing.constructor.hasPropertyDescriptor('additionalNames')
           ? thing.additionalNames.map(entry => entry.name)
-       : Object.hasOwn(thing, 'aliasNames')
+       : thing.constructor.hasPropertyDescriptor('aliasNames')
           ? thing.aliasNames
           : []);
 

@@ -84,53 +84,21 @@ function inspect(value) {
 
 export default class CacheableObject {
   static propertyDescriptors = Symbol.for('CacheableObject.propertyDescriptors');
+  static constructorFinalized = Symbol.for('CacheableObject.constructorFinalized');
+  static propertyDependants = Symbol.for('CacheableObject.propertyDependants');
 
-  #propertyUpdateValues = Object.create(null);
-  #propertyUpdateCacheInvalidators = Object.create(null);
-
-  // Note the constructor doesn't take an initial data source. Due to a quirk
-  // of JavaScript, private members can't be accessed before the superclass's
-  // constructor is finished processing - so if we call the overridden
-  // update() function from inside this constructor, it will error when
-  // writing to private members. Pretty bad!
-  //
-  // That means initial data must be provided by following up with update()
-  // after constructing the new instance of the Thing (sub)class.
+  static cacheValid = Symbol.for('CacheableObject.cacheValid');
+  static updateValue = Symbol.for('CacheableObject.updateValues');
 
   constructor() {
-    this.#defineProperties();
-    this.#initializeUpdatingPropertyValues();
+    this[CacheableObject.updateValue] = Object.create(null);
+    this[CacheableObject.cachedValue] = Object.create(null);
+    this[CacheableObject.cacheValid] = Object.create(null);
 
-    if (CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES) {
-      return new Proxy(this, {
-        get: (obj, key) => {
-          if (!Object.hasOwn(obj, key)) {
-            if (key !== 'constructor') {
-              CacheableObject._invalidAccesses.add(`(${obj.constructor.name}).${key}`);
-            }
-          }
-          return obj[key];
-        },
-      });
-    }
-  }
-
-  #withEachPropertyDescriptor(callback) {
-    const {[CacheableObject.propertyDescriptors]: propertyDescriptors} =
-      this.constructor;
-
+    const propertyDescriptors = this.constructor[CacheableObject.propertyDescriptors];
     for (const property of Reflect.ownKeys(propertyDescriptors)) {
-      callback(property, propertyDescriptors[property]);
-    }
-  }
-
-  #initializeUpdatingPropertyValues() {
-    this.#withEachPropertyDescriptor((property, descriptor) => {
-      const {flags, update} = descriptor;
-
-      if (!flags.update) {
-        return;
-      }
+      const {flags, update} = propertyDescriptors[property];
+      if (!flags.update) continue;
 
       if (
         typeof update === 'object' &&
@@ -141,188 +109,157 @@ export default class CacheableObject {
       } else {
         this[property] = null;
       }
-    });
+    }
   }
 
-  #defineProperties() {
-    if (!this.constructor[CacheableObject.propertyDescriptors]) {
-      throw new Error(`Expected constructor ${this.constructor.name} to provide CacheableObject.propertyDescriptors`);
+  static finalizeCacheableObjectPrototype() {
+    if (this[CacheableObject.constructorFinalized]) {
+      throw new Error(`Constructor ${this.name} already finalized`);
     }
 
-    this.#withEachPropertyDescriptor((property, descriptor) => {
-      const {flags} = descriptor;
+    if (!this[CacheableObject.propertyDescriptors]) {
+      throw new Error(`Expected constructor ${this.name} to provide CacheableObject.propertyDescriptors`);
+    }
+
+    this[CacheableObject.constructorFinalized] = true;
+    this[CacheableObject.propertyDependants] = Object.create(null);
+
+    const propertyDescriptors = this[CacheableObject.propertyDescriptors];
+    for (const property of Reflect.ownKeys(propertyDescriptors)) {
+      const {flags, update, expose} = propertyDescriptors[property];
 
       const definition = {
         configurable: false,
         enumerable: flags.expose,
       };
 
-      if (flags.update) {
-        definition.set = this.#getUpdateObjectDefinitionSetterFunction(property);
-      }
-
-      if (flags.expose) {
-        definition.get = this.#getExposeObjectDefinitionGetterFunction(property);
-      }
-
-      Object.defineProperty(this, property, definition);
-    });
-
-    Object.seal(this);
-  }
-
-  #getUpdateObjectDefinitionSetterFunction(property) {
-    const {update} = this.#getPropertyDescriptor(property);
-    const validate = update?.validate;
-
-    return (newValue) => {
-      const oldValue = this.#propertyUpdateValues[property];
-
-      if (newValue === undefined) {
-        throw new TypeError(`Properties cannot be set to undefined`);
-      }
-
-      if (newValue === oldValue) {
-        return;
-      }
-
-      if (newValue !== null && validate) {
-        try {
-          const result = validate(newValue);
-          if (result === undefined) {
-            throw new TypeError(`Validate function returned undefined`);
-          } else if (result !== true) {
-            throw new TypeError(`Validation failed for value ${newValue}`);
+      if (flags.update) setSetter: {
+        definition.set = function(newValue) {
+          if (newValue === undefined) {
+            throw new TypeError(`Properties cannot be set to undefined`);
           }
-        } catch (caughtError) {
-          throw new CacheableObjectPropertyValueError(
-            property, oldValue, newValue, {cause: caughtError});
+
+          const oldValue = this[CacheableObject.updateValue][property];
+
+          if (newValue === oldValue) {
+            return;
+          }
+
+          if (newValue !== null && update?.validate) {
+            try {
+              const result = update.validate(newValue);
+              if (result === undefined) {
+                throw new TypeError(`Validate function returned undefined`);
+              } else if (result !== true) {
+                throw new TypeError(`Validation failed for value ${newValue}`);
+              }
+            } catch (caughtError) {
+              throw new CacheableObjectPropertyValueError(
+                property, oldValue, newValue, {cause: caughtError});
+            }
+          }
+
+          this[CacheableObject.updateValue][property] = newValue;
+
+          const dependants = this.constructor[CacheableObject.propertyDependants][property];
+          if (dependants) {
+            for (const dependant of dependants) {
+              this[CacheableObject.cacheValid][dependant] = false;
+            }
+          }
+        };
+      }
+
+      if (flags.expose) setGetter: {
+        if (flags.update && !expose?.transform) {
+          definition.get = function() {
+            return this[CacheableObject.updateValue][property];
+          };
+
+          break setGetter;
+        }
+
+        if (flags.update && expose?.compute) {
+          throw new Error(`Updating property ${property} has compute function, should be formatted as transform`);
+        }
+
+        if (!flags.update && !expose?.compute) {
+          throw new Error(`Exposed property ${property} does not update and is missing compute function`);
+        }
+
+        definition.get = function() {
+          if (this[CacheableObject.cacheValid][property]) {
+            return this[CacheableObject.cachedValue][property];
+          }
+
+          this[CacheableObject.cacheValid][property] = true;
+
+          const dependencies = Object.create(null);
+          for (const key of expose.dependencies ?? []) {
+            switch (key) {
+              case 'this':
+                dependencies.this = this;
+                break;
+
+              case 'thisProperty':
+                dependencies.thisProperty = property;
+                break;
+
+              default:
+                dependencies[key] = this[CacheableObject.updateValue][key];
+                break;
+            }
+          }
+
+          const value =
+            (flags.update
+              ? expose.transform(this[CacheableObject.updateValue][property], dependencies)
+              : expose.compute(dependencies));
+
+          this[CacheableObject.cachedValue][property] = value;
+
+          return value;
+        };
+      }
+
+      if (flags.expose) recordAsDependant: {
+        const dependantsMap = this[CacheableObject.propertyDependants];
+
+        if (flags.update && expose?.transform) {
+          if (dependantsMap[property]) {
+            dependantsMap[property].push(property);
+          } else {
+            dependantsMap[property] = [property];
+          }
+        }
+
+        for (const dependency of expose?.dependencies ?? []) {
+          switch (dependency) {
+            case 'this':
+            case 'thisProperty':
+              continue;
+
+            default: {
+              if (dependantsMap[dependency]) {
+                dependantsMap[dependency].push(property);
+              } else {
+                dependantsMap[dependency] = [property];
+              }
+            }
+          }
         }
       }
 
-      this.#propertyUpdateValues[property] = newValue;
-      this.#invalidateCachesDependentUpon(property);
-    };
-  }
-
-  #getPropertyDescriptor(property) {
-    return this.constructor[CacheableObject.propertyDescriptors][property];
-  }
-
-  #invalidateCachesDependentUpon(property) {
-    const invalidators = this.#propertyUpdateCacheInvalidators[property];
-    if (!invalidators) {
-      return;
-    }
-
-    for (const invalidate of invalidators) {
-      invalidate();
+      Object.defineProperty(this.prototype, property, definition);
     }
   }
 
-  #getExposeObjectDefinitionGetterFunction(property) {
-    const {flags} = this.#getPropertyDescriptor(property);
-    const compute = this.#getExposeComputeFunction(property);
-
-    if (compute) {
-      let cachedValue;
-      const checkCacheValid = this.#getExposeCheckCacheValidFunction(property);
-      return () => {
-        if (checkCacheValid()) {
-          return cachedValue;
-        } else {
-          return (cachedValue = compute());
-        }
-      };
-    } else if (!flags.update && !compute) {
-      throw new Error(`Exposed property ${property} does not update and is missing compute function`);
-    } else {
-      return () => this.#propertyUpdateValues[property];
-    }
+  static getPropertyDescriptor(property) {
+    return this[CacheableObject.propertyDescriptors][property];
   }
 
-  #getExposeComputeFunction(property) {
-    const {flags, expose} = this.#getPropertyDescriptor(property);
-
-    const compute = expose?.compute;
-    const transform = expose?.transform;
-
-    if (flags.update && !transform) {
-      return null;
-    } else if (flags.update && compute) {
-      throw new Error(`Updating property ${property} has compute function, should be formatted as transform`);
-    } else if (!flags.update && !compute) {
-      throw new Error(`Exposed property ${property} does not update and is missing compute function`);
-    }
-
-    let getAllDependencies;
-
-    if (expose.dependencies?.length > 0) {
-      const dependencyKeys = expose.dependencies.slice();
-      const shouldReflectObject = dependencyKeys.includes('this');
-      const shouldReflectProperty = dependencyKeys.includes('thisProperty');
-
-      getAllDependencies = () => {
-        const dependencies = Object.create(null);
-
-        for (const key of dependencyKeys) {
-          dependencies[key] = this.#propertyUpdateValues[key];
-        }
-
-        if (shouldReflectObject) {
-          dependencies.this = this;
-        }
-
-        if (shouldReflectProperty) {
-          dependencies.thisProperty = property;
-        }
-
-        return dependencies;
-      };
-    } else {
-      const dependencies = Object.create(null);
-      Object.freeze(dependencies);
-      getAllDependencies = () => dependencies;
-    }
-
-    if (flags.update) {
-      return () => transform(this.#propertyUpdateValues[property], getAllDependencies());
-    } else {
-      return () => compute(getAllDependencies());
-    }
-  }
-
-  #getExposeCheckCacheValidFunction(property) {
-    const {flags, expose} = this.#getPropertyDescriptor(property);
-
-    let valid = false;
-
-    const invalidate = () => {
-      valid = false;
-    };
-
-    const dependencyKeys = new Set(expose?.dependencies);
-
-    if (flags.update) {
-      dependencyKeys.add(property);
-    }
-
-    for (const key of dependencyKeys) {
-      if (this.#propertyUpdateCacheInvalidators[key]) {
-        this.#propertyUpdateCacheInvalidators[key].push(invalidate);
-      } else {
-        this.#propertyUpdateCacheInvalidators[key] = [invalidate];
-      }
-    }
-
-    return () => {
-      if (!valid) {
-        valid = true;
-        return false;
-      } else {
-        return true;
-      }
-    };
+  static hasPropertyDescriptor(property) {
+    return Object.hasOwn(this[CacheableObject.propertyDescriptors], property);
   }
 
   static cacheAllExposedProperties(obj) {
@@ -368,11 +305,11 @@ export default class CacheableObject {
   }
 
   static getUpdateValue(object, key) {
-    if (!Object.hasOwn(object, key)) {
+    if (!object.constructor.hasPropertyDescriptor(key)) {
       return undefined;
     }
 
-    return object.#propertyUpdateValues[key] ?? null;
+    return object[CacheableObject.updateValue][key] ?? null;
   }
 
   static clone(object) {
@@ -384,7 +321,7 @@ export default class CacheableObject {
   }
 
   static copyUpdateValuesOnto(source, target) {
-    Object.assign(target, source.#propertyUpdateValues);
+    Object.assign(target, source[CacheableObject.updateValue]);
   }
 }
 

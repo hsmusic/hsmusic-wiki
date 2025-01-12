@@ -238,6 +238,27 @@ listingSpec.push({
   groupUnderOther: true,
 });
 
+// Dunkass mock. Listings should be Things! In the fuuuuture!
+class Listing {
+  static properties = {};
+
+  constructor() {
+    Object.assign(this, this.constructor.properties);
+  }
+
+  static hasPropertyDescriptor(key) {
+    return Object.hasOwn(this.properties, key);
+  }
+}
+
+for (const [index, listing] of listingSpec.entries()) {
+  class ListingSubclass extends Listing {
+    static properties = listing;
+  }
+
+  listingSpec.splice(index, 1, new ListingSubclass);
+}
+
 {
   const errors = [];
 

@@ -177,6 +177,16 @@ function evaluateSerializeDescriptors() {
   });
 }
 
+function finalizeCacheableObjectPrototypes() {
+  return descriptorAggregateHelper({
+    message: `Errors finalizing Thing class prototypes`,
+
+    op(constructor) {
+      constructor.finalizeCacheableObjectPrototype();
+    },
+  });
+}
+
 if (!errorDuplicateClassNames())
   process.exit(1);
 
@@ -186,6 +196,9 @@ if (!evaluatePropertyDescriptors())
   process.exit(1);
 
 if (!evaluateSerializeDescriptors())
+  process.exit(1);
+
+if (!finalizeCacheableObjectPrototypes())
   process.exit(1);
 
 Object.assign(allClasses, {Thing});

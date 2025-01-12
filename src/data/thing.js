@@ -28,14 +28,13 @@ export default class Thing extends CacheableObject {
   // Symbol.for('Thing.isThingConstructor') in constructor
   static [Symbol.for('Thing.isThingConstructor')] = NaN;
 
-  static [CacheableObject.propertyDescriptors] = {
+  constructor() {
+    super();
+
     // To detect:
     // Object.hasOwn(object, Symbol.for('Thing.isThing'))
-    [Symbol.for('Thing.isThing')]: {
-      flags: {expose: true},
-      expose: {compute: () => NaN},
-    },
-  };
+    this[Symbol.for('Thing.isThing')] = NaN;
+  }
 
   static [Symbol.for('Thing.selectAll')] = _wikiData => [];
 
