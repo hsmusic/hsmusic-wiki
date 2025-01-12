@@ -5,7 +5,9 @@ import * as path from 'node:path';
 import {pipeline} from 'node:stream/promises';
 import {inspect as nodeInspect} from 'node:util';
 
-import {ENABLE_COLOR, colors, logInfo, logWarn, progressCallAll} from '#cli';
+import {openAggregate} from '#aggregate';
+import {ENABLE_COLOR, colors, fileIssue, logInfo, logWarn, progressCallAll}
+  from '#cli';
 import {watchContentDependencies} from '#content-dependencies';
 import {quickEvaluate} from '#content-function';
 import * as html from '#html';
@@ -165,20 +167,46 @@ export async function go({
 
   const commonUtilities = {...universalUtilities};
 
+  const pathAggregate = openAggregate({message: `Errors computing page paths`});
+
   let targetSpecPairs = getPageSpecsWithTargets({wikiData});
-  const pages = progressCallAll(`Computing page data & paths for ${targetSpecPairs.length} targets.`,
+  const pages = progressCallAll(`Computing page paths for ${targetSpecPairs.length} targets.`,
     targetSpecPairs.flatMap(({
       pageSpec,
       target,
       targetless,
     }) => () => {
-      if (targetless) {
-        const result = pageSpec.pathsTargetless({wikiData});
-        return Array.isArray(result) ? result : [result];
-      } else {
-        return pageSpec.pathsForTarget(target);
+      try {
+        if (targetless) {
+          const result = pageSpec.pathsTargetless({wikiData});
+          return Array.isArray(result) ? result : [result];
+        } else {
+          return pageSpec.pathsForTarget(target);
+        }
+      } catch (caughtError) {
+        if (targetless) {
+          pathAggregate.push(new Error(
+            `Failed to compute targetless paths for ` +
+            inspect(pageSpec, {compact: true}),
+            {cause: caughtError}));
+        } else {
+          pathAggregate.push(new Error(
+            `Failed to compute paths for ` +
+            inspect(target),
+            {cause: caughtError}));
+        }
+        return [];
       }
     })).flat();
+
+  try {
+    pathAggregate.close();
+  } catch (error) {
+    niceShowAggregate(error);
+    logWarn`Failed to compute page paths for some targets.`;
+    logWarn`This means some pages that normally exist will be 404s.`;
+    fileIssue();
+  }
 
   logInfo`Will be serving a total of ${pages.length} pages.`;
 
