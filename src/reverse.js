@@ -3,16 +3,36 @@ import * as fr from './find-reverse.js';
 import {sortByDate} from '#sort';
 import {stitchArrays} from '#sugar';
 
+function checkUnique(value) {
+  if (value.length === 0) {
+    return null;
+  } else if (value.length === 1) {
+    return value[0];
+  } else {
+    throw new Error(
+      `Requested unique referencing thing, ` +
+      `but ${value.length} reference this`);
+  }
+}
+
 function reverseHelper(spec) {
   const cache = new WeakMap();
 
-  return (thing, data) => {
+  return (thing, data, {
+    unique = false,
+  } = {}) => {
     // Check for an existing cache record which corresponds to this data.
     // If it exists, query it for the requested thing, and return that;
     // if it doesn't, create it and put it where it needs to be.
 
     if (cache.has(data)) {
-      return cache.get(data).get(thing) ?? [];
+      const value = cache.get(data).get(thing) ?? [];
+
+      if (unique) {
+        return checkUnique(value);
+      } else {
+        return value;
+      }
     }
 
     const cacheRecord = new WeakMap();
@@ -70,7 +90,13 @@ function reverseHelper(spec) {
     // Then just pluck out the requested thing from the now-filled
     // cache record!
 
-    return cacheRecord.get(thing) ?? [];
+    const value = cacheRecord.get(thing) ?? [];
+
+    if (unique) {
+      return checkUnique(value);
+    } else {
+      return value;
+    }
   };
 }
 
