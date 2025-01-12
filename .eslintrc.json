@@ -10,6 +10,9 @@
   },
   "rules": {
     "indent": ["off"],
+    "no-empty": ["error", {
+      "allowEmptyCatch": true
+    }],
     "no-unexpected-multiline": ["off"],
     "no-unused-labels": ["off"],
     "no-unused-vars": ["error", {
@@ -17,6 +20,7 @@
       "destructuredArrayIgnorePattern": "^"
     }],
     "no-cond-assign": ["off"],
-    "no-constant-condition": ["off"]
+    "no-constant-condition": ["off"],
+    "no-unsafe-finally": ["off"]
   }
 }
