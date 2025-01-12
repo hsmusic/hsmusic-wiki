@@ -47,6 +47,7 @@ import find, {bindFind, getAllFindSpecs} from '#find';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
 import {isMain, traverse} from '#node-utils';
+import {bindReverse} from '#reverse';
 import {writeSearchData} from '#search';
 import {sortByName} from '#sort';
 import {generateURLs, urlSpec} from '#urls';
@@ -1526,7 +1527,7 @@ async function main() {
     timeStart: Date.now(),
   });
 
-  linkWikiDataArrays(wikiData, {bindFind});
+  linkWikiDataArrays(wikiData, {bindFind, bindReverse});
 
   Object.assign(stepStatusSummary.linkWikiDataArrays, {
     status: STATUS_DONE_CLEAN,
@@ -1740,7 +1741,7 @@ async function main() {
     timeStart: Date.now(),
   });
 
-  sortWikiDataArrays(yamlDataSteps, wikiData, {bindFind});
+  sortWikiDataArrays(yamlDataSteps, wikiData, {bindFind, bindReverse});
 
   Object.assign(stepStatusSummary.sortWikiDataArrays, {
     status: STATUS_DONE_CLEAN,

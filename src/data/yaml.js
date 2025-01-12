@@ -1225,10 +1225,10 @@ export async function loadAndProcessDataDocuments(dataSteps, {dataPath}) {
 // Data linking! Basically, provide (portions of) wikiData to the Things which
 // require it - they'll expose dynamically computed properties as a result (many
 // of which are required for page HTML generation and other expected behavior).
-export function linkWikiDataArrays(wikiData, {bindFind}) {
+export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
   const linkWikiDataSpec = new Map([
     // entries must be present here even without any properties to explicitly
-    // link if the 'find' property will be implicitly linked
+    // link if the 'find' or 'reverse' properties will be implicitly linked
 
     [wikiData.albumData, [
       'albumData',
@@ -1284,9 +1284,10 @@ export function linkWikiDataArrays(wikiData, {bindFind}) {
   ]);
 
   const constructorHasFindMap = new Map();
-  const boundFind = bindFind(wikiData);
+  const constructorHasReverseMap = new Map();
 
-  for (const thing of Object.values(wikiData).flat());
+  const boundFind = bindFind(wikiData);
+  const boundReverse = bindReverse(wikiData);
 
   for (const [things, keys] of linkWikiDataSpec.entries()) {
     if (things === undefined) continue;
@@ -1306,6 +1307,18 @@ export function linkWikiDataArrays(wikiData, {bindFind}) {
         thing.find = boundFind;
       }
 
+      let hasReverse;
+      if (constructorHasReverseMap.has(thing.constructor)) {
+        hasReverse = constructorHasReverseMap.get(thing.constructor);
+      } else {
+        hasReverse = 'reverse' in thing;
+        constructorHasReverseMap.set(thing.constructor, hasReverse);
+      }
+
+      if (hasReverse) {
+        thing.reverse = boundReverse;
+      }
+
       for (const key of keys) {
         if (!(key in wikiData)) continue;
 
@@ -1315,7 +1328,7 @@ export function linkWikiDataArrays(wikiData, {bindFind}) {
   }
 }
 
-export function sortWikiDataArrays(dataSteps, wikiData, {bindFind}) {
+export function sortWikiDataArrays(dataSteps, wikiData, {bindFind, bindReverse}) {
   for (const [key, value] of Object.entries(wikiData)) {
     if (!Array.isArray(value)) continue;
     wikiData[key] = value.slice();
@@ -1331,7 +1344,7 @@ export function sortWikiDataArrays(dataSteps, wikiData, {bindFind}) {
   // slices instead of the original arrays) - this is so that the object
   // caching system understands that it's working with a new ordering.
   // We still need to actually provide those updated arrays over again!
-  linkWikiDataArrays(wikiData, {bindFind});
+  linkWikiDataArrays(wikiData, {bindFind, bindReverse});
 }
 
 // Utility function for loading all wiki data from the provided YAML data
@@ -1343,6 +1356,7 @@ export function sortWikiDataArrays(dataSteps, wikiData, {bindFind}) {
 export async function quickLoadAllFromYAML(dataPath, {
   find,
   bindFind,
+  bindReverse,
   getAllFindSpecs,
 
   showAggregate: customShowAggregate = showAggregate,
@@ -1367,7 +1381,7 @@ export async function quickLoadAllFromYAML(dataPath, {
     }
   }
 
-  linkWikiDataArrays(wikiData, {bindFind});
+  linkWikiDataArrays(wikiData, {bindFind, bindReverse});
 
   try {
     reportDirectoryErrors(wikiData, {getAllFindSpecs});
@@ -1393,7 +1407,7 @@ export async function quickLoadAllFromYAML(dataPath, {
     logWarn`Content text errors found.`;
   }
 
-  sortWikiDataArrays(dataSteps, wikiData, {bindFind});
+  sortWikiDataArrays(dataSteps, wikiData, {bindFind, bindReverse});
 
   return wikiData;
 }
