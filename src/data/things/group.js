@@ -52,17 +52,7 @@ export class Group extends Thing {
     // Update only
 
     find: soupyFind(),
-
-    // used for albums (reverse)
-    albumData: wikiData({
-      class: input.value(Album),
-    }),
-
-    // used for category (reverse)
-    // used for color (reverse)
-    groupCategoryData: wikiData({
-      class: input.value(GroupCategory),
-    }),
+    reverse: soupyFind(),
 
     // Expose only
 
@@ -82,9 +72,9 @@ export class Group extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['this', 'albumData'],
-        compute: ({this: group, albumData}) =>
-          albumData?.filter((album) => album.groups.includes(group)) ?? [],
+        dependencies: ['this', 'reverse'],
+        compute: ({this: group, reverse}) =>
+          reverse.albumsWhoseGroupsInclude(group),
       },
     },
 
@@ -92,9 +82,9 @@ export class Group extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['this', 'groupCategoryData'],
-        compute: ({this: group, groupCategoryData}) =>
-          groupCategoryData.find((category) => category.groups.includes(group))
+        dependencies: ['this', 'reverse'],
+        compute: ({this: group, reverse}) =>
+          reverse.groupCategoriesWhichInclude(group, {unique: true})
             ?.color,
       },
     },
@@ -103,9 +93,9 @@ export class Group extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['this', 'groupCategoryData'],
-        compute: ({this: group, groupCategoryData}) =>
-          groupCategoryData.find((category) => category.groups.includes(group)) ??
+        dependencies: ['this', 'reverse'],
+        compute: ({this: group, reverse}) =>
+          reverse.groupCategoriesWhichInclude(group, {unique: true}) ??
           null,
       },
     },
@@ -115,6 +105,25 @@ export class Group extends Thing {
     group: {
       referenceTypes: ['group', 'group-gallery'],
       bindTo: 'groupData',
+    },
+  };
+
+  static [Thing.reverseSpecs] = {
+    groupsCloselyLinkedTo: {
+      bindTo: 'groupData',
+
+      referencing: group =>
+        group.closelyLinkedArtists
+          .map(({artist, ...referenceDetails}) => ({
+            group,
+            artist,
+            referenceDetails,
+          })),
+
+      referenced: ({artist}) => [artist],
+
+      tidy: ({group, referenceDetails}) =>
+        ({group, ...referenceDetails}),
     },
   };
 
@@ -216,6 +225,15 @@ export class GroupCategory extends Thing {
 
     find: soupyFind(),
   });
+
+  static [Thing.reverseSpecs] = {
+    groupCategoriesWhichInclude: {
+      bindTo: 'groupCategoryData',
+
+      referencing: groupCategory => [groupCategory],
+      referenced: groupCategory => groupCategory.groups,
+    },
+  };
 
   static [Thing.yamlDocumentSpec] = {
     fields: {

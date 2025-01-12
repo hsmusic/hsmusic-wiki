@@ -11,19 +11,16 @@ import Thing from '#thing';
 import {isName, validateArrayItems} from '#validators';
 import {getKebabCase} from '#wiki-data';
 
-import {withReverseContributionList} from '#composite/wiki-data';
-
 import {
   contentString,
   directory,
   fileExtension,
   flag,
   name,
-  reverseAnnotatedReferenceList,
-  reverseContributionList,
   reverseReferenceList,
   singleReference,
   soupyFind,
+  soupyReverse,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -62,90 +59,56 @@ export class Artist extends Thing {
     // Update only
 
     find: soupyFind(),
-
-    // used for reverse contribution lists
-    albumData: wikiData({
-      class: input.value(Album),
-    }),
-
-    // used for reverse contribution lists
-    flashData: wikiData({
-      class: input.value(Flash),
-    }),
-
-    // used for closelyLinkedGroups
-    groupData: wikiData({
-      class: input.value(Group),
-    }),
-
-    // used for reverse contribution lists
-    trackData: wikiData({
-      class: input.value(Track),
-    }),
+    reverse: soupyReverse(),
 
     // Expose only
 
-    trackArtistContributions: reverseContributionList({
-      data: 'trackData',
-      list: input.value('artistContribs'),
+    trackArtistContributions: reverseReferenceList({
+      reverse: soupyReverse.input('trackArtistContributionsBy'),
     }),
 
-    trackContributorContributions: reverseContributionList({
-      data: 'trackData',
-      list: input.value('contributorContribs'),
+    trackContributorContributions: reverseReferenceList({
+      reverse: soupyReverse.input('trackContributorContributionsBy'),
     }),
 
-    trackCoverArtistContributions: reverseContributionList({
-      data: 'trackData',
-      list: input.value('coverArtistContribs'),
+    trackCoverArtistContributions: reverseReferenceList({
+      reverse: soupyReverse.input('trackCoverArtistContributionsBy'),
     }),
 
     tracksAsCommentator: reverseReferenceList({
-      data: 'trackData',
-      list: input.value('commentatorArtists'),
+      reverse: soupyReverse.input('tracksWithCommentaryBy'),
     }),
 
-    albumArtistContributions: reverseContributionList({
-      data: 'albumData',
-      list: input.value('artistContribs'),
+    albumArtistContributions: reverseReferenceList({
+      reverse: soupyReverse.input('albumArtistContributionsBy'),
     }),
 
-    albumCoverArtistContributions: reverseContributionList({
-      data: 'albumData',
-      list: input.value('coverArtistContribs'),
+    albumCoverArtistContributions: reverseReferenceList({
+      reverse: soupyReverse.input('albumCoverArtistContributionsBy'),
     }),
 
-    albumWallpaperArtistContributions: reverseContributionList({
-      data: 'albumData',
-      list: input.value('wallpaperArtistContribs'),
+    albumWallpaperArtistContributions: reverseReferenceList({
+      reverse: soupyReverse.input('albumWallpaperArtistContributionsBy'),
     }),
 
-    albumBannerArtistContributions: reverseContributionList({
-      data: 'albumData',
-      list: input.value('bannerArtistContribs'),
+    albumBannerArtistContributions: reverseReferenceList({
+      reverse: soupyReverse.input('albumBannerArtistContributionsBy'),
     }),
 
     albumsAsCommentator: reverseReferenceList({
-      data: 'albumData',
-      list: input.value('commentatorArtists'),
+      reverse: soupyReverse.input('albumsWithCommentaryBy'),
     }),
 
-    flashContributorContributions: reverseContributionList({
-      data: 'flashData',
-      list: input.value('contributorContribs'),
+    flashContributorContributions: reverseReferenceList({
+      reverse: soupyReverse.input('flashContributorContributionsBy'),
     }),
 
     flashesAsCommentator: reverseReferenceList({
-      data: 'flashData',
-      list: input.value('commentatorArtists'),
+      reverse: soupyReverse.input('flashesWithCommentaryBy'),
     }),
 
-    closelyLinkedGroups: reverseAnnotatedReferenceList({
-      data: 'groupData',
-      list: input.value('closelyLinkedArtists'),
-
-      forward: input.value('artist'),
-      backward: input.value('group'),
+    closelyLinkedGroups: reverseReferenceList({
+      reverse: soupyReverse.input('groupsCloselyLinkedTo'),
     }),
 
     totalDuration: artistTotalDuration(),

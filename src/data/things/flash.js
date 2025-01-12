@@ -30,6 +30,7 @@ import {
   referenceList,
   simpleDate,
   soupyFind,
+  soupyReverse,
   thing,
   urls,
   wikiData,
@@ -115,11 +116,7 @@ export class Flash extends Thing {
     // Update only
 
     find: soupyFind(),
-
-    // used for withFlashAct (reverse)
-    flashActData: wikiData({
-      class: input.value(FlashAct),
-    }),
+    reverse: soupyReverse(),
 
     // used for withMatchingContributionPresets (indirectly by Contribution)
     wikiInfo: thing({
@@ -164,6 +161,25 @@ export class Flash extends Thing {
     flash: {
       referenceTypes: ['flash'],
       bindTo: 'flashData',
+    },
+  };
+
+  static [Thing.reverseSpecs] = {
+    flashesWhichFeature: {
+      bindTo: 'flashData',
+
+      referencing: flash => [flash],
+      referenced: flash => flash.featuredTracks,
+    },
+
+    flashContributorContributionsBy:
+      soupyReverse.contributionsBy('flashData', 'contributorContribs'),
+
+    flashesWithCommentaryBy: {
+      bindTo: 'flashData',
+
+      referencing: flash => [flash],
+      referenced: flash => flash.commentatorArtists,
     },
   };
 
@@ -242,11 +258,7 @@ export class FlashAct extends Thing {
     // Update only
 
     find: soupyFind(),
-
-    // used for withFlashSide
-    flashSideData: wikiData({
-      class: input.value(FlashSide),
-    }),
+    reverse: soupyReverse(),
 
     // Expose only
 
@@ -260,6 +272,15 @@ export class FlashAct extends Thing {
     flashAct: {
       referenceTypes: ['flash-act'],
       bindTo: 'flashActData',
+    },
+  };
+
+  static [Thing.reverseSpecs] = {
+    flashActsWhoseFlashesInclude: {
+      bindTo: 'flashActData',
+
+      referencing: flashAct => [flashAct],
+      referenced: flashAct => flashAct.flashes,
     },
   };
 
@@ -311,6 +332,15 @@ export class FlashSide extends Thing {
     flashSide: {
       referenceTypes: ['flash-side'],
       bindTo: 'flashSideData',
+    },
+  };
+
+  static [Thing.reverseSpecs] = {
+    flashSidesWhoseActsInclude: {
+      bindTo: 'flashSideData',
+
+      referencing: flashSide => [flashSide],
+      referenced: flashSide => flashSide.acts,
     },
   };
 

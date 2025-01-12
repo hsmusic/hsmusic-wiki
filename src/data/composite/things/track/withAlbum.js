@@ -2,9 +2,10 @@
 // If there's no album whose list of tracks includes this track, the output
 // dependency will be null.
 
-import {input, templateCompositeFrom} from '#composite';
+import {templateCompositeFrom} from '#composite';
 
 import {withUniqueReferencingThing} from '#composite/wiki-data';
+import {soupyReverse} from '#composite/wiki-properties';
 
 export default templateCompositeFrom({
   annotation: `withAlbum`,
@@ -13,8 +14,7 @@ export default templateCompositeFrom({
 
   steps: () => [
     withUniqueReferencingThing({
-      data: 'albumData',
-      list: input.value('tracks'),
+      reverse: soupyReverse.input('albumsWhoseTracksInclude'),
     }).outputs({
       ['#uniqueReferencingThing']: '#album',
     }),

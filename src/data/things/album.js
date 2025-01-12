@@ -44,10 +44,11 @@ import {
   name,
   referencedArtworkList,
   referenceList,
-  reverseReferencedArtworkList,
+  reverseReferenceList,
   simpleDate,
   simpleString,
   soupyFind,
+  soupyReverse,
   thing,
   thingList,
   urls,
@@ -262,6 +263,7 @@ export class Album extends Thing {
     // Update only
 
     find: soupyFind(),
+    reverse: soupyReverse(),
 
     // used for referencedArtworkList (mixedFind)
     albumData: wikiData({
@@ -297,7 +299,9 @@ export class Album extends Thing {
         value: input.value([]),
       }),
 
-      reverseReferencedArtworkList(),
+      reverseReferenceList({
+        reverse: soupyReverse.input('artworksWhichReference'),
+      }),
     ],
   });
 
@@ -353,6 +357,55 @@ export class Album extends Thing {
 
       include: album =>
         album.hasCoverArt,
+    },
+  };
+
+  static [Thing.reverseSpecs] = {
+    albumsWhoseTracksInclude: {
+      bindTo: 'albumData',
+
+      referencing: album => [album],
+      referenced: album => album.tracks,
+    },
+
+    albumsWhoseTrackSectionsInclude: {
+      bindTo: 'albumData',
+
+      referencing: album => [album],
+      referenced: album => album.trackSections,
+    },
+
+    albumsWhoseArtworksFeature: {
+      bindTo: 'albumData',
+
+      referencing: album => [album],
+      referenced: album => album.artTags,
+    },
+
+    albumsWhoseGroupsInclude: {
+      bindTo: 'albumData',
+
+      referencing: album => [album],
+      referenced: album => album.groups,
+    },
+
+    albumArtistContributionsBy:
+      soupyReverse.contributionsBy('albumData', 'artistContribs'),
+
+    albumCoverArtistContributionsBy:
+      soupyReverse.contributionsBy('albumData', 'coverArtistContribs'),
+
+    albumWallpaperArtistContributionsBy:
+      soupyReverse.contributionsBy('albumData', 'wallpaperArtistContribs'),
+
+    albumBannerArtistContributionsBy:
+      soupyReverse.contributionsBy('albumData', 'bannerArtistContribs'),
+
+    albumsWithCommentaryBy: {
+      bindTo: 'albumData',
+
+      referencing: album => [album],
+      referenced: album => album.commentatorArtists,
     },
   };
 
@@ -624,10 +677,7 @@ export class TrackSection extends Thing {
 
     // Update only
 
-    // used for withAlbum
-    albumData: wikiData({
-      class: input.value(Album),
-    }),
+    reverse: soupyReverse(),
 
     // Expose only
 
@@ -709,6 +759,15 @@ export class TrackSection extends Thing {
 
       getMatchableDirectories: trackSection =>
         [trackSection.unqualifiedDirectory],
+    },
+  };
+
+  static [Thing.reverseSpecs] = {
+    trackSectionsWhichInclude: {
+      bindTo: 'trackSectionData',
+
+      referencing: trackSection => [trackSection],
+      referenced: trackSection => trackSection.tracks,
     },
   };
 

@@ -1236,33 +1236,19 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
       'wikiInfo',
     ]],
 
-    [wikiData.artTagData, [
-      'albumData',
-      'trackData',
-    ]],
+    [wikiData.artTagData, [/* reverse */]],
 
-    [wikiData.artistData, [
-      'albumData',
-      'flashData',
-      'groupData',
-      'trackData',
-    ]],
+    [wikiData.artistData, [/* find, reverse */]],
 
     [wikiData.flashData, [
-      'flashActData',
       'wikiInfo',
     ]],
 
-    [wikiData.flashActData, [
-      'flashSideData',
-    ]],
+    [wikiData.flashActData, [/* find, reverse */]],
 
     [wikiData.flashSideData, [/* find */]],
 
-    [wikiData.groupData, [
-      'albumData',
-      'groupCategoryData',
-    ]],
+    [wikiData.groupData, [/* find, reverse */]],
 
     [wikiData.groupCategoryData, [/* find */]],
 
@@ -1270,15 +1256,11 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
 
     [wikiData.trackData, [
       'albumData',
-      'flashData',
       'trackData',
-      'trackSectionData',
       'wikiInfo',
     ]],
 
-    [wikiData.trackSectionData, [
-      'albumData',
-    ]],
+    [wikiData.trackSectionData, [/* reverse */]],
 
     [[wikiData.wikiInfo], [/* find */]],
   ]);

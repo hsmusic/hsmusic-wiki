@@ -1,8 +1,9 @@
 // Gets the track section's album.
 
-import {input, templateCompositeFrom} from '#composite';
+import {templateCompositeFrom} from '#composite';
 
 import {withUniqueReferencingThing} from '#composite/wiki-data';
+import {soupyReverse} from '#composite/wiki-properties';
 
 export default templateCompositeFrom({
   annotation: `withAlbum`,
@@ -11,8 +12,7 @@ export default templateCompositeFrom({
 
   steps: () => [
     withUniqueReferencingThing({
-      data: 'albumData',
-      list: input.value('trackSections'),
+      reverse: soupyReverse.input('albumsWhoseTrackSectionsInclude'),
     }).outputs({
       ['#uniqueReferencingThing']: '#album',
     }),

@@ -2,8 +2,9 @@ import {input, templateCompositeFrom} from '#composite';
 
 import {exposeDependency} from '#composite/control-flow';
 import {withFilteredList, withPropertyFromList} from '#composite/data';
-import {withContributionListSums, withReverseContributionList}
+import {withContributionListSums, withReverseReferenceList}
   from '#composite/wiki-data';
+import {soupyReverse} from '#composite/wiki-properties';
 
 export default templateCompositeFrom({
   annotation: `artistTotalDuration`,
@@ -11,18 +12,16 @@ export default templateCompositeFrom({
   compose: false,
 
   steps: () => [
-    withReverseContributionList({
-      data: 'trackData',
-      list: input.value('artistContribs'),
+    withReverseReferenceList({
+      reverse: soupyReverse.input('trackArtistContributionsBy'),
     }).outputs({
-      '#reverseContributionList': '#contributionsAsArtist',
+      '#reverseReferenceList': '#contributionsAsArtist',
     }),
 
-    withReverseContributionList({
-      data: 'trackData',
-      list: input.value('contributorContribs'),
+    withReverseReferenceList({
+      reverse: soupyReverse.input('trackContributorContributionsBy'),
     }).outputs({
-      '#reverseContributionList': '#contributionsAsContributor',
+      '#reverseReferenceList': '#contributionsAsContributor',
     }),
 
     {

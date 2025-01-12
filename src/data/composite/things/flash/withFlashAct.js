@@ -2,9 +2,10 @@
 // If there's no flash whose list of flashes includes this flash, the output
 // dependency will be null.
 
-import {input, templateCompositeFrom} from '#composite';
+import {templateCompositeFrom} from '#composite';
 
 import {withUniqueReferencingThing} from '#composite/wiki-data';
+import {soupyReverse} from '#composite/wiki-properties';
 
 export default templateCompositeFrom({
   annotation: `withFlashAct`,
@@ -13,8 +14,7 @@ export default templateCompositeFrom({
 
   steps: () => [
     withUniqueReferencingThing({
-      data: 'flashActData',
-      list: input.value('flashes'),
+      reverse: soupyReverse.input('flashActsWhoseFlashesInclude'),
     }).outputs({
       ['#uniqueReferencingThing']: '#flashAct',
     }),

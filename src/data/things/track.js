@@ -48,11 +48,11 @@ import {
   referenceList,
   referencedArtworkList,
   reverseReferenceList,
-  reverseReferencedArtworkList,
   simpleDate,
   simpleString,
   singleReference,
   soupyFind,
+  soupyReverse,
   thing,
   urls,
   wikiData,
@@ -62,7 +62,6 @@ import {
   exitWithoutUniqueCoverArt,
   inheritContributionListFromOriginalRelease,
   inheritFromOriginalRelease,
-  trackReverseReferenceList,
   withAlbum,
   withAlwaysReferenceByDirectory,
   withContainingTrackSection,
@@ -370,27 +369,16 @@ export class Track extends Thing {
     // Update only
 
     find: soupyFind(),
+    reverse: soupyReverse(),
 
     // used for referencedArtworkList (mixedFind)
-    // used for withAlbum (reverse)
     albumData: wikiData({
       class: input.value(Album),
     }),
 
-    // used for featuredInFlashes (reverse)
-    flashData: wikiData({
-      class: input.value(Flash),
-    }),
-
     // used for referencedArtworkList (mixedFind)
-    // used for trackReverseReferenceList (reverse)
     trackData: wikiData({
       class: input.value(Track),
-    }),
-
-    // used for withContainingTrackSection (reverse)
-    trackSectionData: wikiData({
-      class: input.value(TrackSection),
     }),
 
     // used for withMatchingContributionPresets (indirectly by Contribution)
@@ -439,17 +427,16 @@ export class Track extends Thing {
       exposeDependency({dependency: '#otherReleases'}),
     ],
 
-    referencedByTracks: trackReverseReferenceList({
-      list: input.value('referencedTracks'),
+    referencedByTracks: reverseReferenceList({
+      reverse: soupyReverse.input('tracksWhichReference'),
     }),
 
-    sampledByTracks: trackReverseReferenceList({
-      list: input.value('sampledTracks'),
+    sampledByTracks: reverseReferenceList({
+      reverse: soupyReverse.input('tracksWhichSample'),
     }),
 
     featuredInFlashes: reverseReferenceList({
-      data: 'flashData',
-      list: input.value('featuredTracks'),
+      reverse: soupyReverse.input('flashesWhichFeature'),
     }),
 
     referencedByArtworks: [
@@ -457,7 +444,9 @@ export class Track extends Thing {
         value: input.value([]),
       }),
 
-      reverseReferencedArtworkList(),
+      reverseReferenceList({
+        reverse: soupyReverse.input('artworksWhichReference'),
+      }),
     ],
   });
 
@@ -663,6 +652,29 @@ export class Track extends Thing {
 
       referencing: track => track.isOriginalRelease ? [track] : [],
       referenced: track => track.sampledTracks,
+    },
+
+    tracksWhoseArtworksFeature: {
+      bindTo: 'trackData',
+
+      referencing: track => [track],
+      referenced: track => track.artTags,
+    },
+
+    trackArtistContributionsBy:
+      soupyReverse.contributionsBy('trackData', 'artistContribs'),
+
+    trackContributorContributionsBy:
+      soupyReverse.contributionsBy('trackData', 'contributorContribs'),
+
+    trackCoverArtistContributionsBy:
+      soupyReverse.contributionsBy('trackData', 'coverArtistContribs'),
+
+    tracksWithCommentaryBy: {
+      bindTo: 'trackData',
+
+      referencing: track => [track],
+      referenced: track => track.commentatorArtists,
     },
   };
 

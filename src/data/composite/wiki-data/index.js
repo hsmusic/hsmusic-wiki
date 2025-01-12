@@ -6,8 +6,10 @@
 
 export {default as exitWithoutContribs} from './exitWithoutContribs.js';
 export {default as gobbleSoupyFind} from './gobbleSoupyFind.js';
+export {default as gobbleSoupyReverse} from './gobbleSoupyReverse.js';
 export {default as inputNotFoundMode} from './inputNotFoundMode.js';
 export {default as inputSoupyFind} from './inputSoupyFind.js';
+export {default as inputSoupyReverse} from './inputSoupyReverse.js';
 export {default as inputWikiData} from './inputWikiData.js';
 export {default as withClonedThings} from './withClonedThings.js';
 export {default as withContributionListSums} from './withContributionListSums.js';
@@ -21,9 +23,6 @@ export {default as withResolvedContribs} from './withResolvedContribs.js';
 export {default as withResolvedReference} from './withResolvedReference.js';
 export {default as withResolvedReferenceList} from './withResolvedReferenceList.js';
 export {default as withResolvedSeriesList} from './withResolvedSeriesList.js';
-export {default as withReverseAnnotatedReferenceList} from './withReverseAnnotatedReferenceList.js';
-export {default as withReverseContributionList} from './withReverseContributionList.js';
 export {default as withReverseReferenceList} from './withReverseReferenceList.js';
-export {default as withReverseSingleReferenceList} from './withReverseSingleReferenceList.js';
 export {default as withThingsSortedAlphabetically} from './withThingsSortedAlphabetically.js';
 export {default as withUniqueReferencingThing} from './withUniqueReferencingThing.js';

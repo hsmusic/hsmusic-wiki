@@ -1,34 +1,36 @@
 // Check out the info on reverseReferenceList!
 // This is its composable form.
 
-import withReverseList_template from './helpers/withReverseList-template.js';
+import {input, templateCompositeFrom} from '#composite';
 
-import {input} from '#composite';
+import gobbleSoupyReverse from './gobbleSoupyReverse.js';
+import inputSoupyReverse from './inputSoupyReverse.js';
+import inputWikiData from './inputWikiData.js';
 
-import {withPropertyFromList} from '#composite/data';
+import withResolvedReverse from './helpers/withResolvedReverse.js';
 
-export default withReverseList_template({
+export default templateCompositeFrom({
   annotation: `withReverseReferenceList`,
 
-  propertyInputName: 'list',
-  outputName: '#reverseReferenceList',
+  inputs: {
+    data: inputWikiData({allowMixedTypes: true}),
+    reverse: inputSoupyReverse(),
+  },
 
-  customCompositionSteps: () => [
-    {
-      dependencies: [input('data')],
-      compute: (continuation, {
-        [input('data')]: data,
-      }) => continuation({
-        ['#referencingThings']:
-          data,
-      }),
-    },
+  outputs: ['#reverseReferenceList'],
 
-    withPropertyFromList({
-      list: '#referencingThings',
-      property: input('list'),
+  steps: () => [
+    gobbleSoupyReverse({
+      reverse: input('reverse'),
+    }),
+
+    // TODO: Check that the reverse spec returns a list.
+
+    withResolvedReverse({
+      data: input('data'),
+      reverse: '#reverse',
     }).outputs({
-      '#values': '#referencedThings',
+      '#resolvedReverse': '#reverseReferenceList',
     }),
   ],
 });

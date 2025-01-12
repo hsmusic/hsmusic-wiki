@@ -12,6 +12,7 @@ import {
   directory,
   flag,
   name,
+  soupyReverse,
   wikiData,
 } from '#composite/wiki-properties';
 
@@ -41,15 +42,7 @@ export class ArtTag extends Thing {
 
     // Update only
 
-    // used for taggedInThings (reverse)
-    albumData: wikiData({
-      class: input.value(Album),
-    }),
-
-    // used for taggedInThings (reverse)
-    trackData: wikiData({
-      class: input.value(Track),
-    }),
+    reverse: soupyReverse(),
 
     // Expose only
 
@@ -57,11 +50,13 @@ export class ArtTag extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['this', 'albumData', 'trackData'],
-        compute: ({this: artTag, albumData, trackData}) =>
+        dependencies: ['this', 'reverse'],
+        compute: ({this: artTag, reverse}) =>
           sortAlbumsTracksChronologically(
-            [...albumData, ...trackData]
-              .filter(({artTags}) => artTags.includes(artTag)),
+            [
+              ...reverse.albumsWhoseArtworksFeature(artTag),
+              ...reverse.tracksWhoseArtworksFeature(artTag),
+            ],
             {getDate: thing => thing.coverArtDate ?? thing.date}),
       },
     },
