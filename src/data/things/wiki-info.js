@@ -1,7 +1,6 @@
 export const WIKI_INFO_FILE = 'wiki-info.yaml';
 
 import {input} from '#composite';
-import find from '#find';
 import Thing from '#thing';
 import {parseContributionPresets} from '#yaml';
 

@@ -1,4 +1,3 @@
-import {input} from '#composite';
 import {isObject} from '#validators';
 
 import {inputSoupyFind} from '#composite/wiki-data';

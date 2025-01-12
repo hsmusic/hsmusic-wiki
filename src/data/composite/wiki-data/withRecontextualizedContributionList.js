@@ -10,7 +10,6 @@
 import {input, templateCompositeFrom} from '#composite';
 import {isStringNonEmpty} from '#validators';
 
-import {raiseOutputWithoutDependency} from '#composite/control-flow';
 import {withClonedThings} from '#composite/wiki-data';
 
 export default templateCompositeFrom({

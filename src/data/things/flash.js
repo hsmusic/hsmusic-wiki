@@ -1,7 +1,6 @@
 export const FLASH_DATA_FILE = 'flashes.yaml';
 
 import {input} from '#composite';
-import find from '#find';
 import {empty} from '#sugar';
 import {sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
@@ -43,7 +42,6 @@ export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';
 
   static [Thing.getPropertyDescriptors] = ({
-    Artist,
     Track,
     FlashAct,
     WikiInfo,

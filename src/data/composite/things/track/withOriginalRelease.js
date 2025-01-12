@@ -5,8 +5,6 @@
 // is specified by reference and that reference doesn't resolve to anything.
 
 import {input, templateCompositeFrom} from '#composite';
-import find from '#find';
-import {validateWikiData} from '#validators';
 
 import {exitWithoutDependency, withResultOfAvailabilityCheck}
   from '#composite/control-flow';

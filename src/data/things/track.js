@@ -3,7 +3,6 @@ import {inspect} from 'node:util';
 import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input} from '#composite';
-import find from '#find';
 import Thing from '#thing';
 import {isBoolean, isColor, isContributionList, isDate, isFileExtension}
   from '#validators';
@@ -21,7 +20,6 @@ import {
 import {withPropertyFromObject} from '#composite/data';
 
 import {
-  exitWithoutDependency,
   exposeConstant,
   exposeDependency,
   exposeDependencyOrContinue,
@@ -84,7 +82,6 @@ export class Track extends Thing {
   static [Thing.getPropertyDescriptors] = ({
     Album,
     ArtTag,
-    Artist,
     Flash,
     TrackSection,
     WikiInfo,

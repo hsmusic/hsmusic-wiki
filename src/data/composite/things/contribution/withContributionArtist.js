@@ -1,5 +1,4 @@
 import {input, templateCompositeFrom} from '#composite';
-import find from '#find';
 
 import {withResolvedReference} from '#composite/wiki-data';
 import {soupyFind} from '#composite/wiki-properties';

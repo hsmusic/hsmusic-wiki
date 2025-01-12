@@ -4,11 +4,8 @@ import {isDate, isObject, validateArrayItems} from '#validators';
 
 import {withPropertyFromList} from '#composite/data';
 
-import {
-  exitWithoutDependency,
-  raiseOutputWithoutDependency,
-  withAvailabilityFilter,
-} from '#composite/control-flow';
+import {raiseOutputWithoutDependency, withAvailabilityFilter}
+  from '#composite/control-flow';
 
 import inputSoupyFind from './inputSoupyFind.js';
 import inputNotFoundMode from './inputNotFoundMode.js';

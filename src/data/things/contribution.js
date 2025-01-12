@@ -8,7 +8,6 @@ import Thing from '#thing';
 import {isStringNonEmpty, isThing, validateReference} from '#validators';
 
 import {exitWithoutDependency, exposeDependency} from '#composite/control-flow';
-import {withResolvedReference} from '#composite/wiki-data';
 import {flag, simpleDate, soupyFind} from '#composite/wiki-properties';
 
 import {

@@ -1,7 +1,6 @@
 export const GROUP_DATA_FILE = 'groups.yaml';
 
 import {input} from '#composite';
-import find from '#find';
 import Thing from '#thing';
 import {parseAnnotatedReferences, parseSerieses} from '#yaml';
 

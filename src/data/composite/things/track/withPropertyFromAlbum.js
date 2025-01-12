@@ -2,7 +2,6 @@
 // property name prefixed with '#album.' (by default).
 
 import {input, templateCompositeFrom} from '#composite';
-import {is} from '#validators';
 
 import {withPropertyFromObject} from '#composite/data';
 

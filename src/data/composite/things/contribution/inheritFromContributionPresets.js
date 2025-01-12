@@ -1,7 +1,7 @@
 import {input, templateCompositeFrom} from '#composite';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
-import {withPropertyFromList, withPropertyFromObject} from '#composite/data';
+import {withPropertyFromList} from '#composite/data';
 
 import withMatchingContributionPresets
   from './withMatchingContributionPresets.js';

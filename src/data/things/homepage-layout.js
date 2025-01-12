@@ -1,7 +1,6 @@
 export const HOMEPAGE_LAYOUT_DATA_FILE = 'homepage.yaml';
 
 import {input} from '#composite';
-import find from '#find';
 import Thing from '#thing';
 
 import {
@@ -55,7 +54,7 @@ export class HomepageLayout extends Thing {
 export class HomepageLayoutRow extends Thing {
   static [Thing.friendlyName] = `Homepage Row`;
 
-  static [Thing.getPropertyDescriptors] = ({Album, Group}) => ({
+  static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
     name: name('Unnamed Homepage Row'),

@@ -1,6 +1,4 @@
 import {input, templateCompositeFrom} from '#composite';
-import find from '#find';
-import {combineWikiDataArrays} from '#wiki-data';
 
 import {
   isContentString,

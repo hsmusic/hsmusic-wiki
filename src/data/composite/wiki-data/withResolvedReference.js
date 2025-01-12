@@ -5,10 +5,7 @@
 
 import {input, templateCompositeFrom} from '#composite';
 
-import {
-  exitWithoutDependency,
-  raiseOutputWithoutDependency,
-} from '#composite/control-flow';
+import {raiseOutputWithoutDependency} from '#composite/control-flow';
 
 import gobbleSoupyFind from './gobbleSoupyFind.js';
 import inputSoupyFind from './inputSoupyFind.js';

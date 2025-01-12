@@ -3,15 +3,13 @@ export const DATA_ALBUM_DIRECTORY = 'album';
 import * as path from 'node:path';
 import {inspect} from 'node:util';
 
-import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input} from '#composite';
-import find from '#find';
 import {traverse} from '#node-utils';
 import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {accumulateSum, empty} from '#sugar';
 import Thing from '#thing';
-import {isColor, isDate, isDirectory, validateWikiData} from '#validators';
+import {isColor, isDate, isDirectory} from '#validators';
 
 import {
   parseAdditionalFiles,
@@ -27,12 +25,8 @@ import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
 
-import {
-  exitWithoutContribs,
-  withDirectory,
-  withResolvedReference,
-  withCoverArtDate,
-} from '#composite/wiki-data';
+import {exitWithoutContribs, withDirectory, withCoverArtDate}
+  from '#composite/wiki-data';
 
 import {
   additionalFiles,
@@ -53,7 +47,6 @@ import {
   reverseReferencedArtworkList,
   simpleDate,
   simpleString,
-  singleReference,
   soupyFind,
   thing,
   thingList,
@@ -70,7 +63,6 @@ export class Album extends Thing {
 
   static [Thing.getPropertyDescriptors] = ({
     ArtTag,
-    Artist,
     Group,
     Track,
     TrackSection,
@@ -508,7 +500,7 @@ export class Album extends Thing {
 
   static [Thing.getYamlLoadingSpec] = ({
     documentModes: {headerAndEntries},
-    thingConstructors: {Album, Track, TrackSectionHelper},
+    thingConstructors: {Album, Track},
   }) => ({
     title: `Process album files`,
 

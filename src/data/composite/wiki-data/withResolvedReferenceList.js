@@ -6,13 +6,9 @@
 import {input, templateCompositeFrom} from '#composite';
 import {isString, validateArrayItems} from '#validators';
 
+import {raiseOutputWithoutDependency, withAvailabilityFilter}
+  from '#composite/control-flow';
 import {withMappedList} from '#composite/data';
-
-import {
-  exitWithoutDependency,
-  raiseOutputWithoutDependency,
-  withAvailabilityFilter,
-} from '#composite/control-flow';
 
 import gobbleSoupyFind from './gobbleSoupyFind.js';
 import inputNotFoundMode from './inputNotFoundMode.js';

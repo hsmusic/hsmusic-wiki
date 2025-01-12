@@ -1,5 +1,4 @@
 import {input, templateCompositeFrom} from '#composite';
-import find from '#find';
 import {stitchArrays} from '#sugar';
 import {isSeriesList, validateThing} from '#validators';
 
