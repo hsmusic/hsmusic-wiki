@@ -392,8 +392,22 @@ export class CacheableObjectPropertyValueError extends Error {
   [Symbol.for('hsmusic.aggregate.translucent')] = true;
 
   constructor(property, oldValue, newValue, options) {
+    let inspectOldValue, inspectNewValue;
+
+    try {
+      inspectOldValue = inspect(oldValue);
+    } catch (error) {
+      inspectOldValue = colors.red(`(couldn't inspect)`);
+    }
+
+    try {
+      inspectNewValue = inspect(newValue);
+    } catch (error) {
+      inspectNewValue = colors.red(`(couldn't inspect)`);
+    }
+
     super(
-      `Error setting ${colors.green(property)} (${inspect(oldValue)} -> ${inspect(newValue)})`,
+      `Error setting ${colors.green(property)} (${inspectOldValue} -> ${inspectNewValue})`,
       options);
 
     this.property = property;
