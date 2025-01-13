@@ -45,7 +45,6 @@ export default class CacheableObject {
       throw new Error(`Expected constructor ${this.name} to provide CacheableObject.propertyDescriptors`);
     }
 
-    this[CacheableObject.constructorFinalized] = true;
     this[CacheableObject.propertyDependants] = Object.create(null);
 
     const propertyDescriptors = this[CacheableObject.propertyDescriptors];
@@ -116,8 +115,6 @@ export default class CacheableObject {
             return this[CacheableObject.cachedValue][property];
           }
 
-          this[CacheableObject.cacheValid][property] = true;
-
           const dependencies = Object.create(null);
           for (const key of expose.dependencies ?? []) {
             switch (key) {
@@ -141,6 +138,7 @@ export default class CacheableObject {
               : expose.compute(dependencies));
 
           this[CacheableObject.cachedValue][property] = value;
+          this[CacheableObject.cacheValid][property] = true;
 
           return value;
         };
@@ -176,6 +174,8 @@ export default class CacheableObject {
 
       Object.defineProperty(this.prototype, property, definition);
     }
+
+    this[CacheableObject.constructorFinalized] = true;
   }
 
   static getPropertyDescriptor(property) {
