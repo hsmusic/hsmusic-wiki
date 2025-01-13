@@ -1,79 +1,3 @@
-// Generally extendable class for caching properties and handling dependencies,
-// with a few key properties:
-//
-// 1) The behavior of every property is defined by its descriptor, which is a
-//    static value stored on the subclass (all instances share the same property
-//    descriptors).
-//
-//  1a) Additional properties may not be added past the time of object
-//      construction, and attempts to do so (including externally setting a
-//      property name which has no corresponding descriptor) will throw a
-//      TypeError. (This is done via an Object.seal(this) call after a newly
-//      created instance defines its own properties according to the descriptor
-//      on its constructor class.)
-//
-// 2) Properties may have two flags set: update and expose. Properties which
-//    update are provided values from the external. Properties which expose
-//    provide values to the external, generally dependent on other update
-//    properties (within the same object).
-//
-//  2a) Properties may be flagged as both updating and exposing. This is so
-//      that the same name may be used for both "output" and "input".
-//
-// 3) Exposed properties have values which are computations dependent on other
-//    properties, as described by a `compute` function on the descriptor.
-//    Depended-upon properties are explicitly listed on the descriptor next to
-//    this function, and are only provided as arguments to the function once
-//    listed.
-//
-//  3a) An exposed property may depend only upon updating properties, not other
-//      exposed properties (within the same object). This is to force the
-//      general complexity of a single object to be fairly simple: inputs
-//      directly determine outputs, with the only in-between step being the
-//      `compute` function, no multiple-layer dependencies. Note that this is
-//      only true within a given object - externally, values provided to one
-//      object's `update` may be (and regularly are) the exposed values of
-//      another object.
-//
-//  3b) If a property both updates and exposes, it is automatically regarded as
-//      a dependancy. (That is, its exposed value will depend on the value it is
-//      updated with.) Rather than a required `compute` function, these have an
-//      optional `transform` function, which takes the update value as its first
-//      argument and then the usual key-value dependencies as its second. If no
-//      `transform` function is provided, the expose value is the same as the
-//      update value.
-//
-// 4) Exposed properties are cached; that is, if no depended-upon properties are
-//    updated, the value of an exposed property is not recomputed.
-//
-//  4a) The cache for an exposed property is invalidated as soon as any of its
-//      dependencies are updated, but the cache itself is lazy: the exposed
-//      value will not be recomputed until it is again accessed. (Likewise, an
-//      exposed value won't be computed for the first time until it is first
-//      accessed.)
-//
-// 5) Updating a property may optionally apply validation checks before passing,
-//    declared by a `validate` function on the `update` block. This function
-//    should either throw an error (e.g. TypeError) or return false if the value
-//    is invalid.
-//
-// 6) Objects do not expect all updating properties to be provided at once.
-//    Incomplete objects are deliberately supported and enabled.
-//
-//  6a) The default value for every updating property is null; undefined is not
-//      accepted as a property value under any circumstances (it always errors).
-//      However, this default may be overridden by specifying a `default` value
-//      on a property's `update` block. (This value will be checked against
-//      the property's validate function.) Note that a property may always be
-//      updated to null, even if the default is non-null. (Null always bypasses
-//      the validate check.)
-//
-//  6b) It's required by the external consumer of an object to determine whether
-//      or not the object is ready for use (within the larger program). This is
-//      convenienced by the static CacheableObject.listAccessibleProperties()
-//      function, which provides a mapping of exposed property names to whether
-//      or not their dependencies are yet met.
-
 import {inspect as nodeInspect} from 'node:util';
 
 import {colors, ENABLE_COLOR} from '#cli';
@@ -283,24 +207,6 @@ export default class CacheableObject {
       }
 
       obj[property];
-    }
-  }
-
-  static DEBUG_SLOW_TRACK_INVALID_PROPERTIES = false;
-  static _invalidAccesses = new Set();
-
-  static showInvalidAccesses() {
-    if (!this.DEBUG_SLOW_TRACK_INVALID_PROPERTIES) {
-      return;
-    }
-
-    if (!this._invalidAccesses.size) {
-      return;
-    }
-
-    console.log(`${this._invalidAccesses.size} unique invalid accesses:`);
-    for (const line of this._invalidAccesses) {
-      console.log(` - ${line}`);
     }
   }
 

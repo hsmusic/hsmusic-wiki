@@ -440,14 +440,6 @@ async function main() {
     },
     magick: {alias: 'magick-threads'},
 
-    // This option is super slow and has the potential for bugs! It puts
-    // CacheableObject in a mode where every instance is a Proxy which will
-    // keep track of invalid property accesses.
-    'show-invalid-property-accesses': {
-      help: `Report accesses at runtime to nonexistant properties on wiki data objects, at a dramatic performance cost\n(Internal/development use only)`,
-      type: 'flag',
-    },
-
     'precache-mode': {
       help:
         `Change the way certain runtime-computed values are preemptively evaluated and cached\n\n` +
@@ -566,7 +558,6 @@ async function main() {
   const showAggregateTraces = cliOptions['show-traces'] ?? false;
 
   const precacheMode = cliOptions['precache-mode'] ?? 'common';
-  const showInvalidPropertyAccesses = cliOptions['show-invalid-property-accesses'] ?? false;
 
   // Makes writing nicer on the CPU and file I/O parts of the OS, with a
   // marginal performance deficit while waiting for file writes to finish
@@ -1330,10 +1321,6 @@ async function main() {
     thumbsCache = result.cache;
   } else {
     thumbsCache = {};
-  }
-
-  if (showInvalidPropertyAccesses) {
-    CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES = true;
   }
 
   Object.assign(stepStatusSummary.loadDataFiles, {
@@ -2694,7 +2681,6 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
     }
 
     decorateTime.displayTime();
-    CacheableObject.showInvalidAccesses();
 
     process.exit(0);
   })();
