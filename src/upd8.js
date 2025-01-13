@@ -124,6 +124,7 @@ const defaultStepStatus = {status: STATUS_NOT_STARTED, annotation: null};
 // This will be initialized and mutated over the course of main().
 let stepStatusSummary;
 let showStepStatusSummary = false;
+let showStepMemoryInSummary = false;
 
 async function main() {
   Error.stackTraceLimit = Infinity;
@@ -418,6 +419,11 @@ async function main() {
       type: 'flag',
     },
 
+    'show-step-memory': {
+      help: `Include total process memory usage traces at the time each top-level build step ends. Use with --show-step-summary. This is mostly useful for programmer debugging!`,
+      type: 'flag',
+    },
+
     'queue-size': {
       help: `Process more or fewer disk files at once to optimize performance or avoid I/O errors, unlimited if set to 0 (between 500 and 700 is usually a safe range for building HSMusic on Windows machines)\nDefaults to ${defaultQueueSize}`,
       type: 'value',
@@ -478,6 +484,7 @@ async function main() {
   });
 
   showStepStatusSummary = cliOptions['show-step-summary'] ?? false;
+  showStepMemoryInSummary = cliOptions['show-step-memory'] ?? false;
 
   if (cliOptions['help']) {
     console.log(
@@ -2608,14 +2615,16 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
       const stepMemories =
         stepDetails.map(({memory}) =>
           (memory
-            ? Math.round(memory["heapUsed"] / 1024 / 1024) + "MB"
-            : "-"));
+            ? Math.round(memory["heapUsed"] / 1024 / 1024) + 'MB'
+            : '-'));
 
-      const longestMemoryLength = 7;
+      const longestMemoryLength =
+        Math.max(...stepMemories.map(memory => memory.length));
 
       for (let index = 0; index < stepDetails.length; index++) {
         const {name, status, annotation} = stepDetails[index];
         const duration = stepDurations[index];
+        const memory = stepMemories[index];
 
         let message =
           (stepsNotClean[index]
@@ -2623,7 +2632,11 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
             : ` - `);
 
         message += `(${duration} `.padStart(longestDurationLength + 2, ' ');
-        message += ` ${stepMemories[index]})`.padStart(longestMemoryLength + 2, ' ');
+
+        if (showStepMemoryInSummary) {
+          message += ` ${memory})`.padStart(longestMemoryLength + 2, ' ');
+        }
+
         message += ` `;
         message += `${name}: `.padEnd(longestNameLength + 4, '.');
         message += ` `;
