@@ -50,7 +50,8 @@ import {isMain, traverse} from '#node-utils';
 import {bindReverse} from '#reverse';
 import {writeSearchData} from '#search';
 import {sortByName} from '#sort';
-import {generateURLs, urlSpec} from '#urls';
+import {internalDefaultURLSpecFile, generateURLs, processURLSpecFromFile}
+  from '#urls';
 import {identifyAllWebRoutes} from '#web-routes';
 
 import {
@@ -178,6 +179,10 @@ async function main() {
 
     precacheAllData:
       {...defaultStepStatus, name: `precache nearly all data`,
+        for: ['build']},
+
+    loadURLFiles:
+      {...defaultStepStatus, name: `load internal & custom url spec files`,
         for: ['build']},
 
     // TODO: This should be split into load/watch steps.
@@ -1627,8 +1632,6 @@ async function main() {
     });
   }
 
-  const urls = generateURLs(urlSpec);
-
   // Filter out any things with duplicate directories throughout the data,
   // warning about them too.
 
@@ -1800,6 +1803,45 @@ async function main() {
       return true;
     }
   }
+
+  Object.assign(stepStatusSummary.loadURLFiles, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
+
+  let internalURLSpec = {};
+
+  try {
+    let aggregate;
+    ({aggregate, result: internalURLSpec} =
+      await processURLSpecFromFile(internalDefaultURLSpecFile));
+
+    aggregate.close();
+  } catch (error) {
+    niceShowAggregate(error);
+    logError`Couldn't load internal default URL spec.`;
+    logError`This is required to build the wiki, so stopping here.`;
+    fileIssue();
+
+    Object.assign(stepStatusSummary.loadURLFiles, {
+      status: STATUS_FATAL_ERROR,
+      annotation: `see log for details`,
+      timeEnd: Date.now(),
+      memory: process.memoryUsage(),
+    });
+
+    return false;
+  }
+
+  const urlSpec = internalURLSpec;
+
+  Object.assign(stepStatusSummary.loadURLFiles, {
+    status: STATUS_DONE_CLEAN,
+    timeEnd: Date.now(),
+    memory: process.memoryUsage(),
+  });
+
+  const urls = generateURLs(urlSpec);
 
   const languageReloading =
     stepStatusSummary.watchLanguageFiles.status === STATUS_NOT_STARTED;

@@ -110,7 +110,6 @@ export function openAggregate({
 
     return results.map(({aggregate, result}) => {
       if (!aggregate) {
-        console.log('nope:', results);
         throw new Error(`Expected an array of {aggregate, result} objects`);
       }
 

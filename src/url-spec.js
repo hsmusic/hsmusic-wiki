@@ -1,145 +1,191 @@
-import {withEntries} from '#sugar';
+// Exports defined here are re-exported through urls.js,
+// so they're generally imported from '#urls'.
 
-// Static files are all grouped under a `static-${STATIC_VERSION}` folder as
-// part of a build. This is so that multiple builds of a wiki can coexist
-// served from the same server / file system root: older builds' HTML files
-// refer to earlier values of STATIC_VERSION, avoiding name collisions.
-const STATIC_VERSION = '3p3';
+import {readFile} from 'node:fs/promises';
+import * as path from 'node:path';
+import {fileURLToPath} from 'node:url';
 
-const genericPaths = {
-  root: '',
-  path: '<>',
-};
+import yaml from 'js-yaml';
 
-const urlSpec = {
-  data: {
-    prefix: 'data/',
+import {annotateError, annotateErrorWithFile, openAggregate} from '#aggregate';
+import {empty, typeAppearance, withEntries} from '#sugar';
 
-    paths: {
-      ...genericPaths,
+export const DEFAULT_URL_SPEC_FILE = 'url-spec-default.yaml';
 
-      album: 'album/<>',
-      artist: 'artist/<>',
-      track: 'track/<>',
-    },
-  },
+export const internalDefaultURLSpecFile =
+  path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    DEFAULT_URL_SPEC_FILE);
 
-  localized: {
-    // TODO: Implement this.
-    // prefix: '_languageCode',
+function processStringToken(key, token) {
+  const oops = appearance =>
+    new Error(
+      `Expected ${key} to be a string or an array of strings, ` +
+      `got ${appearance}`);
 
-    paths: {
-      ...genericPaths,
-      page: '<>/',
+  if (typeof token === 'string') {
+    return token;
+  } else if (Array.isArray(token)) {
+    if (empty(token)) {
+      throw oops(`empty array`);
+    } else if (token.every(item => typeof item !== 'string')) {
+      throw oops(`array of non-strings`);
+    } else if (token.some(item => typeof item !== 'string')) {
+      throw oops(`array of mixed strings and non-strings`);
+    } else {
+      return token.join('');
+    }
+  } else {
+    throw oops(typeAppearance(token));
+  }
+}
 
-      home: '',
+// Mutates, so don't even think about reusing the original representation.
+function processObjectToken(key, token) {
+  const oops = appearance =>
+    new Error(
+      `Expected ${key} to be an object or an array of objects, ` +
+      `got ${appearance}`);
 
-      album: 'album/<>/',
-      albumCommentary: 'commentary/album/<>/',
-      albumGallery: 'album/<>/gallery/',
-      albumReferencedArtworks: 'album/<>/referenced-art/',
-      albumReferencingArtworks: 'album/<>/referencing-art/',
+  const looksLikeObject = value =>
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value);
 
-      artist: 'artist/<>/',
-      artistGallery: 'artist/<>/gallery/',
+  if (looksLikeObject(token)) {
+    return token;
+  } else if (Array.isArray(token)) {
+    if (empty(token)) {
+      throw oops(`empty array`);
+    } else if (token.every(item => !looksLikeObject(item))) {
+      throw oops(`array of non-objects`);
+    } else if (token.some(item => !looksLikeObject(item))) {
+      throw oops(`array of mixed objects and non-objects`);
+    } else {
+      return Object.assign(...token);
+    }
+  }
+}
 
-      commentaryIndex: 'commentary/',
+function makeProcessToken(aggregate) {
+  return (object, key, processFn) => {
+    if (key in object) {
+      const value = aggregate.call(processFn, key, object[key]);
+      if (value === null) {
+        delete object[key];
+      } else {
+        object[key] = value;
+      }
+    }
+  };
+}
 
-      flashIndex: 'flash/',
+export function processGroupSpec(groupKey, groupSpec) {
+  const aggregate =
+    openAggregate({message: `Errors procsesing group "${groupKey}"`});
 
-      flash: 'flash/<>/',
+  const processToken = makeProcessToken(aggregate);
 
-      flashActGallery: 'flash-act/<>/',
+  processToken(groupSpec, 'prefix', processStringToken);
+  processToken(groupSpec, 'paths', processObjectToken);
 
-      groupInfo: 'group/<>/',
-      groupGallery: 'group/<>/gallery/',
+  return {aggregate, result: groupSpec};
+}
 
-      listingIndex: 'list/',
+export function processURLSpec(sourceSpec) {
+  const aggregate =
+    openAggregate({message: `Errors processing URL spec`});
 
-      listing: 'list/<>/',
+  const urlSpec = structuredClone(sourceSpec);
 
-      newsIndex: 'news/',
+  delete urlSpec.yamlAliases;
+  delete urlSpec.localizedWithBaseDirectory;
 
-      newsEntry: 'news/<>/',
+  aggregate.nest({message: `Errors processing groups`}, groupsAggregate => {
+    Object.assign(urlSpec,
+      withEntries(urlSpec, entries =>
+        entries.map(([groupKey, groupSpec]) => [
+          groupKey,
+          groupsAggregate.receive(
+            processGroupSpec(groupKey, groupSpec)),
+        ])));
+  });
 
-      staticPage: '<>/',
+  switch (sourceSpec.localizedWithBaseDirectory) {
+    case '<auto>': {
+      if (!urlSpec.localized) {
+        aggregate.push(new Error(
+          `Couldn't prepare 'localizedWithBaseDirectory' group, ` +
+          `'localized' not available`));
 
-      tag: 'tag/<>/',
+        break;
+      }
 
-      track: 'track/<>/',
-      trackReferencedArtworks: 'track/<>/referenced-art/',
-      trackReferencingArtworks: 'track/<>/referencing-art/',
-    },
-  },
+      if (!urlSpec.localized.paths) {
+        aggregate.push(new Error(
+          `Couldn't prepare 'localizedWithBaseDirectory' group, ` +
+          `'localized' group's paths not available`));
 
-  shared: {
-    paths: genericPaths,
-  },
+        break;
+      }
 
-  staticCSS: {
-    prefix: `static-${STATIC_VERSION}/css/`,
-    paths: genericPaths,
-  },
+      const paths =
+        withEntries(urlSpec.localized.paths, entries =>
+          entries.map(([key, path]) => [key, '<>/' + path]));
 
-  staticJS: {
-    prefix: `static-${STATIC_VERSION}/js/`,
-    paths: genericPaths,
-  },
+      urlSpec.localizedWithBaseDirectory =
+        Object.assign(
+          structuredClone(urlSpec.localized),
+          {paths});
 
-  staticLib: {
-    prefix: `static-${STATIC_VERSION}/lib/`,
-    paths: genericPaths,
-  },
+      break;
+    }
 
-  staticMisc: {
-    prefix: `static-${STATIC_VERSION}/misc/`,
-    paths: {
-      ...genericPaths,
-      icon: 'icons.svg#icon-<>',
-    },
-  },
+    case undefined:
+      break;
 
-  staticSharedUtil: {
-    prefix: `static-${STATIC_VERSION}/shared-util/`,
-    paths: genericPaths,
-  },
+    default:
+      aggregate.push(new Error(
+        `Expected 'localizedWithBaseDirectory' group to have value '<auto>' ` +
+        `or not be set`));
 
-  media: {
-    prefix: 'media/',
+      break;
+  }
 
-    paths: {
-      ...genericPaths,
+  return {aggregate, result: urlSpec};
+}
 
-      albumAdditionalFile: 'album-additional/<>/<>',
-      albumBanner: 'album-art/<>/banner.<>',
-      albumCover: 'album-art/<>/cover.<>',
-      albumWallpaper: 'album-art/<>/bg.<>',
-      albumWallpaperPart: 'album-art/<>/<>',
+export async function processURLSpecFromFile(file) {
+  let contents;
 
-      artistAvatar: 'artist-avatar/<>.<>',
+  try {
+    contents = await readFile(file, 'utf-8');
+  } catch (caughtError) {
+    throw annotateError(
+      new Error(`Failed to read URL spec file`, {cause: caughtError}),
+      error => annotateErrorWithFile(error, file));
+  }
 
-      flashArt: 'flash-art/<>.<>',
+  let sourceSpec;
+  let parseLanguage;
 
-      trackCover: 'album-art/<>/<>.<>',
-    },
-  },
+  try {
+    if (path.extname(file) === '.yaml') {
+      parseLanguage = 'YAML';
+      sourceSpec = yaml.load(contents);
+    } else {
+      parseLanguage = 'JSON';
+      sourceSpec = JSON.parse(contents);
+    }
+  } catch (caughtError) {
+    throw annotateError(
+      new Error(`Failed to parse URL spec file as valid ${parseLanguage}`, {cause: caughtError}),
+      error => annotateErrorWithFile(error, file));
+  }
 
-  thumb: {
-    prefix: 'thumb/',
-    paths: genericPaths,
-  },
-
-  searchData: {
-    prefix: 'search-data/',
-    paths: genericPaths,
-  },
-};
-
-// This gets automatically switched in place when working from a baseDirectory,
-// so it should never be referenced manually.
-urlSpec.localizedWithBaseDirectory = {
-  paths: withEntries(urlSpec.localized.paths, (entries) =>
-    entries.map(([key, path]) => [key, '<>/' + path])),
-};
-
-export default urlSpec;
+  try {
+    return processURLSpec(sourceSpec);
+  } catch (caughtError) {
+    throw annotateErrorWithFile(caughtError, file);
+  }
+}

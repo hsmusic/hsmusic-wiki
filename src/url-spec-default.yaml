@@ -1,0 +1,143 @@
+# These are variables which are used to make expressing this
+# YAML file more convenient. They are not exposed externally.
+# (Stuff which uses this YAML file can't even see the names
+# for each variable!)
+yamlAliases:
+  - &genericPaths
+      root: ''
+      path: '<>'
+
+  # Static files are all grouped under a `static-${STATIC_VERSION}` folder as
+  # part of a build. This is so that multiple builds of a wiki can coexist
+  # served from the same server / file system root: older builds' HTML files
+  # refer to earlier values of STATIC_VERSION, avoiding name collisions.
+  - &staticVersion 3p4
+
+data:
+  prefix: 'data/'
+
+  paths:
+  - *genericPaths
+
+  - album: 'album/<>'
+    artist: 'artist/<>'
+    track: 'track/<>'
+
+localized:
+  paths:
+  - *genericPaths
+  - page: '<>/'
+
+    home: ''
+
+    album: 'album/<>/'
+    albumCommentary: 'commentary/album/<>/'
+    albumGallery: 'album/<>/gallery/'
+    albumReferencedArtworks: 'album/<>/referenced-art/'
+    albumReferencingArtworks: 'album/<>/referencing-art/'
+
+    artist: 'artist/<>/'
+    artistGallery: 'artist/<>/gallery/'
+
+    commentaryIndex: 'commentary/'
+
+    flashIndex: 'flash/'
+
+    flash: 'flash/<>/'
+
+    flashActGallery: 'flash-act/<>/'
+
+    groupInfo: 'group/<>/'
+    groupGallery: 'group/<>/gallery/'
+
+    listingIndex: 'list/'
+
+    listing: 'list/<>/'
+
+    newsIndex: 'news/'
+
+    newsEntry: 'news/<>/'
+
+    staticPage: '<>/'
+
+    tag: 'tag/<>/'
+
+    track: 'track/<>/'
+    trackReferencedArtworks: 'track/<>/referenced-art/'
+    trackReferencingArtworks: 'track/<>/referencing-art/'
+
+# This gets automatically switched in place when working from
+# a baseDirectory, so it should never be referenced manually.
+# It's also filled in externally to this YAML spec.
+localizedWithBaseDirectory: '<auto>'
+
+shared:
+  paths: *genericPaths
+
+staticCSS:
+  prefix:
+  - 'static-'
+  - *staticVersion
+  - '/css/'
+
+  paths: *genericPaths
+
+staticJS:
+  prefix:
+  - 'static-'
+  - *staticVersion
+  - '/js/'
+
+  paths: *genericPaths
+
+staticLib:
+  prefix:
+  - 'static-'
+  - *staticVersion
+  - '/lib/'
+
+  paths: *genericPaths
+
+staticMisc:
+  prefix:
+  - 'static-'
+  - *staticVersion
+  - '/misc/'
+
+  paths:
+  - *genericPaths
+  - icon: 'icons.svg#icon-<>'
+
+staticSharedUtil:
+  prefix:
+  - 'static-'
+  - *staticVersion
+  - '/shared-util/'
+
+  paths: *genericPaths
+
+media:
+  prefix: 'media/'
+
+  paths:
+  - *genericPaths
+
+  - albumAdditionalFile: 'album-additional/<>/<>'
+    albumBanner: 'album-art/<>/banner.<>'
+    albumCover: 'album-art/<>/cover.<>'
+    albumWallpaper: 'album-art/<>/bg.<>'
+    albumWallpaperPart: 'album-art/<>/<>'
+
+    artistAvatar: 'artist-avatar/<>.<>'
+
+    flashArt: 'flash-art/<>.<>'
+
+    trackCover: 'album-art/<>/<>.<>'
+
+thumb:
+  prefix: 'thumb/'
+  paths: *genericPaths
+
+searchData:
+  prefix: 'search-data/'
+  paths: *genericPaths
