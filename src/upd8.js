@@ -2407,35 +2407,37 @@ async function main() {
     // paths that will be exposed in site build code. We'll build a mapping
     // function between them so that when site code requests a site path,
     // it'll get the size of the file at the corresponding device path.
-    const additionalFilePaths = [
-      ...wikiData.albumData.flatMap((album) =>
-        [
-          ...(album.additionalFiles ?? []),
-          ...album.tracks.flatMap((track) => [
-            ...(track.additionalFiles ?? []),
-            ...(track.sheetMusicFiles ?? []),
-            ...(track.midiProjectFiles ?? []),
+
+    const albumAdditionalFilePaths =
+      wikiData.albumData.flatMap(album =>
+        ([
+          ...album.additionalFiles,
+          ...album.tracks.flatMap(track => [
+            ...track.additionalFiles,
+            ...track.sheetMusicFiles,
+            ...track.midiProjectFiles,
           ]),
-        ]
-          .flatMap((fileGroup) => fileGroup.files ?? [])
-          .map((file) => ({
-            device: path.join(
+        ]).flatMap(fileGroup => fileGroup.files ?? [])
+          .map(file => ['media.albumAdditionalFile', album.directory, file]));
+
+    const additionalFilePaths =
+      ([
+        ...albumAdditionalFilePaths,
+      ]).map(filePath => ({
+          device:
+            path.join(
               mediaPath,
-              urls
-                .from('media.root')
-                .toDevice('media.albumAdditionalFile', album.directory, file)
-            ),
-            media: urls
-              .from('media.root')
-              .to('media.albumAdditionalFile', album.directory, file),
-          }))
-      ),
-    ];
+              urls.from('media.root').toDevice(...filePath)),
+
+          media:
+            urls.from('media.root').to(...filePath),
+        }));
 
     // Same dealio for images. Since just about any image can be embedded and
     // we can't super easily know which ones are referenced at runtime, just
     // cheat and get file sizes for all images under media. (This includes
     // additional files which are images.)
+
     const imageFilePaths =
       await traverse(mediaPath, {
         pathStyle: 'device',
