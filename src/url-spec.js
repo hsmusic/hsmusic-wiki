@@ -40,7 +40,6 @@ function processStringToken(key, token) {
   }
 }
 
-// Mutates, so don't even think about reusing the original representation.
 function processObjectToken(key, token) {
   const oops = appearance =>
     new Error(
@@ -53,7 +52,7 @@ function processObjectToken(key, token) {
     !Array.isArray(value);
 
   if (looksLikeObject(token)) {
-    return token;
+    return {...token};
   } else if (Array.isArray(token)) {
     if (empty(token)) {
       throw oops(`empty array`);
@@ -62,7 +61,7 @@ function processObjectToken(key, token) {
     } else if (token.some(item => !looksLikeObject(item))) {
       throw oops(`array of mixed objects and non-objects`);
     } else {
-      return Object.assign(...token);
+      return Object.assign({}, ...token);
     }
   }
 }
@@ -82,7 +81,7 @@ function makeProcessToken(aggregate) {
 
 export function processGroupSpec(groupKey, groupSpec) {
   const aggregate =
-    openAggregate({message: `Errors procsesing group "${groupKey}"`});
+    openAggregate({message: `Errors processing group "${groupKey}"`});
 
   const processToken = makeProcessToken(aggregate);
 
