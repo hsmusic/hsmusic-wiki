@@ -48,8 +48,20 @@ export function generateURLs(urlSpec) {
   const generateTo = (fromPath, fromGroup) => {
     const A = trimLeadingSlash(fromPath);
 
-    const rebasePrefix = '../'
-      .repeat((fromGroup.prefix || '').split('/').filter(Boolean).length);
+    const fromPrefix = fromGroup.prefix || '';
+
+    const rebasePrefix =
+      '../'.repeat(fromPrefix.split('/').filter(Boolean).length);
+
+    const originOfPrefix = prefix => {
+      try {
+        return new URL(prefix).origin;
+      } catch {
+        return null;
+      }
+    };
+
+    const fromOrigin = originOfPrefix(fromPrefix);
 
     const pathHelper = (toPath, toGroup) => {
       let B = trimLeadingSlash(toPath);
@@ -57,40 +69,106 @@ export function generateURLs(urlSpec) {
       let argIndex = 0;
       B = B.replaceAll('<>', () => `<${argIndex++}>`);
 
-      if (toGroup.prefix !== fromGroup.prefix) {
-        // TODO: Handle differing domains in prefixes.
-        B = rebasePrefix + (toGroup.prefix || '') + B;
-      }
-
       const suffix = toPath.endsWith('/') ? '/' : '';
 
-      return {
-        posix: path.posix.relative(A, B) + suffix,
-        device: path.relative(A, B) + suffix,
-      };
+      const toPrefix = toGroup.prefix;
+
+      if (toPrefix !== fromPrefix) {
+        // Compare origins. Note that originOfPrefix() can
+        // be null for both prefixes.
+        const toOrigin = originOfPrefix(toPrefix);
+        if (fromOrigin === toOrigin) {
+          // Go to the root, add the to-group's prefix, then
+          // continue with normal path.relative() behavior.
+          B = rebasePrefix + (toGroup.prefix || '') + B;
+        } else {
+          // Crossing origins never conceptually represents
+          // something you can interpret on-`.device()`.
+          return {
+            posix: toGroup.prefix + B + suffix,
+            device: null,
+          };
+        }
+      }
+
+      // If we're coming from a qualified origin (domain),
+      // then at this point, A and B represent paths on the
+      // same origin. We can use normal path.relative() behavior.
+      if (fromOrigin) {
+        // If we're working on an origin, there's no meaning to
+        // a `.device()`-local relative path.
+        return {
+          posix: path.posix.relative(A, B) + suffix,
+          device: null,
+        };
+      } else {
+        return {
+          posix: path.posix.relative(A, B) + suffix,
+          device: path.relative(A, B) + suffix,
+        };
+      }
     };
 
-    const groupSymbol = Symbol();
+    const groupHelper = urlGroup =>
+      withEntries(urlGroup.paths, entries =>
+        entries.map(([key, path]) => [
+          key,
+          pathHelper(path, urlGroup),
+        ]));
 
-    const groupHelper = (urlGroup) => ({
-      [groupSymbol]: urlGroup,
-      ...withEntries(urlGroup.paths, (entries) =>
-        entries.map(([key, path]) => [key, pathHelper(path, urlGroup)])
-      ),
-    });
-
-    const relative = withEntries(urlSpec, (entries) =>
-      entries.map(([key, urlGroup]) => [key, groupHelper(urlGroup)])
-    );
+    const relative =
+      withEntries(urlSpec, entries =>
+        entries.map(([key, urlGroup]) => [
+          key,
+          groupHelper(urlGroup),
+        ]));
 
     const toHelper =
       ({device}) =>
       (key, ...args) => {
-        const {
-          value: {
-            [device ? 'device' : 'posix']: template,
-          },
-        } = getValueForFullKey(relative, key);
+        const templateKey = (device ? 'device' : 'posix');
+
+        const {value: {[templateKey]: template}} =
+          getValueForFullKey(relative, key);
+
+        // If we got past getValueForFullKey(), we've already ruled out
+        // the common errors, i.e. incorrectly formatted key or invalid
+        // group key or subkey.
+        if (template === null) {
+          // Self-diagnose, brutally.
+
+          const otherTemplateKey = (device ? 'posix' : 'device');
+
+          const {value: {[templateKey]: otherTemplate}} =
+            getValueForFullKey(relative, key);
+
+          const effectiveMode =
+            (otherTemplate
+              ? `${templateKey} mode`
+              : `either mode`);
+
+          const toGroupKey = key.split('.')[0];
+
+          const anyOthers =
+            Object.values(relative[toGroupKey])
+              .find(templates =>
+                (otherTemplate
+                  ? templates[templateKey]
+                  : templates.posix || templates.device));
+
+          const effectiveTo =
+            (anyOthers
+              ? key
+              : `${toGroupKey}.*`);
+
+          if (anyOthers) {
+            console.log(relative[toGroupKey]);
+          }
+
+          throw new Error(
+            `from(${fromGroup.key}.*).to(${effectiveTo}) ` +
+            `not available in ${effectiveMode} with this url spec`);
+        }
 
         let missing = 0;
         let result = template.replaceAll(/<([0-9]+)>/g, (match, n) => {
@@ -110,19 +188,31 @@ export function generateURLs(urlSpec) {
 
         if (missing) {
           throw new Error(
-            `Expected ${missing + args.length} arguments, got ${
-              args.length
-            } (key ${key}, args [${args}])`
-          );
+            `Expected ${missing + args.length} arguments, ` +
+            `got ${args.length} (key ${key}, args [${args}])`);
         }
 
         return result;
       };
 
-    return {
-      to: toHelper({device: false}),
-      toDevice: toHelper({device: true}),
-    };
+    const toAvailableHelper =
+      ({device}) =>
+      (key) => {
+        const templateKey = (device ? 'device' : 'posix');
+
+        const {value: {[templateKey]: template}} =
+          getValueForFullKey(relative, key);
+
+        return !!template;
+      };
+
+    const to = toHelper({device: false});
+    const toDevice = toHelper({device: true});
+
+    to.available = toAvailableHelper({device: false});
+    toDevice.available = toAvailableHelper({device: true});
+
+    return {to, toDevice};
   };
 
   const generateFrom = () => {

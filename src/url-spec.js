@@ -85,6 +85,8 @@ export function processGroupSpec(groupKey, groupSpec) {
 
   const processToken = makeProcessToken(aggregate);
 
+  groupSpec.key = groupKey;
+
   processToken(groupSpec, 'prefix', processStringToken);
   processToken(groupSpec, 'paths', processObjectToken);
 
