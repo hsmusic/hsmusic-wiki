@@ -342,6 +342,11 @@ async function main() {
       type: 'value',
     },
 
+    'show-url-spec': {
+      help: `Displays the entire computed URL spec, after the data folder's default override and optional specs are applied. This is mostly useful for progammer debugging!`,
+      type: 'flag',
+    },
+
     'skip-directory-validation': {
       help: `Skips checking for duplicated directories, which speeds up the build but may cause the wiki to catch on fire`,
       type: 'flag',
@@ -584,6 +589,7 @@ async function main() {
   const precacheMode = cliOptions['precache-mode'] ?? 'common';
 
   const wantedURLSpecKeys = cliOptions['urls'] ?? [];
+  const showURLSpec = cliOptions['show-url-spec'] ?? false;
 
   // Makes writing nicer on the CPU and file I/O parts of the OS, with a
   // marginal performance deficit while waiting for file writes to finish
@@ -1959,6 +1965,16 @@ async function main() {
     });
 
     return false;
+  }
+
+  if (showURLSpec) {
+    if (!paragraph) console.log('');
+
+    logInfo`Here's the final URL spec, via ${'--show-url-spec'}:`
+    console.log(urlSpec);
+    console.log('');
+
+    paragraph = true;
   }
 
   Object.assign(stepStatusSummary.loadURLFiles, {
