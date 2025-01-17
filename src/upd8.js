@@ -40,7 +40,7 @@ import {fileURLToPath} from 'node:url';
 
 import wrap from 'word-wrap';
 
-import {mapAggregate, showAggregate} from '#aggregate';
+import {mapAggregate, openAggregate, showAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
 import {displayCompositeCacheAnalysis} from '#composite';
 import find, {bindFind, getAllFindSpecs} from '#find';
@@ -50,8 +50,6 @@ import {isMain, traverse} from '#node-utils';
 import {bindReverse} from '#reverse';
 import {writeSearchData} from '#search';
 import {sortByName} from '#sort';
-import {internalDefaultURLSpecFile, generateURLs, processURLSpecFromFile}
-  from '#urls';
 import {identifyAllWebRoutes} from '#web-routes';
 
 import {
@@ -75,6 +73,7 @@ import {
 import {
   bindOpts,
   empty,
+  filterMultipleArrays,
   indentWrap as unboundIndentWrap,
   withEntries,
 } from '#sugar';
@@ -87,6 +86,14 @@ import genThumbs, {
   migrateThumbsIntoDedicatedCacheDirectory,
   verifyImagePaths,
 } from '#thumbs';
+
+import {
+  applyLocalizedWithBaseDirectory,
+  applyURLSpecOverriding,
+  generateURLs,
+  internalDefaultURLSpecFile,
+  processURLSpecFromFile,
+} from '#urls';
 
 import {
   getAllDataSteps,
@@ -330,6 +337,11 @@ async function main() {
       type: 'value',
     },
 
+    'urls': {
+      help: `Specify which optional URL specs to use for this build, customizing where pages are generated or resources are accessed from`,
+      type: 'value',
+    },
+
     'skip-directory-validation': {
       help: `Skips checking for duplicated directories, which speeds up the build but may cause the wiki to catch on fire`,
       type: 'flag',
@@ -570,6 +582,8 @@ async function main() {
   const showAggregateTraces = cliOptions['show-traces'] ?? false;
 
   const precacheMode = cliOptions['precache-mode'] ?? 'common';
+
+  const wantedURLSpecKeys = cliOptions['urls'] ?? [];
 
   // Makes writing nicer on the CPU and file I/O parts of the OS, with a
   // marginal performance deficit while waiting for file writes to finish
@@ -1833,13 +1847,127 @@ async function main() {
     return false;
   }
 
-  const urlSpec = internalURLSpec;
+  // We'll mutate this as we load other url spec files.
+  const urlSpec = structuredClone(internalURLSpec);
+
+  const allURLSpecDataFiles =
+    (await readdir(dataPath))
+      .filter(name =>
+        name.startsWith('urls') &&
+        ['.json', '.yaml'].includes(path.extname(name)))
+      .sort() /* Just in case... */
+      .map(name => path.join(dataPath, name));
+
+  const getURLSpecKeyFromFile = file => {
+    const base = path.basename(file, path.extname(file));
+    if (base === 'urls') {
+      return base;
+    } else {
+      return base.replace(/^urls-/, '');
+    }
+  };
+
+  const isDefaultURLSpecFile = file =>
+    getURLSpecKeyFromFile(file) === 'urls';
+
+  const overrideDefaultURLSpecFile =
+    allURLSpecDataFiles.find(file => isDefaultURLSpecFile(file));
+
+  const optionalURLSpecDataFiles =
+    allURLSpecDataFiles.filter(file => !isDefaultURLSpecFile(file));
+
+  const optionalURLSpecDataKeys =
+    optionalURLSpecDataFiles.map(file => getURLSpecKeyFromFile(file));
+
+  const selectedURLSpecDataKeys = optionalURLSpecDataKeys.slice();
+  const selectedURLSpecDataFiles = optionalURLSpecDataFiles.slice();
+
+  const {removed: [unusedURLSpecDataKeys]} =
+    filterMultipleArrays(
+      selectedURLSpecDataKeys,
+      selectedURLSpecDataFiles,
+      (key, _file) => wantedURLSpecKeys.includes(key));
+
+  if (!empty(selectedURLSpecDataKeys)) {
+    logInfo`Using these optional URL specs: ${selectedURLSpecDataKeys.join(', ')}`;
+    if (!empty(unusedURLSpecDataKeys)) {
+      logInfo`Other available optional URL specs: ${unusedURLSpecDataKeys.join(', ')}`;
+    }
+  } else if (!empty(unusedURLSpecDataKeys)) {
+    logInfo`Not using any optional URL specs.`;
+    logInfo`These are available with --urls: ${unusedURLSpecDataKeys.join(', ')}`;
+  }
+
+  if (overrideDefaultURLSpecFile) {
+    try {
+      let aggregate;
+      let overrideDefaultURLSpec;
+
+      ({aggregate, result: overrideDefaultURLSpec} =
+          await processURLSpecFromFile(overrideDefaultURLSpecFile));
+
+      aggregate.close();
+
+      ({aggregate} =
+          applyURLSpecOverriding(overrideDefaultURLSpec, urlSpec));
+
+      aggregate.close();
+    } catch (error) {
+      niceShowAggregate(error);
+      logError`Errors loading this data repo's ${'urls.yaml'} file.`;
+      logError`This provides essential overrides for this wiki,`;
+      logError`so stopping here. Debug the errors to continue.`;
+
+      Object.assign(stepStatusSummary.loadURLFiles, {
+        status: STATUS_FATAL_ERROR,
+        annotation: `see log for details`,
+        timeEnd: Date.now(),
+        memory: process.memoryUsage(),
+      });
+
+      return false;
+    }
+  }
+
+  const processURLSpecsAggregate =
+    openAggregate({message: `Errors processing URL specs`});
+
+  const selectedURLSpecs =
+    processURLSpecsAggregate.receive(
+      await Promise.all(
+        selectedURLSpecDataFiles
+          .map(file => processURLSpecFromFile(file))));
+
+  for (const selectedURLSpec of selectedURLSpecs) {
+    processURLSpecsAggregate.receive(
+      applyURLSpecOverriding(selectedURLSpec, urlSpec));
+  }
+
+  try {
+    processURLSpecsAggregate.close();
+  } catch (error) {
+    niceShowAggregate(error);
+    logWarn`There were errors loading the optional URL specs you`;
+    logWarn`selected using ${'--urls'}. Since they might misfunction,`;
+    logWarn`debug the errors or remove the failing ones from ${'--urls'}.`;
+
+    Object.assign(stepStatusSummary.loadURLFiles, {
+      status: STATUS_FATAL_ERROR,
+      annotation: `see log for details`,
+      timeEnd: Date.now(),
+      memory: process.memoryUsage(),
+    });
+
+    return false;
+  }
 
   Object.assign(stepStatusSummary.loadURLFiles, {
     status: STATUS_DONE_CLEAN,
     timeEnd: Date.now(),
     memory: process.memoryUsage(),
   });
+
+  applyLocalizedWithBaseDirectory(urlSpec);
 
   const urls = generateURLs(urlSpec);
 

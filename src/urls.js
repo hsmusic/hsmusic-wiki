@@ -11,6 +11,13 @@ import {withEntries} from '#sugar';
 export * from './url-spec.js';
 
 export function generateURLs(urlSpec) {
+  if (
+    typeof urlSpec.localized === 'object' &&
+    typeof urlSpec.localizedWithBaseDirectory !== 'object'
+  ) {
+    throw new Error(`Provided urlSpec missing localizedWithBaseDirectory`);
+  }
+
   const getValueForFullKey = (obj, fullKey) => {
     const [groupKey, subKey] = fullKey.split('.');
     if (!groupKey || !subKey) {

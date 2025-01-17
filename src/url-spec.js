@@ -10,7 +10,7 @@ import yaml from 'js-yaml';
 import {annotateError, annotateErrorWithFile, openAggregate} from '#aggregate';
 import {empty, typeAppearance, withEntries} from '#sugar';
 
-export const DEFAULT_URL_SPEC_FILE = 'url-spec-default.yaml';
+export const DEFAULT_URL_SPEC_FILE = 'urls-default.yaml';
 
 export const internalDefaultURLSpecFile =
   path.resolve(
@@ -96,6 +96,8 @@ export function processURLSpec(sourceSpec) {
   const aggregate =
     openAggregate({message: `Errors processing URL spec`});
 
+  sourceSpec ??= {};
+
   const urlSpec = structuredClone(sourceSpec);
 
   delete urlSpec.yamlAliases;
@@ -115,28 +117,13 @@ export function processURLSpec(sourceSpec) {
     case '<auto>': {
       if (!urlSpec.localized) {
         aggregate.push(new Error(
-          `Couldn't prepare 'localizedWithBaseDirectory' group, ` +
+          `Not ready for 'localizedWithBaseDirectory' group, ` +
           `'localized' not available`));
-
-        break;
-      }
-
-      if (!urlSpec.localized.paths) {
+      } else if (!urlSpec.localized.paths) {
         aggregate.push(new Error(
-          `Couldn't prepare 'localizedWithBaseDirectory' group, ` +
+          `Not ready for 'localizedWithBaseDirectory' group, ` +
           `'localized' group's paths not available`));
-
-        break;
       }
-
-      const paths =
-        withEntries(urlSpec.localized.paths, entries =>
-          entries.map(([key, path]) => [key, '<>/' + path]));
-
-      urlSpec.localizedWithBaseDirectory =
-        Object.assign(
-          structuredClone(urlSpec.localized),
-          {paths});
 
       break;
     }
@@ -153,6 +140,47 @@ export function processURLSpec(sourceSpec) {
   }
 
   return {aggregate, result: urlSpec};
+}
+
+export function applyURLSpecOverriding(overrideSpec, baseSpec) {
+  const aggregate = openAggregate({message: `Errors applying URL spec`});
+
+  for (const [groupKey, overrideGroupSpec] of Object.entries(overrideSpec)) {
+    const baseGroupSpec = baseSpec[groupKey];
+
+    if (!baseGroupSpec) {
+      aggregate.push(new Error(`Group key "${groupKey}" not available on base spec`));
+      continue;
+    }
+
+    if (overrideGroupSpec.prefix) {
+      baseGroupSpec.prefix = overrideGroupSpec.prefix;
+    }
+
+    if (overrideGroupSpec.paths) {
+      for (const [pathKey, overridePathValue] of Object.entries(overrideGroupSpec.paths)) {
+        if (!baseGroupSpec.paths[pathKey]) {
+          aggregate.push(new Error(`Path key "${groupKey}.${pathKey}" not available on base spec`));
+          continue;
+        }
+
+        baseGroupSpec.paths[pathKey] = overridePathValue;
+      }
+    }
+  }
+
+  return {aggregate};
+}
+
+export function applyLocalizedWithBaseDirectory(urlSpec) {
+  const paths =
+    withEntries(urlSpec.localized.paths, entries =>
+      entries.map(([key, path]) => [key, '<>/' + path]));
+
+  urlSpec.localizedWithBaseDirectory =
+    Object.assign(
+      structuredClone(urlSpec.localized),
+      {paths});
 }
 
 export async function processURLSpecFromFile(file) {
