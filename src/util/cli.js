@@ -95,8 +95,12 @@ export async function parseOptions(options, optionDescriptorMap) {
   // }
   //
   // ['--directory', 'apple'] -> {'directory': 'apple'}
+  // ['--directory=banana'] -> {'directory': 'banana'}
   // ['--directory', 'artichoke'] -> (error)
+  //
   // ['--files', 'a', 'b', 'c', ';'] -> {'files': ['a', 'b', 'c']}
+  // ['--files=a,b,c'] -> {'files': ['a', 'b', 'c']}
+  // ['--files', 'a,b,c'] -> {'files': ['a', 'b', 'c']}
 
   const handleDashless = optionDescriptorMap[parseOptions.handleDashless];
   const handleUnknown = optionDescriptorMap[parseOptions.handleUnknown];
@@ -149,9 +153,27 @@ export async function parseOptions(options, optionDescriptorMap) {
         }
 
         case 'series': {
+          if (option.includes('=')) {
+            result[name] = option.split('=')[1].split(',');
+            break;
+          }
+
+          // without a semicolon to conclude the series,
+          // assume the next option expresses the whole series
           if (!options.slice(i).includes(';')) {
-            console.error(`Expected a series of values concluding with ; (\\;) for --${name}`);
-            process.exit(1);
+            let value = options[++i];
+
+            if (!value || value.startsWith('-')) {
+              value = null;
+            }
+
+            if (!value) {
+              console.error(`Expected values for --${name}`);
+              process.exit(1);
+            }
+
+            result[name] = value.split('=')[1].split(',');
+            break;
           }
 
           const endIndex = i + options.slice(i).indexOf(';');
