@@ -53,15 +53,7 @@ export function generateURLs(urlSpec) {
     const rebasePrefix =
       '../'.repeat(fromPrefix.split('/').filter(Boolean).length);
 
-    const originOfPrefix = prefix => {
-      try {
-        return new URL(prefix).origin;
-      } catch {
-        return null;
-      }
-    };
-
-    const fromOrigin = originOfPrefix(fromPrefix);
+    const fromOrigin = getOrigin(fromPrefix);
 
     const pathHelper = (toPath, toGroup) => {
       let B = trimLeadingSlash(toPath);
@@ -74,9 +66,9 @@ export function generateURLs(urlSpec) {
       const toPrefix = toGroup.prefix;
 
       if (toPrefix !== fromPrefix) {
-        // Compare origins. Note that originOfPrefix() can
+        // Compare origins. Note that getOrigin() can
         // be null for both prefixes.
-        const toOrigin = originOfPrefix(toPrefix);
+        const toOrigin = getOrigin(toPrefix);
         if (fromOrigin === toOrigin) {
           // Go to the root, add the to-group's prefix, then
           // continue with normal path.relative() behavior.
@@ -231,6 +223,14 @@ export function generateURLs(urlSpec) {
   };
 
   return generateFrom();
+}
+
+export function getOrigin(prefix) {
+  try {
+    return new URL(prefix).origin;
+  } catch {
+    return null;
+  }
 }
 
 const thumbnailHelper = (name) => (file) =>

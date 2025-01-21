@@ -34,7 +34,7 @@
 import '#import-heck';
 
 import {execSync} from 'node:child_process';
-import {readdir, readFile, stat} from 'node:fs/promises';
+import {readdir, readFile, stat, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
@@ -91,6 +91,7 @@ import {
   applyLocalizedWithBaseDirectory,
   applyURLSpecOverriding,
   generateURLs,
+  getOrigin,
   internalDefaultURLSpecFile,
   processURLSpecFromFile,
 } from '#urls';
@@ -148,8 +149,8 @@ async function main() {
       {...defaultStepStatus, name: `migrate thumbnails`,
         for: ['thumbs']},
 
-    loadThumbnailCache:
-      {...defaultStepStatus, name: `load thumbnail cache file`,
+    loadOfflineThumbnailCache:
+      {...defaultStepStatus, name: `load offline thumbnail cache file`,
         for: ['thumbs', 'build']},
 
     generateThumbnails:
@@ -191,6 +192,10 @@ async function main() {
     loadURLFiles:
       {...defaultStepStatus, name: `load internal & custom url spec files`,
         for: ['build']},
+
+    loadOnlineThumbnailCache:
+      {...defaultStepStatus, name: `load online thumbnail cache file`,
+        for: ['thumbs', 'build']},
 
     // TODO: This should be split into load/watch steps.
     loadInternalDefaultLanguage:
@@ -953,7 +958,7 @@ async function main() {
   }
 
   if (stepStatusSummary.generateThumbnails.status === STATUS_NOT_STARTED) {
-    Object.assign(stepStatusSummary.loadThumbnailCache, {
+    Object.assign(stepStatusSummary.loadOfflineThumbnailCache, {
       status: STATUS_NOT_APPLICABLE,
       annotation: `using cache from thumbnail generation`,
     });
@@ -1247,16 +1252,17 @@ async function main() {
   };
 
   if (
-    stepStatusSummary.loadThumbnailCache.status === STATUS_NOT_STARTED &&
+    stepStatusSummary.loadOfflineThumbnailCache.status === STATUS_NOT_STARTED &&
     stepStatusSummary.generateThumbnails.status === STATUS_NOT_STARTED
   ) {
-    throw new Error(`Unable to continue with both loadThumbnailCache and generateThumbnails`);
+    throw new Error(`Unable to continue with both loadOfflineThumbnailCache and generateThumbnails`);
   }
 
   let thumbsCache;
 
-  if (stepStatusSummary.loadThumbnailCache.status === STATUS_NOT_STARTED) {
-    Object.assign(stepStatusSummary.loadThumbnailCache, {
+  // TODO: Skip this step if we're using online thumbs
+  if (stepStatusSummary.loadOfflineThumbnailCache.status === STATUS_NOT_STARTED) {
+    Object.assign(stepStatusSummary.loadOfflineThumbnailCache, {
       status: STATUS_STARTED_NOT_DONE,
       timeStart: Date.now(),
     });
@@ -1272,7 +1278,7 @@ async function main() {
         logError`that you'll be good to go and don't need to process thumbnails`
         logError`again!`;
 
-        Object.assign(stepStatusSummary.loadThumbnailCache, {
+        Object.assign(stepStatusSummary.loadOfflineThumbnailCache, {
           status: STATUS_FATAL_ERROR,
           annotation: `cache does not exist`,
           timeEnd: Date.now(),
@@ -1290,7 +1296,7 @@ async function main() {
         logError`to help you out with troubleshooting!`;
         logError`${'https://hsmusic.wiki/discord/'}`;
 
-        Object.assign(stepStatusSummary.loadThumbnailCache, {
+        Object.assign(stepStatusSummary.loadOfflineThumbnailCache, {
           status: STATUS_FATAL_ERROR,
           annotation: `cache malformed or unreadable`,
           timeEnd: Date.now(),
@@ -1303,7 +1309,7 @@ async function main() {
 
     logInfo`Thumbnail cache file successfully read.`;
 
-    Object.assign(stepStatusSummary.loadThumbnailCache, {
+    Object.assign(stepStatusSummary.loadOfflineThumbnailCache, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
       memory: process.memoryUsage(),
@@ -1983,9 +1989,172 @@ async function main() {
     memory: process.memoryUsage(),
   });
 
+  if (!getOrigin(urlSpec.thumb.prefix)) {
+    Object.assign(stepStatusSummary.loadOnlineThumbnailCache, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `using offline thumbs`,
+    });
+  }
+
   applyLocalizedWithBaseDirectory(urlSpec);
 
   const urls = generateURLs(urlSpec);
+
+  if (stepStatusSummary.loadOnlineThumbnailCache.status === STATUS_NOT_STARTED) loadOnlineThumbnailCache: {
+    Object.assign(stepStatusSummary.loadOnlineThumbnailCache, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
+
+    let onlineThumbsCache = null;
+
+    const cacheFile = path.join(wikiCachePath, 'online-thumbnail-cache.json');
+
+    let readError = null;
+    let writeError = null;
+
+    try {
+      onlineThumbsCache = JSON.parse(await readFile(cacheFile));
+    } catch (caughtError) {
+      readError = caughtError;
+    }
+
+    if (onlineThumbsCache) obliterateThumbsCache: {
+      if (!onlineThumbsCache._urlPrefix) {
+        // Well, it doesn't even count.
+        onlineThumbsCache = null;
+        break obliterateThumbsCache;
+      }
+
+      if (onlineThumbsCache._urlPrefix !== urlSpec.thumb.cache) {
+        logInfo`Local copy of online thumbs cache is for a different prefix.`;
+        logInfo`It'll be downloaded and replaced, for reuse next time.`;
+        paragraph = false;
+
+        onlineThumbsCache = null;
+        break obliterateThumbsCache;
+      }
+
+      let stats;
+      try {
+        stats = await stat(cacheFile);
+      } catch {
+        logInfo`Unable to get the stats of local copy of online thumbs cache...`;
+        logInfo`This is really weird, since we *were* able to read it...`;
+        logInfo`We're just going to try writing to it and download fresh!`;
+        paragraph = false;
+
+        onlineThumbsCache = null;
+        break obliterateThumbsCache;
+      }
+
+      const delta = Date.now() - stats.mtimeMs;
+      const minute = 60 * 1000;
+      const delay = 60 * minute;
+
+      const whenst = duration => `~${Math.ceil(duration / minute)} min`;
+
+      if (delta < delay) {
+        logInfo`Online thumbs cache was downloaded recently, skipping for this build.`;
+        logInfo`Next scheduled is in ${whenst(delay - delta)}, or by using ${'--refresh-online-thumbs'}.`;
+        paragraph = false;
+
+        Object.assign(stepStatusSummary.loadOnlineThumbnailCache, {
+          status: STATUS_DONE_CLEAN,
+          annotation: `reusing local copy, earlier than scheduled based on file mtime`,
+        });
+
+        thumbsCache = onlineThumbsCache;
+
+        break loadOnlineThumbnailCache;
+      } else {
+        logInfo`Online thumbs cache hasn't been downloaded for a little while.`;
+        logInfo`It'll be downloaded this build, then again in ${whenst(delay)}.`;
+        onlineThumbsCache = null;
+        paragraph = false;
+      }
+    }
+
+    try {
+      await writeFile(cacheFile, JSON.stringify(onlineThumbsCache ?? {}));
+    } catch (caughtError) {
+      writeError = caughtError;
+    }
+
+    if (readError && writeError && readError.code !== 'ENOENT') {
+      console.error(readError);
+      logWarn`Wasn't able to read the local copy of the`;
+      logWarn`online thumbs cache file...`;
+      console.error(writeError);
+      logWarn`...or write to it, either.`;
+      logWarn`The online thumbs cache will be downloaded`;
+      logWarn`for every build until you investigate this path:`;
+      logWarn`${cacheFile}`;
+      paragraph = false;
+    } else if (readError && readError.code === 'ENOENT' && !writeError) {
+      logInfo`No local copy of online thumbs cache.`;
+      logInfo`It'll be downloaded this time and reused next time.`;
+      paragraph = false;
+    } else if (readError && readError.code === 'ENOENT' && writeError) {
+      console.error(writeError);
+      logWarn`Doesn't look like we can write a local copy of`;
+      logWarn`the offline thumbs cache, at this path:`;
+      logWarn`${cacheFile}`;
+      logWarn`The online thumbs cache will be downloaded`;
+      logWarn`for every build until you investigate that.`;
+      paragraph = false;
+    }
+
+    const url = new URL(urlSpec.thumb.prefix);
+    url.pathname = path.posix.join(url.pathname, 'thumbnail-cache.json');
+
+    try {
+      onlineThumbsCache = await fetch(url).then(res => res.json());
+    } catch (error) {
+      console.error(error);
+      logWarn`There was an error downloading the online thumbnail cache.`;
+      logWarn`The wiki will act as though no thumbs are available at all.`;
+      paragraph = false;
+
+      Object.assign(stepStatusSummary.loadOnlineThumbnailCache, {
+        status: STATUS_HAS_WARNINGS,
+        annotation: `failed to download`,
+      });
+
+      onlineThumbsCache = {};
+      thumbsCache = {};
+
+      break loadOnlineThumbnailCache;
+    }
+
+    onlineThumbsCache._prefix = urlSpec.thumb.prefix;
+
+    thumbsCache = onlineThumbsCache;
+
+    if (onlineThumbsCache && !writeError) {
+      try {
+        await writeFile(cacheFile, JSON.stringify(onlineThumbsCache));
+      } catch (error) {
+        console.error(error);
+        logWarn`There was an error saving a local copy of the`;
+        logWarn`online thumbnail cache. It'll be fetched again`;
+        logWarn`next time.`;
+        paragraph = false;
+
+        Object.assign(stepStatusSummary.loadOnlineThumbnailCache, {
+          status: STATUS_HAS_WARNINGS,
+          annotation: `failed to download`,
+        });
+
+        break loadOnlineThumbnailCache;
+      }
+    }
+
+    Object.assign(stepStatusSummary.loadOnlineThumbnailCache, {
+      status: STATUS_DONE_CLEAN,
+      timeStart: Date.now(),
+    });
+  }
 
   const languageReloading =
     stepStatusSummary.watchLanguageFiles.status === STATUS_NOT_STARTED;
