@@ -57,7 +57,7 @@
         "#yaml": "./src/data/yaml.js"
     },
     "engines": {
-        "node": ">= 20.9.0"
+        "node": ">= 22.13.0"
     },
     "dependencies": {
         "@js-temporal/polyfill": "^0.4.4",

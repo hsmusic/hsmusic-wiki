@@ -11,7 +11,7 @@ HSMusic, short for the *Homestuck Music Wiki*, is a revitalization and reimagini
 
 Install dependencies:
 
-- [Node.js](https://nodejs.org/en/) - we recommend using [nvm](https://github.com/nvm-sh/nvm) to install Node and keep easy track of any versions you've got installed; development is generally tested on latest but 20.x LTS should also work
+- [Node.js](https://nodejs.org/en/) - we recommend using [nvm](https://github.com/nvm-sh/nvm) to install Node and keep easy track of any versions you've got installed; during development we generally test on 22.x LTS
 - [ImageMagick](https://imagemagick.org/) - check your package manager if it's available (e.g. apt or homebrew) or follow [installation info right from the official website](https://imagemagick.org/script/download.php)
 
 Make a new empty folder for storing all your wiki repositories, then clone 'em with git:
