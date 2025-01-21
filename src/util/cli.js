@@ -5,6 +5,8 @@
 
 const {process} = globalThis;
 
+import {sortByName} from './sort.js';
+
 export const ENABLE_COLOR =
   process &&
   ((process.env.CLICOLOR_FORCE && process.env.CLICOLOR_FORCE === '1') ??

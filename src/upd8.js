@@ -2614,6 +2614,38 @@ async function main() {
         memory: process.memoryUsage(),
       });
     }
+
+    // TODO: kinda jank that this is out of band of any particular step,
+    // even though it's operationally a follow-up to preloadFileSizes
+
+    let oopsCache = false;
+    saveFileSizeCache: {
+      let cache;
+      try {
+        cache = fileSizePreloader.saveAsCache();
+      } catch (error) {
+        console.error(error);
+        logWarn`Couldn't compute file size preloader's cache.`;
+        oopsCache = true;
+        break saveFileSizeCache;
+      }
+
+      const cacheFile = path.join(mediaCachePath, 'file-size-cache.json');
+
+      try {
+        await writeFile(cacheFile, stringifyCache(cache));
+      } catch (error) {
+        console.error(error);
+        logWarn`Couldn't save preloaded file sizes to a cache file:`;
+        logWarn`${cacheFile}`;
+        oopsCache = true;
+      }
+    }
+
+    if (oopsCache) {
+      logWarn`This won't affect the build, but this build should not be used`;
+      logWarn`as a model for another build accessing its media files online.`;
+    }
   }
 
   if (stepStatusSummary.buildSearchIndex.status === STATUS_NOT_STARTED) {

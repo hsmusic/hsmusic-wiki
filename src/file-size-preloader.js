@@ -20,6 +20,7 @@
 import {stat} from 'node:fs/promises';
 
 import {logWarn} from '#cli';
+import {transposeArrays} from '#sugar';
 
 export default class FileSizePreloader {
   #paths = [];
@@ -100,5 +101,27 @@ export default class FileSizePreloader {
     if (index === -1) return null;
     if (index > this.#loadedPathIndex) return null;
     return this.#sizes[index];
+  }
+
+  saveAsCache() {
+    const entries =
+      transposeArrays([
+        this.#paths.slice(0, this.#loadedPathIndex),
+        this.#sizes.slice(0, this.#loadedPathIndex),
+      ]);
+
+    return Object.fromEntries(entries);
+  }
+
+  loadFromCache(cache) {
+    const entries =
+      Object.entries(cache)
+        .filter(([p]) => !this.#paths.includes(p));
+
+    const [newPaths, newSizes] = transposeArrays(entries);
+
+    this.#paths.splice(this.#loadedPathIndex + 1, 0, ...newPaths);
+    this.#sizes.splice(this.#loadedPathIndex + 1, 0, ...newSizes);
+    this.#loadedPathIndex += entries.length;
   }
 }
