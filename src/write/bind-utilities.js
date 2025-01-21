@@ -20,8 +20,7 @@ import {
 export function bindUtilities({
   absoluteTo,
   defaultLanguage,
-  getSizeOfAdditionalFile,
-  getSizeOfImagePath,
+  getSizeOfMediaFile,
   language,
   languages,
   missingImagePaths,
@@ -37,8 +36,7 @@ export function bindUtilities({
   Object.assign(bound, {
     absoluteTo,
     defaultLanguage,
-    getSizeOfAdditionalFile,
-    getSizeOfImagePath,
+    getSizeOfMediaFile,
     getThumbnailsAvailableForDimensions,
     html,
     language,

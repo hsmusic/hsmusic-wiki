@@ -5,7 +5,7 @@ export default {
   extraDependencies: [
     'checkIfImagePathHasCachedThumbnails',
     'getDimensionsOfImagePath',
-    'getSizeOfImagePath',
+    'getSizeOfMediaFile',
     'getThumbnailEqualOrSmaller',
     'getThumbnailsAvailableForDimensions',
     'html',
@@ -83,7 +83,7 @@ export default {
   generate(data, relations, slots, {
     checkIfImagePathHasCachedThumbnails,
     getDimensionsOfImagePath,
-    getSizeOfImagePath,
+    getSizeOfMediaFile,
     getThumbnailEqualOrSmaller,
     getThumbnailsAvailableForDimensions,
     html,
@@ -228,7 +228,7 @@ export default {
 
       const fileSize =
         (willLink && mediaSrc
-          ? getSizeOfImagePath(mediaSrc)
+          ? getSizeOfMediaFile(mediaSrc)
           : null);
 
       imgAttributes.add([

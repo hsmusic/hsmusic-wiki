@@ -9,7 +9,7 @@ export default {
     'transformContent',
   ],
 
-  extraDependencies: ['getSizeOfAdditionalFile', 'html', 'urls'],
+  extraDependencies: ['getSizeOfMediaFile', 'html', 'urls'],
 
   relations: (relation, album, additionalFiles) => ({
     list:
@@ -55,7 +55,7 @@ export default {
     showFileSizes: {type: 'boolean', default: true},
   },
 
-  generate: (data, relations, slots, {getSizeOfAdditionalFile, urls}) =>
+  generate: (data, relations, slots, {getSizeOfMediaFile, urls}) =>
     relations.list.slots({
       chunks:
         stitchArrays({
@@ -86,7 +86,7 @@ export default {
                   fileLink: fileLink,
                   fileSize:
                     (slots.showFileSizes
-                      ? getSizeOfAdditionalFile(
+                      ? getSizeOfMediaFile(
                           urls
                             .from('media.root')
                             .to('media.albumAdditionalFile', data.albumDirectory, location))
