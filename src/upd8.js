@@ -42,6 +42,7 @@ import wrap from 'word-wrap';
 
 import {mapAggregate, openAggregate, showAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
+import {stringifyCache} from '#cli';
 import {displayCompositeCacheAnalysis} from '#composite';
 import find, {bindFind, getAllFindSpecs} from '#find';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
@@ -2076,7 +2077,7 @@ async function main() {
     }
 
     try {
-      await writeFile(cacheFile, JSON.stringify(onlineThumbsCache ?? {}));
+      await writeFile(cacheFile, stringifyCache(onlineThumbsCache));
     } catch (caughtError) {
       writeError = caughtError;
     }
@@ -2133,7 +2134,7 @@ async function main() {
 
     if (onlineThumbsCache && !writeError) {
       try {
-        await writeFile(cacheFile, JSON.stringify(onlineThumbsCache));
+        await writeFile(cacheFile, stringifyCache(onlineThumbsCache));
       } catch (error) {
         console.error(error);
         logWarn`There was an error saving a local copy of the`;

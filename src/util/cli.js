@@ -493,3 +493,27 @@ export async function logicalPathTo(target) {
   const cwd = await logicalCWD();
   return relative(cwd, target);
 }
+
+export function stringifyCache(cache) {
+  cache ??= {};
+
+  if (Object.keys(cache).length === 0) {
+    return `{}`;
+  }
+
+  const entries = Object.entries(cache);
+  sortByName(entries, {getName: entry => entry[0]});
+
+  return [
+    `{`,
+    entries
+      .map(([key, value]) => [JSON.stringify(key), JSON.stringify(value)])
+      .map(([key, value]) => `${key}: ${value}`)
+      .map((line, index, array) =>
+        (index < array.length - 1
+          ? `${line},`
+          : line))
+      .map(line => `  ${line}`),
+    `}`,
+  ].flat().join('\n');
+}

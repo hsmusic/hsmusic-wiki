@@ -163,6 +163,7 @@ import {
 import dimensionsOf from 'image-size';
 
 import CacheableObject from '#cacheable-object';
+import {stringifyCache} from '#cli';
 import {commandExists, isMain, promisifyProcess, traverse} from '#node-utils';
 import {sortByName} from '#sort';
 
@@ -344,28 +345,6 @@ export function getThumbnailsAvailableForDimensions([width, height]) {
     [larger[0], longerEdge],
     ...rest,
   ];
-}
-
-function stringifyCache(cache) {
-  if (Object.keys(cache).length === 0) {
-    return `{}`;
-  }
-
-  const entries = Object.entries(cache);
-  sortByName(entries, {getName: entry => entry[0]});
-
-  return [
-    `{`,
-    entries
-      .map(([key, value]) => [JSON.stringify(key), JSON.stringify(value)])
-      .map(([key, value]) => `${key}: ${value}`)
-      .map((line, index, array) =>
-        (index < array.length - 1
-          ? `${line},`
-          : line))
-      .map(line => `  ${line}`),
-    `}`,
-  ].flat().join('\n');
 }
 
 getThumbnailsAvailableForDimensions.all =
