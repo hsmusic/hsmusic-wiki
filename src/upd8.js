@@ -223,6 +223,10 @@ async function main() {
       {...defaultStepStatus, name: `preload file sizes`,
         for: ['build']},
 
+    loadOnlineFileSizeCache:
+      {...defaultStepStatus, name: `load online file size cache file`,
+        for: ['build']},
+
     buildSearchIndex:
       {...defaultStepStatus, name: `generate search index`,
         for: ['build', 'search']},
@@ -918,14 +922,14 @@ async function main() {
         logInfo`Next scheduled is in ${whenst(delay - delta)}, or by using ${'--refresh-search'}.`;
         Object.assign(stepStatusSummary.buildSearchIndex, {
           status: STATUS_NOT_APPLICABLE,
-          annotation: `earlier than scheduled based on file mtime`,
+          annotation: `earlier than scheduled`,
         });
       } else {
         logInfo`Search index hasn't been generated for a little while.`;
         logInfo`It'll be generated this build, then again in ${whenst(delay)}.`;
         Object.assign(stepStatusSummary.buildSearchIndex, {
           status: STATUS_NOT_STARTED,
-          annotation: `past when shceduled based on file mtime`,
+          annotation: `past when shceduled`,
         });
       }
 
@@ -1997,6 +2001,18 @@ async function main() {
     });
   }
 
+  if (getOrigin(urlSpec.media.prefix)) {
+    Object.assign(stepStatusSummary.preloadFileSizes, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `using online media`,
+    });
+  } else {
+    Object.assign(stepStatusSummary.loadOnlineFileSizeCache, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `using offline media`,
+    });
+  }
+
   applyLocalizedWithBaseDirectory(urlSpec);
 
   const urls = generateURLs(urlSpec);
@@ -2020,20 +2036,20 @@ async function main() {
       readError = caughtError;
     }
 
-    if (onlineThumbsCache) obliterateThumbsCache: {
+    if (onlineThumbsCache) obliterateLocalCopy: {
       if (!onlineThumbsCache._urlPrefix) {
         // Well, it doesn't even count.
         onlineThumbsCache = null;
-        break obliterateThumbsCache;
+        break obliterateLocalCopy;
       }
 
-      if (onlineThumbsCache._urlPrefix !== urlSpec.thumb.cache) {
+      if (onlineThumbsCache._urlPrefix !== urlSpec.thumb.prefix) {
         logInfo`Local copy of online thumbs cache is for a different prefix.`;
         logInfo`It'll be downloaded and replaced, for reuse next time.`;
         paragraph = false;
 
         onlineThumbsCache = null;
-        break obliterateThumbsCache;
+        break obliterateLocalCopy;
       }
 
       let stats;
@@ -2046,7 +2062,7 @@ async function main() {
         paragraph = false;
 
         onlineThumbsCache = null;
-        break obliterateThumbsCache;
+        break obliterateLocalCopy;
       }
 
       const delta = Date.now() - stats.mtimeMs;
@@ -2062,7 +2078,9 @@ async function main() {
 
         Object.assign(stepStatusSummary.loadOnlineThumbnailCache, {
           status: STATUS_DONE_CLEAN,
-          annotation: `reusing local copy, earlier than scheduled based on file mtime`,
+          annotation: `reusing local copy, earlier than scheduled`,
+          timeEnd: Date.now(),
+          memory: process.memoryUsage(),
         });
 
         thumbsCache = onlineThumbsCache;
@@ -2120,6 +2138,8 @@ async function main() {
       Object.assign(stepStatusSummary.loadOnlineThumbnailCache, {
         status: STATUS_HAS_WARNINGS,
         annotation: `failed to download`,
+        timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
 
       onlineThumbsCache = {};
@@ -2128,7 +2148,7 @@ async function main() {
       break loadOnlineThumbnailCache;
     }
 
-    onlineThumbsCache._prefix = urlSpec.thumb.prefix;
+    onlineThumbsCache._urlPrefix = urlSpec.thumb.prefix;
 
     thumbsCache = onlineThumbsCache;
 
@@ -2145,6 +2165,8 @@ async function main() {
         Object.assign(stepStatusSummary.loadOnlineThumbnailCache, {
           status: STATUS_HAS_WARNINGS,
           annotation: `failed to download`,
+          timeEnd: Date.now(),
+          memory: process.memoryUsage(),
         });
 
         break loadOnlineThumbnailCache;
@@ -2154,6 +2176,8 @@ async function main() {
     Object.assign(stepStatusSummary.loadOnlineThumbnailCache, {
       status: STATUS_DONE_CLEAN,
       timeStart: Date.now(),
+      timeEnd: Date.now(),
+      memory: process.memoryUsage(),
     });
   }
 
@@ -2556,20 +2580,191 @@ async function main() {
     }
   }
 
-  let getSizeOfMediaFile;
+  let getSizeOfMediaFile = () => null;
 
-  if (stepStatusSummary.preloadFileSizes.status === STATUS_NOT_APPLICABLE) {
-    getSizeOfMediaFile = () => null;
-  } else if (stepStatusSummary.preloadFileSizes.status === STATUS_NOT_STARTED) {
-    Object.assign(stepStatusSummary.preloadFileSizes, {
+  const fileSizePreloader =
+    new FileSizePreloader({
+      prefix: mediaPath,
+    });
+
+  if (stepStatusSummary.loadOnlineFileSizeCache.status === STATUS_NOT_STARTED) loadOnlineFileSizeCache: {
+    Object.assign(stepStatusSummary.loadOnlineFileSizeCache, {
       status: STATUS_STARTED_NOT_DONE,
       timeStart: Date.now(),
     });
 
-    const fileSizePreloader =
-      new FileSizePreloader({
-        prefix: mediaPath,
+    let onlineFileSizeCache = null;
+
+    const makeFileSizeCacheAvailable = () => {
+      fileSizePreloader.loadFromCache(onlineFileSizeCache);
+
+      getSizeOfMediaFile = p =>
+        fileSizePreloader.getSizeOfPath(
+          path.resolve(
+            mediaPath,
+            decodeURIComponent(p).split('/').join(path.sep)));
+    };
+
+    const cacheFile = path.join(wikiCachePath, 'online-file-size-cache.json');
+
+    let readError = null;
+    let writeError = null;
+
+    try {
+      onlineFileSizeCache = JSON.parse(await readFile(cacheFile));
+    } catch (caughtError) {
+      readError = caughtError;
+    }
+
+    if (onlineFileSizeCache) obliterateLocalCopy: {
+      if (!onlineFileSizeCache._urlPrefix) {
+        // Well, it doesn't even count.
+        onlineFileSizeCache = null;
+        break obliterateLocalCopy;
+      }
+
+      if (onlineFileSizeCache._urlPrefix !== urlSpec.media.prefix) {
+        logInfo`Local copy of online file size cache is for a different prefix.`;
+        logInfo`It'll be downloaded and replaced, for reuse next time.`;
+        paragraph = false;
+
+        onlineFileSizeCache = null;
+        break obliterateLocalCopy;
+      }
+
+      let stats;
+      try {
+        stats = await stat(cacheFile);
+      } catch {
+        logInfo`Unable to get the stats of local copy of online file size cache...`;
+        logInfo`This is really weird, since we *were* able to read it...`;
+        logInfo`We're just going to try writing to it and download fresh!`;
+        paragraph = false;
+
+        onlineFileSizeCache = null;
+        break obliterateLocalCopy;
+      }
+
+      const delta = Date.now() - stats.mtimeMs;
+      const minute = 60 * 1000;
+      const delay = 60 * minute;
+
+      const whenst = duration => `~${Math.ceil(duration / minute)} min`;
+
+      if (delta < delay) {
+        logInfo`Online file size cache was downloaded recently, skipping for this build.`;
+        logInfo`Next scheduled is in ${whenst(delay - delta)}, or by using ${'--refresh-online-file-sizes'}.`;
+        paragraph = false;
+
+        Object.assign(stepStatusSummary.loadOnlineFileSizeCache, {
+          status: STATUS_DONE_CLEAN,
+          annotation: `reusing local copy, earlier than scheduled`,
+          timeEnd: Date.now(),
+          memory: process.memoryUsage(),
+        });
+
+        delete onlineFileSizeCache._urlPrefix;
+
+        makeFileSizeCacheAvailable();
+
+        break loadOnlineFileSizeCache;
+      } else {
+        logInfo`Online file size hasn't been downloaded for a little while.`;
+        logInfo`It'll be downloaded this build, then again in ${whenst(delay)}.`;
+        onlineFileSizeCache = null;
+        paragraph = false;
+      }
+    }
+
+    try {
+      await writeFile(cacheFile, stringifyCache(onlineFileSizeCache));
+    } catch (caughtError) {
+      writeError = caughtError;
+    }
+
+    if (readError && writeError && readError.code !== 'ENOENT') {
+      console.error(readError);
+      logWarn`Wasn't able to read the local copy of the`;
+      logWarn`online file size cache file...`;
+      console.error(writeError);
+      logWarn`...or write to it, either.`;
+      logWarn`The online file size cache will be downloaded`;
+      logWarn`for every build until you investigate this path:`;
+      logWarn`${cacheFile}`;
+      paragraph = false;
+    } else if (readError && readError.code === 'ENOENT' && !writeError) {
+      logInfo`No local copy of online file size cache.`;
+      logInfo`It'll be downloaded this time and reused next time.`;
+      paragraph = false;
+    } else if (readError && readError.code === 'ENOENT' && writeError) {
+      console.error(writeError);
+      logWarn`Doesn't look like we can write a local copy of`;
+      logWarn`the offline file size cache, at this path:`;
+      logWarn`${cacheFile}`;
+      logWarn`The online file size cache will be downloaded`;
+      logWarn`for every build until you investigate that.`;
+      paragraph = false;
+    }
+
+    const url = new URL(urlSpec.media.prefix);
+    url.pathname = path.posix.join(url.pathname, 'file-size-cache.json');
+
+    try {
+      onlineFileSizeCache = await fetch(url).then(res => res.json());
+    } catch (error) {
+      console.error(error);
+      logWarn`There was an error downloading the online file size cache.`;
+      logWarn`The wiki will act as though no file sizes are available at all.`;
+      paragraph = false;
+
+      Object.assign(stepStatusSummary.loadOnlineFileSizeCache, {
+        status: STATUS_HAS_WARNINGS,
+        annotation: `failed to download`,
+        timeEnd: Date.now(),
+        memory: process.memoryUsage(),
       });
+
+      break loadOnlineFileSizeCache;
+    }
+
+    makeFileSizeCacheAvailable();
+
+    onlineFileSizeCache._urlPrefix = urlSpec.media.prefix;
+
+    if (onlineFileSizeCache && !writeError) {
+      try {
+        await writeFile(cacheFile, stringifyCache(onlineFileSizeCache));
+      } catch (error) {
+        console.error(error);
+        logWarn`There was an error saving a local copy of the`;
+        logWarn`online file size cache. It'll be fetched again`;
+        logWarn`next time.`;
+        paragraph = false;
+
+        Object.assign(stepStatusSummary.loadOnlineFileSizeCache, {
+          status: STATUS_HAS_WARNINGS,
+          annotation: `failed to download`,
+          timeEnd: Date.now(),
+          memory: process.memoryUsage(),
+        });
+
+        break loadOnlineFileSizeCache;
+      }
+    }
+
+    Object.assign(stepStatusSummary.loadOnlineFileSizeCache, {
+      status: STATUS_DONE_CLEAN,
+      timeStart: Date.now(),
+      timeEnd: Date.now(),
+      memory: process.memoryUsage(),
+    });
+  }
+
+  if (stepStatusSummary.preloadFileSizes.status === STATUS_NOT_STARTED) {
+    Object.assign(stepStatusSummary.preloadFileSizes, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
 
     const mediaFilePaths =
       await traverse(mediaPath, {
@@ -2633,7 +2828,7 @@ async function main() {
         break saveFileSizeCache;
       }
 
-      const cacheFile = path.join(mediaCachePath, 'file-size-cache.json');
+      const cacheFile = path.join(mediaPath, 'file-size-cache.json');
 
       try {
         await writeFile(cacheFile, stringifyCache(cache));
