@@ -2566,7 +2566,10 @@ async function main() {
       timeStart: Date.now(),
     });
 
-    const fileSizePreloader = new FileSizePreloader();
+    const fileSizePreloader =
+      new FileSizePreloader({
+        prefix: mediaPath,
+      });
 
     const mediaFilePaths =
       await traverse(mediaPath, {

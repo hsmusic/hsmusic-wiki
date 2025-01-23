@@ -18,6 +18,7 @@
 // are very, very fast.
 
 import {stat} from 'node:fs/promises';
+import {relative, resolve} from 'node:path';
 
 import {logWarn} from '#cli';
 import {transposeArrays} from '#sugar';
@@ -31,6 +32,10 @@ export default class FileSizePreloader {
   #resolveLoadingPromise = null;
 
   hadErrored = false;
+
+  constructor({prefix = ''} = {}) {
+    this.prefix = prefix;
+  }
 
   loadPaths(...paths) {
     this.#paths.push(...paths.filter((p) => !this.#paths.includes(p)));
@@ -46,9 +51,9 @@ export default class FileSizePreloader {
       return this.#loadingPromise;
     }
 
-    this.#loadingPromise = new Promise((resolve) => {
-      this.#resolveLoadingPromise = resolve;
-    });
+    ({promise: this.#loadingPromise,
+      resolve: this.#resolveLoadingPromise} =
+        Promise.withResolvers());
 
     this.#loadNextPath();
 
@@ -97,6 +102,14 @@ export default class FileSizePreloader {
   }
 
   getSizeOfPath(path) {
+    let size = this.#getSizeOfPath(path);
+    if (size || !this.prefix) return size;
+    const path2 = resolve(this.prefix, path);
+    if (path2 === path) return null;
+    return this.#getSizeOfPath(path2);
+  }
+
+  #getSizeOfPath(path) {
     const index = this.#paths.indexOf(path);
     if (index === -1) return null;
     if (index > this.#loadedPathIndex) return null;
@@ -106,7 +119,9 @@ export default class FileSizePreloader {
   saveAsCache() {
     const entries =
       transposeArrays([
-        this.#paths.slice(0, this.#loadedPathIndex),
+        this.#paths.slice(0, this.#loadedPathIndex)
+          .map(path => relative(this.prefix, path)),
+
         this.#sizes.slice(0, this.#loadedPathIndex),
       ]);
 
@@ -118,7 +133,8 @@ export default class FileSizePreloader {
       Object.entries(cache)
         .filter(([p]) => !this.#paths.includes(p));
 
-    const [newPaths, newSizes] = transposeArrays(entries);
+    let [newPaths, newSizes] = transposeArrays(entries);
+    newPaths = newPaths.map(p => resolve(this.prefix, p));
 
     this.#paths.splice(this.#loadedPathIndex + 1, 0, ...newPaths);
     this.#sizes.splice(this.#loadedPathIndex + 1, 0, ...newSizes);
