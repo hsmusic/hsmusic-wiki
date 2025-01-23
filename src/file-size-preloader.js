@@ -18,10 +18,10 @@
 // are very, very fast.
 
 import {stat} from 'node:fs/promises';
-import {relative, resolve} from 'node:path';
+import {relative, resolve, sep} from 'node:path';
 
 import {logWarn} from '#cli';
-import {transposeArrays} from '#sugar';
+import {filterMultipleArrays, transposeArrays} from '#sugar';
 
 export default class FileSizePreloader {
   #paths = [];
@@ -125,16 +125,28 @@ export default class FileSizePreloader {
         this.#sizes.slice(0, this.#loadedPathIndex),
       ]);
 
+    // Do not be alarmed: This cannot be meaningfully moved to
+    // the top because stringifyCache sorts alphabetically lol
+    entries.push(['_separator', sep]);
+
     return Object.fromEntries(entries);
   }
 
   loadFromCache(cache) {
-    const entries =
-      Object.entries(cache)
-        .filter(([p]) => !this.#paths.includes(p));
-
+    const {_separator: cacheSep, ...rest} = cache;
+    const entries = Object.entries(rest);
     let [newPaths, newSizes] = transposeArrays(entries);
+
+    if (sep !== cacheSep) {
+      newPaths = newPaths.map(p => p.split(cacheSep).join(sep));
+    }
+
     newPaths = newPaths.map(p => resolve(this.prefix, p));
+
+    filterMultipleArrays(
+      newPaths,
+      newSizes,
+      path => !this.#paths.includes(path));
 
     this.#paths.splice(this.#loadedPathIndex + 1, 0, ...newPaths);
     this.#sizes.splice(this.#loadedPathIndex + 1, 0, ...newSizes);
