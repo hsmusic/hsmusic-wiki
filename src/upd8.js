@@ -397,8 +397,18 @@ async function main() {
       type: 'flag',
     },
 
+    'refresh-online-thumbs': {
+      help: `Downloads a fresh copy of the online file size cache, so changes there are immediately reflected`,
+      type: 'flag',
+    },
+
     'skip-file-sizes': {
       help: `Skips preloading file sizes for images and additional files, which will be left blank in the build`,
+      type: 'flag',
+    },
+
+    'refresh-online-file-sizes': {
+      help: `Downloads a fresh copy of the online file size cache, so changes there are immediately reflected`,
       type: 'flag',
     },
 
@@ -2030,10 +2040,12 @@ async function main() {
     let readError = null;
     let writeError = null;
 
-    try {
-      onlineThumbsCache = JSON.parse(await readFile(cacheFile));
-    } catch (caughtError) {
-      readError = caughtError;
+    if (!cliOptions['refresh-online-thumbs']) {
+      try {
+        onlineThumbsCache = JSON.parse(await readFile(cacheFile));
+      } catch (caughtError) {
+        readError = caughtError;
+      }
     }
 
     if (onlineThumbsCache) obliterateLocalCopy: {
@@ -2610,10 +2622,12 @@ async function main() {
     let readError = null;
     let writeError = null;
 
-    try {
-      onlineFileSizeCache = JSON.parse(await readFile(cacheFile));
-    } catch (caughtError) {
-      readError = caughtError;
+    if (!cliOptions['refresh-online-file-sizes']) {
+      try {
+        onlineFileSizeCache = JSON.parse(await readFile(cacheFile));
+      } catch (caughtError) {
+        readError = caughtError;
+      }
     }
 
     if (onlineFileSizeCache) obliterateLocalCopy: {
