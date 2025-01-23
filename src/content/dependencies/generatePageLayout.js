@@ -578,6 +578,16 @@ export default {
           ])),
       ]));
 
+    const styleRulesCSS =
+      html.resolve(slots.styleRules, {normalize: 'string'});
+
+    const fallbackBackgroundStyleRule =
+      (styleRulesCSS.match(/body::before[^}]*background-image:/)
+        ? ''
+        : `body::before {\n` +
+          `    background-image: url("${to('media.path', 'bg.jpg')}");\n` +
+          `}`);
+
     const numWallpaperParts =
       html.resolve(slots.styleRules, {normalize: 'string'})
         .match(/\.wallpaper-part:nth-child/g)
@@ -725,6 +735,8 @@ export default {
             html.tag('style', [
               relations.colorStyleRules
                 .slot('color', slots.color ?? data.wikiColor),
+
+              fallbackBackgroundStyleRule,
               slots.styleRules,
             ]),
 

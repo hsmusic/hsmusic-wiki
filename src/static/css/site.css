@@ -237,7 +237,10 @@ body {
 }
 
 body::before {
-  background-image: url("../../media/bg.jpg");
+  /* This is where the basic background-image rule
+   * gets applied... but the path *to* that media file
+   * isn't part of the CSS itself anymore!
+   */
 }
 
 body::before, .wallpaper-part {
