@@ -27,6 +27,7 @@ import {
 } from '#cli';
 
 import {
+  getOrigin,
   getPagePathname,
   getURLsFrom,
   getURLsFromRoot,
@@ -436,12 +437,18 @@ async function writePage({
   ].filter(Boolean));
 }
 
+function filterNoOrigin(route) {
+  return !getOrigin(route.to);
+}
+
 function writeWebRouteSymlinks({
   outputPath,
   webRoutes,
 }) {
   const symlinkRoutes =
-    webRoutes.filter(route => route.statically === 'symlink');
+    webRoutes
+      .filter(route => route.statically === 'symlink')
+      .filter(filterNoOrigin);
 
   const promises =
     symlinkRoutes.map(async route => {
@@ -481,7 +488,9 @@ async function writeWebRouteCopies({
   webRoutes,
 }) {
   const copyRoutes =
-    webRoutes.filter(route => route.statically === 'copy');
+    webRoutes
+      .filter(route => route.statically === 'copy')
+      .filter(filterNoOrigin);
 
   const promises =
     copyRoutes.map(async route => {
