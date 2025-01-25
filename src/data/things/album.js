@@ -86,6 +86,7 @@ export class Album extends Thing {
       }),
     ],
 
+    alwaysReferenceByDirectory: flag(false),
     alwaysReferenceTracksByDirectory: flag(false),
     suffixTrackDirectories: flag(false),
 
@@ -349,6 +350,11 @@ export class Album extends Thing {
     album: {
       referenceTypes: ['album', 'album-commentary', 'album-gallery'],
       bindTo: 'albumData',
+
+      getMatchableNames: album =>
+        (album.alwaysReferenceByDirectory 
+          ? [] 
+          : [album.name]),
     },
 
     albumWithArtwork: {
@@ -357,6 +363,11 @@ export class Album extends Thing {
 
       include: album =>
         album.hasCoverArt,
+
+      getMatchableNames: album =>
+        (album.alwaysReferenceByDirectory 
+          ? [] 
+          : [album.name]),
     },
   };
 
@@ -417,6 +428,7 @@ export class Album extends Thing {
       'Directory Suffix': {property: 'directorySuffix'},
       'Suffix Track Directories': {property: 'suffixTrackDirectories'},
 
+      'Always Reference By Directory': {property: 'alwaysReferenceByDirectory'},
       'Always Reference Tracks By Directory': {
         property: 'alwaysReferenceTracksByDirectory',
       },
