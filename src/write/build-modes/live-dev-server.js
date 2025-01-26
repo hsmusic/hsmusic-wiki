@@ -458,7 +458,7 @@ export async function go({
         language,
         pagePath: servePath,
         pagePathStringFromRoot: pathname.replace(/^\//, ''),
-        to,
+        to: page.absoluteLinks ? absoluteTo : to,
       });
 
       const topLevelResult =

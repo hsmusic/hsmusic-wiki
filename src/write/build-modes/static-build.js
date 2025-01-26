@@ -322,7 +322,7 @@ export async function go({
           language,
           pagePath,
           pagePathStringFromRoot: pathname,
-          to,
+          to: page.absoluteLinks ? absoluteTo : to,
         });
 
         let pageHTML, oEmbedJSON;
