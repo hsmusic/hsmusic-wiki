@@ -4,7 +4,7 @@ export default {
     'generateTrackSocialEmbedDescription',
   ],
 
-  extraDependencies: ['absoluteTo', 'language', 'urls'],
+  extraDependencies: ['absoluteTo', 'language'],
 
   relations(relation, track) {
     return {
@@ -39,7 +39,7 @@ export default {
     return data;
   },
 
-  generate: (data, relations, {absoluteTo, language, urls}) =>
+  generate: (data, relations, {absoluteTo, language}) =>
     language.encapsulate('trackPage.socialEmbed', embedCapsule =>
       relations.socialEmbed.slots({
         title:
@@ -60,15 +60,9 @@ export default {
 
         imagePath:
           (data.imageSource === 'album'
-            ? '/' +
-              urls
-                .from('shared.root')
-                .to('media.albumCover', data.albumDirectory, data.coverArtFileExtension)
+            ? ['media.albumCover', data.albumDirectory, data.coverArtFileExtension]
          : data.imageSource === 'track'
-            ? '/' +
-              urls
-                .from('shared.root')
-                .to('media.trackCover', data.albumDirectory, data.trackDirectory, data.coverArtFileExtension)
+            ? ['media.trackCover', data.albumDirectory, data.trackDirectory, data.coverArtFileExtension]
             : null),
       })),
 };

@@ -1,5 +1,7 @@
+import {getOrigin} from '#urls';
+
 export default {
-  extraDependencies: ['html', 'language', 'wikiData'],
+  extraDependencies: ['html', 'language', 'urls', 'wikiData'],
 
   sprawl({wikiInfo}) {
     return {
@@ -23,10 +25,10 @@ export default {
 
     headingContent: {type: 'string'},
     headingLink: {type: 'string'},
-    imagePath: {type: 'string'},
+    imagePath: {validate: v => v.strictArrayOf(v.isString)},
   },
 
-  generate(data, slots, {html, language}) {
+  generate(data, slots, {html, language, urls}) {
     switch (slots.mode) {
       case 'html':
         return html.tags([
@@ -40,7 +42,22 @@ export default {
             }),
 
           slots.imagePath &&
-            html.tag('meta', {property: 'og:image', content: slots.imagePath}),
+            html.tag('meta', {
+              property: 'og:image',
+              content:
+                (() => {
+                  const toResult =
+                    urls
+                      .from('shared.root')
+                      .to(...slots.imagePath);
+
+                  if (getOrigin(toResult)) {
+                    return toResult;
+                  } else {
+                    return '/' + toResult;
+                  }
+                })(),
+            }),
         ]);
 
       case 'json':

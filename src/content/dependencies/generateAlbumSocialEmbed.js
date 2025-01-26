@@ -6,7 +6,7 @@ export default {
     'generateAlbumSocialEmbedDescription',
   ],
 
-  extraDependencies: ['absoluteTo', 'language', 'urls'],
+  extraDependencies: ['absoluteTo', 'language'],
 
   relations(relation, album) {
     return {
@@ -41,7 +41,7 @@ export default {
     return data;
   },
 
-  generate: (data, relations, {absoluteTo, language, urls}) =>
+  generate: (data, relations, {absoluteTo, language}) =>
     language.encapsulate('albumPage.socialEmbed', embedCapsule =>
       relations.socialEmbed.slots({
         title:
@@ -65,10 +65,7 @@ export default {
 
         imagePath:
           (data.hasImage
-            ? '/' +
-              urls
-                .from('shared.root')
-                .to('media.albumCover', data.coverArtDirectory, data.coverArtFileExtension)
+            ? ['media.albumCover', data.coverArtDirectory, data.coverArtFileExtension]
             : null),
       })),
 };
