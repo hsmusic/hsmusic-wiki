@@ -300,14 +300,18 @@ export function getURLsFromRoot({
 
   return (targetFullKey, ...args) => {
     const [groupKey, subKey] = targetFullKey.split('.');
-    return (
-      '/' +
+    const toResult =
       (groupKey === 'localized' && baseDirectory
         ? to('localizedWithBaseDirectory.' + subKey, baseDirectory, ...args)
      : groupKey === 'localizedDefaultLanguage'
         ? to('localized.' + subKey, ...args)
-        : to(targetFullKey, ...args))
-    );
+        : to(targetFullKey, ...args));
+
+    if (getOrigin(toResult)) {
+      return toResult;
+    } else {
+      return '/' + toResult;
+    }
   };
 }
 
