@@ -543,7 +543,7 @@ export function isContentString(content) {
     const parts = [
       actionPart,
       surroundings,
-      `(${where})`,
+      `(${colors.yellow(where)})`,
     ].filter(Boolean);
 
     illegalAggregate.push(new TypeError(parts.join(` `)));

@@ -6,8 +6,6 @@
 // It will likely only do exactly what I want it to, and only in the cases I
 // decided were relevant enough to 8other handling.
 
-import {colors} from './cli.js';
-
 // Apparently JavaScript doesn't come with a function to split an array into
 // chunks! Weird. Anyway, this is an awesome place to use a generator, even
 // though we don't really make use of the 8enefits of generators any time we
@@ -461,14 +459,12 @@ export function* iterateMultiline(content, iterator, {
 
     const columnNumber = index - startOfLine;
 
-    let where = null;
-    if (formatWhere) {
-      where =
-        colors.yellow(
-          (isMultiline
-            ? `line: ${lineNumber + 1}, col: ${columnNumber + 1}`
-            : `pos: ${index + 1}`));
-    }
+    const where =
+      (formatWhere && isMultiline
+        ? `line: ${lineNumber + 1}, col: ${columnNumber + 1}`
+     : formatWhere
+        ? `pos: ${index + 1}`
+        : null);
 
     countLineBreaks(index, length);
 
