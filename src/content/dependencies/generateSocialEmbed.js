@@ -1,7 +1,5 @@
-import {getOrigin} from '#urls';
-
 export default {
-  extraDependencies: ['html', 'language', 'urls', 'wikiData'],
+  extraDependencies: ['absoluteTo', 'html', 'language', 'wikiData'],
 
   sprawl({wikiInfo}) {
     return {
@@ -28,7 +26,7 @@ export default {
     imagePath: {validate: v => v.strictArrayOf(v.isString)},
   },
 
-  generate(data, slots, {html, language, urls}) {
+  generate(data, slots, {absoluteTo, html, language}) {
     switch (slots.mode) {
       case 'html':
         return html.tags([
@@ -44,19 +42,7 @@ export default {
           slots.imagePath &&
             html.tag('meta', {
               property: 'og:image',
-              content:
-                (() => {
-                  const toResult =
-                    urls
-                      .from('shared.root')
-                      .to(...slots.imagePath);
-
-                  if (getOrigin(toResult)) {
-                    return toResult;
-                  } else {
-                    return '/' + toResult;
-                  }
-                })(),
+              content: absoluteTo(...slots.imagePath),
             }),
         ]);
 
