@@ -115,7 +115,7 @@ export class Language extends Thing {
     },
 
     // List of descriptors for providing to external link utilities when using
-    // language.formatExternalLink - refer to util/external-links.js for info.
+    // language.formatExternalLink - refer to #external-links for info.
     externalLinkSpec: {
       flags: {update: true, expose: true},
       update: {validate: isExternalLinkSpec},
