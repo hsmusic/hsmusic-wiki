@@ -7,7 +7,7 @@ import {sortAlphabetically} from '#sort';
 import Thing from '#thing';
 import {isName} from '#validators';
 
-import {contentString, directory, name, simpleString}
+import {contentString, directory, flag, name, simpleString}
   from '#composite/wiki-properties';
 
 export class StaticPage extends Thing {
@@ -30,9 +30,12 @@ export class StaticPage extends Thing {
     },
 
     directory: directory(),
-    content: contentString(),
+
     stylesheet: simpleString(),
     script: simpleString(),
+    content: contentString(),
+
+    absoluteLinks: flag(),
   });
 
   static [Thing.findSpecs] = {
@@ -47,6 +50,8 @@ export class StaticPage extends Thing {
       'Name': {property: 'name'},
       'Short Name': {property: 'nameShort'},
       'Directory': {property: 'directory'},
+
+      'Absolute Links': {property: 'absoluteLinks'},
 
       'Style': {property: 'stylesheet'},
       'Script': {property: 'script'},

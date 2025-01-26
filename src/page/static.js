@@ -12,6 +12,7 @@ export function pathsForTarget(staticPage) {
     {
       type: 'page',
       path: ['staticPage', staticPage.directory],
+      absoluteLinks: staticPage.absoluteLinks,
 
       contentFunction: {
         name: 'generateStaticPage',
