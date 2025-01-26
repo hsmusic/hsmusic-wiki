@@ -303,11 +303,9 @@ export function getURLsFromRoot({
     return (
       '/' +
       (groupKey === 'localized' && baseDirectory
-        ? to(
-            'localizedWithBaseDirectory.' + subKey,
-            baseDirectory,
-            ...args
-          )
+        ? to('localizedWithBaseDirectory.' + subKey, baseDirectory, ...args)
+     : groupKey === 'localizedDefaultLanguage'
+        ? to('localized.' + subKey, ...args)
         : to(targetFullKey, ...args))
     );
   };
