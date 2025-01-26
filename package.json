@@ -12,7 +12,7 @@
         "dev": "eslint src && node src/upd8.js"
     },
     "imports": {
-        "#aggregate": "./src/util/aggregate.js",
+        "#aggregate": "./src/aggregate.js",
         "#cacheable-object": "./src/data/cacheable-object.js",
         "#colors": "./src/util/colors.js",
         "#composite": "./src/data/composite.js",
@@ -29,7 +29,7 @@
         "#composite/things/track-section": "./src/data/composite/things/track-section/index.js",
         "#content-dependencies": "./src/content/dependencies/index.js",
         "#content-function": "./src/content-function.js",
-        "#cli": "./src/util/cli.js",
+        "#cli": "./src/cli.js",
         "#data-checks": "./src/data/checks.js",
         "#external-links": "./src/external-links.js",
         "#find": "./src/find.js",

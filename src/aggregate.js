@@ -1,5 +1,5 @@
-import {colors} from './cli.js';
-import {empty, typeAppearance} from './sugar.js';
+import {colors} from '#cli';
+import {empty, typeAppearance} from '#sugar';
 
 // Utility function for providing useful interfaces to the JS AggregateError
 // class.

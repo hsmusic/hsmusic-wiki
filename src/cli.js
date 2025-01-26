@@ -1,14 +1,8 @@
 // Utility functions for CLI- and de8ugging-rel8ted stuff.
-//
-// A 8unch of these depend on process.stdout 8eing availa8le, so they won't
-// work within the 8rowser.
 
-const {process} = globalThis;
-
-import {sortByName} from './sort.js';
+import {sortByName} from '#sort';
 
 export const ENABLE_COLOR =
-  process &&
   ((process.env.CLICOLOR_FORCE && process.env.CLICOLOR_FORCE === '1') ??
     (process.env.CLICOLOR &&
       process.env.CLICOLOR === '1' &&
