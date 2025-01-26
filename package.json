@@ -14,7 +14,7 @@
     "imports": {
         "#aggregate": "./src/aggregate.js",
         "#cacheable-object": "./src/data/cacheable-object.js",
-        "#colors": "./src/util/colors.js",
+        "#colors": "./src/common-util/colors.js",
         "#composite": "./src/data/composite.js",
         "#composite/control-flow": "./src/data/composite/control-flow/index.js",
         "#composite/data": "./src/data/composite/data/index.js",
@@ -42,10 +42,10 @@
         "#replacer": "./src/replacer.js",
         "#reverse": "./src/reverse.js",
         "#search": "./src/search.js",
-        "#search-spec": "./src/util/search-spec.js",
+        "#search-spec": "./src/common-util/search-spec.js",
         "#serialize": "./src/data/serialize.js",
-        "#sort": "./src/util/sort.js",
-        "#sugar": "./src/util/sugar.js",
+        "#sort": "./src/common-util/sort.js",
+        "#sugar": "./src/common-util/sugar.js",
         "#test-lib": "./test/lib/index.js",
         "#thing": "./src/data/thing.js",
         "#things": "./src/data/things/index.js",
@@ -53,7 +53,7 @@
         "#urls": "./src/urls.js",
         "#validators": "./src/validators.js",
         "#web-routes": "./src/web-routes.js",
-        "#wiki-data": "./src/util/wiki-data.js",
+        "#wiki-data": "./src/common-util/wiki-data.js",
         "#yaml": "./src/data/yaml.js"
     },
     "engines": {

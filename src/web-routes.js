@@ -34,7 +34,7 @@ export const stationaryCodeRoutes = [
   },
 
   {
-    from: path.join(codeSrcPath, 'util'),
+    from: path.join(codeSrcPath, 'common-util'),
     to: ['staticSharedUtil.root'],
     statically: 'copy',
   },
