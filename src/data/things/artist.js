@@ -56,6 +56,8 @@ export class Artist extends Thing {
       find: soupyFind.input('artist'),
     }),
 
+    alwaysReferenceByDirectory: flag(false),
+
     // Update only
 
     find: soupyFind(),
@@ -137,6 +139,11 @@ export class Artist extends Thing {
       bindTo: 'artistData',
 
       include: artist => !artist.isAlias,
+
+      getMatchableNames: artist =>
+        (artist.alwaysReferenceByDirectory 
+          ? [] 
+          : [artist.name]),
     },
 
     artistAlias: {
@@ -199,6 +206,8 @@ export class Artist extends Thing {
       'Aliases': {property: 'aliasNames'},
 
       'Dead URLs': {ignore: true},
+
+      'Always Reference By Directory': {property: 'alwaysReferenceByDirectory'},
 
       'Review Points': {ignore: true},
     },

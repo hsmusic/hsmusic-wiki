@@ -9,6 +9,7 @@ import {
   color,
   contentString,
   directory,
+  flag,
   name,
   referenceList,
   seriesList,
@@ -48,6 +49,8 @@ export class Group extends Thing {
     serieses: seriesList({
       group: input.myself(),
     }),
+
+    alwaysReferenceByDirectory: flag(false),
 
     // Update only
 
@@ -105,6 +108,11 @@ export class Group extends Thing {
     group: {
       referenceTypes: ['group', 'group-gallery'],
       bindTo: 'groupData',
+
+      getMatchableNames: group =>
+        (group.alwaysReferenceByDirectory 
+          ? [] 
+          : [group.name]),
     },
   };
 
@@ -149,6 +157,8 @@ export class Group extends Thing {
         property: 'serieses',
         transform: parseSerieses,
       },
+
+      'Always Reference By Directory': {property: 'alwaysReferenceByDirectory'},
 
       'Review Points': {ignore: true},
     },
