@@ -26,6 +26,16 @@ export const replacerSpec = {
     link: 'linkAlbumGallery',
   },
 
+  'album-referenced-artworks': {
+    find: 'albumWithArtwork',
+    link: 'linkAlbumReferencedArtworks',
+  },
+
+  'album-referencing-artworks': {
+    find: 'albumWithArtwork',
+    link: 'linkAlbumReferencingArtworks',
+  },
+
   'artist': {
     find: 'artist',
     link: 'linkArtist',
@@ -143,6 +153,16 @@ export const replacerSpec = {
   'track': {
     find: 'track',
     link: 'linkTrackDynamically',
+  },
+
+  'track-referenced-artworks': {
+    find: 'trackWithArtwork',
+    link: 'linkTrackReferencedArtworks',
+  },
+
+  'track-referencing-artworks': {
+    find: 'trackWithArtwork',
+    link: 'linkTrackReferencingArtworks',
   },
 };
 

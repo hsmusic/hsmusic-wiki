@@ -348,7 +348,12 @@ export class Album extends Thing {
 
   static [Thing.findSpecs] = {
     album: {
-      referenceTypes: ['album', 'album-commentary', 'album-gallery'],
+      referenceTypes: [
+        'album',
+        'album-commentary',
+        'album-gallery',
+      ],
+
       bindTo: 'albumData',
 
       getMatchableNames: album =>
@@ -358,7 +363,12 @@ export class Album extends Thing {
     },
 
     albumWithArtwork: {
-      referenceTypes: ['album'],
+      referenceTypes: [
+        'album',
+        'album-referencing-artworks',
+        'album-referenced-artworks',
+      ],
+
       bindTo: 'albumData',
 
       include: album =>

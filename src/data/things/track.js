@@ -600,6 +600,7 @@ export class Track extends Thing {
   static [Thing.findSpecs] = {
     track: {
       referenceTypes: ['track'],
+
       bindTo: 'trackData',
 
       getMatchableNames: track =>
@@ -626,7 +627,12 @@ export class Track extends Thing {
     },
 
     trackWithArtwork: {
-      referenceTypes: ['track'],
+      referenceTypes: [
+        'track',
+        'track-referencing-artworks',
+        'track-referenced-artworks',
+      ],
+
       bindTo: 'trackData',
 
       include: track =>
