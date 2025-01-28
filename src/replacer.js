@@ -146,6 +146,13 @@ export const replacerSpec = {
   },
 };
 
+export const keylessReplacerOrder = [
+  'track',
+  'artist',
+  'album',
+  'group',
+];
+
 // Syntax literals.
 const tagBeginning = '[[';
 const tagEnding = ']]';

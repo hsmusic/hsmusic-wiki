@@ -4,7 +4,7 @@ import {inspect as nodeInspect} from 'node:util';
 import {colors, ENABLE_COLOR} from '#cli';
 
 import CacheableObject from '#cacheable-object';
-import {replacerSpec, parseInput} from '#replacer';
+import {replacerSpec, keylessReplacerOrder, parseInput} from '#replacer';
 import {compareArrays, cut, cutStart, empty, getNestedProp, iterateMultiline}
   from '#sugar';
 import Thing from '#thing';
@@ -142,12 +142,35 @@ function bindFindArtistOrAlias(boundFind) {
     if (alias) {
       // No need to check if the original exists here. Aliases are automatically
       // created from a field on the original, so the original certainly exists.
-      const original = alias.aliasedArtist;
-      throw new Error(`Reference ${colors.red(artistRef)} is to an alias, should be ${colors.green(original.name)}`);
+      throw new Error(`Reference ${colors.red(artistRef)} is to an alias, `
+      `should be ${colors.green(alias.aliasedArtist.name)}`);
     }
 
     return boundFind.artist(artistRef);
   };
+}
+
+function bindFindThing(boundFind) {
+  return ref => {
+    // Find findable Things in the order defined in keylessReplacerOrder
+    for (const key of keylessReplacerOrder) {
+      const thing = boundFind[key](ref, {mode: 'quiet'});
+      if (thing) {
+        return boundFind[key](ref);
+      }
+    }
+
+    // If we still didn't match anything, check if an artist alias was misused
+    const artistAlias = boundFind.artistAlias(ref, {mode: 'quiet'});
+    if (artistAlias) {
+      // No need to check if the original exists here. Aliases are automatically
+      // created from a field on the original, so the original certainly exists.
+      const original = artistAlias.aliasedArtist;
+      throw new Error(`Reference ${colors.red(ref)} is to an alias, should be ${colors.green(original.name)}`);
+    }
+
+    throw new Error(`Reference ${colors.red(ref)} didn't match anything`);
+  }
 }
 
 function getFieldPropertyMessage(yamlDocumentSpec, property) {
@@ -232,6 +255,7 @@ export function filterReferenceErrors(wikiData, {
   ];
 
   const boundFind = bindFind(wikiData, {mode: 'error'});
+  const findThing = bindFindThing(boundFind);
   const findArtistOrAlias = bindFindArtistOrAlias(boundFind);
 
   const aggregate = openAggregate({message: `Errors validating between-thing references in data`});
@@ -311,7 +335,7 @@ export function filterReferenceErrors(wikiData, {
                 break;
 
               case '_commentary':
-                findFn = findArtistOrAlias;
+                findFn = findThing;
                 break;
 
               case '_contrib':
@@ -599,6 +623,7 @@ export function reportContentTextErrors(wikiData, {
   ];
 
   const boundFind = bindFind(wikiData, {mode: 'error'});
+  const findThing = bindFindThing(boundFind);
   const findArtistOrAlias = bindFindArtistOrAlias(boundFind);
 
   function* processContent(input) {
@@ -609,52 +634,51 @@ export function reportContentTextErrors(wikiData, {
       const length = node.iEnd - node.i;
 
       if (node.type === 'tag') {
-        const replacerKeyImplied = !node.data.replacerKey;
-        const replacerKey = replacerKeyImplied ? 'track' : node.data.replacerKey.data;
-        const spec = replacerSpec[replacerKey];
-
-        if (!spec) {
-          yield {
-            index, length,
-            message:
-              `Unknown tag key ${colors.red(`"${replacerKey}"`)}`,
-          };
-
-          // No spec, no further errors to report.
-          continue;
-        }
-
-        const replacerValue = node.data.replacerValue[0].data;
-
-        if (spec.find) {
-          let findFn;
-
-          switch (spec.find) {
-            case 'artist':
-              findFn = findArtistOrAlias;
-              break;
-
-            default:
-              findFn = boundFind[spec.find];
-              break;
-          }
-
-          const findRef =
-            (replacerKeyImplied
-              ? replacerValue
-              : replacerKey + `:` + replacerValue);
-
-          try {
-            findFn(findRef);
-          } catch (error) {
+        let findFn;
+        let findRef;
+        const replacerKeyMissing = !node.data.replacerKey;
+        if (replacerKeyMissing) {
+          findFn = findThing;
+          findRef = node.data.replacerValue[0].data;
+        } else {
+          const replacerKey = node.data.replacerKey.data;
+          const replacerValue = node.data.replacerValue[0].data;
+          const spec = replacerSpec[replacerKey];
+          if (!spec) {
             yield {
               index, length,
-              message: error.message,
+              message:
+                `Unknown tag key ${colors.red(`"${replacerKey}"`)}`,
             };
-
-            // It's only possible to have one error per node at the moment.
+  
+            // No spec, no further errors to report.
             continue;
           }
+          if (spec.find) {
+            switch (spec.find) {
+              case 'artist':
+                findFn = findArtistOrAlias;
+                break;
+  
+              default:
+                findFn = boundFind[spec.find];
+                break;
+            }
+  
+            findRef = replacerKey + `:` + replacerValue;
+          } else {
+            continue;
+          }
+        }
+        try {
+          findFn(findRef);
+        } catch (error) {
+          yield {
+            index, length,
+            message: error.message,
+          };
+          // It's only possible to have one error per node at the moment.
+          continue;
         }
       } else if (node.type === 'external-link') {
         try {

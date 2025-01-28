@@ -1,5 +1,5 @@
 import {bindFind} from '#find';
-import {replacerSpec, parseInput} from '#replacer';
+import {replacerSpec, keylessReplacerOrder, parseInput} from '#replacer';
 
 import {Marked} from 'marked';
 
@@ -59,94 +59,137 @@ export default {
 
   sprawl(wikiData, content) {
     const find = bindFind(wikiData);
-
     const parsedNodes = parseInput(content ?? '');
-
+  
     return {
-      nodes: parsedNodes
-        .map(node => {
-          if (node.type !== 'tag') {
-            return node;
-          }
-
-          const placeholder = getPlaceholder(node, content);
-
-          const replacerKeyImplied = !node.data.replacerKey;
-          const replacerKey = replacerKeyImplied ? 'track' : node.data.replacerKey.data;
-
-          // TODO: We don't support recursive nodes like before, at the moment. Sorry!
-          // const replacerValue = transformNodes(node.data.replacerValue, opts);
-          const replacerValue = node.data.replacerValue[0].data;
-
-          const spec = replacerSpec[replacerKey];
-
-          if (!spec) {
+      nodes: parsedNodes.map(node => {
+        if (node.type !== 'tag') {
+          return node;
+        }
+  
+        const placeholder = getPlaceholder(node, content);
+  
+        // The user-supplied text inside the [[ brackets ]].
+        // e.g., in [[track:whatever]] => node.data.replacerValue[0].data is "whatever"
+        // If it’s just [[Whatever]] => there's no .replacerKey, so we must fallback.
+        const replacerValue = node.data.replacerValue[0].data;
+        const replacerKeyMissing = !node.data.replacerKey;
+  
+        // ------------------------------------------------------------------------------
+        // 1) If the user did NOT supply a key (i.e. "track:", "album:", etc.),
+        //    we'll try Things in the order defined in keylessReplacerOrder
+        // ------------------------------------------------------------------------------
+        if (replacerKeyMissing) {
+          if (!replacerValue || replacerValue === '-') {
             return placeholder;
           }
-
-          if (spec.link) {
-            let data = {link: spec.link};
-
-            determineData: {
-              // No value at all: this is an index link.
-              if (!replacerValue || replacerValue === '-') {
-                break determineData;
-              }
-
-              // Nothing to find: the link operates on a path or string, not a data object.
-              if (!spec.find) {
-                data.value = replacerValue;
-                break determineData;
-              }
-
-              const thing =
-                find[spec.find](
-                  (replacerKeyImplied
-                    ? replacerValue
-                    : replacerKey + `:` + replacerValue),
-                  wikiData);
-
-              // Nothing was found: this is unexpected, so return placeholder.
-              if (!thing) {
-                return placeholder;
-              }
-
-              // Something was found: the link operates on that thing.
-              data.thing = thing;
+  
+          // Go through each findable Thing 
+          let foundThing = null;
+          let foundSpec = null;
+  
+          for (const tryKey of keylessReplacerOrder) {
+            const attempt = find[tryKey](replacerValue, {mode: 'quiet'});
+            if (attempt) {
+              foundThing = attempt;
+              foundSpec = replacerSpec[tryKey];
+              break;
             }
-
-            const {transformName} = spec;
-
-            // TODO: Again, no recursive nodes. Sorry!
-            // const enteredLabel = node.data.label && transformNode(node.data.label, opts);
-            const enteredLabel = node.data.label?.data;
-            const enteredHash = node.data.hash?.data;
-
-            data.label =
-              enteredLabel ??
-                (transformName && data.thing.name
-                  ? transformName(data.thing.name, node, content)
-                  : null);
-
-            data.hash = enteredHash ?? null;
-
-            return {i: node.i, iEnd: node.iEnd, type: 'internal-link', data};
           }
-
-          // This will be another {type: 'tag'} node which gets processed in
-          // generate. Extract replacerKey and replacerValue now, since it'd
-          // be a pain to deal with later.
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              replacerKey: node.data.replacerKey.data,
-              replacerValue: node.data.replacerValue[0].data,
-            },
-          };
-        }),
+  
+          // If nothing matched, we have no link to generate, so just bail out.
+          if (!foundThing || !foundSpec) {
+            return placeholder;
+          }
+  
+          // We found a match. Construct the data for an internal link node:
+          const data = { link: foundSpec.link, thing: foundThing };
+  
+          // If the replacerSpec for that type had, e.g., transformName, we can do that:
+          const {transformName} = foundSpec;
+          const enteredLabel = node.data.label?.data;
+          const enteredHash = node.data.hash?.data;
+  
+          data.label =
+            enteredLabel ??
+            (transformName && data.thing.name
+              ? transformName(data.thing.name, node, content)
+              : null);
+  
+          data.hash = enteredHash ?? null;
+  
+          return {i: node.i, iEnd: node.iEnd, type: 'internal-link', data};
+        }
+  
+        // ------------------------------------------------------------------------------
+        // 2) If we DO have a key, (e.g. [[album:whatever]]),
+        //    we use the find defined in its spec.
+        // ------------------------------------------------------------------------------
+        const replacerKey = node.data.replacerKey.data;
+        const spec = replacerSpec[replacerKey];
+  
+        if (!spec) {
+          return placeholder;
+        }
+  
+        // If this `spec` includes a `.link` property, it means we generate an internal link.
+        if (spec.link) {
+          const data = { link: spec.link };
+  
+          determineData: {
+            // If no actual value after "[[album:...]]"", treat it as an index link or skip.
+            if (!replacerValue || replacerValue === '-') {
+              break determineData;
+            }
+  
+            // If `spec.find` is missing, it means the link is just a plain path or string
+            // rather than referencing a data object. So store the string as `.value`.
+            if (!spec.find) {
+              data.value = replacerValue;
+              break determineData;
+            }
+  
+            // Otherwise, we do a normal "find" call with "key:value":
+            const thing = find[spec.find](replacerKey + ':' + replacerValue, wikiData);
+  
+            if (!thing) {
+              return placeholder;
+            }
+  
+            data.thing = thing;
+          }
+  
+          const {transformName} = spec;
+          const enteredLabel = node.data.label?.data;
+          const enteredHash = node.data.hash?.data;
+  
+          data.label =
+            enteredLabel ??
+            (transformName && data.thing?.name
+              ? transformName(data.thing.name, node, content)
+              : null);
+  
+          data.hash = enteredHash ?? null;
+  
+          return {i: node.i, iEnd: node.iEnd, type: 'internal-link', data};
+        }
+  
+        // ------------------------------------------------------------------------------
+        // 3) Fallback: it’s a tag that we do NOT treat as a link.
+        //    Just pass the replacerKey & replacerValue so generate() can handle it.
+        // ------------------------------------------------------------------------------
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            replacerKey,
+            replacerValue,
+          },
+        };
+      }),
     };
   },
+  
 
   data(sprawl, content) {
     return {
