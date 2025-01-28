@@ -170,7 +170,7 @@ function getImageSources(details) {
     };
   } else {
     return {
-      mainSrc: originalSrc,
+      mainSrc: details.originalSrc,
       thumbSrc: null,
       mainThumb: '',
       thumbThumb: '',
