@@ -3097,6 +3097,10 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
   .grid-listing > .grid-item {
     flex-basis: 40%;
   }
+
+  .wiki-search-sidebar-box {
+    max-height: max(245px, 60vh, calc(100vh - 205px));
+  }
 }
 
 /* Layout - Thin (phones) */
