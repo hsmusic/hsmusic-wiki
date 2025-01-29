@@ -128,6 +128,20 @@ If your shell is **zsh,** enter these contents:
 
 Then use `source env.sh` when starting work from the CLI to get access to all the convenient environment variables.
 
+## Notes for developers
+
+### Which platform features are OK for hsmusic-wiki!?
+
+Here's how to decide when new programming language features are ready for use in hsmusic-wiki:
+
+- **Build-code JS** (anything *not* in the browser): Whatever is supported in the latest LTS release of node.js. We hung out on 20.x for a needlessly long time; now we're calling that we can update to the latest LTS at any point.
+
+- **Client JS:** This one's mucky, but target stuff available across latest browsers since three years ago (to the month). It's generally possible for individual client modules to fail and even for graceful fallbacks where we notice, so it's not the end of the world for stuff to slip through a little early.
+
+- **Client HTML and CSS:** Firmer focus on only using what was available across browsers three years ago (to the month). Utterly ornamental CSS can use newer features, but only if it's flat-out necessary and does not impact the usability of the site at all (i.e. if the CSS fails then it's just as though that ornament weren't added).
+
+We haven't noted whether caniuse and MDN are based on different data sets or not, but *out of convenience,* we usually use MDN now that it shows this "Baseline" box for a lot of features, with month-year compat info up front. We're aware that these resources are never perfect, so pay closer attention before committing to huge new JS APIs, etc.
+
   [discord]: https://hsmusic.wiki/discord/
   [fandom]: https://homestuck-and-mspa-music.fandom.com/wiki/Homestuck_and_MSPA_Music_Wiki
   [cgit-code]: https://nebula.ed1.club/git/hsmusic-wiki
