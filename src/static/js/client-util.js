@@ -1,12 +1,19 @@
 /* eslint-env browser */
 
 export function rebase(href, rebaseKey = 'rebaseLocalized') {
-  const relative = (document.documentElement.dataset[rebaseKey] || '.') + '/';
-  if (relative) {
-    return relative + href;
-  } else {
-    return href;
+  let result = document.documentElement.dataset[rebaseKey] || './';
+
+  if (!result.endsWith('/')) {
+    result += '/';
   }
+
+  if (href.startsWith('/')) {
+    href = href.slice(1);
+  }
+
+  result += href;
+
+  return result;
 }
 
 export function cssProp(el, ...args) {
