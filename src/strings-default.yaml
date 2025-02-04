@@ -1247,6 +1247,9 @@ artistPage:
   wikiEditArtworks: >-
     {ARTIST} has edited these artworks for this wiki:
 
+  wikiEditorCommentary: >-
+    {ARTIST} has written these commentary entries as an editor of this wiki:
+
 #
 # artistGalleryPage:
 #   The artist gallery page shows a neat grid of all of the album and

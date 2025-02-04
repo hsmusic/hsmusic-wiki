@@ -19,7 +19,7 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  query(artist) {
+  query(artist, filterWikiEditorCommentary) {
     const processEntry = ({
       thing,
       entry,
@@ -87,6 +87,12 @@ export default {
         .flatMap(thing =>
           thing.commentary
             .filter(entry => entry.artists.includes(artist))
+
+            .filter(({annotation}) =>
+              (filterWikiEditorCommentary
+                ? annotation?.startsWith(`wiki editor`)
+                : !annotation?.startsWith(`wiki editor`)))
+
             .map(entry => processEntry({thing, entry})));
 
     const processAlbumEntries = ({albums}) =>
@@ -146,7 +152,7 @@ export default {
     return {chunks};
   },
 
-  relations: (relation, query) => ({
+  relations: (relation, query, _artist, filterWikiEditorCommentary) => ({
     chunks:
       query.chunks
         .map(() => relation('generateArtistInfoPageChunk')),
@@ -179,10 +185,13 @@ export default {
       query.chunks
         .map(({chunk}) => chunk
           .map(({annotation}) =>
-            relation('transformContent', annotation))),
+            relation('transformContent',
+              (filterWikiEditorCommentary
+                ? annotation?.replace(/^wiki editor(, )?/, '')
+                : annotation)))),
   }),
 
-  data: (query) => ({
+  data: (query, _artist, _filterWikiEditorCommentary) => ({
     chunkTypes:
       query.chunks
         .map(({chunkType}) => chunkType),

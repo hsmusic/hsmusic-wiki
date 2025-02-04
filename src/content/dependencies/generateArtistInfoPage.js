@@ -115,7 +115,10 @@ export default {
       relation('generateArtistInfoPageFlashesChunkedList', artist),
 
     commentaryChunkedList:
-      relation('generateArtistInfoPageCommentaryChunkedList', artist),
+      relation('generateArtistInfoPageCommentaryChunkedList', artist, false),
+
+    wikiEditorCommentaryChunkedList:
+      relation('generateArtistInfoPageCommentaryChunkedList', artist, true),
   }),
 
   data: (query, artist) => ({
@@ -262,7 +265,8 @@ export default {
                       {href: '#flashes'},
                       language.$(pageCapsule, 'flashList.title')),
 
-                  !html.isBlank(relations.commentaryChunkedList) &&
+                  (!html.isBlank(relations.commentaryChunkedList) ||
+                   !html.isBlank(relations.wikiEditorCommentaryChunkedList)) &&
                     html.tag('a',
                       {href: '#commentary'},
                       language.$(pageCapsule, 'commentaryList.title')),
@@ -380,6 +384,17 @@ export default {
               }),
 
             relations.commentaryChunkedList,
+
+            html.tags([
+              html.tag('p',
+                {[html.onlyIfSiblings]: true},
+
+                language.$(pageCapsule, 'wikiEditorCommentary', {
+                  artist: data.name,
+                })),
+
+              relations.wikiEditorCommentaryChunkedList,
+            ]),
           ]),
         ],
 
