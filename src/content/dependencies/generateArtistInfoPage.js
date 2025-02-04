@@ -353,12 +353,17 @@ export default {
               }),
 
             html.tags([
-              html.tag('p',
-                {[html.onlyIfSiblings]: true},
+              language.encapsulate(pageCapsule, 'wikiEditArtworks', capsule =>
+                relations.contentHeading.clone()
+                  .slots({
+                    tag: 'p',
 
-                language.$(pageCapsule, 'wikiEditArtworks', {
-                  artist: data.name,
-                })),
+                    title:
+                      language.$(capsule, {artist: data.name}),
+
+                    stickyTitle:
+                      language.$(capsule, 'sticky'),
+                  })),
 
               relations.editsForWikiArtworksChunkedList,
             ]),
@@ -386,12 +391,17 @@ export default {
             relations.commentaryChunkedList,
 
             html.tags([
-              html.tag('p',
-                {[html.onlyIfSiblings]: true},
+              language.encapsulate(pageCapsule, 'wikiEditorCommentary', capsule =>
+                relations.contentHeading.clone()
+                  .slots({
+                    tag: 'p',
 
-                language.$(pageCapsule, 'wikiEditorCommentary', {
-                  artist: data.name,
-                })),
+                    title:
+                      language.$(capsule, {artist: data.name}),
+
+                    stickyTitle:
+                      language.$(capsule, 'sticky'),
+                  })),
 
               relations.wikiEditorCommentaryChunkedList,
             ]),

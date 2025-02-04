@@ -1244,11 +1244,13 @@ artistPage:
     orBrowseList: "View {LINK}! Or browse the list:"
     link: "art gallery"
 
-  wikiEditArtworks: >-
-    {ARTIST} has edited these artworks for this wiki:
+  wikiEditArtworks:
+    _: "{ARTIST} has edited these artworks for this wiki:"
+    sticky: "Artworks — edited for this wiki"
 
-  wikiEditorCommentary: >-
-    {ARTIST} has written these commentary entries as an editor of this wiki:
+  wikiEditorCommentary:
+    _: "{ARTIST} has written these commentary entries as an editor of this wiki:"
+    sticky: "Commentary — written for this wiki"
 
 #
 # artistGalleryPage:
