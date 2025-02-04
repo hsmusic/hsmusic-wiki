@@ -179,9 +179,7 @@ export default {
       query.chunks
         .map(({chunk}) => chunk
           .map(({annotation}) =>
-            (annotation
-              ? relation('transformContent', annotation)
-              : null))),
+            relation('transformContent', annotation))),
   }),
 
   data: (query) => ({
@@ -232,12 +230,10 @@ export default {
                     }).map(({item, link, annotation, type}) =>
                       item.slots({
                         annotation:
-                          (annotation
-                            ? annotation.slots({
-                                mode: 'inline',
-                                absorbPunctuationFollowingExternalLinks: false,
-                              })
-                            : null),
+                          annotation.slots({
+                            mode: 'inline',
+                            absorbPunctuationFollowingExternalLinks: false,
+                          }),
 
                         content:
                           (type === 'album'
