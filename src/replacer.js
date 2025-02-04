@@ -84,6 +84,11 @@ export const replacerSpec = {
     link: 'linkFlashAct',
   },
 
+  'flash-side': {
+    find: 'flashSide',
+    link: 'linkFlashSide',
+  },
+
   'group': {
     find: 'group',
     link: 'linkGroup',
