@@ -291,16 +291,16 @@ releaseInfo:
 
     sticky:
       _: "Tracks that reference this one:"
-      fromGroup: "Tracks from {GROUP} that reference this one:"
-      fromOther: "Tracks from somewhere else that reference this one:"
+      fromGroup: "Tracks that reference this one — from {GROUP}:"
+      fromOther: "Tracks that reference this one — from somewhere else:"
 
   tracksThatSample:
     _: "Tracks that sample {TRACK}:"
 
     sticky:
       _: "Tracks that sample this one:"
-      fromGroup: "Tracks from {GROUP} that sample this one:"
-      fromOther: "Tracks from somewhere else that sample this one:"
+      fromGroup: "Tracks that sample this one — from {GROUP}:"
+      fromOther: "Tracks that sample this one — from somewhere else:"
 
   flashesThatFeature:
     _: "Flashes & games that feature {TRACK}:"
