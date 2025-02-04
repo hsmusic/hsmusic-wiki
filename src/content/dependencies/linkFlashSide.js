@@ -1,37 +1,22 @@
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'linkStationaryIndex',
-  ],
+  contentDependencies: ['linkFlashAct'],
 
-  query: (flashSide) => ({
-    jumpAct:
-      flashSide.acts[0],
-  }),
-
-  relations: (relation, _query, flashSide) => ({
+  relations: (relation, flashSide) => ({
     link:
-      relation(
-        'linkStationaryIndex',
-        'localized.flashIndex',
-        'flashIndex.title'),
-
-    colorStyle:
-      relation('generateColorStyleAttribute', flashSide.color ?? null),
+      relation('linkFlashAct', flashSide.acts[0]),
   }),
 
-  data: (query, flashSide) => ({
+  data: (flashSide) => ({
     name:
       flashSide.name,
 
-    jumpActDirectory:
-      query.jumpAct.directory,
+    color:
+      flashSide.color,
   }),
 
   generate: (data, relations) =>
     relations.link.slots({
       content: data.name,
-      hash: data.jumpActDirectory,
-      attributes: [relations.colorStyle],
+      color: data.color,
     }),
 };
