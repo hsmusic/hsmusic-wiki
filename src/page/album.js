@@ -38,9 +38,12 @@ export function pathsForTarget(album) {
       },
     },
 
-    !empty(album.referencedArtworks) && {
+    {
       type: 'page',
       path: ['albumReferencedArtworks', album.directory],
+
+      condition: () =>
+        !empty(album.referencedArtworks),
 
       contentFunction: {
         name: 'generateAlbumReferencedArtworksPage',
@@ -48,9 +51,12 @@ export function pathsForTarget(album) {
       },
     },
 
-    !empty(album.referencedByArtworks) && {
+    {
       type: 'page',
       path: ['albumReferencingArtworks', album.directory],
+
+      condition: () =>
+        !empty(album.referencedByArtworks),
 
       contentFunction: {
         name: 'generateAlbumReferencingArtworksPage',
@@ -80,13 +86,15 @@ export function pathsTargetless({wikiData: {wikiInfo}}) {
       contentFunction: {name: 'generateCommentaryIndexPage'},
     },
 
-    wikiInfo.canonicalBase === 'https://hsmusic.wiki/' &&
-      {
-        type: 'redirect',
-        fromPath: ['page', 'list/all-commentary'],
-        toPath: ['commentaryIndex'],
-        title: 'Album Commentary',
-      },
+    {
+      type: 'redirect',
+      fromPath: ['page', 'list/all-commentary'],
+      toPath: ['commentaryIndex'],
+      title: 'Album Commentary',
+
+      condition: () =>
+        wikiInfo.canonicalBase === 'https://hsmusic.wiki/',
+    },
   ];
 }
 

@@ -20,9 +20,12 @@ export function pathsForTarget(track) {
       },
     },
 
-    !empty(track.referencedArtworks) && {
+    {
       type: 'page',
       path: ['trackReferencedArtworks', track.directory],
+
+      condition: () =>
+        !empty(track.referencedArtworks),
 
       contentFunction: {
         name: 'generateTrackReferencedArtworksPage',
@@ -30,9 +33,12 @@ export function pathsForTarget(track) {
       },
     },
 
-    !empty(track.referencedByArtworks) && {
+    {
       type: 'page',
       path: ['trackReferencingArtworks', track.directory],
+
+      condition: () =>
+        !empty(track.referencedByArtworks),
 
       contentFunction: {
         name: 'generateTrackReferencingArtworksPage',

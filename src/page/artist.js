@@ -8,10 +8,6 @@ export function targets({wikiData}) {
 }
 
 export function pathsForTarget(artist) {
-  const hasGalleryPage =
-    !empty(artist.albumCoverArtistContributions) ||
-    !empty(artist.trackCoverArtistContributions);
-
   return [
     {
       type: 'page',
@@ -23,9 +19,13 @@ export function pathsForTarget(artist) {
       },
     },
 
-    hasGalleryPage && {
+    {
       type: 'page',
       path: ['artistGallery', artist.directory],
+
+      condition: () =>
+        !empty(artist.albumCoverArtistContributions) ||
+        !empty(artist.trackCoverArtistContributions),
 
       contentFunction: {
         name: 'generateArtistGalleryPage',

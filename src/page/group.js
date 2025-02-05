@@ -7,8 +7,6 @@ export function targets({wikiData}) {
 }
 
 export function pathsForTarget(group) {
-  const hasGalleryPage = !empty(group.albums);
-
   return [
     {
       type: 'page',
@@ -20,9 +18,12 @@ export function pathsForTarget(group) {
       },
     },
 
-    hasGalleryPage && {
+    {
       type: 'page',
       path: ['groupGallery', group.directory],
+
+      condition: () =>
+        !empty(group.albums),
 
       contentFunction: {
         name: 'generateGroupGalleryPage',
@@ -34,20 +35,24 @@ export function pathsForTarget(group) {
 
 export function pathsTargetless({wikiData: {wikiInfo}}) {
   return [
-    wikiInfo.canonicalBase === 'https://hsmusic.wiki/' &&
-      {
-        type: 'redirect',
-        fromPath: ['page', 'albums/fandom'],
-        toPath: ['groupGallery', 'fandom'],
-        title: 'Fandom - Gallery',
-      },
+    {
+      type: 'redirect',
+      fromPath: ['page', 'albums/fandom'],
+      toPath: ['groupGallery', 'fandom'],
+      title: 'Fandom - Gallery',
 
-    wikiInfo.canonicalBase === 'https://hsmusic.wiki/' &&
-      {
-        type: 'redirect',
-        fromPath: ['page', 'albums/official'],
-        toPath: ['groupGallery', 'official'],
-        title: 'Official - Gallery',
-      },
+      condition: () =>
+        wikiInfo.canonicalBase === 'https://hsmusic.wiki/',
+    },
+
+    {
+      type: 'redirect',
+      fromPath: ['page', 'albums/official'],
+      toPath: ['groupGallery', 'official'],
+      title: 'Official - Gallery',
+
+      condition: () =>
+        wikiInfo.canonicalBase === 'https://hsmusic.wiki/',
+    },
   ];
 }
