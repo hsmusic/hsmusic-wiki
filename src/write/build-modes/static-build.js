@@ -195,7 +195,7 @@ export async function go({
           return null;
         }
 
-        const paths = [];
+        let paths = [];
 
         if (pageSpec.pathsTargetless) {
           const result = pageSpec.pathsTargetless({wikiData});
@@ -224,6 +224,9 @@ export async function go({
           paths.push(...targets.flatMap(target => pageSpec.pathsForTarget(target)));
           // TODO: Validate each pathsForTargets entry
         }
+
+        paths =
+          paths.filter(path => path.condition?.() ?? true);
 
         return paths;
       })

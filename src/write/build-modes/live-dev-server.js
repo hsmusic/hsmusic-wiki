@@ -389,7 +389,11 @@ export async function go({
     // URL to page map expects trailing slash but no leading slash.
     const pathnameKey = pathname.replace(/^\//, '') + (pathname.endsWith('/') ? '' : '/');
 
-    if (!Object.hasOwn(urlToPageMap, pathnameKey)) {
+    const is404 =
+      !Object.hasOwn(urlToPageMap, pathnameKey) ||
+      !(urlToPageMap[pathnameKey].page.condition?.() ?? true);
+
+    if (is404) {
       response.writeHead(404, contentTypePlain);
       response.end(`No page found for: ${pathnameKey}\n`);
       if (loudResponses) console.log(`${requestHead} [404] ${pathname} (no page)`);
