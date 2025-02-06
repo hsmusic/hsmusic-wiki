@@ -264,7 +264,10 @@ export default {
                       item.slots({
                         annotation:
                           (annotation
-                            ? annotation.slot('mode', 'inline')
+                            ? annotation.slots({
+                                mode: 'inline',
+                                absorbPunctuationFollowingExternalLinks: false,
+                              })
                             : null),
 
                         content:
