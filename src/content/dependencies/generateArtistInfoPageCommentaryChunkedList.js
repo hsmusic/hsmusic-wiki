@@ -90,8 +90,8 @@ export default {
 
             .filter(({annotation}) =>
               (filterWikiEditorCommentary
-                ? annotation?.startsWith(`wiki editor`)
-                : !annotation?.startsWith(`wiki editor`)))
+                ? annotation?.match(/^wiki editor/i)
+                : !annotation?.match(/^wiki editor/i)))
 
             .map(entry => processEntry({thing, entry})));
 
@@ -187,7 +187,7 @@ export default {
           .map(({annotation}) =>
             relation('transformContent',
               (filterWikiEditorCommentary
-                ? annotation?.replace(/^wiki editor(, )?/, '')
+                ? annotation?.replace(/^wiki editor(, )?/i, '')
                 : annotation)))),
   }),
 
