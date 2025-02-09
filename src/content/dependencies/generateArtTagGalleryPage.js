@@ -156,11 +156,12 @@ export default {
                 language.$(capsule, 'callToAction'),
               ])),
 
-          relations.featuredLine.clone()
-            .slots({
-              showing: 'all',
-              count: data.numArtworksTotal,
-            }),
+          data.numArtworksTotal >= 1 &&
+            relations.featuredLine.clone()
+              .slots({
+                showing: 'all',
+                count: data.numArtworksTotal,
+              }),
 
           data.hasMixedDirectIndirect && [
             relations.featuredLine.clone()
