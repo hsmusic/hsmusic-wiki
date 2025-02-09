@@ -103,6 +103,13 @@ export default {
     relatedArtTagAnnotations:
       artTag.relatedArtTags
         .map(({annotation}) => annotation),
+
+    directDescendantTimesFeaturedTotal:
+      artTag.directDescendantArtTags.map(artTag =>
+        unique([
+          ...artTag.directlyTaggedInThings,
+          ...artTag.indirectlyTaggedInThings,
+        ]).length),
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -230,7 +237,8 @@ export default {
                 stitchArrays({
                   infoLink: relations.directDescendantInfoLinks,
                   galleryLink: relations.directDescendantGalleryLinks,
-                }).map(({infoLink, galleryLink}) =>
+                  timesFeaturedTotal: data.directDescendantTimesFeaturedTotal,
+                }).map(({infoLink, galleryLink, timesFeaturedTotal}) =>
                     html.tag('li',
                       language.encapsulate(listCapsule, 'item', itemCapsule =>
                         language.encapsulate(itemCapsule, workingCapsule => {
@@ -243,6 +251,14 @@ export default {
                             workingOptions.gallery =
                               galleryLink.slot('content',
                                 language.$(itemCapsule, 'withGallery.gallery'));
+                          }
+
+                          if (timesFeaturedTotal >= 1) {
+                            workingCapsule += `.withTimesUsed`;
+                            workingOptions.timesUsed =
+                              language.countTimesFeatured(timesFeaturedTotal, {
+                                unit: true,
+                              });
                           }
 
                           return language.$(workingCapsule, workingOptions);

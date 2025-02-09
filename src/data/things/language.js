@@ -904,6 +904,7 @@ Object.assign(Language.prototype, {
   countDays: countHelper('days'),
   countFlashes: countHelper('flashes'),
   countMonths: countHelper('months'),
+  countTimesFeatured: countHelper('timesFeatured'),
   countTimesReferenced: countHelper('timesReferenced'),
   countTimesUsed: countHelper('timesUsed'),
   countTracks: countHelper('tracks'),

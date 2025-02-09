@@ -1,4 +1,4 @@
-import {collectTreeLeaves, empty, stitchArrays} from '#sugar';
+import {collectTreeLeaves, empty, stitchArrays, unique} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -51,6 +51,13 @@ export default {
   data: (query, sprawl, artTag) => ({
     name: artTag.name,
 
+    directDescendantTimesFeaturedTotal:
+      artTag.directDescendantArtTags.map(artTag =>
+        unique([
+          ...artTag.directlyTaggedInThings,
+          ...artTag.indirectlyTaggedInThings,
+        ]).length),
+
     furthestAncestorArtTagNames:
       query.furthestAncestorArtTags
         .map(ancestorArtTag => ancestorArtTag.name),
@@ -79,8 +86,15 @@ export default {
                       language.sanitize(data.name)))),
 
                 html.tag('ul',
-                  relations.directDescendantArtTagLinks
-                    .map(link => html.tag('li', link))),
+                  stitchArrays({
+                    link: relations.directDescendantArtTagLinks,
+                    timesFeaturedTotal: data.directDescendantTimesFeaturedTotal,
+                  }).map(({link, timesFeaturedTotal}) =>
+                      html.tag('li', [
+                        link,
+                        html.tag('span', {class: 'times-used'},
+                          language.countTimesFeatured(timesFeaturedTotal)),
+                      ]))),
               ]),
 
             stitchArrays({

@@ -1,4 +1,9 @@
-import {filterMultipleArrays, sortMultipleArrays, stitchArrays} from '#sugar';
+import {
+  filterMultipleArrays,
+  sortMultipleArrays,
+  stitchArrays,
+  unique,
+} from '#sugar';
 
 export default {
   contentDependencies: ['linkArtTagDynamically'],
@@ -25,6 +30,13 @@ export default {
               .length
           : null);
 
+      const artTagsTimesFeaturedTotal =
+        artTags.map(artTag =>
+          unique([
+            ...artTag.directlyTaggedInThings,
+            ...artTag.indirectlyTaggedInThings,
+          ]).length);
+
       const sublists =
         stitchArrays({
           artTag: artTags,
@@ -35,12 +47,12 @@ export default {
               : null));
 
       if (displayBriefly) {
-        filterMultipleArrays(artTags, sublists,
+        filterMultipleArrays(artTags, sublists, artTagsTimesFeaturedTotal,
           (artTag, sublist) =>
             artTag === targetArtTag ||
             sublist !== null);
       } else {
-        sortMultipleArrays(artTags, sublists,
+        sortMultipleArrays(artTags, sublists, artTagsTimesFeaturedTotal,
           (artTagA, artTagB, sublistA, sublistB) =>
             (sublistA && sublistB
               ? 0
@@ -55,6 +67,7 @@ export default {
         displayBriefly,
         numExemptArtTags,
         artTags,
+        artTagsTimesFeaturedTotal,
         sublists,
       };
     };
@@ -77,9 +90,16 @@ export default {
   },
 
   data(query, _ancestorArtTag, targetArtTag) {
-    const recursive = ({displayBriefly, numExemptArtTags, artTags, sublists}) => ({
+    const recursive = ({
       displayBriefly,
       numExemptArtTags,
+      artTags,
+      artTagsTimesFeaturedTotal,
+      sublists,
+    }) => ({
+      displayBriefly,
+      numExemptArtTags,
+      artTagsTimesFeaturedTotal,
 
       artTagsAreTargetTag:
         artTags
@@ -105,17 +125,22 @@ export default {
 
         stitchArrays({
           isTargetTag: dataNode.artTagsAreTargetTag,
+          timesFeaturedTotal: dataNode.artTagsTimesFeaturedTotal,
           dataSublist: dataNode.sublists,
 
           artTagLink: relationsNode.artTagLinks,
           relationsSublist: relationsNode.sublists,
         }).map(({
-            isTargetTag, dataSublist,
+            isTargetTag, timesFeaturedTotal, dataSublist,
             artTagLink, relationsSublist,
           }) => [
             html.tag('dt',
               {class: (dataSublist || isTargetTag) && 'current'},
-              artTagLink),
+              [
+                artTagLink,
+                html.tag('span', {class: 'times-used'},
+                  language.countTimesFeatured(timesFeaturedTotal)),
+              ]),
 
             dataSublist &&
               html.tag('dd',

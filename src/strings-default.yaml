@@ -149,6 +149,16 @@ count:
       many: ""
       other: "{MONTHS} months"
 
+  timesFeatured:
+    _: "{TIMES_FEATURED}"
+    withUnit:
+      zero: ""
+      one: "featured {TIMES_FEATURED} time"
+      two: ""
+      few: ""
+      many: ""
+      other: "featured {TIMES_FEATURED} times"
+
   timesReferenced:
     _: "{TIMES_REFERENCED}"
     withUnit:
@@ -1326,9 +1336,13 @@ artTagInfoPage:
 
     item:
       _: "{TAG}"
+
       withGallery:
         _: "{TAG} ({GALLERY})"
         gallery: "Gallery"
+
+      withTimesUsed: "{TAG} ({TIMES_USED})"
+      withGallery.withTimesUsed: "{TAG} ({GALLERY}, {TIMES_USED})"
 
 #
 # artTagGalleryPage:
