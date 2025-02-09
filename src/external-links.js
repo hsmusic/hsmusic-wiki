@@ -417,6 +417,17 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {
+      domain: 'media.hsmusic.wiki',
+      pathname: /^misc\/archive/,
+    },
+
+    platform: 'hsmusic.archive',
+
+    icon: 'globe',
+  },
+
+  {
     match: {domain: 'hsmusic.wiki'},
     platform: 'hsmusic',
     icon: 'globe',
