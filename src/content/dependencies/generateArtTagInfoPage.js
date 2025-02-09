@@ -78,7 +78,7 @@ export default {
       artTag.directDescendantArtTags.map(artTag =>
         (query.allDescendantsHaveMoreDescendants
           ? null
-          : relation('linkArtTagInfo', artTag))),
+          : relation('linkArtTagGallery', artTag))),
   }),
 
   data: (query, sprawl, artTag) => ({
