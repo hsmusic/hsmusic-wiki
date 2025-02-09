@@ -6,11 +6,13 @@ import {sortAlphabetically, sortAlbumsTracksChronologically} from '#sort';
 import Thing from '#thing';
 import {unique} from '#sugar';
 import {isName} from '#validators';
+import {parseAnnotatedReferences} from '#yaml';
 
 import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
 
 import {
+  annotatedReferenceList,
   color,
   directory,
   flag,
@@ -57,6 +59,16 @@ export class ArtTag extends Thing {
     directDescendantArtTags: referenceList({
       class: input.value(ArtTag),
       find: soupyFind.input('artTag'),
+    }),
+
+    relatedArtTags: annotatedReferenceList({
+      class: input.value(ArtTag),
+      find: soupyFind.input('artTag'),
+
+      date: input.value(null),
+
+      reference: input.value('artTag'),
+      thing: input.value('artTag'),
     }),
 
     // Update only
@@ -154,6 +166,15 @@ export class ArtTag extends Thing {
       'Is CW': {property: 'isContentWarning'},
 
       'Direct Descendant Tags': {property: 'directDescendantArtTags'},
+
+      'Related Tags': {
+        property: 'relatedArtTags',
+        transform: entries =>
+          parseAnnotatedReferences(entries, {
+            referenceField: 'Tag',
+            referenceProperty: 'artTag',
+          }),
+      },
     },
   };
 

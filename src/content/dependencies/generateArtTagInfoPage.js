@@ -62,6 +62,10 @@ export default {
       artTag.extraReadingURLs
         .map(url => relation('linkExternal', url)),
 
+    relatedArtTagLinks:
+      artTag.relatedArtTags
+        .map(({artTag}) => relation('linkArtTagInfo', artTag)),
+
     directAncestorLinks:
       artTag.directAncestorArtTags
         .map(artTag => relation('linkArtTagInfo', artTag)),
@@ -95,6 +99,10 @@ export default {
 
     numArtworksTotal:
       query.allThings.length,
+
+    relatedArtTagAnnotations:
+      artTag.relatedArtTags
+        .map(({annotation}) => annotation),
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -147,6 +155,27 @@ export default {
                 relations.galleryLink
                   ?.slot('content', language.$(pageCapsule, 'viewArtGallery.link')),
             })),
+
+          html.tag('p',
+            {[html.onlyIfContent]: true},
+
+            language.encapsulate(pageCapsule, 'seeAlso', capsule =>
+              language.$(capsule, {
+                [language.onlyIfOptions]: ['tags'],
+
+                tags:
+                  language.formatUnitList(
+                    stitchArrays({
+                      artTagLink: relations.relatedArtTagLinks,
+                      annotation: data.relatedArtTagAnnotations,
+                    }).map(({artTagLink, annotation}) =>
+                        (html.isBlank(annotation)
+                          ? artTagLink
+                          : language.$(capsule, 'tagWithAnnotation', {
+                              tag: artTagLink,
+                              annotation,
+                            })))),
+              }))),
 
           html.tag('blockquote',
             {[html.onlyIfContent]: true},

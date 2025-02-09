@@ -1300,6 +1300,10 @@ artTagInfoPage:
 
   readMoreOn: "Read more about {TAG} on {LINKS}."
 
+  seeAlso:
+    _: "See also: {TAGS}"
+    tagWithAnnotation: "{TAG} ({ANNOTATION})"
+
   featuredIn:
     notFeatured: >-
       This tag hasn't been featured in any artworks yet.
