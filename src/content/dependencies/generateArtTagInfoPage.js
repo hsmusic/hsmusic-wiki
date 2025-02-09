@@ -95,19 +95,6 @@ export default {
 
     numArtworksTotal:
       query.allThings.length,
-
-    names:
-      query.allThings.map(thing => thing.name),
-
-    paths:
-      query.allThings.map(thing =>
-        (thing.album
-          ? ['media.trackCover', thing.album.directory, thing.directory, thing.coverArtFileExtension]
-          : ['media.albumCover', thing.directory, thing.coverArtFileExtension])),
-
-    onlyFeaturedIndirectly:
-      query.allThings.map(thing =>
-        !query.directThings.includes(thing)),
   }),
 
   generate: (data, relations, {html, language}) =>
