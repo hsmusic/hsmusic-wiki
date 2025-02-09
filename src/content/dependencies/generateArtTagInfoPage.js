@@ -238,7 +238,7 @@ export default {
 
                           workingOptions.tag = infoLink;
 
-                          if (!html.isBlank(galleryLink)) {
+                          if (!html.isBlank(galleryLink ?? html.blank())) {
                             workingCapsule += '.withGallery';
                             workingOptions.gallery =
                               galleryLink.slot('content',
