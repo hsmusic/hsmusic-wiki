@@ -183,13 +183,15 @@ export default {
           ],
 
           relations.ancestorLinks &&
-            html.tag('p', {class: 'quick-info'},
+            html.tag('p', {id: 'descends-from-line'},
+              {class: 'quick-info'},
               language.$(pageCapsule, 'descendsFrom', {
-                tags: language.formatConjunctionList(relations.ancestorLinks),
+                tags: language.formatUnitList(relations.ancestorLinks),
               })),
 
           relations.descendantLinks &&
-            html.tag('p', {class: 'quick-info'},
+            html.tag('p', {id: 'descendants-line'},
+              {class: 'quick-info'},
               language.$(pageCapsule, 'descendants', {
                 tags: language.formatUnitList(relations.descendantLinks),
               })),

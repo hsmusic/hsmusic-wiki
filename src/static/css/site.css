@@ -2013,6 +2013,20 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content h1
 
 /* Specific pages - art tag gallery */
 
+html[data-url-key="localized.artTagGallery"] #descends-from-line {
+  margin-bottom: 0.25em;
+}
+
+html[data-url-key="localized.artTagGallery"] #descendants-line {
+  margin-top: 0.25em;
+}
+
+html[data-url-key="localized.artTagGallery"] #descends-from-line a,
+html[data-url-key="localized.artTagGallery"] #descendants-line a {
+  display: inline-block;
+}
+
+
 html[data-url-key="localized.artTagGallery"] #featured-direct-line,
 html[data-url-key="localized.artTagGallery"] #featured-indirect-line,
 html[data-url-key="localized.artTagGallery"] #showing-direct-line,

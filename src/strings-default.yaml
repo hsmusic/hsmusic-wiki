@@ -1308,7 +1308,7 @@ artTagInfoPage:
     _: "View this tag's {LINK}!"
     link: "art gallery"
 
-  readMoreOn: "Read more about {TAG} on {LINKS}."
+  readMoreOn: "Read more about '{TAG}' on {LINKS}."
 
   seeAlso:
     _: "See also: {TAGS}"
@@ -1322,27 +1322,27 @@ artTagInfoPage:
       This tag is featured in {ARTWORKS}.
 
     indirectlyOnly: >-
-      This tag is featured in {ARTWORKS}, but only indirectly - have a look at its descendant tags!
+      This tag is featured in {ARTWORKS}, but only indirectly.
 
     directlyAndIndirectly: >-
       This tag is directly featured in {ARTWORKS_DIRECTLY}, and indirectly in {ARTWORKS_INDIRECTLY} more, for a total of {ARTWORKS_TOTAL}.
 
   descendsFromTags:
-    _: "Tags that {TAG} descends from:"
+    _: "Tags which '{TAG}' falls under:"
     item: "{TAG}"
 
   descendantTags:
-    _: "Tags that descend from {TAG}:"
+    _: "Tags which fall under '{TAG}':"
 
     item:
       _: "{TAG}"
 
       withGallery:
         _: "{TAG} ({GALLERY})"
-        gallery: "Gallery"
+        gallery: "view gallery"
 
       withTimesUsed: "{TAG} ({TIMES_USED})"
-      withGallery.withTimesUsed: "{TAG} ({GALLERY}, {TIMES_USED})"
+      withGallery.withTimesUsed: "{TAG} ({GALLERY}; {TIMES_USED})"
 
 #
 # artTagGalleryPage:
@@ -1357,8 +1357,8 @@ artTagInfoPage:
 artTagGalleryPage:
   title: "{TAG}"
 
-  descendsFrom: "Descends from {TAGS}."
-  descendants: "Direct descendants: {TAGS}."
+  descendsFrom: "Up: {TAGS}."
+  descendants: "Down: {TAGS}."
 
   featuredLine:
     all: >-
