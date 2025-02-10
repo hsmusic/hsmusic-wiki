@@ -2,6 +2,7 @@ import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateAdditionalNamesBox',
     'generateArtTagNavLinks',
     'generateArtTagSidebar',
     'generateContentHeading',
@@ -46,6 +47,9 @@ export default {
 
     sidebar:
       relation('generateArtTagSidebar', artTag),
+
+    additionalNamesBox:
+      relation('generateAdditionalNamesBox', artTag.additionalNames),
 
     contentHeading:
       relation('generateContentHeading'),
@@ -120,8 +124,10 @@ export default {
             tag: language.sanitize(data.name),
           }),
 
-        headingMode: 'static',
+        headingMode: 'sticky',
         color: data.color,
+
+        additionalNames: relations.additionalNamesBox,
 
         mainContent: [
           html.tag('p',

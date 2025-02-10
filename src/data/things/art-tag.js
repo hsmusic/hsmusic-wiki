@@ -6,12 +6,13 @@ import {sortAlphabetically, sortAlbumsTracksChronologically} from '#sort';
 import Thing from '#thing';
 import {unique} from '#sugar';
 import {isName} from '#validators';
-import {parseAnnotatedReferences} from '#yaml';
+import {parseAdditionalNames, parseAnnotatedReferences} from '#yaml';
 
 import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
 
 import {
+  additionalNameList,
   annotatedReferenceList,
   color,
   directory,
@@ -53,6 +54,8 @@ export class ArtTag extends Thing {
           name.replace(/ \([^)]*?\)$/, ''),
       },
     ],
+
+    additionalNames: additionalNameList(),
 
     description: simpleString(),
 
@@ -161,6 +164,11 @@ export class ArtTag extends Thing {
       'Directory': {property: 'directory'},
       'Description': {property: 'description'},
       'Extra Reading URLs': {property: 'extraReadingURLs'},
+
+      'Additional Names': {
+        property: 'additionalNames',
+        transform: parseAdditionalNames,
+      },
 
       'Color': {property: 'color'},
       'Is CW': {property: 'isContentWarning'},

@@ -3,6 +3,7 @@ import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateAdditionalNamesBox',
     'generateArtTagGalleryPageFeaturedLine',
     'generateArtTagGalleryPageShowingLine',
     'generateArtTagNavLinks',
@@ -45,6 +46,9 @@ export default {
 
     relations.navLinks =
       relation('generateArtTagNavLinks', artTag);
+
+    relations.additionalNamesBox =
+      relation('generateAdditionalNamesBox', artTag.additionalNames);
 
     relations.quickDescription =
       relation('generateQuickDescription', artTag);
@@ -139,8 +143,9 @@ export default {
           }),
 
         headingMode: 'static',
-
         color: data.color,
+
+        additionalNames: relations.additionalNamesBox,
 
         mainClasses: ['top-index'],
         mainContent: [
