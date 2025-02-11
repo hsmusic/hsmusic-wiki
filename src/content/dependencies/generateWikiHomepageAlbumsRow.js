@@ -3,7 +3,6 @@ import {getNewAdditions, getNewReleases} from '#wiki-data';
 
 export default {
   contentDependencies: [
-    'generateWikiHomepageContentRow',
     'generateCoverCarousel',
     'generateCoverGrid',
     'image',
@@ -44,9 +43,6 @@ export default {
   },
 
   relations: (relation, sprawl, row) => ({
-    contentRow:
-      relation('generateWikiHomepageContentRow', row),
-
     coverGrid:
       (row.displayStyle === 'grid'
         ? relation('generateCoverGrid')
@@ -117,23 +113,15 @@ export default {
             .slot('mode', 'single-link')
             .content);
 
-    let content;
-
     switch (data.displayStyle) {
       case 'grid':
-        content =
-          relations.coverGrid.slots({
-            ...commonSlots,
-            names: data.names,
-          });
-        break;
+        return relations.coverGrid.slots({
+          ...commonSlots,
+          names: data.names,
+        });
 
       case 'carousel':
-        content =
-          relations.coverCarousel.slots(commonSlots);
-        break;
+        return relations.coverCarousel.slots(commonSlots);
     }
-
-    return relations.contentRow.slots({content});
   },
 };

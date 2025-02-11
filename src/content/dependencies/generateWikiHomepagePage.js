@@ -3,8 +3,8 @@ export default {
     'generatePageLayout',
     'generatePageSidebar',
     'generatePageSidebarBox',
-    'generateWikiHomepageAlbumsRow',
     'generateWikiHomepageNewsBox',
+    'generateWikiHomepageSection',
     'transformContent',
   ],
 
@@ -40,15 +40,9 @@ export default {
       homepageLayout.navbarLinks
         .map(content => relation('transformContent', content)),
 
-    contentRows:
-      homepageLayout.rows.map(row => {
-        switch (row.type) {
-          case 'albums':
-            return relation('generateWikiHomepageAlbumsRow', row);
-          default:
-            return null;
-        }
-      }),
+    sections:
+      homepageLayout.sections
+        .map(section => relation('generateWikiHomepageSection', section)),
   }),
 
   data: (sprawl) => ({
@@ -65,7 +59,7 @@ export default {
       headingMode: 'static',
 
       mainContent: [
-        relations.contentRows,
+        relations.sections,
       ],
 
       leftSidebar:
