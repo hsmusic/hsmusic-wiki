@@ -30,6 +30,7 @@ import {
   atOffset,
   empty,
   filterProperties,
+  getNestedProp,
   stitchArrays,
   typeAppearance,
   withEntries,
@@ -1230,39 +1231,39 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
     // entries must be present here even without any properties to explicitly
     // link if the 'find' or 'reverse' properties will be implicitly linked
 
-    [wikiData.albumData, [
+    ['albumData', [
       'albumData',
       'trackData',
       'wikiInfo',
     ]],
 
-    [wikiData.artTagData, [/* reverse */]],
+    ['artTagData', [/* reverse */]],
 
-    [wikiData.artistData, [/* find, reverse */]],
+    ['artistData', [/* find, reverse */]],
 
-    [wikiData.flashData, [
+    ['flashData', [
       'wikiInfo',
     ]],
 
-    [wikiData.flashActData, [/* find, reverse */]],
+    ['flashActData', [/* find, reverse */]],
 
-    [wikiData.flashSideData, [/* find */]],
+    ['flashSideData', [/* find */]],
 
-    [wikiData.groupData, [/* find, reverse */]],
+    ['groupData', [/* find, reverse */]],
 
-    [wikiData.groupCategoryData, [/* find */]],
+    ['groupCategoryData', [/* find */]],
 
-    [wikiData.homepageLayout.rows, [/* find */]],
+    ['homepageLayout.rows', [/* find */]],
 
-    [wikiData.trackData, [
+    ['trackData', [
       'albumData',
       'trackData',
       'wikiInfo',
     ]],
 
-    [wikiData.trackSectionData, [/* reverse */]],
+    ['trackSectionData', [/* reverse */]],
 
-    [[wikiData.wikiInfo], [/* find */]],
+    ['wikiInfo', [/* find */]],
   ]);
 
   const constructorHasFindMap = new Map();
@@ -1271,8 +1272,12 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
   const boundFind = bindFind(wikiData);
   const boundReverse = bindReverse(wikiData);
 
-  for (const [things, keys] of linkWikiDataSpec.entries()) {
-    if (things === undefined) continue;
+  for (const [thingDataProp, keys] of linkWikiDataSpec.entries()) {
+    const thingData = getNestedProp(wikiData, thingDataProp);
+    const things =
+      (Array.isArray(thingData)
+        ? thingData.flat(Infinity)
+        : [thingData]);
 
     for (const thing of things) {
       if (thing === undefined) continue;
