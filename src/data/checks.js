@@ -237,7 +237,7 @@ export function filterReferenceErrors(wikiData, {
   const aggregate = openAggregate({message: `Errors validating between-thing references in data`});
   for (const [thingDataProp, propSpec] of referenceSpec) {
     const thingData = getNestedProp(wikiData, thingDataProp);
-    const things = Array.isArray(thingData) ? thingData : [thingData];
+    const things = Array.isArray(thingData) ? thingData.flat(Infinity) : [thingData];
     aggregate.nest({message: `Reference errors in ${colors.green('wikiData.' + thingDataProp)}`}, ({nest}) => {
       for (const thing of things) {
         nest({message: `Reference errors in ${inspect(thing)}`}, ({nest, push, filter}) => {
