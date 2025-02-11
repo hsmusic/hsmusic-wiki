@@ -196,7 +196,7 @@ export function filterReferenceErrors(wikiData, {
       groups: 'group',
     }],
 
-    ['homepageLayout.rows', {
+    ['homepageLayout.sections.rows', {
       sourceGroup: '_homepageSourceGroup',
       sourceAlbums: 'album',
     }],

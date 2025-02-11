@@ -1508,7 +1508,11 @@ async function main() {
       logThings('staticPageData', 'static pages');
       if (wikiData.homepageLayout) {
         logInfo` - ${1} homepage layout (${
-          wikiData.homepageLayout.rows.length
+          wikiData.homepageLayout.sections.length
+        } sections, ${
+          wikiData.homepageLayout.sections
+            .flatMap(section => section.rows)
+            .length
         } rows)`;
       }
       if (wikiData.wikiInfo) {

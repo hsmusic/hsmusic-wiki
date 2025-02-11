@@ -1253,7 +1253,7 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
 
     ['groupCategoryData', [/* find */]],
 
-    ['homepageLayout.rows', [/* find */]],
+    ['homepageLayout.sections.rows', [/* find */]],
 
     ['trackData', [
       'albumData',

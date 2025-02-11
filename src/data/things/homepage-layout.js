@@ -2,6 +2,7 @@ export const HOMEPAGE_LAYOUT_DATA_FILE = 'homepage.yaml';
 
 import {input} from '#composite';
 import Thing from '#thing';
+import {empty} from '#sugar';
 
 import {
   anyOf,
@@ -10,19 +11,26 @@ import {
   isString,
   isStringNonEmpty,
   validateArrayItems,
-  validateInstanceOf,
   validateReference,
 } from '#validators';
 
 import {exposeDependency} from '#composite/control-flow';
 import {withResolvedReference} from '#composite/wiki-data';
-import {color, contentString, name, referenceList, soupyFind}
-  from '#composite/wiki-properties';
+
+import {
+  color,
+  contentString,
+  name,
+  referenceList,
+  soupyFind,
+  thing,
+  thingList,
+} from '#composite/wiki-properties';
 
 export class HomepageLayout extends Thing {
   static [Thing.friendlyName] = `Homepage Layout`;
 
-  static [Thing.getPropertyDescriptors] = ({HomepageLayoutRow}) => ({
+  static [Thing.getPropertyDescriptors] = ({HomepageLayoutSection}) => ({
     // Update & expose
 
     sidebarContent: contentString(),
@@ -32,13 +40,9 @@ export class HomepageLayout extends Thing {
       update: {validate: validateArrayItems(isStringNonEmpty)},
     },
 
-    rows: {
-      flags: {update: true, expose: true},
-
-      update: {
-        validate: validateArrayItems(validateInstanceOf(HomepageLayoutRow)),
-      },
-    },
+    sections: thingList({
+      class: input.value(HomepageLayoutSection),
+    }),
   });
 
   static [Thing.yamlDocumentSpec] = {
@@ -51,49 +55,111 @@ export class HomepageLayout extends Thing {
   };
 
   static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {headerAndEntries}, // Kludge, see below
+    documentModes: {allInOne},
     thingConstructors: {
       HomepageLayout,
+      HomepageLayoutSection,
       HomepageLayoutAlbumsRow,
     },
   }) => ({
     title: `Process homepage layout file`,
+    file: HOMEPAGE_LAYOUT_DATA_FILE,
 
-    // Kludge: This benefits from the same headerAndEntries style messaging as
-    // albums and tracks (for example), but that document mode is designed to
-    // support multiple files, and only one is actually getting processed here.
-    files: [HOMEPAGE_LAYOUT_DATA_FILE],
-
-    documentMode: headerAndEntries,
-    headerDocumentThing: HomepageLayout,
-    entryDocumentThing: document => {
-      switch (document['Type']) {
-        case 'albums':
-          return HomepageLayoutAlbumsRow;
-        default:
-          throw new TypeError(`No processDocument function for row type ${document['Type']}!`);
+    documentMode: allInOne,
+    documentThing: document => {
+      if (document['Homepage']) {
+        return HomepageLayout;
       }
+
+      if (document['Section']) {
+        return HomepageLayoutSection;
+      }
+
+      if (document['Row']) {
+        switch (document['Row']) {
+          case 'albums':
+            return HomepageLayoutAlbumsRow;
+          default:
+            throw new TypeError(`Unrecognized row type ${document['Row']}`);
+        }
+      }
+
+      return null;
     },
 
     save(results) {
-      if (!results[0]) {
-        return;
+      if (!empty(results) && !(results[0] instanceof HomepageLayout)) {
+        throw new Error(`Expected 'Homepage' document at top of homepage layout file`);
       }
 
-      const {header: homepageLayout, entries: rows} = results[0];
-      Object.assign(homepageLayout, {rows});
+      const homepageLayout = results[0];
+      const sections = [];
+
+      let currentSection = null;
+      let currentSectionRows = [];
+
+      const closeCurrentSection = () => {
+        if (currentSection) {
+          for (const row of currentSectionRows) {
+            row.section = currentSection;
+          }
+
+          currentSection.rows = currentSectionRows;
+          sections.push(currentSection);
+
+          currentSection = null;
+          currentSectionRows = [];
+        }
+      };
+
+      for (const entry of results.slice(1)) {
+        if (entry instanceof HomepageLayout) {
+          throw new Error(`Expected only one 'Homepage' document in total`);
+        } else if (entry instanceof HomepageLayoutSection) {
+          closeCurrentSection();
+          currentSection = entry;
+        } else if (entry instanceof HomepageLayoutRow) {
+          currentSectionRows.push(entry);
+        }
+      }
+
+      closeCurrentSection();
+
+      homepageLayout.sections = sections;
+
       return {homepageLayout};
     },
   });
 }
 
+export class HomepageLayoutSection extends Thing {
+  static [Thing.friendlyName] = `Homepage Section`;
+
+  static [Thing.getPropertyDescriptors] = ({HomepageLayoutRow}) => ({
+    // Update & expose
+
+    name: name(`Unnamed Homepage Section`),
+
+    color: color(),
+
+    rows: thingList({
+      class: input.value(HomepageLayoutRow),
+    }),
+  });
+
+  static [Thing.yamlDocumentSpec] = {
+    fields: {
+      'Section': {property: 'name'},
+      'Color': {property: 'color'},
+    },
+  };
+}
+
 export class HomepageLayoutRow extends Thing {
   static [Thing.friendlyName] = `Homepage Row`;
 
-  static [Thing.getPropertyDescriptors] = () => ({
+  static [Thing.getPropertyDescriptors] = ({HomepageLayoutSection}) => ({
     // Update & expose
-
-    name: name('Unnamed Homepage Row'),
 
     type: {
       flags: {update: true, expose: true},
@@ -105,7 +171,9 @@ export class HomepageLayoutRow extends Thing {
       },
     },
 
-    color: color(),
+    section: thing({
+      class: input.value(HomepageLayoutSection),
+    }),
 
     // Update only
 
@@ -114,9 +182,7 @@ export class HomepageLayoutRow extends Thing {
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
-      'Row': {property: 'name'},
-      'Color': {property: 'color'},
-      'Type': {property: 'type'},
+      'Row': {property: 'type'},
     },
   };
 }
