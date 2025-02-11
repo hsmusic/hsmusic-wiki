@@ -1,5 +1,8 @@
 export const HOMEPAGE_LAYOUT_DATA_FILE = 'homepage.yaml';
 
+import {inspect} from 'node:util';
+
+import {colors} from '#cli';
 import {input} from '#composite';
 import Thing from '#thing';
 import {empty} from '#sugar';
@@ -185,6 +188,24 @@ export class HomepageLayoutRow extends Thing {
       'Row': {property: 'type'},
     },
   };
+
+  [inspect.custom](depth) {
+    const parts = [];
+
+    parts.push(Thing.prototype[inspect.custom].apply(this));
+
+    if (depth >= 0 && this.section) {
+      const sectionName = this.section.name;
+      const index = this.section.rows.indexOf(this);
+      const rowNum =
+        (index === -1
+          ? 'indeterminate position'
+          : `#${index + 1}`);
+      parts.push(` (${colors.yellow(rowNum)} in ${colors.green(sectionName)})`);
+    }
+
+    return parts.join('');
+  }
 }
 
 export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
