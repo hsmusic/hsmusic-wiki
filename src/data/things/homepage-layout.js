@@ -164,16 +164,6 @@ export class HomepageLayoutRow extends Thing {
   static [Thing.getPropertyDescriptors] = ({HomepageLayoutSection}) => ({
     // Update & expose
 
-    type: {
-      flags: {update: true, expose: true},
-
-      update: {
-        validate() {
-          throw new Error(`'type' property validator must be overridden`);
-        },
-      },
-    },
-
     section: thing({
       class: input.value(HomepageLayoutSection),
     }),
@@ -181,11 +171,23 @@ export class HomepageLayoutRow extends Thing {
     // Update only
 
     find: soupyFind(),
+
+    // Expose only
+
+    type: {
+      flags: {expose: true},
+
+      expose: {
+        compute() {
+          throw new Error(`'type' property validator must be overridden`);
+        },
+      },
+    },
   });
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
-      'Row': {property: 'type'},
+      'Row': {ignore: true},
     },
   };
 
@@ -215,19 +217,6 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
     ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
 
     // Update & expose
-
-    type: {
-      flags: {update: true, expose: true},
-      update: {
-        validate(value) {
-          if (value !== 'albums') {
-            throw new TypeError(`Expected 'albums'`);
-          }
-
-          return true;
-        },
-      },
-    },
 
     displayStyle: {
       flags: {update: true, expose: true},
@@ -279,9 +268,11 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       update: {validate: isCountingNumber},
     },
 
-    actionLinks: {
-      flags: {update: true, expose: true},
-      update: {validate: validateArrayItems(isString)},
+    // Expose only
+
+    type: {
+      flags: {expose: true},
+      expose: {compute: () => 'albums'},
     },
   });
 
