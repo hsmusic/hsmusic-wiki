@@ -49,6 +49,42 @@ export class HomepageLayout extends Thing {
       'Navbar Links': {property: 'navbarLinks'},
     },
   };
+
+  static [Thing.getYamlLoadingSpec] = ({
+    documentModes: {headerAndEntries}, // Kludge, see below
+    thingConstructors: {
+      HomepageLayout,
+      HomepageLayoutAlbumsRow,
+    },
+  }) => ({
+    title: `Process homepage layout file`,
+
+    // Kludge: This benefits from the same headerAndEntries style messaging as
+    // albums and tracks (for example), but that document mode is designed to
+    // support multiple files, and only one is actually getting processed here.
+    files: [HOMEPAGE_LAYOUT_DATA_FILE],
+
+    documentMode: headerAndEntries,
+    headerDocumentThing: HomepageLayout,
+    entryDocumentThing: document => {
+      switch (document['Type']) {
+        case 'albums':
+          return HomepageLayoutAlbumsRow;
+        default:
+          throw new TypeError(`No processDocument function for row type ${document['Type']}!`);
+      }
+    },
+
+    save(results) {
+      if (!results[0]) {
+        return;
+      }
+
+      const {header: homepageLayout, entries: rows} = results[0];
+      Object.assign(homepageLayout, {rows});
+      return {homepageLayout};
+    },
+  });
 }
 
 export class HomepageLayoutRow extends Thing {
@@ -169,42 +205,6 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       'Count': {property: 'countAlbumsFromGroup'},
       'Albums': {property: 'sourceAlbums'},
       'Actions': {property: 'actionLinks'},
-    },
-  });
-
-  static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {headerAndEntries}, // Kludge, see below
-    thingConstructors: {
-      HomepageLayout,
-      HomepageLayoutAlbumsRow,
-    },
-  }) => ({
-    title: `Process homepage layout file`,
-
-    // Kludge: This benefits from the same headerAndEntries style messaging as
-    // albums and tracks (for example), but that document mode is designed to
-    // support multiple files, and only one is actually getting processed here.
-    files: [HOMEPAGE_LAYOUT_DATA_FILE],
-
-    documentMode: headerAndEntries,
-    headerDocumentThing: HomepageLayout,
-    entryDocumentThing: document => {
-      switch (document['Type']) {
-        case 'albums':
-          return HomepageLayoutAlbumsRow;
-        default:
-          throw new TypeError(`No processDocument function for row type ${document['Type']}!`);
-      }
-    },
-
-    save(results) {
-      if (!results[0]) {
-        return;
-      }
-
-      const {header: homepageLayout, entries: rows} = results[0];
-      Object.assign(homepageLayout, {rows});
-      return {homepageLayout};
     },
   });
 }
