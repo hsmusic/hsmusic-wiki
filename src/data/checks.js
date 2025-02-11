@@ -373,6 +373,10 @@ export function filterReferenceErrors(wikiData, {
             }
 
             const suppress = fn => conditionallySuppressError(error => {
+              // We're not suppressing any errors at the moment.
+              // An old suppression is kept below for reference.
+
+              /*
               if (property === 'sampledTracks') {
                 // Suppress "didn't match anything" errors in particular, just for samples.
                 // In hsmusic-data we have a lot of "stub" sample data which don't have
@@ -385,6 +389,7 @@ export function filterReferenceErrors(wikiData, {
                   return true;
                 }
               }
+              */
 
               return false;
             }, fn);
