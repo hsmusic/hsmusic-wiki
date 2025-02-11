@@ -3,8 +3,8 @@ export default {
     'generatePageLayout',
     'generatePageSidebar',
     'generatePageSidebarBox',
-    'generateWikiHomeAlbumsRow',
-    'generateWikiHomeNewsBox',
+    'generateWikiHomepageAlbumsRow',
+    'generateWikiHomepageNewsBox',
     'transformContent',
   ],
 
@@ -37,7 +37,7 @@ export default {
 
     if (sprawl.enableNews) {
       relations.newsSidebarBox =
-        relation('generateWikiHomeNewsBox');
+        relation('generateWikiHomepageNewsBox');
     }
 
     if (homepageLayout.navbarLinks) {
@@ -50,7 +50,7 @@ export default {
       homepageLayout.rows.map(row => {
         switch (row.type) {
           case 'albums':
-            return relation('generateWikiHomeAlbumsRow', row);
+            return relation('generateWikiHomepageAlbumsRow', row);
           default:
             return null;
         }

@@ -7,7 +7,7 @@ export function pathsTargetless({wikiData}) {
       path: ['home'],
 
       contentFunction: {
-        name: 'generateWikiHomePage',
+        name: 'generateWikiHomepagePage',
         args: [wikiData.homepageLayout],
       },
     },

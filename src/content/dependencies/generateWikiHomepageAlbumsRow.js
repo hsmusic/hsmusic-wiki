@@ -3,7 +3,7 @@ import {getNewAdditions, getNewReleases} from '#wiki-data';
 
 export default {
   contentDependencies: [
-    'generateWikiHomeContentRow',
+    'generateWikiHomepageContentRow',
     'generateCoverCarousel',
     'generateCoverGrid',
     'image',
@@ -47,7 +47,7 @@ export default {
     const relations = {};
 
     relations.contentRow =
-      relation('generateWikiHomeContentRow', row);
+      relation('generateWikiHomepageContentRow', row);
 
     if (row.displayStyle === 'grid') {
       relations.coverGrid =

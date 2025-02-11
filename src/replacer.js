@@ -101,7 +101,7 @@ export const replacerSpec = {
 
   'home': {
     find: null,
-    link: 'linkWikiHome',
+    link: 'linkWikiHomepage',
   },
 
   'listing-index': {
