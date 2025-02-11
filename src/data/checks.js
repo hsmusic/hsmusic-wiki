@@ -197,6 +197,7 @@ export function filterReferenceErrors(wikiData, {
     }],
 
     ['homepageLayout.sections.rows', {
+      _include: row => row.type === 'albums',
       sourceGroup: '_homepageSourceGroup',
       sourceAlbums: 'album',
     }],
@@ -244,8 +245,16 @@ export function filterReferenceErrors(wikiData, {
 
     aggregate.nest({message: `Reference errors in ${colors.green('wikiData.' + thingDataProp)}`}, ({nest}) => {
       for (const thing of things) {
+        if (propSpec._include && !propSpec._include(thing)) {
+          continue;
+        }
+
         nest({message: `Reference errors in ${inspect(thing)}`}, ({nest, push, filter}) => {
           for (const [property, findFnKey] of Object.entries(propSpec)) {
+            if (property === '_include') {
+              continue;
+            }
+
             let value = CacheableObject.getUpdateValue(thing, property);
             let writeProperty = true;
 
