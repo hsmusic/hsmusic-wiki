@@ -80,6 +80,8 @@ export class HomepageLayout extends Thing {
 
       if (document['Row']) {
         switch (document['Row']) {
+          case 'actions':
+            return HomepageLayoutActionsRow;
           case 'albums':
             return HomepageLayoutAlbumsRow;
           default:
@@ -210,6 +212,34 @@ export class HomepageLayoutRow extends Thing {
   }
 }
 
+export class HomepageLayoutActionsRow extends HomepageLayoutRow {
+  static [Thing.friendlyName] = `Homepage Actions Row`;
+
+  static [Thing.getPropertyDescriptors] = (opts) => ({
+    ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
+
+    // Update & expose
+
+    actionLinks: {
+      flags: {update: true, expose: true},
+      update: {validate: validateArrayItems(isString)},
+    },
+
+    // Expose only
+
+    type: {
+      flags: {expose: true},
+      expose: {compute: () => 'actions'},
+    },
+  });
+
+  static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(HomepageLayoutRow, {
+    fields: {
+      'Actions': {property: 'actionLinks'},
+    },
+  });
+}
+
 export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
   static [Thing.friendlyName] = `Homepage Albums Row`;
 
@@ -282,7 +312,6 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       'Group': {property: 'sourceGroup'},
       'Count': {property: 'countAlbumsFromGroup'},
       'Albums': {property: 'sourceAlbums'},
-      'Actions': {property: 'actionLinks'},
     },
   });
 }

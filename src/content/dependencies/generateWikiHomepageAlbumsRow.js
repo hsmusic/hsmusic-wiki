@@ -7,7 +7,6 @@ export default {
     'generateCoverGrid',
     'image',
     'linkAlbum',
-    'transformContent',
   ],
 
   extraDependencies: ['language', 'wikiData'],
@@ -60,10 +59,6 @@ export default {
     images:
       sprawl.albums
         .map(album => relation('image', album.artTags)),
-
-    actionLinks:
-      row.actionLinks
-        .map(content => relation('transformContent', content)),
   }),
 
   data: (sprawl, row) => ({
@@ -105,13 +100,6 @@ export default {
                 album: name,
               }),
             }));
-
-    commonSlots.actionLinks =
-      relations.actionLinks
-        .map(contents =>
-          contents
-            .slot('mode', 'single-link')
-            .content);
 
     switch (data.displayStyle) {
       case 'grid':

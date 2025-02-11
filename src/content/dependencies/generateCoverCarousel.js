@@ -2,24 +2,16 @@ import {empty, repeat, stitchArrays} from '#sugar';
 import {getCarouselLayoutForNumberOfItems} from '#wiki-data';
 
 export default {
-  contentDependencies: ['generateGridActionLinks'],
   extraDependencies: ['html'],
-
-  relations(relation) {
-    return {
-      actionLinks: relation('generateGridActionLinks'),
-    };
-  },
 
   slots: {
     images: {validate: v => v.strictArrayOf(v.isHTML)},
     links: {validate: v => v.strictArrayOf(v.isHTML)},
 
     lazy: {validate: v => v.anyOf(v.isWholeNumber, v.isBoolean)},
-    actionLinks: {validate: v => v.sparseArrayOf(v.isHTML)},
   },
 
-  generate(relations, slots, {html}) {
+  generate(slots, {html}) {
     const stitched =
       stitchArrays({
         image: slots.images,
@@ -58,9 +50,6 @@ export default {
                     }),
                 })))),
         ])),
-
-      relations.actionLinks
-        .slot('actionLinks', slots.actionLinks),
     ]);
   },
 };

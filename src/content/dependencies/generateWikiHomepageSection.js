@@ -1,6 +1,7 @@
 export default {
   contentDependencies: [
     'generateColorStyleAttribute',
+    'generateWikiHomepageActionsRow',
     'generateWikiHomepageAlbumsRow',
   ],
 
@@ -12,7 +13,9 @@ export default {
 
     rows:
       homepageSection.rows.map(row =>
-        (row.type === 'albums'
+        (row.type === 'actions'
+          ? relation('generateWikiHomepageActionsRow', row)
+       : row.type === 'albums'
           ? relation('generateWikiHomepageAlbumsRow', row)
           : null)),
   }),
