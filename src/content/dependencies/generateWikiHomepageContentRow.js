@@ -7,8 +7,10 @@ export default {
       relation('generateColorStyleAttribute', row.color),
   }),
 
-  data: (row) =>
-    ({name: row.name}),
+  data: (row) => ({
+    name:
+      row.name,
+  }),
 
   slots: {
     content: {

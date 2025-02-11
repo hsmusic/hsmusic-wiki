@@ -43,59 +43,50 @@ export default {
     return sprawl;
   },
 
-  relations(relation, sprawl, row) {
-    const relations = {};
+  relations: (relation, sprawl, row) => ({
+    contentRow:
+      relation('generateWikiHomepageContentRow', row),
 
-    relations.contentRow =
-      relation('generateWikiHomepageContentRow', row);
+    coverGrid:
+      (row.displayStyle === 'grid'
+        ? relation('generateCoverGrid')
+        : null),
 
-    if (row.displayStyle === 'grid') {
-      relations.coverGrid =
-        relation('generateCoverGrid');
-    }
+    coverCarousel:
+      (row.displayStyle === 'carousel'
+        ? relation('generateCoverCarousel')
+        : null),
 
-    if (row.displayStyle === 'carousel') {
-      relations.coverCarousel =
-        relation('generateCoverCarousel');
-    }
-
-    relations.links =
+    links:
       sprawl.albums
-        .map(album => relation('linkAlbum', album));
+        .map(album => relation('linkAlbum', album)),
 
-    relations.images =
+    images:
       sprawl.albums
-        .map(album => relation('image', album.artTags));
+        .map(album => relation('image', album.artTags)),
 
-    if (row.actionLinks) {
-      relations.actionLinks =
-        row.actionLinks
-          .map(content => relation('transformContent', content));
-    }
+    actionLinks:
+      row.actionLinks
+        .map(content => relation('transformContent', content)),
+  }),
 
-    return relations;
-  },
+  data: (sprawl, row) => ({
+    displayStyle:
+      row.displayStyle,
 
-  data(sprawl, row) {
-    const data = {};
+    names:
+      (row.displayStyle === 'grid'
+        ? sprawl.albums
+            .map(album => album.name)
+        : null),
 
-    data.displayStyle = row.displayStyle;
-
-    if (row.displayStyle === 'grid') {
-      data.names =
-        sprawl.albums
-          .map(album => album.name);
-    }
-
-    data.paths =
+    paths:
       sprawl.albums
         .map(album =>
           (album.hasCoverArt
             ? ['media.albumCover', album.directory, album.coverArtFileExtension]
-            : null));
-
-    return data;
-  },
+            : null)),
+  }),
 
   generate(data, relations, {language}) {
     // Grids and carousels share some slots! Very convenient.
@@ -120,13 +111,11 @@ export default {
             }));
 
     commonSlots.actionLinks =
-      (relations.actionLinks
-        ? relations.actionLinks
-            .map(contents =>
-              contents
-                .slot('mode', 'single-link')
-                .content)
-        : null);
+      relations.actionLinks
+        .map(contents =>
+          contents
+            .slot('mode', 'single-link')
+            .content);
 
     let content;
 

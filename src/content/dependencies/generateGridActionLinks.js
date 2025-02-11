@@ -1,5 +1,3 @@
-import {empty} from '#sugar';
-
 export default {
   extraDependencies: ['html'],
 
@@ -7,16 +5,12 @@ export default {
     actionLinks: {validate: v => v.sparseArrayOf(v.isHTML)},
   },
 
-  generate(slots, {html}) {
-    if (empty(slots.actionLinks)) {
-      return html.blank();
-    }
+  generate: (slots, {html}) =>
+    html.tag('div', {class: 'grid-actions'},
+      {[html.onlyIfContent]: true},
 
-    return (
-      html.tag('div', {class: 'grid-actions'},
-        slots.actionLinks
-          .filter(Boolean)
-          .map(link => link
-            .slot('attributes', {class: ['grid-item', 'box']}))));
-  },
+      (slots.actionLinks ?? [])
+        .filter(link => link && !html.isBlank(link))
+        .map(link => link
+          .slot('attributes', {class: ['grid-item', 'box']}))),
 };

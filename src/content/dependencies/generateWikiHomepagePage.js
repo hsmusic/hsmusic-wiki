@@ -10,43 +10,37 @@ export default {
 
   extraDependencies: ['wikiData'],
 
-  sprawl({wikiInfo}) {
-    return {
-      wikiName: wikiInfo.name,
+  sprawl: ({wikiInfo}) => ({
+    wikiName:
+      wikiInfo.name,
 
-      enableNews: wikiInfo.enableNews,
-    };
-  },
+    enableNews:
+      wikiInfo.enableNews,
+  }),
 
-  relations(relation, sprawl, homepageLayout) {
-    const relations = {};
+  relations: (relation, sprawl, homepageLayout) => ({
+    layout:
+      relation('generatePageLayout'),
 
-    relations.layout =
-      relation('generatePageLayout');
+    sidebar:
+      relation('generatePageSidebar'),
 
-    relations.sidebar =
-      relation('generatePageSidebar');
+    customSidebarBox:
+      relation('generatePageSidebarBox'),
 
-    if (homepageLayout.sidebarContent) {
-      relations.customSidebarBox =
-        relation('generatePageSidebarBox');
+    customSidebarContent:
+      relation('transformContent', homepageLayout.sidebarContent),
 
-      relations.customSidebarContent =
-        relation('transformContent', homepageLayout.sidebarContent);
-    }
+    newsSidebarBox:
+      (sprawl.enableNews
+        ? relation('generateWikiHomepageNewsBox')
+        : null),
 
-    if (sprawl.enableNews) {
-      relations.newsSidebarBox =
-        relation('generateWikiHomepageNewsBox');
-    }
+    customNavLinkContents:
+      homepageLayout.navbarLinks
+        .map(content => relation('transformContent', content)),
 
-    if (homepageLayout.navbarLinks) {
-      relations.customNavLinkContents =
-        homepageLayout.navbarLinks
-          .map(content => relation('transformContent', content));
-    }
-
-    relations.contentRows =
+    contentRows:
       homepageLayout.rows.map(row => {
         switch (row.type) {
           case 'albums':
@@ -54,19 +48,16 @@ export default {
           default:
             return null;
         }
-      });
+      }),
+  }),
 
-    return relations;
-  },
+  data: (sprawl) => ({
+    wikiName:
+      sprawl.wikiName,
+  }),
 
-  data(sprawl) {
-    return {
-      wikiName: sprawl.wikiName,
-    };
-  },
-
-  generate(data, relations) {
-    return relations.layout.slots({
+  generate: (data, relations) =>
+    relations.layout.slots({
       title: data.wikiName,
       showWikiNameInTitle: false,
 
@@ -82,15 +73,14 @@ export default {
           wide: true,
 
           boxes: [
-            relations.customSidebarContent &&
-              relations.customSidebarBox.slots({
-                attributes: {class: 'custom-content-sidebar-box'},
-                collapsible: false,
+            relations.customSidebarBox.slots({
+              attributes: {class: 'custom-content-sidebar-box'},
+              collapsible: false,
 
-                content:
-                  relations.customSidebarContent
-                    .slot('mode', 'multiline'),
-              }),
+              content:
+                relations.customSidebarContent
+                  .slot('mode', 'multiline'),
+            }),
 
             relations.newsSidebarBox,
           ],
@@ -100,17 +90,14 @@ export default {
       navLinks: [
         {auto: 'home', current: true},
 
-        ...(
-          relations.customNavLinkContents
-            ?.map(content => ({
-              html:
-                content.slots({
-                  mode: 'single-link',
-                  preferShortLinkNames: true,
-                }),
-            }))
-          ?? []),
+        ...
+          relations.customNavLinkContents.map(content => ({
+            html:
+              content.slots({
+                mode: 'single-link',
+                preferShortLinkNames: true,
+              }),
+          })),
       ],
-    });
-  },
+    }),
 };
