@@ -197,7 +197,12 @@ export function filterReferenceErrors(wikiData, {
     }],
 
     ['homepageLayout.sections.rows', {
-      _include: row => row.type === 'albums',
+      _include: row => row.type === 'album carousel',
+      albums: 'album',
+    }],
+
+    ['homepageLayout.sections.rows', {
+      _include: row => row.type === 'album grid',
       sourceGroup: '_homepageSourceGroup',
       sourceAlbums: 'album',
     }],

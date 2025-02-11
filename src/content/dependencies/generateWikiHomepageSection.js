@@ -2,7 +2,8 @@ export default {
   contentDependencies: [
     'generateColorStyleAttribute',
     'generateWikiHomepageActionsRow',
-    'generateWikiHomepageAlbumsRow',
+    'generateWikiHomepageAlbumCarouselRow',
+    'generateWikiHomepageAlbumGridRow',
   ],
 
   extraDependencies: ['html'],
@@ -15,8 +16,10 @@ export default {
       homepageSection.rows.map(row =>
         (row.type === 'actions'
           ? relation('generateWikiHomepageActionsRow', row)
-       : row.type === 'albums'
-          ? relation('generateWikiHomepageAlbumsRow', row)
+       : row.type === 'album carousel'
+          ? relation('generateWikiHomepageAlbumCarouselRow', row)
+       : row.type === 'album grid'
+          ? relation('generateWikiHomepageAlbumGridRow', row)
           : null)),
   }),
 

@@ -82,8 +82,10 @@ export class HomepageLayout extends Thing {
         switch (document['Row']) {
           case 'actions':
             return HomepageLayoutActionsRow;
-          case 'albums':
-            return HomepageLayoutAlbumsRow;
+          case 'album carousel':
+            return HomepageLayoutAlbumCarouselRow;
+          case 'album grid':
+            return HomepageLayoutAlbumGridRow;
           default:
             throw new TypeError(`Unrecognized row type ${document['Row']}`);
         }
@@ -240,26 +242,41 @@ export class HomepageLayoutActionsRow extends HomepageLayoutRow {
   });
 }
 
-export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
-  static [Thing.friendlyName] = `Homepage Albums Row`;
+export class HomepageLayoutAlbumCarouselRow extends HomepageLayoutRow {
+  static [Thing.friendlyName] = `Homepage Album Carousel Row`;
 
   static [Thing.getPropertyDescriptors] = (opts, {Album, Group} = opts) => ({
     ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
 
     // Update & expose
 
-    displayStyle: {
-      flags: {update: true, expose: true},
+    albums: referenceList({
+      class: input.value(Album),
+      find: soupyFind.input('album'),
+    }),
 
-      update: {
-        validate: is('grid', 'carousel'),
-      },
+    // Expose only
 
-      expose: {
-        transform: (displayStyle) =>
-          displayStyle ?? 'grid',
-      },
+    type: {
+      flags: {expose: true},
+      expose: {compute: () => 'album carousel'},
     },
+  });
+
+  static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(HomepageLayoutRow, {
+    fields: {
+      'Albums': {property: 'albums'},
+    },
+  });
+}
+
+export class HomepageLayoutAlbumGridRow extends HomepageLayoutRow {
+  static [Thing.friendlyName] = `Homepage Album Grid Row`;
+
+  static [Thing.getPropertyDescriptors] = (opts, {Album, Group} = opts) => ({
+    ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
+
+    // Update & expose
 
     sourceGroup: [
       {
@@ -302,13 +319,12 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
 
     type: {
       flags: {expose: true},
-      expose: {compute: () => 'albums'},
+      expose: {compute: () => 'album grid'},
     },
   });
 
   static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(HomepageLayoutRow, {
     fields: {
-      'Display Style': {property: 'displayStyle'},
       'Group': {property: 'sourceGroup'},
       'Count': {property: 'countAlbumsFromGroup'},
       'Albums': {property: 'sourceAlbums'},
