@@ -476,6 +476,10 @@ function trackSidebarSearchDownloadEnds(event) {
 async function activateSidebarSearch(query) {
   const {session, state} = info;
 
+  if (!query) {
+    return;
+  }
+
   if (state.stoppedTypingTimeout) {
     clearTimeout(state.stoppedTypingTimeout);
     state.stoppedTypingTimeout = null;
