@@ -350,7 +350,7 @@ export function addPageListeners() {
     }
 
     const inputRect = info.searchInput.getBoundingClientRect();
-    if (domEvent.clientX < inputRect.left) {
+    if (domEvent.clientX < inputRect.left - 3) {
       info.searchInput.select();
     }
   });
