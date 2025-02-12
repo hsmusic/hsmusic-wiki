@@ -461,7 +461,7 @@ export function initializeState() {
       info.searchInput.value = session.activeQuery;
       activateSidebarSearch(session.activeQuery);
     } else if (session.activeQueryResults) {
-      recallRecentSidebarSearch();
+      considerRecallingRecentSidebarSearch();
     }
   }
 }
@@ -1057,11 +1057,22 @@ function restoreSidebarSearchColumn() {
   info.searchInput.placeholder = info.standbyInputPlaceholder;
 }
 
-function recallRecentSidebarSearch() {
+function considerRecallingRecentSidebarSearch() {
   const {session, state} = info;
+
+  if (document.documentElement.dataset.urlKey === 'localized.home') {
+    return forgetRecentSidebarSearch();
+  }
 
   info.searchInput.placeholder = session.activeQuery;
   state.recallingRecentSearch = true;
+}
+
+function forgetRecentSidebarSearch() {
+  const {session} = info;
+
+  session.activeQuery = null;
+  session.activeQueryResults = null;
 }
 
 async function handleDroppedIntoSearchInput(domEvent) {
