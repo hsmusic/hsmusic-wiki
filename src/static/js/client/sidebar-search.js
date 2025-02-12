@@ -49,6 +49,8 @@ export const info = {
   endSearchLine: null,
   endSearchLink: null,
 
+  standbyInputPlaceholder: null,
+
   preparingString: null,
   loadingDataString: null,
   searchingString: null,
@@ -68,6 +70,8 @@ export const info = {
 
     tidiedSidebar: null,
     collapsedDetailsForTidiness: null,
+
+    recallingRecentSearch: null,
 
     currentValue: null,
 
@@ -132,6 +136,9 @@ export function getPageReferences() {
 
   info.searchSidebarColumn =
     info.searchBox.closest('.sidebar-column');
+
+  info.standbyInputPlaceholder =
+    info.searchInput.placeholder;
 
   const findString = classPart =>
     info.searchBox.querySelector(`.wiki-search-${classPart}-string`);
@@ -310,6 +317,17 @@ export function mutatePageContent() {
 export function addPageListeners() {
   if (!info.searchInput) return;
 
+  info.searchInput.addEventListener('focus', _domEvent => {
+    const {session, state} = info;
+
+    if (state.recallingRecentSearch) {
+      info.searchInput.value = session.activeQuery;
+      info.searchInput.placeholder = info.standbyInputPlaceholder;
+      showSidebarSearchResults(session.activeQueryResults);
+      state.recallingRecentSearch = false;
+    }
+  });
+
   info.searchInput.addEventListener('change', _domEvent => {
     const {state} = info;
 
@@ -412,11 +430,11 @@ export function initializeState() {
   if (!info.searchInput) return;
 
   if (session.activeQuery) {
-    info.searchInput.value = session.activeQuery;
     if (session.repeatQueryOnReload) {
+      info.searchInput.value = session.activeQuery;
       activateSidebarSearch(session.activeQuery);
     } else if (session.activeQueryResults) {
-      showSidebarSearchResults(session.activeQueryResults);
+      recallRecentSidebarSearch();
     }
   }
 }
@@ -1008,6 +1026,15 @@ function restoreSidebarSearchColumn() {
 
   state.collapsedDetailsForTidiness = [];
   state.tidiedSidebar = null;
+
+  info.searchInput.placeholder = info.standbyInputPlaceholder;
+}
+
+function recallRecentSidebarSearch() {
+  const {session, state} = info;
+
+  info.searchInput.placeholder = session.activeQuery;
+  state.recallingRecentSearch = true;
 }
 
 async function handleDroppedIntoSearchInput(domEvent) {
