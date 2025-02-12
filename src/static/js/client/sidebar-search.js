@@ -348,6 +348,11 @@ export function addPageListeners() {
       state.recallingRecentSearchFromMouse = false;
       return;
     }
+
+    const inputRect = info.searchInput.getBoundingClientRect();
+    if (domEvent.clientX < inputRect.left) {
+      info.searchInput.select();
+    }
   });
 
   info.searchInput.addEventListener('change', _domEvent => {
