@@ -72,6 +72,7 @@ export const info = {
     collapsedDetailsForTidiness: null,
 
     recallingRecentSearch: null,
+    recallingRecentSearchFromMouse: null,
 
     currentValue: null,
 
@@ -317,6 +318,14 @@ export function mutatePageContent() {
 export function addPageListeners() {
   if (!info.searchInput) return;
 
+  info.searchInput.addEventListener('mousedown', _domEvent => {
+    const {state} = info;
+
+    if (state.recallingRecentSearch) {
+      state.recallingRecentSearchFromMouse = true;
+    }
+  });
+
   info.searchInput.addEventListener('focus', _domEvent => {
     const {session, state} = info;
 
@@ -325,6 +334,19 @@ export function addPageListeners() {
       info.searchInput.placeholder = info.standbyInputPlaceholder;
       showSidebarSearchResults(session.activeQueryResults);
       state.recallingRecentSearch = false;
+    }
+  });
+
+  info.searchLabel.addEventListener('click', domEvent => {
+    const {state} = info;
+
+    if (state.recallingRecentSearchFromMouse) {
+      if (info.searchInput.selectionStart === info.searchInput.selectionEnd) {
+        info.searchInput.select();
+      }
+
+      state.recallingRecentSearchFromMouse = false;
+      return;
     }
   });
 
