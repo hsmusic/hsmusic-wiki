@@ -126,7 +126,11 @@ export class HomepageLayout extends Thing {
           closeCurrentSection();
           currentSection = entry;
         } else if (entry instanceof HomepageLayoutRow) {
-          currentSectionRows.push(entry);
+          if (currentSection) {
+            currentSectionRows.push(entry);
+          } else {
+            throw new Error(`Expected a 'Section' document to add following rows into`);
+          }
         }
       }
 
