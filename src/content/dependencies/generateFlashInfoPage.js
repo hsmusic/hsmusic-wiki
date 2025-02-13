@@ -2,6 +2,7 @@ import {empty} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateAdditionalNamesBox',
     'generateCommentarySection',
     'generateContentHeading',
     'generateContributionList',
@@ -38,6 +39,9 @@ export default {
 
     sidebar:
       relation('generateFlashActSidebar', flash.act, flash),
+
+    additionalNamesBox:
+      relation('generateAdditionalNamesBox', flash.additionalNames),
 
     externalLinks:
       query.urls
@@ -89,6 +93,8 @@ export default {
 
         color: data.color,
         headingMode: 'sticky',
+
+        additionalNames: relations.additionalNamesBox,
 
         cover: relations.cover,
 

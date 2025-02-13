@@ -6,7 +6,8 @@ import {sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
 import {anyOf, isColor, isContentString, isDirectory, isNumber, isString}
   from '#validators';
-import {parseContributors, parseDate, parseDimensions} from '#yaml';
+import {parseAdditionalNames, parseContributors, parseDate, parseDimensions}
+  from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
 
@@ -18,6 +19,7 @@ import {
 } from '#composite/control-flow';
 
 import {
+  additionalNameList,
   color,
   commentary,
   commentatorArtists,
@@ -110,6 +112,8 @@ export class Flash extends Thing {
 
     urls: urls(),
 
+    additionalNames: additionalNameList(),
+
     commentary: commentary(),
     creditSources: commentary(),
 
@@ -194,6 +198,11 @@ export class Flash extends Thing {
       'Date': {
         property: 'date',
         transform: parseDate,
+      },
+
+      'Additional Names': {
+        property: 'additionalNames',
+        transform: parseAdditionalNames,
       },
 
       'Cover Art File Extension': {property: 'coverArtFileExtension'},
