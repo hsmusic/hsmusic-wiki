@@ -839,7 +839,7 @@ export class TrackSection extends Thing {
 
         const range =
           (albumIndex >= 0 && first !== null && length !== null
-            ? `: ${first + 1}-${first + length + 1}`
+            ? `: ${first + 1}-${first + length}`
             : '');
 
         parts.push(` (${colors.yellow(num + range)} in ${colors.green(albumName)})`);
