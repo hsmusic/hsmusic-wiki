@@ -253,6 +253,11 @@ export default {
           'oembed.json'
         : null);
 
+    const canonicalHref =
+      (data.canonicalBase
+        ? data.canonicalBase + pagePathStringFromRoot
+        : null);
+
     const titleContentsHTML =
       (html.isBlank(slots.title)
         ? null
@@ -699,13 +704,15 @@ export default {
               Object.entries(meta)
                 .filter(([key, value]) => value)
                 .map(([key, value]) => html.tag('meta', {[key]: value}))),
+            */
 
-            canonical &&
+            canonicalHref &&
               html.tag('link', {
                 rel: 'canonical',
-                href: canonical,
+                href: canonicalHref,
               }),
 
+            /*
             ...(
               localizedCanonical
                 .map(({lang, href}) => html.tag('link', {
@@ -713,7 +720,6 @@ export default {
                   hreflang: lang,
                   href,
                 }))),
-
             */
 
             hasSocialEmbed &&
