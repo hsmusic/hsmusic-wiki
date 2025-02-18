@@ -1,4 +1,4 @@
-import {atOffset} from '#sugar';
+import {atOffset, empty} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -65,8 +65,8 @@ export default {
       album.tracks.length > 1,
 
     commentaryPageIsStub:
-      !album.commentary &&
-      album.tracks.every(t => !t.commentary),
+      [album, ...album.tracks]
+        .every(({commentary}) => empty(commentary)),
 
     galleryIsStub:
       album.tracks.every(t => !t.hasUniqueCoverArt),

@@ -1,3 +1,5 @@
+import {empty} from '#sugar';
+
 export default {
   contentDependencies: [
     'generateAlbumSidebarTrackSection',
@@ -28,10 +30,10 @@ export default {
 
   data: (album) => ({
     albumHasCommentary:
-      !!album.commentary,
+      !empty(album.commentary),
 
     anyTrackHasCommentary:
-      album.tracks.some(track => track.commentary),
+      album.tracks.some(track => !empty(track.commentary)),
   }),
 
   generate: (data, relations, {html, language}) =>

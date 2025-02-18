@@ -14,10 +14,8 @@ export default {
       relation('generateContentHeading'),
 
     entries:
-      (entries
-        ? entries.map(entry =>
-            relation('generateCommentaryEntry', entry))
-        : []),
+      entries.map(entry =>
+        relation('generateCommentaryEntry', entry)),
   }),
 
   data: (entries) => ({

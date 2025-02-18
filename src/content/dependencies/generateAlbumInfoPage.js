@@ -1,3 +1,5 @@
+import {empty} from '#sugar';
+
 export default {
   contentDependencies: [
     'generateAdditionalNamesBox',
@@ -64,7 +66,7 @@ export default {
         : null),
 
     commentaryLink:
-      (album.commentary || album.tracks.some(t => t.commentary)
+      ([album, ...album.tracks].some(({commentary}) => !empty(commentary))
         ? relation('linkAlbumCommentary', album)
         : null),
 

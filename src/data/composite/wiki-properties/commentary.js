@@ -16,7 +16,7 @@ export default templateCompositeFrom({
     exitWithoutDependency({
       dependency: input.updateValue({validate: isCommentary}),
       mode: input.value('falsy'),
-      value: input.value(null),
+      value: input.value([]),
     }),
 
     withParsedCommentaryEntries({

@@ -1,3 +1,5 @@
+import {empty} from '#sugar';
+
 export default {
   contentDependencies: ['linkTrack'],
   extraDependencies: ['pagePath'],
@@ -14,7 +16,7 @@ export default {
       track.album.directory,
 
     trackHasCommentary:
-      !!track.commentary,
+      !empty(track.commentary),
   }),
 
   generate(data, relations, {pagePath}) {

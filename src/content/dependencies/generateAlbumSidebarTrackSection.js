@@ -1,3 +1,5 @@
+import {empty} from '#sugar';
+
 export default {
   contentDependencies: ['linkTrack'],
   extraDependencies: ['getColors', 'html', 'language'],
@@ -39,7 +41,7 @@ export default {
 
     data.tracksAreMissingCommentary =
       trackSection.tracks
-        .map(track => !track.commentary);
+        .map(track => empty(track.commentary));
 
     return data;
   },

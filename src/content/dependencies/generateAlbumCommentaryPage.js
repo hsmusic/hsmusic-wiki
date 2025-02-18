@@ -1,4 +1,4 @@
-import {stitchArrays} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -18,7 +18,22 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  relations(relation, album) {
+  query(album) {
+    const query = {};
+
+    query.tracksWithCommentary =
+      album.tracks
+        .filter(({commentary}) => !empty(commentary));
+
+    query.thingsWithCommentary =
+      (empty(album.commentary)
+        ? query.tracksWithCommentary
+        : [album, ...query.tracksWithCommentary]);
+
+    return query;
+  },
+
+  relations(relation, query, album) {
     const relations = {};
 
     relations.layout =
@@ -39,7 +54,7 @@ export default {
     relations.albumNavAccent =
       relation('generateAlbumNavAccent', album, null);
 
-    if (album.commentary) {
+    if (!empty(album.commentary)) {
       relations.albumCommentaryHeading =
         relation('generateContentHeading');
 
@@ -59,32 +74,28 @@ export default {
           .map(entry => relation('generateCommentaryEntry', entry));
     }
 
-    const tracksWithCommentary =
-      album.tracks
-        .filter(({commentary}) => commentary);
-
     relations.trackCommentaryHeadings =
-      tracksWithCommentary
+      query.tracksWithCommentary
         .map(() => relation('generateContentHeading'));
 
     relations.trackCommentaryLinks =
-      tracksWithCommentary
+      query.tracksWithCommentary
         .map(track => relation('linkTrack', track));
 
     relations.trackCommentaryListeningLinks =
-      tracksWithCommentary
+      query.tracksWithCommentary
         .map(track =>
           track.urls.map(url => relation('linkExternal', url)));
 
     relations.trackCommentaryCovers =
-      tracksWithCommentary
+      query.tracksWithCommentary
         .map(track =>
           (track.hasUniqueCoverArt
             ? relation('generateTrackCoverArtwork', track)
             : null));
 
     relations.trackCommentaryEntries =
-      tracksWithCommentary
+      query.tracksWithCommentary
         .map(track =>
           track.commentary
             .map(entry => relation('generateCommentaryEntry', entry)));
@@ -92,29 +103,20 @@ export default {
     return relations;
   },
 
-  data(album) {
+  data(query, album) {
     const data = {};
 
     data.name = album.name;
     data.color = album.color;
     data.date = album.date;
 
-    const tracksWithCommentary =
-      album.tracks
-        .filter(({commentary}) => commentary);
-
-    const thingsWithCommentary =
-      (album.commentary
-        ? [album, ...tracksWithCommentary]
-        : tracksWithCommentary);
-
     data.entryCount =
-      thingsWithCommentary
+      query.thingsWithCommentary
         .flatMap(({commentary}) => commentary)
         .length;
 
     data.wordCount =
-      thingsWithCommentary
+      query.thingsWithCommentary
         .flatMap(({commentary}) => commentary)
         .map(({body}) => body)
         .join(' ')
@@ -122,15 +124,15 @@ export default {
         .length;
 
     data.trackCommentaryTrackDates =
-      tracksWithCommentary
+      query.tracksWithCommentary
         .map(track => track.dateFirstReleased);
 
     data.trackCommentaryDirectories =
-      tracksWithCommentary
+      query.tracksWithCommentary
         .map(track => track.directory);
 
     data.trackCommentaryColors =
-      tracksWithCommentary
+      query.tracksWithCommentary
         .map(track =>
           (track.color === album.color
             ? null

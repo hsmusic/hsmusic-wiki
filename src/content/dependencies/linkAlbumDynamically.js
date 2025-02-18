@@ -1,3 +1,5 @@
+import {empty} from '#sugar';
+
 export default {
   contentDependencies: [
     'linkAlbumCommentary',
@@ -23,7 +25,7 @@ export default {
       album.directory,
 
     albumHasCommentary:
-      !!album.commentary,
+      !empty(album.commentary),
   }),
 
   slots: {
