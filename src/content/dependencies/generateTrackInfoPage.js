@@ -67,7 +67,7 @@ export default {
       relation('generateTrackReleaseInfo', track),
 
     otherReleasesList:
-        relation('generateTrackInfoPageOtherReleasesList', track),
+      relation('generateTrackInfoPageOtherReleasesList', track),
 
     contributorContributionList:
       relation('generateContributionList', track.contributorContribs),
@@ -201,15 +201,7 @@ export default {
                   })),
             ])),
 
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'also-released-as'},
-                title: language.$('releaseInfo.alsoReleasedAs'),
-              }),
-
-            relations.otherReleasesList,
-          ]),
+          relations.otherReleasesList,
 
           html.tags([
             relations.contentHeading.clone()

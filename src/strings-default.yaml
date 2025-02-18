@@ -291,12 +291,7 @@ releaseInfo:
   lyrics: "Lyrics:"
   note: "Context notes:"
 
-  alsoReleasedAs:
-    _: "Also released as:"
-
-    item:
-      _: "{TRACK} ({ALBUM})"
-      withYear: "({YEAR}) {TRACK} ({ALBUM})"
+  alsoReleasedOn: "Also released on {ALBUMS}."
 
   tracksReferenced:
     _: "Tracks that {TRACK} references:"
