@@ -51,6 +51,9 @@ export default {
             relations.colorStyle.clone()
               .slot('color', slots.color),
 
+          !html.isBlank(relations.date) &&
+            {class: 'dated'},
+
           language.encapsulate(entryCapsule, 'title', titleCapsule => [
             html.tag('span', {class: 'commentary-entry-heading-text'},
               language.encapsulate(titleCapsule, workingCapsule => {

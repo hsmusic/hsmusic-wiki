@@ -1419,7 +1419,7 @@ p.image-details.illustrator-details {
   font-style: oblique;
 }
 
-#artist-commentary.first-entry-is-dated {
+p.content-heading:has(+ .commentary-entry-heading.dated) {
   clear: right;
 }
 

@@ -1,5 +1,3 @@
-import {empty} from '#sugar';
-
 export default {
   contentDependencies: [
     'transformContent',
@@ -18,19 +16,12 @@ export default {
         relation('generateCommentaryEntry', entry)),
   }),
 
-  data: (entries) => ({
-    firstEntryIsDated:
-      (empty(entries)
-        ? null
-        : !!entries[0].date),
-  }),
-
   slots: {
     title: {type: 'html', mutable: false},
     id: {type: 'string', default: 'artist-commentary'},
   },
 
-  generate: (data, relations, slots, {html, language}) =>
+  generate: (relations, slots, {html, language}) =>
     html.tags([
       relations.heading
         .slots({
@@ -39,11 +30,7 @@ export default {
               ? language.$('misc.artistCommentary')
               : slots.title),
 
-          attributes: [
-            {id: slots.id},
-            data.firstEntryIsDated &&
-              {class: 'first-entry-is-dated'},
-          ],
+          attributes: {id: slots.id},
         }),
 
       relations.entries,
