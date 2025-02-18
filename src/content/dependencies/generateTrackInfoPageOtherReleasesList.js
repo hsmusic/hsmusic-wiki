@@ -14,6 +14,10 @@ export default {
     albumNames:
       track.otherReleases
         .map(track => track.album.name),
+
+    albumColors:
+      track.otherReleases
+        .map(track => track.album.color),
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -28,9 +32,11 @@ export default {
             stitchArrays({
               trackLink: relations.trackLinks,
               albumName: data.albumNames,
-            }).map(({trackLink, albumName}) =>
+              albumColor: data.albumColors,
+            }).map(({trackLink, albumName, albumColor}) =>
                 trackLink.slots({
                   content: language.sanitize(albumName),
+                  color: albumColor,
                 }))),
       })),
 };
