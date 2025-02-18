@@ -1,4 +1,5 @@
-import {stitchArrays} from '#sugar';
+import {sortAlbumsTracksChronologically} from '#sort';
+import {stitchArrays, transposeArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -18,7 +19,7 @@ export default {
       groupData.flatMap(group => group.serieses),
   }),
 
-  query(sprawl, album) {
+  query(sprawl, album, track) {
     const query = {};
 
     query.groups =
@@ -35,6 +36,33 @@ export default {
         .filter(series =>
           series.albums.includes(album) &&
           !query.groups.includes(series.group));
+
+    if (track) {
+      const albumTrackMap =
+        new Map(transposeArrays([
+          [track.album, ...track.otherReleases.map(t => t.album)],
+          [track, ...track.otherReleases],
+        ]));
+
+      const allReleaseAlbums =
+        sortAlbumsTracksChronologically(
+          Array.from(albumTrackMap.keys()));
+
+      const currentReleaseIndex =
+        allReleaseAlbums.indexOf(track.album);
+
+      const earlierReleaseAlbums =
+        allReleaseAlbums.slice(0, currentReleaseIndex);
+
+      const laterReleaseAlbums =
+        allReleaseAlbums.slice(currentReleaseIndex + 1);
+
+      query.earlierReleaseTracks =
+        earlierReleaseAlbums.map(album => albumTrackMap.get(album));
+
+      query.laterReleaseTracks =
+        laterReleaseAlbums.map(album => albumTrackMap.get(album));
+    }
 
     return query;
   },
@@ -65,10 +93,19 @@ export default {
         .map(series =>
           relation('generateAlbumSidebarSeriesBox', album, series)),
 
-    trackReleaseBoxes:
-      track.otherReleases
-        .map(track =>
-          relation('generateTrackReleaseBox', track)),
+    earlierTrackReleaseBoxes:
+      (track
+        ? query.earlierReleaseTracks
+            .map(track =>
+              relation('generateTrackReleaseBox', track))
+        : null),
+
+    laterTrackReleaseBoxes:
+      (track
+        ? query.laterReleaseTracks
+            .map(track =>
+              relation('generateTrackReleaseBox', track))
+        : null),
   }),
 
   data: (_query, _sprawl, _album, track) => ({
@@ -106,9 +143,12 @@ export default {
         ],
 
         data.isTrackPage &&
-          relations.trackReleaseBoxes,
+          relations.earlierTrackReleaseBoxes,
 
         relations.trackListBox,
+
+        data.isTrackPage &&
+          relations.laterTrackReleaseBoxes,
 
         data.isTrackPage &&
           relations.conjoinedBox.slots({
