@@ -975,6 +975,13 @@ albumSidebar:
     next: "Next: {ALBUM}"
     previous: "Previous: {ALBUM}"
 
+  # releaseBox:
+  #   This is the narrow box for alternate releases of the
+  #   current track.
+
+  releaseBox:
+    title: "{ALBUM}"
+
 #
 # albumSecondaryNav:
 #   The secondary nav bar is shown in medium and thin layouts,

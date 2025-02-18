@@ -7,6 +7,7 @@ export default {
     'generateAlbumSidebarTrackListBox',
     'generatePageSidebar',
     'generatePageSidebarConjoinedBox',
+    'generateTrackReleaseBox',
   ],
 
   extraDependencies: ['html', 'wikiData'],
@@ -63,10 +64,16 @@ export default {
       query.disconnectedSerieses
         .map(series =>
           relation('generateAlbumSidebarSeriesBox', album, series)),
+
+    trackReleaseBoxes:
+      track.otherReleases
+        .map(track =>
+          relation('generateTrackReleaseBox', track)),
   }),
 
   data: (_query, _sprawl, _album, track) => ({
     isAlbumPage: !track,
+    isTrackPage: !!track,
   }),
 
   generate(data, relations, {html}) {
@@ -98,9 +105,12 @@ export default {
             ]),
         ],
 
+        data.isTrackPage &&
+          relations.trackReleaseBoxes,
+
         relations.trackListBox,
 
-        !data.isAlbumPage &&
+        data.isTrackPage &&
           relations.conjoinedBox.slots({
             attributes: {class: 'conjoined-group-sidebar-box'},
             boxes:

@@ -548,6 +548,27 @@ summary.underline-white > span:hover a:not(:hover) {
   margin-top: 0 !important;
 }
 
+.track-release-sidebar-box {
+  --content-padding: 3px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background: var(--dark-color), var(--bg-black-color);
+}
+
+.track-release-sidebar-box h1 {
+  margin: 0;
+  font-weight: normal;
+  font-size: 0.9em;
+  font-style: oblique;
+}
+
+.track-release-sidebar-box + .track-release-sidebar-box,
+.track-release-sidebar-box + .track-list-sidebar-box {
+  margin-top: 5px !important;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
 .wiki-search-sidebar-box {
   padding: 1px 0 0 0;
 
