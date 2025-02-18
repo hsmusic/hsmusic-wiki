@@ -36,6 +36,8 @@ export default {
         .map(({track: directlyFeaturedTrack}) =>
           (directlyFeaturedTrack === track
             ? null
+         : directlyFeaturedTrack.name === track.name
+            ? null
             : relation('linkTrack', directlyFeaturedTrack))),
   }),
 
@@ -52,7 +54,6 @@ export default {
           const options = {flash: flashLink};
 
           if (trackLink) {
-            attributes.add('class', 'rerelease');
             parts.push('asDifferentRelease');
             options.track = trackLink;
           }
