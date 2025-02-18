@@ -6,7 +6,7 @@ export default {
     'generateAlbumSecondaryNav',
     'generateAlbumSidebar',
     'generateAlbumStyleRules',
-    'generateCommentarySection',
+    'generateCommentaryEntry',
     'generateContentHeading',
     'generateContributionList',
     'generatePageLayout',
@@ -116,11 +116,13 @@ export default {
         track.album,
         track.additionalFiles),
 
-    artistCommentarySection:
-      relation('generateCommentarySection', track.commentary),
+    artistCommentaryEntries:
+      track.commentary
+        .map(entry => relation('generateCommentaryEntry', entry)),
 
-    creditSourcesSection:
-      relation('generateCommentarySection', track.creditSources),
+    creditSourceEntries:
+      track.creditSources
+        .map(entry => relation('generateCommentaryEntry', entry)),
   }),
 
   data: (_query, _sprawl, track) => ({
@@ -189,7 +191,7 @@ export default {
                         language.$(capsule, 'link')),
                   })),
 
-              !html.isBlank(relations.artistCommentarySection) &&
+              !html.isBlank(relations.artistCommentaryEntries) &&
                 language.encapsulate(capsule, 'readCommentary', capsule =>
                   language.$(capsule, {
                     link:
@@ -198,7 +200,7 @@ export default {
                         language.$(capsule, 'link')),
                   })),
 
-              !html.isBlank(relations.creditSourcesSection) &&
+              !html.isBlank(relations.creditSourceEntries) &&
                 language.encapsulate(capsule, 'readCreditSources', capsule =>
                   language.$(capsule, {
                     link:
@@ -362,12 +364,25 @@ export default {
             relations.additionalFilesList,
           ]),
 
-          relations.artistCommentarySection,
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'artist-commentary'},
+                title: language.$('misc.artistCommentary'),
+              }),
 
-          relations.creditSourcesSection.slots({
-            id: 'credit-sources',
-            title: language.$('misc.creditSources'),
-          }),
+            relations.artistCommentaryEntries,
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'credit-sources'},
+                title: language.$('misc.creditSources'),
+              }),
+
+            relations.creditSourceEntries,
+          ]),
         ],
 
         navLinkStyle: 'hierarchical',

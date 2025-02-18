@@ -3,7 +3,7 @@ import {empty} from '#sugar';
 export default {
   contentDependencies: [
     'generateAdditionalNamesBox',
-    'generateCommentarySection',
+    'generateCommentaryEntry',
     'generateContentHeading',
     'generateContributionList',
     'generateFlashActSidebar',
@@ -65,11 +65,13 @@ export default {
     contributorContributionList:
       relation('generateContributionList', flash.contributorContribs),
 
-    artistCommentarySection:
-      relation('generateCommentarySection', flash.commentary),
+    artistCommentaryEntries:
+      flash.commentary
+        .map(entry => relation('generateCommentaryEntry', entry)),
 
-    creditSourcesSection:
-      relation('generateCommentarySection', flash.creditSources),
+    creditSourceEntries:
+      flash.commentary
+        .map(entry => relation('generateCommentaryEntry', entry)),
   }),
 
   data: (_query, flash) => ({
@@ -121,7 +123,7 @@ export default {
             {[html.joinChildren]: html.tag('br')},
 
             language.encapsulate('releaseInfo', capsule => [
-              !html.isBlank(relations.artistCommentarySection) &&
+              !html.isBlank(relations.artistCommentaryEntries) &&
                 language.encapsulate(capsule, 'readCommentary', capsule =>
                   language.$(capsule, {
                     link:
@@ -130,7 +132,7 @@ export default {
                         language.$(capsule, 'link')),
                   })),
 
-              !html.isBlank(relations.creditSourcesSection) &&
+              !html.isBlank(relations.creditSourceEntries) &&
                 language.encapsulate(capsule, 'readCreditSources', capsule =>
                   language.$(capsule, {
                     link:
@@ -165,12 +167,25 @@ export default {
             }),
           ]),
 
-          relations.artistCommentarySection,
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'artist-commentary'},
+                title: language.$('misc.artistCommentary'),
+              }),
 
-          relations.creditSourcesSection.slots({
-            id: 'credit-sources',
-            title: language.$('misc.creditSources'),
-          }),
+            relations.artistCommentaryEntries,
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'credit-sources'},
+                title: language.$('misc.creditSources'),
+              }),
+
+            relations.creditSourceEntries,
+          ]),
         ],
 
         navLinkStyle: 'hierarchical',

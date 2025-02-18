@@ -13,7 +13,7 @@ export default {
     'generateAlbumSocialEmbed',
     'generateAlbumStyleRules',
     'generateAlbumTrackList',
-    'generateCommentarySection',
+    'generateCommentaryEntry',
     'generateContentHeading',
     'generatePageLayout',
     'linkAlbumCommentary',
@@ -78,11 +78,13 @@ export default {
         album,
         album.additionalFiles),
 
-    artistCommentarySection:
-      relation('generateCommentarySection', album.commentary),
+    artistCommentaryEntries:
+      album.commentary
+        .map(entry => relation('generateCommentaryEntry', entry)),
 
-    creditSourcesSection:
-      relation('generateCommentarySection', album.creditSources),
+    creditSourceEntries:
+      album.creditSources
+        .map(entry => relation('generateCommentaryEntry', entry)),
   }),
 
   data: (album) => ({
@@ -196,12 +198,25 @@ export default {
               relations.additionalFilesList,
             ])),
 
-          relations.artistCommentarySection,
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'artist-commentary'},
+                title: language.$('misc.artistCommentary'),
+              }),
 
-          relations.creditSourcesSection.slots({
-            id: 'credit-sources',
-            title: language.$('misc.creditSources'),
-          }),
+            relations.artistCommentaryEntries,
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'credit-sources'},
+                title: language.$('misc.creditSources'),
+              }),
+
+            relations.creditSourceEntries,
+          ]),
         ],
 
         navLinkStyle: 'hierarchical',
