@@ -30,7 +30,14 @@ export default {
       wikiInfo.divideTrackListsByGroups,
   }),
 
-  relations: (relation, sprawl, track) => ({
+  query: (_sprawl, track) => ({
+    originalReleaseTrack:
+      (track.isOriginalRelease
+        ? track
+        : track.originalReleaseTrack),
+  }),
+
+  relations: (relation, query, sprawl, track) => ({
     layout:
       relation('generatePageLayout'),
 
@@ -80,12 +87,12 @@ export default {
 
     referencedByTracksList:
       relation('generateTrackListDividedByGroups',
-        track.referencedByTracks,
+        query.originalReleaseTrack.referencedByTracks,
         sprawl.divideTrackListsByGroups),
 
     sampledByTracksList:
       relation('generateTrackListDividedByGroups',
-        track.sampledByTracks,
+        query.originalReleaseTrack.sampledByTracks,
         sprawl.divideTrackListsByGroups),
 
     flashesThatFeatureList:
@@ -116,7 +123,7 @@ export default {
       relation('generateCommentarySection', track.creditSources),
   }),
 
-  data: (sprawl, track) => ({
+  data: (_query, _sprawl, track) => ({
     name:
       track.name,
 
