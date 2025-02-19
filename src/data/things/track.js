@@ -63,6 +63,7 @@ import {
   inheritContributionListFromMainRelease,
   inheritFromMainRelease,
   withAlbum,
+  withAllReleases,
   withAlwaysReferenceByDirectory,
   withContainingTrackSection,
   withDate,
@@ -419,6 +420,17 @@ export class Track extends Thing {
       }),
     ],
 
+    // Only has any value for main releases, because secondary releases
+    // are never secondary to *another* secondary release.
+    secondaryReleases: reverseReferenceList({
+      reverse: soupyReverse.input('tracksWhichAreSecondaryReleasesOf'),
+    }),
+
+    allReleases: [
+      withAllReleases(),
+      exposeDependency({dependency: '#allReleases'}),
+    ],
+
     otherReleases: [
       withOtherReleases(),
       exposeDependency({dependency: '#otherReleases'}),
@@ -678,6 +690,13 @@ export class Track extends Thing {
 
       referencing: track => [track],
       referenced: track => track.commentatorArtists,
+    },
+
+    tracksWhichAreSecondaryReleasesOf: {
+      bindTo: 'trackData',
+
+      referencing: track => track.isSecondaryRelease ? [track] : [],
+      referenced: track => [track.mainReleaseTrack],
     },
   };
 

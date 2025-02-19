@@ -1,8 +1,12 @@
+// Gets all releases of the current track *except* this track itself;
+// in other words, all other releases of the current track.
+
 import {input, templateCompositeFrom} from '#composite';
 
 import {exitWithoutDependency} from '#composite/control-flow';
+import {withPropertyFromObject} from '#composite/data';
 
-import withMainRelease from './withMainRelease.js';
+import withAllReleases from './withAllReleases.js';
 
 export default templateCompositeFrom({
   annotation: `withOtherReleases`,
@@ -10,32 +14,16 @@ export default templateCompositeFrom({
   outputs: ['#otherReleases'],
 
   steps: () => [
-    exitWithoutDependency({
-      dependency: 'trackData',
-      mode: input.value('empty'),
-    }),
+    withAllReleases(),
 
-    withMainRelease({
-      selfIfMain: input.value(true),
-      notFoundValue: input.value([]),
-    }),
-
-    // TODO: Jegus shouldn't this be a proper reverse list
     {
-      dependencies: [input.myself(), '#mainRelease', 'trackData'],
+      dependencies: [input.myself(), '#allReleases'],
       compute: (continuation, {
         [input.myself()]: thisTrack,
-        ['#mainRelease']: mainRelease,
-        trackData,
+        ['#allReleases']: allReleases,
       }) => continuation({
         ['#otherReleases']:
-          (mainRelease === thisTrack
-            ? []
-            : [mainRelease])
-            .concat(trackData.filter(track =>
-              track !== mainRelease &&
-              track !== thisTrack &&
-              track.mainReleaseTrack === mainRelease)),
+          allReleases.filter(track => track !== thisTrack),
       }),
     },
   ],
