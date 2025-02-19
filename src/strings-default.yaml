@@ -512,6 +512,22 @@ misc:
 
       seeOriginalRelease: "See {ORIGINAL}!"
 
+    info:
+      fromMainRelease: >-
+        This commentary is properly placed on this track's main release, {ALBUM}.
+
+      fromMainRelease.namedDifferently: >-
+        This commentary is properly placed on this track's main release, {ALBUM}, where it's named {NAME}.
+
+      releaseSpecific: >-
+        This commentary is specific to this release, {ALBUM}.
+
+      seeRereleases: >-
+        For release-specific commentary, check out: {ALBUMS}.
+
+      seeRereleases.withMainCommentary: >-
+        For release-specific commentary, see also: {ALBUMS}.
+
   artistCredit:
     withNormalArtists: >-
       {NORMAL}

@@ -1962,19 +1962,9 @@ h1 a[href="#additional-names-box"]:hover {
   --custom-scroll-offset: calc(0.5em - 2px);
 
   margin: 1em 0 1em -10px;
-  padding: 15px 20px 10px 20px;
-  width: max-content;
   max-width: min(60vw, 600px);
 
-  border: 1px dotted var(--primary-color);
-  border-radius: 6px;
-
-  background:
-    linear-gradient(var(--bg-color), var(--bg-color)),
-    linear-gradient(#000000bb, #000000bb),
-    var(--primary-color);
-
-  box-shadow: 0 -2px 6px -1px var(--dim-color) inset;
+  padding: 15px 20px 10px 20px;
 
   display: none;
 }
@@ -2154,6 +2144,32 @@ html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:las
   left: -3px;
   border-bottom-right-radius: 6px;
   border-top-left-radius: 3px;
+}
+
+/* "Drops" */
+
+.drop {
+  padding: 15px 20px;
+  width: max-content;
+  max-width: min(60vw, 600px);
+
+  border: 1px dotted var(--primary-color);
+  border-radius: 6px;
+
+  background:
+    linear-gradient(var(--bg-color), var(--bg-color)),
+    linear-gradient(#000000bb, #000000bb),
+    var(--primary-color);
+
+  box-shadow: 0 -2px 6px -1px var(--dim-color) inset;
+}
+
+.commentary-drop {
+  margin-top: 25px;
+  margin-bottom: 15px;
+  margin-left: 20px;
+  padding: 10px 20px;
+  max-width: min(60vw, 300px);
 }
 
 /* Images */

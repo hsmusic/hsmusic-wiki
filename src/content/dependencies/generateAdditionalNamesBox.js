@@ -10,6 +10,7 @@ export default {
 
   generate: (relations, {html, language}) =>
     html.tag('div', {id: 'additional-names-box'},
+      {class: 'drop'},
       {[html.onlyIfContent]: true},
 
       [

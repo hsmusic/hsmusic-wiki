@@ -10,6 +10,7 @@ export default {
     'generateContentHeading',
     'generateContributionList',
     'generatePageLayout',
+    'generateTrackArtistCommentarySection',
     'generateTrackCoverArtwork',
     'generateTrackInfoPageFeaturedByFlashesList',
     'generateTrackInfoPageOtherReleasesList',
@@ -116,9 +117,8 @@ export default {
         track.album,
         track.additionalFiles),
 
-    artistCommentaryEntries:
-      track.commentary
-        .map(entry => relation('generateCommentaryEntry', entry)),
+    artistCommentarySection:
+      relation('generateTrackArtistCommentarySection', track),
 
     creditSourceEntries:
       track.creditSources
@@ -191,7 +191,7 @@ export default {
                         language.$(capsule, 'link')),
                   })),
 
-              !html.isBlank(relations.artistCommentaryEntries) &&
+              !html.isBlank(relations.artistCommentarySection) &&
                 language.encapsulate(capsule, 'readCommentary', capsule =>
                   language.$(capsule, {
                     link:
@@ -364,15 +364,7 @@ export default {
             relations.additionalFilesList,
           ]),
 
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'artist-commentary'},
-                title: language.$('misc.artistCommentary'),
-              }),
-
-            relations.artistCommentaryEntries,
-          ]),
+          relations.artistCommentarySection,
 
           html.tags([
             relations.contentHeading.clone()
