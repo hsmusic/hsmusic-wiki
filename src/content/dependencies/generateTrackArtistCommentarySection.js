@@ -11,7 +11,7 @@ export default {
   extraDependencies: ['html', 'language'],
 
   query: (track) => ({
-    otherRereleasesWithCommentary:
+    otherSecondaryReleasesWithCommentary:
       track.otherReleases
         .filter(track => !track.isMainRelease)
         .filter(track => !empty(track.commentary)),
@@ -40,7 +40,7 @@ export default {
         .map(entry => relation('generateCommentaryEntry', entry)),
 
     otherReleaseTrackLinks:
-      query.otherRereleasesWithCommentary
+      query.otherSecondaryReleasesWithCommentary
         .map(track => relation('linkTrack', track)),
   }),
 
@@ -67,11 +67,11 @@ export default {
         : null),
 
     otherReleaseAlbumNames:
-      query.otherRereleasesWithCommentary
+      query.otherSecondaryReleasesWithCommentary
         .map(track => track.album.name),
 
     otherReleaseAlbumColors:
-      query.otherRereleasesWithCommentary
+      query.otherSecondaryReleasesWithCommentary
         .map(track => track.album.color),
   }),
 
@@ -130,7 +130,7 @@ export default {
         html.tag('p', {class: ['drop', 'commentary-drop']},
           {[html.onlyIfContent]: true},
 
-          language.encapsulate(capsule, 'info.seeRereleases', workingCapsule => {
+          language.encapsulate(capsule, 'info.seeSpecificReleases', workingCapsule => {
             const workingOptions = {};
 
             workingOptions[language.onlyIfOptions] = ['albums'];

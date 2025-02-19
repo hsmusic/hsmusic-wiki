@@ -520,10 +520,10 @@ misc:
       releaseSpecific: >-
         This commentary is specific to this release, {ALBUM}.
 
-      seeRereleases: >-
+      seeSpecificReleases: >-
         For release-specific commentary, check out: {ALBUMS}.
 
-      seeRereleases.withMainCommentary: >-
+      seeSpecificReleases.withMainCommentary: >-
         For release-specific commentary, see also: {ALBUMS}.
 
   artistCredit:
