@@ -27,10 +27,10 @@ export default {
   extraDependencies: ['html', 'language'],
 
   query: (track) => ({
-    originalReleaseTrack:
-      (track.isOriginalRelease
+    mainReleaseTrack:
+      (track.isMainRelease
         ? track
-        : track.originalReleaseTrack),
+        : track.mainReleaseTrack),
   }),
 
   relations: (relation, query, track) => ({
@@ -83,11 +83,11 @@ export default {
 
     referencedByTracksList:
       relation('generateTrackListDividedByGroups',
-        query.originalReleaseTrack.referencedByTracks),
+        query.mainReleaseTrack.referencedByTracks),
 
     sampledByTracksList:
       relation('generateTrackListDividedByGroups',
-        query.originalReleaseTrack.sampledByTracks),
+        query.mainReleaseTrack.sampledByTracks),
 
     flashesThatFeatureList:
       relation('generateTrackInfoPageFeaturedByFlashesList', track),

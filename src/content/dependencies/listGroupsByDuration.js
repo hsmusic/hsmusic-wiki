@@ -16,7 +16,7 @@ export default {
       groups.map(group =>
         getTotalDuration(
           group.albums.flatMap(album => album.tracks),
-          {originalReleasesOnly: true}));
+          {mainReleasesOnly: true}));
 
     filterByCount(groups, durations);
     sortByCount(groups, durations, {greatestFirst: true});

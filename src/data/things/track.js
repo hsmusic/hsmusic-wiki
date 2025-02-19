@@ -60,15 +60,15 @@ import {
 
 import {
   exitWithoutUniqueCoverArt,
-  inheritContributionListFromOriginalRelease,
-  inheritFromOriginalRelease,
+  inheritContributionListFromMainRelease,
+  inheritFromMainRelease,
   withAlbum,
   withAlwaysReferenceByDirectory,
   withContainingTrackSection,
   withDate,
   withDirectorySuffix,
   withHasUniqueCoverArt,
-  withOriginalRelease,
+  withMainRelease,
   withOtherReleases,
   withPropertyFromAlbum,
   withSuffixDirectoryFromAlbum,
@@ -208,7 +208,7 @@ export class Track extends Thing {
     creditSources: commentary(),
 
     lyrics: [
-      inheritFromOriginalRelease(),
+      inheritFromMainRelease(),
       contentString(),
     ],
 
@@ -216,7 +216,7 @@ export class Track extends Thing {
     sheetMusicFiles: additionalFiles(),
     midiProjectFiles: additionalFiles(),
 
-    originalReleaseTrack: singleReference({
+    mainReleaseTrack: singleReference({
       class: input.value(Track),
       find: soupyFind.input('track'),
     }),
@@ -230,7 +230,7 @@ export class Track extends Thing {
     }),
 
     artistContribs: [
-      inheritContributionListFromOriginalRelease(),
+      inheritContributionListFromMainRelease(),
 
       withDate(),
 
@@ -266,7 +266,7 @@ export class Track extends Thing {
     ],
 
     contributorContribs: [
-      inheritContributionListFromOriginalRelease(),
+      inheritContributionListFromMainRelease(),
 
       withDate(),
 
@@ -276,9 +276,6 @@ export class Track extends Thing {
       }),
     ],
 
-    // Cover artists aren't inherited from the original release, since it
-    // typically varies by release and isn't defined by the musical qualities
-    // of the track.
     coverArtistContribs: [
       exitWithoutUniqueCoverArt({
         value: input.value([]),
@@ -320,7 +317,7 @@ export class Track extends Thing {
     ],
 
     referencedTracks: [
-      inheritFromOriginalRelease({
+      inheritFromMainRelease({
         notFoundValue: input.value([]),
       }),
 
@@ -331,7 +328,7 @@ export class Track extends Thing {
     ],
 
     sampledTracks: [
-      inheritFromOriginalRelease({
+      inheritFromMainRelease({
         notFoundValue: input.value([]),
       }),
 
@@ -405,20 +402,20 @@ export class Track extends Thing {
       exposeDependency({dependency: '#hasUniqueCoverArt'}),
     ],
 
-    isOriginalRelease: [
-      withOriginalRelease(),
+    isMainRelease: [
+      withMainRelease(),
 
       exposeWhetherDependencyAvailable({
-        dependency: '#originalRelease',
+        dependency: '#mainRelease',
         negate: input.value(true),
       }),
     ],
 
-    isRerelease: [
-      withOriginalRelease(),
+    isSecondaryRelease: [
+      withMainRelease(),
 
       exposeWhetherDependencyAvailable({
-        dependency: '#originalRelease',
+        dependency: '#mainRelease',
       }),
     ],
 
@@ -525,7 +522,7 @@ export class Track extends Thing {
         transform: parseAdditionalFiles,
       },
 
-      'Originally Released As': {property: 'originalReleaseTrack'},
+      'Main Release': {property: 'mainReleaseTrack'},
       'Referenced Tracks': {property: 'referencedTracks'},
       'Sampled Tracks': {property: 'sampledTracks'},
 
@@ -558,28 +555,28 @@ export class Track extends Thing {
     },
 
     invalidFieldCombinations: [
-      {message: `Rereleases inherit references from the original`, fields: [
-        'Originally Released As',
+      {message: `Secondary releases inherit references from the main one`, fields: [
+        'Main Release',
         'Referenced Tracks',
       ]},
 
-      {message: `Rereleases inherit samples from the original`, fields: [
-        'Originally Released As',
+      {message: `Secondary releases inherit samples from the main one`, fields: [
+        'Main Release',
         'Sampled Tracks',
       ]},
 
-      {message: `Rereleases inherit artists from the original`, fields: [
-        'Originally Released As',
+      {message: `Secondary releases inherit artists from the main one`, fields: [
+        'Main Release',
         'Artists',
       ]},
 
-      {message: `Rereleases inherit contributors from the original`, fields: [
-        'Originally Released As',
+      {message: `Secondary releases inherit contributors from the main one`, fields: [
+        'Main Release',
         'Contributors',
       ]},
 
-      {message: `Rereleases inherit lyrics from the original`, fields: [
-        'Originally Released As',
+      {message: `Secondary releases inherit lyrics from the main one`, fields: [
+        'Main Release',
         'Lyrics',
       ]},
 
@@ -609,12 +606,12 @@ export class Track extends Thing {
           : [track.name]),
     },
 
-    trackOriginalReleasesOnly: {
+    trackMainReleasesOnly: {
       referenceTypes: ['track'],
       bindTo: 'trackData',
 
       include: track =>
-        !CacheableObject.getUpdateValue(track, 'originalReleaseTrack'),
+        !CacheableObject.getUpdateValue(track, 'mainReleaseTrack'),
 
       // It's still necessary to check alwaysReferenceByDirectory here, since
       // it may be set manually (with `Always Reference By Directory: true`),
@@ -649,14 +646,14 @@ export class Track extends Thing {
     tracksWhichReference: {
       bindTo: 'trackData',
 
-      referencing: track => track.isOriginalRelease ? [track] : [],
+      referencing: track => track.isMainRelease ? [track] : [],
       referenced: track => track.referencedTracks,
     },
 
     tracksWhichSample: {
       bindTo: 'trackData',
 
-      referencing: track => track.isOriginalRelease ? [track] : [],
+      referencing: track => track.isMainRelease ? [track] : [],
       referenced: track => track.sampledTracks,
     },
 
@@ -692,8 +689,8 @@ export class Track extends Thing {
 
     parts.push(Thing.prototype[inspect.custom].apply(this));
 
-    if (CacheableObject.getUpdateValue(this, 'originalReleaseTrack')) {
-      parts.unshift(`${colors.yellow('[rerelease]')} `);
+    if (CacheableObject.getUpdateValue(this, 'mainReleaseTrack')) {
+      parts.unshift(`${colors.yellow('[secrelease]')} `);
     }
 
     let album;

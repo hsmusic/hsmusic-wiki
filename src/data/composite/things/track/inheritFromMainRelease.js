@@ -1,9 +1,9 @@
 // Early exits with the value for the same property as specified on the
-// original release, if this track is a rerelease, and otherwise continues
+// main release, if this track is a secondary release, and otherwise continues
 // without providing any further dependencies.
 //
-// Like withOriginalRelease, this will early exit (with notFoundValue) if the
-// original release is specified by reference and that reference doesn't
+// Like withMainRelease, this will early exit (with notFoundValue) if the
+// main release is specified by reference and that reference doesn't
 // resolve to anything.
 
 import {input, templateCompositeFrom} from '#composite';
@@ -11,11 +11,11 @@ import {input, templateCompositeFrom} from '#composite';
 import {exposeDependency, raiseOutputWithoutDependency}
   from '#composite/control-flow';
 
-import withPropertyFromOriginalRelease
-  from './withPropertyFromOriginalRelease.js';
+import withPropertyFromMainRelease
+  from './withPropertyFromMainRelease.js';
 
 export default templateCompositeFrom({
-  annotation: `inheritFromOriginalRelease`,
+  annotation: `inheritFromMainRelease`,
 
   inputs: {
     notFoundValue: input({
@@ -24,18 +24,18 @@ export default templateCompositeFrom({
   },
 
   steps: () => [
-    withPropertyFromOriginalRelease({
+    withPropertyFromMainRelease({
       property: input.thisProperty(),
       notFoundValue: input('notFoundValue'),
     }),
 
     raiseOutputWithoutDependency({
-      dependency: '#isRerelease',
+      dependency: '#isSecondaryRelease',
       mode: input.value('falsy'),
     }),
 
     exposeDependency({
-      dependency: '#originalValue',
+      dependency: '#mainReleaseValue',
     }),
   ],
 });

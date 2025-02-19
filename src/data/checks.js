@@ -228,11 +228,11 @@ export function filterReferenceErrors(wikiData, {
       artistContribs: '_contrib',
       contributorContribs: '_contrib',
       coverArtistContribs: '_contrib',
-      referencedTracks: '_trackNotRerelease',
-      sampledTracks: '_trackNotRerelease',
+      referencedTracks: '_trackMainReleasesOnly',
+      sampledTracks: '_trackMainReleasesOnly',
       artTags: '_artTag',
       referencedArtworks: '_artwork',
-      originalReleaseTrack: '_trackNotRerelease',
+      mainReleaseTrack: '_trackMainReleasesOnly',
       commentary: '_commentary',
     }],
 
@@ -358,29 +358,28 @@ export function filterReferenceErrors(wikiData, {
                 findFn = ref => boundFind.track(ref.reference);
                 break;
 
-              case '_trackNotRerelease':
+              case '_trackMainReleasesOnly':
                 findFn = trackRef => {
                   const track = boundFind.track(trackRef);
-                  const originalRef = track && CacheableObject.getUpdateValue(track, 'originalReleaseTrack');
+                  const mainRef = track && CacheableObject.getUpdateValue(track, 'mainReleaseTrack');
 
-                  if (originalRef) {
-                    // It's possible for the original to not actually exist, in this case.
-                    // It should still be reported since the 'Originally Released As' field
-                    // was present.
-                    const original = boundFind.track(originalRef, {mode: 'quiet'});
+                  if (mainRef) {
+                    // It's possible for the main release to not actually exist, in this case.
+                    // It should still be reported since the 'Main Release' field was present.
+                    const main = boundFind.track(mainRef, {mode: 'quiet'});
 
                     // Prefer references by name, but only if it's unambiguous.
-                    const originalByName =
-                      (original
-                        ? boundFind.track(original.name, {mode: 'quiet'})
+                    const mainByName =
+                      (main
+                        ? boundFind.track(main.name, {mode: 'quiet'})
                         : null);
 
                     const shouldBeMessage =
-                      (originalByName
-                        ? colors.green(original.name)
-                     : original
-                        ? colors.green('track:' + original.directory)
-                        : colors.green(originalRef));
+                      (mainByName
+                        ? colors.green(main.name)
+                     : main
+                        ? colors.green('track:' + main.directory)
+                        : colors.green(mainRef));
 
                     throw new Error(`Reference ${colors.red(trackRef)} is to a rerelease, should be ${shouldBeMessage}`);
                   }

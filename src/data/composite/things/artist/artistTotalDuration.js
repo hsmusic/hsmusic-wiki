@@ -48,18 +48,18 @@ export default templateCompositeFrom({
 
     withPropertyFromList({
       list: '#allContributions.thing',
-      property: input.value('isOriginalRelease'),
+      property: input.value('isMainRelease'),
     }),
 
     withFilteredList({
       list: '#allContributions',
-      filter: '#allContributions.thing.isOriginalRelease',
+      filter: '#allContributions.thing.isMainRelease',
     }).outputs({
-      '#filteredList': '#originalContributions',
+      '#filteredList': '#mainReleaseContributions',
     }),
 
     withContributionListSums({
-      list: '#originalContributions',
+      list: '#mainReleaseContributions',
     }),
 
     exposeDependency({

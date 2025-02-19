@@ -109,7 +109,7 @@ export const searchSpec = {
       trackData
         // Exclude rereleases - there's no reasonable way to differentiate
         // them from the main release as part of this query.
-        .filter(track => !track.originalReleaseTrack),
+        .filter(track => !track.mainReleaseTrack),
     ].flat(),
 
     process(thing, opts) {

@@ -1,5 +1,5 @@
-// Like inheritFromOriginalRelease, but tuned for contributions.
-// Recontextualized contributions for this track.
+// Like inheritFromMainRelease, but tuned for contributions.
+// Recontextualizes contributions for this track.
 
 import {input, templateCompositeFrom} from '#composite';
 
@@ -9,36 +9,36 @@ import {withRecontextualizedContributionList, withRedatedContributionList}
   from '#composite/wiki-data';
 
 import withDate from './withDate.js';
-import withPropertyFromOriginalRelease
-  from './withPropertyFromOriginalRelease.js';
+import withPropertyFromMainRelease
+  from './withPropertyFromMainRelease.js';
 
 export default templateCompositeFrom({
-  annotation: `inheritContributionListFromOriginalRelease`,
+  annotation: `inheritContributionListFromMainRelease`,
 
   steps: () => [
-    withPropertyFromOriginalRelease({
+    withPropertyFromMainRelease({
       property: input.thisProperty(),
       notFoundValue: input.value([]),
     }),
 
     raiseOutputWithoutDependency({
-      dependency: '#isRerelease',
+      dependency: '#isSecondaryRelease',
       mode: input.value('falsy'),
     }),
 
     withRecontextualizedContributionList({
-      list: '#originalValue',
+      list: '#mainReleaseValue',
     }),
 
     withDate(),
 
     withRedatedContributionList({
-      list: '#originalValue',
+      list: '#mainReleaseValue',
       date: '#date',
     }),
 
     exposeDependency({
-      dependency: '#originalValue',
+      dependency: '#mainReleaseValue',
     }),
   ],
 });

@@ -1,8 +1,8 @@
-// Provides a value inherited from the original release, if applicable, and a
-// flag indicating if this track is a rerelase or not.
+// Provides a value inherited from the main release, if applicable, and a
+// flag indicating if this track is a secondary release or not.
 //
-// Like withOriginalRelease, this will early exit (with notFoundValue) if the
-// original release is specified by reference and that reference doesn't
+// Like withMainRelease, this will early exit (with notFoundValue) if the
+// main release is specified by reference and that reference doesn't
 // resolve to anything.
 
 import {input, templateCompositeFrom} from '#composite';
@@ -10,10 +10,10 @@ import {input, templateCompositeFrom} from '#composite';
 import {withResultOfAvailabilityCheck} from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
 
-import withOriginalRelease from './withOriginalRelease.js';
+import withMainRelease from './withMainRelease.js';
 
 export default templateCompositeFrom({
-  annotation: `inheritFromOriginalRelease`,
+  annotation: `inheritFromMainRelease`,
 
   inputs: {
     property: input({type: 'string'}),
@@ -26,18 +26,18 @@ export default templateCompositeFrom({
   outputs: ({
     [input.staticValue('property')]: property,
   }) =>
-    ['#isRerelease'].concat(
+    ['#isSecondaryRelease'].concat(
       (property
-        ? ['#original.' + property]
-        : ['#originalValue'])),
+        ? ['#mainRelease.' + property]
+        : ['#mainReleaseValue'])),
 
   steps: () => [
-    withOriginalRelease({
+    withMainRelease({
       notFoundValue: input('notFoundValue'),
     }),
 
     withResultOfAvailabilityCheck({
-      from: '#originalRelease',
+      from: '#mainRelease',
     }),
 
     {
@@ -54,14 +54,14 @@ export default templateCompositeFrom({
           ? continuation()
           : continuation.raiseOutput(
               Object.assign(
-                {'#isRerelease': false},
+                {'#isSecondaryRelease': false},
                 (property
-                  ? {['#original.' + property]: null}
-                  : {'#originalValue': null})))),
+                  ? {['#mainRelease.' + property]: null}
+                  : {'#mainReleaseValue': null})))),
     },
 
     withPropertyFromObject({
-      object: '#originalRelease',
+      object: '#mainRelease',
       property: input('property'),
     }),
 
@@ -77,10 +77,10 @@ export default templateCompositeFrom({
       }) =>
         continuation.raiseOutput(
           Object.assign(
-            {'#isRerelease': true},
+            {'#isSecondaryRelease': true},
             (property
-              ? {['#original.' + property]: value}
-              : {'#originalValue': value}))),
+              ? {['#mainRelease.' + property]: value}
+              : {'#mainReleaseValue': value}))),
     },
   ],
 });

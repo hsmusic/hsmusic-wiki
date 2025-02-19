@@ -42,10 +42,10 @@ export default {
         query.chunks
           .map(({date}) => date),
 
-      rereleases:
+      secreleases:
         query.chunks.map(({chunk}) =>
           chunk.map(track =>
-            track.originalReleaseTrack !== null)),
+            track.mainReleaseTrack !== null)),
     };
   },
 
@@ -65,20 +65,20 @@ export default {
       chunkRows:
         stitchArrays({
           trackLinks: relations.trackLinks,
-          rereleases: data.rereleases,
-        }).map(({trackLinks, rereleases}) =>
+          secreleases: data.secreleases,
+        }).map(({trackLinks, secreleases}) =>
             stitchArrays({
               trackLink: trackLinks,
-              rerelease: rereleases,
-            }).map(({trackLink, rerelease}) =>
-                (rerelease
+              secrelease: secreleases,
+            }).map(({trackLink, secrelease}) =>
+                (secrelease
                   ? {stringsKey: 'rerelease', track: trackLink}
                   : {track: trackLink}))),
 
       chunkRowAttributes:
-        data.rereleases.map(rereleases =>
-          rereleases.map(rerelease =>
-            (rerelease
+        data.secreleases.map(secreleases =>
+          secreleases.map(secrelease =>
+            (secrelease
               ? {class: 'rerelease'}
               : null))),
     });

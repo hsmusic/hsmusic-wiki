@@ -40,7 +40,7 @@ export default {
         contribs
           .filter(contrib => contrib.countInDurationTotals)
           .map(contrib => contrib.thing)
-          .filter(track => track.isOriginalRelease)
+          .filter(track => track.isMainRelease)
           .filter(track => track.duration > 0));
 
     data.duration =

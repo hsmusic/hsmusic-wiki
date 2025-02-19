@@ -2,7 +2,7 @@ import {input, templateCompositeFrom} from '#composite';
 
 import {exitWithoutDependency} from '#composite/control-flow';
 
-import withOriginalRelease from './withOriginalRelease.js';
+import withMainRelease from './withMainRelease.js';
 
 export default templateCompositeFrom({
   annotation: `withOtherReleases`,
@@ -15,26 +15,27 @@ export default templateCompositeFrom({
       mode: input.value('empty'),
     }),
 
-    withOriginalRelease({
-      selfIfOriginal: input.value(true),
+    withMainRelease({
+      selfIfMain: input.value(true),
       notFoundValue: input.value([]),
     }),
 
+    // TODO: Jegus shouldn't this be a proper reverse list
     {
-      dependencies: [input.myself(), '#originalRelease', 'trackData'],
+      dependencies: [input.myself(), '#mainRelease', 'trackData'],
       compute: (continuation, {
         [input.myself()]: thisTrack,
-        ['#originalRelease']: originalRelease,
+        ['#mainRelease']: mainRelease,
         trackData,
       }) => continuation({
         ['#otherReleases']:
-          (originalRelease === thisTrack
+          (mainRelease === thisTrack
             ? []
-            : [originalRelease])
+            : [mainRelease])
             .concat(trackData.filter(track =>
-              track !== originalRelease &&
+              track !== mainRelease &&
               track !== thisTrack &&
-              track.originalReleaseTrack === originalRelease)),
+              track.mainReleaseTrack === mainRelease)),
       }),
     },
   ],

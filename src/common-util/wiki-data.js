@@ -167,10 +167,10 @@ export function getFlashLink(flash) {
 }
 
 export function getTotalDuration(tracks, {
-  originalReleasesOnly = false,
+  mainReleasesOnly = false,
 } = {}) {
-  if (originalReleasesOnly) {
-    tracks = tracks.filter(t => !t.originalReleaseTrack);
+  if (mainReleasesOnly) {
+    tracks = tracks.filter(t => !t.mainReleaseTrack);
   }
 
   return accumulateSum(tracks, track => track.duration);

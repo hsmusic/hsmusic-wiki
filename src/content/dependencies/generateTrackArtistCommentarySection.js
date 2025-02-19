@@ -13,7 +13,7 @@ export default {
   query: (track) => ({
     otherRereleasesWithCommentary:
       track.otherReleases
-        .filter(track => !track.isOriginalRelease)
+        .filter(track => !track.isMainRelease)
         .filter(track => !empty(track.commentary)),
   }),
 
@@ -21,14 +21,14 @@ export default {
     contentHeading:
       relation('generateContentHeading'),
 
-    originalReleaseTrackLink:
-      (track.isRerelease
-        ? relation('linkTrack', track.originalReleaseTrack)
+    mainReleaseTrackLink:
+      (track.isSecondaryRelease
+        ? relation('linkTrack', track.mainReleaseTrack)
         : null),
 
-    originalReleaseArtistCommentaryEntries:
-      (track.isRerelease
-        ? track.originalReleaseTrack.commentary
+    mainReleaseArtistCommentaryEntries:
+      (track.isSecondaryRelease
+        ? track.mainReleaseTrack.commentary
             .map(entry => relation('generateCommentaryEntry', entry))
         : null),
 
@@ -48,22 +48,22 @@ export default {
     name:
       track.name,
 
-    isRerelease:
-      track.isRerelease,
+    isSecondaryRelease:
+      track.isSecondaryRelease,
 
-    originalReleaseName:
-      (track.isRerelease
-        ? track.originalReleaseTrack.name
+    mainReleaseName:
+      (track.isSecondaryRelease
+        ? track.mainReleaseTrack.name
         : null),
 
-    originalReleaseAlbumName:
-      (track.isRerelease
-        ? track.originalReleaseTrack.album.name
+    mainReleaseAlbumName:
+      (track.isSecondaryRelease
+        ? track.mainReleaseTrack.album.name
         : null),
 
-    originalReleaseAlbumColor:
-      (track.isRerelease
-        ? track.originalReleaseTrack.album.color
+    mainReleaseAlbumColor:
+      (track.isSecondaryRelease
+        ? track.mainReleaseTrack.album.color
         : null),
 
     otherReleaseAlbumNames:
@@ -84,7 +84,7 @@ export default {
             title: language.$('misc.artistCommentary'),
           }),
 
-        data.isRerelease &&
+        data.isSecondaryRelease &&
           html.tags([
             html.tag('p', {class: ['drop', 'commentary-drop']},
               {[html.onlyIfSiblings]: true},
@@ -93,29 +93,29 @@ export default {
                 const workingOptions = {};
 
                 workingOptions.album =
-                  relations.originalReleaseTrackLink.slots({
+                  relations.mainReleaseTrackLink.slots({
                     content:
-                      data.originalReleaseAlbumName,
+                      data.mainReleaseAlbumName,
 
                     color:
-                      data.originalReleaseAlbumColor,
+                      data.mainReleaseAlbumColor,
                   });
 
-                if (data.name !== data.originalReleaseName) {
+                if (data.name !== data.mainReleaseName) {
                   workingCapsule += '.namedDifferently';
                   workingOptions.name =
-                    html.tag('i', data.originalReleaseName);
+                    html.tag('i', data.mainReleaseName);
                 }
 
                 return language.$(workingCapsule, workingOptions);
               })),
 
-            relations.originalReleaseArtistCommentaryEntries,
+            relations.mainReleaseArtistCommentaryEntries,
           ]),
 
         html.tags([
-          data.isRerelease &&
-          !html.isBlank(relations.originalReleaseArtistCommentaryEntries) &&
+          data.isSecondaryRelease &&
+          !html.isBlank(relations.mainReleaseArtistCommentaryEntries) &&
             html.tag('p', {class: ['drop', 'commentary-drop']},
               {[html.onlyIfSiblings]: true},
 

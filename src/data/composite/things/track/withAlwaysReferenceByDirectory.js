@@ -51,7 +51,7 @@ export default templateCompositeFrom({
 
     // Remaining code is for defaulting to true if this track is a rerelease of
     // another with the same name, so everything further depends on access to
-    // trackData as well as originalReleaseTrack.
+    // trackData as well as mainReleaseTrack.
 
     exitWithoutDependency({
       dependency: 'trackData',
@@ -60,45 +60,46 @@ export default templateCompositeFrom({
     }),
 
     exitWithoutDependency({
-      dependency: 'originalReleaseTrack',
+      dependency: 'mainReleaseTrack',
       value: input.value(false),
     }),
 
-    // It's necessary to use the custom trackOriginalReleasesOnly find function
+    // It's necessary to use the custom trackMainReleasesOnly find function
     // here, so as to avoid recursion issues - the find.track() function depends
     // on accessing each track's alwaysReferenceByDirectory, which means it'll
     // hit *this track* - and thus this step - and end up recursing infinitely.
-    // By definition, find.trackOriginalReleasesOnly excludes tracks which have
-    // an originalReleaseTrack update value set, which means even though it does
+    // By definition, find.trackMainReleasesOnly excludes tracks which have
+    // an mainReleaseTrack update value set, which means even though it does
     // still access each of tracks' `alwaysReferenceByDirectory` property, it
     // won't access that of *this* track - it will never proceed past the
     // `exitWithoutDependency` step directly above, so there's no opportunity
     // for recursion.
     withResolvedReference({
-      ref: 'originalReleaseTrack',
+      ref: 'mainReleaseTrack',
       data: 'trackData',
-      find: input.value(find.trackOriginalReleasesOnly),
+      find: input.value(find.trackMainReleasesOnly),
     }).outputs({
-      '#resolvedReference': '#originalRelease',
+      '#resolvedReference': '#mainRelease',
     }),
 
     exitWithoutDependency({
-      dependency: '#originalRelease',
+      dependency: '#mainRelease',
       value: input.value(false),
     }),
 
     withPropertyFromObject({
-      object: '#originalRelease',
+      object: '#mainRelease',
       property: input.value('name'),
     }),
 
     {
-      dependencies: ['name', '#originalRelease.name'],
+      dependencies: ['name', '#mainRelease.name'],
       compute: (continuation, {
         name,
-        ['#originalRelease.name']: originalName,
+        ['#mainRelease.name']: mainReleaseName,
       }) => continuation({
-        ['#alwaysReferenceByDirectory']: name === originalName,
+        ['#alwaysReferenceByDirectory']:
+          name === mainReleaseName,
       }),
     },
   ],

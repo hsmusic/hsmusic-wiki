@@ -510,8 +510,6 @@ misc:
         date.sometime.range: "sometime {DATE_RANGE}"
         date.throughout.range: "throughout {DATE_RANGE}"
 
-      seeOriginalRelease: "See {ORIGINAL}!"
-
     info:
       fromMainRelease: >-
         This commentary is properly placed on this track's main release, {ALBUM}.

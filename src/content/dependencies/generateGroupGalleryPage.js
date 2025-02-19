@@ -86,7 +86,7 @@ export default {
 
     data.numAlbums = albums.length;
     data.numTracks = tracks.length;
-    data.totalDuration = getTotalDuration(tracks, {originalReleasesOnly: true});
+    data.totalDuration = getTotalDuration(tracks, {mainReleasesOnly: true});
 
     data.gridNames = albums.map(album => album.name);
     data.gridDurations = albums.map(album => getTotalDuration(album.tracks));

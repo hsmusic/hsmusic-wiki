@@ -80,7 +80,7 @@ export default {
       query.track.duration,
 
     rerelease:
-      query.track.isRerelease,
+      query.track.isSecondaryRelease,
 
     contribAnnotations:
       (query.displayedContributions
