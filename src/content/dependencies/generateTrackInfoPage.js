@@ -24,21 +24,16 @@ export default {
     'transformContent',
   ],
 
-  extraDependencies: ['html', 'language', 'wikiData'],
+  extraDependencies: ['html', 'language'],
 
-  sprawl: ({wikiInfo}) => ({
-    divideTrackListsByGroups:
-      wikiInfo.divideTrackListsByGroups,
-  }),
-
-  query: (_sprawl, track) => ({
+  query: (track) => ({
     originalReleaseTrack:
       (track.isOriginalRelease
         ? track
         : track.originalReleaseTrack),
   }),
 
-  relations: (relation, query, sprawl, track) => ({
+  relations: (relation, query, track) => ({
     layout:
       relation('generatePageLayout'),
 
@@ -88,13 +83,11 @@ export default {
 
     referencedByTracksList:
       relation('generateTrackListDividedByGroups',
-        query.originalReleaseTrack.referencedByTracks,
-        sprawl.divideTrackListsByGroups),
+        query.originalReleaseTrack.referencedByTracks),
 
     sampledByTracksList:
       relation('generateTrackListDividedByGroups',
-        query.originalReleaseTrack.sampledByTracks,
-        sprawl.divideTrackListsByGroups),
+        query.originalReleaseTrack.sampledByTracks),
 
     flashesThatFeatureList:
       relation('generateTrackInfoPageFeaturedByFlashesList', track),
@@ -125,7 +118,7 @@ export default {
         .map(entry => relation('generateCommentaryEntry', entry)),
   }),
 
-  data: (_query, _sprawl, track) => ({
+  data: (_query, track) => ({
     name:
       track.name,
 
