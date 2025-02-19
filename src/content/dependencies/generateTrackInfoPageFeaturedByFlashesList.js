@@ -14,7 +14,7 @@ export default {
     sortedFeatures:
       (sprawl.enableFlashesAndGames
         ? sortFlashesChronologically(
-            [track, ...track.otherReleases].flatMap(track =>
+            track.allReleases.flatMap(track =>
               track.featuredInFlashes.map(flash => ({
                 flash,
                 track,

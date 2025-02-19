@@ -40,8 +40,8 @@ export default {
     if (track) {
       const albumTrackMap =
         new Map(transposeArrays([
-          [track.album, ...track.otherReleases.map(t => t.album)],
-          [track, ...track.otherReleases],
+          track.allReleases.map(t => t.album),
+          track.allReleases,
         ]));
 
       const allReleaseAlbums =
