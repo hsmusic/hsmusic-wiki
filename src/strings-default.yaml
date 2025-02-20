@@ -1202,7 +1202,19 @@ artistPage:
       #   artists or contributors, and get dimmed a little compared
       #   to original release track entries.
 
-      rerelease: "{ENTRY} (rerelease)"
+      rerelease:
+        _: "{ENTRY} ({RERELEASE})"
+        term: "rerelease"
+
+        firstRelease: >-
+          First released on {ALBUM}
+
+      firstRelease:
+        _: "{ENTRY} ({FIRST_RELEASE})"
+        term: "first release"
+
+        rerelease: >-
+          {WHEN}: {ALBUM}
 
       # track:
       #   The string without duration is used in both the artist's

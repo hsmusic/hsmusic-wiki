@@ -1022,7 +1022,8 @@ a:not([href]):hover {
 .text-with-tooltip.datetimestamp .text-with-tooltip-interaction-cue,
 .text-with-tooltip.missing-duration .text-with-tooltip-interaction-cue,
 .text-with-tooltip.commentary-date .text-with-tooltip-interaction-cue,
-.text-with-tooltip.wiki-edits .text-with-tooltip-interaction-cue {
+.text-with-tooltip.wiki-edits .text-with-tooltip-interaction-cue,
+.text-with-tooltip.rerelease .text-with-tooltip-interaction-cue {
   cursor: default;
 }
 
@@ -1079,7 +1080,8 @@ li:not(:first-child:last-child) .tooltip,
 
 .datetimestamp-tooltip,
 .missing-duration-tooltip,
-.commentary-date-tooltip {
+.commentary-date-tooltip,
+.rerelease-tooltip {
   padding: 3px 4px 2px 2px;
   left: -10px;
 }
@@ -1244,6 +1246,12 @@ li:not(:first-child:last-child) .tooltip,
   padding: 3px 4.5px;
 }
 
+.rerelease-tooltip .tooltip-content {
+  padding: 3px 4.5px;
+  width: 260px;
+  font-size: 0.9em;
+}
+
 .external-icon {
   display: inline-block;
   padding: 0 3px;
@@ -1260,8 +1268,8 @@ li:not(:first-child:last-child) .tooltip,
   fill: var(--primary-color);
 }
 
-.rerelease,
-.other-group-accent {
+.other-group-accent,
+.rerelease-line {
   opacity: 0.7;
   font-style: oblique;
 }

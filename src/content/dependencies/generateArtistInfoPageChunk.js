@@ -102,6 +102,7 @@ export default {
       html.tag('dt', accentedLink),
       html.tag('dd',
         html.tag('ul',
+          {class: 'offset-tooltips'},
           slots.items)),
     ]);
   },

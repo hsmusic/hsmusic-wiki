@@ -1,7 +1,13 @@
 import {empty} from '#sugar';
 
 export default {
+  contentDependencies: ['generateTextWithTooltip'],
   extraDependencies: ['html', 'language'],
+
+  relations: (relation) => ({
+    textWithTooltip:
+      relation('generateTextWithTooltip'),
+  }),
 
   slots: {
     content: {
@@ -18,10 +24,13 @@ export default {
       validate: v => v.strictArrayOf(v.isHTML),
     },
 
-    rerelease: {type: 'boolean'},
+    rereleaseTooltip: {
+      type: 'html',
+      mutable: false,
+    },
   },
 
-  generate: (slots, {html, language}) =>
+  generate: (relations, slots, {html, language}) =>
     language.encapsulate('artistPage.creditList.entry', entryCapsule =>
       html.tag('li',
         slots.rerelease && {class: 'rerelease'},
@@ -29,8 +38,15 @@ export default {
         language.encapsulate(entryCapsule, workingCapsule => {
           const workingOptions = {entry: slots.content};
 
-          if (slots.rerelease) {
+          if (!html.isBlank(slots.rereleaseTooltip)) {
             workingCapsule += '.rerelease';
+            workingOptions.rerelease =
+              relations.textWithTooltip.slots({
+                attributes: {class: 'rerelease'},
+                text: language.$(entryCapsule, 'rerelease.term'),
+                tooltip: slots.rereleaseTooltip,
+              });
+
             return language.$(workingCapsule, workingOptions);
           }
 

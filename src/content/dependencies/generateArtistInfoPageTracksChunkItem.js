@@ -5,6 +5,7 @@ export default {
   contentDependencies: [
     'generateArtistInfoPageChunkItem',
     'generateArtistInfoPageOtherArtistLinks',
+    'generateArtistInfoPageRereleaseTooltip',
     'linkTrack',
   ],
 
@@ -62,6 +63,17 @@ export default {
       ];
     }
 
+    query.isRerelease =
+      // It's kinda awkward to perform this chronological sort here,
+      // per track, rather than just reusing the one that's done to
+      // sort all the items on the page altogether... but then, the
+      // sort for the page is actually *a different* sort, on purpsoe.
+      // That sort is according to the dates of the contributions;
+      // this is according to the dates of the tracks. Those can be
+      // different - and it's the latter that determines whether the
+      // track is a rerelease!
+      sortChronologically(query.track.allReleases)[0] !== query.track;
+
     return query;
   },
 
@@ -74,22 +86,16 @@ export default {
 
     otherArtistLinks:
       relation('generateArtistInfoPageOtherArtistLinks', contribs),
+
+    rereleaseTooltip:
+      (query.isRerelease
+        ? relation('generateArtistInfoPageRereleaseTooltip', query.track)
+        : null),
   }),
 
   data: (query) => ({
     duration:
       query.track.duration,
-
-    rerelease:
-      // It's kinda awkward to perform this chronological sort here,
-      // per track, rather than just reusing the one that's done to
-      // sort all the items on the page altogether... but then, the
-      // sort for the page is actually *a different* sort, on purpsoe.
-      // That sort is according to the dates of the contributions;
-      // this is according to the dates of the tracks. Those can be
-      // different - and it's the latter that determines whether the
-      // track is a rerelease!
-      sortChronologically(query.track.allReleases)[0] !== query.track,
 
     contribAnnotations:
       (query.displayedContributions
@@ -101,7 +107,7 @@ export default {
   generate: (data, relations, {html, language}) =>
     relations.template.slots({
       otherArtistLinks: relations.otherArtistLinks,
-      rerelease: data.rerelease,
+      rereleaseTooltip: relations.rereleaseTooltip,
 
       annotation:
         (data.contribAnnotations

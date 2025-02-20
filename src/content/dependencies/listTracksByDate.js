@@ -84,7 +84,7 @@ export default {
         data.rereleases.map(rereleases =>
           rereleases.map(rerelease =>
             (rerelease
-              ? {class: 'rerelease'}
+              ? {class: 'rerelease-line'}
               : null))),
     });
   },

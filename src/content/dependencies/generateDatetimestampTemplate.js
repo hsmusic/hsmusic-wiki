@@ -31,8 +31,10 @@ export default {
           slots.mainContent),
 
       tooltip:
-        slots.tooltip?.slots({
-          attributes: [{class: 'datetimestamp-tooltip'}],
-        }),
+        (html.isBlank(slots.tooltip)
+          ? null
+          : slots.tooltip.slots({
+              attributes: [{class: 'datetimestamp-tooltip'}],
+            })),
     }),
 };
