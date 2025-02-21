@@ -1214,7 +1214,7 @@ artistPage:
         term: "first release"
 
         rerelease: >-
-          {WHEN}: {ALBUM}
+          Also released on {ALBUM}
 
       # track:
       #   The string without duration is used in both the artist's

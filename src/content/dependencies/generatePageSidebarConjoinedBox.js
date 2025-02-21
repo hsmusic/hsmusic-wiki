@@ -32,11 +32,7 @@ export default {
           .map((content, index, {length}) => [
             content,
             index < length - 1 &&
-              html.tag('hr', {
-                style:
-                  `border-color: var(--primary-color); ` +
-                  `border-style: none none dotted none`,
-              }),
+              html.tag('hr', {class: 'cute'}),
           ]),
     }),
 };

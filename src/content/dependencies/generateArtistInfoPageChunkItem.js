@@ -28,6 +28,11 @@ export default {
       type: 'html',
       mutable: false,
     },
+
+    firstReleaseTooltip: {
+      type: 'html',
+      mutable: false,
+    },
   },
 
   generate: (relations, slots, {html, language}) =>
@@ -45,6 +50,18 @@ export default {
                 attributes: {class: 'rerelease'},
                 text: language.$(entryCapsule, 'rerelease.term'),
                 tooltip: slots.rereleaseTooltip,
+              });
+
+            return language.$(workingCapsule, workingOptions);
+          }
+
+          if (!html.isBlank(slots.firstReleaseTooltip)) {
+            workingCapsule += '.firstRelease';
+            workingOptions.firstRelease =
+              relations.textWithTooltip.slots({
+                attributes: {class: 'first-release'},
+                text: language.$(entryCapsule, 'firstRelease.term'),
+                tooltip: slots.firstReleaseTooltip,
               });
 
             return language.$(workingCapsule, workingOptions);

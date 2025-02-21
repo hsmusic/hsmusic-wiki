@@ -1023,7 +1023,8 @@ a:not([href]):hover {
 .text-with-tooltip.missing-duration .text-with-tooltip-interaction-cue,
 .text-with-tooltip.commentary-date .text-with-tooltip-interaction-cue,
 .text-with-tooltip.wiki-edits .text-with-tooltip-interaction-cue,
-.text-with-tooltip.rerelease .text-with-tooltip-interaction-cue {
+.text-with-tooltip.rerelease .text-with-tooltip-interaction-cue,
+.text-with-tooltip.first-release .text-with-tooltip-interaction-cue {
   cursor: default;
 }
 
@@ -1081,7 +1082,8 @@ li:not(:first-child:last-child) .tooltip,
 .datetimestamp-tooltip,
 .missing-duration-tooltip,
 .commentary-date-tooltip,
-.rerelease-tooltip {
+.rerelease-tooltip,
+.first-release-tooltip {
   padding: 3px 4px 2px 2px;
   left: -10px;
 }
@@ -1176,11 +1178,16 @@ li:not(:first-child:last-child) .tooltip,
   font-size: 0.85em;
 }
 
-.contribution-tooltip .tooltip-divider {
+.contribution-tooltip .tooltip-divider,
+.tooltip-content hr.cute {
   grid-column-start: icon-start;
   grid-column-end: platform-end;
-
   border-top: 1px dotted var(--primary-color);
+}
+
+/* Don't mind me... */
+.tooltip-content .tooltip-divider,
+.tooltip-content hr.cute {
   margin-top: 3px;
   margin-bottom: 4px;
 }
@@ -1246,7 +1253,8 @@ li:not(:first-child:last-child) .tooltip,
   padding: 3px 4.5px;
 }
 
-.rerelease-tooltip .tooltip-content {
+.rerelease-tooltip .tooltip-content,
+.first-release-tooltip .tooltip-content {
   padding: 3px 4.5px;
   width: 260px;
   font-size: 0.9em;
@@ -1321,6 +1329,13 @@ progress {
 
 p .current {
   font-weight: 800;
+}
+
+hr.cute,
+#content hr.cute,
+.sidebar hr.cute {
+  border-color: var(--primary-color);
+  border-style: none none dotted none;
 }
 
 #cover-art-container {
