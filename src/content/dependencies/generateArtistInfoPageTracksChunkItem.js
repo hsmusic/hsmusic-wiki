@@ -99,12 +99,12 @@ export default {
 
     rereleaseTooltip:
       (query.isRerelease
-        ? relation('generateArtistInfoPageRereleaseTooltip', query.track)
+        ? relation('generateArtistInfoPageRereleaseTooltip', query.track, artist)
         : null),
 
     firstReleaseTooltip:
       (query.isFirstRelease && query.hasOtherReleases
-        ? relation('generateArtistInfoPageFirstReleaseTooltip', query.track)
+        ? relation('generateArtistInfoPageFirstReleaseTooltip', query.track, artist)
         : null),
   }),
 

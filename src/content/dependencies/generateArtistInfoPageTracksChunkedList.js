@@ -1,6 +1,7 @@
 import {sortAlbumsTracksChronologically, sortContributionsChronologically}
   from '#sort';
-import {chunkByConditions, stitchArrays} from '#sugar';
+import {stitchArrays} from '#sugar';
+import {chunkArtistTrackContributions} from '#wiki-data';
 
 export default {
   contentDependencies: [
@@ -21,19 +22,7 @@ export default {
       sortAlbumsTracksChronologically);
 
     query.contribs =
-      // First chunk by (contribution) date and album.
-      chunkByConditions(allContributions, [
-        ({date: date1}, {date: date2}) =>
-          +date1 !== +date2,
-        ({thing: track1}, {thing: track2}) =>
-          track1.album !== track2.album,
-      ]).map(contribs =>
-          // Then, *within* the boundaries of the existing chunks,
-          // chunk contributions to the same thing together.
-          chunkByConditions(contribs, [
-            ({thing: thing1}, {thing: thing2}) =>
-              thing1 !== thing2,
-          ]));
+      chunkArtistTrackContributions(allContributions);
 
     query.albums =
       query.contribs
@@ -58,8 +47,35 @@ export default {
             contribs)),
   }),
 
-  generate: (relations) =>
+  data: (query, _artist) => ({
+    albumDirectories:
+      query.albums
+        .map(album => album.directory),
+
+    albumChunkIndices:
+      query.albums
+        .reduce(([indices, map], album) => {
+          if (map.has(album)) {
+            const n = map.get(album);
+            indices.push(n);
+            map.set(album, n + 1);
+          } else {
+            indices.push(0);
+            map.set(album, 1);
+          }
+          return [indices, map];
+        }, [[], new Map()])
+        [0],
+  }),
+
+  generate: (data, relations) =>
     relations.chunkedList.slots({
-      chunks: relations.chunks,
+      chunks:
+        stitchArrays({
+          chunk: relations.chunks,
+          albumDirectory: data.albumDirectories,
+          albumChunkIndex: data.albumChunkIndices,
+        }).map(({chunk, albumDirectory, albumChunkIndex}) =>
+            chunk.slot('id', `tracks-${albumDirectory}-${albumChunkIndex}`)),
     }),
 };

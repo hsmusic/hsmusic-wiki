@@ -1790,6 +1790,10 @@ dl dt {
   margin-bottom: 2px;
 }
 
+dl dt[id]:not(.content-heading) {
+  --custom-scroll-offset: calc(2.5em - 2px);
+}
+
 dl dd {
   margin-bottom: 1em;
 }

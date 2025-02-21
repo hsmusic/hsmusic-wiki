@@ -14,7 +14,7 @@ export default {
       sortChronologically(track.allReleases)[0],
   }),
 
-  relations: (relation, query, track) => ({
+  relations: (relation, query, track, artist) => ({
     tooltip:
       relation('generateTooltip'),
 
@@ -22,7 +22,7 @@ export default {
       relation('generateColorStyleAttribute', track.color),
 
     firstReleaseLink:
-      relation('linkOtherReleaseOnArtistInfoPage', query.firstRelease),
+      relation('linkOtherReleaseOnArtistInfoPage', query.firstRelease, artist),
   }),
 
   data: (query, track) => ({

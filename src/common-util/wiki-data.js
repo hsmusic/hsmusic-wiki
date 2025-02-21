@@ -1,6 +1,6 @@
 // Utility functions for interacting with wiki data.
 
-import {accumulateSum, empty, unique} from './sugar.js';
+import {accumulateSum, chunkByConditions, empty, unique} from './sugar.js';
 import {sortByDate} from './sort.js';
 
 // This is a duplicate binding of filterMultipleArrays that's included purely
@@ -190,6 +190,25 @@ export function getTrackCover(track, {to}) {
 
 export function getArtistAvatar(artist, {to}) {
   return to('media.artistAvatar', artist.directory, artist.avatarFileExtension);
+}
+
+// Used in multiple content functions for the artist info page,
+// because shared logic is torture oooooooooooooooo.
+export function chunkArtistTrackContributions(contributions) {
+  return (
+    // First chunk by (contribution) date and album.
+    chunkByConditions(contributions, [
+      ({date: date1}, {date: date2}) =>
+        +date1 !== +date2,
+      ({thing: track1}, {thing: track2}) =>
+        track1.album !== track2.album,
+    ]).map(contribs =>
+        // Then, *within* the boundaries of the existing chunks,
+        // chunk contributions to the same thing together.
+        chunkByConditions(contribs, [
+          ({thing: thing1}, {thing: thing2}) =>
+            thing1 !== thing2,
+        ])));
 }
 
 // Big-ass homepage row functions

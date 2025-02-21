@@ -15,7 +15,7 @@ export default {
       sortChronologically(track.allReleases).slice(1),
   }),
 
-  relations: (relation, query, track) => ({
+  relations: (relation, query, track, artist) => ({
     tooltip:
       relation('generateTooltip'),
 
@@ -25,7 +25,7 @@ export default {
     rereleaseLinks:
       query.rereleases
         .map(rerelease =>
-          relation('linkOtherReleaseOnArtistInfoPage', rerelease)),
+          relation('linkOtherReleaseOnArtistInfoPage', rerelease, artist)),
   }),
 
   data: (query, track) => ({

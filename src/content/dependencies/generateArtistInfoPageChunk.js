@@ -8,6 +8,8 @@ export default {
       validate: v => v.is('flash', 'album'),
     },
 
+    id: {type: 'string'},
+
     albumLink: {
       type: 'html',
       mutable: false,
@@ -99,7 +101,10 @@ export default {
     }
 
     return html.tags([
-      html.tag('dt', accentedLink),
+      html.tag('dt',
+        slots.id && {id: slots.id},
+        accentedLink),
+
       html.tag('dd',
         html.tag('ul',
           {class: 'offset-tooltips'},
