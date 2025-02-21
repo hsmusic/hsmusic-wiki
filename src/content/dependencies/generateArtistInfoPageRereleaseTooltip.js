@@ -1,7 +1,12 @@
 import {sortChronologically} from '#sort';
 
 export default {
-  contentDependencies: ['generateColorStyleAttribute', 'generateTooltip'],
+  contentDependencies: [
+    'generateColorStyleAttribute',
+    'generateTooltip',
+    'linkOtherReleaseOnArtistInfoPage'
+  ],
+
   extraDependencies: ['html', 'language'],
 
   query: (track) => ({
@@ -16,14 +21,11 @@ export default {
     rereleaseColorStyle:
       relation('generateColorStyleAttribute', track.color),
 
-    firstReleaseColorStyle:
-      relation('generateColorStyleAttribute', query.firstRelease.color),
+    firstReleaseLink:
+      relation('linkOtherReleaseOnArtistInfoPage', query.firstRelease),
   }),
 
   data: (query, track) => ({
-    firstReleaseAlbumName:
-      query.firstRelease.album.name,
-
     rereleaseDate:
       track.dateFirstReleased ??
       track.album.date,
@@ -44,12 +46,7 @@ export default {
         content: [
           language.$(capsule, 'firstRelease', {
             album:
-              html.metatag('blockwrap',
-                html.tag('a',
-                  {href: '#'},
-                  relations.firstReleaseColorStyle.slot('context', 'primary-only'),
-
-                  language.sanitize(data.firstReleaseAlbumName))),
+              html.metatag('blockwrap', relations.firstReleaseLink),
           }),
 
           html.tag('br'),

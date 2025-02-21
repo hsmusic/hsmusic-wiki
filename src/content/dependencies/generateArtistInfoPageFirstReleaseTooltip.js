@@ -2,7 +2,12 @@ import {sortChronologically} from '#sort';
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['generateColorStyleAttribute', 'generateTooltip'],
+  contentDependencies: [
+    'generateColorStyleAttribute',
+    'generateTooltip',
+    'linkOtherReleaseOnArtistInfoPage',
+  ],
+
   extraDependencies: ['html', 'language'],
 
   query: (track) => ({
@@ -17,20 +22,16 @@ export default {
     firstReleaseColorStyle:
       relation('generateColorStyleAttribute', track.color),
 
-    rereleaseColorStyles:
+    rereleaseLinks:
       query.rereleases
         .map(rerelease =>
-          relation('generateColorStyleAttribute', rerelease.album.color)),
+          relation('linkOtherReleaseOnArtistInfoPage', rerelease)),
   }),
 
   data: (query, track) => ({
     firstReleaseDate:
       track.dateFirstReleased ??
       track.album.date,
-
-    rereleaseAlbumNames:
-      query.rereleases
-        .map(rerelease => rerelease.album.name),
 
     rereleaseDates:
       query.rereleases
@@ -53,24 +54,18 @@ export default {
 
         content:
           stitchArrays({
-            colorStyle: relations.rereleaseColorStyles,
-            albumName: data.rereleaseAlbumNames,
-            date: data.rereleaseDates,
-          }).map(({colorStyle, albumName, date}) =>
+            rereleaseLink: relations.rereleaseLinks,
+            rereleaseDate: data.rereleaseDates,
+          }).map(({rereleaseLink, rereleaseDate}) =>
               html.tags([
                 language.$(capsule, 'rerelease', {
                   album:
-                    html.metatag('blockwrap',
-                      html.tag('a',
-                        {href: '#'},
-                        colorStyle.slot('context', 'primary-only'),
-
-                        language.sanitize(albumName))),
+                    html.metatag('blockwrap', rereleaseLink),
                 }),
 
                 html.tag('br'),
 
-                language.formatRelativeDate(date, data.firstReleaseDate, {
+                language.formatRelativeDate(rereleaseDate, data.firstReleaseDate, {
                   considerRoundingDays: true,
                   approximate: true,
                   absolute: true,
