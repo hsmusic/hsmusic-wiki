@@ -1510,6 +1510,7 @@ async function main() {
         logThings('newsData', 'news entries');
       }
       logThings('staticPageData', 'static pages');
+      logThings('sortingRules', 'sorting rules');
       if (wikiData.homepageLayout) {
         logInfo` - ${1} homepage layout (${
           wikiData.homepageLayout.sections.length
