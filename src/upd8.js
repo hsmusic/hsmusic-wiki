@@ -1480,6 +1480,10 @@ async function main() {
           ? prop
           : wikiData[prop]);
 
+      if (array && empty(array)) {
+        return;
+      }
+
       logInfo` - ${array?.length ?? colors.red('(Missing!)')} ${colors.normal(colors.dim(label))}`;
     }
 
