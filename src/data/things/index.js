@@ -6,6 +6,7 @@ import CacheableObject from '#cacheable-object';
 import {logError} from '#cli';
 import {compositeFrom} from '#composite';
 import * as serialize from '#serialize';
+import {withEntries} from '#sugar';
 import Thing from '#thing';
 
 import * as albumClasses from './album.js';
@@ -81,13 +82,25 @@ function errorDuplicateClassNames() {
 }
 
 function flattenClassLists() {
+  let allClassesUnsorted = Object.create(null);
+
   for (const classes of Object.values(allClassLists)) {
     for (const [name, constructor] of Object.entries(classes)) {
       if (typeof constructor !== 'function') continue;
       if (!(constructor.prototype instanceof Thing)) continue;
-      allClasses[name] = constructor;
+      allClassesUnsorted[name] = constructor;
     }
   }
+
+  // Sort subclasses after their superclasses.
+  Object.assign(allClasses,
+    withEntries(allClassesUnsorted, entries =>
+      entries.sort(({[1]: A}, {[1]: B}) =>
+        (A.prototype instanceof B
+          ? +1
+       : B.prototype instanceof A
+          ? -1
+          :  0))));
 }
 
 function descriptorAggregateHelper({
