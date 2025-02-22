@@ -1532,6 +1532,44 @@ export function getThingLayoutForFilename(filename, wikiData) {
   }
 }
 
+export function flattenThingLayoutToDocumentOrder(layout) {
+  switch (layout.documentMode) {
+    case documentModes.oneDocumentTotal:
+    case documentModes.onePerFile: {
+      if (layout.thing) {
+        return [0];
+      } else {
+        return [];
+      }
+    }
+
+    case documentModes.allInOne: {
+      const indices =
+        layout.things
+          .map(thing => thing[Thing.yamlSourceDocumentPlacement][1]);
+
+      return indices;
+    }
+
+    case documentModes.headerAndEntries: {
+      const entryIndices =
+        layout.entryThings
+          .map(thing => thing[Thing.yamlSourceDocumentPlacement][2])
+          .map(index => index + 1);
+
+      if (layout.headerThing) {
+        return [0, ...entryIndices];
+      } else {
+        return entryIndices;
+      }
+    }
+
+    default: {
+      throw new Error(`Unknown document mode`);
+    }
+  }
+}
+
 export function* splitDocumentsInYAMLSourceText(sourceText) {
   const dividerRegex = /^-{3,}\n?/gm;
   let previousDivider = '';
