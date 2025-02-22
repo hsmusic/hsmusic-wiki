@@ -33,6 +33,7 @@ import {
   getNestedProp,
   stitchArrays,
   typeAppearance,
+  unique,
   withEntries,
 } from '#sugar';
 
@@ -918,7 +919,8 @@ export function processThingsFromDataStep(documents, dataStep) {
             processDocument(document, dataStep.documentThing);
 
           thing[Thing.yamlSourceDocument] = document;
-          thing[Thing.yamlSourceDocumentPlacement] = ['all in one', index];
+          thing[Thing.yamlSourceDocumentPlacement] =
+            [documentModes.allInOne, index];
 
           result.push(thing);
           aggregate.call(subAggregate.close);
@@ -939,7 +941,8 @@ export function processThingsFromDataStep(documents, dataStep) {
         processDocument(documents[0], dataStep.documentThing);
 
       thing[Thing.yamlSourceDocument] = documents[0];
-      thing[Thing.yamlSourceDocumentPlacement] = ['one document total'];
+      thing[Thing.yamlSourceDocumentPlacement] =
+        [documentModes.oneDocumentTotal];
 
       return {
         aggregate,
@@ -961,7 +964,8 @@ export function processThingsFromDataStep(documents, dataStep) {
         processDocument(headerDocument, dataStep.headerDocumentThing);
 
       headerThing[Thing.yamlSourceDocument] = headerDocument;
-      headerThing[Thing.yamlSourceDocumentPlacement] = ['header'];
+      headerThing[Thing.yamlSourceDocumentPlacement] =
+        [documentModes.headerAndEntries, 'header'];
 
       try {
         headerAggregate.close();
@@ -977,7 +981,8 @@ export function processThingsFromDataStep(documents, dataStep) {
           processDocument(entryDocument, dataStep.entryDocumentThing);
 
         entryThing[Thing.yamlSourceDocument] = entryDocument;
-        entryThing[Thing.yamlSourceDocumentPlacement] = ['entry under header', index];
+        entryThing[Thing.yamlSourceDocumentPlacement] =
+          [documentModes.headerAndEntries, 'entry', index];
 
         entryThings.push(entryThing);
 
@@ -1010,7 +1015,8 @@ export function processThingsFromDataStep(documents, dataStep) {
         processDocument(documents[0], dataStep.documentThing);
 
       thing[Thing.yamlSourceDocument] = documents[0];
-      thing[Thing.yamlSourceDocumentPlacement] = ['one per file'];
+      thing[Thing.yamlSourceDocumentPlacement] =
+        [documentModes.onePerFile];
 
       return {
         aggregate,
@@ -1439,4 +1445,89 @@ export async function quickLoadAllFromYAML(dataPath, {
   sortWikiDataArrays(dataSteps, wikiData, {bindFind, bindReverse});
 
   return wikiData;
+}
+
+export function cruddilyGetAllThings(wikiData) {
+  const allThings = [];
+
+  for (const v of Object.values(wikiData)) {
+    if (Array.isArray(v)) {
+      allThings.push(...v);
+    } else {
+      allThings.push(v);
+    }
+  }
+
+  return allThings;
+}
+
+export function matchFilenameToThings(filename, wikiData) {
+  const things =
+    cruddilyGetAllThings(wikiData)
+      .filter(thing =>
+        thing[Thing.yamlSourceFilename] === filename);
+
+  if (empty(things)) {
+    return null;
+  }
+
+  const allDocumentModes =
+    unique(things.map(thing =>
+      thing[Thing.yamlSourceDocumentPlacement][0]));
+
+  if (allDocumentModes.length > 1) {
+    throw new Error(`More than one document mode for documents from ${filename}`);
+  }
+
+  const documentMode = allDocumentModes[0];
+
+  switch (documentMode) {
+    case documentModes.allInOne: {
+      return {
+        documentMode,
+        things:
+          things.sort((a, b) =>
+            a[Thing.yamlSourceDocumentPlacement][1] -
+            b[Thing.yamlSourceDocumentPlacement][1]),
+      };
+    }
+
+    case documentModes.oneDocumentTotal:
+    case documentModes.onePerFile: {
+      if (things.length > 1) {
+        throw new Error(`More than one document for ${filename}`);
+      }
+
+      return {
+        documentMode,
+        thing: things[0],
+      };
+    }
+
+    case documentModes.headerAndEntries: {
+      const headerThings =
+        things.filter(thing =>
+          thing[Thing.yamlSourceDocumentPlacement][1] === 'header');
+
+      if (headerThings.length > 1) {
+        throw new Error(`More than one header document for ${filename}`);
+      }
+
+      return {
+        documentMode,
+        headerThing: headerThings[0] ?? null,
+        entryThings:
+          things
+            .filter(thing =>
+              thing[Thing.yamlSourceDocumentPlacement][1] === 'entry')
+            .sort((a, b) =>
+              a[Thing.yamlSourceDocumentPlacement][2] -
+              b[Thing.yamlSourceDocumentPlacement][2]),
+      };
+    }
+
+    default: {
+      return {documentMode};
+    }
+  }
 }
