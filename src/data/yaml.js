@@ -1461,7 +1461,7 @@ export function cruddilyGetAllThings(wikiData) {
   return allThings;
 }
 
-export function matchFilenameToThings(filename, wikiData) {
+export function getThingLayoutForFilename(filename, wikiData) {
   const things =
     cruddilyGetAllThings(wikiData)
       .filter(thing =>
