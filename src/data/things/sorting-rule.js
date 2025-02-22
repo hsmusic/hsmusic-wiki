@@ -1,9 +1,11 @@
 export const SORTING_RULE_DATA_FILE = 'sorting-rules.yaml';
 
+import {readFile, writeFile} from 'node:fs/promises';
+import * as path from 'node:path';
+
 import {input} from '#composite';
 import Thing from '#thing';
 import {isStringNonEmpty, strictArrayOf} from '#validators';
-import {documentModes} from '#yaml';
 
 import {
   compareCaseLessSensitive,
@@ -11,6 +13,13 @@ import {
   sortByDirectory,
   sortByName,
 } from '#sort';
+
+import {
+  documentModes,
+  flattenThingLayoutToDocumentOrder,
+  getThingLayoutForFilename,
+  reorderDocumentsInYAMLSourceText,
+} from '#yaml';
 
 import {flag} from '#composite/wiki-properties';
 
@@ -130,7 +139,27 @@ export class DocumentSortingRule extends ThingSortingRule {
     },
   });
 
-  apply(layout) {
+  async apply({wikiData, dataPath}) {
+    let layout = getThingLayoutForFilename(this.filename, wikiData);
+    if (!layout) return;
+
+    layout = this.#processLayout(layout);
+
+    const order = flattenThingLayoutToDocumentOrder(layout);
+
+    const realPath =
+      path.join(
+        dataPath,
+        this.filename.split(path.posix.sep).join(path.sep));
+
+    let sourceText = await readFile(realPath, 'utf8');
+
+    sourceText = reorderDocumentsInYAMLSourceText(sourceText, order);
+
+    await writeFile(realPath, sourceText);
+  }
+
+  #processLayout(layout) {
     const fresh = {...layout};
 
     let sortable = null;
