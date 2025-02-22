@@ -186,6 +186,10 @@ function finalizeCacheableObjectPrototypes() {
     op(constructor) {
       constructor.finalizeCacheableObjectPrototype();
     },
+
+    showFailedClasses(failedClasses) {
+      logError`Failed to finalize cacheable object prototypes for classes: ${failedClasses.join(', ')}`;
+    },
   });
 }
 

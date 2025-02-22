@@ -37,7 +37,7 @@ export default class CacheableObject {
   }
 
   static finalizeCacheableObjectPrototype() {
-    if (this[CacheableObject.constructorFinalized]) {
+    if (Object.hasOwn(this, CacheableObject.constructorFinalized)) {
       throw new Error(`Constructor ${this.name} already finalized`);
     }
 
