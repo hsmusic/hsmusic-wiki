@@ -913,15 +913,22 @@ export function processThingsFromDataStep(documents, dataStep) {
       const aggregate = openAggregate({message: `Errors processing documents`});
 
       documents.forEach(
-        decorateErrorWithIndex(document => {
+        decorateErrorWithIndex((document, index) => {
           const {thing, aggregate: subAggregate} =
             processDocument(document, dataStep.documentThing);
+
+          thing[Thing.yamlSourceDocument] = document;
+          thing[Thing.yamlSourceDocumentPlacement] = ['all in one', index];
 
           result.push(thing);
           aggregate.call(subAggregate.close);
         }));
 
-      return {aggregate, result};
+      return {
+        aggregate,
+        result,
+        things: result,
+      };
     }
 
     case documentModes.oneDocumentTotal: {
@@ -931,7 +938,14 @@ export function processThingsFromDataStep(documents, dataStep) {
       const {thing, aggregate} =
         processDocument(documents[0], dataStep.documentThing);
 
-      return {aggregate, result: thing};
+      thing[Thing.yamlSourceDocument] = documents[0];
+      thing[Thing.yamlSourceDocumentPlacement] = ['one document total'];
+
+      return {
+        aggregate,
+        result: thing,
+        things: [thing],
+      };
     }
 
     case documentModes.headerAndEntries: {
@@ -946,6 +960,9 @@ export function processThingsFromDataStep(documents, dataStep) {
       const {thing: headerThing, aggregate: headerAggregate} =
         processDocument(headerDocument, dataStep.headerDocumentThing);
 
+      headerThing[Thing.yamlSourceDocument] = headerDocument;
+      headerThing[Thing.yamlSourceDocumentPlacement] = ['header'];
+
       try {
         headerAggregate.close();
       } catch (caughtError) {
@@ -958,6 +975,9 @@ export function processThingsFromDataStep(documents, dataStep) {
       for (const [index, entryDocument] of entryDocuments.entries()) {
         const {thing: entryThing, aggregate: entryAggregate} =
           processDocument(entryDocument, dataStep.entryDocumentThing);
+
+        entryThing[Thing.yamlSourceDocument] = entryDocument;
+        entryThing[Thing.yamlSourceDocumentPlacement] = ['entry under header', index];
 
         entryThings.push(entryThing);
 
@@ -975,6 +995,7 @@ export function processThingsFromDataStep(documents, dataStep) {
           header: headerThing,
           entries: entryThings,
         },
+        things: [headerThing, ...entryThings],
       };
     }
 
@@ -988,7 +1009,14 @@ export function processThingsFromDataStep(documents, dataStep) {
       const {thing, aggregate} =
         processDocument(documents[0], dataStep.documentThing);
 
-      return {aggregate, result: thing};
+      thing[Thing.yamlSourceDocument] = documents[0];
+      thing[Thing.yamlSourceDocumentPlacement] = ['one per file'];
+
+      return {
+        aggregate,
+        result: thing,
+        things: [thing],
+      };
     }
 
     default:
@@ -1088,8 +1116,15 @@ export async function processThingsFromDataSteps(documentLists, fileLists, dataS
           file: files,
           documents: documentLists,
         }).map(({file, documents}) => {
-            const {result, aggregate} =
+            const {result, aggregate, things} =
               processThingsFromDataStep(documents, dataStep);
+
+            for (const thing of things) {
+              thing[Thing.yamlSourceFilename] =
+                path.relative(dataPath, file)
+                  .split(path.sep)
+                  .join(path.posix.sep);
+            }
 
             const close = decorateErrorWithFileFromDataPath(aggregate.close, {dataPath});
             aggregate.close = () => close({file});
