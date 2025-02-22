@@ -1531,3 +1531,73 @@ export function matchFilenameToThings(filename, wikiData) {
     }
   }
 }
+
+export function* splitDocumentsInYAMLSourceText(sourceText) {
+  const dividerRegex = /^-{3,}\n?/gm;
+  let previousDivider = '';
+
+  while (true) {
+    const {lastIndex} = dividerRegex;
+    const match = dividerRegex.exec(sourceText);
+    if (match) {
+      const nextDivider = match[0].trim();
+
+      yield {
+        previousDivider,
+        nextDivider,
+        text: sourceText.slice(lastIndex, match.index),
+      };
+
+      previousDivider = nextDivider;
+    } else {
+      const nextDivider = '';
+
+      yield {
+        previousDivider,
+        nextDivider,
+        text: sourceText.slice(lastIndex).replace(/(?<!\n)$/, '\n'),
+      };
+
+      return;
+    }
+  }
+}
+
+export function recombineDocumentsIntoYAMLSourceText(documents) {
+  const dividers =
+    unique(
+      documents
+        .flatMap(d => [d.previousDivider, d.nextDivider])
+        .filter(Boolean));
+
+  const divider = dividers[0];
+
+  if (dividers.length > 1) {
+    // TODO: Accommodate mixed dividers as best as we can lol
+    logWarn`Found multiple dividers in this file, using only ${divider}`;
+  }
+
+  let sourceText = '';
+
+  for (const document of documents) {
+    if (sourceText) {
+      sourceText += divider + '\n';
+    }
+
+    sourceText += document.text;
+  }
+
+  return sourceText;
+}
+
+export function reorderDocumentsInYAMLSourceText(sourceText, order) {
+  const sourceDocuments =
+    Array.from(splitDocumentsInYAMLSourceText(sourceText));
+
+  const sortedDocuments =
+    Array.from(
+      order,
+      sourceIndex => sourceDocuments[sourceIndex]);
+
+  return recombineDocumentsIntoYAMLSourceText(sortedDocuments);
+}
