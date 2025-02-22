@@ -46,17 +46,9 @@ export class SortingRule extends Thing {
   });
 }
 
-export class DocumentSortingRule extends SortingRule {
+export class ThingSortingRule extends SortingRule {
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
-
-    // TODO: glob :plead:
-    filename: {
-      flags: {update: true, expose: true},
-      update: {
-        validate: isStringNonEmpty,
-      },
-    },
 
     properties: {
       flags: {update: true, expose: true},
@@ -68,30 +60,11 @@ export class DocumentSortingRule extends SortingRule {
 
   static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(SortingRule, {
     fields: {
-      'Sort Documents': {property: 'filename'},
       'By Properties': {property: 'properties'},
     },
   });
 
-  apply(layout) {
-    const fresh = {...layout};
-
-    let sortable = null;
-    switch (fresh.documentMode) {
-      case documentModes.headerAndEntries:
-        sortable = fresh.entryThings =
-          fresh.entryThings.slice();
-        break;
-
-      case documentModes.allInOne:
-        sortable = fresh.things =
-          fresh.things.slice();
-        break;
-
-      default:
-        throw new Error(`Invalid document type for sorting`);
-    }
-
+  sort(sortable) {
     if (this.properties) {
       for (const property of this.properties.slice().reverse()) {
         const get = thing => thing[property];
@@ -133,6 +106,50 @@ export class DocumentSortingRule extends SortingRule {
             :  0));
       }
     }
+
+    return sortable;
+  }
+}
+
+export class DocumentSortingRule extends ThingSortingRule {
+  static [Thing.getPropertyDescriptors] = () => ({
+    // Update & expose
+
+    // TODO: glob :plead:
+    filename: {
+      flags: {update: true, expose: true},
+      update: {
+        validate: isStringNonEmpty,
+      },
+    },
+  });
+
+  static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(ThingSortingRule, {
+    fields: {
+      'Sort Documents': {property: 'filename'},
+    },
+  });
+
+  apply(layout) {
+    const fresh = {...layout};
+
+    let sortable = null;
+    switch (fresh.documentMode) {
+      case documentModes.headerAndEntries:
+        sortable = fresh.entryThings =
+          fresh.entryThings.slice();
+        break;
+
+      case documentModes.allInOne:
+        sortable = fresh.things =
+          fresh.things.slice();
+        break;
+
+      default:
+        throw new Error(`Invalid document type for sorting`);
+    }
+
+    this.sort(sortable);
 
     return fresh;
   }
