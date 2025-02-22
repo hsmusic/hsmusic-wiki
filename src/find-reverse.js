@@ -17,9 +17,16 @@ export function getAllSpecs({
 
   const specs = {...hardcodedSpecs};
 
+  const seenSpecs = new Set();
+
   for (const thingConstructor of Object.values(thingConstructors)) {
     const thingSpecs = thingConstructor[constructorKey];
     if (!thingSpecs) continue;
+
+    // Subclasses can expose literally the same static properties
+    // by inheritence. We don't want to double-count those!
+    if (seenSpecs.has(thingSpecs)) continue;
+    seenSpecs.add(thingSpecs);
 
     for (const [key, spec] of Object.entries(thingSpecs)) {
       specs[key] =

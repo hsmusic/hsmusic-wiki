@@ -695,9 +695,16 @@ export function getAllDataSteps() {
 
   const steps = [];
 
+  const seenLoadingFns = new Set();
+
   for (const thingConstructor of Object.values(thingConstructors)) {
     const getSpecFn = thingConstructor[Thing.getYamlLoadingSpec];
     if (!getSpecFn) continue;
+
+    // Subclasses can expose literally the same static properties
+    // by inheritence. We don't want to double-count those!
+    if (seenLoadingFns.has(getSpecFn)) continue;
+    seenLoadingFns.add(getSpecFn);
 
     steps.push(getSpecFn({
       documentModes,
