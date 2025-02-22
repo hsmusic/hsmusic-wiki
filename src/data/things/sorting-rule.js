@@ -4,6 +4,7 @@ import {readFile, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
 import {input} from '#composite';
+import {compareArrays} from '#sugar';
 import Thing from '#thing';
 import {isStringNonEmpty, strictArrayOf} from '#validators';
 
@@ -30,10 +31,16 @@ export class SortingRule extends Thing {
     // Update & expose
 
     active: flag(true),
+
+    message: {
+      flags: {update: true, expose: true},
+      update: {validate: isStringNonEmpty},
+    },
   });
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
+      'Message': {property: 'message'},
       'Active': {property: 'active'},
     },
   };
@@ -127,8 +134,18 @@ export class DocumentSortingRule extends ThingSortingRule {
     // TODO: glob :plead:
     filename: {
       flags: {update: true, expose: true},
-      update: {
-        validate: isStringNonEmpty,
+      update: {validate: isStringNonEmpty},
+    },
+
+    message: {
+      flags: {update: true, expose: true},
+      update: {validate: isStringNonEmpty},
+
+      expose: {
+        dependencies: ['filename'],
+        transform: (value, {filename}) =>
+          value ??
+          `Sort ${filename}`,
       },
     },
   });
@@ -139,24 +156,34 @@ export class DocumentSortingRule extends ThingSortingRule {
     },
   });
 
+  check({wikiData}) {
+    const oldLayout = getThingLayoutForFilename(this.filename, wikiData);
+    if (!oldLayout) return;
+
+    const newLayout = this.#processLayout(oldLayout);
+
+    const oldOrder = flattenThingLayoutToDocumentOrder(oldLayout);
+    const newOrder = flattenThingLayoutToDocumentOrder(newLayout);
+
+    return compareArrays(oldOrder, newOrder);
+  }
+
   async apply({wikiData, dataPath}) {
-    let layout = getThingLayoutForFilename(this.filename, wikiData);
-    if (!layout) return;
+    const oldLayout = getThingLayoutForFilename(this.filename, wikiData);
+    if (!oldLayout) return;
 
-    layout = this.#processLayout(layout);
-
-    const order = flattenThingLayoutToDocumentOrder(layout);
+    const newLayout = this.#processLayout(oldLayout);
+    const newOrder = flattenThingLayoutToDocumentOrder(newLayout);
 
     const realPath =
       path.join(
         dataPath,
         this.filename.split(path.posix.sep).join(path.sep));
 
-    let sourceText = await readFile(realPath, 'utf8');
+    const oldSourceText = await readFile(realPath, 'utf8');
+    const newSourceText = reorderDocumentsInYAMLSourceText(oldSourceText, newOrder);
 
-    sourceText = reorderDocumentsInYAMLSourceText(sourceText, order);
-
-    await writeFile(realPath, sourceText);
+    await writeFile(realPath, newSourceText);
   }
 
   #processLayout(layout) {
