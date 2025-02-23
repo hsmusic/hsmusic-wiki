@@ -198,13 +198,26 @@ export class DocumentSortingRule extends ThingSortingRule {
         },
       },
     },
+
+    selectDocumentsUnder: {
+      flags: {update: true, expose: true},
+      update: {validate: isStringNonEmpty},
+    },
   });
 
   static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(ThingSortingRule, {
     fields: {
       'Sort Documents': {property: 'filename'},
       'Select Documents Following': {property: 'selectDocumentsFollowing'},
+      'Select Documents Under': {property: 'selectDocumentsUnder'},
     },
+
+    invalidFieldCombinations: [
+      {message: `Specify only one of these`, fields: [
+        'Select Documents Following',
+        'Select Documents Under',
+      ]},
+    ],
   });
 
   static check(rule, {wikiData}) {
@@ -329,6 +342,28 @@ export class DocumentSortingRule extends ThingSortingRule {
       this.sort(subsortable);
 
       sortable.splice(after + 1, before - after - 1, ...subsortable);
+    } else if (this.selectDocumentsUnder) {
+      const field = this.selectDocumentsUnder;
+
+      const indices =
+        Array.from(sortable.entries())
+          .filter(([_index, thing]) =>
+            Object.hasOwn(thing[Thing.yamlSourceDocument], field))
+          .map(([index, _thing]) => index);
+
+      for (const [indicesIndex, after] of indices.entries()) {
+        const before =
+          (indicesIndex === indices.length - 1
+            ? sortable.length
+            : indices[indicesIndex + 1]);
+
+        const subsortable =
+          sortable.slice(after + 1, before);
+
+        this.sort(subsortable);
+
+        sortable.splice(after + 1, before - after - 1, ...subsortable);
+      }
     } else {
       this.sort(sortable);
     }
