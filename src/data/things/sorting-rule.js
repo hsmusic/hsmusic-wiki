@@ -6,7 +6,7 @@ import * as path from 'node:path';
 import {input} from '#composite';
 import {chunkByProperties, compareArrays, unique} from '#sugar';
 import Thing from '#thing';
-import {isObject, isStringNonEmpty, strictArrayOf} from '#validators';
+import {isObject, isStringNonEmpty, anyOf, strictArrayOf} from '#validators';
 
 import {
   compareCaseLessSensitive,
@@ -23,6 +23,17 @@ import {
 } from '#yaml';
 
 import {flag} from '#composite/wiki-properties';
+
+function isSelectFollowingEntry(value) {
+  isObject(value);
+
+  const {length} = Object.keys(value);
+  if (length !== 1) {
+    throw new Error(`Expected object with 1 key, got ${length}`);
+  }
+
+  return true;
+}
 
 export class SortingRule extends Thing {
   static [Thing.friendlyName] = `Sorting Rule`;
@@ -186,16 +197,17 @@ export class DocumentSortingRule extends ThingSortingRule {
       flags: {update: true, expose: true},
 
       update: {
-        validate(value) {
-          isObject(value);
+        validate:
+          anyOf(
+            isSelectFollowingEntry,
+            strictArrayOf(isSelectFollowingEntry)),
+      },
 
-          const {length} = Object.keys(value);
-          if (length !== 1) {
-            throw new Error(`Expected object with 1 key, got ${length}`);
-          }
-
-          return true;
-        },
+      compute: {
+        transform: value =>
+          (Array.isArray(value)
+            ? value
+            : [value]),
       },
     },
 
@@ -317,31 +329,33 @@ export class DocumentSortingRule extends ThingSortingRule {
     }
 
     if (this.selectDocumentsFollowing) {
-      const [field, value] = Object.entries(this.selectDocumentsFollowing)[0];
+      for (const entry of this.selectDocumentsFollowing) {
+        const [field, value] = Object.entries(entry)[0];
 
-      const after =
-        sortable.findIndex(thing =>
-          thing[Thing.yamlSourceDocument][field] === value);
+        const after =
+          sortable.findIndex(thing =>
+            thing[Thing.yamlSourceDocument][field] === value);
 
-      const different =
-        after +
-        sortable
-          .slice(after)
-          .findIndex(thing =>
-            Object.hasOwn(thing[Thing.yamlSourceDocument], field) &&
-            thing[Thing.yamlSourceDocument][field] !== value);
+        const different =
+          after +
+          sortable
+            .slice(after)
+            .findIndex(thing =>
+              Object.hasOwn(thing[Thing.yamlSourceDocument], field) &&
+              thing[Thing.yamlSourceDocument][field] !== value);
 
-      const before =
-        (different === -1
-          ? sortable.length
-          : different);
+        const before =
+          (different === -1
+            ? sortable.length
+            : different);
 
-      const subsortable =
-        sortable.slice(after + 1, before);
+        const subsortable =
+          sortable.slice(after + 1, before);
 
-      this.sort(subsortable);
+        this.sort(subsortable);
 
-      sortable.splice(after + 1, before - after - 1, ...subsortable);
+        sortable.splice(after + 1, before - after - 1, ...subsortable);
+      }
     } else if (this.selectDocumentsUnder) {
       const field = this.selectDocumentsUnder;
 
