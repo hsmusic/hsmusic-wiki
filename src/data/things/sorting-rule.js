@@ -4,7 +4,7 @@ import {readFile, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
 import {input} from '#composite';
-import {compareArrays} from '#sugar';
+import {chunkByProperties, compareArrays, unique} from '#sugar';
 import Thing from '#thing';
 import {isStringNonEmpty, strictArrayOf} from '#validators';
 
@@ -60,6 +60,39 @@ export class SortingRule extends Thing {
 
     save: (results) => ({sortingRules: results}),
   });
+
+  check({wikiData}) {
+    return this.constructor.check(this, opts);
+  }
+
+  apply(opts) {
+    return this.constructor.apply(this, opts);
+  }
+
+  static check() {
+    throw new Error(`Not implemented`);
+  }
+
+  static async apply() {
+    throw new Error(`Not implemented`);
+  }
+
+  static async* applyAll() {
+    throw new Error(`Not implemented`);
+  }
+
+  static async* go({dataPath, wikiData}) {
+    const rules = wikiData.sortingRules;
+    const constructors = unique(rules.map(rule => rule.constructor));
+
+    for (const constructor of constructors) {
+      yield* constructor.applyAll(
+        rules
+          .filter(rule => rule.active)
+          .filter(rule => rule.constructor === constructor),
+        {dataPath, wikiData});
+    }
+  }
 }
 
 export class ThingSortingRule extends SortingRule {
@@ -156,11 +189,11 @@ export class DocumentSortingRule extends ThingSortingRule {
     },
   });
 
-  check({wikiData}) {
-    const oldLayout = getThingLayoutForFilename(this.filename, wikiData);
+  static check(rule, {wikiData}) {
+    const oldLayout = getThingLayoutForFilename(rule.filename, wikiData);
     if (!oldLayout) return;
 
-    const newLayout = this.#processLayout(oldLayout);
+    const newLayout = rule.#processLayout(oldLayout);
 
     const oldOrder = flattenThingLayoutToDocumentOrder(oldLayout);
     const newOrder = flattenThingLayoutToDocumentOrder(newLayout);
@@ -168,22 +201,69 @@ export class DocumentSortingRule extends ThingSortingRule {
     return compareArrays(oldOrder, newOrder);
   }
 
-  async apply({wikiData, dataPath}) {
-    const oldLayout = getThingLayoutForFilename(this.filename, wikiData);
+  static async apply(rule, {wikiData, dataPath}) {
+    const oldLayout = getThingLayoutForFilename(rule.filename, wikiData);
     if (!oldLayout) return;
 
-    const newLayout = this.#processLayout(oldLayout);
+    const newLayout = rule.#processLayout(oldLayout);
     const newOrder = flattenThingLayoutToDocumentOrder(newLayout);
 
     const realPath =
       path.join(
         dataPath,
-        this.filename.split(path.posix.sep).join(path.sep));
+        rule.filename.split(path.posix.sep).join(path.sep));
 
     const oldSourceText = await readFile(realPath, 'utf8');
     const newSourceText = reorderDocumentsInYAMLSourceText(oldSourceText, newOrder);
 
     await writeFile(realPath, newSourceText);
+  }
+
+  static async* applyAll(rules, {wikiData, dataPath}) {
+    rules =
+      rules
+        .slice()
+        .sort((a, b) => a.filename.localeCompare(b.filename));
+
+    for (const {chunk, filename} of chunkByProperties(rules, ['filename'])) {
+      const initialLayout = getThingLayoutForFilename(filename, wikiData);
+      if (!initialLayout) continue;
+
+      let currLayout = initialLayout;
+      let prevLayout = initialLayout;
+      let anyChanged = false;
+
+      for (const rule of chunk) {
+        currLayout = rule.#processLayout(currLayout);
+
+        const prevOrder = flattenThingLayoutToDocumentOrder(prevLayout);
+        const currOrder = flattenThingLayoutToDocumentOrder(currLayout);
+
+        if (compareArrays(currOrder, prevOrder)) {
+          yield {rule, changed: false};
+        } else {
+          anyChanged = true;
+          yield {rule, changed: true};
+        }
+
+        prevLayout = currLayout;
+      }
+
+      if (!anyChanged) continue;
+
+      const newLayout = currLayout;
+      const newOrder = flattenThingLayoutToDocumentOrder(newLayout);
+
+      const realPath =
+        path.join(
+          dataPath,
+          filename.split(path.posix.sep).join(path.sep));
+
+      const oldSourceText = await readFile(realPath, 'utf8');
+      const newSourceText = reorderDocumentsInYAMLSourceText(oldSourceText, newOrder);
+
+      await writeFile(realPath, newSourceText);
+    }
   }
 
   #processLayout(layout) {

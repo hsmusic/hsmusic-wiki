@@ -2,6 +2,7 @@ export const description = `Update data files in-place to satisfy custom sorting
 
 import {logInfo} from '#cli';
 import {empty} from '#sugar';
+import thingConstructors from '#things';
 
 export const config = {
   fileSizes: {
@@ -39,23 +40,21 @@ export async function go({wikiData, dataPath}) {
     return true;
   }
 
+  const {SortingRule} = thingConstructors;
+
   let numUpdated = 0;
   let numActive = 0;
 
-  for (const sortingRule of wikiData.sortingRules) {
-    if (!sortingRule.active) continue;
-
+  for await (const result of SortingRule.go({wikiData, dataPath})) {
     numActive++;
 
-    const niceMessage = `"${sortingRule.message}"`;
+    const niceMessage = `"${result.rule.message}"`;
 
-    if (sortingRule.check({wikiData})) {
-      logInfo`Already good: ${niceMessage}`;
-    } else {
-      logInfo`Updating to satisfy ${niceMessage}.`;
-      await sortingRule.apply({wikiData, dataPath});
-
+    if (result.changed) {
       numUpdated++;
+      logInfo`Updating to satisfy ${niceMessage}.`;
+    } else {
+      logInfo`Already good: ${niceMessage}`;
     }
   }
 
