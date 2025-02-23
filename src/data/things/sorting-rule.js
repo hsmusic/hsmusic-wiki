@@ -6,7 +6,7 @@ import * as path from 'node:path';
 import {input} from '#composite';
 import {chunkByProperties, compareArrays, unique} from '#sugar';
 import Thing from '#thing';
-import {isStringNonEmpty, strictArrayOf} from '#validators';
+import {isObject, isStringNonEmpty, strictArrayOf} from '#validators';
 
 import {
   compareCaseLessSensitive,
@@ -181,11 +181,29 @@ export class DocumentSortingRule extends ThingSortingRule {
           `Sort ${filename}`,
       },
     },
+
+    selectDocumentsFollowing: {
+      flags: {update: true, expose: true},
+
+      update: {
+        validate(value) {
+          isObject(value);
+
+          const {length} = Object.keys(value);
+          if (length !== 1) {
+            throw new Error(`Expected object with 1 key, got ${length}`);
+          }
+
+          return true;
+        },
+      },
+    },
   });
 
   static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(ThingSortingRule, {
     fields: {
       'Sort Documents': {property: 'filename'},
+      'Select Documents Following': {property: 'selectDocumentsFollowing'},
     },
   });
 
@@ -285,7 +303,35 @@ export class DocumentSortingRule extends ThingSortingRule {
         throw new Error(`Invalid document type for sorting`);
     }
 
-    this.sort(sortable);
+    if (this.selectDocumentsFollowing) {
+      const [field, value] = Object.entries(this.selectDocumentsFollowing)[0];
+
+      const after =
+        sortable.findIndex(thing =>
+          thing[Thing.yamlSourceDocument][field] === value);
+
+      const different =
+        after +
+        sortable
+          .slice(after)
+          .findIndex(thing =>
+            Object.hasOwn(thing[Thing.yamlSourceDocument], field) &&
+            thing[Thing.yamlSourceDocument][field] !== value);
+
+      const before =
+        (different === -1
+          ? sortable.length
+          : different);
+
+      const subsortable =
+        sortable.slice(after + 1, before);
+
+      this.sort(subsortable);
+
+      sortable.splice(after + 1, before - after - 1, ...subsortable);
+    } else {
+      this.sort(sortable);
+    }
 
     return fresh;
   }
