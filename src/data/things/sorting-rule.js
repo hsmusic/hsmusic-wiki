@@ -72,7 +72,7 @@ export class SortingRule extends Thing {
     save: (results) => ({sortingRules: results}),
   });
 
-  check({wikiData}) {
+  check(opts) {
     return this.constructor.check(this, opts);
   }
 
@@ -80,19 +80,22 @@ export class SortingRule extends Thing {
     return this.constructor.apply(this, opts);
   }
 
-  static check() {
+  static check(rule, opts) {
+    const result = this.apply(rule, {...opts, dry: true});
+    if (!result) return true;
+    if (!result.changed) return true;
+    return false;
+  }
+
+  static async apply(_rule, _opts) {
     throw new Error(`Not implemented`);
   }
 
-  static async apply() {
+  static async* applyAll(_rules, _opts) {
     throw new Error(`Not implemented`);
   }
 
-  static async* applyAll() {
-    throw new Error(`Not implemented`);
-  }
-
-  static async* go({dataPath, wikiData}) {
+  static async* go({dataPath, wikiData, dry}) {
     const rules = wikiData.sortingRules;
     const constructors = unique(rules.map(rule => rule.constructor));
 
@@ -101,7 +104,7 @@ export class SortingRule extends Thing {
         rules
           .filter(rule => rule.active)
           .filter(rule => rule.constructor === constructor),
-        {dataPath, wikiData});
+        {dataPath, wikiData, dry});
     }
   }
 }
@@ -232,24 +235,17 @@ export class DocumentSortingRule extends ThingSortingRule {
     ],
   });
 
-  static check(rule, {wikiData}) {
+  static async apply(rule, {wikiData, dataPath, dry}) {
     const oldLayout = getThingLayoutForFilename(rule.filename, wikiData);
-    if (!oldLayout) return;
+    if (!oldLayout) return null;
 
     const newLayout = rule.#processLayout(oldLayout);
 
     const oldOrder = flattenThingLayoutToDocumentOrder(oldLayout);
     const newOrder = flattenThingLayoutToDocumentOrder(newLayout);
+    const changed = compareArrays(oldOrder, newOrder);
 
-    return compareArrays(oldOrder, newOrder);
-  }
-
-  static async apply(rule, {wikiData, dataPath}) {
-    const oldLayout = getThingLayoutForFilename(rule.filename, wikiData);
-    if (!oldLayout) return;
-
-    const newLayout = rule.#processLayout(oldLayout);
-    const newOrder = flattenThingLayoutToDocumentOrder(newLayout);
+    if (dry) return {changed};
 
     const realPath =
       path.join(
@@ -260,9 +256,11 @@ export class DocumentSortingRule extends ThingSortingRule {
     const newSourceText = reorderDocumentsInYAMLSourceText(oldSourceText, newOrder);
 
     await writeFile(realPath, newSourceText);
+
+    return {changed};
   }
 
-  static async* applyAll(rules, {wikiData, dataPath}) {
+  static async* applyAll(rules, {wikiData, dataPath, dry}) {
     rules =
       rules
         .slice()
@@ -293,6 +291,7 @@ export class DocumentSortingRule extends ThingSortingRule {
       }
 
       if (!anyChanged) continue;
+      if (dry) continue;
 
       const newLayout = currLayout;
       const newOrder = flattenThingLayoutToDocumentOrder(newLayout);
