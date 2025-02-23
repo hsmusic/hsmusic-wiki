@@ -51,6 +51,7 @@ import {isMain, traverse} from '#node-utils';
 import {bindReverse} from '#reverse';
 import {writeSearchData} from '#search';
 import {sortByName} from '#sort';
+import thingConstructors from '#things';
 import {identifyAllWebRoutes} from '#web-routes';
 
 import {
@@ -190,6 +191,13 @@ async function main() {
       {...defaultStepStatus, name: `precache nearly all data`,
         for: ['build']},
 
+    sortWikiDataSourceFiles:
+      {...defaultStepStatus, name: `apply sorting rules to wiki data files`,
+        for: ['build']},
+
+    checkWikiDataSourceFileSorting:
+      {...defaultStepStatus, name: `check sorting rules against wiki data files`},
+
     loadURLFiles:
       {...defaultStepStatus, name: `load internal & custom url spec files`,
         for: ['build']},
@@ -270,6 +278,35 @@ async function main() {
     }));
 
   let selectedBuildModeFlag;
+  let sortInAdditionToBuild = false;
+
+  // As an exception, --sort can be combined with another build mode.
+  if (selectedBuildModeFlags.length >= 2 && selectedBuildModeFlags.includes('sort')) {
+    sortInAdditionToBuild = true;
+    selectedBuildModeFlags.splice(selectedBuildModeFlags.indexOf('sort'), 1);
+  }
+
+  if (sortInAdditionToBuild) {
+    Object.assign(stepStatusSummary.sortWikiDataSourceFiles, {
+      status: STATUS_NOT_STARTED,
+      annotation: `--sort provided with another build mode`,
+    });
+
+    Object.assign(stepStatusSummary.checkWikiDataSourceFileSorting, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `--sort provided, dry run not applicable`,
+    });
+  } else {
+    Object.assign(stepStatusSummary.sortWikiDataSourceFiles, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `--sort not provided, dry run only`,
+    });
+
+    Object.assign(stepStatusSummary.checkWikiDataSourceFileSorting, {
+      status: STATUS_NOT_STARTED,
+      annotation: `--sort not provided, dry run applicable`,
+    });
+  }
 
   if (empty(selectedBuildModeFlags)) {
     // No build mode selected. This is not a valid state for building the wiki,
@@ -1844,6 +1881,77 @@ async function main() {
       timeEnd: Date.now(),
       memory: process.memoryUsage(),
     });
+  }
+
+  if (stepStatusSummary.sortWikiDataSourceFiles.status === STATUS_NOT_STARTED) {
+    Object.assign(stepStatusSummary.sortWikiDataSourceFiles, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
+
+    const {SortingRule} = thingConstructors;
+    const results =
+      await Array.fromAsync(SortingRule.go({dataPath, wikiData}));
+
+    if (results.some(result => result.changed)) {
+      logInfo`Updated data files to satisfy sorting.`;
+      logInfo`Restarting automatically, since that's now needed!`;
+
+      Object.assign(stepStatusSummary.sortWikiDataSourceFiles, {
+        status: STATUS_DONE_CLEAN,
+        annotation: `changes cueing restart`,
+        timeEnd: Date.now(),
+        memory: process.memoryUsage(),
+      });
+
+      return 'restart';
+    } else {
+      logInfo`All sorting rules are satisfied. Nice!`;
+      paragraph = false;
+
+      Object.assign(stepStatusSummary.sortWikiDataSourceFiles, {
+        status: STATUS_DONE_CLEAN,
+        annotation: `no changes needed`,
+        timeEnd: Date.now(),
+        memory: process.memoryUsage(),
+      });
+    }
+  } else if (stepStatusSummary.checkWikiDataSourceFileSorting.status === STATUS_NOT_STARTED) {
+    Object.assign(stepStatusSummary.checkWikiDataSourceFileSorting, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
+
+    const {SortingRule} = thingConstructors;
+    const results =
+      await Array.fromAsync(SortingRule.go({dataPath, wikiData, dry: true}));
+
+    const needed = results.filter(result => result.changed);
+
+    if (empty(needed)) {
+      logInfo`All sorting rules are satisfied. Nice!`;
+      paragraph = false;
+
+      Object.assign(stepStatusSummary.checkWikiDataSourceFileSorting, {
+        status: STATUS_DONE_CLEAN,
+        timeEnd: Date.now(),
+        memory: process.memoryUsage(),
+      });
+    } else {
+      logWarn`Some of this wiki's sorting rules currently aren't satisfied:`;
+      for (const {rule} of needed) {
+        logWarn`- ${rule.message}`;
+      }
+      logWarn`Run ${'hsmusic --sort'} to automatically update data files.`;
+      paragraph = false;
+
+      Object.assign(stepStatusSummary.checkWikiDataSourceFileSorting, {
+        status: STATUS_HAS_WARNINGS,
+        annotation: `not all rules satisfied`,
+        timeEnd: Date.now(),
+        memory: process.memoryUsage(),
+      });
+    }
   }
 
   if (stepStatusSummary.performBuild.status === STATUS_NOT_APPLICABLE) {
