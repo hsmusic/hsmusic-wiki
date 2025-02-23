@@ -133,8 +133,8 @@ const defaultStepStatus = {status: STATUS_NOT_STARTED, annotation: null};
 // Defined globally for quick access outside the main() function's contents.
 // This will be initialized and mutated over the course of main().
 let stepStatusSummary;
-let showStepStatusSummary = false;
-let showStepMemoryInSummary = false;
+let shouldShowStepStatusSummary = false;
+let shouldShowStepMemoryInSummary = false;
 
 async function main() {
   Error.stackTraceLimit = Infinity;
@@ -525,8 +525,8 @@ async function main() {
     ...buildOptions,
   });
 
-  showStepStatusSummary = cliOptions['show-step-summary'] ?? false;
-  showStepMemoryInSummary = cliOptions['show-step-memory'] ?? false;
+  shouldShowStepStatusSummary = cliOptions['show-step-summary'] ?? false;
+  shouldShowStepMemoryInSummary = cliOptions['show-step-memory'] ?? false;
 
   if (cliOptions['help']) {
     console.log(
@@ -3094,141 +3094,67 @@ async function main() {
 if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmusic') {
   (async () => {
     let result;
+    let numRestarts = 0;
 
     const totalTimeStart = Date.now();
 
-    try {
-      result = await main();
-    } catch (error) {
-      if (error instanceof AggregateError) {
-        showAggregate(error);
-      } else if (error.cause) {
-        console.error(error);
-        showAggregate(error);
+    while (true) {
+      try {
+        result = await main();
+      } catch (error) {
+        if (error instanceof AggregateError) {
+          showAggregate(error);
+        } else if (error.cause) {
+          console.error(error);
+          showAggregate(error);
+        } else {
+          console.error(error);
+        }
+      }
+
+      if (result === 'restart') {
+        console.log('');
+
+        if (shouldShowStepStatusSummary) {
+          if (numRestarts >= 1) {
+            console.error(colors.bright(`Step summary since latest restart:`));
+          } else {
+            console.error(colors.bright(`Step summary before restart:`));
+          }
+
+          showStepStatusSummary();
+          console.log('');
+        }
+
+        if (numRestarts > 5) {
+          logError`A restart was cued, but we've restarted a bunch already.`;
+          logError`Exiting because this is probably a bug!`;
+          console.log('');
+          break;
+        } else {
+          console.log('');
+          logInfo`A restart was cued. This is probably normal, and required`;
+          logInfo`to load updated data files. Restarting automatically now!`;
+          console.log('');
+          numRestarts++;
+        }
       } else {
-        console.error(error);
+        break;
       }
     }
 
-    const totalTimeEnd = Date.now();
-
-    const formatDuration = timeDelta => {
-      const seconds = timeDelta / 1000;
-
-      if (seconds > 90) {
-        const modSeconds = Math.floor(seconds % 60);
-        const minutes = Math.floor(seconds - seconds % 60) / 60;
-        return `${minutes}m${modSeconds}s`;
+    if (shouldShowStepStatusSummary)  {
+      if (numRestarts >= 1) {
+        console.error(colors.bright(`Step summary after final restart:`));
+      } else {
+        console.error(colors.bright(`Step summary:`));
       }
 
-      if (seconds < 0.1) {
-        return 'instant';
-      }
+      const {anyStepsNotClean} =
+        showStepStatusSummary();
 
-      const precision = (seconds > 1 ? 3 : 2);
-      return `${seconds.toPrecision(precision)}s`;
-    };
-
-    if (showStepStatusSummary) {
+      const totalTimeEnd = Date.now();
       const totalDuration = formatDuration(totalTimeEnd - totalTimeStart);
-
-      console.error(colors.bright(`Step summary:`));
-
-      const longestNameLength =
-        Math.max(...
-          Object.values(stepStatusSummary)
-            .map(({name}) => name.length));
-
-      const stepsNotClean =
-        Object.values(stepStatusSummary)
-          .map(({status}) =>
-            status === STATUS_HAS_WARNINGS ||
-            status === STATUS_FATAL_ERROR ||
-            status === STATUS_STARTED_NOT_DONE);
-
-      const anyStepsNotClean =
-        stepsNotClean.includes(true);
-
-      const stepDetails = Object.values(stepStatusSummary);
-
-      const stepDurations =
-        stepDetails.map(({status, timeStart, timeEnd}) => {
-          if (
-            status === STATUS_NOT_APPLICABLE ||
-            status === STATUS_NOT_STARTED ||
-            status === STATUS_STARTED_NOT_DONE
-          ) {
-            return '-';
-          }
-
-          if (typeof timeStart !== 'number' || typeof timeEnd !== 'number') {
-            return 'unknown';
-          }
-
-          return formatDuration(timeEnd - timeStart);
-        });
-
-      const longestDurationLength =
-        Math.max(...stepDurations.map(duration => duration.length));
-
-      const stepMemories =
-        stepDetails.map(({memory}) =>
-          (memory
-            ? Math.round(memory["heapUsed"] / 1024 / 1024) + 'MB'
-            : '-'));
-
-      const longestMemoryLength =
-        Math.max(...stepMemories.map(memory => memory.length));
-
-      for (let index = 0; index < stepDetails.length; index++) {
-        const {name, status, annotation} = stepDetails[index];
-        const duration = stepDurations[index];
-        const memory = stepMemories[index];
-
-        let message =
-          (stepsNotClean[index]
-            ? `!! `
-            : ` - `);
-
-        message += `(${duration} `.padStart(longestDurationLength + 2, ' ');
-
-        if (showStepMemoryInSummary) {
-          message += ` ${memory})`.padStart(longestMemoryLength + 2, ' ');
-        }
-
-        message += ` `;
-        message += `${name}: `.padEnd(longestNameLength + 4, '.');
-        message += ` `;
-        message += status;
-
-        if (annotation) {
-          message += ` (${annotation})`;
-        }
-
-        switch (status) {
-          case STATUS_DONE_CLEAN:
-            console.error(colors.green(message));
-            break;
-
-          case STATUS_NOT_STARTED:
-          case STATUS_NOT_APPLICABLE:
-            console.error(colors.dim(message));
-            break;
-
-          case STATUS_HAS_WARNINGS:
-          case STATUS_STARTED_NOT_DONE:
-            console.error(colors.yellow(message));
-            break;
-
-          case STATUS_FATAL_ERROR:
-            console.error(colors.red(message));
-            break;
-
-          default:
-            console.error(message);
-            break;
-        }
-      }
 
       console.error(colors.bright(`Done in ${totalDuration}.`));
 
@@ -3256,4 +3182,121 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
 
     process.exit(0);
   })();
+}
+
+function formatDuration(timeDelta) {
+  const seconds = timeDelta / 1000;
+
+  if (seconds > 90) {
+    const modSeconds = Math.floor(seconds % 60);
+    const minutes = Math.floor(seconds - seconds % 60) / 60;
+    return `${minutes}m${modSeconds}s`;
+  }
+
+  if (seconds < 0.1) {
+    return 'instant';
+  }
+
+  const precision = (seconds > 1 ? 3 : 2);
+  return `${seconds.toPrecision(precision)}s`;
+}
+
+function showStepStatusSummary() {
+  const longestNameLength =
+    Math.max(...
+      Object.values(stepStatusSummary)
+        .map(({name}) => name.length));
+
+  const stepsNotClean =
+    Object.values(stepStatusSummary)
+      .map(({status}) =>
+        status === STATUS_HAS_WARNINGS ||
+        status === STATUS_FATAL_ERROR ||
+        status === STATUS_STARTED_NOT_DONE);
+
+  const anyStepsNotClean =
+    stepsNotClean.includes(true);
+
+  const stepDetails = Object.values(stepStatusSummary);
+
+  const stepDurations =
+    stepDetails.map(({status, timeStart, timeEnd}) => {
+      if (
+        status === STATUS_NOT_APPLICABLE ||
+        status === STATUS_NOT_STARTED ||
+        status === STATUS_STARTED_NOT_DONE
+      ) {
+        return '-';
+      }
+
+      if (typeof timeStart !== 'number' || typeof timeEnd !== 'number') {
+        return 'unknown';
+      }
+
+      return formatDuration(timeEnd - timeStart);
+    });
+
+  const longestDurationLength =
+    Math.max(...stepDurations.map(duration => duration.length));
+
+  const stepMemories =
+    stepDetails.map(({memory}) =>
+      (memory
+        ? Math.round(memory["heapUsed"] / 1024 / 1024) + 'MB'
+        : '-'));
+
+  const longestMemoryLength =
+    Math.max(...stepMemories.map(memory => memory.length));
+
+  for (let index = 0; index < stepDetails.length; index++) {
+    const {name, status, annotation} = stepDetails[index];
+    const duration = stepDurations[index];
+    const memory = stepMemories[index];
+
+    let message =
+      (stepsNotClean[index]
+        ? `!! `
+        : ` - `);
+
+    message += `(${duration} `.padStart(longestDurationLength + 2, ' ');
+
+    if (shouldShowStepMemoryInSummary) {
+      message += ` ${memory})`.padStart(longestMemoryLength + 2, ' ');
+    }
+
+    message += ` `;
+    message += `${name}: `.padEnd(longestNameLength + 4, '.');
+    message += ` `;
+    message += status;
+
+    if (annotation) {
+      message += ` (${annotation})`;
+    }
+
+    switch (status) {
+      case STATUS_DONE_CLEAN:
+        console.error(colors.green(message));
+        break;
+
+      case STATUS_NOT_STARTED:
+      case STATUS_NOT_APPLICABLE:
+        console.error(colors.dim(message));
+        break;
+
+      case STATUS_HAS_WARNINGS:
+      case STATUS_STARTED_NOT_DONE:
+        console.error(colors.yellow(message));
+        break;
+
+      case STATUS_FATAL_ERROR:
+        console.error(colors.red(message));
+        break;
+
+      default:
+        console.error(message);
+        break;
+    }
+  }
+
+  return {anyStepsNotClean};
 }
