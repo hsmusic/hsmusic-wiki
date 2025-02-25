@@ -264,7 +264,7 @@ export class DocumentSortingRule extends ThingSortingRule {
     rules =
       rules
         .slice()
-        .sort((a, b) => a.filename.localeCompare(b.filename));
+        .sort((a, b) => a.filename.localeCompare(b.filename, 'en'));
 
     for (const {chunk, filename} of chunkByProperties(rules, ['filename'])) {
       const initialLayout = getThingLayoutForFilename(filename, wikiData);

@@ -3,6 +3,12 @@
 // initial sort matters! (Spoilers: If what you're doing involves any kind of
 // parallelization, it definitely matters.)
 
+// TODO: This is obviously limiting. It does describe the behavior
+// we've been *assuming* for the entire time the wiki is around,
+// but it would be nice to support sorting in different locales
+// somehow.
+export const SORTING_LOCALE = 'en';
+
 import {empty, sortMultipleArrays, unique}
   from './sugar.js';
 
@@ -17,8 +23,8 @@ export function compareCaseLessSensitive(a, b) {
   const bl = b.toLowerCase();
 
   return al === bl
-    ? a.localeCompare(b, undefined, {numeric: true})
-    : al.localeCompare(bl, undefined, {numeric: true});
+    ? a.localeCompare(b, SORTING_LOCALE, {numeric: true})
+    : al.localeCompare(bl, SORTING_LOCALE, {numeric: true});
 }
 
 // Subtract common prefixes and other characters which some people don't like
