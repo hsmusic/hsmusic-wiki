@@ -578,6 +578,10 @@ export function reportContentTextErrors(wikiData, {
       commentary: commentaryShape,
     }],
 
+    ['artTagData', {
+      description: '_content',
+    }],
+
     ['artistData', {
       contextNotes: '_content',
     }],

@@ -15,11 +15,11 @@ import {
   additionalNameList,
   annotatedReferenceList,
   color,
+  contentString,
   directory,
   flag,
   referenceList,
   reverseReferenceList,
-  simpleString,
   name,
   soupyFind,
   soupyReverse,
@@ -57,7 +57,7 @@ export class ArtTag extends Thing {
 
     additionalNames: additionalNameList(),
 
-    description: simpleString(),
+    description: contentString(),
 
     directDescendantArtTags: referenceList({
       class: input.value(ArtTag),
