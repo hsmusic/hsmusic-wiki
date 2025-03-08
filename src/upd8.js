@@ -449,6 +449,11 @@ async function main() {
       type: 'flag',
     },
 
+    'skip-sorting-validation': {
+      help: `Skips checking the if custom sorting rules for this wiki are satisfied`,
+      type: 'flag',
+    },
+
     'skip-media-validation': {
       help: `Skips checking and reporting missing and misplaced media files, which isn't necessary if you aren't adding or removing data or updating directories`,
       type: 'flag',
@@ -982,6 +987,17 @@ async function main() {
 
       paragraph = false;
     }
+
+    fallbackStep('checkWikiDataSourceFileSorting', {
+      default: 'perform',
+      cli: {
+        flag: 'skip-sorting-validation',
+        negate: true,
+        warning:
+          `Skipping sorting validation. If any of this wiki's sorting rules are not\n` +
+          `satisfied, those errors will be silently passed along to the build.`,
+      },
+    });
 
     fallbackStep('verifyImagePaths', {
       default: 'perform',
