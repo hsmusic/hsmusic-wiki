@@ -28,6 +28,10 @@ export const config = {
   webRoutes: {
     applicable: false,
   },
+
+  sort: {
+    applicable: false,
+  },
 };
 
 export function getCLIOptions() {

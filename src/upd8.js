@@ -990,6 +990,7 @@ async function main() {
 
     fallbackStep('checkWikiDataSourceFileSorting', {
       default: 'perform',
+      buildConfig: 'sort',
       cli: {
         flag: 'skip-sorting-validation',
         negate: true,
