@@ -164,7 +164,7 @@ export default {
 
                 : html.blank()),
 
-              !html.isBlank(relations.creditSourcesSection) &&
+              !html.isBlank(relations.creditSourceEntries) &&
                 language.encapsulate(capsule, 'readCreditSources', capsule =>
                   language.$(capsule, {
                     link:
