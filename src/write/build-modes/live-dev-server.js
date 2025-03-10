@@ -1,6 +1,7 @@
 import {spawn} from 'node:child_process';
 import * as http from 'node:http';
 import {open, stat} from 'node:fs/promises';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import {pipeline} from 'node:stream/promises';
 import {inspect as nodeInspect} from 'node:util';
@@ -492,7 +493,13 @@ export async function go({
     }
   });
 
-  const address = `http://${host}:${port}/`;
+  const addresses =
+    (host === '0.0.0.0'
+      ? [`http://localhost:${port}/`,
+         `http://${os.hostname()}:${port}/`]
+   : host === '127.0.0.1'
+      ? [`http://localhost:${port}/`]
+      : [`http://${host}:${port}/`]);
 
   server.on('error', error => {
     if (error.code === 'EADDRINUSE') {
@@ -509,7 +516,15 @@ export async function go({
   });
 
   server.on('listening', () => {
-    logInfo`${'All done!'} Listening at: ${address}`;
+    if (addresses.length === 1) {
+      logInfo`${'All done!'} Listening at: ${addresses[0]}`;
+    } else {
+      logInfo`${`All done!`} Listening at:`;
+      for (const address of addresses) {
+        logInfo`- ${address}`;
+      }
+    }
+
     logInfo`Press ^C here (control+C) to stop the server and exit.`;
     if (showTimings && loudResponses) {
       logInfo`Printing all HTTP responses, plus page generation timings.`;
