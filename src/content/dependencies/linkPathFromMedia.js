@@ -44,6 +44,8 @@ export default {
         fileSize &&
           {'data-original-size': fileSize},
 
+        {'data-dimensions': dimensions.join('x')},
+
         !empty(availableThumbs) &&
           {'data-thumbs':
               availableThumbs

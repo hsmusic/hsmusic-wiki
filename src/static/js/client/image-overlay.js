@@ -159,6 +159,11 @@ function getImageLinkDetails(imageLink) {
       a.dataset.thumbs ??
       null,
 
+    dimensions:
+      img?.dataset.dimensions?.split('x') ??
+      a.dataset.dimensions?.split('x') ??
+      null,
+
     color:
       cssProp(imageLink, '--primary-color'),
   };
@@ -230,6 +235,20 @@ async function loadOverlayImage(details) {
   // Y'know, just for debugging convenience.
   info.mainImage.dataset.displayingThumb = details.mainThumb;
   info.thumbImage.dataset.displayingThumb = details.thumbThubm;
+
+  if (details.dimensions) {
+    info.mainImage.width = details.dimensions[0];
+    info.mainImage.height = details.dimensions[1];
+    info.thumbImage.width = details.dimensions[0];
+    info.thumbImage.height = details.dimensions[1];
+    cssProp(info.thumbImage, 'aspect-ratio', details.dimensions.join('/'));
+  } else {
+    info.mainImage.removeAttribute('width');
+    info.mainImage.removeAttribute('height');
+    info.thumbImage.removeAttribute('width');
+    info.thumbImage.removeAttribute('height');
+    cssProp(info.thumbImage, 'aspect-ratio', null);
+  }
 
   info.mainImage.addEventListener('load', handleMainImageLoaded);
   info.mainImage.addEventListener('error', handleMainImageErrored);

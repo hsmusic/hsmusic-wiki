@@ -224,7 +224,6 @@ export default {
 
       const originalDimensions = getDimensionsOfImagePath(mediaSrc);
       const availableThumbs = getThumbnailsAvailableForDimensions(originalDimensions);
-      const originalLength = Math.max(originalDimensions[0], originalDimensions[1]);
 
       const fileSize =
         (willLink && mediaSrc
@@ -235,8 +234,7 @@ export default {
         fileSize &&
           {'data-original-size': fileSize},
 
-        originalLength &&
-          {'data-original-length': originalLength},
+        {'data-dimensions': originalDimensions.join('x')},
 
         !empty(availableThumbs) &&
           {'data-thumbs':
