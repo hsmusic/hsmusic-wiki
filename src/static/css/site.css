@@ -904,6 +904,24 @@ a:not([href]):hover {
   color: white;
 }
 
+.image-media-link::after {
+  content: '';
+  display: inline-block;
+  width: 22px;
+  height: 1em;
+
+  background-color: var(--primary-color);
+
+  mask-image: url(/static-4p1/misc/image.svg);
+  mask-repeat: no-repeat;
+  mask-position: calc(100% - 2px);
+  vertical-align: text-bottom;
+}
+
+.image-media-link:hover::after {
+  background-color: white;
+}
+
 .nav-link {
   display: inline-block;
 }
