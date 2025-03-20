@@ -66,8 +66,13 @@ export function getPageReferences() {
   info.fileSizeWarning =
     document.getElementById('image-overlay-file-size-warning');
 
+  const linkQuery = [
+    '.image-link',
+    '.image-media-link',
+  ].join(', ');
+
   info.links =
-    Array.from(document.querySelectorAll('.image-link'))
+    Array.from(document.querySelectorAll(linkQuery))
       .filter(link => !link.closest('.no-image-preview'));
 }
 
