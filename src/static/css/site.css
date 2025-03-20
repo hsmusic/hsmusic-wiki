@@ -3157,31 +3157,30 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
           backdrop-filter: blur(3px);
 }
 
-#image-overlay-image-container {
+#image-overlay-image-area {
   display: block;
-  position: relative;
   overflow: hidden;
   width: 80vmin;
-  height: 80vmin;
   margin-left: auto;
   margin-right: auto;
 }
 
+#image-overlay-image-layout {
+  display: block;
+  position: relative;
+  margin: 4px 3px;
+  background: rgba(0, 0, 0, 0.65);
+}
+
 #image-overlay-image,
 #image-overlay-image-thumb {
-  display: inline-block;
-  object-fit: contain;
+  display: block;
   width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.65);
+  height: auto;
 }
 
 #image-overlay-image {
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: calc(100% - 6px);
-  height: calc(100% - 4px);
 }
 
 #image-overlay-image-thumb {
@@ -3195,7 +3194,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   transition: opacity 0.25s;
 }
 
-#image-overlay-image-container::after {
+#image-overlay-image-area::after {
   content: "";
   display: block;
   position: absolute;
@@ -3208,18 +3207,18 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   transition: 0.25s;
 }
 
-#image-overlay-container.loaded #image-overlay-image-container::after {
+#image-overlay-container.loaded #image-overlay-image-area::after {
   width: 100%;
   background: white;
   opacity: 0;
 }
 
-#image-overlay-container.errored #image-overlay-image-container::after {
+#image-overlay-container.errored #image-overlay-image-area::after {
   width: 100%;
   background: red;
 }
 
-#image-overlay-container:not(.visible) #image-overlay-image-container::after {
+#image-overlay-container:not(.visible) #image-overlay-image-area::after {
   width: 0 !important;
 }
 

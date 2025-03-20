@@ -540,10 +540,11 @@ export default {
 
     const imageOverlayHTML = html.tag('div', {id: 'image-overlay-container'},
       html.tag('div', {id: 'image-overlay-content-container'}, [
-        html.tag('a', {id: 'image-overlay-image-container'}, [
-          html.tag('img', {id: 'image-overlay-image'}),
-          html.tag('img', {id: 'image-overlay-image-thumb'}),
-        ]),
+        html.tag('span', {id: 'image-overlay-image-area'},
+          html.tag('span', {id: 'image-overlay-image-layout'}, [
+            html.tag('img', {id: 'image-overlay-image'}),
+            html.tag('img', {id: 'image-overlay-image-thumb'}),
+          ])),
 
         html.tag('div', {id: 'image-overlay-action-container'},
           language.encapsulate('releaseInfo.viewOriginalFile', capsule => [
