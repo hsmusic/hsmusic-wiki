@@ -234,7 +234,7 @@ async function loadOverlayImage(details) {
   // Show the thumbnail size on each <img> element's data attributes.
   // Y'know, just for debugging convenience.
   info.mainImage.dataset.displayingThumb = details.mainThumb;
-  info.thumbImage.dataset.displayingThumb = details.thumbThubm;
+  info.thumbImage.dataset.displayingThumb = details.thumbThumb;
 
   if (details.dimensions) {
     info.mainImage.width = details.dimensions[0];
