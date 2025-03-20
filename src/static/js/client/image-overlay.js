@@ -93,10 +93,10 @@ function handleContainerClicked(evt) {
     return;
   }
 
-  // If you clicked anything close to or beneath the action bar, don't hide
-  // the image overlay.
+  // If you clicked anything near the action bar, don't hide the
+  // image overlay.
   const rect = info.actionContainer.getBoundingClientRect();
-  if (evt.clientY >= rect.top - 40) {
+  if (evt.clientY >= rect.top - 40 && evt.clientY <= rect.bottom + 40) {
     return;
   }
 
