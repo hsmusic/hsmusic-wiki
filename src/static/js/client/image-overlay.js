@@ -141,13 +141,18 @@ function getImageLinkDetails(imageLink) {
       a.href,
 
     embeddedSrc:
-      img.src,
+      img?.src ??
+      a.dataset.embedSrc,
 
     originalFileSize:
-      img.dataset.originalSize,
+      img?.dataset.originalSize ??
+      a.dataset.originalSize ??
+      null,
 
     availableThumbList:
-      img.dataset.thumbs,
+      img?.dataset.thumbs ??
+      a.dataset.thumbs ??
+      null,
 
     color:
       cssProp(imageLink, '--primary-color'),
