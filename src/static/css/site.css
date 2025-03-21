@@ -887,6 +887,10 @@ a:not([href]):hover {
   text-decoration: none;
 }
 
+a .normal-content {
+  color: white;
+}
+
 .external-link:not(.from-content) {
   white-space: nowrap;
 }
@@ -897,10 +901,6 @@ a:not([href]):hover {
 }
 
 .external-link.indicate-external:hover::after {
-  color: white;
-}
-
-.external-link .normal-content {
   color: white;
 }
 

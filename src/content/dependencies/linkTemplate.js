@@ -26,6 +26,11 @@ export default {
       type: 'html',
       mutable: false,
     },
+
+    suffixNormalContent: {
+      type: 'html',
+      mutable: false,
+    },
   },
 
   generate(slots, {
@@ -61,13 +66,22 @@ export default {
       attributes.set('title', slots.tooltip);
     }
 
-    const content =
+    const mainContent =
       (html.isBlank(slots.content)
         ? language.$('misc.missingLinkContent')
-        : striptags(html.resolve(slots.content, {normalize: 'string'}), {
-            disallowedTags: new Set(['a']),
-          }));
+        : striptags(
+            html.resolve(slots.content, {normalize: 'string'}),
+            {disallowedTags: new Set(['a'])}));
 
-    return html.tag('a', attributes, content);
+    const allContent =
+      (html.isBlank(slots.suffixNormalContent)
+        ? mainContent
+        : html.tags([
+            mainContent,
+            html.tag('span', {class: 'normal-content'},
+              slots.suffixNormalContent),
+          ], {[html.joinChildren]: ''}));
+
+    return html.tag('a', attributes, allContent);
   },
 }
