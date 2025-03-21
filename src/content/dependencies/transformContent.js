@@ -258,6 +258,20 @@ export default {
       data.nodes.map((node, index) => {
         const nextNode = data.nodes[index + 1];
 
+        const absorbFollowingPunctuation = template => {
+          if (nextNode?.type !== 'text') {
+            return;
+          }
+
+          const text = nextNode.data;
+          const match = text.match(/^[.,;:?!…]+/);
+          const suffix = match?.[0];
+          if (suffix) {
+            template.setSlot('suffixNormalContent', suffix);
+            offsetTextNode = suffix.length;
+          }
+        };
+
         switch (node.type) {
           case 'text': {
             const text = node.data.slice(offsetTextNode);
@@ -458,14 +472,8 @@ export default {
               fromContent: true,
             });
 
-            if (slots.absorbPunctuationFollowingExternalLinks && nextNode?.type === 'text') {
-              const text = nextNode.data;
-              const match = text.match(/^[.,;:?!…]+/);
-              const suffix = match?.[0];
-              if (suffix) {
-                externalLink.setSlot('suffixNormalContent', suffix);
-                offsetTextNode = suffix.length;
-              }
+            if (slots.absorbPunctuationFollowingExternalLinks) {
+              absorbFollowingPunctuation(externalLink);
             }
 
             if (slots.indicateExternalLinks) {
