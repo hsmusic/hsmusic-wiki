@@ -460,6 +460,18 @@ export default {
               link.setSlot('tooltipStyle', 'none');
             }
 
+            let doTheAbsorbyThing = false;
+
+            // TODO: This is just silly.
+            try {
+              const tag = html.resolve(link, {normalize: 'tag'});
+              doTheAbsorbyThing ||= tag.attributes.has('class', 'image-media-link');
+            } catch {}
+
+            if (doTheAbsorbyThing) {
+              absorbFollowingPunctuation(link);
+            }
+
             return {type: 'processed-internal-link', data: link};
           }
 
