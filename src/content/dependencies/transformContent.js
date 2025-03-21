@@ -264,7 +264,7 @@ export default {
           }
 
           const text = nextNode.data;
-          const match = text.match(/^[.,;:?!…]+(?=.*[a-z])/i);
+          const match = text.match(/^[.,;:?!…]+(?=[^\n]*[a-z])/i);
           const suffix = match?.[0];
           if (suffix) {
             template.setSlot('suffixNormalContent', suffix);
