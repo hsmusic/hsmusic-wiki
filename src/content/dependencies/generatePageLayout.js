@@ -454,14 +454,15 @@ export default {
 
     let showingSidebarLeft;
     let showingSidebarRight;
+    let sidebarsInContentColumn = false;
 
     const leftSidebar = getSidebar('leftSidebar', 'sidebar-left', willShowSearch);
     const rightSidebar = getSidebar('rightSidebar', 'sidebar-right', false);
 
     if (willShowSearch) {
       if (html.isBlank(leftSidebar)) {
-        leftSidebar.setSlot('initiallyHidden', true);
-        showingSidebarLeft = false;
+        sidebarsInContentColumn = true;
+        showingSidebarLeft = true;
       }
 
       leftSidebar.setSlot(
@@ -731,6 +732,9 @@ export default {
 
                 showingSidebarRight &&
                   {class: 'showing-sidebar-right'},
+
+                sidebarsInContentColumn &&
+                  {class: 'sidebars-in-content-column'},
 
                 [
                   skippersHTML,

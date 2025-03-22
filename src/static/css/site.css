@@ -179,6 +179,16 @@ body::before, .wallpaper-part {
   display: none;
 }
 
+.sidebar-column.always-content-column {
+  /* duplicated in thin & medium media query */
+  position: static !important;
+  max-width: unset !important;
+  flex-basis: unset !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  width: 100%;
+}
+
 .sidebar-multiple {
   display: flex;
   flex-direction: column;
@@ -3329,6 +3339,8 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
     display: none;
   }
 
+  /* Duplicated for "sidebars in content column" */
+
   .layout-columns {
     flex-direction: column;
   }
@@ -3346,6 +3358,8 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
     width: 100%;
   }
 
+  /* End duplicated for "sidebars in content column" */
+
   .sidebar .news-entry:not(.first-news-entry) {
     display: none;
   }
@@ -3357,6 +3371,32 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   .wiki-search-sidebar-box {
     max-height: max(245px, 60vh, calc(100vh - 205px));
   }
+}
+
+/* Layout - "sidebars in content column"
+ * This is the same code as immediately above, for medium and
+ * thin layouts, but can be opted into by the page itself
+ * instead of through a media query.
+ */
+
+#page-container.sidebars-in-content-column
+.layout-columns {
+  flex-direction: column;
+}
+
+#page-container.sidebars-in-content-column
+.layout-columns > *:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+#page-container.sidebars-in-content-column
+.sidebar-column {
+  position: static !important;
+  max-width: unset !important;
+  flex-basis: unset !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  width: 100%;
 }
 
 /* Layout - Thin (phones) */
