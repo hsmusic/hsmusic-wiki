@@ -41,6 +41,7 @@ export class HomepageLayout extends Thing {
     navbarLinks: {
       flags: {update: true, expose: true},
       update: {validate: validateArrayItems(isStringNonEmpty)},
+      expose: {transform: value => value ?? []},
     },
 
     sections: thingList({
