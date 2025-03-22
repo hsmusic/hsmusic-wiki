@@ -3259,8 +3259,8 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 /* Layout - Wide (most computers) */
 
 @media (min-width: 900px) {
-  #page-container.showing-sidebar-left #secondary-nav:not(.always-visible),
-  #page-container.showing-sidebar-right #secondary-nav:not(.always-visible) {
+  #page-container.showing-sidebar-left:not(.sidebars-in-content-column) #secondary-nav:not(.always-visible),
+  #page-container.showing-sidebar-right:not(.sidebars-in-content-column) #secondary-nav:not(.always-visible) {
     display: none;
   }
 }
