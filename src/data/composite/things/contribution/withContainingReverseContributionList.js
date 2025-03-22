@@ -1,6 +1,7 @@
 // Get the artist's contribution list containing this property. Although that
-// list literally includes both dated and un-dated contributions, here the list
-// is filtered including only the matching subset (has dates vs dateless).
+// list literally includes both dated and dateless contributions, here, if the
+// current contribution is dateless, the list is filtered to only include
+// dateless contributions from the same immediately nearby context.
 
 import {input, templateCompositeFrom} from '#composite';
 
@@ -51,9 +52,28 @@ export default templateCompositeFrom({
       compute: (continuation, {
         ['#hasDate']: hasDate,
         ['#list']: list,
+      }) =>
+        (hasDate
+          ? continuation.raiseOutput({
+              ['#containingReverseContributionList']:
+                list.filter(contrib => contrib.date),
+            })
+          : continuation({
+              ['#list']:
+                list.filter(contrib => !contrib.date),
+            })),
+    },
+
+    {
+      dependencies: ['#list', 'thing'],
+      compute: (continuation, {
+        ['#list']: list,
+        ['thing']: thing,
       }) => continuation({
         ['#containingReverseContributionList']:
-          list.filter(contribution => !!contribution.date === hasDate),
+          (thing.album
+            ? list.filter(contrib => contrib.thing.album === thing.album)
+            : list),
       }),
     },
   ],
