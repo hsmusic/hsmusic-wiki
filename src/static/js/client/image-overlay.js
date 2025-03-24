@@ -226,9 +226,11 @@ async function loadOverlayImage(details) {
   if (details.thumbSrc) {
     info.thumbImage.src = details.thumbSrc;
     info.thumbImage.style.display = null;
+    info.container.classList.remove('no-thumb');
   } else {
     info.thumbImage.src = '';
     info.thumbImage.style.display = 'none';
+    info.container.classList.add('no-thumb');
   }
 
   // Show the thumbnail size on each <img> element's data attributes.
