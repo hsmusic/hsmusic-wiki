@@ -382,15 +382,13 @@ export default {
                 ? to('media.path', node.src.slice('media/'.length))
                 : node.src);
 
-            const {
-              width,
-              height,
-              align,
-              pixelate,
-            } = node;
+            const {width, height, align, pixelate} = node;
 
             const content =
               html.tag('div', {class: 'content-video-container'},
+                align === 'center' &&
+                  {class: 'align-center'},
+
                 html.tag('video',
                   src && {src},
                   width && {width},
@@ -398,16 +396,45 @@ export default {
 
                   {controls: true},
 
-                  align === 'center' &&
-                    {class: 'align-center'},
-
                   pixelate &&
                     {class: 'pixelate'}));
 
             return {
               type: 'processed-video',
-              data:
-                content,
+              data: content,
+            };
+          }
+
+          case 'audio': {
+            const src =
+              (node.src.startsWith('media/')
+                ? to('media.path', node.src.slice('media/'.length))
+                : node.src);
+
+            const {align, inline} = node;
+
+            const audio =
+              html.tag('audio',
+                src && {src},
+
+                align === 'center' &&
+                inline &&
+                  {class: 'align-center'},
+
+                {controls: true});
+
+            const content =
+              (inline
+                ? audio
+                : html.tag('div', {class: 'content-audio-container'},
+                    align === 'center' &&
+                      {class: 'align-center'},
+
+                    audio));
+
+            return {
+              type: 'processed-audio',
+              data: content,
             };
           }
 
@@ -604,7 +631,8 @@ export default {
         if (
           (attributes.get('data-type') === 'processed-image' &&
           !attributes.get('data-inline')) ||
-          attributes.get('data-type') === 'processed-video'
+          attributes.get('data-type') === 'processed-video' ||
+          attributes.get('data-type') === 'processed-audio'
         ) {
           tags[tags.length - 1] = tags[tags.length - 1].replace(/<p>$/, '');
           deleteParagraph = true;

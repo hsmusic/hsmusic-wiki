@@ -1545,13 +1545,14 @@ p.content-heading:has(+ .commentary-entry-heading.dated) {
 }
 
 .content-image-container.align-center,
-.content-video-container.align-center {
+.content-video-container.align-center,
+.content-audio-container.align-center {
   text-align: center;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
 
-a.align-center, img.align-center {
+a.align-center, img.align-center, audio.align-center {
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -2245,13 +2246,19 @@ html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:las
   color: white;
 }
 
-/* Videos (in content) get a lite version of image-container. */
-.content-video-container {
+/* Videos and audios (in content) get a lite version of image-container. */
+.content-video-container,
+.content-audio-container {
   width: min-content;
   background-color: var(--dark-color);
   border: 2px solid var(--primary-color);
   border-radius: 2.5px 2.5px 3px 3px;
   padding: 5px;
+}
+
+.content-video-container video,
+.content-audio-container audio {
+  display: block;
 }
 
 .image-text-area {

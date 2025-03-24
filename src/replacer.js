@@ -655,6 +655,18 @@ export function postprocessVideos(inputNodes) {
     });
 }
 
+export function postprocessAudios(inputNodes) {
+  return postprocessHTMLTags(inputNodes, 'audio',
+    (attributes, {inline}) => {
+      const node = {type: 'audio'};
+
+      node.src = attributes.get('src');
+      node.inline = attributes.get('inline') ?? inline;
+
+      return node;
+    });
+}
+
 export function postprocessHeadings(inputNodes) {
   const outputNodes = [];
 
@@ -817,6 +829,7 @@ export function parseInput(input) {
     output = postprocessComments(output);
     output = postprocessImages(output);
     output = postprocessVideos(output);
+    output = postprocessAudios(output);
     output = postprocessHeadings(output);
     output = postprocessSummaries(output);
     output = postprocessExternalLinks(output);
