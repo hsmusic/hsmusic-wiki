@@ -518,12 +518,20 @@ export function postprocessComments(inputNodes) {
   return outputNodes;
 }
 
-export function postprocessImages(inputNodes) {
+function postprocessHTMLTags(inputNodes, tagName, callback) {
   const outputNodes = [];
 
-  let atStartOfLine = true;
-
   const lastNode = inputNodes.at(-1);
+
+  const regexp =
+    new RegExp(
+      `<${tagName} (.*?)>` +
+      (html.selfClosingTags.includes(tagName)
+        ? ''
+        : `(?:</${tagName}>)?`),
+      'g');
+
+  let atStartOfLine = true;
 
   for (const node of inputNodes) {
     if (node.type === 'tag') {
@@ -531,10 +539,8 @@ export function postprocessImages(inputNodes) {
     }
 
     if (node.type === 'text') {
-      const imageRegexp = /<img (.*?)>/g;
-
       let match = null, parseFrom = 0;
-      while (match = imageRegexp.exec(node.data)) {
+      while (match = regexp.exec(node.data)) {
         const previousText = node.data.slice(parseFrom, match.index);
 
         outputNodes.push({
@@ -546,23 +552,19 @@ export function postprocessImages(inputNodes) {
 
         parseFrom = match.index + match[0].length;
 
-        const imageNode = {type: 'image'};
-        const attributes = html.parseAttributes(match[1]);
-
-        imageNode.src = attributes.get('src');
-
         if (previousText.endsWith('\n')) {
           atStartOfLine = true;
         } else if (previousText.length) {
           atStartOfLine = false;
         }
 
-        imageNode.inline = (() => {
-          // Images can force themselves to be rendered inline using a custom
-          // attribute - this style just works better for certain embeds,
-          // usually jokes or small images.
-          if (attributes.get('inline')) return true;
+        const attributes =
+          html.parseAttributes(match[1]);
 
+        const remainingTextInNode =
+          node.data.slice(parseFrom);
+
+        const inline = (() => {
           // If we've already determined we're in the middle of a line,
           // we're inline. (Of course!)
           if (!atStartOfLine) {
@@ -571,42 +573,27 @@ export function postprocessImages(inputNodes) {
 
           // If there's more text to go in this text node, and what's
           // remaining doesn't start with a line break, we're inline.
-          if (
-            parseFrom !== node.data.length &&
-            node.data[parseFrom] !== '\n'
-          ) {
+          if (remainingTextInNode && remainingTextInNode[0] !== '\n') {
             return true;
           }
 
           // If we're at the end of this text node, but this text node
           // isn't the last node overall, we're inline.
-          if (
-            parseFrom === node.data.length &&
-            node !== lastNode
-          ) {
+          if (!remainingTextInNode && node !== lastNode) {
             return true;
           }
 
-          // If no other condition matches, this image is on its own line.
+          // If no other condition matches, this tag is on its own line.
           return false;
         })();
 
-        if (attributes.get('link')) imageNode.link = attributes.get('link');
-        if (attributes.get('style')) imageNode.style = attributes.get('style');
-        if (attributes.get('width')) imageNode.width = parseInt(attributes.get('width'));
-        if (attributes.get('height')) imageNode.height = parseInt(attributes.get('height'));
-        if (attributes.get('align')) imageNode.align = attributes.get('align');
-        if (attributes.get('pixelate')) imageNode.pixelate = true;
+        outputNodes.push(
+          callback(attributes, {
+            inline,
+          }));
 
-        if (attributes.get('warning')) {
-          imageNode.warnings =
-            attributes.get('warning').split(', ');
-        }
-
-        outputNodes.push(imageNode);
-
-        // No longer at the start of a line after an image - there will at
-        // least be a text node with only '\n' before the next image that's
+        // No longer at the start of a line after the tag - there will at
+        // least be text with only '\n' before the next of this tag that's
         // on its own line.
         atStartOfLine = false;
       }
@@ -629,54 +616,43 @@ export function postprocessImages(inputNodes) {
   return outputNodes;
 }
 
+export function postprocessImages(inputNodes) {
+  return postprocessHTMLTags(inputNodes, 'img',
+    (attributes, {inline}) => {
+      const node = {type: 'image'};
+
+      node.src = attributes.get('src');
+      node.inline = attributes.get('inline') ?? inline;
+
+      if (attributes.get('link')) node.link = attributes.get('link');
+      if (attributes.get('style')) node.style = attributes.get('style');
+      if (attributes.get('width')) node.width = parseInt(attributes.get('width'));
+      if (attributes.get('height')) node.height = parseInt(attributes.get('height'));
+      if (attributes.get('align')) node.align = attributes.get('align');
+      if (attributes.get('pixelate')) node.pixelate = true;
+
+      if (attributes.get('warning')) {
+        node.warnings =
+          attributes.get('warning').split(', ');
+      }
+
+      return node;
+    });
+}
+
 export function postprocessVideos(inputNodes) {
-  const outputNodes = [];
+  return postprocessHTMLTags(inputNodes, 'video',
+    attributes => {
+      const node = {type: 'video'};
 
-  for (const node of inputNodes) {
-    if (node.type !== 'text') {
-      outputNodes.push(node);
-      continue;
-    }
+      node.src = attributes.get('src');
 
-    const videoRegexp = /<video (.*?)>(<\/video>)?/g;
+      if (attributes.get('width')) node.width = parseInt(attributes.get('width'));
+      if (attributes.get('height')) node.height = parseInt(attributes.get('height'));
+      if (attributes.get('pixelate')) node.pixelate = true;
 
-    let match = null, parseFrom = 0;
-    while (match = videoRegexp.exec(node.data)) {
-      const previousText = node.data.slice(parseFrom, match.index);
-
-      outputNodes.push({
-        type: 'text',
-        data: previousText,
-        i: node.i + parseFrom,
-        iEnd: node.i + parseFrom + match.index,
-      });
-
-      parseFrom = match.index + match[0].length;
-
-      const videoNode = {type: 'video'};
-      const attributes = html.parseAttributes(match[1]);
-
-      videoNode.src = attributes.get('src');
-
-      if (attributes.get('width')) videoNode.width = parseInt(attributes.get('width'));
-      if (attributes.get('height')) videoNode.height = parseInt(attributes.get('height'));
-      if (attributes.get('align')) videoNode.align = attributes.get('align');
-      if (attributes.get('pixelate')) videoNode.pixelate = true;
-
-      outputNodes.push(videoNode);
-    }
-
-    if (parseFrom !== node.data.length) {
-      outputNodes.push({
-        type: 'text',
-        data: node.data.slice(parseFrom),
-        i: node.i + parseFrom,
-        iEnd: node.iEnd,
-      });
-    }
-  }
-
-  return outputNodes;
+      return node;
+    });
 }
 
 export function postprocessHeadings(inputNodes) {
