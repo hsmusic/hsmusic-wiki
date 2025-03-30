@@ -9,6 +9,7 @@ export const info = {
 
   stickyContainers: null,
 
+  stickyHeadingRows: null,
   stickyHeadings: null,
   stickySubheadingRows: null,
   stickySubheadings: null,
@@ -51,9 +52,13 @@ export function getPageReferences() {
     info.stickyCovers
       .map(el => el?.querySelector('.image-text-area'));
 
-  info.stickyHeadings =
+  info.stickyHeadingRows =
     info.stickyContainers
-      .map(el => el.querySelector('.content-sticky-heading-row h1'));
+      .map(el => el.querySelector('.content-sticky-heading-row'));
+
+  info.stickyHeadings =
+    info.stickyHeadingRows
+      .map(el => el.querySelector('h1'));
 
   info.stickySubheadingRows =
     info.stickyContainers
@@ -221,15 +226,8 @@ function getContentHeadingClosestToStickySubheading(index) {
     return null;
   }
 
-  const stickySubheading = info.stickySubheadings[index];
-
-  if (stickySubheading.childNodes.length === 0) {
-    // Supply a non-breaking space to ensure correct basic line height.
-    stickySubheading.appendChild(document.createTextNode('\xA0'));
-  }
-
-  const stickyContainer = info.stickyContainers[index];
-  const stickyRect = stickyContainer.getBoundingClientRect();
+  const stickyHeadingRow = info.stickyHeadingRows[index];
+  const stickyRect = stickyHeadingRow.getBoundingClientRect();
 
   // Subheadings only appear when the sticky heading is collapsed,
   // so the used bottom edge should always be *as though* it's only
@@ -239,18 +237,15 @@ function getContentHeadingClosestToStickySubheading(index) {
     stickyHeading.getBoundingClientRect().height -
     parseFloat(getComputedStyle(stickyHeading).fontSize);
 
-  const subheadingRect = stickySubheading.getBoundingClientRect();
-
   const stickyBottom =
     (stickyRect.bottom
-   + subheadingRect.height
    - correctBottomEdge);
 
   // Iterate from bottom to top of the content area.
   const contentHeadings = info.contentHeadings[index];
   for (const heading of contentHeadings.slice().reverse()) {
     const headingRect = heading.getBoundingClientRect();
-    if (headingRect.y + headingRect.height / 1.5 < stickyBottom + 20) {
+    if (headingRect.y + headingRect.height / 1.5 < stickyBottom + 40) {
       return heading;
     }
   }
