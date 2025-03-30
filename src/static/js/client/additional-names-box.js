@@ -3,12 +3,17 @@
 import {cssProp} from '../client-util.js';
 
 import {info as hashLinkInfo} from './hash-link.js';
+import {info as stickyHeadingInfo} from './sticky-heading.js';
 
 export const info = {
   id: 'additionalNamesBoxInfo',
 
   box: null,
+
   links: null,
+  stickyHeadingLink: null,
+
+  contentContainer: null,
   mainContentContainer: null,
 
   state: {
@@ -23,6 +28,14 @@ export function getPageReferences() {
   info.links =
     document.querySelectorAll('a[href="#additional-names-box"]');
 
+  info.stickyHeadingLink =
+    document.querySelector(
+      '.content-sticky-heading-container ' +
+      'a[href="#additional-names-box"]');
+
+  info.contentContainer =
+    document.querySelector('#content');
+
   info.mainContentContainer =
     document.querySelector('#content .main-content-container');
 }
@@ -31,6 +44,34 @@ export function addInternalListeners() {
   hashLinkInfo.event.beforeHashLinkScrolls.push(({target}) => {
     if (target === info.box) {
       return false;
+    }
+  });
+
+  stickyHeadingInfo.event.whenStuckStatusChanges.push((index, stuck) => {
+    const {state} = info;
+
+    if (!info.stickyHeadingLink) return;
+
+    const container = stickyHeadingInfo.contentContainers[index];
+    if (container !== info.contentContainer) return;
+
+    if (stuck) {
+      if (!state.visible) {
+        info.stickyHeadingLink.removeAttribute('href');
+
+        if (info.stickyHeadingLink.hasAttribute('title')) {
+          info.stickyHeadingLink.dataset.restoreTitle = info.stickyHeadingLink.getAttribute('title');
+          info.stickyHeadingLink.removeAttribute('title');
+        }
+      }
+    } else {
+      info.stickyHeadingLink.setAttribute('href', '#additional-names-box');
+
+      const {restoreTitle} = info.stickyHeadingLink.dataset;
+      if (restoreTitle) {
+        info.stickyHeadingLink.setAttribute('title', restoreTitle);
+        delete info.stickyHeadingLink.dataset.restoreTitle;
+      }
     }
   });
 }
@@ -48,6 +89,7 @@ function handleAdditionalNamesBoxLinkClicked(domEvent) {
 
   domEvent.preventDefault();
 
+  if (!domEvent.target.hasAttribute('href')) return;
   if (!info.box || !info.mainContentContainer) return;
 
   const margin =

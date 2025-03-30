@@ -2903,14 +2903,36 @@ h3.content-heading {
   );
 }
 
-.content-sticky-heading-container {
+.content-sticky-heading-root {
   position: sticky;
   top: 0;
+  width: 100%;
+}
 
+.content-sticky-heading-anchor {
+  position: relative;
+  width: 100%;
+}
+
+.content-sticky-heading-container {
+  position: absolute;
+  width: 100%;
+}
+
+.imaginary-static-heading-root,
+.imaginary-static-heading-row,
+.imaginary-static-heading-title {
+  display: block;
+}
+
+.content-sticky-heading-root,
+.imaginary-static-heading-root {
+  width: calc(100% + 2 * var(--content-padding));
   margin: calc(-1 * var(--content-padding));
-  margin-bottom: calc(0.5 * var(--content-padding));
+}
 
-  transform: translateY(-5px);
+.imaginary-static-heading-root {
+  margin-bottom: calc(0.5 * var(--content-padding));
 }
 
 main.long-content .content-sticky-heading-container {
@@ -2924,7 +2946,12 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   padding-right: calc(var(--long-content-padding-ratio) * (100% - 2 * var(--content-padding)) + var(--content-padding));
 }
 
-.content-sticky-heading-row {
+.imaginary-static-heading-root {
+  visibility: hidden;
+}
+
+.content-sticky-heading-row,
+.imaginary-static-heading-row {
   box-sizing: border-box;
   padding:
     calc(1.25 * var(--content-padding) + 5px)
@@ -2934,7 +2961,9 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 
   width: 100%;
   margin: 0;
+}
 
+.content-sticky-heading-row {
   background: var(--bg-black-color);
   border-bottom: 1px dotted rgba(220, 220, 220, 0.4);
 
@@ -2950,9 +2979,56 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   grid-template-columns: 1fr min(40%, 400px);
 }
 
+.content-sticky-heading-container.cover-visible .content-sticky-heading-row {
+  grid-template-columns: 1fr min(40%, 90px);
+}
+
+.content-sticky-heading-root.has-cover +
+.imaginary-static-heading-root .imaginary-static-heading-title {
+  padding-right: min(40%, 400px);
+}
+
 .content-sticky-heading-row h1 {
+  position: relative;
   margin: 0;
   padding-right: 20px;
+}
+
+.content-sticky-heading-row h1 .reference-collapsed-heading {
+  position: absolute;
+  white-space: nowrap;
+  visibility: hidden;
+}
+
+.content-sticky-heading-container.collapse h1 {
+  white-space: nowrap;
+  overflow-wrap: normal;
+
+  animation: collapse-sticky-heading 0.35s forwards;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+}
+
+@keyframes collapse-sticky-heading {
+  from {
+    height: var(--uncollapsed-heading-height);
+  }
+
+  to {
+    height: var(--collapsed-heading-height);
+  }
+}
+
+.content-sticky-heading-container h1 a {
+  transition: text-decoration-color 0.35s;
+}
+
+.content-sticky-heading-container h1 a:not([href]) {
+  color: inherit;
+  cursor: text;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: transparent;
 }
 
 .content-sticky-heading-cover-container {
@@ -3297,7 +3373,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 /* Layout - Wide or Medium */
 
 @media (min-width: 600px) {
-  .content-sticky-heading-container {
+  .content-sticky-heading-root {
     /* Safari doesn't always play nicely with position: sticky,
      * this seems to fix images sometimes displaying above the
      * position: absolute subheading (h2) child
@@ -3448,7 +3524,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 
   /* Show sticky heading above cover art */
 
-  .content-sticky-heading-container {
+  .content-sticky-heading-root {
     z-index: 2;
   }
 

@@ -1,13 +1,15 @@
 /* eslint-env browser */
 
 import {filterMultipleArrays, stitchArrays} from '../../shared-util/sugar.js';
-import {dispatchInternalEvent, templateContent} from '../client-util.js';
+import {cssProp, dispatchInternalEvent, templateContent}
+  from '../client-util.js';
 
 export const info = {
   id: 'stickyHeadingInfo',
 
   stickyContainers: null,
 
+  stickyHeadings: null,
   stickySubheadingRows: null,
   stickySubheadings: null,
 
@@ -20,12 +22,16 @@ export const info = {
   contentCovers: null,
   contentCoversReveal: null,
 
+  imaginaryStaticHeadings: null,
+  referenceCollapsedHeading: null,
+
   state: {
     displayedHeading: null,
   },
 
   event: {
     whenDisplayedHeadingChanges: [],
+    whenStuckStatusChanges: [],
   },
 };
 
@@ -45,6 +51,10 @@ export function getPageReferences() {
     info.stickyCovers
       .map(el => el?.querySelector('.image-text-area'));
 
+  info.stickyHeadings =
+    info.stickyContainers
+      .map(el => el.querySelector('.content-sticky-heading-row h1'));
+
   info.stickySubheadingRows =
     info.stickyContainers
       .map(el => el.querySelector('.content-sticky-subheading-row'));
@@ -55,7 +65,7 @@ export function getPageReferences() {
 
   info.contentContainers =
     info.stickyContainers
-      .map(el => el.parentElement);
+      .map(el => el.closest('.content-sticky-heading-root').parentElement);
 
   info.contentCovers =
     info.contentContainers
@@ -68,6 +78,14 @@ export function getPageReferences() {
   info.contentHeadings =
     info.contentContainers
       .map(el => Array.from(el.querySelectorAll('.content-heading')));
+
+  info.imaginaryStaticHeadings =
+    info.contentContainers
+      .map(el => el.querySelector('.imaginary-static-heading-root'));
+
+  info.referenceCollapsedHeading =
+    info.stickyHeadings
+      .map(el => el.querySelector('.reference-collapsed-heading'));
 }
 
 export function mutatePageContent() {
@@ -137,15 +155,61 @@ function topOfViewInside(el, scroll = window.scrollY) {
     scroll < el.offsetTop + el.offsetHeight);
 }
 
+function updateStuckStatus(index) {
+  const {event} = info;
+
+  const contentContainer = info.contentContainers[index];
+  const stickyContainer = info.stickyContainers[index];
+
+  const wasStuck = stickyContainer.classList.contains('stuck');
+  const stuck = topOfViewInside(contentContainer);
+
+  if (stuck === wasStuck) return;
+
+  if (stuck) {
+    stickyContainer.classList.add('stuck');
+  } else {
+    stickyContainer.classList.remove('stuck');
+  }
+
+  dispatchInternalEvent(event, 'whenStuckStatusChanges', index, stuck);
+}
+
+function updateCollapseStatus(index) {
+  const stickyContainer = info.stickyContainers[index];
+  const stickyHeading = info.stickyHeadings[index];
+  const imaginaryStaticHeading = info.imaginaryStaticHeadings[index];
+  const referenceCollapsedHeading = info.referenceCollapsedHeading[index];
+
+  const {height: uncollapsedHeight} = stickyHeading.getBoundingClientRect();
+  const {height: collapsedHeight} = referenceCollapsedHeading.getBoundingClientRect();
+
+  if (
+    imaginaryStaticHeading.getBoundingClientRect().bottom < 4 ||
+    imaginaryStaticHeading.getBoundingClientRect().top < -80
+  ) {
+    if (!stickyContainer.classList.contains('collapse')) {
+      stickyContainer.classList.add('collapse');
+      cssProp(stickyContainer, '--uncollapsed-heading-height', uncollapsedHeight + 'px');
+      cssProp(stickyContainer, '--collapsed-heading-height', collapsedHeight + 'px');
+    }
+  } else {
+    stickyContainer.classList.remove('collapse');
+  }
+}
+
 function updateStickyCoverVisibility(index) {
   const stickyCoverContainer = info.stickyCoverContainers[index];
+  const stickyContainer = info.stickyContainers[index];
   const contentCover = info.contentCovers[index];
 
   if (contentCover && stickyCoverContainer) {
     if (contentCover.getBoundingClientRect().bottom < 4) {
       stickyCoverContainer.classList.add('visible');
+      stickyContainer.classList.add('cover-visible');
     } else {
       stickyCoverContainer.classList.remove('visible');
+      stickyContainer.classList.remove('cover-visible');
     }
   }
 }
@@ -167,10 +231,20 @@ function getContentHeadingClosestToStickySubheading(index) {
   const stickyContainer = info.stickyContainers[index];
   const stickyRect = stickyContainer.getBoundingClientRect();
 
-  // TODO: Should this compute with the subheading row instead of h2?
+  // Subheadings only appear when the sticky heading is collapsed,
+  // so the used bottom edge should always be *as though* it's only
+  // displaying one line of text. Subtract the current discrepancy.
+  const stickyHeading = info.stickyHeadings[index];
+  const correctBottomEdge =
+    stickyHeading.getBoundingClientRect().height -
+    parseFloat(getComputedStyle(stickyHeading).fontSize);
+
   const subheadingRect = stickySubheading.getBoundingClientRect();
 
-  const stickyBottom = stickyRect.bottom + subheadingRect.height;
+  const stickyBottom =
+    (stickyRect.bottom
+   + subheadingRect.height
+   - correctBottomEdge);
 
   // Iterate from bottom to top of the content area.
   const contentHeadings = info.contentHeadings[index];
@@ -187,7 +261,12 @@ function getContentHeadingClosestToStickySubheading(index) {
 function updateStickySubheadingContent(index) {
   const {event, state} = info;
 
-  const closestHeading = getContentHeadingClosestToStickySubheading(index);
+  const stickyContainer = info.stickyContainers[index];
+
+  const closestHeading =
+    (stickyContainer.classList.contains('collapse')
+      ? getContentHeadingClosestToStickySubheading(index)
+      : null);
 
   if (state.displayedHeading === closestHeading) return;
 
@@ -233,6 +312,8 @@ function updateStickySubheadingContent(index) {
 }
 
 export function updateStickyHeadings(index) {
+  updateStuckStatus(index);
+  updateCollapseStatus(index);
   updateStickyCoverVisibility(index);
   updateStickySubheadingContent(index);
 }
