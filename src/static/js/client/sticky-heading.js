@@ -233,9 +233,10 @@ function getContentHeadingClosestToStickySubheading(index) {
   // so the used bottom edge should always be *as though* it's only
   // displaying one line of text. Subtract the current discrepancy.
   const stickyHeading = info.stickyHeadings[index];
+  const referenceCollapsedHeading = info.referenceCollapsedHeading[index];
   const correctBottomEdge =
     stickyHeading.getBoundingClientRect().height -
-    parseFloat(getComputedStyle(stickyHeading).fontSize);
+    referenceCollapsedHeading.getBoundingClientRect().height;
 
   const stickyBottom =
     (stickyRect.bottom
