@@ -2992,6 +2992,10 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   position: relative;
   margin: 0;
   padding-right: 20px;
+}
+
+.content-sticky-heading-row h1,
+.imaginary-static-heading-title {
   line-height: 1.4;
 }
 
