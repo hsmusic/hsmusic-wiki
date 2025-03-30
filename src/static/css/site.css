@@ -3015,8 +3015,12 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
     height: var(--uncollapsed-heading-height);
   }
 
-  to {
+  99.9% {
     height: var(--collapsed-heading-height);
+  }
+
+  to {
+    height: auto;
   }
 }
 
