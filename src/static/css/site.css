@@ -2992,6 +2992,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   position: relative;
   margin: 0;
   padding-right: 20px;
+  line-height: 1.4;
 }
 
 .content-sticky-heading-row h1 .reference-collapsed-heading {
