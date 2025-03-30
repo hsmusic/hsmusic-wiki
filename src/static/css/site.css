@@ -3083,6 +3083,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 }
 
 .content-sticky-subheading-row {
+  position: absolute;
   width: 100%;
   box-sizing: border-box;
   padding: 10px 20px 5px 20px;
