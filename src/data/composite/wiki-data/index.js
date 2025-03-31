@@ -12,6 +12,7 @@ export {default as inputSoupyFind} from './inputSoupyFind.js';
 export {default as inputSoupyReverse} from './inputSoupyReverse.js';
 export {default as inputWikiData} from './inputWikiData.js';
 export {default as withClonedThings} from './withClonedThings.js';
+export {default as withConstitutedArtwork} from './withConstitutedArtwork.js';
 export {default as withContributionListSums} from './withContributionListSums.js';
 export {default as withCoverArtDate} from './withCoverArtDate.js';
 export {default as withDirectory} from './withDirectory.js';

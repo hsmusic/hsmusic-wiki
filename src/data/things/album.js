@@ -15,6 +15,7 @@ import {
   parseAdditionalFiles,
   parseAdditionalNames,
   parseAnnotatedReferences,
+  parseArtwork,
   parseContributors,
   parseDate,
   parseDimensions,
@@ -34,6 +35,7 @@ import {
   commentary,
   color,
   commentatorArtists,
+  constitutibleArtwork,
   contentString,
   contribsPresent,
   contributionList,
@@ -156,6 +158,12 @@ export class Album extends Thing {
       exitWithoutContribs({contribs: 'bannerArtistContribs'}),
       dimensions(),
     ],
+
+    coverArtwork: constitutibleArtwork({
+      contribs: 'coverArtistContribs',
+      date: 'coverArtDate',
+      artistProperty: input.value('albumCoverArtistContributions'),
+    }),
 
     hasTrackNumbers: flag(true),
     isListedOnHomepage: flag(true),
@@ -459,6 +467,16 @@ export class Album extends Thing {
       'Listed on Homepage': {property: 'isListedOnHomepage'},
       'Listed in Galleries': {property: 'isListedInGalleries'},
 
+      'Cover Artwork': {
+        property: 'coverArtwork',
+        transform:
+          parseArtwork({
+            dateFromThingProperty: 'coverArtDate',
+            artistContribsFromThingProperty: 'coverArtistContribs',
+            artistContribsArtistProperty: 'albumCoverArtistContributions',
+          }),
+      },
+
       'Cover Art Date': {
         property: 'coverArtDate',
         transform: parseDate,
@@ -585,6 +603,7 @@ export class Album extends Thing {
       const albumData = [];
       const trackSectionData = [];
       const trackData = [];
+      const artworkData = [];
 
       for (const {header: album, entries} of results) {
         const trackSections = [];
@@ -625,6 +644,10 @@ export class Album extends Thing {
           currentTrackSectionTracks.push(entry);
           trackData.push(entry);
 
+          if (entry.trackArtwork) {
+            artworkData.push(entry.trackArtwork);
+          }
+
           entry.dataSourceAlbum = albumRef;
         }
 
@@ -635,7 +658,12 @@ export class Album extends Thing {
         album.trackSections = trackSections;
       }
 
-      return {albumData, trackSectionData, trackData};
+      return {
+        albumData,
+        trackSectionData,
+        trackData,
+        artworkData,
+      };
     },
 
     sort({albumData, trackData}) {

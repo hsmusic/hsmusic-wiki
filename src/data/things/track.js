@@ -11,6 +11,7 @@ import {
   parseAdditionalFiles,
   parseAdditionalNames,
   parseAnnotatedReferences,
+  parseArtwork,
   parseContributors,
   parseDate,
   parseDimensions,
@@ -38,6 +39,7 @@ import {
   additionalNameList,
   commentary,
   commentatorArtists,
+  constitutibleArtwork,
   contentString,
   contributionList,
   dimensions,
@@ -83,6 +85,7 @@ export class Track extends Thing {
   static [Thing.getPropertyDescriptors] = ({
     Album,
     ArtTag,
+    Artwork,
     Flash,
     TrackSection,
     WikiInfo,
@@ -338,12 +341,11 @@ export class Track extends Thing {
       }),
     ],
 
-    trackArtwork: [
-      constitutibleArtwork({
-        contribs: 'coverArtistContribs',
-        date: 'coverArtDate',
-      }),
-    ],
+    trackArtwork: constitutibleArtwork({
+      contribs: 'coverArtistContribs',
+      date: 'coverArtDate',
+      artistProperty: input.value('trackCoverArtistContributions'),
+    }),
 
     artTags: [
       exitWithoutUniqueCoverArt({
@@ -568,6 +570,16 @@ export class Track extends Thing {
       'Cover Artists': {
         property: 'coverArtistContribs',
         transform: parseContributors,
+      },
+
+      'Track Artwork': {
+        property: 'trackArtwork',
+        transform:
+          parseArtwork({
+            dateFromThingProperty: 'coverArtDate',
+            artistContribsFromThingProperty: 'coverArtistContribs',
+            artistContribsArtistProperty: 'trackCoverArtistContributions',
+          }),
       },
 
       'Art Tags': {property: 'artTags'},

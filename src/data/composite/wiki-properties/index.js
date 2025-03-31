@@ -9,6 +9,7 @@ export {default as annotatedReferenceList} from './annotatedReferenceList.js';
 export {default as color} from './color.js';
 export {default as commentary} from './commentary.js';
 export {default as commentatorArtists} from './commentatorArtists.js';
+export {default as constitutibleArtwork} from './constitutibleArtwork.js';
 export {default as contentString} from './contentString.js';
 export {default as contribsPresent} from './contribsPresent.js';
 export {default as contributionList} from './contributionList.js';

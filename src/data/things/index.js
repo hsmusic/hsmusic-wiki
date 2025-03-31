@@ -12,6 +12,7 @@ import Thing from '#thing';
 import * as albumClasses from './album.js';
 import * as artTagClasses from './art-tag.js';
 import * as artistClasses from './artist.js';
+import * as artworkClasses from './artwork.js';
 import * as contributionClasses from './contribution.js';
 import * as flashClasses from './flash.js';
 import * as groupClasses from './group.js';
@@ -27,6 +28,7 @@ const allClassLists = {
   'album.js': albumClasses,
   'art-tag.js': artTagClasses,
   'artist.js': artistClasses,
+  'artwork.js': artworkClasses,
   'contribution.js': contributionClasses,
   'flash.js': flashClasses,
   'group.js': groupClasses,

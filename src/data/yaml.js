@@ -733,6 +733,22 @@ export function parseAnnotatedReferences(entries, {
   });
 }
 
+export function parseArtwork({
+  dateFromThingProperty,
+  artistContribsFromThingProperty,
+  artistContribsArtistProperty,
+}) {
+  return (entry, {subdoc, Artwork}) =>
+    subdoc(Artwork, entry, {
+      bindInto: 'thing',
+      provide: {
+        dateFromThingProperty,
+        artistContribsFromThingProperty,
+        artistContribsArtistProperty,
+      },
+    });
+}
+
 // documentModes: Symbols indicating sets of behavior for loading and processing
 // data files.
 export const documentModes = {
@@ -1406,6 +1422,8 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
     ['artTagData', [/* reverse */]],
 
     ['artistData', [/* find, reverse */]],
+
+    ['artworkData', [/* find */]],
 
     ['flashData', [
       'wikiInfo',
