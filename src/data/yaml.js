@@ -13,6 +13,7 @@ import Thing from '#thing';
 import thingConstructors from '#things';
 
 import {
+  aggregateThrows,
   annotateErrorWithFile,
   decorateErrorWithIndex,
   decorateErrorWithAnnotation,
@@ -88,6 +89,10 @@ function makeProcessDocument(thingConstructor, {
   // A or B.
   //
   invalidFieldCombinations = [],
+
+  // Bouncing function used to process subdocuments: this is a function which
+  // in turn calls the appropriate *result of* makeProcessDocument.
+  processDocument: bouncer,
 }) {
   if (!thingConstructor) {
     throw new Error(`Missing Thing class`);
@@ -95,6 +100,10 @@ function makeProcessDocument(thingConstructor, {
 
   if (!fieldSpecs) {
     throw new Error(`Expected fields to be provided`);
+  }
+
+  if (!bouncer) {
+    throw new Error(`Missing processDocument bouncer`);
   }
 
   const knownFields = Object.keys(fieldSpecs);
@@ -144,6 +153,7 @@ function makeProcessDocument(thingConstructor, {
         : `document`);
 
     const aggregate = openAggregate({
+      ...aggregateThrows(ProcessDocumentError),
       message: `Errors processing ${constructorPart}` + namePart,
     });
 
@@ -194,13 +204,31 @@ function makeProcessDocument(thingConstructor, {
 
     const fieldValues = {};
 
+    const subdocSymbol = Symbol('subdoc');
+    const subdocSetups = {};
+
+    const transformUtilities = {
+      ...thingConstructors,
+
+      subdoc(documentType, data) {
+        if (!documentType)
+          throw new Error(`Expected document type, got ${typeAppearance(documentType)}`);
+        if (!data)
+          throw new Error(`Expected data, got ${typeAppearance(data)}`);
+        if (typeof data !== 'object' || data === null)
+          throw new Error(`Expected data to be an object, got ${data}`);
+
+        return {[subdocSymbol]: {documentType, data}};
+      },
+    };
+
     for (const [field, documentValue] of documentEntries) {
       if (skippedFields.has(field)) continue;
 
       // This variable would like to certify itself as "not into capitalism".
       let propertyValue =
         (fieldSpecs[field].transform
-          ? fieldSpecs[field].transform(documentValue)
+          ? fieldSpecs[field].transform(documentValue, transformUtilities)
           : documentValue);
 
       // Completely blank items in a YAML list are read as null.
@@ -223,7 +251,42 @@ function makeProcessDocument(thingConstructor, {
         }
       }
 
+      if (
+        typeof propertyValue === 'object' &&
+        propertyValue !== null &&
+        Object.hasOwn(propertyValue, subdocSymbol)
+      ) {
+        subdocSetups[field] = propertyValue[subdocSymbol];
+        continue;
+      }
+
       fieldValues[field] = propertyValue;
+    }
+
+    const subdocErrors = [];
+    for (const [field, setup] of Object.entries(subdocSetups)) {
+      let subthing;
+      try {
+        const result = bouncer(setup.data, setup.documentType);
+        subthing = result.thing;
+        result.aggregate.close();
+      } catch (caughtError) {
+        if (!subthing) {
+          skippedFields.add(field);
+        }
+
+        subdocErrors.push(new SubdocError(
+          field, setup, {cause: caughtError}));
+      }
+
+      if (subthing) {
+        fieldValues[field] = subthing;
+      }
+    }
+
+    if (!empty(subdocErrors)) {
+      aggregate.push(new SubdocAggregateError(
+        subdocErrors, thingConstructor));
     }
 
     const thing = Reflect.construct(thingConstructor, []);
@@ -259,6 +322,8 @@ function makeProcessDocument(thingConstructor, {
     return {thing, aggregate};
   });
 }
+
+export class ProcessDocumentError extends AggregateError {}
 
 export class UnknownFieldsError extends Error {
   constructor(fields) {
@@ -350,6 +415,37 @@ export class SkippedFieldsSummaryError extends Error {
       colors.bright(colors.yellow(`Altogether, skipped ${numFieldsText}:\n`)) +
       lines.join('\n') + '\n' +
       colors.bright(colors.yellow(`See above errors for details.`)));
+  }
+}
+
+export class SubdocError extends Error {
+  constructor(field, setup, options) {
+    const fieldText =
+      colors.green(`"${field}"`);
+
+    const constructorText =
+      setup.documentType.name;
+
+    if (options.cause instanceof ProcessDocumentError) {
+      options.cause[Symbol.for('hsmusic.aggregate.translucent')] = true;
+    }
+
+    super(
+      `Errors processing ${constructorText} for ${fieldText} field`,
+      options);
+  }
+}
+
+export class SubdocAggregateError extends AggregateError {
+  [Symbol.for('hsmusic.aggregate.translucent')] = true;
+
+  constructor(errors, thingConstructor) {
+    const constructorText =
+      colors.green(thingConstructor.name);
+
+    super(
+      errors,
+      `Errors processing subdocuments for ${constructorText}`);
   }
 }
 
@@ -899,7 +995,7 @@ export function processThingsFromDataStep(documents, dataStep) {
         throw new Error(`Class "${thingClass.name}" doesn't specify Thing.yamlDocumentSpec`);
       }
 
-      fn = makeProcessDocument(thingClass, spec);
+      fn = makeProcessDocument(thingClass, {...spec, processDocument});
       submap.set(thingClass, fn);
     }
 
