@@ -14,7 +14,7 @@ export default class CacheableObject {
   static cacheValid = Symbol.for('CacheableObject.cacheValid');
   static updateValue = Symbol.for('CacheableObject.updateValues');
 
-  constructor() {
+  constructor({seal = true} = {}) {
     this[CacheableObject.updateValue] = Object.create(null);
     this[CacheableObject.cachedValue] = Object.create(null);
     this[CacheableObject.cacheValid] = Object.create(null);
@@ -33,6 +33,10 @@ export default class CacheableObject {
       } else {
         this[property] = null;
       }
+    }
+
+    if (seal) {
+      Object.seal(this);
     }
   }
 

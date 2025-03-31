@@ -25,6 +25,10 @@ export default class Thing extends CacheableObject {
   static yamlSourceDocument = Symbol.for('Thing.yamlSourceDocument');
   static yamlSourceDocumentPlacement = Symbol.for('Thing.yamlSourceDocumentPlacement');
 
+  [Symbol.for('Thing.yamlSourceFilename')] = null;
+  [Symbol.for('Thing.yamlSourceDocument')] = null;
+  [Symbol.for('Thing.yamlSourceDocumentPlacement')] = null;
+
   static isThingConstructor = Symbol.for('Thing.isThingConstructor');
   static isThing = Symbol.for('Thing.isThing');
 
@@ -33,11 +37,13 @@ export default class Thing extends CacheableObject {
   static [Symbol.for('Thing.isThingConstructor')] = NaN;
 
   constructor() {
-    super();
+    super({seal: false});
 
     // To detect:
     // Object.hasOwn(object, Symbol.for('Thing.isThing'))
     this[Symbol.for('Thing.isThing')] = NaN;
+
+    Object.seal(this);
   }
 
   static [Symbol.for('Thing.selectAll')] = _wikiData => [];
