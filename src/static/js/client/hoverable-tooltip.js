@@ -576,6 +576,17 @@ export function showTooltipFromHoverable(hoverable) {
 
   hoverable.classList.add('has-visible-tooltip');
 
+  const isolator =
+    hoverable.closest('.isolate-tooltip-z-indexing > *');
+
+  if (isolator) {
+    for (const child of isolator.parentElement.children) {
+      cssProp(child, 'z-index', null);
+    }
+
+    cssProp(isolator, 'z-index', '1');
+  }
+
   positionTooltipFromHoverableWithBrains(hoverable);
 
   cssProp(tooltip, 'display', 'block');

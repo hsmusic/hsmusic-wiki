@@ -329,6 +329,8 @@ export default {
 
           html.tag('div', {id: 'cover-art-column'},
             {[html.onlyIfContent]: true},
+            {class: 'isolate-tooltip-z-indexing'},
+
             slots.coverColumnContent),
 
           subtitleHTML,

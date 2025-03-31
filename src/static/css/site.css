@@ -1096,6 +1096,11 @@ a .normal-content {
   text-decoration: none !important;
 }
 
+.isolate-tooltip-z-indexing > * {
+  position: relative;
+  z-index: -1;
+}
+
 .tooltip {
   position: absolute;
   z-index: 3;
