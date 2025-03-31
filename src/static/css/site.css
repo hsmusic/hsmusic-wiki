@@ -1096,17 +1096,27 @@ a .normal-content {
   text-decoration: none !important;
 }
 
+.text-with-tooltip.wiki-edits > .hoverable {
+  white-space: nowrap;
+}
+
 .isolate-tooltip-z-indexing > * {
   position: relative;
   z-index: -1;
 }
 
 .tooltip {
+  font-size: 1rem;
   position: absolute;
   z-index: 3;
   left: -10px;
   top: calc(1em + 1px);
   display: none;
+}
+
+.cover-artwork .tooltip,
+#sidebar .tooltip {
+  font-size: 0.9rem;
 }
 
 li:not(:first-child:last-child) .tooltip,
@@ -1154,7 +1164,8 @@ li:not(:first-child:last-child) .tooltip,
   left: -6px !important;
 }
 
-.wiki-edits-tooltip {
+.thing-name-tooltip .tooltip-content,
+.wiki-edits-tooltip .tooltip-content {
   font-size: 0.85em;
 }
 
