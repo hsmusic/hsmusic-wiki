@@ -1006,6 +1006,14 @@ export function getTooltipBaselineOpportunityAreas(tooltip) {
   return results;
 }
 
+export function mutatePageContent() {
+  for (const isolatorRoot of document.querySelectorAll('.isolate-tooltip-z-indexing')) {
+    if (isolatorRoot.firstElementChild) {
+      cssProp(isolatorRoot.firstElementChild, 'z-index', '1');
+    }
+  }
+}
+
 export function addPageListeners() {
   const {state} = info;
 
