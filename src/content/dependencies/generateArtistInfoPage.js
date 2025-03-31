@@ -11,6 +11,7 @@ export default {
     'generateContentHeading',
     'generateCoverArtwork',
     'generatePageLayout',
+    'image',
     'linkArtistGallery',
     'linkExternal',
     'linkGroup',
@@ -71,6 +72,11 @@ export default {
     cover:
       (artist.hasAvatar
         ? relation('generateCoverArtwork', [], [])
+        : null),
+
+    image:
+      (artist.hasAvatar
+        ? relation('image')
         : null),
 
     contentHeading:
@@ -153,11 +159,14 @@ export default {
         cover:
           (relations.cover
             ? relations.cover.slots({
-                path: [
-                  'media.artistAvatar',
-                  data.directory,
-                  data.avatarFileExtension,
-                ],
+                image:
+                  relations.image.slots({
+                    path: [
+                      'media.artistAvatar',
+                      data.directory,
+                      data.avatarFileExtension,
+                    ],
+                  }),
               })
             : null),
 
