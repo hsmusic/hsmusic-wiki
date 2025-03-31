@@ -214,6 +214,7 @@ function makeProcessDocument(thingConstructor, {
 
       subdoc(documentType, data, {
         bindInto = null,
+        provide = null,
       } = {}) {
         if (!documentType)
           throw new Error(`Expected document type, got ${typeAppearance(documentType)}`);
@@ -223,12 +224,15 @@ function makeProcessDocument(thingConstructor, {
           throw new Error(`Expected data to be an object, got ${typeAppearance(data)}`);
         if (typeof bindInto !== 'string' && bindInto !== null)
           throw new Error(`Expected bindInto to be a string, got ${typeAppearance(bindInto)}`);
+        if (typeof provide !== 'object' && provide !== null)
+          throw new Error(`Expected provide to be an object, got ${typeAppearance(provide)}`);
 
         return {
           [subdocSymbol]: {
             documentType,
             data,
             bindInto,
+            provide,
           },
         };
       },
@@ -293,6 +297,10 @@ function makeProcessDocument(thingConstructor, {
 
       if (setup.bindInto) {
         subthing[setup.bindInto] = thing;
+      }
+
+      if (setup.provide) {
+        Object.assign(subthing, setup.provide);
       }
 
       if (subthing) {
