@@ -37,7 +37,6 @@ export default {
 
     if (
       track.hasUniqueCoverArt &&
-      track.coverArtDate &&
       +track.coverArtDate !== +track.date
     ) {
       data.coverArtDate = track.coverArtDate;

@@ -105,7 +105,7 @@ export class ArtTag extends Thing {
               ...reverse.albumsWhoseArtworksFeature(artTag),
               ...reverse.tracksWhoseArtworksFeature(artTag),
             ],
-            {getDate: thing => thing.coverArtDate ?? thing.date}),
+            {getDate: thing => thing.coverArtDate}),
       },
     },
 

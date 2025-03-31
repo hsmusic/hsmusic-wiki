@@ -283,9 +283,7 @@ export class Track extends Thing {
         value: input.value([]),
       }),
 
-      withTrackArtDate({
-        fallback: input.value(true),
-      }),
+      withTrackArtDate(),
 
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
@@ -340,6 +338,13 @@ export class Track extends Thing {
       }),
     ],
 
+    trackArtwork: [
+      constitutibleArtwork({
+        contribs: 'coverArtistContribs',
+        date: 'coverArtDate',
+      }),
+    ],
+
     artTags: [
       exitWithoutUniqueCoverArt({
         value: input.value([]),
@@ -356,9 +361,7 @@ export class Track extends Thing {
         value: input.value([]),
       }),
 
-      withTrackArtDate({
-        fallback: input.value(true),
-      }),
+      withTrackArtDate(),
 
       referencedArtworkList({
         date: '#trackArtDate',

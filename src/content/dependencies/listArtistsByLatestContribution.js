@@ -98,13 +98,16 @@ export default {
       ])) {
         // Might combine later with 'track' of the same album and date.
         considerDate(artist, album.coverArtDate ?? album.date, album, 'artwork');
+        // '?? album.date' is kept here because wallpaper and banner may
+        // technically be present for an album w/o cover art, therefore
+        // also no cover art date.
       }
     }
 
     for (const track of tracksLatestFirst) {
       for (const artist of getArtists(track, 'coverArtistContribs')) {
         // No special effect if artist already has 'artwork' for the same album and date.
-        considerDate(artist, track.coverArtDate ?? track.date, track.album, 'artwork');
+        considerDate(artist, track.coverArtDate, track.album, 'artwork');
       }
 
       for (const artist of new Set([

@@ -104,16 +104,10 @@ export class Album extends Thing {
     dateAddedToWiki: simpleDate(),
 
     coverArtDate: [
-      // ~~TODO: Why does this fall back, but Track.coverArtDate doesn't?~~
-      // TODO: OK so it's because tracks don't *store* dates just like that.
-      // Really instead of fallback being a flag, it should be a date value,
-      // if this option is worth existing at all.
       withCoverArtDate({
         from: input.updateValue({
           validate: isDate,
         }),
-
-        fallback: input.value(true),
       }),
 
       exposeDependency({dependency: '#coverArtDate'}),
@@ -181,9 +175,7 @@ export class Album extends Thing {
     }),
 
     coverArtistContribs: [
-      withCoverArtDate({
-        fallback: input.value(true),
-      }),
+      withCoverArtDate(),
 
       contributionList({
         date: '#coverArtDate',
@@ -202,9 +194,7 @@ export class Album extends Thing {
     }),
 
     wallpaperArtistContribs: [
-      withCoverArtDate({
-        fallback: input.value(true),
-      }),
+      withCoverArtDate(),
 
       contributionList({
         date: '#coverArtDate',
@@ -213,9 +203,7 @@ export class Album extends Thing {
     ],
 
     bannerArtistContribs: [
-      withCoverArtDate({
-        fallback: input.value(true),
-      }),
+      withCoverArtDate(),
 
       contributionList({
         date: '#coverArtDate',

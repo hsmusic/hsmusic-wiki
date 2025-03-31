@@ -24,7 +24,7 @@ export default {
 
     sortAlbumsTracksChronologically(things, {
       latestFirst: true,
-      getDate: thing => thing.coverArtDate ?? thing.date,
+      getDate: thing => thing.coverArtDate,
     });
 
     return {things};

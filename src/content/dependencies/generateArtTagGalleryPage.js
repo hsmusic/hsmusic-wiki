@@ -31,7 +31,7 @@ export default {
     const allThings = unique([...directThings, ...indirectThings]);
 
     sortAlbumsTracksChronologically(allThings, {
-      getDate: thing => thing.coverArtDate ?? thing.date,
+      getDate: thing => thing.coverArtDate,
       latestFirst: true,
     });
 

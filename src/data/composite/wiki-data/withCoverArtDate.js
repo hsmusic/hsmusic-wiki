@@ -1,7 +1,3 @@
-// Gets the current thing's coverArtDate, or, if the 'fallback' option is set,
-// the thing's date. This is always null if the thing doesn't actually have
-// any coverArtistContribs.
-
 import {input, templateCompositeFrom} from '#composite';
 import {isDate} from '#validators';
 
@@ -17,11 +13,6 @@ export default templateCompositeFrom({
       validate: isDate,
       defaultDependency: 'coverArtDate',
       acceptsNull: true,
-    }),
-
-    fallback: input({
-      type: 'boolean',
-      defaultValue: false,
     }),
   },
 
@@ -50,21 +41,11 @@ export default templateCompositeFrom({
     },
 
     {
-      dependencies: [input('fallback')],
-      compute: (continuation, {
-        [input('fallback')]: fallback,
-      }) =>
-        (fallback
-          ? continuation()
-          : continuation.raiseOutput({'#coverArtDate': null})),
-    },
-
-    {
       dependencies: ['date'],
       compute: (continuation, {date}) =>
         (date
-          ? continuation.raiseOutput({'#coverArtDate': date})
-          : continuation.raiseOutput({'#coverArtDate': null})),
+          ? continuation({'#coverArtDate': date})
+          : continuation({'#coverArtDate': null})),
     },
   ],
 });
