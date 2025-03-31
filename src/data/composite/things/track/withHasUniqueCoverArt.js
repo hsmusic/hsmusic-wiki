@@ -9,6 +9,8 @@
 import {input, templateCompositeFrom} from '#composite';
 import {empty} from '#sugar';
 
+import {raiseOutputWithoutDependency} from '#composite/control-flow';
+import {withPropertyFromObject} from '#composite/data';
 import {withResolvedContribs} from '#composite/wiki-data';
 
 import withPropertyFromAlbum from './withPropertyFromAlbum.js';
@@ -55,9 +57,39 @@ export default templateCompositeFrom({
       compute: (continuation, {
         ['#album.trackCoverArtistContribs']: contribsFromAlbum,
       }) =>
-        continuation.raiseOutput({
+        (empty(contribsFromAlbum)
+          ? continuation()
+          : continuation.raiseOutput({
+              ['#hasUniqueCoverArt']:
+                !empty(contribsFromAlbum),
+            })),
+    },
+
+    withPropertyFromObject({
+      object: 'trackArtwork',
+      property: input.value('artistContribs'),
+      internal: input.value(true),
+    }),
+
+    raiseOutputWithoutDependency({
+      dependency: '#trackArtwork.artistContribs',
+      mode: input.value('empty'),
+      output: input.value({'#hasUniqueCoverArt': false}),
+    }),
+
+    withResolvedContribs({
+      from: '#trackArtwork.artistContribs',
+      date: input.value(null),
+    }),
+
+    {
+      dependencies: ['#resolvedContribs'],
+      compute: (continuation, {
+        ['#resolvedContribs']: contribsFromArtwork,
+      }) =>
+        continuation({
           ['#hasUniqueCoverArt']:
-            !empty(contribsFromAlbum),
+            !empty(contribsFromArtwork),
         }),
     },
   ],
