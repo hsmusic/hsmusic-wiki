@@ -14,11 +14,6 @@ export default {
     relations.artistContributionLinks =
       relation('generateReleaseInfoContributionsLine', track.artistContribs);
 
-    if (track.hasUniqueCoverArt) {
-      relations.coverArtistContributionsLine =
-        relation('generateReleaseInfoContributionsLine', track.coverArtistContribs);
-    }
-
     if (!empty(track.urls)) {
       relations.externalLinks =
         track.urls.map(url =>
@@ -59,19 +54,9 @@ export default {
               chronologyKind: 'track',
             }),
 
-            relations.coverArtistContributionsLine?.slots({
-              stringKey: capsule + '.coverArtBy',
-              chronologyKind: 'trackArt',
-            }),
-
             language.$(capsule, 'released', {
               [language.onlyIfOptions]: ['date'],
               date: language.formatDate(data.date),
-            }),
-
-            language.$(capsule, 'artReleased', {
-              [language.onlyIfOptions]: ['date'],
-              date: language.formatDate(data.coverArtDate),
             }),
 
             language.$(capsule, 'duration', {

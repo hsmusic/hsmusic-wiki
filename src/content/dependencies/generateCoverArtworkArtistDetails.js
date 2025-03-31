@@ -2,9 +2,9 @@ export default {
   contentDependencies: ['linkArtistGallery'],
   extraDependencies: ['html', 'language'],
 
-  relations: (relation, contributions) => ({
+  relations: (relation, artwork) => ({
     artistLinks:
-      contributions
+      artwork.artistContribs
         .map(contrib => contrib.artist)
         .map(artist =>
           relation('linkArtistGallery', artist)),

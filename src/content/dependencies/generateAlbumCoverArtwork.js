@@ -3,6 +3,7 @@ export default {
     'generateCoverArtwork',
     'generateCoverArtworkArtTagDetails',
     'generateCoverArtworkArtistDetails',
+    'generateCoverArtworkOriginDetails',
     'generateCoverArtworkReferenceDetails',
     'image',
     'linkAlbumReferencedArtworks',
@@ -18,11 +19,14 @@ export default {
     image:
       relation('image'),
 
+    originDetails:
+      relation('generateCoverArtworkOriginDetails', album.coverArtwork),
+
     artTagDetails:
-      relation('generateCoverArtworkArtTagDetails', album.artTags),
+      relation('generateCoverArtworkArtTagDetails', album.coverArtwork),
 
     artistDetails:
-      relation('generateCoverArtworkArtistDetails', album.coverArtistContribs),
+      relation('generateCoverArtworkArtistDetails', album.coverArtwork),
 
     referenceDetails:
       relation('generateCoverArtworkReferenceDetails',
@@ -60,6 +64,11 @@ export default {
       default: 'tags',
     },
 
+    showOriginDetails: {
+      type: 'boolean',
+      default: false,
+    },
+
     showReferenceLinks: {
       type: 'boolean',
       default: false,
@@ -81,6 +90,9 @@ export default {
       warnings: data.warnings,
 
       details: [
+        slots.showOriginDetails &&
+          relations.originDetails,
+
         slots.details === 'tags' &&
           relations.artTagDetails,
 

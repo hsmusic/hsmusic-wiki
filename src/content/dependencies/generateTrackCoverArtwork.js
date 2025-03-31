@@ -3,6 +3,7 @@ export default {
     'generateCoverArtwork',
     'generateCoverArtworkArtTagDetails',
     'generateCoverArtworkArtistDetails',
+    'generateCoverArtworkOriginDetails',
     'generateCoverArtworkReferenceDetails',
     'image',
     'linkAlbum',
@@ -15,13 +16,10 @@ export default {
   query: (track) => ({
     artTags:
       (track.hasUniqueCoverArt
-        ? track.artTags
-        : track.album.artTags),
-
-    coverArtistContribs:
-      (track.hasUniqueCoverArt
-        ? track.coverArtistContribs
-        : track.album.coverArtistContribs),
+        ? track.trackArtwork.artTags
+     : track.album.hasCoverArt
+        ? track.album.coverArtwork.artTags
+        : []),
   }),
 
   relations: (relation, query, track) => ({
@@ -31,13 +29,14 @@ export default {
     image:
       relation('image'),
 
+    originDetails:
+      relation('generateCoverArtworkOriginDetails', track.trackArtwork),
+
     artTagDetails:
-      relation('generateCoverArtworkArtTagDetails',
-        query.artTags),
+      relation('generateCoverArtworkArtTagDetails', track.trackArtwork),
 
     artistDetails:
-      relation('generateCoverArtworkArtistDetails',
-        query.coverArtistContribs),
+      relation('generateCoverArtworkArtistDetails', track.trackArtwork),
 
     referenceDetails:
       relation('generateCoverArtworkReferenceDetails',
@@ -85,6 +84,11 @@ export default {
       default: 'tags',
     },
 
+    showOriginDetails: {
+      type: 'boolean',
+      default: false,
+    },
+
     showReferenceLinks: {
       type: 'boolean',
       default: false,
@@ -111,6 +115,9 @@ export default {
       warnings: data.warnings,
 
       details: [
+        slots.showOriginDetails &&
+          relations.originDetails,
+
         slots.details === 'tags' &&
           relations.artTagDetails,
 
@@ -131,7 +138,7 @@ export default {
           html.tag('p', {class: 'image-details'},
             {class: 'non-unique-details'},
 
-            language.$('misc.trackArtFromAlbum', {
+            language.$('misc.coverArtwork.trackArtFromAlbum', {
               album:
                 relations.albumLink.slots({
                   color: false,

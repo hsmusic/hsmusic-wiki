@@ -1480,6 +1480,10 @@ hr.cute,
   margin-bottom: 2px;
 }
 
+ul.image-details.art-tag-details {
+  padding-bottom: 0;
+}
+
 ul.image-details.art-tag-details li {
   display: inline-block;
 }
@@ -1495,6 +1499,10 @@ ul.image-details.art-tag-details li:not(:last-child)::after {
 p.image-details.illustrator-details {
   text-align: center;
   font-style: oblique;
+}
+
+p.image-details.origin-details {
+  margin-bottom: 2px;
 }
 
 p.content-heading:has(+ .commentary-entry-heading.dated) {

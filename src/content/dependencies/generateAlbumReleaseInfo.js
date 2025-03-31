@@ -14,9 +14,6 @@ export default {
     relations.artistContributionsLine =
       relation('generateReleaseInfoContributionsLine', album.artistContribs);
 
-    relations.coverArtistContributionsLine =
-      relation('generateReleaseInfoContributionsLine', album.coverArtistContribs);
-
     relations.wallpaperArtistContributionsLine =
       relation('generateReleaseInfoContributionsLine', album.wallpaperArtistContribs);
 
@@ -71,21 +68,6 @@ export default {
               stringKey: capsule + '.by',
               featuringStringKey: capsule + '.by.featuring',
               chronologyKind: 'album',
-            }),
-
-            relations.coverArtistContributionsLine.slots({
-              stringKey: capsule + '.coverArtBy',
-              chronologyKind: 'coverArt',
-            }),
-
-            relations.wallpaperArtistContributionsLine.slots({
-              stringKey: capsule + '.wallpaperArtBy',
-              chronologyKind: 'wallpaperArt',
-            }),
-
-            relations.bannerArtistContributionsLine.slots({
-              stringKey: capsule + '.bannerArtBy',
-              chronologyKind: 'bannerArt',
             }),
 
             language.$(capsule, 'released', {

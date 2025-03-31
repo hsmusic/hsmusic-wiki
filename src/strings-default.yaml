@@ -880,8 +880,6 @@ misc:
   socialEmbed:
     heading: "{WIKI_NAME} | {HEADING}"
 
-  trackArtFromAlbum: "Album cover for {ALBUM}"
-
   # jumpTo:
   #   Generic action displayed at the top of some longer pages, for
   #   quickly scrolling down to a particular section.
@@ -898,6 +896,16 @@ misc:
   contentWarnings:
     warnings: "{WARNINGS}"
     reveal: "click to show"
+
+  # coverArtwork:
+  #   Generic or particular strings for artworks outside a grid
+  #   context, when just one cover is being spotlighted.
+
+  coverArtwork:
+    artworkBy: "Artwork by {ARTISTS}"
+    released: "Released {DATE}"
+
+    trackArtFromAlbum: "Album cover for {ALBUM}"
 
   # coverGrid:
   #   Generic strings for various sorts of gallery grids, displayed

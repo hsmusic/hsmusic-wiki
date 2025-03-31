@@ -144,6 +144,7 @@ export default {
         cover:
           (relations.cover
             ? relations.cover.slots({
+                showOriginDetails: true,
                 showReferenceLinks: true,
                 showNonUniqueLine: true,
               })

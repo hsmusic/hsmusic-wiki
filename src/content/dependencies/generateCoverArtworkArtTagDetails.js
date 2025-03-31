@@ -4,19 +4,19 @@ export default {
   contentDependencies: ['linkArtTagGallery'],
   extraDependencies: ['html'],
 
-  query: (artTags) => ({
+  query: (artwork) => ({
     linkableArtTags:
-      artTags
+      artwork.artTags
         .filter(tag => !tag.isContentWarning),
   }),
 
-  relations: (relation, query, _artTags) => ({
+  relations: (relation, query, _artwork) => ({
     artTagLinks:
       query.linkableArtTags
         .map(tag => relation('linkArtTagGallery', tag)),
   }),
 
-  data: (query, _artTags) => {
+  data: (query, _artwork) => {
     const seenShortNames = new Set();
     const duplicateShortNames = new Set();
 
