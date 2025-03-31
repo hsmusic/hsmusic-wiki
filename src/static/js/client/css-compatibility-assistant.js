@@ -1,22 +1,30 @@
 /* eslint-env browser */
 
+import {stitchArrays} from '../../shared-util/sugar.js';
+
 export const info = {
   id: 'cssCompatibilityAssistantInfo',
 
-  coverArtContainer: null,
-  coverArtImageDetails: null,
+  coverArtworks: null,
+  coverArtworkImageDetails: null,
 };
 
 export function getPageReferences() {
-  info.coverArtContainer =
-    document.getElementById('cover-art-container');
+  info.coverArtworks =
+    Array.from(document.querySelectorAll('.cover-artwork'));
 
-  info.coverArtImageDetails =
-    info.coverArtContainer?.querySelector('.image-details');
+  info.coverArtworkImageDetails =
+    info.coverArtworks
+      .map(artwork => artwork.querySelector('.image-details'));
 }
 
 export function mutatePageContent() {
-  if (info.coverArtImageDetails) {
-    info.coverArtContainer.classList.add('has-image-details');
-  }
+  stitchArrays({
+    coverArtwork: info.coverArtworks,
+    imageDetails: info.coverArtworkImageDetails,
+  }).forEach(({coverArtwork, imageDetails}) => {
+      if (imageDetails) {
+        coverArtwork.classList.add('has-image-details');
+      }
+    });
 }
