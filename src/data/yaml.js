@@ -412,7 +412,7 @@ export class SkippedFieldsSummaryError extends Error {
         : `${entries.length} fields`);
 
     super(
-      colors.bright(colors.yellow(`Altogether, skipped ${numFieldsText}:\n`)) +
+      colors.bright(colors.yellow(`Altogether, skipped ${numFieldsText}:`)) + '\n' +
       lines.join('\n') + '\n' +
       colors.bright(colors.yellow(`See above errors for details.`)));
   }
