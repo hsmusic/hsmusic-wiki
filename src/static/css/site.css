@@ -1508,6 +1508,24 @@ p.image-details.origin-details {
   margin-bottom: 2px;
 }
 
+.album-art-info {
+  font-size: 0.8em;
+  border: 2px solid var(--deep-color);
+
+  margin: 10px min(15px, 1vw) 15px;
+
+  background: var(--bg-black-color);
+  padding: 6px;
+  border-radius: 5px;
+
+  -webkit-backdrop-filter: blur(3px);
+          backdrop-filter: blur(3px);
+}
+
+.album-art-info p {
+  margin: 0;
+}
+
 p.content-heading:has(+ .commentary-entry-heading.dated) {
   clear: right;
 }

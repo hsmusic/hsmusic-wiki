@@ -275,9 +275,8 @@ releaseInfo:
 
   from: "From {ALBUM}."
 
-  coverArtBy: "Cover art by {ARTISTS}."
-  wallpaperArtBy: "Wallpaper art by {ARTISTS}."
-  bannerArtBy: "Banner art by {ARTISTS}."
+  wallpaperArtBy: "Wallpaper by {ARTISTS}"
+  bannerArtBy: "Banner by {ARTISTS}"
 
   released: "Released {DATE}."
   albumReleased: "Album released {DATE}."

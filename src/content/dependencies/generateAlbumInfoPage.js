@@ -4,6 +4,7 @@ export default {
   contentDependencies: [
     'generateAdditionalNamesBox',
     'generateAlbumAdditionalFilesList',
+    'generateAlbumArtInfoBox',
     'generateAlbumBanner',
     'generateAlbumCoverArtwork',
     'generateAlbumNavAccent',
@@ -48,6 +49,9 @@ export default {
       (album.hasCoverArt
         ? relation('generateAlbumCoverArtwork', album)
         : null),
+
+    albumArtInfoBox:
+      relation('generateAlbumArtInfoBox', album),
 
     banner:
       (album.hasBannerArt
@@ -119,6 +123,9 @@ export default {
                 showReferenceLinks: true,
               })
             : null),
+
+          relations.albumArtInfoBox,
+        ],
 
         mainContent: [
           relations.releaseInfo,
