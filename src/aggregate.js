@@ -440,7 +440,15 @@ export function showAggregate(topError, {
       }
     }
 
-    return determineCauseHelper(cause.cause);
+    if (cause.cause) {
+      return determineCauseHelper(cause.cause);
+    }
+
+    if (cause.errors) {
+      return determineErrorsHelper(cause);
+    }
+
+    return cause;
   };
 
   const determineCause = error =>
@@ -478,7 +486,7 @@ export function showAggregate(topError, {
       : error.errors?.flatMap(determineErrorsHelper) ?? null);
 
   const flattenErrorStructure = (error, level = 0) => {
-    const cause = determineCause(error);
+    const cause = determineCause(error); // may be an array!
     const errors = determineErrors(error);
 
     return {
@@ -493,7 +501,9 @@ export function showAggregate(topError, {
           : error.stack),
 
       cause:
-        (cause
+        (Array.isArray(cause)
+          ? cause.map(cause => flattenErrorStructure(cause, level + 1))
+       : cause
           ? flattenErrorStructure(cause, level + 1)
           : null),
 
@@ -528,14 +538,28 @@ export function showAggregate(topError, {
       unhelpfulTraceLines: ownUnhelpfulTraceLines,
     },
   }, index, apparentSiblings) => {
+    const causeSingle = Array.isArray(cause) ? null : cause;
+    const causeArray = Array.isArray(cause) ? cause : null;
+
     const subApparentSiblings =
-      (cause && errors
-        ? [cause, ...errors]
-     : cause
-        ? [cause]
+      (causeSingle && errors
+        ? [causeSingle, ...errors]
+     : causeSingle
+        ? [causeSingle]
+     : causeArray && errors
+        ? [...causeArray, ...errors]
+     : causeArray
+        ? causeArray
      : errors
         ? errors
         : []);
+
+    const presentedAsErrors =
+      (causeArray && errors
+        ? [...causeArray, ...errors]
+     : causeArray
+        ? causeArray
+        : errors);
 
     const anythingHasErrorsThisLayer =
       apparentSiblings.some(({errors}) => !empty(errors));
@@ -584,8 +608,8 @@ export function showAggregate(topError, {
     const bar1 = ' ';
 
     const causePart =
-      (cause
-        ? recursive(cause, 0, subApparentSiblings)
+      (causeSingle
+        ? recursive(causeSingle, 0, subApparentSiblings)
             .split('\n')
             .map((line, i) => i === 0 ? ` ${head1} ${line}` : ` ${bar1} ${line}`)
             .join('\n')
@@ -595,8 +619,8 @@ export function showAggregate(topError, {
     const bar2 = level % 2 === 0 ? '\u2502' : colors.dim('\u254e');
 
     const errorsPart =
-      (errors
-        ? errors
+      (presentedAsErrors
+        ? presentedAsErrors
             .map((error, index) => recursive(error, index + 1, subApparentSiblings))
             .flatMap(str => str.split('\n'))
             .map((line, i) => i === 0 ? ` ${head2} ${line}` : ` ${bar2} ${line}`)
