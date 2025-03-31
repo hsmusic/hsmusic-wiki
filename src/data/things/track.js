@@ -704,7 +704,7 @@ export class Track extends Thing {
       soupyReverse.contributionsBy('trackData', 'contributorContribs'),
 
     trackCoverArtistContributionsBy:
-      soupyReverse.contributionsBy('trackData', 'coverArtistContribs'),
+      soupyReverse.artworkContributionsBy('trackData', 'trackArtwork'),
 
     tracksWithCommentaryBy: {
       bindTo: 'trackData',

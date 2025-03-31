@@ -19,4 +19,16 @@ soupyReverse.contributionsBy =
     referenced: contrib => [contrib.artist],
   });
 
+soupyReverse.artworkContributionsBy =
+  (bindTo, artworkProperty) => ({
+    bindTo,
+
+    referencing: thing =>
+      (thing[artworkProperty]
+        ? thing[artworkProperty].artistContribs
+        : []),
+
+    referenced: contrib => [contrib.artist],
+  });
+
 export default soupyReverse;

@@ -411,7 +411,7 @@ export class Album extends Thing {
       soupyReverse.contributionsBy('albumData', 'artistContribs'),
 
     albumCoverArtistContributionsBy:
-      soupyReverse.contributionsBy('albumData', 'coverArtistContribs'),
+      soupyReverse.artworkContributionsBy('albumData', 'coverArtwork'),
 
     albumWallpaperArtistContributionsBy:
       soupyReverse.contributionsBy('albumData', 'wallpaperArtistContribs'),
