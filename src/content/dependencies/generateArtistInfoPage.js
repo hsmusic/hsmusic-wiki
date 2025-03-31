@@ -156,7 +156,7 @@ export default {
         title: data.name,
         headingMode: 'sticky',
 
-        cover:
+        coverColumnContent:
           (relations.cover
             ? relations.cover.slots({
                 image:

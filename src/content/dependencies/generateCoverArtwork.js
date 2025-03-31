@@ -38,49 +38,43 @@ export default {
         ? {square: true}
         : {dimensions: slots.dimensions});
 
-    switch (slots.mode) {
-      case 'primary':
-        return html.tags([
-          slots.image.slots({
-            thumb: 'medium',
-            reveal: true,
-            link: true,
+    return (
+      html.tag('div', {class: 'cover-artwork'},
+        slots.mode === 'commentary' &&
+          {class: 'commentary-art'},
 
-            warnings: slots.warnings,
-            ...sizeSlots,
-          }),
+        (slots.mode === 'primary'
+          ? [
+              slots.image.slots({
+                thumb: 'medium',
+                reveal: true,
+                link: true,
 
-          slots.details,
-        ]);
+                warnings: slots.warnings,
+                ...sizeSlots,
+              }),
 
-      case 'thumbnail':
-        return (
-          slots.image.slots({
-            thumb: 'small',
-            reveal: false,
-            link: false,
+              slots.details,
+            ]
+       : slots.mode === 'thumbnail'
+          ? slots.image.slots({
+              thumb: 'small',
+              reveal: false,
+              link: false,
 
-            warnings: slots.warnings,
-            ...sizeSlots,
-          }));
+              warnings: slots.warnings,
+              ...sizeSlots,
+            })
+       : slots.mode === 'commentary'
+          ? slots.image.slots({
+              thumb: 'medium',
+              reveal: true,
+              link: true,
+              lazy: true,
 
-      case 'commentary':
-        return (
-          slots.image.slots({
-            thumb: 'medium',
-            reveal: true,
-            link: true,
-            lazy: true,
-
-            warnings: slots.warnings,
-            ...sizeSlots,
-
-            attributes:
-              {class: 'commentary-art'},
-          }));
-
-      default:
-        return html.blank();
-    }
+              warnings: slots.warnings,
+              ...sizeSlots,
+            })
+          : html.blank())));
   },
 };

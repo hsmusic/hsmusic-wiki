@@ -93,7 +93,7 @@ export default {
       mutable: false,
     },
 
-    cover: {
+    coverColumnContent: {
       type: 'html',
       mutable: false,
     },
@@ -262,6 +262,17 @@ export default {
         ? data.canonicalBase + pagePathStringFromRoot
         : null);
 
+    const firstItemInCoverColumn =
+      html.smooth(slots.coverColumnContent)
+        .content[0];
+
+    const primaryCover =
+      (firstItemInCoverColumn &&
+       html.resolve(firstItemInCoverColumn, {normalize: 'tag'})
+         .attributes.has('class', 'cover-artwork')
+        ? firstItemInCoverColumn
+        : null);
+
     const titleContentsHTML =
       (html.isBlank(slots.title)
         ? null
@@ -279,7 +290,7 @@ export default {
         ? [
             relations.stickyHeadingContainer.slots({
               title: titleContentsHTML,
-              cover: slots.cover,
+              cover: primaryCover,
             }),
 
             relations.stickyHeadingContainer.clone().slots({
@@ -316,9 +327,9 @@ export default {
         [
           titleHTML,
 
-          html.tag('div', {id: 'cover-art-container'},
+          html.tag('div', {id: 'cover-art-column'},
             {[html.onlyIfContent]: true},
-            slots.cover),
+            slots.coverColumnContent),
 
           subtitleHTML,
 

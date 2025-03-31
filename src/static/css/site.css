@@ -1393,12 +1393,9 @@ hr.cute,
   border-style: none none dotted none;
 }
 
-#cover-art-container {
+.cover-artwork {
   font-size: 0.8em;
   border: 2px solid var(--primary-color);
-  box-shadow:
-    0 2px 14px -6px var(--primary-color),
-    0 0 12px 12px #00000080;
 
   border-radius: 0 0 4px 4px;
   background: var(--bg-black-color);
@@ -1407,37 +1404,43 @@ hr.cute,
           backdrop-filter: blur(3px);
 }
 
-#cover-art-container:has(.image-details),
-#cover-art-container.has-image-details {
+.cover-artwork:has(.image-details),
+.cover-artwork.has-image-details {
   border-radius: 0 0 6px 6px;
 }
 
-#cover-art-container:not(:has(.image-details)),
-#cover-art-container:not(.has-image-details) {
+.cover-artwork:not(:has(.image-details)),
+.cover-artwork:not(.has-image-details) {
   /* Hacky: `overflow: hidden` hides tag tooltips, so it can't be applied
    * if we've got tags/details visible. But it's okay, because we only
    * need to apply it if it *doesn't* - that's when the rounded border
-   * of #cover-art-container needs to cut off its child image-container
+   * of the .cover-artwork needs to cut off its child .image-container
    * (which has a background that otherwise causes sharp corners).
    */
   overflow: hidden;
 }
 
-#cover-art-container .image-container {
-  /* Border is handled on the cover-art-container. */
-  border: none;
-  border-radius: 0;
+#cover-art-column .cover-artwork {
+  box-shadow:
+    0 2px 14px -6px var(--primary-color),
+    0 0 12px 12px #00000080;
 }
 
-#cover-art-container .image-details {
+.cover-artwork .image-container {
+  /* Border is handled on the .cover-artwork. */
+  border: none;
+  border-radius: 0 !important;
+}
+
+.cover-artwork .image-details {
   border-top-color: var(--deep-color);
 }
 
-#cover-art-container .image-details + .image-details {
+.cover-artwork .image-details + .image-details {
   border-top-color: var(--primary-color);
 }
 
-#cover-art-container .image {
+.cover-artwork .image {
   display: block;
   width: 100%;
   height: 100%;
@@ -3084,7 +3087,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   transition: transform 0.35s, opacity 0.30s;
 }
 
-.content-sticky-heading-cover .image-container {
+.content-sticky-heading-cover .cover-artwork {
   border-width: 1px;
   border-radius: 1.25px;
   box-shadow: none;
@@ -3415,7 +3418,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   /* Cover art floats to the right. It's positioned in HTML beneath the
    * heading, so pull it up a little to "float" on top.
    */
-  #cover-art-container {
+  #cover-art-column {
     float: right;
     width: 40%;
     max-width: 400px;
@@ -3428,7 +3431,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   /* ...Except on top-indexes, where cover art is displayed prominently
    * between the heading and subheading.
    */
-  #content.top-index #cover-art-container {
+  #content.top-index #cover-art-column {
     float: none;
     margin: 2em auto 2.5em auto;
     max-width: 375px;
@@ -3535,7 +3538,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
     --responsive-padding-ratio: 0.02;
   }
 
-  #cover-art-container {
+  #cover-art-column {
     margin: 25px 0 5px 0;
     width: 100%;
     max-width: unset;

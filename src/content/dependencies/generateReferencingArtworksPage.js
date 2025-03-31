@@ -76,7 +76,7 @@ export default {
         color: slots.color,
         styleRules: slots.styleRules,
 
-        cover:
+        coverColumnContent:
           slots.cover.slot('details', 'artists'),
 
         mainClasses: ['top-index'],

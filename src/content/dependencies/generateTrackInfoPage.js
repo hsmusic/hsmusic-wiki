@@ -141,7 +141,7 @@ export default {
         color: data.color,
         styleRules: [relations.albumStyleRules],
 
-        cover:
+        coverColumnContent:
           (relations.cover
             ? relations.cover.slots({
                 showOriginDetails: true,

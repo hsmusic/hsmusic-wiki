@@ -112,7 +112,7 @@ export default {
 
         additionalNames: relations.additionalNamesBox,
 
-        cover:
+        coverColumnContent: [
           (relations.cover
             ? relations.cover.slots({
                 showOriginDetails: true,
