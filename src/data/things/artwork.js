@@ -1,18 +1,23 @@
 import {input} from '#composite';
 import Thing from '#thing';
-import {isContributionList, isDate} from '#validators';
+import {isContributionList, isDate, validateReferenceList} from '#validators';
 import {parseContributors} from '#yaml';
 
-import {withRecontextualizedContributionList, withResolvedContribs}
-  from '#composite/wiki-data';
-import {referenceList, simpleString, soupyFind, thing}
-  from '#composite/wiki-properties';
+import {withPropertyFromObject} from '#composite/data';
+import {simpleString, soupyFind, thing} from '#composite/wiki-properties';
 
 import {
+  exposeConstant,
   exposeDependency,
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
 } from '#composite/control-flow';
+
+import {
+  withRecontextualizedContributionList,
+  withResolvedContribs,
+  withResolvedReferenceList,
+} from '#composite/wiki-data';
 
 import {withDate} from '#composite/things/artwork';
 
@@ -27,10 +32,34 @@ export class Artwork extends Thing {
 
     thing: thing(),
 
-    artTags: referenceList({
-      class: input.value(ArtTag),
-      find: soupyFind.input('artTag'),
-    }),
+    artTags: [
+      withResolvedReferenceList({
+        list: input.updateValue({
+          validate:
+            validateReferenceList(ArtTag[Thing.referenceType]),
+        }),
+
+        find: soupyFind.input('artTag'),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#resolvedReferenceList',
+        mode: input.value('empty'),
+      }),
+
+      withPropertyFromObject({
+        object: 'thing',
+        property: input.value('artTags'),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#thing.artTags',
+      }),
+
+      exposeConstant({
+        value: input.value([]),
+      }),
+    ],
 
     artistContribsFromThingProperty: simpleString(),
     artistContribsArtistProperty: simpleString(),
