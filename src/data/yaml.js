@@ -157,6 +157,8 @@ function makeProcessDocument(thingConstructor, {
       message: `Errors processing ${constructorPart}` + namePart,
     });
 
+    const thing = Reflect.construct(thingConstructor, []);
+
     const documentEntries = Object.entries(document)
       .filter(([field]) => !ignoredFields.includes(field));
 
@@ -210,15 +212,25 @@ function makeProcessDocument(thingConstructor, {
     const transformUtilities = {
       ...thingConstructors,
 
-      subdoc(documentType, data) {
+      subdoc(documentType, data, {
+        bindInto = null,
+      } = {}) {
         if (!documentType)
           throw new Error(`Expected document type, got ${typeAppearance(documentType)}`);
         if (!data)
           throw new Error(`Expected data, got ${typeAppearance(data)}`);
         if (typeof data !== 'object' || data === null)
-          throw new Error(`Expected data to be an object, got ${data}`);
+          throw new Error(`Expected data to be an object, got ${typeAppearance(data)}`);
+        if (typeof bindInto !== 'string' && bindInto !== null)
+          throw new Error(`Expected bindInto to be a string, got ${typeAppearance(bindInto)}`);
 
-        return {[subdocSymbol]: {documentType, data}};
+        return {
+          [subdocSymbol]: {
+            documentType,
+            data,
+            bindInto,
+          },
+        };
       },
     };
 
@@ -279,6 +291,10 @@ function makeProcessDocument(thingConstructor, {
           field, setup, {cause: caughtError}));
       }
 
+      if (setup.bindInto) {
+        subthing[setup.bindInto] = thing;
+      }
+
       if (subthing) {
         fieldValues[field] = subthing;
       }
@@ -288,8 +304,6 @@ function makeProcessDocument(thingConstructor, {
       aggregate.push(new SubdocAggregateError(
         subdocErrors, thingConstructor));
     }
-
-    const thing = Reflect.construct(thingConstructor, []);
 
     const fieldValueErrors = [];
 
