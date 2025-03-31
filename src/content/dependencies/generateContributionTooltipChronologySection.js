@@ -1,3 +1,19 @@
+import Thing from '#thing';
+
+function getName(thing) {
+  if (!thing) {
+    return null;
+  }
+
+  const referenceType = thing.constructor[Thing.referenceType];
+
+  if (referenceType === 'artwork') {
+    return thing.thing.name;
+  }
+
+  return thing.name;
+}
+
 export default {
   contentDependencies: ['linkAnythingMan'],
   extraDependencies: ['html', 'language'],
@@ -30,14 +46,10 @@ export default {
 
   data: (query, _contribution) => ({
     previousName:
-      (query.previous
-        ? query.previous.thing.name
-        : null),
+      getName(query.previous?.thing),
 
     nextName:
-      (query.next
-        ? query.next.thing.name
-        : null),
+      getName(query.next?.thing),
   }),
 
   slots: {

@@ -1,6 +1,7 @@
 export default {
   contentDependencies: [
     'linkAlbum',
+    'linkArtwork',
     'linkFlash',
     'linkTrack',
   ],
@@ -13,6 +14,8 @@ export default {
     link:
       (query.referenceType === 'album'
         ? relation('linkAlbum', thing)
+     : query.referenceType === 'artwork'
+        ? relation('linkArtwork', thing)
      : query.referenceType === 'flash'
         ? relation('linkFlash', thing)
      : query.referenceType === 'track'
