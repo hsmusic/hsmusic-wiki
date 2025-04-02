@@ -902,7 +902,10 @@ misc:
 
   coverArtwork:
     artworkBy: "Artwork by {ARTISTS}"
-    released: "Released {DATE}"
+    artworkBy.customLabel: "{LABEL} by {ARTISTS}"
+
+    released: "Art released {DATE}"
+    source: "Via {SOURCE}"
 
     trackArtFromAlbum: "Album cover for {ALBUM}"
 

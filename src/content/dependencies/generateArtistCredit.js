@@ -80,6 +80,8 @@ export default {
     // It won't be used if contextContributions isn't provided.
     featuringStringKey: {type: 'string'},
 
+    additionalStringOptions: {validate: v => v.isObject},
+
     showAnnotation: {type: 'boolean', default: false},
     showExternalLinks: {type: 'boolean', default: false},
     showChronology: {type: 'boolean', default: false},
@@ -148,7 +150,10 @@ export default {
 
     if (empty(relations.featuringContributionLinks)) {
       if (data.normalContributionsDifferFromContext) {
-        return language.$(slots.normalStringKey, {artists: artistsList});
+        return language.$(slots.normalStringKey, {
+          ...slots.additionalStringOptions,
+          artists: artistsList,
+        });
       } else {
         return html.blank();
       }
@@ -156,13 +161,20 @@ export default {
 
     if (data.normalContributionsDifferFromContext && slots.normalFeaturingStringKey) {
       return language.$(slots.normalFeaturingStringKey, {
+        ...slots.additionalStringOptions,
         artists: artistsList,
         featuring: featuringList,
       });
     } else if (slots.featuringStringKey) {
-      return language.$(slots.featuringStringKey, {artists: featuringList});
+      return language.$(slots.featuringStringKey, {
+        ...slots.additionalStringOptions,
+        artists: featuringList,
+      });
     } else {
-      return language.$(slots.normalStringKey, {artists: everyoneList});
+      return language.$(slots.normalStringKey, {
+        ...slots.additionalStringOptions,
+        artists: everyoneList,
+      });
     }
   },
 };

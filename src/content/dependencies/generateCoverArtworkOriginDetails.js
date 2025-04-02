@@ -1,13 +1,19 @@
 export default {
-  contentDependencies: ['generateArtistCredit'],
+  contentDependencies: ['generateArtistCredit', 'transformContent'],
   extraDependencies: ['html', 'language'],
 
   relations: (relation, artwork) => ({
     credit:
       relation('generateArtistCredit', artwork.artistContribs, []),
+
+    source:
+      relation('transformContent', artwork.source),
   }),
 
   data: (artwork) => ({
+    label:
+      artwork.label,
+
     date:
       (artwork.date !== artwork.thing.date
         ? artwork.date
@@ -33,12 +39,25 @@ export default {
 
             chronologyKind: 'coverArt',
 
-            normalStringKey: capsule + '.artworkBy',
+            normalStringKey:
+              (data.label
+                ? capsule + '.artworkBy.customLabel'
+                : capsule + '.artworkBy'),
+
+            additionalStringOptions:
+              (data.label
+                ? {label: data.label}
+                : {}),
           }),
 
           language.$(capsule, 'released', {
             [language.onlyIfOptions]: ['date'],
             date: language.formatDate(data.date),
-          })
+          }),
+
+          language.$(capsule, 'source', {
+            [language.onlyIfOptions]: ['source'],
+            source: relations.source.slot('mode', 'inline'),
+          }),
         ])),
 };

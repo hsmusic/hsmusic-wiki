@@ -4,7 +4,8 @@ import {isContributionList, isDate, validateReferenceList} from '#validators';
 import {parseContributors, parseDate} from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
-import {simpleString, soupyFind, thing} from '#composite/wiki-properties';
+import {contentString, simpleString, soupyFind, thing}
+  from '#composite/wiki-properties';
 
 import {
   exposeConstant,
@@ -31,6 +32,9 @@ export class Artwork extends Thing {
     // Update & expose
 
     thing: thing(),
+
+    label: simpleString(),
+    source: contentString(),
 
     dateFromThingProperty: simpleString(),
 
@@ -115,6 +119,9 @@ export class Artwork extends Thing {
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
+      'Label': {property: 'label'},
+      'Source': {property: 'source'},
+
       'Date': {
         property: 'date',
         transform: parseDate,
