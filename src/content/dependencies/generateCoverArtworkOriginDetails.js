@@ -1,16 +1,33 @@
-export default {
-  contentDependencies: ['generateArtistCredit', 'transformContent'],
-  extraDependencies: ['html', 'language'],
+import Thing from '#thing';
 
-  relations: (relation, artwork) => ({
+export default {
+  contentDependencies: [
+    'generateArtistCredit',
+    'linkAlbum',
+    'transformContent',
+  ],
+
+  extraDependencies: ['html', 'language', 'pagePath'],
+
+  query: (artwork) => ({
+    artworkThingType:
+      artwork.thing.constructor[Thing.referenceType],
+  }),
+
+  relations: (relation, query, artwork) => ({
     credit:
       relation('generateArtistCredit', artwork.artistContribs, []),
 
     source:
       relation('transformContent', artwork.source),
+
+    albumLink:
+      (query.artworkThingType === 'album'
+        ? relation('linkAlbum', artwork.thing)
+        : null),
   }),
 
-  data: (artwork) => ({
+  data: (query, artwork) => ({
     label:
       artwork.label,
 
@@ -18,9 +35,12 @@ export default {
       (artwork.date !== artwork.thing.date
         ? artwork.date
         : null),
+
+    artworkThingType:
+      query.artworkThingType,
   }),
 
-  generate: (data, relations, {html, language}) =>
+  generate: (data, relations, {html, language, pagePath}) =>
     language.encapsulate('misc.coverArtwork', capsule =>
       html.tag('p', {class: 'image-details'},
         {[html.onlyIfContent]: true},
@@ -49,6 +69,13 @@ export default {
                 ? {label: data.label}
                 : {}),
           }),
+
+          pagePath[0] === 'track' &&
+          data.artworkThingType === 'album' &&
+            language.$(capsule, 'trackArtFromAlbum', {
+              album:
+                relations.albumLink.slot('color', false),
+            }),
 
           language.$(capsule, 'released', {
             [language.onlyIfOptions]: ['date'],

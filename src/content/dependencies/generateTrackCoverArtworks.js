@@ -21,6 +21,5 @@ export default {
         cover.slots({
           showOriginDetails: true,
           showReferenceLinks: true,
-          showNonUniqueLine: true,
         })),
 };

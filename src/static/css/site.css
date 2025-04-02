@@ -1511,10 +1511,6 @@ ul.image-details.art-tag-details li:not(:last-child)::after {
   content: " \00b7 ";
 }
 
-.image-details.non-unique-details {
-  font-style: oblique;
-}
-
 p.image-details.illustrator-details {
   text-align: center;
   font-style: oblique;

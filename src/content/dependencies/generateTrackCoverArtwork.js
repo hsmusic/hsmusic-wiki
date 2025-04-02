@@ -64,11 +64,6 @@ export default {
       type: 'boolean',
       default: false,
     },
-
-    showNonUniqueLine: {
-      type: 'boolean',
-      default: false,
-    },
   },
 
   generate: (data, relations, slots, {language}) =>
@@ -96,18 +91,6 @@ export default {
               relations.referencingArtworksLink,
           }),
         */
-
-        slots.showNonUniqueLine &&
-        data.nonUnique &&
-          html.tag('p', {class: 'image-details'},
-            {class: 'non-unique-details'},
-
-            language.$('misc.coverArtwork.trackArtFromAlbum', {
-              album:
-                relations.albumLink.slots({
-                  color: false,
-                }),
-            })),
       ],
     }),
 };
