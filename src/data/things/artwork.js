@@ -120,7 +120,7 @@ export class Artwork extends Thing {
         transform: parseContributors,
       },
 
-      'Art Tags': {property: 'artTags'},
+      'Tags': {property: 'artTags'},
     },
   };
 }
