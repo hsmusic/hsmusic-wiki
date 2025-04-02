@@ -1,6 +1,23 @@
 export default {
-  contentDependencies: ['image'],
+  contentDependencies: [
+    'generateCoverArtworkArtTagDetails',
+    'generateCoverArtworkArtistDetails',
+    'generateCoverArtworkOriginDetails',
+    'image',
+  ],
+
   extraDependencies: ['html'],
+
+  relations: (relation, artwork) => ({
+    originDetails:
+      relation('generateCoverArtworkOriginDetails', artwork),
+
+    artTagDetails:
+      relation('generateCoverArtworkArtTagDetails', artwork),
+
+    artistDetails:
+      relation('generateCoverArtworkArtistDetails', artwork),
+  }),
 
   slots: {
     image: {
@@ -21,13 +38,17 @@ export default {
       validate: v => v.looseArrayOf(v.isString),
     },
 
+    showOriginDetails: {type: 'boolean', default: false},
+    showArtTagDetails: {type: 'boolean', default: false},
+    showArtistDetails: {type: 'boolean', default: false},
+
     details: {
       type: 'html',
       mutable: false,
     },
   },
 
-  generate(slots, {html}) {
+  generate(relations, slots, {html}) {
     const square =
       (slots.dimensions
         ? slots.dimensions[0] === slots.dimensions[1]
@@ -54,7 +75,14 @@ export default {
                 ...sizeSlots,
               }),
 
-              slots.details,
+              slots.showOriginDetails &&
+                relations.originDetails,
+
+              slots.showArtTagDetails &&
+                relations.artTagDetails,
+
+              slots.showArtistDetails &&
+                relations.artistDetails,
             ]
        : slots.mode === 'thumbnail'
           ? slots.image.slots({

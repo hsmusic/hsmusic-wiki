@@ -10,7 +10,7 @@ import {input, templateCompositeFrom} from '#composite';
 import {empty} from '#sugar';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
-import {withPropertyFromObject} from '#composite/data';
+import {withFlattenedList, withPropertyFromList} from '#composite/data';
 import {withResolvedContribs} from '#composite/wiki-data';
 
 import withPropertyFromAlbum from './withPropertyFromAlbum.js';
@@ -65,20 +65,24 @@ export default templateCompositeFrom({
             })),
     },
 
-    withPropertyFromObject({
-      object: 'trackArtwork',
-      property: input.value('artistContribs'),
-      internal: input.value(true),
-    }),
-
     raiseOutputWithoutDependency({
-      dependency: '#trackArtwork.artistContribs',
+      dependency: 'trackArtworks',
       mode: input.value('empty'),
       output: input.value({'#hasUniqueCoverArt': false}),
     }),
 
+    withPropertyFromList({
+      list: 'trackArtworks',
+      property: input.value('artistContribs'),
+      internal: input.value(true),
+    }),
+
+    withFlattenedList({
+      list: '#trackArtworks.artistContribs',
+    }),
+
     withResolvedContribs({
-      from: '#trackArtwork.artistContribs',
+      from: '#flattenedList',
       date: input.value(null),
     }),
 

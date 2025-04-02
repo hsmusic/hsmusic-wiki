@@ -35,7 +35,7 @@ import {
   commentary,
   color,
   commentatorArtists,
-  constitutibleArtwork,
+  constitutibleArtworkList,
   contentString,
   contribsPresent,
   contributionList,
@@ -159,7 +159,7 @@ export class Album extends Thing {
       dimensions(),
     ],
 
-    coverArtwork: constitutibleArtwork({
+    coverArtworks: constitutibleArtworkList({
       contribs: 'coverArtistContribs',
       date: 'coverArtDate',
       artistProperty: input.value('albumCoverArtistContributions'),
@@ -411,7 +411,7 @@ export class Album extends Thing {
       soupyReverse.contributionsBy('albumData', 'artistContribs'),
 
     albumCoverArtistContributionsBy:
-      soupyReverse.artworkContributionsBy('albumData', 'coverArtwork'),
+      soupyReverse.artworkContributionsBy('albumData', 'coverArtworks'),
 
     albumWallpaperArtistContributionsBy:
       soupyReverse.contributionsBy('albumData', 'wallpaperArtistContribs'),
@@ -468,7 +468,7 @@ export class Album extends Thing {
       'Listed in Galleries': {property: 'isListedInGalleries'},
 
       'Cover Artwork': {
-        property: 'coverArtwork',
+        property: 'coverArtworks',
         transform:
           parseArtwork({
             dateFromThingProperty: 'coverArtDate',
@@ -644,9 +644,7 @@ export class Album extends Thing {
           currentTrackSectionTracks.push(entry);
           trackData.push(entry);
 
-          if (entry.trackArtwork) {
-            artworkData.push(entry.trackArtwork);
-          }
+          artworkData.push(...entry.trackArtworks);
 
           entry.dataSourceAlbum = albumRef;
         }
@@ -654,6 +652,8 @@ export class Album extends Thing {
         closeCurrentTrackSection();
 
         albumData.push(album);
+
+        artworkData.push(...album.coverArtworks);
 
         album.trackSections = trackSections;
       }

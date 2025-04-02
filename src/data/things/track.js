@@ -39,7 +39,7 @@ import {
   additionalNameList,
   commentary,
   commentatorArtists,
-  constitutibleArtwork,
+  constitutibleArtworkList,
   contentString,
   contributionList,
   dimensions,
@@ -341,7 +341,7 @@ export class Track extends Thing {
       }),
     ],
 
-    trackArtwork: constitutibleArtwork({
+    trackArtworks: constitutibleArtworkList({
       contribs: 'coverArtistContribs',
       date: 'coverArtDate',
       artistProperty: input.value('trackCoverArtistContributions'),
@@ -573,7 +573,7 @@ export class Track extends Thing {
       },
 
       'Track Artwork': {
-        property: 'trackArtwork',
+        property: 'trackArtworks',
         transform:
           parseArtwork({
             dateFromThingProperty: 'coverArtDate',
@@ -704,7 +704,7 @@ export class Track extends Thing {
       soupyReverse.contributionsBy('trackData', 'contributorContribs'),
 
     trackCoverArtistContributionsBy:
-      soupyReverse.artworkContributionsBy('trackData', 'trackArtwork'),
+      soupyReverse.artworkContributionsBy('trackData', 'trackArtworks'),
 
     tracksWithCommentaryBy: {
       bindTo: 'trackData',

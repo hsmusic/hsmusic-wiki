@@ -1,7 +1,7 @@
 import {input, templateCompositeFrom} from '#composite';
-import {isContributionList, isDate, validateThing} from '#validators';
+import {isContributionList, isDate, validateWikiData} from '#validators';
 
-import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
+import {exitWithoutDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
 import {withConstitutedArtwork} from '#composite/wiki-data';
 
@@ -29,14 +29,14 @@ export default templateCompositeFrom({
   steps: () => [
     exposeUpdateValueOrContinue({
       validate: input.value(
-        validateThing({
+        validateWikiData({
           referenceType: 'artwork',
         })),
     }),
 
     exitWithoutDependency({
       dependency: input('contribs'),
-      value: input.value(null),
+      value: input.value([]),
     }),
 
     {
@@ -60,8 +60,11 @@ export default templateCompositeFrom({
       dateProperty: '#dateProperty',
     }),
 
-    exposeDependency({
-      dependency: '#constitutedArtwork',
-    }),
+    {
+      dependencies: ['#constitutedArtwork'],
+      compute: ({
+        ['#constitutedArtwork']: constitutedArtwork,
+      }) => [constitutedArtwork],
+    },
   ],
 });

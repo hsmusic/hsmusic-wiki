@@ -11,7 +11,7 @@ export default {
     'generateContributionList',
     'generatePageLayout',
     'generateTrackArtistCommentarySection',
-    'generateTrackCoverArtwork',
+    'generateTrackCoverArtworks',
     'generateTrackInfoPageFeaturedByFlashesList',
     'generateTrackInfoPageOtherReleasesList',
     'generateTrackList',
@@ -58,9 +58,9 @@ export default {
     additionalNamesBox:
       relation('generateAdditionalNamesBox', track.additionalNames),
 
-    cover:
+    covers:
       (track.hasUniqueCoverArt || track.album.hasCoverArt
-        ? relation('generateTrackCoverArtwork', track)
+        ? relation('generateTrackCoverArtworks', track)
         : null),
 
     contentHeading:
@@ -142,13 +142,7 @@ export default {
         styleRules: [relations.albumStyleRules],
 
         coverColumnContent:
-          (relations.cover
-            ? relations.cover.slots({
-                showOriginDetails: true,
-                showReferenceLinks: true,
-                showNonUniqueLine: true,
-              })
-            : null),
+          relations.covers,
 
         mainContent: [
           relations.releaseInfo,

@@ -1,9 +1,6 @@
 export default {
   contentDependencies: [
     'generateCoverArtwork',
-    'generateCoverArtworkArtTagDetails',
-    'generateCoverArtworkArtistDetails',
-    'generateCoverArtworkOriginDetails',
     'generateCoverArtworkReferenceDetails',
     'image',
     'linkAlbum',
@@ -13,65 +10,52 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  query: (track) => ({
-    artTags:
-      (track.hasUniqueCoverArt
-        ? track.trackArtwork.artTags
-     : track.album.hasCoverArt
-        ? track.album.coverArtwork.artTags
-        : []),
-  }),
-
-  relations: (relation, query, track) => ({
+  relations: (relation, artwork) => ({
     coverArtwork:
-      relation('generateCoverArtwork'),
+      relation('generateCoverArtwork', artwork),
 
     image:
       relation('image'),
 
-    originDetails:
-      relation('generateCoverArtworkOriginDetails', track.trackArtwork),
+    // referenceDetails:
+    //   relation('generateCoverArtworkReferenceDetails',
+    //     artwork.referencedArtworks,
+    //     artwork.referencedByArtworks),
 
-    artTagDetails:
-      relation('generateCoverArtworkArtTagDetails', track.trackArtwork),
+    // referencedArtworksLink:
+    //   relation('linkTrackReferencedArtworks', track),
 
-    artistDetails:
-      relation('generateCoverArtworkArtistDetails', track.trackArtwork),
-
-    referenceDetails:
-      relation('generateCoverArtworkReferenceDetails',
-        track.referencedArtworks,
-        track.referencedByArtworks),
-
-    referencedArtworksLink:
-      relation('linkTrackReferencedArtworks', track),
-
-    referencingArtworksLink:
-      relation('linkTrackReferencingArtworks', track),
+    // referencingArtworksLink:
+    //   relation('linkTrackReferencingArtworks', track),
 
     albumLink:
-      relation('linkAlbum', track.album),
+      (artwork.thing.album
+        ? relation('linkAlbum', artwork.thing.album)
+        : relation('linkAlbum', artwork.thing)),
   }),
 
-  data: (query, track) => ({
+  data: (artwork) => ({
     path:
-      (track.hasUniqueCoverArt
-        ? ['media.trackCover', track.album.directory, track.directory, track.coverArtFileExtension]
-        : ['media.albumCover', track.album.directory, track.album.coverArtFileExtension]),
+      (artwork.thing.album
+        ? ['media.trackCover',
+           artwork.thing.album.directory,
+           artwork.thing.directory,
+           artwork.thing.coverArtFileExtension]
+        : ['media.albumCover',
+           artwork.thing.directory,
+           artwork.thing.coverArtFileExtension]),
 
-    color:
-      track.color,
+    // color:
+    //   track.color,
 
     dimensions:
-      (track.hasUniqueCoverArt
-        ? track.coverArtDimensions
-        : track.album.coverArtDimensions),
+      artwork.thing.coverArtDimensions,
 
     nonUnique:
-      !track.hasUniqueCoverArt,
+      !artwork.thing.album,
 
     warnings:
-      query.artTags
+      artwork.artTags
         .filter(tag => tag.isContentWarning)
         .map(tag => tag.name),
   }),
@@ -107,23 +91,19 @@ export default {
       image:
         relations.image.slots({
           path: data.path,
-          color: data.color,
+          // color: data.color,
           alt: language.$('misc.alt.trackCover'),
         }),
 
       dimensions: data.dimensions,
       warnings: data.warnings,
 
+      showOriginDetails: slots.showOriginDetails,
+      showArtTagDetails: slots.details === 'tags',
+      showArtistDetails: slots.details === 'artists',
+
       details: [
-        slots.showOriginDetails &&
-          relations.originDetails,
-
-        slots.details === 'tags' &&
-          relations.artTagDetails,
-
-        slots.details === 'artists'&&
-          relations.artistDetails,
-
+        /*
         slots.showReferenceLinks &&
           relations.referenceDetails.slots({
             referencedLink:
@@ -132,6 +112,7 @@ export default {
             referencingLink:
               relations.referencingArtworksLink,
           }),
+        */
 
         slots.showNonUniqueLine &&
         data.nonUnique &&

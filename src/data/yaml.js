@@ -794,7 +794,7 @@ export function parseArtwork({
   artistContribsFromThingProperty,
   artistContribsArtistProperty,
 }) {
-  return (entry, {subdoc, Artwork}) =>
+  const parseSingleEntry = (entry, {subdoc, Artwork}) =>
     subdoc(Artwork, entry, {
       bindInto: 'thing',
       provide: {
@@ -803,6 +803,11 @@ export function parseArtwork({
         artistContribsArtistProperty,
       },
     });
+
+  return (value, ...args) =>
+    (Array.isArray(value)
+      ? value.map(entry => parseSingleEntry(entry, ...args))
+      : [parseSingleEntry(value, ...args)]);
 }
 
 // documentModes: Symbols indicating sets of behavior for loading and processing
