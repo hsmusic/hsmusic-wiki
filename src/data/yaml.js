@@ -207,7 +207,12 @@ function makeProcessDocument(thingConstructor, {
     const fieldValues = {};
 
     const subdocSymbol = Symbol('subdoc');
-    const subdocSetups = {};
+    const subdocLayouts = {};
+
+    const isSubdocToken = value =>
+      typeof value === 'object' &&
+      value !== null &&
+      Object.hasOwn(value, subdocSymbol);
 
     const transformUtilities = {
       ...thingConstructors,
@@ -267,12 +272,15 @@ function makeProcessDocument(thingConstructor, {
         }
       }
 
-      if (
-        typeof propertyValue === 'object' &&
-        propertyValue !== null &&
-        Object.hasOwn(propertyValue, subdocSymbol)
-      ) {
-        subdocSetups[field] = propertyValue[subdocSymbol];
+      if (isSubdocToken(propertyValue)) {
+        subdocLayouts[field] = propertyValue[subdocSymbol];
+        continue;
+      }
+
+      if (Array.isArray(propertyValue) && propertyValue.every(isSubdocToken)) {
+        subdocLayouts[field] =
+          propertyValue
+            .map(token => token[subdocSymbol]);
         continue;
       }
 
@@ -280,31 +288,76 @@ function makeProcessDocument(thingConstructor, {
     }
 
     const subdocErrors = [];
-    for (const [field, setup] of Object.entries(subdocSetups)) {
+
+    const followSubdocSetup = setup => {
+      let error = null;
+
       let subthing;
       try {
         const result = bouncer(setup.data, setup.documentType);
         subthing = result.thing;
         result.aggregate.close();
       } catch (caughtError) {
-        if (!subthing) {
-          skippedFields.add(field);
-        }
-
-        subdocErrors.push(new SubdocError(
-          field, setup, {cause: caughtError}));
-      }
-
-      if (setup.bindInto) {
-        subthing[setup.bindInto] = thing;
-      }
-
-      if (setup.provide) {
-        Object.assign(subthing, setup.provide);
+        error = caughtError;
       }
 
       if (subthing) {
-        fieldValues[field] = subthing;
+        if (setup.bindInto) {
+          subthing[setup.bindInto] = thing;
+        }
+
+        if (setup.provide) {
+          Object.assign(subthing, setup.provide);
+        }
+      }
+
+      return {error, subthing};
+    };
+
+    for (const [field, layout] of Object.entries(subdocLayouts)) {
+      if (Array.isArray(layout)) {
+        const subthings = [];
+        let anySucceeded = false;
+        let anyFailed = false;
+
+        for (const [index, setup] of layout.entries()) {
+          const {subthing, error} = followSubdocSetup(setup);
+          if (error) {
+            subdocErrors.push(new SubdocError(
+              {field, index},
+              setup,
+              {cause: error}));
+          }
+
+          if (subthing) {
+            subthings.push(subthing);
+            anySucceeded = true;
+          } else {
+            anyFailed = true;
+          }
+        }
+
+        if (anySucceeded) {
+          fieldValues[field] = subthings;
+        } else if (anyFailed) {
+          skippedFields.add(field);
+        }
+      } else {
+        const setup = layout;
+        const {subthing, error} = followSubdocSetup(setup);
+
+        if (error) {
+          subdocErrors.push(new SubdocError(
+            {field},
+            setup,
+            {cause: error}));
+        }
+
+        if (subthing) {
+          fieldValues[field] = subthing;
+        } else {
+          skippedFields.add(field);
+        }
       }
     }
 
@@ -441,9 +494,12 @@ export class SkippedFieldsSummaryError extends Error {
 }
 
 export class SubdocError extends Error {
-  constructor(field, setup, options) {
+  constructor({field, index = null}, setup, options) {
     const fieldText =
-      colors.green(`"${field}"`);
+      (index === null
+        ? colors.green(`"${field}"`)
+        : colors.yellow(`#${index + 1}`) + ' in ' +
+          colors.green(`"${field}"`));
 
     const constructorText =
       setup.documentType.name;
