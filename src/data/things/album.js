@@ -671,6 +671,14 @@ export class Album extends Thing {
       sortAlbumsTracksChronologically(trackData);
     },
   });
+
+  getOwnArtworkPath(_artwork) {
+    return [
+      'media.albumCover',
+      this.directory,
+      this.coverArtFileExtension,
+    ];
+  }
 }
 
 export class TrackSection extends Thing {

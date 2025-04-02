@@ -9,6 +9,9 @@ export default {
   extraDependencies: ['html'],
 
   relations: (relation, artwork) => ({
+    image:
+      relation('image'),
+
     originDetails:
       relation('generateCoverArtworkOriginDetails', artwork),
 
@@ -19,10 +22,16 @@ export default {
       relation('generateCoverArtworkArtistDetails', artwork),
   }),
 
+  data: (artwork) => ({
+    path:
+      artwork.path,
+  }),
+
   slots: {
-    image: {
-      type: 'html',
-      mutable: true,
+    alt: {type: 'string'},
+
+    color: {
+      validate: v => v.isColor,
     },
 
     mode: {
@@ -48,16 +57,27 @@ export default {
     },
   },
 
-  generate(relations, slots, {html}) {
+  generate(data, relations, slots, {html}) {
+    const {image} = relations;
+
+    image.setSlots({
+      path: data.path,
+
+      color: slots.color,
+      alt: slots.alt,
+      warnings: slots.warnings,
+    });
+
     const square =
       (slots.dimensions
         ? slots.dimensions[0] === slots.dimensions[1]
         : true);
 
-    const sizeSlots =
-      (square
-        ? {square: true}
-        : {dimensions: slots.dimensions});
+    if (square) {
+      image.setSlot('square', true);
+    } else {
+      image.setSlot('dimensions', slots.dimensions);
+    }
 
     return (
       html.tag('div', {class: 'cover-artwork'},
@@ -66,13 +86,10 @@ export default {
 
         (slots.mode === 'primary'
           ? [
-              slots.image.slots({
+              relations.image.slots({
                 thumb: 'medium',
                 reveal: true,
                 link: true,
-
-                warnings: slots.warnings,
-                ...sizeSlots,
               }),
 
               slots.showOriginDetails &&
@@ -83,25 +100,21 @@ export default {
 
               slots.showArtistDetails &&
                 relations.artistDetails,
+
+              slots.details,
             ]
        : slots.mode === 'thumbnail'
-          ? slots.image.slots({
+          ? relations.image.slots({
               thumb: 'small',
               reveal: false,
               link: false,
-
-              warnings: slots.warnings,
-              ...sizeSlots,
             })
        : slots.mode === 'commentary'
-          ? slots.image.slots({
+          ? relations.image.slots({
               thumb: 'medium',
               reveal: true,
               link: true,
               lazy: true,
-
-              warnings: slots.warnings,
-              ...sizeSlots,
             })
           : html.blank())));
   },

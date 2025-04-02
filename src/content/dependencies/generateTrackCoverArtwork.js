@@ -14,9 +14,6 @@ export default {
     coverArtwork:
       relation('generateCoverArtwork', artwork),
 
-    image:
-      relation('image'),
-
     // referenceDetails:
     //   relation('generateCoverArtworkReferenceDetails',
     //     artwork.referencedArtworks,
@@ -35,16 +32,6 @@ export default {
   }),
 
   data: (artwork) => ({
-    path:
-      (artwork.thing.album
-        ? ['media.trackCover',
-           artwork.thing.album.directory,
-           artwork.thing.directory,
-           artwork.thing.coverArtFileExtension]
-        : ['media.albumCover',
-           artwork.thing.directory,
-           artwork.thing.coverArtFileExtension]),
-
     // color:
     //   track.color,
 
@@ -84,16 +71,12 @@ export default {
     },
   },
 
-  generate: (data, relations, slots, {html, language}) =>
+  generate: (data, relations, slots, {language}) =>
     relations.coverArtwork.slots({
       mode: slots.mode,
 
-      image:
-        relations.image.slots({
-          path: data.path,
-          // color: data.color,
-          alt: language.$('misc.alt.trackCover'),
-        }),
+      // color: data.color,
+      alt: language.$('misc.alt.trackCover'),
 
       dimensions: data.dimensions,
       warnings: data.warnings,

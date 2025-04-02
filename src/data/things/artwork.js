@@ -135,4 +135,11 @@ export class Artwork extends Thing {
       'Tags': {property: 'artTags'},
     },
   };
+
+  get path() {
+    if (!this.thing) return null;
+    if (!this.thing.getOwnArtworkPath) return null;
+
+    return this.thing.getOwnArtworkPath(this);
+  }
 }
