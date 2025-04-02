@@ -678,12 +678,12 @@ export function positionTooltipFromHoverableWithBrains(hoverable) {
 
     for (let i = 0; i < numBaselineRects; i++) {
       for (const [dir1, dir2] of [
+        ['down', 'right'],
+        ['down', 'left'],
         ['right', 'down'],
         ['left', 'down'],
         ['right', 'up'],
         ['left', 'up'],
-        ['down', 'right'],
-        ['down', 'left'],
         ['up', 'right'],
         ['up', 'left'],
       ]) {
