@@ -1,7 +1,7 @@
 import {input} from '#composite';
 import Thing from '#thing';
 import {isContributionList, isDate, validateReferenceList} from '#validators';
-import {parseContributors} from '#yaml';
+import {parseContributors, parseDate} from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
 import {simpleString, soupyFind, thing} from '#composite/wiki-properties';
@@ -32,33 +32,14 @@ export class Artwork extends Thing {
 
     thing: thing(),
 
-    artTags: [
-      withResolvedReferenceList({
-        list: input.updateValue({
-          validate:
-            validateReferenceList(ArtTag[Thing.referenceType]),
-        }),
+    dateFromThingProperty: simpleString(),
 
-        find: soupyFind.input('artTag'),
+    date: [
+      withDate({
+        from: input.updateValue({validate: isDate}),
       }),
 
-      exposeDependencyOrContinue({
-        dependency: '#resolvedReferenceList',
-        mode: input.value('empty'),
-      }),
-
-      withPropertyFromObject({
-        object: 'thing',
-        property: input.value('artTags'),
-      }),
-
-      exposeDependencyOrContinue({
-        dependency: '#thing.artTags',
-      }),
-
-      exposeConstant({
-        value: input.value([]),
-      }),
+      exposeDependency({dependency: '#date'}),
     ],
 
     artistContribsFromThingProperty: simpleString(),
@@ -98,14 +79,33 @@ export class Artwork extends Thing {
       }),
     ],
 
-    dateFromThingProperty: simpleString(),
+    artTags: [
+      withResolvedReferenceList({
+        list: input.updateValue({
+          validate:
+            validateReferenceList(ArtTag[Thing.referenceType]),
+        }),
 
-    date: [
-      withDate({
-        from: input.updateValue({validate: isDate}),
+        find: soupyFind.input('artTag'),
       }),
 
-      exposeDependency({dependency: '#date'}),
+      exposeDependencyOrContinue({
+        dependency: '#resolvedReferenceList',
+        mode: input.value('empty'),
+      }),
+
+      withPropertyFromObject({
+        object: 'thing',
+        property: input.value('artTags'),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#thing.artTags',
+      }),
+
+      exposeConstant({
+        value: input.value([]),
+      }),
     ],
 
     // Update only
@@ -115,6 +115,11 @@ export class Artwork extends Thing {
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
+      'Date': {
+        property: 'date',
+        transform: parseDate,
+      },
+
       'Artists': {
         property: 'artistContribs',
         transform: parseContributors,
