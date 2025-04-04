@@ -75,11 +75,6 @@ export default {
               date: language.formatDate(data.date),
             }),
 
-            language.$(capsule, 'artReleased', {
-              [language.onlyIfOptions]: ['date'],
-              date: language.formatDate(data.coverArtDate),
-            }),
-
             language.$(capsule, 'duration', {
               [language.onlyIfOptions]: ['duration'],
               duration:

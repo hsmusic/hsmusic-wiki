@@ -3,6 +3,7 @@ import Thing from '#thing';
 export default {
   contentDependencies: [
     'generateArtistCredit',
+    'generateAbsoluteDatetimestamp',
     'linkAlbum',
     'transformContent',
   ],
@@ -25,16 +26,17 @@ export default {
       (query.artworkThingType === 'album'
         ? relation('linkAlbum', artwork.thing)
         : null),
+
+    datetimestamp:
+      (artwork.date !== artwork.thing.date
+        ? relation('generateAbsoluteDatetimestamp', artwork.date)
+        : null),
   }),
+
 
   data: (query, artwork) => ({
     label:
       artwork.label,
-
-    date:
-      (artwork.date !== artwork.thing.date
-        ? artwork.date
-        : null),
 
     artworkThingType:
       query.artworkThingType,
@@ -49,25 +51,36 @@ export default {
         {class: 'origin-details'},
 
         [
-          relations.credit.slots({
-            showAnnotation: true,
-            showExternalLinks: true,
-            showChronology: true,
-            showWikiEdits: true,
+          language.encapsulate(capsule, 'artworkBy', workingCapsule => {
+            const workingOptions = {};
 
-            trimAnnotation: false,
+            if (data.label) {
+              workingCapsule += '.customLabel';
+              workingOptions.label = data.label;
+            }
 
-            chronologyKind: 'coverArt',
+            if (relations.datetimestamp) {
+              workingCapsule += '.withYear';
+              workingOptions.year =
+                relations.datetimestamp.slots({
+                  style: 'year',
+                  tooltip: true,
+                });
+            }
 
-            normalStringKey:
-              (data.label
-                ? capsule + '.artworkBy.customLabel'
-                : capsule + '.artworkBy'),
+            return relations.credit.slots({
+              showAnnotation: true,
+              showExternalLinks: true,
+              showChronology: true,
+              showWikiEdits: true,
 
-            additionalStringOptions:
-              (data.label
-                ? {label: data.label}
-                : {}),
+              trimAnnotation: false,
+
+              chronologyKind: 'coverArt',
+
+              normalStringKey: workingCapsule,
+              additionalStringOptions: workingOptions,
+            });
           }),
 
           pagePath[0] === 'track' &&
@@ -76,11 +89,6 @@ export default {
               album:
                 relations.albumLink.slot('color', false),
             }),
-
-          language.$(capsule, 'released', {
-            [language.onlyIfOptions]: ['date'],
-            date: language.formatDate(data.date),
-          }),
 
           language.$(capsule, 'source', {
             [language.onlyIfOptions]: ['source'],

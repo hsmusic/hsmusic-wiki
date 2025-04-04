@@ -280,7 +280,6 @@ releaseInfo:
 
   released: "Released {DATE}."
   albumReleased: "Album released {DATE}."
-  artReleased: "Art released {DATE}."
   trackReleased: "Track released {DATE}."
   addedToWiki: "Added to wiki {DATE}."
 
@@ -901,10 +900,18 @@ misc:
   #   context, when just one cover is being spotlighted.
 
   coverArtwork:
-    artworkBy: "Artwork by {ARTISTS}"
-    artworkBy.customLabel: "{LABEL} by {ARTISTS}"
+    artworkBy: >-
+      Artwork by {ARTISTS}
 
-    released: "Art released {DATE}"
+    artworkBy.customLabel: >-
+      {LABEL} by {ARTISTS}
+
+    artworkBy.withYear: >-
+      Artwork ({YEAR}) by {ARTISTS}
+
+    artworkBy.customLabel.withYear: >-
+      {LABEL} ({YEAR}) by {ARTISTS}
+
     source: "Via {SOURCE}"
 
     trackArtFromAlbum: "Album cover for {ALBUM}"
