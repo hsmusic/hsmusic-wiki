@@ -119,7 +119,7 @@ function handleAdditionalNamesBoxLinkClicked(domEvent) {
       ? top > 0.7 * window.innerHeight
    : height && !boxFitsInFrame
       ? top > 0.4 * window.innerHeight
-      ? top > 0.5 * window.innerHeight) ||
+      : top > 0.5 * window.innerHeight) ||
 
     (bottom && bottomFitsInFrame
       ? bottom > window.innerHeight - 20
