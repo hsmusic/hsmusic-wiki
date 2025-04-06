@@ -22,8 +22,11 @@ export default templateCompositeFrom({
 
     annotatedReferenceList({
       referenceType: input.value(['album', 'track']),
+
       data: 'artworkData',
       find: '#find',
+
+      thing: input.value('artwork'),
     }),
   ],
 });

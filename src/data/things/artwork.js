@@ -196,6 +196,8 @@ export class Artwork extends Thing {
 
         data: 'artworkData',
         find: '#find',
+
+        thing: input.value('artwork'),
       }),
 
       exposeDependencyOrContinue({
