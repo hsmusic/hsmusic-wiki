@@ -1,13 +1,24 @@
 import {inspect} from 'node:util';
 
 import {input} from '#composite';
+import find from '#find';
 import Thing from '#thing';
-import {isContributionList, isDate, isFileExtension, validateReferenceList}
-  from '#validators';
-import {parseContributors, parseDate} from '#yaml';
+import {parseAnnotatedReferences, parseContributors, parseDate} from '#yaml';
+
+import {
+  isContentString,
+  isContributionList,
+  isDate,
+  isFileExtension,
+  optional,
+  validateArrayItems,
+  validateProperties,
+  validateReference,
+  validateReferenceList,
+} from '#validators';
 
 import {withPropertyFromObject} from '#composite/data';
-import {contentString, directory, simpleString, soupyFind, thing}
+import {contentString, directory, simpleString, soupyFind, thing, wikiData}
   from '#composite/wiki-properties';
 
 import {
@@ -20,6 +31,7 @@ import {
 
 import {
   withRecontextualizedContributionList,
+  withResolvedAnnotatedReferenceList,
   withResolvedContribs,
   withResolvedReferenceList,
 } from '#composite/wiki-data';
@@ -157,9 +169,63 @@ export class Artwork extends Thing {
       }),
     ],
 
+    referencedArtworks: [
+      {
+        compute: (continuation) => continuation({
+          ['#find']:
+            find.mixed({
+              track: find.trackPrimaryArtwork,
+              album: find.albumPrimaryArtwork,
+            }),
+        }),
+      },
+
+      withResolvedAnnotatedReferenceList({
+        list: input.updateValue({
+          validate:
+            // TODO: It's annoying to hardcode this when it's really the
+            // same behavior as through annotatedReferenceList and through
+            // referenceListUpdateDescription, the latter of which isn't
+            // available outside of #composite/wiki-data internals.
+            validateArrayItems(
+              validateProperties({
+                reference: validateReference(['album', 'track']),
+                annotation: optional(isContentString),
+              })),
+        }),
+
+        data: 'artworkData',
+        find: '#find',
+        date: input.value(null),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#resolvedAnnotatedReferenceList',
+        mode: input.value('empty'),
+      }),
+
+      withPropertyFromObject({
+        object: 'thing',
+        property: input.value('referencedArtworks'),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#thing.referencedArtworks',
+      }),
+
+      exposeConstant({
+        value: input.value([]),
+      }),
+    ],
+
     // Update only
 
     find: soupyFind(),
+
+    // used for referencedArtworks (mixedFind)
+    artworkData: wikiData({
+      class: input.value(Artwork),
+    }),
   });
 
   static [Thing.yamlDocumentSpec] = {
@@ -181,6 +247,11 @@ export class Artwork extends Thing {
       },
 
       'Tags': {property: 'artTags'},
+
+      'Referenced Artworks': {
+        property: 'referencedArtworks',
+        transform: parseAnnotatedReferences,
+      },
     },
   };
 
