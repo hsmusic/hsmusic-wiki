@@ -4,6 +4,7 @@ export {default as inheritFromMainRelease} from './inheritFromMainRelease.js';
 export {default as withAllReleases} from './withAllReleases.js';
 export {default as withAlwaysReferenceByDirectory} from './withAlwaysReferenceByDirectory.js';
 export {default as withContainingTrackSection} from './withContainingTrackSection.js';
+export {default as withCoverArtistContribs} from './withCoverArtistContribs.js';
 export {default as withDate} from './withDate.js';
 export {default as withDirectorySuffix} from './withDirectorySuffix.js';
 export {default as withHasUniqueCoverArt} from './withHasUniqueCoverArt.js';
