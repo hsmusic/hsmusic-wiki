@@ -1442,6 +1442,16 @@ hr.cute,
     0 0 12px 12px #00000080;
 }
 
+#cover-art-column .cover-artwork:not(:first-child) {
+  margin-top: 20px;
+  margin-left: 30px;
+  margin-right: 5px;
+}
+
+#cover-art-column .cover-artwork:last-child:not(:first-child) {
+  margin-bottom: 25px;
+}
+
 .cover-artwork .image-container {
   /* Border is handled on the .cover-artwork. */
   border: none;
