@@ -1,13 +1,15 @@
 import {input} from '#composite';
 import Thing from '#thing';
-import {isContributionList, isDate, validateReferenceList} from '#validators';
+import {isContributionList, isDate, isFileExtension, validateReferenceList}
+  from '#validators';
 import {parseContributors, parseDate} from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
-import {contentString, simpleString, soupyFind, thing}
+import {contentString, directory, simpleString, soupyFind, thing}
   from '#composite/wiki-properties';
 
 import {
+  exitWithoutDependency,
   exposeConstant,
   exposeDependency,
   exposeDependencyOrContinue,
@@ -31,6 +33,10 @@ export class Artwork extends Thing {
   }) => ({
     // Update & expose
 
+    unqualifiedDirectory: directory({
+      name: input.value(null),
+    }),
+
     thing: thing(),
 
     label: simpleString(),
@@ -44,6 +50,43 @@ export class Artwork extends Thing {
       }),
 
       exposeDependency({dependency: '#date'}),
+    ],
+
+    fileExtensionFromThingProperty: simpleString(),
+
+    fileExtension: [
+      {
+        compute: (continuation) => continuation({
+          ['#default']: 'jpg',
+        }),
+      },
+
+      exposeUpdateValueOrContinue({
+        validate: input.value(isFileExtension),
+      }),
+
+      exitWithoutDependency({
+        dependency: 'thing',
+        value: '#default',
+      }),
+
+      exitWithoutDependency({
+        dependency: 'fileExtensionFromThingProperty',
+        value: '#default',
+      }),
+
+      withPropertyFromObject({
+        object: 'thing',
+        property: 'fileExtensionFromThingProperty',
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#value',
+      }),
+
+      exposeDependency({
+        dependency: '#default',
+      }),
     ],
 
     artistContribsFromThingProperty: simpleString(),
@@ -119,6 +162,9 @@ export class Artwork extends Thing {
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
+      'Directory': {property: 'unqualifiedDirectory'},
+      'File Extension': {property: 'fileExtension'},
+
       'Label': {property: 'label'},
       'Source': {property: 'source'},
 
