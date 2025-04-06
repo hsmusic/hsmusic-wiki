@@ -646,7 +646,7 @@ export class Album extends Thing {
 
           artworkData.push(...entry.trackArtworks);
 
-          entry.dataSourceAlbum = albumRef;
+          entry.album = album;
         }
 
         closeCurrentTrackSection();

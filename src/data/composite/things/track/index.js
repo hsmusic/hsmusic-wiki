@@ -1,7 +1,6 @@
 export {default as exitWithoutUniqueCoverArt} from './exitWithoutUniqueCoverArt.js';
 export {default as inheritContributionListFromMainRelease} from './inheritContributionListFromMainRelease.js';
 export {default as inheritFromMainRelease} from './inheritFromMainRelease.js';
-export {default as withAlbum} from './withAlbum.js';
 export {default as withAllReleases} from './withAllReleases.js';
 export {default as withAlwaysReferenceByDirectory} from './withAlwaysReferenceByDirectory.js';
 export {default as withContainingTrackSection} from './withContainingTrackSection.js';

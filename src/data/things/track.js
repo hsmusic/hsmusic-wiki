@@ -64,7 +64,6 @@ import {
   exitWithoutUniqueCoverArt,
   inheritContributionListFromMainRelease,
   inheritFromMainRelease,
-  withAlbum,
   withAllReleases,
   withAlwaysReferenceByDirectory,
   withContainingTrackSection,
@@ -123,6 +122,10 @@ export class Track extends Thing {
         dependency: '#suffixDirectoryFromAlbum',
       })
     ],
+
+    album: thing({
+      class: input.value(Album),
+    }),
 
     additionalNames: additionalNameList(),
 
@@ -224,14 +227,6 @@ export class Track extends Thing {
     mainReleaseTrack: singleReference({
       class: input.value(Track),
       find: soupyFind.input('track'),
-    }),
-
-    // Internal use only - for directly identifying an album inside a track's
-    // util.inspect display, if it isn't indirectly available (by way of being
-    // included in an album's track list).
-    dataSourceAlbum: singleReference({
-      class: input.value(Album),
-      find: soupyFind.input('album'),
     }),
 
     artistContribs: [
@@ -393,11 +388,6 @@ export class Track extends Thing {
     // Expose only
 
     commentatorArtists: commentatorArtists(),
-
-    album: [
-      withAlbum(),
-      exposeDependency({dependency: '#album'}),
-    ],
 
     date: [
       withDate(),
@@ -747,15 +737,7 @@ export class Track extends Thing {
     let album;
 
     if (depth >= 0) {
-      try {
-        album = this.album;
-      } catch (_error) {
-        // Computing album might crash for any reason, which we don't want to
-        // distract from another error we might be trying to work out at the
-        // moment (for which debugging might involve inspecting this track!).
-      }
-
-      album ??= this.dataSourceAlbum;
+      album = this.album;
     }
 
     if (album) {

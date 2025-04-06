@@ -5,8 +5,6 @@ import {input, templateCompositeFrom} from '#composite';
 
 import {withPropertyFromObject} from '#composite/data';
 
-import withAlbum from './withAlbum.js';
-
 export default templateCompositeFrom({
   annotation: `withPropertyFromAlbum`,
 
@@ -19,10 +17,9 @@ export default templateCompositeFrom({
   }) => ['#album.' + property],
 
   steps: () => [
-    withAlbum(),
 
     withPropertyFromObject({
-      object: '#album',
+      object: 'album',
       property: input('property'),
     }),
 

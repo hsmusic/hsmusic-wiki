@@ -17,6 +17,8 @@ import {
   exposeUpdateValueOrContinue,
 } from '#composite/control-flow';
 
+import withPropertyFromAlbum from './withPropertyFromAlbum.js';
+
 export default templateCompositeFrom({
   annotation: `withAlwaysReferenceByDirectory`,
 
@@ -27,18 +29,7 @@ export default templateCompositeFrom({
       validate: input.value(isBoolean),
     }),
 
-    // withAlwaysReferenceByDirectory is sort of a fragile area - we can't
-    // find the track's album the normal way because albums' track lists
-    // recurse back into alwaysReferenceByDirectory!
-    withResolvedReference({
-      ref: 'dataSourceAlbum',
-      find: soupyFind.input('album'),
-    }).outputs({
-      '#resolvedReference': '#album',
-    }),
-
-    withPropertyFromObject({
-      object: '#album',
+    withPropertyFromAlbum({
       property: input.value('alwaysReferenceTracksByDirectory'),
     }),
 
