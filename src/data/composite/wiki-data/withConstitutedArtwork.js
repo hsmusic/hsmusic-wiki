@@ -6,9 +6,10 @@ export default templateCompositeFrom({
   annotation: `withConstitutedArtwork`,
 
   inputs: {
-    contribsProperty: input({type: 'string'}),
-    artistProperty: input({type: 'string'}),
-    dateProperty: input({type: 'string'}),
+    fileExtensionFromThingProperty: input({type: 'string'}),
+    artistContribsFromThingProperty: input({type: 'string'}),
+    artistContribsArtistProperty: input({type: 'string'}),
+    dateFromThingProperty: input({type: 'string'}),
   },
 
   outputs: ['#constitutedArtwork'],
@@ -19,24 +20,30 @@ export default templateCompositeFrom({
         input.myself(),
         'find',
 
-        input('contribsProperty'),
-        input('dateProperty'),
+        input('fileExtensionFromThingProperty'),
+        input('artistContribsFromThingProperty'),
+        input('artistContribsArtistProperty'),
+        input('dateFromThingProperty'),
       ],
 
       compute: (continuation, {
         [input.myself()]: myself,
         ['find']: find,
 
-        [input('contribsProperty')]: contribsProperty,
-        [input('dateProperty')]: dateProperty,
+        [input('fileExtensionFromThingProperty')]: fileExtensionFromThingProperty,
+        [input('artistContribsFromThingProperty')]: artistContribsFromThingProperty,
+        [input('artistContribsArtistProperty')]: artistContribsArtistProperty,
+        [input('dateFromThingProperty')]: dateFromThingProperty,
       }) => continuation({
         ['#constitutedArtwork']:
           Object.assign(new thingConstructors.Artwork, {
             thing: myself,
             find: find,
 
-            artistContribsFromThingProperty: contribsProperty,
-            dateFromThingProperty: dateProperty,
+            fileExtensionFromThingProperty,
+            artistContribsFromThingProperty,
+            artistContribsArtistProperty,
+            dateFromThingProperty,
           }),
       }),
     },

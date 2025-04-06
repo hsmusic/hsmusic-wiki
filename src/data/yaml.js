@@ -790,24 +790,29 @@ export function parseAnnotatedReferences(entries, {
 }
 
 export function parseArtwork({
+  fileExtensionFromThingProperty,
   dateFromThingProperty,
   artistContribsFromThingProperty,
   artistContribsArtistProperty,
 }) {
-  const parseSingleEntry = (entry, {subdoc, Artwork}) =>
-    subdoc(Artwork, entry, {
-      bindInto: 'thing',
-      provide: {
-        dateFromThingProperty,
-        artistContribsFromThingProperty,
-        artistContribsArtistProperty,
-      },
-    });
+  const provide = {
+    fileExtensionFromThingProperty,
+    dateFromThingProperty,
+    artistContribsFromThingProperty,
+    artistContribsArtistProperty,
+  };
 
-  return (value, ...args) =>
+  const parseSingleEntry = (entry, {subdoc, Artwork}) =>
+    subdoc(Artwork, entry, {bindInto: 'thing', provide});
+
+  const transform = (value, ...args) =>
     (Array.isArray(value)
       ? value.map(entry => parseSingleEntry(entry, ...args))
       : [parseSingleEntry(value, ...args)]);
+
+  transform.provide = provide;
+
+  return transform;
 }
 
 // documentModes: Symbols indicating sets of behavior for loading and processing

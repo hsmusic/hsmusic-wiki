@@ -1,29 +1,25 @@
-import {input, templateCompositeFrom} from '#composite';
-import {isContributionList, isDate, validateWikiData} from '#validators';
+// This composition does not actually inspect the values of any properties
+// specified, so it's not responsible for determining whether a constituted
+// artwork should exist at all.
 
-import {exitWithoutDependency, exposeUpdateValueOrContinue}
-  from '#composite/control-flow';
+import {input, templateCompositeFrom} from '#composite';
+import {withEntries} from '#sugar';
+import Thing from '#thing';
+import {validateWikiData} from '#validators';
+
+import {exposeUpdateValueOrContinue} from '#composite/control-flow';
 import {withConstitutedArtwork} from '#composite/wiki-data';
 
-export default templateCompositeFrom({
+const template = templateCompositeFrom({
   annotation: `constitutibleArtwork`,
 
   compose: false,
 
   inputs: {
-    contribs: input.staticDependency({
-      validate: isContributionList,
-      acceptsNull: true,
-    }),
-
-    date: input.staticDependency({
-      validate: isDate,
-      acceptsNull: true,
-    }),
-
-    artistProperty: input.staticValue({
-      type: 'string',
-    }),
+    fileExtensionFromThingProperty: input({type: 'string'}),
+    artistContribsFromThingProperty: input({type: 'string'}),
+    artistContribsArtistProperty: input({type: 'string'}),
+    dateFromThingProperty: input({type: 'string'}),
   },
 
   steps: () => [
@@ -34,30 +30,11 @@ export default templateCompositeFrom({
         })),
     }),
 
-    exitWithoutDependency({
-      dependency: input('contribs'),
-      value: input.value([]),
-    }),
-
-    {
-      dependencies: [
-        input.staticDependency('contribs'),
-        input.staticDependency('date'),
-      ],
-
-      compute: (continuation, {
-        [input.staticDependency('contribs')]: contribsProperty,
-        [input.staticDependency('date')]: dateProperty,
-      }) => continuation({
-        ['#contribsProperty']: contribsProperty,
-        ['#dateProperty']: dateProperty,
-      })
-    },
-
     withConstitutedArtwork({
-      contribsProperty: '#contribsProperty',
-      artistProperty: input('artistProperty'),
-      dateProperty: '#dateProperty',
+      fileExtensionFromThingProperty: input('fileExtensionFromThingProperty'),
+      artistContribsFromThingProperty: input('artistContribsFromThingProperty'),
+      artistContribsArtistProperty: input('artistContribsArtistProperty'),
+      dateFromThingProperty: input('dateFromThingProperty'),
     }),
 
     {
@@ -68,3 +45,20 @@ export default templateCompositeFrom({
     },
   ],
 });
+
+template.fromYAMLFieldSpec = function(field) {
+  const {[Thing.yamlDocumentSpec]: documentSpec} = this;
+
+  const {provide} = documentSpec.fields[field].transform;
+
+  const inputs =
+    withEntries(provide, entries =>
+      entries.map(([property, value]) => [
+        property,
+        input.value(value),
+      ]));
+
+  return template(inputs);
+};
+
+export default template;

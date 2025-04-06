@@ -309,11 +309,14 @@ export class Track extends Thing {
       }),
     ],
 
-    trackArtworks: constitutibleArtworkList({
-      contribs: 'coverArtistContribs',
-      date: 'coverArtDate',
-      artistProperty: input.value('trackCoverArtistContributions'),
-    }),
+    trackArtworks: [
+      exitWithoutUniqueCoverArt({
+        value: input.value([]),
+      }),
+
+      constitutibleArtworkList.fromYAMLFieldSpec
+        .call(this, 'Track Artwork'),
+    ],
 
     artTags: [
       exitWithoutUniqueCoverArt({
@@ -539,6 +542,7 @@ export class Track extends Thing {
         property: 'trackArtworks',
         transform:
           parseArtwork({
+            fileExtensionFromThingProperty: 'coverArtFileExtension',
             dateFromThingProperty: 'coverArtDate',
             artistContribsFromThingProperty: 'coverArtistContribs',
             artistContribsArtistProperty: 'trackCoverArtistContributions',

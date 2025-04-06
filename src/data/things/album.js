@@ -159,11 +159,16 @@ export class Album extends Thing {
       dimensions(),
     ],
 
-    coverArtworks: constitutibleArtworkList({
-      contribs: 'coverArtistContribs',
-      date: 'coverArtDate',
-      artistProperty: input.value('albumCoverArtistContributions'),
-    }),
+    coverArtworks: [
+      exitWithoutDependency({
+        dependency: 'coverArtistContribs',
+        mode: input.value('empty'),
+        value: input.value([]),
+      }),
+
+      constitutibleArtworkList.fromYAMLFieldSpec
+        .call(this, 'Cover Artwork'),
+    ],
 
     hasTrackNumbers: flag(true),
     isListedOnHomepage: flag(true),
@@ -471,6 +476,7 @@ export class Album extends Thing {
         property: 'coverArtworks',
         transform:
           parseArtwork({
+            fileExtensionFromThingProperty: 'coverArtFileExtension',
             dateFromThingProperty: 'coverArtDate',
             artistContribsFromThingProperty: 'coverArtistContribs',
             artistContribsArtistProperty: 'albumCoverArtistContributions',
