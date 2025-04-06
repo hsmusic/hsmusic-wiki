@@ -352,6 +352,7 @@ export class Track extends Thing {
     }),
 
     // used for referencedArtworkList (mixedFind)
+    // used for withAlwaysReferenceByDirectory (for some reason)
     trackData: wikiData({
       class: input.value(Track),
     }),
