@@ -691,14 +691,18 @@ export class Track extends Thing {
   // Track YAML loading is handled in album.js.
   static [Thing.getYamlLoadingSpec] = null;
 
-  getOwnArtworkPath(_artwork) {
+  getOwnArtworkPath(artwork) {
     if (!this.album) return null;
 
     return [
       'media.trackCover',
       this.album.directory,
-      this.directory,
-      this.coverArtFileExtension,
+
+      (artwork.unqualifiedDirectory
+        ? this.directory + '-' + artwork.unqualifiedDirectory
+        : this.directory),
+
+      artwork.fileExtension,
     ];
   }
 
