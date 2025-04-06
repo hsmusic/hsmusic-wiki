@@ -950,7 +950,7 @@ a .normal-content {
   font-weight: 800;
 }
 
-.nav-links-hierarchical .nav-link:not(:first-child)::before {
+.nav-links-hierarchical .nav-link + .blockwrap .nav-link::before {
   content: "\0020/\0020";
 }
 

@@ -396,30 +396,24 @@ export default {
                     i === slots.navLinks.length - 1);
 
                 return (
-                  html.tag('span', {class: 'nav-link'},
-                    showAsCurrent &&
-                      {class: 'current'},
+                  html.metatag('blockwrap',
+                    html.tag('span', {class: 'nav-link'},
+                      showAsCurrent &&
+                        {class: 'current'},
 
-                    [
-                      html.tag('span', {class: 'nav-link-content'},
-                        // Use inline-block styling on the content span,
-                        // rather than wrapping the whole nav-link in a proper
-                        // blockwrap, so that if the content spans multiple
-                        // lines, it'll kick the accent down beneath it.
-                        i > 0 &&
-                          {class: 'blockwrap'},
+                      [
+                        html.tag('span', {class: 'nav-link-content'},
+                          content),
 
-                        content),
+                        html.tag('span', {class: 'nav-link-accent'},
+                          {[html.noEdgeWhitespace]: true},
+                          {[html.onlyIfContent]: true},
 
-                      html.tag('span', {class: 'nav-link-accent'},
-                        {[html.noEdgeWhitespace]: true},
-                        {[html.onlyIfContent]: true},
-
-                        language.$('misc.navAccent', {
-                          [language.onlyIfOptions]: ['links'],
-                          links: cur.accent,
-                        })),
-                    ]));
+                          language.$('misc.navAccent', {
+                            [language.onlyIfOptions]: ['links'],
+                            links: cur.accent,
+                          })),
+                      ])));
               })),
 
           html.tag('div', {class: 'nav-bottom-row'},
