@@ -404,6 +404,11 @@ async function main() {
       type: 'flag',
     },
 
+    'skip-orphaned-artwork-validation': {
+      help: `Skips checking for internally orphaned artworks, which is a bad idea, unless you're debugging those in particular`,
+      type: 'flag',
+    },
+
     'skip-reference-validation': {
       help: `Skips checking and reporting reference errors, which speeds up the build but may silently allow erroneous data to pass through`,
       type: 'flag',
@@ -845,6 +850,16 @@ async function main() {
         warn:
           `Skipping directory validation. If any directories are duplicated\n` +
           `in data, the build will probably fail in unpredictable ways.`,
+      },
+    });
+
+    fallbackStep('reportOrphanedArtworks', {
+      default: 'perform',
+      cli: {
+        flag: 'skip-orphaned-artwork-validation',
+        negate: true,
+        warn:
+          `Skipping orphaned artwork validation. Hopefully you're debugging!`,
       },
     });
 
