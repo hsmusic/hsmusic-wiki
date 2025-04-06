@@ -18,6 +18,7 @@ export default templateCompositeFrom({
     name: input({
       validate: isName,
       defaultDependency: 'name',
+      acceptsNull: true,
     }),
 
     suffix: input({
