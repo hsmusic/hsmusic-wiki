@@ -5,13 +5,17 @@
 // or a placeholder. (This property is named hasUniqueCoverArt instead of
 // the usual hasCoverArt to emphasize that it does not inherit from the
 // album.)
+//
+// withHasUniqueCoverArt is based only around the presence of *specified*
+// cover artist contributions, not whether the references to artists on those
+// contributions actually resolve to anything. It completely evades interacting
+// with find/replace.
 
 import {input, templateCompositeFrom} from '#composite';
-import {empty} from '#sugar';
 
-import {raiseOutputWithoutDependency} from '#composite/control-flow';
+import {raiseOutputWithoutDependency, withResultOfAvailabilityCheck}
+  from '#composite/control-flow';
 import {withFlattenedList, withPropertyFromList} from '#composite/data';
-import {withResolvedContribs} from '#composite/wiki-data';
 
 import withPropertyFromAlbum from './withPropertyFromAlbum.js';
 
@@ -31,38 +35,43 @@ export default templateCompositeFrom({
           : continuation()),
     },
 
-    withResolvedContribs({
+    withResultOfAvailabilityCheck({
       from: 'coverArtistContribs',
-      date: input.value(null),
+      mode: input.value('empty'),
     }),
 
     {
-      dependencies: ['#resolvedContribs'],
+      dependencies: ['#availability'],
       compute: (continuation, {
-        ['#resolvedContribs']: contribsFromTrack,
+        ['#availability']: availability,
       }) =>
-        (empty(contribsFromTrack)
-          ? continuation()
-          : continuation.raiseOutput({
+        (availability
+          ? continuation.raiseOutput({
               ['#hasUniqueCoverArt']: true,
-            })),
+            })
+          : continuation()),
     },
 
     withPropertyFromAlbum({
       property: input.value('trackCoverArtistContribs'),
+      internal: input.value(true),
+    }),
+
+    withResultOfAvailabilityCheck({
+      from: '#album.trackCoverArtistContribs',
+      mode: input.value('empty'),
     }),
 
     {
-      dependencies: ['#album.trackCoverArtistContribs'],
+      dependencies: ['#availability'],
       compute: (continuation, {
-        ['#album.trackCoverArtistContribs']: contribsFromAlbum,
+        ['#availability']: availability,
       }) =>
-        (empty(contribsFromAlbum)
-          ? continuation()
-          : continuation.raiseOutput({
-              ['#hasUniqueCoverArt']:
-                !empty(contribsFromAlbum),
-            })),
+        (availability
+          ? continuation.raiseOutput({
+              ['#hasUniqueCoverArt']: true,
+            })
+          : continuation()),
     },
 
     raiseOutputWithoutDependency({
@@ -81,19 +90,19 @@ export default templateCompositeFrom({
       list: '#trackArtworks.artistContribs',
     }),
 
-    withResolvedContribs({
+    withResultOfAvailabilityCheck({
       from: '#flattenedList',
-      date: input.value(null),
+      mode: input.value('empty'),
     }),
 
     {
-      dependencies: ['#resolvedContribs'],
+      dependencies: ['#availability'],
       compute: (continuation, {
-        ['#resolvedContribs']: contribsFromArtwork,
+        ['#availability']: availability,
       }) =>
         continuation({
           ['#hasUniqueCoverArt']:
-            !empty(contribsFromArtwork),
+            availability,
         }),
     },
   ],
