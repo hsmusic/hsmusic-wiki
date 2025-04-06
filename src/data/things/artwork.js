@@ -1,3 +1,5 @@
+import {inspect} from 'node:util';
+
 import {input} from '#composite';
 import Thing from '#thing';
 import {isContributionList, isDate, isFileExtension, validateReferenceList}
@@ -187,5 +189,29 @@ export class Artwork extends Thing {
     if (!this.thing.getOwnArtworkPath) return null;
 
     return this.thing.getOwnArtworkPath(this);
+  }
+
+  [inspect.custom](depth, options, inspect) {
+    const parts = [];
+
+    parts.push(Thing.prototype[inspect.custom].apply(this));
+
+    if (this.thing) {
+      if (depth >= 0) {
+        const newOptions = {
+          ...options,
+          depth:
+            (options.depth === null
+              ? null
+              : options.depth - 1),
+        };
+
+        parts.push(` for ${inspect(this.thing, newOptions)}`);
+      } else {
+        parts.push(` for ${colors.blue(Thing.getReference(this.thing))}`);
+      }
+    }
+
+    return parts.join('');
   }
 }
