@@ -2904,35 +2904,31 @@ h3.content-heading {
 }
 
 .content-sticky-heading-root {
-  position: sticky;
-  top: 0;
-  width: 100%;
-}
-
-.content-sticky-heading-anchor {
-  position: relative;
-  width: 100%;
-}
-
-.content-sticky-heading-container {
-  position: absolute;
-  width: 100%;
-}
-
-.imaginary-static-heading-root,
-.imaginary-static-heading-row,
-.imaginary-static-heading-title {
-  display: block;
-}
-
-.content-sticky-heading-root,
-.imaginary-static-heading-root {
   width: calc(100% + 2 * var(--content-padding));
   margin: calc(-1 * var(--content-padding));
+  margin-bottom: 0;
 }
 
-.imaginary-static-heading-root {
-  margin-bottom: calc(0.5 * var(--content-padding));
+.content-sticky-heading-anchor,
+.content-sticky-heading-container {
+  width: 100%;
+}
+
+.content-sticky-heading-root:not([inert]) {
+  position: sticky;
+  top: 0;
+}
+
+.content-sticky-heading-anchor:not(:matches(.content-sticky-heading-root[inert]) *) {
+  position: relative;
+}
+
+.content-sticky-heading-container:not(:matches(.content-sticky-heading-root[inert]) *) {
+  position: absolute;
+}
+
+.content-sticky-heading-root[inert] {
+  visibility: hidden;
 }
 
 main.long-content .content-sticky-heading-container {
@@ -2946,12 +2942,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   padding-right: calc(var(--long-content-padding-ratio) * (100% - 2 * var(--content-padding)) + var(--content-padding));
 }
 
-.imaginary-static-heading-root {
-  visibility: hidden;
-}
-
-.content-sticky-heading-row,
-.imaginary-static-heading-row {
+.content-sticky-heading-row {
   box-sizing: border-box;
   padding:
     calc(1.25 * var(--content-padding) + 5px)
@@ -2961,9 +2952,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 
   width: 100%;
   margin: 0;
-}
 
-.content-sticky-heading-row {
   background: var(--bg-black-color);
   border-bottom: 1px dotted rgba(220, 220, 220, 0.4);
 
@@ -2983,8 +2972,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   grid-template-columns: 1fr min(40%, 90px);
 }
 
-.content-sticky-heading-root.has-cover +
-.imaginary-static-heading-root .imaginary-static-heading-title {
+.content-sticky-heading-root.has-cover {
   padding-right: min(40%, 400px);
 }
 
@@ -2992,10 +2980,6 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   position: relative;
   margin: 0;
   padding-right: 20px;
-}
-
-.content-sticky-heading-row h1,
-.imaginary-static-heading-title {
   line-height: 1.4;
 }
 

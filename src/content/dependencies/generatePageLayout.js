@@ -276,10 +276,16 @@ export default {
       (html.isBlank(slots.title)
         ? null
      : slots.headingMode === 'sticky'
-        ? relations.stickyHeadingContainer.slots({
-            title: titleContentsHTML,
-            cover: slots.cover,
-          })
+        ? [
+            relations.stickyHeadingContainer.slots({
+              title: titleContentsHTML,
+              cover: slots.cover,
+            }),
+
+            relations.stickyHeadingContainer.clone().slots({
+              rootAttributes: {inert: true},
+            }),
+          ]
         : html.tag('h1', titleContentsHTML));
 
     // TODO: There could be neat interactions with the sticky heading here,

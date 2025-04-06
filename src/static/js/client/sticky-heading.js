@@ -7,7 +7,10 @@ import {cssProp, dispatchInternalEvent, templateContent}
 export const info = {
   id: 'stickyHeadingInfo',
 
+  stickyRoots: null,
+
   stickyContainers: null,
+  staticContainers: null,
 
   stickyHeadingRows: null,
   stickyHeadings: null,
@@ -23,7 +26,6 @@ export const info = {
   contentCovers: null,
   contentCoversReveal: null,
 
-  imaginaryStaticHeadings: null,
   referenceCollapsedHeading: null,
 
   state: {
@@ -37,8 +39,16 @@ export const info = {
 };
 
 export function getPageReferences() {
+  info.stickyRoots =
+    Array.from(document.querySelectorAll('.content-sticky-heading-root:not([inert])'));
+
   info.stickyContainers =
-    Array.from(document.getElementsByClassName('content-sticky-heading-container'));
+    info.stickyRoots
+      .map(el => el.querySelector('.content-sticky-heading-container'));
+
+  info.staticContainers =
+    info.stickyRoots
+      .map(el => el.nextElementSibling);
 
   info.stickyCoverContainers =
     info.stickyContainers
@@ -83,10 +93,6 @@ export function getPageReferences() {
   info.contentHeadings =
     info.contentContainers
       .map(el => Array.from(el.querySelectorAll('.content-heading')));
-
-  info.imaginaryStaticHeadings =
-    info.contentContainers
-      .map(el => el.querySelector('.imaginary-static-heading-root'));
 
   info.referenceCollapsedHeading =
     info.stickyHeadings
@@ -182,16 +188,16 @@ function updateStuckStatus(index) {
 
 function updateCollapseStatus(index) {
   const stickyContainer = info.stickyContainers[index];
+  const staticContainer = info.staticContainers[index];
   const stickyHeading = info.stickyHeadings[index];
-  const imaginaryStaticHeading = info.imaginaryStaticHeadings[index];
   const referenceCollapsedHeading = info.referenceCollapsedHeading[index];
 
   const {height: uncollapsedHeight} = stickyHeading.getBoundingClientRect();
   const {height: collapsedHeight} = referenceCollapsedHeading.getBoundingClientRect();
 
   if (
-    imaginaryStaticHeading.getBoundingClientRect().bottom < 4 ||
-    imaginaryStaticHeading.getBoundingClientRect().top < -80
+    staticContainer.getBoundingClientRect().bottom < 4 ||
+    staticContainer.getBoundingClientRect().top < -80
   ) {
     if (!stickyContainer.classList.contains('collapse')) {
       stickyContainer.classList.add('collapse');

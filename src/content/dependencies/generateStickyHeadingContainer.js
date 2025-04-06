@@ -2,6 +2,11 @@ export default {
   extraDependencies: ['html'],
 
   slots: {
+    rootAttributes: {
+      type: 'attributes',
+      mutable: false,
+    },
+
     title: {
       type: 'html',
       mutable: false,
@@ -15,6 +20,8 @@ export default {
 
   generate: (slots, {html}) => html.tags([
     html.tag('div', {class: 'content-sticky-heading-root'},
+      slots.rootAttributes,
+
       !html.isBlank(slots.cover) &&
         {class: 'has-cover'},
 
@@ -48,10 +55,5 @@ export default {
             html.tag('div', {class: 'content-sticky-subheading-row'},
               html.tag('h2', {class: 'content-sticky-subheading'})),
           ]))),
-
-    html.tag('h1', {class: 'imaginary-static-heading-root'},
-      html.tag('span', {class: 'imaginary-static-heading-row'},
-        html.tag('span', {class: 'imaginary-static-heading-title'},
-          slots.title.clone()))),
   ]),
 };
