@@ -347,11 +347,10 @@ export class Track extends Thing {
     reverse: soupyReverse(),
 
     // used for referencedArtworkList (mixedFind)
-    albumData: wikiData({
-      class: input.value(Album),
+    artworkData: wikiData({
+      class: input.value(Artwork),
     }),
 
-    // used for referencedArtworkList (mixedFind)
     // used for withAlwaysReferenceByDirectory (for some reason)
     trackData: wikiData({
       class: input.value(Track),
@@ -640,6 +639,31 @@ export class Track extends Thing {
         (track.alwaysReferenceByDirectory
           ? []
           : [track.name]),
+    },
+
+    trackPrimaryArtwork: {
+      [Thing.findThisThingOnly]: false,
+
+      referenceTypes: [
+        'track',
+        'track-referencing-artworks',
+        'track-referenced-artworks',
+      ],
+
+      bindTo: 'artworkData',
+
+      include: (artwork, {Artwork, Track}) =>
+        artwork instanceof Artwork &&
+        artwork.thing instanceof Track &&
+        artwork === artwork.thing.trackArtworks[0],
+
+      getMatchableNames: ({thing: track}) =>
+        (track.alwaysReferenceByDirectory
+          ? []
+          : [track.name]),
+
+      getMatchableDirectories: ({thing: track}) =>
+        [track.directory],
     },
   };
 

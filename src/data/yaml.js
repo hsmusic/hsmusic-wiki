@@ -1480,8 +1480,7 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
     // link if the 'find' or 'reverse' properties will be implicitly linked
 
     ['albumData', [
-      'albumData',
-      'trackData',
+      'artworkData',
       'wikiInfo',
     ]],
 
@@ -1506,7 +1505,7 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
     ['homepageLayout.sections.rows', [/* find */]],
 
     ['trackData', [
-      'albumData',
+      'artworkData',
       'trackData',
       'wikiInfo',
     ]],

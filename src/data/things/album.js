@@ -67,6 +67,7 @@ export class Album extends Thing {
 
   static [Thing.getPropertyDescriptors] = ({
     ArtTag,
+    Artwork,
     Group,
     Track,
     TrackSection,
@@ -269,13 +270,8 @@ export class Album extends Thing {
     reverse: soupyReverse(),
 
     // used for referencedArtworkList (mixedFind)
-    albumData: wikiData({
-      class: input.value(Album),
-    }),
-
-    // used for referencedArtworkList (mixedFind)
-    trackData: wikiData({
-      class: input.value(Track),
+    artworkData: wikiData({
+      class: input.value(Artwork),
     }),
 
     // used for withMatchingContributionPresets (indirectly by Contribution)
@@ -380,6 +376,31 @@ export class Album extends Thing {
         (album.alwaysReferenceByDirectory 
           ? [] 
           : [album.name]),
+    },
+
+    albumPrimaryArtwork: {
+      [Thing.findThisThingOnly]: false,
+
+      referenceTypes: [
+        'album',
+        'album-referencing-artworks',
+        'album-referenced-artworks',
+      ],
+
+      bindTo: 'artworkData',
+
+      include: (artwork, {Artwork, Album}) =>
+        artwork instanceof Artwork &&
+        artwork.thing instanceof Album &&
+        artwork === artwork.thing.coverArtworks[0],
+
+      getMatchableNames: ({thing: album}) =>
+        (album.alwaysReferenceByDirectory
+          ? []
+          : [album.name]),
+
+      getMatchableDirectories: ({thing: album}) =>
+        [album.directory],
     },
   };
 

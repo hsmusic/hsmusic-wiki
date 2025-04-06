@@ -313,15 +313,12 @@ export function filterReferenceErrors(wikiData, {
               case '_artwork': {
                 const mixed =
                   find.mixed({
-                    album: find.albumWithArtwork,
-                    track: find.trackWithArtwork,
+                    album: find.albumPrimaryArtwork,
+                    track: find.trackPrimaryArtwork,
                   });
 
                 const data =
-                  combineWikiDataArrays([
-                    wikiData.albumData,
-                    wikiData.trackData,
-                  ]);
+                  wikiData.artworkData;
 
                 findFn = ref => mixed(ref.reference, data, {mode: 'error'});
 
