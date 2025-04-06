@@ -9,13 +9,6 @@ export default templateCompositeFrom({
 
   compose: false,
 
-  inputs: {
-    date: input({
-      validate: isDate,
-      acceptsNull: true,
-    }),
-  },
-
   steps: () => [
     {
       compute: (continuation) => continuation({
@@ -31,7 +24,7 @@ export default templateCompositeFrom({
       referenceType: input.value(['album', 'track']),
       data: 'artworkData',
       find: '#find',
-      date: input('date'),
+      date: input.value(null),
     }),
   ],
 });

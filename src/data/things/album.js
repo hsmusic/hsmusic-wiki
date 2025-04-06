@@ -248,20 +248,7 @@ export class Album extends Thing {
         value: input.value([]),
       }),
 
-      {
-        dependencies: ['coverArtDate', 'date'],
-        compute: (continuation, {
-          coverArtDate,
-          date,
-        }) => continuation({
-          ['#date']:
-            coverArtDate ?? date,
-        }),
-      },
-
-      referencedArtworkList({
-        date: '#date',
-      }),
+      referencedArtworkList(),
     ],
 
     // Update only

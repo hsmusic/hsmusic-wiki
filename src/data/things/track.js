@@ -334,11 +334,7 @@ export class Track extends Thing {
         value: input.value([]),
       }),
 
-      withTrackArtDate(),
-
-      referencedArtworkList({
-        date: '#trackArtDate',
-      }),
+      referencedArtworkList(),
     ],
 
     // Update only
