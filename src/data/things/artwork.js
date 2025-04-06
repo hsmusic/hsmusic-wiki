@@ -18,8 +18,6 @@ import {
 } from '#validators';
 
 import {withPropertyFromObject} from '#composite/data';
-import {contentString, directory, simpleString, soupyFind, thing, wikiData}
-  from '#composite/wiki-properties';
 
 import {
   exitWithoutDependency,
@@ -35,6 +33,17 @@ import {
   withResolvedContribs,
   withResolvedReferenceList,
 } from '#composite/wiki-data';
+
+import {
+  contentString,
+  directory,
+  reverseReferenceList,
+  simpleString,
+  soupyFind,
+  soupyReverse,
+  thing,
+  wikiData,
+} from '#composite/wiki-properties';
 
 import {withDate} from '#composite/things/artwork';
 
@@ -222,10 +231,17 @@ export class Artwork extends Thing {
     // Update only
 
     find: soupyFind(),
+    reverse: soupyReverse(),
 
     // used for referencedArtworks (mixedFind)
     artworkData: wikiData({
       class: input.value(Artwork),
+    }),
+
+    // Expose only
+
+    referencedByArtworks: reverseReferenceList({
+      reverse: soupyReverse.input('artworksWhichReference'),
     }),
   });
 
@@ -253,6 +269,16 @@ export class Artwork extends Thing {
         property: 'referencedArtworks',
         transform: parseAnnotatedReferences,
       },
+    },
+  };
+
+  static [Thing.reverseSpecs] = {
+    artworksWhichReference: {
+      bindTo: 'artworkData',
+
+      referencing: artwork => [artwork],
+      referenced: artwork =>
+        artwork.referencedArtworks.map(ref => ref.artwork),
     },
   };
 

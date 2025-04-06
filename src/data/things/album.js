@@ -278,17 +278,6 @@ export class Album extends Thing {
       withTracks(),
       exposeDependency({dependency: '#tracks'}),
     ],
-
-    referencedByArtworks: [
-      exitWithoutContribs({
-        contribs: 'coverArtistContribs',
-        value: input.value([]),
-      }),
-
-      reverseReferenceList({
-        reverse: soupyReverse.input('artworksWhichReference'),
-      }),
-    ],
   });
 
   static [Thing.getSerializeDescriptors] = ({

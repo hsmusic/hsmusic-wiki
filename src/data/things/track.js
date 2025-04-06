@@ -420,16 +420,6 @@ export class Track extends Thing {
     featuredInFlashes: reverseReferenceList({
       reverse: soupyReverse.input('flashesWhichFeature'),
     }),
-
-    referencedByArtworks: [
-      exitWithoutUniqueCoverArt({
-        value: input.value([]),
-      }),
-
-      reverseReferenceList({
-        reverse: soupyReverse.input('artworksWhichReference'),
-      }),
-    ],
   });
 
   static [Thing.yamlDocumentSpec] = {
