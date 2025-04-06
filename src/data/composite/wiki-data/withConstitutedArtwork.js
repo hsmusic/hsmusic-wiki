@@ -18,8 +18,6 @@ export default templateCompositeFrom({
     {
       dependencies: [
         input.myself(),
-        'find',
-
         input('fileExtensionFromThingProperty'),
         input('artistContribsFromThingProperty'),
         input('artistContribsArtistProperty'),
@@ -28,8 +26,6 @@ export default templateCompositeFrom({
 
       compute: (continuation, {
         [input.myself()]: myself,
-        ['find']: find,
-
         [input('fileExtensionFromThingProperty')]: fileExtensionFromThingProperty,
         [input('artistContribsFromThingProperty')]: artistContribsFromThingProperty,
         [input('artistContribsArtistProperty')]: artistContribsArtistProperty,
@@ -38,8 +34,6 @@ export default templateCompositeFrom({
         ['#constitutedArtwork']:
           Object.assign(new thingConstructors.Artwork, {
             thing: myself,
-            find: find,
-
             fileExtensionFromThingProperty,
             artistContribsFromThingProperty,
             artistContribsArtistProperty,
