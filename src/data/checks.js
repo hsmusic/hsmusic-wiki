@@ -795,3 +795,49 @@ export function reportContentTextErrors(wikiData, {
     }
   });
 }
+
+export function reportOrphanedArtworks(wikiData) {
+  const aggregate =
+    openAggregate({message: `Artwork objects are orphaned`});
+
+  const assess = ({
+    message,
+    filterThing,
+    filterContribs,
+    link,
+  }) => {
+    aggregate.nest({message: `Orphaned ${message}`}, ({push}) => {
+      const ostensibleArtworks =
+        wikiData.artworkData
+          .filter(artwork =>
+            artwork.thing instanceof filterThing &&
+            artwork.artistContribsFromThingProperty === filterContribs);
+
+      const orphanedArtworks =
+        ostensibleArtworks
+          .filter(artwork => !artwork.thing[link].includes(artwork));
+
+      for (const artwork of orphanedArtworks) {
+        push(new Error(`Orphaned: ${inspect(artwork)}`));
+      }
+    });
+  };
+
+  const {Album, Track} = thingConstructors;
+
+  assess({
+    message: `album cover artworks`,
+    filterThing: Album,
+    filterContribs: 'coverArtistContribs',
+    link: 'coverArtworks',
+  });
+
+  assess({
+    message: `track artworks`,
+    filterThing: Track,
+    filterContribs: 'coverArtistContribs',
+    link: 'trackArtworks',
+  });
+
+  aggregate.close();
+}

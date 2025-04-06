@@ -68,8 +68,9 @@ import {
 
 import {
   filterReferenceErrors,
-  reportDirectoryErrors,
   reportContentTextErrors,
+  reportDirectoryErrors,
+  reportOrphanedArtworks,
 } from '#data-checks';
 
 import {
@@ -173,6 +174,10 @@ async function main() {
 
     reportDirectoryErrors:
       {...defaultStepStatus, name: `report directory errors`,
+        for: ['verify']},
+
+    reportOrphanedArtworks:
+      {...defaultStepStatus, name: `report orphaned artworks`,
         for: ['verify']},
 
     filterReferenceErrors:
@@ -1736,8 +1741,8 @@ async function main() {
     });
   }
 
-  // Filter out any things with duplicate directories throughout the data,
-  // warning about them too.
+  // Check for things with duplicate directories throughout the data,
+  // and halt if any are found.
 
   if (stepStatusSummary.reportDirectoryErrors.status === STATUS_NOT_STARTED) {
     Object.assign(stepStatusSummary.reportDirectoryErrors, {
@@ -1778,8 +1783,42 @@ async function main() {
     }
   }
 
-  // Filter out any reference errors throughout the data, warning about them
-  // too.
+  // Check for artwork objects which have been orphaned from their things,
+  // and halt if any are found.
+
+  if (stepStatusSummary.reportOrphanedArtworks.status === STATUS_NOT_STARTED) {
+    Object.assign(stepStatusSummary.reportOrphanedArtworks, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
+
+    try {
+      reportOrphanedArtworks(wikiData, {getAllFindSpecs});
+
+      Object.assign(stepStatusSummary.reportOrphanedArtworks, {
+        status: STATUS_DONE_CLEAN,
+        timeEnd: Date.now(),
+        memory: process.memoryUsage(),
+      });
+    } catch (aggregate) {
+      if (!paragraph) console.log('');
+      niceShowAggregate(aggregate);
+
+      logError`Failed to initialize artwork data connections properly.`;
+      fileIssue();
+
+      Object.assign(stepStatusSummary.reportOrphanedArtworks, {
+        status: STATUS_FATAL_ERROR,
+        annotation: `orphaned artworks found`,
+        timeEnd: Date.now(),
+        memory: process.memoryUsage(),
+      });
+
+      return false;
+    }
+  }
+
+  // Filter out any reference errors throughout the data, warning about these.
 
   if (stepStatusSummary.filterReferenceErrors.status === STATUS_NOT_STARTED) {
     Object.assign(stepStatusSummary.filterReferenceErrors, {
