@@ -650,9 +650,12 @@ export class Album extends Thing {
           currentTrackSectionTracks.push(entry);
           trackData.push(entry);
 
-          artworkData.push(...entry.trackArtworks);
-
+          // Set the track's album before accessing its list of artworks.
+          // The existence of its artwork objects may depend on access to
+          // its album's 'Default Track Cover Artists'.
           entry.album = album;
+
+          artworkData.push(...entry.trackArtworks);
         }
 
         closeCurrentTrackSection();
