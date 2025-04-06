@@ -30,8 +30,10 @@ export function getPageReferences() {
 
   info.stickyHeadingLink =
     document.querySelector(
-      '.content-sticky-heading-container ' +
-      'a[href="#additional-names-box"]');
+      '.content-sticky-heading-container' +
+      ' ' +
+      'a[href="#additional-names-box"]' +
+      ':not(:matches([inert] *))');
 
   info.contentContainer =
     document.querySelector('#content');

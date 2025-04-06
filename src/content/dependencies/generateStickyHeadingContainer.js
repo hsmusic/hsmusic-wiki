@@ -33,12 +33,12 @@ export default {
           [
             html.tag('div', {class: 'content-sticky-heading-row'}, [
               html.tag('h1', [
-                slots.title,
-
-                // Placement after generally keeps the contents from being
-                // the first, when matched by .querySelector() calls.
                 html.tag('span', {class: 'reference-collapsed-heading'},
+                  {inert: true},
+
                   slots.title.clone()),
+
+                slots.title,
               ]),
 
               html.tag('div', {class: 'content-sticky-heading-cover-container'},
