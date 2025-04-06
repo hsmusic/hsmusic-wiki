@@ -1242,12 +1242,11 @@ export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
   const fromRoot = urls.from('media.root');
 
   const paths = [
+    wikiData.artworkData
+      .map(artwork => fromRoot.to(...artwork.path)),
+
     wikiData.albumData
       .map(album => [
-        album.hasCoverArt && [
-          fromRoot.to('media.albumCover', album.directory, album.coverArtFileExtension),
-        ],
-
         !empty(CacheableObject.getUpdateValue(album, 'bannerArtistContribs')) && [
           fromRoot.to('media.albumBanner', album.directory, album.bannerFileExtension),
         ],
@@ -1273,10 +1272,6 @@ export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
 
     wikiData.flashData
       .map(flash => fromRoot.to('media.flashArt', flash.directory, flash.coverArtFileExtension)),
-
-    wikiData.trackData
-      .filter(track => track.hasUniqueCoverArt)
-      .map(track => fromRoot.to('media.trackCover', track.album.directory, track.directory, track.coverArtFileExtension)),
   ].flat();
 
   sortByName(paths, {getName: path => path});
