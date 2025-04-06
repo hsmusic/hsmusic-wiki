@@ -102,7 +102,30 @@ function handleAdditionalNamesBoxLinkClicked(domEvent) {
       ? info.box.getBoundingClientRect()
       : info.mainContentContainer.getBoundingClientRect());
 
-  if (top + 20 < margin || top > 0.4 * window.innerHeight) {
+  const {bottom, height} =
+    (state.visible
+      ? info.box.getBoundingClientRect()
+      : {bottom: null});
+
+  const boxFitsInFrame =
+    (height
+      ? height < window.innerHeight - margin - 60
+      : null);
+
+  const worthScrolling =
+    top + 20 < margin ||
+
+    (height && boxFitsInFrame
+      ? top > 0.7 * window.innerHeight
+   : height && !boxFitsInFrame
+      ? top > 0.4 * window.innerHeight
+      ? top > 0.5 * window.innerHeight) ||
+
+    (bottom && bottomFitsInFrame
+      ? bottom > window.innerHeight - 20
+      : false);
+
+  if (worthScrolling) {
     if (!state.visible) {
       toggleAdditionalNamesBox();
     }
