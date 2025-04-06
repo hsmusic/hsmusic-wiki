@@ -24,7 +24,6 @@ export default templateCompositeFrom({
       referenceType: input.value(['album', 'track']),
       data: 'artworkData',
       find: '#find',
-      date: input.value(null),
     }),
   ],
 });

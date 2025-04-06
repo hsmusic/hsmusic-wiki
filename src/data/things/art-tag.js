@@ -68,8 +68,6 @@ export class ArtTag extends Thing {
       class: input.value(ArtTag),
       find: soupyFind.input('artTag'),
 
-      date: input.value(null),
-
       reference: input.value('artTag'),
       thing: input.value('artTag'),
     }),

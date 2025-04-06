@@ -29,7 +29,7 @@ export default templateCompositeFrom({
 
     date: input({
       validate: isDate,
-      acceptsNull: true,
+      defaultValue: null,
     }),
 
     reference: input.staticValue({type: 'string', defaultValue: 'reference'}),

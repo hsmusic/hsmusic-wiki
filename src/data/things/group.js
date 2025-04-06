@@ -34,8 +34,6 @@ export class Group extends Thing {
       class: input.value(Artist),
       find: soupyFind.input('artist'),
 
-      date: input.value(null),
-
       reference: input.value('artist'),
       thing: input.value('artist'),
     }),

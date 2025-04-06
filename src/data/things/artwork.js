@@ -196,7 +196,6 @@ export class Artwork extends Thing {
 
         data: 'artworkData',
         find: '#find',
-        date: input.value(null),
       }),
 
       exposeDependencyOrContinue({
