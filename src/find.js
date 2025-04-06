@@ -42,7 +42,7 @@ export function processAvailableMatchesByName(data, {
   multipleNameMatches = Object.create(null),
 }) {
   for (const thing of data) {
-    if (!include(thing)) continue;
+    if (!include(thing, thingConstructors)) continue;
 
     for (const name of getMatchableNames(thing)) {
       if (typeof name !== 'string') {
@@ -79,7 +79,7 @@ export function processAvailableMatchesByDirectory(data, {
   results = Object.create(null),
 }) {
   for (const thing of data) {
-    if (!include(thing)) continue;
+    if (!include(thing, thingConstructors)) continue;
 
     for (const directory of getMatchableDirectories(thing)) {
       if (typeof directory !== 'string') {
@@ -266,9 +266,9 @@ export function postprocessFindSpec(spec, {thingConstructor}) {
   if (spec[Symbol.for('Thing.findThisThingOnly')] !== false) {
     if (spec.include) {
       const oldInclude = spec.include;
-      newSpec.include = thing =>
+      newSpec.include = (thing, ...args) =>
         thing instanceof thingConstructor &&
-        oldInclude(thing);
+        oldInclude(thing, ...args);
     } else {
       newSpec.include = thing =>
         thing instanceof thingConstructor;

@@ -50,7 +50,7 @@ export function reportDirectoryErrors(wikiData, {
     if (!thingData) continue;
 
     for (const thing of thingData) {
-      if (findSpec.include && !findSpec.include(thing)) {
+      if (findSpec.include && !findSpec.include(thing, thingConstructors)) {
         continue;
       }
 
