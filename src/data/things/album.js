@@ -745,44 +745,6 @@ export class TrackSection extends Thing {
 
       exposeDependency({dependency: '#continueCountingFrom'}),
     ],
-
-    startIndex: [
-      withAlbum(),
-
-      withPropertyFromObject({
-        object: '#album',
-        property: input.value('trackSections'),
-      }),
-
-      {
-        dependencies: ['#album.trackSections', input.myself()],
-        compute: (continuation, {
-          ['#album.trackSections']: trackSections,
-          [input.myself()]: myself,
-        }) => continuation({
-          ['#index']:
-            trackSections.indexOf(myself),
-        }),
-      },
-
-      exitWithoutDependency({
-        dependency: '#index',
-        mode: input.value('index'),
-        value: input.value(0),
-      }),
-
-      {
-        dependencies: ['#album.trackSections', '#index'],
-        compute: ({
-          ['#album.trackSections']: trackSections,
-          ['#index']: index,
-        }) =>
-          accumulateSum(
-            trackSections
-              .slice(0, index)
-              .map(section => section.tracks.length)),
-      },
-    ],
   });
 
   static [Thing.findSpecs] = {
