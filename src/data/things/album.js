@@ -9,7 +9,7 @@ import {traverse} from '#node-utils';
 import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {accumulateSum, empty} from '#sugar';
 import Thing from '#thing';
-import {isColor, isDate, isDirectory} from '#validators';
+import {isColor, isDate, isDirectory, isNumber} from '#validators';
 
 import {
   parseAdditionalFiles,
@@ -57,7 +57,8 @@ import {
 } from '#composite/wiki-properties';
 
 import {withTracks} from '#composite/things/album';
-import {withAlbum} from '#composite/things/track-section';
+import {withAlbum, withContinueCountingFrom, withStartCountingFrom}
+  from '#composite/things/track-section';
 
 export class Album extends Thing {
   static [Thing.referenceType] = 'album';
@@ -682,6 +683,14 @@ export class TrackSection extends Thing {
       exposeDependency({dependency: '#album.color'}),
     ],
 
+    startCountingFrom: [
+      withStartCountingFrom({
+        from: input.updateValue({validate: isNumber}),
+      }),
+
+      exposeDependency({dependency: '#startCountingFrom'}),
+    ],
+
     dateOriginallyReleased: simpleDate(),
 
     isDefaultTrackSection: flag(false),
@@ -729,6 +738,12 @@ export class TrackSection extends Thing {
         }) =>
           albumDirectory + '/' + unqualifiedDirectory,
       },
+    ],
+
+    continueCountingFrom: [
+      withContinueCountingFrom(),
+
+      exposeDependency({dependency: '#continueCountingFrom'}),
     ],
 
     startIndex: [
@@ -797,6 +812,7 @@ export class TrackSection extends Thing {
     fields: {
       'Section': {property: 'name'},
       'Color': {property: 'color'},
+      'Start Counting From': {property: 'startCountingFrom'},
 
       'Date Originally Released': {
         property: 'dateOriginallyReleased',
@@ -820,12 +836,12 @@ export class TrackSection extends Thing {
 
       let first = null;
       try {
-        first = this.startIndex;
+        first = this.tracks.at(0).trackNumber;
       } catch {}
 
-      let length = null;
+      let last = null;
       try {
-        length = this.tracks.length;
+        last = this.tracks.at(-1).trackNumber;
       } catch {}
 
       if (album) {
@@ -838,8 +854,8 @@ export class TrackSection extends Thing {
             : `#${albumIndex + 1}`);
 
         const range =
-          (albumIndex >= 0 && first !== null && length !== null
-            ? `: ${first + 1}-${first + length}`
+          (albumIndex >= 0 && first !== null && last !== null
+            ? `: ${first}-${last}`
             : '');
 
         parts.push(` (${colors.yellow(num + range)} in ${colors.green(albumName)})`);

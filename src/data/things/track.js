@@ -74,6 +74,7 @@ import {
   withPropertyFromAlbum,
   withSuffixDirectoryFromAlbum,
   withTrackArtDate,
+  withTrackNumber,
 } from '#composite/things/track';
 
 export class Track extends Thing {
@@ -396,6 +397,11 @@ export class Track extends Thing {
     date: [
       withDate(),
       exposeDependency({dependency: '#date'}),
+    ],
+
+    trackNumber: [
+      withTrackNumber(),
+      exposeDependency({dependency: '#trackNumber'}),
     ],
 
     hasUniqueCoverArt: [
