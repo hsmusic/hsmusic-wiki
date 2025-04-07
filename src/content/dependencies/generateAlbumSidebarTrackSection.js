@@ -1,4 +1,4 @@
-import {empty} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: ['linkTrack'],
@@ -17,23 +17,25 @@ export default {
   data(album, track, trackSection) {
     const data = {};
 
-    data.hasTrackNumbers = album.hasTrackNumbers;
+    data.hasTrackNumbers =
+      album.hasTrackNumbers &&
+      !empty(trackSection.tracks);
+
     data.isTrackPage = !!track;
 
     data.name = trackSection.name;
     data.color = trackSection.color;
     data.isDefaultTrackSection = trackSection.isDefaultTrackSection;
 
-    data.firstTrackNumber = trackSection.startIndex + 1;
-    data.lastTrackNumber = trackSection.startIndex + trackSection.tracks.length;
+    data.firstTrackNumber =
+      (data.hasTrackNumbers
+        ? trackSection.tracks.at(0).trackNumber
+        : null);
 
-    if (track) {
-      const index = trackSection.tracks.indexOf(track);
-      if (index !== -1) {
-        data.includesCurrentTrack = true;
-        data.currentTrackIndex = index;
-      }
-    }
+    data.lastTrackNumber =
+      (data.hasTrackNumbers
+        ? trackSection.tracks.at(-1).trackNumber
+        : null);
 
     data.trackDirectories =
       trackSection.tracks
@@ -42,6 +44,13 @@ export default {
     data.tracksAreMissingCommentary =
       trackSection.tracks
         .map(track => empty(track.commentary));
+
+    data.tracksAreCurrentTrack =
+      trackSection.tracks
+        .map(traaaaaaaack => traaaaaaaack === track);
+
+    data.includesCurrentTrack =
+      data.tracksAreCurrentTrack.includes(true);
 
     return data;
   },
@@ -72,29 +81,39 @@ export default {
     }
 
     const trackListItems =
-      relations.trackLinks.map((trackLink, index) =>
-        html.tag('li',
-          data.includesCurrentTrack &&
-          index === data.currentTrackIndex &&
-            {class: 'current'},
+      stitchArrays({
+        trackLink: relations.trackLinks,
+        directory: data.trackDirectories,
+        isCurrentTrack: data.tracksAreCurrentTrack,
+        missingCommentary: data.tracksAreMissingCommentary,
+      }).map(({
+          trackLink,
+          directory,
+          isCurrentTrack,
+          missingCommentary,
+        }) =>
+          html.tag('li',
+            data.includesCurrentTrack &&
+            isCurrentTrack &&
+              {class: 'current'},
 
-          slots.mode === 'commentary' &&
-          data.tracksAreMissingCommentary[index] &&
-            {class: 'no-commentary'},
+            slots.mode === 'commentary' &&
+            missingCommentary &&
+              {class: 'no-commentary'},
 
-          language.$(capsule, 'item', {
-            track:
-              (slots.mode === 'commentary' && data.tracksAreMissingCommentary[index]
-                ? trackLink.slots({
-                    linkless: true,
-                  })
-             : slots.anchor
-                ? trackLink.slots({
-                    anchor: true,
-                    hash: data.trackDirectories[index],
-                  })
-                : trackLink),
-          })));
+            language.$(capsule, 'item', {
+              track:
+                (slots.mode === 'commentary' && missingCommentary
+                  ? trackLink.slots({
+                      linkless: true,
+                    })
+               : slots.anchor
+                  ? trackLink.slots({
+                      anchor: true,
+                      hash: directory,
+                    })
+                  : trackLink),
+            })));
 
     return html.tag('details',
       data.includesCurrentTrack &&

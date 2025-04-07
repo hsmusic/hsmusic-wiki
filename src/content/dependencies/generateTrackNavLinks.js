@@ -15,7 +15,7 @@ export default {
       track.album.hasTrackNumbers,
 
     trackNumber:
-      track.album.tracks.indexOf(track) + 1,
+      track.trackNumber,
   }),
 
   slots: {

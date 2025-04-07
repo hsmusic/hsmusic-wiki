@@ -102,11 +102,11 @@ export default {
             .map(section => section.tracks.length > 1);
 
         if (album.hasTrackNumbers) {
-          data.trackSectionStartIndices =
+          data.trackSectionsStartCountingFrom =
             album.trackSections
-              .map(section => section.startIndex);
+              .map(section => section.startCountingFrom);
         } else {
-          data.trackSectionStartIndices =
+          data.trackSectionsStartCountingFrom =
             album.trackSections
               .map(() => null);
         }
@@ -147,7 +147,7 @@ export default {
             name: data.trackSectionNames,
             duration: data.trackSectionDurations,
             durationApproximate: data.trackSectionDurationsApproximate,
-            startIndex: data.trackSectionStartIndices,
+            startCountingFrom: data.trackSectionsStartCountingFrom,
           }).map(({
               heading,
               description,
@@ -156,7 +156,7 @@ export default {
               name,
               duration,
               durationApproximate,
-              startIndex,
+              startCountingFrom,
             }) => [
               language.encapsulate('trackList.section', capsule =>
                 heading.slots({
@@ -190,7 +190,7 @@ export default {
 
                 html.tag(listTag,
                   data.hasTrackNumbers &&
-                    {start: startIndex + 1},
+                    {start: startCountingFrom},
 
                   slotItems(items)),
               ]),
