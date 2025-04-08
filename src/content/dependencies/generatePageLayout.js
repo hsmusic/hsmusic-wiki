@@ -414,17 +414,14 @@ export default {
                         })),
                     ]);
 
-                const considerNotBlockwrapping = entry =>
-                  entry.blockwrap !== true &&
-                  (entry.blockwrap === false ||
-                   entry.auto === 'home');
-
                 const prev =
                   atOffset(entries, i, -1);
 
                 if (
-                  considerNotBlockwrapping(cur) ||
-                  prev && considerNotBlockwrapping(prev)
+                  prev &&
+                  prev.releaseRestToWrapTogether !== true &&
+                  (prev.releaseRestToWrapTogether === false ||
+                   prev.auto === 'home')
                 ) {
                   return navLink;
                 } else {
