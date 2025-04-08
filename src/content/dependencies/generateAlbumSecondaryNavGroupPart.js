@@ -67,6 +67,8 @@ export default {
 
   generate: (relations, slots) =>
     relations.parentSiblingsPart.slots({
+      attributes: {class: 'group-nav-links'},
+
       showPreviousNext: slots.mode === 'album',
 
       colorStyle: relations.colorStyle,

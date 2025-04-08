@@ -62,7 +62,7 @@ export default {
 
   generate: (data, relations, slots, {language}) =>
     relations.parentSiblingsPart.slots({
-      attributes: {class: 'series-nav-link'},
+      attributes: {class: 'series-nav-links'},
 
       showPreviousNext: slots.mode === 'album',
 

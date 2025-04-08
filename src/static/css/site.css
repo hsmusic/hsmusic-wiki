@@ -950,29 +950,46 @@ a .normal-content {
   font-weight: 800;
 }
 
+.nav-links-hierarchical .nav-link + .nav-link::before,
 .nav-links-hierarchical .nav-link + .blockwrap .nav-link::before {
   content: "\0020/\0020";
 }
 
-.series-nav-link {
+.series-nav-links {
   display: inline-block;
 }
 
-.series-nav-link:not(:first-child)::before {
+.series-nav-links:not(:first-child)::before {
   content: "\00a0»\00a0";
   font-weight: normal;
 }
 
-.series-nav-link:not(:last-child)::after {
+.series-nav-links:not(:last-child)::after {
   content: ",\00a0";
 }
 
-.series-nav-link + .series-nav-link::before {
+.series-nav-links + .series-nav-links::before {
   content: "";
+}
+
+.dot-switcher > span:not(:first-child) {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* Yeah, all this stuff only applies to elements of the dot switcher
+ * besides the first, which will necessarily have a bullet point at left.
+ */
+.dot-switcher *:matches(.dot-switcher > span:not(:first-child) > *) {
+  display: inline-block;
+  white-space: wrap;
+  text-align: left;
+  vertical-align: top;
 }
 
 .dot-switcher > span:not(:first-child)::before {
   content: "\0020\00b7\0020";
+  white-space: pre;
   font-weight: 800;
 }
 
@@ -999,7 +1016,7 @@ a .normal-content {
   display: block;
 }
 
-#secondary-nav.album-secondary-nav.with-previous-next {
+#secondary-nav.album-secondary-nav {
   display: flex;
   justify-content: space-around;
   padding-left: 7.5% !important;
@@ -1017,7 +1034,8 @@ a .normal-content {
   margin-right: 5px;
 }
 
-#secondary-nav.album-secondary-nav .dot-switcher {
+#secondary-nav.album-secondary-nav .group-nav-links .dot-switcher,
+#secondary-nav.album-secondary-nav .series-nav-links .dot-switcher {
   white-space: nowrap;
 }
 
