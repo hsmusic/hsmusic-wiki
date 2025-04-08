@@ -29,8 +29,35 @@ export default templateCompositeFrom({
         input('value'),
       ],
 
-      compute: ({
+      compute: (continuation, {
         ['#thing.constructor']: constructor,
+        [input('value')]: value,
+      }) =>
+        (constructor[Symbol.for('Thing.referenceType')] === value
+          ? continuation.exit(true)
+       : constructor[Symbol.for('Thing.referenceType')] === 'artwork'
+          ? continuation()
+          : continuation.exit(false)),
+    },
+
+    withPropertyFromObject({
+      object: 'thing',
+      property: input.value('thing'),
+    }),
+
+    withPropertyFromObject({
+      object: '#thing.thing',
+      property: input.value('constructor'),
+    }),
+
+    {
+      dependencies: [
+        '#thing.thing.constructor',
+        input('value'),
+      ],
+
+      compute: ({
+        ['#thing.thing.constructor']: constructor,
         [input('value')]: value,
       }) =>
         constructor[Symbol.for('Thing.referenceType')] === value,

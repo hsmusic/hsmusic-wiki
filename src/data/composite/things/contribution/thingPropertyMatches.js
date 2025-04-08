@@ -1,6 +1,7 @@
 import {input, templateCompositeFrom} from '#composite';
 
 import {exitWithoutDependency} from '#composite/control-flow';
+import {withPropertyFromObject} from '#composite/data';
 
 export default templateCompositeFrom({
   annotation: `thingPropertyMatches`,
@@ -12,19 +13,31 @@ export default templateCompositeFrom({
   },
 
   steps: () => [
+    {
+      dependencies: ['thing', 'thingProperty'],
+
+      compute: (continuation, {thing, thingProperty}) =>
+        continuation({
+          ['#thingProperty']:
+            (thing.constructor[Symbol.for('Thing.referenceType')] === 'artwork'
+              ? thing.artistContribsFromThingProperty
+              : thingProperty),
+        }),
+    },
+
     exitWithoutDependency({
-      dependency: 'thingProperty',
+      dependency: '#thingProperty',
       value: input.value(false),
     }),
 
     {
       dependencies: [
-        'thingProperty',
+        '#thingProperty',
         input('value'),
       ],
 
       compute: ({
-        ['thingProperty']: thingProperty,
+        ['#thingProperty']: thingProperty,
         [input('value')]: value,
       }) =>
         thingProperty === value,
