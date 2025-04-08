@@ -980,7 +980,7 @@ a .normal-content {
 /* Yeah, all this stuff only applies to elements of the dot switcher
  * besides the first, which will necessarily have a bullet point at left.
  */
-.dot-switcher *:matches(.dot-switcher > span:not(:first-child) > *) {
+.dot-switcher *:where(.dot-switcher > span:not(:first-child) > *) {
   display: inline-block;
   white-space: wrap;
   text-align: left;
@@ -2937,11 +2937,11 @@ h3.content-heading {
   top: 0;
 }
 
-.content-sticky-heading-anchor:not(:matches(.content-sticky-heading-root[inert]) *) {
+.content-sticky-heading-anchor:not(:where(.content-sticky-heading-root[inert]) *) {
   position: relative;
 }
 
-.content-sticky-heading-container:not(:matches(.content-sticky-heading-root[inert]) *) {
+.content-sticky-heading-container:not(:where(.content-sticky-heading-root[inert]) *) {
   position: absolute;
 }
 
