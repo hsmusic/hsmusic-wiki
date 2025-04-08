@@ -35,7 +35,7 @@ export default {
     // Artworks are different, though. We intentionally duplicate album data
     // objects when the artist has contributed some combination of cover art,
     // wallpaper, and banner - these each count as a unique contribution.
-    allArtworks:
+    allArtworkThings:
       ([
         artist.albumCoverArtistContributions,
         artist.albumWallpaperArtistContributions,
@@ -43,7 +43,7 @@ export default {
         artist.trackCoverArtistContributions,
       ]).flat()
         .filter(({annotation}) => !annotation?.startsWith('edits for wiki'))
-        .map(({thing}) => thing),
+        .map(({thing}) => thing.thing),
 
     // Banners and wallpapers don't show up in the artist gallery page, only
     // cover art.
@@ -110,7 +110,7 @@ export default {
       relation('generateArtistInfoPageArtworksChunkedList', artist, true),
 
     artworksGroupInfo:
-      relation('generateArtistGroupContributionsInfo', query.allArtworks),
+      relation('generateArtistGroupContributionsInfo', query.allArtworkThings),
 
     artistGalleryLink:
       (query.hasGallery

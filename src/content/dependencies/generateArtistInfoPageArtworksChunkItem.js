@@ -24,7 +24,7 @@ export default {
 
     trackLink:
       (query.kind === 'track-cover'
-        ? relation('linkTrack', contrib.thing)
+        ? relation('linkTrack', contrib.thing.thing)
         : null),
 
     otherArtistLinks:

@@ -27,20 +27,21 @@ export default {
 
     sortContributionsChronologically(
       filteredContributions,
-      sortAlbumsTracksChronologically);
+      sortAlbumsTracksChronologically,
+      {getThing: contrib => contrib.thing.thing});
 
     query.contribs =
       chunkByConditions(filteredContributions, [
         ({date: date1}, {date: date2}) =>
           +date1 !== +date2,
-        ({thing: thing1}, {thing: thing2}) =>
+        ({thing: {thing: thing1}}, {thing: {thing: thing2}}) =>
           (thing1.album ?? thing1) !==
           (thing2.album ?? thing2),
       ]);
 
     query.albums =
       query.contribs
-        .map(contribs => contribs[0].thing)
+        .map(contribs => contribs[0].thing.thing)
         .map(thing => thing.album ?? thing);
 
     return query;
