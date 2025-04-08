@@ -790,6 +790,7 @@ export function parseAnnotatedReferences(entries, {
 }
 
 export function parseArtwork({
+  single = false,
   fileExtensionFromThingProperty,
   dateFromThingProperty,
   artistContribsFromThingProperty,
@@ -808,6 +809,8 @@ export function parseArtwork({
   const transform = (value, ...args) =>
     (Array.isArray(value)
       ? value.map(entry => parseSingleEntry(entry, ...args))
+   : single
+      ? parseSingleEntry(value, ...args)
       : [parseSingleEntry(value, ...args)]);
 
   transform.provide = provide;

@@ -20,12 +20,16 @@ soupyReverse.contributionsBy =
   });
 
 soupyReverse.artworkContributionsBy =
-  (bindTo, artworkProperty) => ({
+  (bindTo, artworkProperty, {single = false} = {}) => ({
     bindTo,
 
     referencing: thing =>
-      thing[artworkProperty]
-        .flatMap(artwork => artwork.artistContribs),
+      (single
+        ? (thing[artworkProperty]
+            ? thing[artworkProperty].artistContribs
+            : [])
+        : thing[artworkProperty]
+            .flatMap(artwork => artwork.artistContribs)),
 
     referenced: contrib => [contrib.artist],
   });

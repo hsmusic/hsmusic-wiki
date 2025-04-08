@@ -5,13 +5,14 @@
 import {input, templateCompositeFrom} from '#composite';
 import {withEntries} from '#sugar';
 import Thing from '#thing';
-import {validateWikiData} from '#validators';
+import {validateThing} from '#validators';
 
-import {exposeUpdateValueOrContinue} from '#composite/control-flow';
+import {exposeDependency, exposeUpdateValueOrContinue}
+  from '#composite/control-flow';
 import {withConstitutedArtwork} from '#composite/wiki-data';
 
 const template = templateCompositeFrom({
-  annotation: `constitutibleArtworkList`,
+  annotation: `constitutibleArtwork`,
 
   compose: false,
 
@@ -25,7 +26,7 @@ const template = templateCompositeFrom({
   steps: () => [
     exposeUpdateValueOrContinue({
       validate: input.value(
-        validateWikiData({
+        validateThing({
           referenceType: 'artwork',
         })),
     }),
@@ -37,12 +38,9 @@ const template = templateCompositeFrom({
       dateFromThingProperty: input('dateFromThingProperty'),
     }),
 
-    {
-      dependencies: ['#constitutedArtwork'],
-      compute: ({
-        ['#constitutedArtwork']: constitutedArtwork,
-      }) => [constitutedArtwork],
-    },
+    exposeDependency({
+      dependency: '#constitutedArtwork',
+    }),
   ],
 });
 
