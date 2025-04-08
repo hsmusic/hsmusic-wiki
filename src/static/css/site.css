@@ -1621,6 +1621,7 @@ p.content-heading:has(+ .commentary-entry-heading.dated) {
 
 .lyrics-entry {
   padding-left: 40px;
+  max-width: 600px;
 }
 
 .js-hide,

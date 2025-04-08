@@ -42,6 +42,8 @@ export default {
         }).map(({title, targetID}) =>
             html.tag('a', {href: '#'},
               {'data-target-id': targetID},
+              {[html.onlyIfContent]: true},
+
               language.sanitize(title))),
     }),
 };

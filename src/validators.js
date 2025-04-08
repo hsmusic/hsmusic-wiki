@@ -3,8 +3,12 @@ import {inspect as nodeInspect} from 'node:util';
 import {openAggregate, withAggregate} from '#aggregate';
 import {colors, ENABLE_COLOR} from '#cli';
 import {cut, empty, matchMultiline, typeAppearance} from '#sugar';
-import {commentaryRegexCaseInsensitive, commentaryRegexCaseSensitiveOneShot}
-  from '#wiki-data';
+
+import {
+  commentaryRegexCaseInsensitive,
+  commentaryRegexCaseSensitiveOneShot,
+  oldStyleLyricsDetectionRegex,
+} from '#wiki-data';
 
 function inspect(value) {
   return nodeInspect(value, {colors: ENABLE_COLOR});
@@ -371,9 +375,9 @@ export const isCommentary =
 export function isOldStyleLyrics(content) {
   isContentString(content);
 
-  if (/^<i>/m.test(content)) {
+  if (oldStyleLyricsDetectionRegex.test(content)) {
     throw new TypeError(
-      `Expected old-style lyrics block not to include <i> at start of any line`);
+      `Expected old-style lyrics block not to include "<i> ... :</i>" at start of any line`);
   }
 
   return true;

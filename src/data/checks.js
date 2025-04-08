@@ -9,7 +9,6 @@ import {compareArrays, cut, cutStart, empty, getNestedProp, iterateMultiline}
   from '#sugar';
 import Thing from '#thing';
 import thingConstructors from '#things';
-import {combineWikiDataArrays, commentaryRegexCaseSensitive} from '#wiki-data';
 
 import {
   annotateErrorWithIndex,
@@ -19,6 +18,12 @@ import {
   openAggregate,
   withAggregate,
 } from '#aggregate';
+
+import {
+  combineWikiDataArrays,
+  commentaryRegexCaseSensitive,
+  oldStyleLyricsDetectionRegex,
+} from '#wiki-data';
 
 function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
@@ -568,6 +573,12 @@ export function reportContentTextErrors(wikiData, {
     annotation: 'commentary annotation',
   };
 
+  const newStyleLyricsShape = {
+    body: 'lyrics body',
+    artistDisplayText: 'lyrics artist display text',
+    annotation: 'lyrics annotation',
+  };
+
   const contentTextSpec = [
     ['albumData', {
       additionalFiles: additionalFileShape,
@@ -614,7 +625,7 @@ export function reportContentTextErrors(wikiData, {
       additionalFiles: additionalFileShape,
       commentary: commentaryShape,
       creditSources: commentaryShape,
-      lyrics: '_content',
+      lyrics: '_lyrics',
       midiProjectFiles: additionalFileShape,
       sheetMusicFiles: additionalFileShape,
     }],
@@ -737,8 +748,9 @@ export function reportContentTextErrors(wikiData, {
         for (const thing of things) {
           nest({message: `Content text errors in ${inspect(thing)}`}, ({nest, push}) => {
 
-            for (const [property, shape] of Object.entries(propSpec)) {
-              const value = thing[property];
+            for (let [property, shape] of Object.entries(propSpec)) {
+              const rawValue = CacheableObject.getUpdateValue(thing, property);
+              let value = thing[property];
 
               if (value === undefined) {
                 push(new TypeError(`Property ${colors.red(property)} isn't valid for ${colors.green(thing.constructor.name)}`));
@@ -747,6 +759,15 @@ export function reportContentTextErrors(wikiData, {
 
               if (value === null) {
                 continue;
+              }
+
+              if (shape === '_lyrics') {
+                if (oldStyleLyricsDetectionRegex.test(rawValue)) {
+                  value = rawValue;
+                  shape = '_content';
+                } else {
+                  shape = newStyleLyricsShape;
+                }
               }
 
               const fieldPropertyMessage =

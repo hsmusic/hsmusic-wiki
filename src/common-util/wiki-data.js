@@ -102,6 +102,11 @@ export const commentaryRegexCaseSensitive =
 export const commentaryRegexCaseSensitiveOneShot =
   new RegExp(commentaryRegexRaw);
 
+// The #validators function isOldStyleLyrics() describes
+// what this regular expression detects.
+export const oldStyleLyricsDetectionRegex =
+  /^<i>.*:<\/i>/m;
+
 export function filterAlbumsByCommentary(albums) {
   return albums
     .filter((album) => [album, ...album.tracks].some((x) => x.commentary));

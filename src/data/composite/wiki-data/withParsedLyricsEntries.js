@@ -1,8 +1,8 @@
 import {input, templateCompositeFrom} from '#composite';
-import find from '#find';
 import {stitchArrays} from '#sugar';
 import {isLyrics} from '#validators';
-import {commentaryRegexCaseSensitive} from '#wiki-data';
+import {commentaryRegexCaseSensitive, oldStyleLyricsDetectionRegex}
+  from '#wiki-data';
 
 import {
   fillMissingListItems,
@@ -11,9 +11,24 @@ import {
   withUnflattenedList,
 } from '#composite/data';
 
+import inputSoupyFind from './inputSoupyFind.js';
 import processContentEntryDates from './processContentEntryDates.js';
 import withParsedContentEntries from './withParsedContentEntries.js';
 import withResolvedReferenceList from './withResolvedReferenceList.js';
+
+function constituteLyricsEntry(text) {
+  return {
+    artists: [],
+    artistDisplayText: null,
+    annotation: null,
+    date: null,
+    secondDate: null,
+    dateKind: null,
+    accessDate: null,
+    accessKind: null,
+    body: text,
+  };
+}
 
 export default templateCompositeFrom({
   annotation: `withParsedLyricsEntries`,
@@ -25,6 +40,19 @@ export default templateCompositeFrom({
   outputs: ['#parsedLyricsEntries'],
 
   steps: () => [
+    {
+      dependencies: [input('from')],
+      compute: (continuation, {
+        [input('from')]: lyrics,
+      }) =>
+        (oldStyleLyricsDetectionRegex.test(lyrics)
+          ? continuation()
+          : continuation.raiseOutput({
+              ['#parsedLyricsEntries']:
+                [constituteLyricsEntry(lyrics)],
+            })),
+    },
+
     withParsedContentEntries({
       from: input('from'),
       caseSensitiveRegex: input.value(commentaryRegexCaseSensitive),
@@ -65,8 +93,7 @@ export default templateCompositeFrom({
 
     withResolvedReferenceList({
       list: '#flattenedList',
-      data: 'artistData',
-      find: input.value(find.artist),
+      find: inputSoupyFind.input('artist'),
       notFoundMode: input.value('null'),
     }),
 
