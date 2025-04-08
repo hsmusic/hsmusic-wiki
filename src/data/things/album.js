@@ -35,6 +35,7 @@ import {
   commentary,
   color,
   commentatorArtists,
+  constitutibleArtwork,
   constitutibleArtworkList,
   contentString,
   contribsPresent,
@@ -139,7 +140,11 @@ export class Album extends Thing {
     ],
 
     wallpaperParts: [
-      exitWithoutContribs({contribs: 'wallpaperArtistContribs'}),
+      exitWithoutContribs({
+        contribs: 'wallpaperArtistContribs',
+        value: input.value([]),
+      }),
+
       wallpaperParts(),
     ],
 
@@ -158,6 +163,28 @@ export class Album extends Thing {
     bannerDimensions: [
       exitWithoutContribs({contribs: 'bannerArtistContribs'}),
       dimensions(),
+    ],
+
+    wallpaperArtwork: [
+      exitWithoutDependency({
+        dependency: 'wallpaperArtistContribs',
+        mode: input.value('empty'),
+        value: input.value(null),
+      }),
+
+      constitutibleArtwork.fromYAMLFieldSpec
+        .call(this, 'Wallpaper Artwork'),
+    ],
+
+    bannerArtwork: [
+      exitWithoutDependency({
+        dependency: 'bannerArtistContribs',
+        mode: input.value('empty'),
+        value: input.value(null),
+      }),
+
+      constitutibleArtwork.fromYAMLFieldSpec
+        .call(this, 'Banner Artwork'),
     ],
 
     coverArtworks: [
@@ -416,10 +443,10 @@ export class Album extends Thing {
       soupyReverse.artworkContributionsBy('albumData', 'coverArtworks'),
 
     albumWallpaperArtistContributionsBy:
-      soupyReverse.contributionsBy('albumData', 'wallpaperArtistContribs'),
+      soupyReverse.artworkContributionsBy('albumData', 'wallpaperArtwork', {single: true}),
 
     albumBannerArtistContributionsBy:
-      soupyReverse.contributionsBy('albumData', 'bannerArtistContribs'),
+      soupyReverse.artworkContributionsBy('albumData', 'bannerArtwork', {single: true}),
 
     albumsWithCommentaryBy: {
       bindTo: 'albumData',
@@ -477,6 +504,30 @@ export class Album extends Thing {
             dateFromThingProperty: 'coverArtDate',
             artistContribsFromThingProperty: 'coverArtistContribs',
             artistContribsArtistProperty: 'albumCoverArtistContributions',
+          }),
+      },
+
+      'Banner Artwork': {
+        property: 'bannerArtwork',
+        transform:
+          parseArtwork({
+            single: true,
+            fileExtensionFromThingProperty: 'bannerFileExtension',
+            dateFromThingProperty: 'date',
+            artistContribsFromThingProperty: 'bannerArtistContribs',
+            artistContribsArtistProperty: 'albumBannerArtistContributions',
+          }),
+      },
+
+      'Wallpaper Artwork': {
+        property: 'wallpaperArtwork',
+        transform:
+          parseArtwork({
+            single: true,
+            fileExtensionFromThingProperty: 'wallpaperFileExtension',
+            dateFromThingProperty: 'date',
+            artistContribsFromThingProperty: 'wallpaperArtistContribs',
+            artistContribsArtistProperty: 'albumWallpaperArtistContributions',
           }),
       },
 
@@ -661,6 +712,14 @@ export class Album extends Thing {
 
         artworkData.push(...album.coverArtworks);
 
+        if (album.bannerArtwork) {
+          artworkData.push(album.bannerArtwork);
+        }
+
+        if (album.wallpaperArtwork) {
+          artworkData.push(album.wallpaperArtwork);
+        }
+
         album.trackSections = trackSections;
       }
 
@@ -678,11 +737,35 @@ export class Album extends Thing {
     },
   });
 
-  getOwnArtworkPath(_artwork) {
+  getOwnArtworkPath(artwork) {
+    if (artwork === this.bannerArtwork) {
+      return [
+        'media.albumBanner',
+        this.directory,
+        artwork.fileExtension,
+      ];
+    }
+
+    if (artwork === this.wallpaperArtwork) {
+      if (!empty(this.wallpaperParts)) {
+        return null;
+      }
+
+      return [
+        'media.albumWallpaper',
+        this.directory,
+        artwork.fileExtension,
+      ];
+    }
+
     return [
       'media.albumCover',
-      this.directory,
-      this.coverArtFileExtension,
+
+      (artwork.unqualifiedDirectory
+        ? this.directory + '-' + artwork.unqualifiedDirectory
+        : this.directory),
+
+      artwork.fileExtension,
     ];
   }
 }

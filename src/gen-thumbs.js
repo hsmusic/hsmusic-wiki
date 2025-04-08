@@ -1243,28 +1243,14 @@ export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
 
   const paths = [
     wikiData.artworkData
+      .filter(artwork => artwork.path)
       .map(artwork => fromRoot.to(...artwork.path)),
 
     wikiData.albumData
-      .map(album => [
-        !empty(CacheableObject.getUpdateValue(album, 'bannerArtistContribs')) && [
-          fromRoot.to('media.albumBanner', album.directory, album.bannerFileExtension),
-        ],
-
-        !empty(CacheableObject.getUpdateValue(album, 'wallpaperArtistContribs')) &&
-        empty(album.wallpaperParts) && [
-          fromRoot.to('media.albumWallpaper', album.directory, album.wallpaperFileExtension),
-        ],
-
-        !empty(CacheableObject.getUpdateValue(album, 'wallpaperArtistContribs')) &&
-        !empty(album.wallpaperParts) &&
-          album.wallpaperParts.flatMap(part => [
-            part.asset &&
-              fromRoot.to('media.albumWallpaperPart', album.directory, part.asset),
-          ]),
-      ])
-      .flat(2)
-      .filter(Boolean),
+      .flatMap(album => album.wallpaperParts
+        .filter(part => part.asset)
+        .map(part =>
+          fromRoot.to('media.albumWallpaperPart', album.directory, part.asset))),
 
     wikiData.artistData
       .filter(artist => artist.hasAvatar)
