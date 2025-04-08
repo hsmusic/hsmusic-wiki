@@ -140,17 +140,22 @@ export default {
           colorStyle,
 
           html.tag('span',
-            language.encapsulate(capsule, 'group', workingCapsule => {
-              const workingOptions = {group: sectionName};
+            language.encapsulate(capsule, 'group', groupCapsule =>
+              language.encapsulate(groupCapsule, workingCapsule => {
+                const workingOptions = {group: sectionName};
 
-              if (data.hasTrackNumbers) {
-                workingCapsule += '.withRange';
-                workingOptions.range =
-                  `${data.firstTrackNumber}–${data.lastTrackNumber}`;
-              }
+                if (data.hasTrackNumbers) {
+                  workingCapsule += '.withRange';
+                  workingOptions.rangePart =
+                    html.tag('span', {class: 'track-section-range'},
+                      language.$(groupCapsule, 'withRange.rangePart', {
+                        range:
+                          `${data.firstTrackNumber}–${data.lastTrackNumber}`,
+                      }));
+                }
 
-              return language.$(workingCapsule, workingOptions);
-            }))),
+                return language.$(workingCapsule, workingOptions);
+              })))),
 
         (data.hasTrackNumbers
           ? html.tag('ol',

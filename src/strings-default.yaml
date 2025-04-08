@@ -972,7 +972,9 @@ albumSidebar:
 
     group:
       _: "{GROUP}"
-      withRange: "{GROUP} ({RANGE})"
+
+      withRange: "{GROUP} {RANGE_PART}"
+      withRange.rangePart: "({RANGE})"
 
   # groupBox:
   #   This is the box for groups. Apart from the next and previous

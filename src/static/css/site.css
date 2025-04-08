@@ -583,6 +583,15 @@ summary.underline-white > span:hover a:not(:hover) {
   border-bottom-left-radius: 0;
 }
 
+.track-list-sidebar-box summary {
+  padding-left: 20px !important;
+  text-indent: -15px !important;
+}
+
+.track-list-sidebar-box .track-section-range {
+  white-space: nowrap;
+}
+
 .wiki-search-sidebar-box {
   padding: 1px 0 0 0;
 
