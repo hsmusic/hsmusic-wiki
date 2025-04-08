@@ -1,5 +1,5 @@
 import {openAggregate} from '#aggregate';
-import {empty, repeat} from '#sugar';
+import {atOffset, empty, repeat} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -361,7 +361,7 @@ export default {
 
             slots.navLinks
               ?.filter(Boolean)
-              ?.map((cur, i) => {
+              ?.map((cur, i, entries) => {
                 let content;
 
                 if (cur.html) {
@@ -395,25 +395,41 @@ export default {
                   (slots.navLinkStyle === 'hierarchical' &&
                     i === slots.navLinks.length - 1);
 
-                return (
-                  html.metatag('blockwrap',
-                    html.tag('span', {class: 'nav-link'},
-                      showAsCurrent &&
-                        {class: 'current'},
+                const navLink =
+                  html.tag('span', {class: 'nav-link'},
+                    showAsCurrent &&
+                      {class: 'current'},
 
-                      [
-                        html.tag('span', {class: 'nav-link-content'},
-                          content),
+                    [
+                      html.tag('span', {class: 'nav-link-content'},
+                        content),
 
-                        html.tag('span', {class: 'nav-link-accent'},
-                          {[html.noEdgeWhitespace]: true},
-                          {[html.onlyIfContent]: true},
+                      html.tag('span', {class: 'nav-link-accent'},
+                        {[html.noEdgeWhitespace]: true},
+                        {[html.onlyIfContent]: true},
 
-                          language.$('misc.navAccent', {
-                            [language.onlyIfOptions]: ['links'],
-                            links: cur.accent,
-                          })),
-                      ])));
+                        language.$('misc.navAccent', {
+                          [language.onlyIfOptions]: ['links'],
+                          links: cur.accent,
+                        })),
+                    ]);
+
+                const considerNotBlockwrapping = entry =>
+                  entry.blockwrap !== true &&
+                  (entry.blockwrap === false ||
+                   entry.auto === 'home');
+
+                const prev =
+                  atOffset(entries, i, -1);
+
+                if (
+                  considerNotBlockwrapping(cur) ||
+                  prev && considerNotBlockwrapping(prev)
+                ) {
+                  return navLink;
+                } else {
+                  return html.metatag('blockwrap', navLink);
+                }
               })),
 
           html.tag('div', {class: 'nav-bottom-row'},
