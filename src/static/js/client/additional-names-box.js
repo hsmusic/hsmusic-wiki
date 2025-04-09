@@ -33,7 +33,7 @@ export function getPageReferences() {
       '.content-sticky-heading-container' +
       ' ' +
       'a[href="#additional-names-box"]' +
-      ':not(:matches([inert] *))');
+      ':not(:where([inert] *))');
 
   info.contentContainer =
     document.querySelector('#content');
