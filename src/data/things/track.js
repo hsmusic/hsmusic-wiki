@@ -204,6 +204,8 @@ export class Track extends Thing {
     coverArtDimensions: [
       exitWithoutUniqueCoverArt(),
 
+      exposeUpdateValueOrContinue(),
+
       withPropertyFromAlbum({
         property: input.value('trackDimensions'),
       }),
