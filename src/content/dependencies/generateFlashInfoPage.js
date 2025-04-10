@@ -7,7 +7,7 @@ export default {
     'generateContentHeading',
     'generateContributionList',
     'generateFlashActSidebar',
-    'generateFlashCoverArtwork',
+    'generateFlashArtworkColumn',
     'generateFlashNavAccent',
     'generatePageLayout',
     'generateTrackList',
@@ -47,8 +47,8 @@ export default {
       query.urls
         .map(url => relation('linkExternal', url)),
 
-    cover:
-      relation('generateFlashCoverArtwork', flash),
+    artworkColumn:
+      relation('generateFlashArtworkColumn', flash),
 
     contentHeading:
       relation('generateContentHeading'),
@@ -98,7 +98,7 @@ export default {
 
         additionalNames: relations.additionalNamesBox,
 
-        cover: relations.cover,
+        artworkColumnContent: relations.artworkColumn,
 
         mainContent: [
           html.tag('p',

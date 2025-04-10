@@ -17,6 +17,8 @@ export default {
       {class: 'illustrator-details'},
 
       language.$('misc.coverGrid.details.coverArtists', {
+        [language.onlyIfOptions]: ['artists'],
+
         artists:
           language.formatConjunctionList(relations.artistLinks),
       })),
