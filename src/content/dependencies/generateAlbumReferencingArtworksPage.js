@@ -1,6 +1,5 @@
 export default {
   contentDependencies: [
-    'generateAlbumCoverArtwork',
     'generateAlbumStyleRules',
     'generateBackToAlbumLink',
     'generateReferencingArtworksPage',
@@ -11,7 +10,7 @@ export default {
 
   relations: (relation, album) => ({
     page:
-      relation('generateReferencingArtworksPage', album.referencedByArtworks),
+      relation('generateReferencingArtworksPage', album.coverArtworks[0]),
 
     albumStyleRules:
       relation('generateAlbumStyleRules', album, null),
@@ -21,17 +20,11 @@ export default {
 
     backToAlbumLink:
       relation('generateBackToAlbumLink', album),
-
-    cover:
-      relation('generateAlbumCoverArtwork', album),
   }),
 
   data: (album) => ({
     name:
       album.name,
-
-    color:
-      album.color,
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -42,10 +35,7 @@ export default {
             data.name,
         }),
 
-      color: data.color,
       styleRules: [relations.albumStyleRules],
-
-      cover: relations.cover,
 
       navLinks: [
         {auto: 'home'},

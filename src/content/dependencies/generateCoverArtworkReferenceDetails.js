@@ -1,20 +1,24 @@
 export default {
+  contentDependencies: ['linkReferencedArtworks', 'linkReferencingArtworks'],
   extraDependencies: ['html', 'language'],
 
-  data: (referenced, referencedBy) => ({
-    referenced:
-      referenced.length,
+  relations: (relation, artwork) => ({
+    referencedArtworksLink:
+      relation('linkReferencedArtworks', artwork),
 
-    referencedBy:
-      referencedBy.length,
+    referencingArtworksLink:
+      relation('linkReferencingArtworks', artwork),
   }),
 
-  slots: {
-    referencedLink: {type: 'html', mutable: true},
-    referencingLink: {type: 'html', mutable: true},
-  },
+  data: (artwork) => ({
+    referenced:
+      artwork.referencedArtworks.length,
 
-  generate: (data, slots, {html, language}) =>
+    referencedBy:
+      artwork.referencedByArtworks.length,
+  }),
+
+  generate: (data, relations, {html, language}) =>
     language.encapsulate('releaseInfo', capsule => {
       const referencedText =
         language.$(capsule, 'referencesArtworks', {
@@ -47,10 +51,10 @@ export default {
 
           [
             !html.isBlank(referencedText) &&
-              slots.referencedLink.slot('content', referencedText),
+              relations.referencedArtworksLink.slot('content', referencedText),
 
             !html.isBlank(referencingText) &&
-              slots.referencingLink.slot('content', referencingText),
+              relations.referencingArtworksLink.slot('content', referencingText),
           ]));
     }),
 }

@@ -4,9 +4,8 @@ export default {
   contentDependencies: [
     'generateAdditionalNamesBox',
     'generateAlbumAdditionalFilesList',
-    'generateAlbumArtInfoBox',
+    'generateAlbumArtworkColumn',
     'generateAlbumBanner',
-    'generateAlbumCoverArtwork',
     'generateAlbumNavAccent',
     'generateAlbumReleaseInfo',
     'generateAlbumSecondaryNav',
@@ -45,13 +44,8 @@ export default {
     additionalNamesBox:
       relation('generateAdditionalNamesBox', album.additionalNames),
 
-    cover:
-      (album.hasCoverArt
-        ? relation('generateAlbumCoverArtwork', album)
-        : null),
-
-    albumArtInfoBox:
-      relation('generateAlbumArtInfoBox', album),
+    artworkColumn:
+      relation('generateAlbumArtworkColumn', album),
 
     banner:
       (album.hasBannerArt
@@ -116,16 +110,8 @@ export default {
 
         additionalNames: relations.additionalNamesBox,
 
-        artworkColumnContent: [
-          (relations.cover
-            ? relations.cover.slots({
-                showOriginDetails: true,
-                showReferenceLinks: true,
-              })
-            : null),
-
-          relations.albumArtInfoBox,
-        ],
+        artworkColumnContent:
+          relations.artworkColumn,
 
         mainContent: [
           relations.releaseInfo,

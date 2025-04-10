@@ -25,7 +25,8 @@ export function pathsForTarget(track) {
       path: ['trackReferencedArtworks', track.directory],
 
       condition: () =>
-        !empty(track.referencedArtworks),
+        track.hasUniqueCoverArt &&
+        !empty(track.trackArtworks[0].referencedArtworks),
 
       contentFunction: {
         name: 'generateTrackReferencedArtworksPage',
@@ -38,7 +39,8 @@ export function pathsForTarget(track) {
       path: ['trackReferencingArtworks', track.directory],
 
       condition: () =>
-        !empty(track.referencedByArtworks),
+        track.hasUniqueCoverArt &&
+        !empty(track.trackArtworks[0].referencedByArtworks),
 
       contentFunction: {
         name: 'generateTrackReferencingArtworksPage',

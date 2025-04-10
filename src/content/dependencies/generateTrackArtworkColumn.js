@@ -1,25 +1,33 @@
 export default {
-  contentDependencies: ['generateTrackCoverArtwork'],
+  contentDependencies: ['generateCoverArtwork'],
+  extraDependencies: ['html'],
 
   relations: (relation, track) => ({
     albumCover:
       (!track.hasUniqueCoverArt && track.album.hasCoverArt
-        ? relation('generateTrackCoverArtwork', track.album.coverArtworks[0])
+        ? relation('generateCoverArtwork', track.album.coverArtworks[0])
         : null),
 
     trackCovers:
       (track.hasUniqueCoverArt
         ? track.trackArtworks.map(artwork =>
-            relation('generateTrackCoverArtwork', artwork))
-        : null),
+            relation('generateCoverArtwork', artwork))
+        : []),
   }),
 
-  generate: (relations) =>
-    [relations.albumCover, ...relations.trackCovers ?? []]
-      .filter(Boolean)
-      .map(cover =>
+  generate: (relations, {html}) =>
+    html.tags([
+      relations.albumCover?.slots({
+        showOriginDetails: true,
+        showArtTagDetails: true,
+        showReferenceDetails: true,
+      }),
+
+      relations.trackCovers.map(cover =>
         cover.slots({
           showOriginDetails: true,
-          showReferenceLinks: true,
+          showArtTagDetails: true,
+          showReferenceDetails: true,
         })),
+    ]),
 };

@@ -3,7 +3,6 @@ export default {
     'generateAlbumStyleRules',
     'generateBackToTrackLink',
     'generateReferencingArtworksPage',
-    'generateTrackCoverArtwork',
     'generateTrackNavLinks',
   ],
 
@@ -11,7 +10,7 @@ export default {
 
   relations: (relation, track) => ({
     page:
-      relation('generateReferencingArtworksPage', track.referencedByArtworks),
+      relation('generateReferencingArtworksPage', track.trackArtworks[0]),
 
     albumStyleRules:
       relation('generateAlbumStyleRules', track.album, track),
@@ -21,17 +20,11 @@ export default {
 
     backToTrackLink:
       relation('generateBackToTrackLink', track),
-
-    cover:
-      relation('generateTrackCoverArtwork', track),
   }),
 
   data: (track) => ({
     name:
       track.name,
-
-    color:
-      track.color,
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -42,10 +35,7 @@ export default {
             data.name,
         }),
 
-      color: data.color,
       styleRules: [relations.albumStyleRules],
-
-      cover: relations.cover,
 
       navLinks:
         html.resolve(

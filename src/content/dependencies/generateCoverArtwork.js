@@ -3,6 +3,7 @@ export default {
     'generateCoverArtworkArtTagDetails',
     'generateCoverArtworkArtistDetails',
     'generateCoverArtworkOriginDetails',
+    'generateCoverArtworkReferenceDetails',
     'image',
   ],
 
@@ -20,11 +21,25 @@ export default {
 
     artistDetails:
       relation('generateCoverArtworkArtistDetails', artwork),
+
+    referenceDetails:
+      relation('generateCoverArtworkReferenceDetails', artwork),
   }),
 
   data: (artwork) => ({
+    color:
+      artwork.thing.color,
+
     path:
       artwork.path,
+
+    dimensions:
+      artwork.dimensions,
+
+    warnings:
+      artwork.artTags
+        .filter(tag => tag.isContentWarning)
+        .map(tag => tag.name),
   }),
 
   slots: {
@@ -39,17 +54,10 @@ export default {
       default: 'primary',
     },
 
-    dimensions: {
-      validate: v => v.isDimensions,
-    },
-
-    warnings: {
-      validate: v => v.looseArrayOf(v.isString),
-    },
-
     showOriginDetails: {type: 'boolean', default: false},
     showArtTagDetails: {type: 'boolean', default: false},
     showArtistDetails: {type: 'boolean', default: false},
+    showReferenceDetails: {type: 'boolean', default: false},
 
     details: {
       type: 'html',
@@ -62,21 +70,21 @@ export default {
 
     image.setSlots({
       path: data.path,
+      warnings: data.warnings,
 
-      color: slots.color,
+      color: slots.color ?? data.color,
       alt: slots.alt,
-      warnings: slots.warnings,
     });
 
     const square =
-      (slots.dimensions
-        ? slots.dimensions[0] === slots.dimensions[1]
+      (data.dimensions
+        ? data.dimensions[0] === data.dimensions[1]
         : true);
 
     if (square) {
       image.setSlot('square', true);
     } else {
-      image.setSlot('dimensions', slots.dimensions);
+      image.setSlot('dimensions', data.dimensions);
     }
 
     return (
@@ -100,6 +108,9 @@ export default {
 
               slots.showArtistDetails &&
                 relations.artistDetails,
+
+              slots.showReferenceDetails &&
+                relations.referenceDetails,
 
               slots.details,
             ]

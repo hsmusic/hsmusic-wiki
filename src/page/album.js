@@ -43,7 +43,8 @@ export function pathsForTarget(album) {
       path: ['albumReferencedArtworks', album.directory],
 
       condition: () =>
-        !empty(album.referencedArtworks),
+        album.hasCoverArt &&
+        !empty(album.coverArtworks[0].referencedArtworks),
 
       contentFunction: {
         name: 'generateAlbumReferencedArtworksPage',
@@ -56,7 +57,8 @@ export function pathsForTarget(album) {
       path: ['albumReferencingArtworks', album.directory],
 
       condition: () =>
-        !empty(album.referencedByArtworks),
+        album.hasCoverArt &&
+        !empty(album.coverArtworks[0].referencedByArtworks),
 
       contentFunction: {
         name: 'generateAlbumReferencingArtworksPage',

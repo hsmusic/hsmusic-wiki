@@ -3,13 +3,12 @@ import {empty, stitchArrays} from '#sugar';
 export default {
   contentDependencies: [
     'generateAlbumCommentarySidebar',
-    'generateAlbumCoverArtwork',
     'generateAlbumNavAccent',
     'generateAlbumSecondaryNav',
     'generateAlbumStyleRules',
     'generateCommentaryEntry',
     'generateContentHeading',
-    'generateTrackCoverArtwork',
+    'generateCoverArtwork',
     'generatePageLayout',
     'linkAlbum',
     'linkExternal',
@@ -66,7 +65,7 @@ export default {
 
       if (album.hasCoverArt) {
         relations.albumCommentaryCover =
-          relation('generateAlbumCoverArtwork', album);
+          relation('generateCoverArtwork', album.coverArtworks[0]);
       }
 
       relations.albumCommentaryEntries =
@@ -91,7 +90,7 @@ export default {
       query.tracksWithCommentary
         .map(track =>
           (track.hasUniqueCoverArt
-            ? relation('generateTrackCoverArtwork', track)
+            ? relation('generateCoverArtwork', track.trackArtworks[0])
             : null));
 
     relations.trackCommentaryEntries =

@@ -2,66 +2,64 @@ import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateCoverArtwork',
     'generateCoverGrid',
     'generatePageLayout',
     'image',
-    'linkAlbum',
-    'linkTrack',
+    'linkAnythingMan',
   ],
 
   extraDependencies: ['html', 'language'],
 
-  relations: (relation, referencingArtworks) => ({
+  relations: (relation, artwork) => ({
     layout:
       relation('generatePageLayout'),
+
+    cover:
+      relation('generateCoverArtwork', artwork),
 
     coverGrid:
       relation('generateCoverGrid'),
 
     links:
-      referencingArtworks.map(({thing}) =>
-        (thing.album
-          ? relation('linkTrack', thing)
-          : relation('linkAlbum', thing))),
+      artwork.referencedByArtworks.map(({artwork}) =>
+        relation('linkAnythingMan', artwork.thing)),
 
     images:
-      referencingArtworks.map(({thing}) =>
-        relation('image', thing.artTags)),
+      artwork.referencedByArtworks.map(({artwork}) =>
+        relation('image', artwork.artTags)),
   }),
 
-  data: (referencingArtworks) => ({
+  data: (artwork) => ({
+    color:
+      artwork.thing.color,
+
     count:
-      referencingArtworks.length,
+      artwork.referencedByArtworks.length,
 
     names:
-      referencingArtworks
-        .map(({thing}) => thing.name),
+      artwork.referencedByArtworks
+        .map(({artwork}) => artwork.thing.name),
 
     paths:
-      referencingArtworks
-        .map(({thing}) =>
-          (thing.album
-            ? ['media.trackCover', thing.album.directory, thing.directory, thing.coverArtFileExtension]
-            : ['media.albumCover', thing.directory, thing.coverArtFileExtension])),
+      artwork.referencedByArtworks
+        .map(({artwork}) => artwork.path),
 
     dimensions:
-      referencingArtworks
-        .map(({thing}) => thing.coverArtDimensions),
+      artwork.referencedByArtworks
+        .map(({artwork}) => artwork.dimensions),
 
     coverArtistNames:
-      referencingArtworks
-        .map(({thing}) =>
-          thing.coverArtistContribs
+      artwork.referencedByArtworks
+        .map(({artwork}) =>
+          artwork.artistContribs
             .map(contrib => contrib.artist.name)),
   }),
 
   slots: {
-    color: {validate: v => v.isColor},
-
     styleRules: {type: 'html', mutable: false},
 
     title: {type: 'html', mutable: false},
-    cover: {type: 'html', mutable: true},
 
     navLinks: {validate: v => v.isArray},
     navBottomRowContent: {type: 'html', mutable: false},
@@ -73,11 +71,13 @@ export default {
         title: slots.title,
         subtitle: language.$(pageCapsule, 'subtitle'),
 
-        color: slots.color,
+        color: data.color,
         styleRules: slots.styleRules,
 
-        coverColumnContent:
-          slots.cover.slot('details', 'artists'),
+        artworkColumnContent:
+          relations.cover.slots({
+            showArtistDetails: true,
+          }),
 
         mainClasses: ['top-index'],
         mainContent: [
