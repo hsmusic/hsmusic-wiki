@@ -414,6 +414,10 @@ export default {
                         })),
                     ]);
 
+                if (slots.navLinkStyle === 'index') {
+                  return navLink;
+                }
+
                 const prev =
                   atOffset(entries, i, -1);
 
