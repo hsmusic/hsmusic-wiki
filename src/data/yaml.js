@@ -791,12 +791,14 @@ export function parseAnnotatedReferences(entries, {
 
 export function parseArtwork({
   single = false,
+  dimensionsFromThingProperty,
   fileExtensionFromThingProperty,
   dateFromThingProperty,
   artistContribsFromThingProperty,
   artistContribsArtistProperty,
 }) {
   const provide = {
+    dimensionsFromThingProperty,
     fileExtensionFromThingProperty,
     dateFromThingProperty,
     artistContribsFromThingProperty,

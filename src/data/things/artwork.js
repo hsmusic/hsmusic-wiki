@@ -9,6 +9,7 @@ import {
   isContentString,
   isContributionList,
   isDate,
+  isDimensions,
   isFileExtension,
   optional,
   validateArrayItems,
@@ -109,6 +110,29 @@ export class Artwork extends Thing {
 
       exposeDependency({
         dependency: '#default',
+      }),
+    ],
+
+    dimensionsFromThingProperty: simpleString(),
+
+    dimensions: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isDimensions),
+      }),
+
+      withPropertyFromObject({
+        object: 'thing',
+        property: 'dimensionsFromThingProperty',
+      }).outputs({
+        ['#value']: '#dimensionsFromThing',
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#dimensionsFromThing',
+      }),
+
+      exposeConstant({
+        value: input.value(null),
       }),
     ],
 

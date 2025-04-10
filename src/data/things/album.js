@@ -500,6 +500,7 @@ export class Album extends Thing {
         property: 'coverArtworks',
         transform:
           parseArtwork({
+            dimensionsFromThingProperty: 'coverArtDimensions',
             fileExtensionFromThingProperty: 'coverArtFileExtension',
             dateFromThingProperty: 'coverArtDate',
             artistContribsFromThingProperty: 'coverArtistContribs',
@@ -512,6 +513,7 @@ export class Album extends Thing {
         transform:
           parseArtwork({
             single: true,
+            dimensionsFromThingProperty: 'bannerDimensions',
             fileExtensionFromThingProperty: 'bannerFileExtension',
             dateFromThingProperty: 'date',
             artistContribsFromThingProperty: 'bannerArtistContribs',
@@ -524,6 +526,7 @@ export class Album extends Thing {
         transform:
           parseArtwork({
             single: true,
+            dimensionsFromThingProperty: null,
             fileExtensionFromThingProperty: 'wallpaperFileExtension',
             dateFromThingProperty: 'date',
             artistContribsFromThingProperty: 'wallpaperArtistContribs',
