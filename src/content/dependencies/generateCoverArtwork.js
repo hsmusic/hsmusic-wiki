@@ -28,7 +28,7 @@ export default {
 
   data: (artwork) => ({
     color:
-      artwork.thing.color,
+      artwork.thing.color ?? null,
 
     path:
       artwork.path,

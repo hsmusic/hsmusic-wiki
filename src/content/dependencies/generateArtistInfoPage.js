@@ -2,6 +2,7 @@ import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateArtistArtworkColumn',
     'generateArtistGroupContributionsInfo',
     'generateArtistInfoPageArtworksChunkedList',
     'generateArtistInfoPageCommentaryChunkedList',
@@ -9,9 +10,7 @@ export default {
     'generateArtistInfoPageTracksChunkedList',
     'generateArtistNavLinks',
     'generateContentHeading',
-    'generateCoverArtwork',
     'generatePageLayout',
-    'image',
     'linkArtistGallery',
     'linkExternal',
     'linkGroup',
@@ -69,15 +68,8 @@ export default {
     artistNavLinks:
       relation('generateArtistNavLinks', artist),
 
-    cover:
-      (artist.hasAvatar
-        ? relation('generateCoverArtwork', [], [])
-        : null),
-
-    image:
-      (artist.hasAvatar
-        ? relation('image')
-        : null),
+    artworkColumn:
+      relation('generateArtistArtworkColumn', artist),
 
     contentHeading:
       relation('generateContentHeading'),
@@ -131,14 +123,6 @@ export default {
     name:
       artist.name,
 
-    directory:
-      artist.directory,
-
-    avatarFileExtension:
-      (artist.hasAvatar
-        ? artist.avatarFileExtension
-        : null),
-
     closeGroupAnnotations:
       query.generalLinkedGroups
         .map(({annotation}) => annotation),
@@ -156,19 +140,8 @@ export default {
         title: data.name,
         headingMode: 'sticky',
 
-        coverColumnContent:
-          (relations.cover
-            ? relations.cover.slots({
-                image:
-                  relations.image.slots({
-                    path: [
-                      'media.artistAvatar',
-                      data.directory,
-                      data.avatarFileExtension,
-                    ],
-                  }),
-              })
-            : null),
+        artworkColumnContent:
+          relations.artworkColumn,
 
         mainContent: [
           html.tags([
