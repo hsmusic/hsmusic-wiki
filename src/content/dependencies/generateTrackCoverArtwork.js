@@ -2,8 +2,6 @@ export default {
   contentDependencies: [
     'generateCoverArtwork',
     'generateCoverArtworkReferenceDetails',
-    'image',
-    'linkAlbum',
     'linkTrackReferencedArtworks',
     'linkTrackReferencingArtworks',
   ],
@@ -24,11 +22,6 @@ export default {
 
     // referencingArtworksLink:
     //   relation('linkTrackReferencingArtworks', track),
-
-    albumLink:
-      (artwork.thing.album
-        ? relation('linkAlbum', artwork.thing.album)
-        : relation('linkAlbum', artwork.thing)),
   }),
 
   data: (artwork) => ({
