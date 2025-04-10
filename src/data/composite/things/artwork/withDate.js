@@ -1,5 +1,6 @@
 import {input, templateCompositeFrom} from '#composite';
 
+import {raiseOutputWithoutDependency} from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
 
 export default templateCompositeFrom({
@@ -24,6 +25,11 @@ export default templateCompositeFrom({
           ? continuation.raiseOutput({'#date': date})
           : continuation()),
     },
+
+    raiseOutputWithoutDependency({
+      dependency: 'dateFromThingProperty',
+      output: input.value({'#date': null}),
+    }),
 
     withPropertyFromObject({
       object: 'thing',

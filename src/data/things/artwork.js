@@ -153,16 +153,17 @@ export class Artwork extends Thing {
         mode: input.value('empty'),
       }),
 
-      {
-        dependencies: ['thing', 'artistContribsFromThingProperty'],
-        compute: (continuation, {thing, artistContribsFromThingProperty}) =>
-          (artistContribsFromThingProperty
-            ? continuation({
-                '#artistContribs':
-                  thing[artistContribsFromThingProperty],
-              })
-            : continuation.exit(null)),
-      },
+      exitWithoutDependency({
+        dependency: 'artistContribsFromThingProperty',
+        value: input.value([]),
+      }),
+
+      withPropertyFromObject({
+        object: 'thing',
+        property: 'artistContribsFromThingProperty',
+      }).outputs({
+        ['#value']: '#artistContribs',
+      }),
 
       withRecontextualizedContributionList({
         list: '#artistContribs',

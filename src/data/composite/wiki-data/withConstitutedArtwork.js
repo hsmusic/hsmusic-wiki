@@ -7,10 +7,10 @@ export default templateCompositeFrom({
 
   inputs: {
     dimensionsFromThingProperty: input({type: 'string', acceptsNull: true}),
-    fileExtensionFromThingProperty: input({type: 'string'}),
-    artistContribsFromThingProperty: input({type: 'string'}),
-    artistContribsArtistProperty: input({type: 'string'}),
-    dateFromThingProperty: input({type: 'string'}),
+    fileExtensionFromThingProperty: input({type: 'string', acceptsNull: true}),
+    artistContribsFromThingProperty: input({type: 'string', acceptsNull: true}),
+    artistContribsArtistProperty: input({type: 'string', acceptsNull: true}),
+    dateFromThingProperty: input({type: 'string', acceptsNull: true}),
   },
 
   outputs: ['#constitutedArtwork'],

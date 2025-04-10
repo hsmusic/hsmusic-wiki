@@ -6,8 +6,14 @@ import {sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
 import {anyOf, isColor, isContentString, isDirectory, isNumber, isString}
   from '#validators';
-import {parseAdditionalNames, parseContributors, parseDate, parseDimensions}
-  from '#yaml';
+
+import {
+  parseArtwork,
+  parseAdditionalNames,
+  parseContributors,
+  parseDate,
+  parseDimensions,
+} from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
 
@@ -23,6 +29,7 @@ import {
   color,
   commentary,
   commentatorArtists,
+  constitutibleArtwork,
   contentString,
   contributionList,
   dimensions,
@@ -99,6 +106,10 @@ export class Flash extends Thing {
     coverArtFileExtension: fileExtension('jpg'),
 
     coverArtDimensions: dimensions(),
+
+    coverArtwork:
+      constitutibleArtwork.fromYAMLFieldSpec
+        .call(this, 'Cover Artwork'),
 
     contributorContribs: contributionList({
       date: 'date',
@@ -205,6 +216,16 @@ export class Flash extends Thing {
         transform: parseAdditionalNames,
       },
 
+      'Cover Artwork': {
+        property: 'coverArtwork',
+        transform:
+          parseArtwork({
+            single: true,
+            fileExtensionFromThingProperty: 'coverArtFileExtension',
+            dimensionsFromThingProperty: 'coverArtDimensions',
+          }),
+      },
+
       'Cover Art File Extension': {property: 'coverArtFileExtension'},
 
       'Cover Art Dimensions': {
@@ -225,6 +246,14 @@ export class Flash extends Thing {
       'Review Points': {ignore: true},
     },
   };
+
+  getOwnArtworkPath(artwork) {
+    return [
+      'media.flashArt',
+      this.directory,
+      artwork.fileExtension,
+    ];
+  }
 }
 
 export class FlashAct extends Thing {
@@ -411,7 +440,9 @@ export class FlashSide extends Thing {
       const flashActData = results.filter(x => x instanceof FlashAct);
       const flashSideData = results.filter(x => x instanceof FlashSide);
 
-      return {flashData, flashActData, flashSideData};
+      const artworkData = flashData.map(flash => flash.coverArtwork);
+
+      return {flashData, flashActData, flashSideData, artworkData};
     },
 
     sort({flashData}) {
