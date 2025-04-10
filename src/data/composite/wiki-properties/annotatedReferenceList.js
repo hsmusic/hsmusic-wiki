@@ -2,7 +2,6 @@ import {input, templateCompositeFrom} from '#composite';
 
 import {
   isContentString,
-  isDate,
   optional,
   validateArrayItems,
   validateProperties,
@@ -26,11 +25,6 @@ export default templateCompositeFrom({
 
     data: inputWikiData({allowMixedTypes: true}),
     find: inputSoupyFind(),
-
-    date: input({
-      validate: isDate,
-      defaultValue: null,
-    }),
 
     reference: input.staticValue({type: 'string', defaultValue: 'reference'}),
     annotation: input.staticValue({type: 'string', defaultValue: 'annotation'}),
@@ -56,8 +50,6 @@ export default templateCompositeFrom({
   steps: () => [
     withResolvedAnnotatedReferenceList({
       list: input.updateValue(),
-
-      date: input('date'),
 
       reference: input('reference'),
       annotation: input('annotation'),
