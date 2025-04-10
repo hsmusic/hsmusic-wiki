@@ -300,9 +300,22 @@ export class Artwork extends Thing {
     artworksWhichReference: {
       bindTo: 'artworkData',
 
-      referencing: artwork => [artwork],
-      referenced: artwork =>
-        artwork.referencedArtworks.map(ref => ref.artwork),
+      referencing: referencingArtwork =>
+        referencingArtwork.referencedArtworks
+          .map(({artwork: referencedArtwork, ...referenceDetails}) => ({
+            referencingArtwork,
+            referencedArtwork,
+            referenceDetails,
+          })),
+
+      referenced: ({referencedArtwork}) => [referencedArtwork],
+
+      tidy: ({referencingArtwork, referenceDetails}) => ({
+        artwork: referencingArtwork,
+        ...referenceDetails,
+      }),
+
+      date: ({artwork}) => artwork.date,
     },
   };
 
