@@ -83,7 +83,9 @@ function reverseHelper(spec) {
     for (const referencedThing of allReferencedThings) {
       if (cacheRecord.has(referencedThing)) {
         const referencingThings = cacheRecord.get(referencedThing);
-        sortByDate(referencingThings);
+        sortByDate(referencingThings, {
+          getDate: spec.date ?? (thing => thing.date),
+        });
       }
     }
 
