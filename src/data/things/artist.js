@@ -10,8 +10,12 @@ import {stitchArrays} from '#sugar';
 import Thing from '#thing';
 import {isName, validateArrayItems} from '#validators';
 import {getKebabCase} from '#wiki-data';
+import {parseArtwork} from '#yaml';
+
+import {exitWithoutDependency} from '#composite/control-flow';
 
 import {
+  constitutibleArtwork,
   contentString,
   directory,
   fileExtension,
@@ -42,6 +46,16 @@ export class Artist extends Thing {
 
     hasAvatar: flag(false),
     avatarFileExtension: fileExtension('jpg'),
+
+    avatarArtwork: [
+      exitWithoutDependency({
+        dependency: 'hasAvatar',
+        value: input.value(null),
+      }),
+
+      constitutibleArtwork.fromYAMLFieldSpec
+        .call(this, 'Avatar Artwork'),
+    ],
 
     aliasNames: {
       flags: {update: true, expose: true},
@@ -193,6 +207,16 @@ export class Artist extends Thing {
       'URLs': {property: 'urls'},
       'Context Notes': {property: 'contextNotes'},
 
+      // note: doesn't really work as an independent field yet
+      'Avatar Artwork': {
+        property: 'avatarArtwork',
+        transform:
+          parseArtwork({
+            single: true,
+            fileExtensionFromThingProperty: 'avatarFileExtension',
+          }),
+      },
+
       'Has Avatar': {property: 'hasAvatar'},
       'Avatar File Extension': {property: 'avatarFileExtension'},
 
@@ -238,7 +262,12 @@ export class Artist extends Thing {
 
       const artistData = [...artists, ...artistAliases];
 
-      return {artistData};
+      const artworkData =
+        artistData
+          .filter(artist => artist.hasAvatar)
+          .map(artist => artist.avatarArtwork);
+
+      return {artistData, artworkData};
     },
 
     sort({artistData}) {
@@ -265,5 +294,13 @@ export class Artist extends Thing {
     }
 
     return parts.join('');
+  }
+
+  getOwnArtworkPath(artwork) {
+    return [
+      'media.artistAvatar',
+      this.directory,
+      artwork.fileExtension,
+    ];
   }
 }

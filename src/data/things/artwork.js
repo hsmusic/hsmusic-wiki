@@ -120,6 +120,11 @@ export class Artwork extends Thing {
         validate: input.value(isDimensions),
       }),
 
+      exitWithoutDependency({
+        dependency: 'artistContribsFromThingProperty',
+        value: input.value(null),
+      }),
+
       withPropertyFromObject({
         object: 'thing',
         property: 'dimensionsFromThingProperty',
