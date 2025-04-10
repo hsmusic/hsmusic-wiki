@@ -116,7 +116,7 @@ export default {
 
         additionalNames: relations.additionalNamesBox,
 
-        coverColumnContent: [
+        artworkColumnContent: [
           (relations.cover
             ? relations.cover.slots({
                 showOriginDetails: true,

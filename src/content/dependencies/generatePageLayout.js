@@ -93,7 +93,7 @@ export default {
       mutable: false,
     },
 
-    coverColumnContent: {
+    artworkColumnContent: {
       type: 'html',
       mutable: false,
     },
@@ -262,15 +262,15 @@ export default {
         ? data.canonicalBase + pagePathStringFromRoot
         : null);
 
-    const firstItemInCoverColumn =
-      html.smooth(slots.coverColumnContent)
+    const firstItemInArtworkColumn =
+      html.smooth(slots.artworkColumnContent)
         .content[0];
 
     const primaryCover =
-      (firstItemInCoverColumn &&
-       html.resolve(firstItemInCoverColumn, {normalize: 'tag'})
+      (firstItemInArtworkColumn &&
+       html.resolve(firstItemInArtworkColumn, {normalize: 'tag'})
          .attributes.has('class', 'cover-artwork')
-        ? firstItemInCoverColumn
+        ? firstItemInArtworkColumn
         : null);
 
     const titleContentsHTML =
@@ -327,11 +327,11 @@ export default {
         [
           titleHTML,
 
-          html.tag('div', {id: 'cover-art-column'},
+          html.tag('div', {id: 'artwork-column'},
             {[html.onlyIfContent]: true},
             {class: 'isolate-tooltip-z-indexing'},
 
-            slots.coverColumnContent),
+            slots.artworkColumnContent),
 
           subtitleHTML,
 

@@ -1436,19 +1436,19 @@ hr.cute,
   overflow: hidden;
 }
 
-#cover-art-column .cover-artwork {
+#artwork-column .cover-artwork {
   box-shadow:
     0 2px 14px -6px var(--primary-color),
     0 0 12px 12px #00000080;
 }
 
-#cover-art-column .cover-artwork:not(:first-child) {
+#artwork-column .cover-artwork:not(:first-child) {
   margin-top: 20px;
   margin-left: 30px;
   margin-right: 5px;
 }
 
-#cover-art-column .cover-artwork:last-child:not(:first-child) {
+#artwork-column .cover-artwork:last-child:not(:first-child) {
   margin-bottom: 25px;
 }
 
@@ -3458,7 +3458,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   /* Cover art floats to the right. It's positioned in HTML beneath the
    * heading, so pull it up a little to "float" on top.
    */
-  #cover-art-column {
+  #artwork-column {
     float: right;
     width: 40%;
     max-width: 400px;
@@ -3471,7 +3471,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   /* ...Except on top-indexes, where cover art is displayed prominently
    * between the heading and subheading.
    */
-  #content.top-index #cover-art-column {
+  #content.top-index #artwork-column {
     float: none;
     margin: 2em auto 2.5em auto;
     max-width: 375px;
@@ -3578,7 +3578,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
     --responsive-padding-ratio: 0.02;
   }
 
-  #cover-art-column {
+  #artwork-column {
     margin: 25px 0 5px 0;
     width: 100%;
     max-width: unset;
