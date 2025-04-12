@@ -222,6 +222,8 @@ export class Artwork extends Thing {
       }),
     ],
 
+    referencedArtworksFromThingProperty: simpleString(),
+
     referencedArtworks: [
       {
         compute: (continuation) => continuation({
@@ -258,13 +260,20 @@ export class Artwork extends Thing {
         mode: input.value('empty'),
       }),
 
+      exitWithoutDependency({
+        dependency: 'referencedArtworksFromThingProperty',
+        value: input.value([]),
+      }),
+
       withPropertyFromObject({
         object: 'thing',
-        property: input.value('referencedArtworks'),
+        property: 'referencedArtworksFromThingProperty',
+      }).outputs({
+        ['#value']: '#referencedArtworks',
       }),
 
       exposeDependencyOrContinue({
-        dependency: '#thing.referencedArtworks',
+        dependency: '#referencedArtworks',
       }),
 
       exposeConstant({

@@ -797,6 +797,7 @@ export function parseArtwork({
   artistContribsFromThingProperty = null,
   artistContribsArtistProperty = null,
   artTagsFromThingProperty = null,
+  referencedArtworksFromThingProperty = null,
 }) {
   const provide = {
     dimensionsFromThingProperty,
@@ -805,6 +806,7 @@ export function parseArtwork({
     artistContribsFromThingProperty,
     artistContribsArtistProperty,
     artTagsFromThingProperty,
+    referencedArtworksFromThingProperty,
   };
 
   const parseSingleEntry = (entry, {subdoc, Artwork}) =>

@@ -23,6 +23,7 @@ const template = templateCompositeFrom({
     artistContribsFromThingProperty: input({type: 'string', acceptsNull: true}),
     artistContribsArtistProperty: input({type: 'string', acceptsNull: true}),
     artTagsFromThingProperty: input({type: 'string', acceptsNull: true}),
+    referencedArtworksFromThingProperty: input({type: 'string', acceptsNull: true}),
   },
 
   steps: () => [
@@ -40,6 +41,7 @@ const template = templateCompositeFrom({
       artistContribsFromThingProperty: input('artistContribsFromThingProperty'),
       artistContribsArtistProperty: input('artistContribsArtistProperty'),
       artTagsFromThingProperty: input('artTagsFromThingProperty'),
+      referencedArtworksFromThingProperty: input('referencedArtworksFromThingProperty'),
     }),
 
     exposeDependency({

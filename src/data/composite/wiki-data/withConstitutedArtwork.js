@@ -12,6 +12,7 @@ export default templateCompositeFrom({
     artistContribsFromThingProperty: input({type: 'string', acceptsNull: true}),
     artistContribsArtistProperty: input({type: 'string', acceptsNull: true}),
     artTagsFromThingProperty: input({type: 'string', acceptsNull: true}),
+    referencedArtworksFromThingProperty: input({type: 'string', acceptsNull: true}),
   },
 
   outputs: ['#constitutedArtwork'],
@@ -26,6 +27,7 @@ export default templateCompositeFrom({
         input('artistContribsFromThingProperty'),
         input('artistContribsArtistProperty'),
         input('artTagsFromThingProperty'),
+        input('referencedArtworksFromThingProperty'),
       ],
 
       compute: (continuation, {
@@ -36,6 +38,7 @@ export default templateCompositeFrom({
         [input('artistContribsFromThingProperty')]: artistContribsFromThingProperty,
         [input('artistContribsArtistProperty')]: artistContribsArtistProperty,
         [input('artTagsFromThingProperty')]: artTagsFromThingProperty,
+        [input('referencedArtworksFromThingProperty')]: referencedArtworksFromThingProperty,
       }) => continuation({
         ['#constitutedArtwork']:
           Object.assign(new thingConstructors.Artwork, {
@@ -46,6 +49,7 @@ export default templateCompositeFrom({
             artistContribsArtistProperty,
             artTagsFromThingProperty,
             dateFromThingProperty,
+            referencedArtworksFromThingProperty,
           }),
       }),
     },
