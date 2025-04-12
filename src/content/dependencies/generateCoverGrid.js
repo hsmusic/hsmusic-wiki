@@ -33,9 +33,11 @@ export default {
     actionLinks: {validate: v => v.sparseArrayOf(v.isHTML)},
   },
 
-  generate(relations, slots, {html, language}) {
-    return (
-      html.tag('div', {class: 'grid-listing'}, [
+  generate: (relations, slots, {html, language}) =>
+    html.tag('div', {class: 'grid-listing'},
+      {[html.onlyIfContent]: true},
+
+      [
         stitchArrays({
           classes: slots.classes,
           image: slots.images,
@@ -84,6 +86,5 @@ export default {
 
         relations.actionLinks
           .slot('actionLinks', slots.actionLinks),
-      ]));
-  },
+      ]),
 };
