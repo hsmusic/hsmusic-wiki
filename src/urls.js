@@ -283,9 +283,14 @@ export function getURLsFrom({
       to = targetFullKey;
     }
 
-    return (
-      subdirectoryPrefix +
-      urls.from(from).to(to, ...args));
+    const toResult =
+      urls.from(from).to(to, ...args);
+
+    if (getOrigin(toResult)) {
+      return toResult;
+    } else {
+      return subdirectoryPrefix + toResult;
+    }
   };
 }
 
