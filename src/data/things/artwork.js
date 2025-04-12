@@ -3,7 +3,6 @@ import {inspect} from 'node:util';
 import {input} from '#composite';
 import find from '#find';
 import Thing from '#thing';
-import {parseAnnotatedReferences, parseContributors, parseDate} from '#yaml';
 
 import {
   isContentString,
@@ -17,6 +16,13 @@ import {
   validateReference,
   validateReferenceList,
 } from '#validators';
+
+import {
+  parseAnnotatedReferences,
+  parseContributors,
+  parseDate,
+  parseDimensions,
+} from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
 
@@ -302,6 +308,11 @@ export class Artwork extends Thing {
     fields: {
       'Directory': {property: 'unqualifiedDirectory'},
       'File Extension': {property: 'fileExtension'},
+
+      'Dimensions': {
+        property: 'dimensions',
+        transform: parseDimensions,
+      },
 
       'Label': {property: 'label'},
       'Source': {property: 'source'},
