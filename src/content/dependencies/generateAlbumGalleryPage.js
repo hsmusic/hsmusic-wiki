@@ -116,7 +116,7 @@ export default {
 
           relations.noTrackArtworksLine,
 
-          data.trackGridIDs.length > 1 &&
+          data.trackGridLabels.some(value => value !== null) &&
             html.tag('p', {class: 'gallery-set-switcher'},
               language.encapsulate(pageCapsule, 'setSwitcher', switcherCapsule =>
                 language.$(switcherCapsule, {
