@@ -533,6 +533,7 @@ export class Track extends Thing {
             dimensionsFromThingProperty: 'coverArtDimensions',
             fileExtensionFromThingProperty: 'coverArtFileExtension',
             dateFromThingProperty: 'coverArtDate',
+            artTagsFromThingProperty: 'artTags',
             artistContribsFromThingProperty: 'coverArtistContribs',
             artistContribsArtistProperty: 'trackCoverArtistContributions',
           }),

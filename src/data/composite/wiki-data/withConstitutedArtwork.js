@@ -8,9 +8,10 @@ export default templateCompositeFrom({
   inputs: {
     dimensionsFromThingProperty: input({type: 'string', acceptsNull: true}),
     fileExtensionFromThingProperty: input({type: 'string', acceptsNull: true}),
+    dateFromThingProperty: input({type: 'string', acceptsNull: true}),
     artistContribsFromThingProperty: input({type: 'string', acceptsNull: true}),
     artistContribsArtistProperty: input({type: 'string', acceptsNull: true}),
-    dateFromThingProperty: input({type: 'string', acceptsNull: true}),
+    artTagsFromThingProperty: input({type: 'string', acceptsNull: true}),
   },
 
   outputs: ['#constitutedArtwork'],
@@ -21,18 +22,20 @@ export default templateCompositeFrom({
         input.myself(),
         input('dimensionsFromThingProperty'),
         input('fileExtensionFromThingProperty'),
+        input('dateFromThingProperty'),
         input('artistContribsFromThingProperty'),
         input('artistContribsArtistProperty'),
-        input('dateFromThingProperty'),
+        input('artTagsFromThingProperty'),
       ],
 
       compute: (continuation, {
         [input.myself()]: myself,
         [input('dimensionsFromThingProperty')]: dimensionsFromThingProperty,
         [input('fileExtensionFromThingProperty')]: fileExtensionFromThingProperty,
+        [input('dateFromThingProperty')]: dateFromThingProperty,
         [input('artistContribsFromThingProperty')]: artistContribsFromThingProperty,
         [input('artistContribsArtistProperty')]: artistContribsArtistProperty,
-        [input('dateFromThingProperty')]: dateFromThingProperty,
+        [input('artTagsFromThingProperty')]: artTagsFromThingProperty,
       }) => continuation({
         ['#constitutedArtwork']:
           Object.assign(new thingConstructors.Artwork, {
@@ -41,6 +44,7 @@ export default templateCompositeFrom({
             fileExtensionFromThingProperty,
             artistContribsFromThingProperty,
             artistContribsArtistProperty,
+            artTagsFromThingProperty,
             dateFromThingProperty,
           }),
       }),

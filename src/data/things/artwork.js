@@ -179,6 +179,8 @@ export class Artwork extends Thing {
       }),
     ],
 
+    artTagsFromThingProperty: simpleString(),
+
     artTags: [
       withResolvedReferenceList({
         list: input.updateValue({
@@ -194,13 +196,20 @@ export class Artwork extends Thing {
         mode: input.value('empty'),
       }),
 
+      exitWithoutDependency({
+        dependency: 'artTagsFromThingProperty',
+        value: input.value([]),
+      }),
+
       withPropertyFromObject({
         object: 'thing',
-        property: input.value('artTags'),
+        property: 'artTagsFromThingProperty',
+      }).outputs({
+        ['#value']: '#artTags',
       }),
 
       exposeDependencyOrContinue({
-        dependency: '#thing.artTags',
+        dependency: '#artTags',
       }),
 
       exposeConstant({

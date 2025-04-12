@@ -18,9 +18,10 @@ const template = templateCompositeFrom({
   inputs: {
     dimensionsFromThingProperty: input({type: 'string', acceptsNull: true}),
     fileExtensionFromThingProperty: input({type: 'string', acceptsNull: true}),
+    dateFromThingProperty: input({type: 'string', acceptsNull: true}),
     artistContribsFromThingProperty: input({type: 'string', acceptsNull: true}),
     artistContribsArtistProperty: input({type: 'string', acceptsNull: true}),
-    dateFromThingProperty: input({type: 'string', acceptsNull: true}),
+    artTagsFromThingProperty: input({type: 'string', acceptsNull: true}),
   },
 
   steps: () => [
@@ -34,9 +35,10 @@ const template = templateCompositeFrom({
     withConstitutedArtwork({
       dimensionsFromThingProperty: input('dimensionsFromThingProperty'),
       fileExtensionFromThingProperty: input('fileExtensionFromThingProperty'),
+      dateFromThingProperty: input('dateFromThingProperty'),
       artistContribsFromThingProperty: input('artistContribsFromThingProperty'),
       artistContribsArtistProperty: input('artistContribsArtistProperty'),
-      dateFromThingProperty: input('dateFromThingProperty'),
+      artTagsFromThingProperty: input('artTagsFromThingProperty'),
     }),
 
     {

@@ -505,6 +505,7 @@ export class Album extends Thing {
             dateFromThingProperty: 'coverArtDate',
             artistContribsFromThingProperty: 'coverArtistContribs',
             artistContribsArtistProperty: 'albumCoverArtistContributions',
+            artTagsFromThingProperty: 'artTags',
           }),
       },
 

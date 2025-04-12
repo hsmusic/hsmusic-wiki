@@ -791,11 +791,12 @@ export function parseAnnotatedReferences(entries, {
 
 export function parseArtwork({
   single = false,
-  dimensionsFromThingProperty,
-  fileExtensionFromThingProperty,
-  dateFromThingProperty,
-  artistContribsFromThingProperty,
-  artistContribsArtistProperty,
+  dimensionsFromThingProperty = null,
+  fileExtensionFromThingProperty = null,
+  dateFromThingProperty = null,
+  artistContribsFromThingProperty = null,
+  artistContribsArtistProperty = null,
+  artTagsFromThingProperty = null,
 }) {
   const provide = {
     dimensionsFromThingProperty,
@@ -803,6 +804,7 @@ export function parseArtwork({
     dateFromThingProperty,
     artistContribsFromThingProperty,
     artistContribsArtistProperty,
+    artTagsFromThingProperty,
   };
 
   const parseSingleEntry = (entry, {subdoc, Artwork}) =>
