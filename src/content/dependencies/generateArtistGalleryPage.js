@@ -1,5 +1,4 @@
-import {sortAlbumsTracksChronologically} from '#sort';
-import {stitchArrays} from '#sugar';
+import {sortArtworksChronologically} from '#sort';
 
 export default {
   contentDependencies: [
@@ -7,83 +6,59 @@ export default {
     'generateCoverGrid',
     'generatePageLayout',
     'image',
-    'linkAlbum',
-    'linkTrack',
+    'linkAnythingMan',
   ],
 
   extraDependencies: ['html', 'language'],
 
-  query(artist) {
-    const things =
-      ([
-        artist.albumCoverArtistContributions,
-        artist.trackCoverArtistContributions,
-      ]).flat()
-        .filter(({annotation}) => !annotation?.startsWith(`edits for wiki`))
-        .map(({thing}) => thing);
+  query: (artist) => ({
+    artworks:
+      sortArtworksChronologically(
+        ([
+          artist.albumCoverArtistContributions,
+          artist.trackCoverArtistContributions,
+        ]).flat()
+          .filter(contrib => !contrib.annotation?.startsWith(`edits for wiki`))
+          .map(contrib => contrib.thing),
+        {latestFirst: true}),
+  }),
 
-    sortAlbumsTracksChronologically(things, {
-      latestFirst: true,
-      getDate: thing => thing.coverArtDate,
-    });
+  relations: (relation, query, artist) => ({
+    layout:
+      relation('generatePageLayout'),
 
-    return {things};
-  },
+    artistNavLinks:
+      relation('generateArtistNavLinks', artist),
 
-  relations(relation, query, artist) {
-    const relations = {};
+    coverGrid:
+      relation('generateCoverGrid'),
 
-    relations.layout =
-      relation('generatePageLayout');
+    links:
+      query.artworks
+        .map(artwork => relation('linkAnythingMan', artwork.thing)),
 
-    relations.artistNavLinks =
-      relation('generateArtistNavLinks', artist);
+    images:
+      query.artworks
+        .map(artwork => relation('image', artwork)),
+  }),
 
-    relations.coverGrid =
-      relation('generateCoverGrid');
+  data: (query, artist) => ({
+    name:
+      artist.name,
 
-    relations.links =
-      query.things.map(thing =>
-        (thing.album
-          ? relation('linkTrack', thing)
-          : relation('linkAlbum', thing)));
+    numArtworks:
+      query.artworks.length,
 
-    relations.images =
-      query.things.map(thing =>
-        relation('image', thing.artTags));
+    names:
+      query.artworks
+        .map(artwork => artwork.thing.name),
 
-    return relations;
-  },
-
-  data(query, artist) {
-    const data = {};
-
-    data.name = artist.name;
-
-    data.numArtworks = query.things.length;
-
-    data.names =
-      query.things.map(thing => thing.name);
-
-    data.paths =
-      query.things.map(thing =>
-        (thing.album
-          ? ['media.trackCover', thing.album.directory, thing.directory, thing.coverArtFileExtension]
-          : ['media.albumCover', thing.directory, thing.coverArtFileExtension]));
-
-    data.dimensions =
-      query.things.map(thing => thing.coverArtDimensions);
-
-    data.otherCoverArtists =
-      query.things.map(thing =>
-        (thing.coverArtistContribs.length > 1
-          ? thing.coverArtistContribs
-              .filter(({artist: otherArtist}) => otherArtist !== artist)
-              .map(({artist: otherArtist}) => otherArtist.name)
-          : null));
-
-    return data;
-  },
+    otherCoverArtists:
+      query.artworks
+        .map(artwork => artwork.artistContribs
+          .filter(contrib => contrib.artist !== artist)
+          .map(contrib => contrib.artist.name)),
+  }),
 
   generate: (data, relations, {html, language}) =>
     language.encapsulate('artistGalleryPage', pageCapsule =>
@@ -100,7 +75,7 @@ export default {
           html.tag('p', {class: 'quick-info'},
             language.$(pageCapsule, 'infoLine', {
               coverArts:
-                language.countCoverArts(data.numArtworks, {
+                language.countArtworks(data.numArtworks, {
                   unit: true,
                 }),
             })),
@@ -109,26 +84,15 @@ export default {
             .slots({
               links: relations.links,
               names: data.names,
+              images: relations.images,
 
-              images:
-                stitchArrays({
-                  image: relations.images,
-                  path: data.paths,
-                  dimensions: data.dimensions,
-                }).map(({image, path, dimensions}) =>
-                    image.slots({
-                      path,
-                      dimensions,
-                    })),
-
-              // TODO: Can this be [language.onlyIfOptions]?
               info:
                 data.otherCoverArtists.map(names =>
-                  (names === null
-                    ? null
-                    : language.$('misc.coverGrid.details.otherCoverArtists', {
-                        artists: language.formatUnitList(names),
-                      }))),
+                  language.$('misc.coverGrid.details.otherCoverArtists', {
+                    [language.onlyIfOptions]: ['artists'],
+
+                    artists: language.formatUnitList(names),
+                  })),
             }),
         ],
 
