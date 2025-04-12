@@ -37,20 +37,25 @@ export default {
         ([
           (unique(
             ([
-              artist.albumArtistContributions,
-              artist.albumCoverArtistContributions,
-              artist.albumWallpaperArtistContributions,
-              artist.albumBannerArtistContributions,
+              artist.albumArtistContributions
+                .map(contrib => contrib.thing),
+              artist.albumCoverArtistContributions
+                .map(contrib => contrib.thing.thing),
+              artist.albumWallpaperArtistContributions
+                .map(contrib => contrib.thing.thing),
+              artist.albumBannerArtistContributions
+                .map(contrib => contrib.thing.thing),
             ]).flat()
-              .map(({thing}) => thing)
           )).map(album => album.groups),
           (unique(
             ([
-              artist.trackArtistContributions,
-              artist.trackContributorContributions,
-              artist.trackCoverArtistContributions,
+              artist.trackArtistContributions
+                .map(contrib => contrib.thing),
+              artist.trackContributorContributions
+                .map(contrib => contrib.thing),
+              artist.trackCoverArtistContributions
+                .map(contrib => contrib.thing.thing),
             ]).flat()
-              .map(({thing}) => thing)
           )).map(track => track.album.groups),
         ]).flat()
           .map(groups => groups
