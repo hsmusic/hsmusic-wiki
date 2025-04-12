@@ -35,8 +35,8 @@ export default {
       counts:
         query.artTags.map(artTag =>
           unique([
-            ...artTag.indirectlyTaggedInThings,
-            ...artTag.directlyTaggedInThings,
+            ...artTag.indirectlyFeaturedInArtworks,
+            ...artTag.directlyFeaturedInArtworks,
           ]).length),
     };
   },

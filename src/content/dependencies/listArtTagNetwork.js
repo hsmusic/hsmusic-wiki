@@ -29,21 +29,21 @@ export default {
 
     const getStats = (artTag) => ({
       directUses:
-        artTag.directlyTaggedInThings.length,
+        artTag.directlyFeaturedInArtworks.length,
 
       // Not currently displayed
       directAndIndirectUses:
         unique([
-          ...artTag.indirectlyTaggedInThings,
-          ...artTag.directlyTaggedInThings,
+          ...artTag.indirectlyFeaturedInArtworks,
+          ...artTag.directlyFeaturedInArtworks,
         ]).length,
 
       totalUses:
         [
-          ...artTag.directlyTaggedInThings,
+          ...artTag.directlyFeaturedInArtworks,
           ...
             artTag.allDescendantArtTags
-              .flatMap(artTag => artTag.directlyTaggedInThings),
+              .flatMap(artTag => artTag.directlyFeaturedInArtworks),
         ].length,
 
       descendants:

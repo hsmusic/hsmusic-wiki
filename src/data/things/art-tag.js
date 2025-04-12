@@ -92,22 +92,11 @@ export class ArtTag extends Thing {
       },
     ],
 
-    directlyTaggedInThings: {
-      flags: {expose: true},
+    directlyFeaturedInArtworks: reverseReferenceList({
+      reverse: soupyReverse.input('artworksWhichFeature'),
+    }),
 
-      expose: {
-        dependencies: ['this', 'reverse'],
-        compute: ({this: artTag, reverse}) =>
-          sortAlbumsTracksChronologically(
-            [
-              ...reverse.albumsWhoseArtworksFeature(artTag),
-              ...reverse.tracksWhoseArtworksFeature(artTag),
-            ],
-            {getDate: thing => thing.coverArtDate}),
-      },
-    },
-
-    indirectlyTaggedInThings: [
+    indirectlyFeaturedInArtworks: [
       withAllDescendantArtTags(),
 
       {
@@ -115,7 +104,7 @@ export class ArtTag extends Thing {
         compute: ({'#allDescendantArtTags': allDescendantArtTags}) =>
           unique(
             allDescendantArtTags
-              .flatMap(artTag => artTag.directlyTaggedInThings)),
+              .flatMap(artTag => artTag.directlyFeaturedInArtworks)),
       },
     ],
 

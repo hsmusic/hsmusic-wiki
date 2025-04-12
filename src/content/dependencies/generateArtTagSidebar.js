@@ -54,8 +54,8 @@ export default {
     directDescendantTimesFeaturedTotal:
       artTag.directDescendantArtTags.map(artTag =>
         unique([
-          ...artTag.directlyTaggedInThings,
-          ...artTag.indirectlyTaggedInThings,
+          ...artTag.directlyFeaturedInArtworks,
+          ...artTag.indirectlyFeaturedInArtworks,
         ]).length),
 
     furthestAncestorArtTagNames:

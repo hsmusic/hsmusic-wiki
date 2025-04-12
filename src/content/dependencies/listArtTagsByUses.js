@@ -17,8 +17,8 @@ export default {
     const counts =
       artTags.map(artTag =>
         unique([
-          ...artTag.directlyTaggedInThings,
-          ...artTag.indirectlyTaggedInThings,
+          ...artTag.directlyFeaturedInArtworks,
+          ...artTag.indirectlyFeaturedInArtworks,
         ]).length);
 
     filterByCount(artTags, counts);

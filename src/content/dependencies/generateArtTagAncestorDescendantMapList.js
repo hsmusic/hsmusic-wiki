@@ -33,8 +33,8 @@ export default {
       const artTagsTimesFeaturedTotal =
         artTags.map(artTag =>
           unique([
-            ...artTag.directlyTaggedInThings,
-            ...artTag.indirectlyTaggedInThings,
+            ...artTag.directlyFeaturedInArtworks,
+            ...artTag.indirectlyFeaturedInArtworks,
           ]).length);
 
       const sublists =

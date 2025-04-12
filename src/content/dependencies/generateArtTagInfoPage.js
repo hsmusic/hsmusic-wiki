@@ -23,10 +23,10 @@ export default {
     const query = {};
 
     query.directThings =
-      artTag.directlyTaggedInThings;
+      artTag.directlyFeaturedInArtworks;
 
     query.indirectThings =
-      artTag.indirectlyTaggedInThings;
+      artTag.indirectlyFeaturedInArtworks;
 
     query.allThings =
       unique([...query.directThings, ...query.indirectThings]);
@@ -111,8 +111,8 @@ export default {
     directDescendantTimesFeaturedTotal:
       artTag.directDescendantArtTags.map(artTag =>
         unique([
-          ...artTag.directlyTaggedInThings,
-          ...artTag.indirectlyTaggedInThings,
+          ...artTag.directlyFeaturedInArtworks,
+          ...artTag.indirectlyFeaturedInArtworks,
         ]).length),
   }),
 

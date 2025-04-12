@@ -1,5 +1,5 @@
-import {sortAlbumsTracksChronologically} from '#sort';
-import {empty, stitchArrays, unique} from '#sugar';
+import {sortArtworksChronologically} from '#sort';
+import {empty, unique} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -11,10 +11,9 @@ export default {
     'generatePageLayout',
     'generateQuickDescription',
     'image',
-    'linkAlbum',
+    'linkAnythingMan',
     'linkArtTagGallery',
     'linkExternal',
-    'linkTrack',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
@@ -26,16 +25,13 @@ export default {
   },
 
   query(sprawl, artTag) {
-    const directThings = artTag.directlyTaggedInThings;
-    const indirectThings = artTag.indirectlyTaggedInThings;
-    const allThings = unique([...directThings, ...indirectThings]);
+    const directArtworks = artTag.directlyFeaturedInArtworks;
+    const indirectArtworks = artTag.indirectlyFeaturedInArtworks;
+    const allArtworks = unique([...directArtworks, ...indirectArtworks]);
 
-    sortAlbumsTracksChronologically(allThings, {
-      getDate: thing => thing.coverArtDate,
-      latestFirst: true,
-    });
+    sortArtworksChronologically(allArtworks, {latestFirst: true});
 
-    return {directThings, indirectThings, allThings};
+    return {directArtworks, indirectArtworks, allArtworks};
   },
 
   relations(relation, query, sprawl, artTag) {
@@ -81,15 +77,12 @@ export default {
       relation('generateCoverGrid');
 
     relations.links =
-      query.allThings
-        .map(thing =>
-          (thing.album
-            ? relation('linkTrack', thing)
-            : relation('linkAlbum', thing)));
+      query.allArtworks
+        .map(artwork => relation('linkAnythingMan', artwork.thing));
 
     relations.images =
-      query.allThings
-        .map(thing => relation('image', thing.artTags));
+      query.allArtworks
+        .map(artwork => relation('image', artwork));
 
     return relations;
   },
@@ -102,30 +95,22 @@ export default {
     data.name = artTag.name;
     data.color = artTag.color;
 
-    data.numArtworksIndirectly = query.indirectThings.length;
-    data.numArtworksDirectly = query.directThings.length;
-    data.numArtworksTotal = query.allThings.length;
+    data.numArtworksIndirectly = query.indirectArtworks.length;
+    data.numArtworksDirectly = query.directArtworks.length;
+    data.numArtworksTotal = query.allArtworks.length;
 
     data.names =
-      query.allThings.map(thing => thing.name);
-
-    data.paths =
-      query.allThings.map(thing =>
-        (thing.album
-          ? ['media.trackCover', thing.album.directory, thing.directory, thing.coverArtFileExtension]
-          : ['media.albumCover', thing.directory, thing.coverArtFileExtension]));
-
-    data.dimensions =
-      query.allThings.map(thing => thing.coverArtDimensions);
+      query.allArtworks
+        .map(artwork => artwork.thing.name);
 
     data.coverArtists =
-      query.allThings.map(thing =>
-        thing.coverArtistContribs
-          .map(({artist}) => artist.name));
+      query.allArtworks
+        .map(artwork => artwork.artistContribs
+          .map(contrib => contrib.artist.name));
 
     data.onlyFeaturedIndirectly =
-      query.allThings.map(thing =>
-        !query.directThings.includes(thing));
+      query.allArtworks.map(artwork =>
+        !query.directArtworks.includes(artwork));
 
     data.hasMixedDirectIndirect =
       data.onlyFeaturedIndirectly.includes(true) &&
@@ -210,23 +195,13 @@ export default {
           relations.coverGrid
             .slots({
               links: relations.links,
+              images: relations.images,
               names: data.names,
               lazy: 12,
 
               classes:
                 data.onlyFeaturedIndirectly.map(onlyFeaturedIndirectly =>
                   (onlyFeaturedIndirectly ? 'featured-indirectly' : '')),
-
-              images:
-                stitchArrays({
-                  image: relations.images,
-                  path: data.paths,
-                  dimensions: data.dimensions,
-                }).map(({image, path, dimensions}) =>
-                    image.slots({
-                      path,
-                      dimensions,
-                    })),
 
               info:
                 data.coverArtists.map(names =>

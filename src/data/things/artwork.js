@@ -332,6 +332,13 @@ export class Artwork extends Thing {
 
       date: ({artwork}) => artwork.date,
     },
+
+    artworksWhichFeature: {
+      bindTo: 'artworkData',
+
+      referencing: artwork => [artwork],
+      referenced: artwork => artwork.artTags,
+    },
   };
 
   get path() {
