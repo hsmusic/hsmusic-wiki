@@ -389,6 +389,22 @@ export function sortAlbumsTracksChronologically(data, {
   return data;
 }
 
+export function sortArtworksChronologically(data, {
+  latestFirst = false,
+} = {}) {
+  // Artworks conveniently describe their things as artwork.thing, so they
+  // work in sortEntryThingPairs. (Yes, this is just assuming the artworks
+  // are only for albums and tracks... sorry... TODO...)
+  sortEntryThingPairs(data, things =>
+    sortAlbumsTracksChronologically(things, {latestFirst}));
+
+  // Artworks' own dates always matter before however the thing places itself,
+  // and accommodate per-thing properties like coverArtDate anyway.
+  sortByDate(data, {latestFirst});
+
+  return data;
+}
+
 export function sortFlashesChronologically(data, {
   latestFirst = false,
   getDate,
