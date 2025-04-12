@@ -4,12 +4,16 @@ export default {
 
   relations: (relation, album) => ({
     wallpaperArtistContributionsLine:
-      relation('generateReleaseInfoContributionsLine',
-        album.wallpaperArtistContribs),
+      (album.wallpaperArtwork
+        ? relation('generateReleaseInfoContributionsLine',
+            album.wallpaperArtwork.artistContribs)
+        : null),
 
     bannerArtistContributionsLine:
-      relation('generateReleaseInfoContributionsLine',
-        album.bannerArtistContribs),
+      (album.bannerArtwork
+        ? relation('generateReleaseInfoContributionsLine',
+            album.bannerArtwork.artistContribs)
+        : null),
   }),
 
   generate: (relations, {html, language}) =>
@@ -22,12 +26,12 @@ export default {
           {[html.joinChildren]: html.tag('br')},
 
           [
-            relations.wallpaperArtistContributionsLine.slots({
+            relations.wallpaperArtistContributionsLine?.slots({
               stringKey: capsule + '.wallpaperArtBy',
               chronologyKind: 'wallpaperArt',
             }),
 
-            relations.bannerArtistContributionsLine.slots({
+            relations.bannerArtistContributionsLine?.slots({
               stringKey: capsule + '.bannerArtBy',
               chronologyKind: 'bannerArt',
             }),
