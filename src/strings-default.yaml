@@ -1108,6 +1108,15 @@ albumGalleryPage:
   noTrackArtworksLine: >-
     This album doesn't have any track artwork.
 
+  # setSwitcher:
+  #   This is displayed if multiple sets of artwork are available
+  #   across the album.
+
+  setSwitcher:
+    _: "({SETS})"
+
+    unlabeledSet: "Main album art"
+
 #
 # albumCommentaryPage:
 #   The album commentary page is a more minimal layout that brings

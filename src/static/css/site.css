@@ -1746,6 +1746,10 @@ ul.quick-info li:not(:last-child)::after {
   margin-top: 25px;
 }
 
+.gallery-set-switcher {
+  text-align: center;
+}
+
 .quick-description:not(.has-external-links-only) {
   --clamped-padding-ratio: max(var(--responsive-padding-ratio), 0.06);
   margin-left: auto;

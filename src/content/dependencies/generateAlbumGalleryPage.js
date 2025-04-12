@@ -1,18 +1,18 @@
-import {compareArrays, stitchArrays} from '#sugar';
+import {stitchArrays, unique} from '#sugar';
+import {getKebabCase} from '#wiki-data';
 
 export default {
   contentDependencies: [
-    'generateAlbumGalleryCoverArtistsLine',
+    'generateAlbumGalleryAlbumGrid',
     'generateAlbumGalleryNoTrackArtworksLine',
     'generateAlbumGalleryStatsLine',
+    'generateAlbumGalleryTrackGrid',
     'generateAlbumNavAccent',
     'generateAlbumSecondaryNav',
     'generateAlbumStyleRules',
-    'generateCoverGrid',
+    'generateIntrapageDotSwitcher',
     'generatePageLayout',
-    'image',
     'linkAlbum',
-    'linkTrack',
   ],
 
   extraDependencies: ['html', 'language'],
@@ -20,147 +20,82 @@ export default {
   query(album) {
     const query = {};
 
-    const tracksWithUniqueCoverArt =
+    const trackArtworkLabels =
       album.tracks
-        .filter(track => track.hasUniqueCoverArt);
+        .map(track => track.trackArtworks
+          .map(artwork => artwork.label));
 
-    // Don't display "all artwork by..." for albums where there's
-    // only one unique artwork in the first place.
-    if (tracksWithUniqueCoverArt.length > 1) {
-      const allCoverArtistArrays =
-        tracksWithUniqueCoverArt
-          .map(track => track.coverArtistContribs)
-          .map(contribs => contribs.map(contrib => contrib.artist));
+    const recurranceThreshold = 2;
 
-      const allSameCoverArtists =
-        allCoverArtistArrays
-          .slice(1)
-          .every(artists => compareArrays(artists, allCoverArtistArrays[0]));
-
-      if (allSameCoverArtists) {
-        query.coverArtistsForAllTracks =
-          allCoverArtistArrays[0];
-      }
-    }
+    // This list may include null, if some artworks are not labelled!
+    // That's expected.
+    query.recurringTrackArtworkLabels =
+      unique(trackArtworkLabels.flat())
+        .filter(label =>
+          trackArtworkLabels
+            .filter(labels => labels.includes(label))
+            .length >=
+          (label === null
+            ? 1
+            : recurranceThreshold));
 
     return query;
   },
 
-  relations(relation, query, album) {
-    const relations = {};
+  relations: (relation, query, album) => ({
+    layout:
+      relation('generatePageLayout'),
 
-    relations.layout =
-      relation('generatePageLayout');
+    albumStyleRules:
+      relation('generateAlbumStyleRules', album, null),
 
-    relations.albumStyleRules =
-      relation('generateAlbumStyleRules', album, null);
-
-    relations.albumLink =
-      relation('linkAlbum', album);
-
-    relations.albumNavAccent =
-      relation('generateAlbumNavAccent', album, null);
-
-    relations.secondaryNav =
-      relation('generateAlbumSecondaryNav', album);
-
-    relations.statsLine =
-      relation('generateAlbumGalleryStatsLine', album);
-
-    if (album.tracks.every(track => !track.hasUniqueCoverArt)) {
-      relations.noTrackArtworksLine =
-        relation('generateAlbumGalleryNoTrackArtworksLine');
-    }
-
-    if (query.coverArtistsForAllTracks) {
-      relations.coverArtistsLine =
-        relation('generateAlbumGalleryCoverArtistsLine', query.coverArtistsForAllTracks);
-    }
-
-    relations.coverGrid =
-      relation('generateCoverGrid');
-
-    relations.links = [
+    albumLink:
       relation('linkAlbum', album),
 
-      ...
-        album.tracks
-          .map(track => relation('linkTrack', track)),
-    ];
+    albumNavAccent:
+      relation('generateAlbumNavAccent', album, null),
 
-    relations.images = [
-      (album.hasCoverArt
-        ? relation('image', album.artTags)
-        : relation('image')),
+    secondaryNav:
+      relation('generateAlbumSecondaryNav', album),
 
-      ...
-        album.tracks.map(track =>
-          (track.hasUniqueCoverArt
-            ? relation('image', track.artTags)
-            : relation('image'))),
-    ];
+    statsLine:
+      relation('generateAlbumGalleryStatsLine', album),
 
-    return relations;
-  },
+    noTrackArtworksLine:
+      (album.tracks.every(track => !track.hasUniqueCoverArt)
+        ? relation('generateAlbumGalleryNoTrackArtworksLine')
+        : null),
 
-  data(query, album) {
-    const data = {};
+    setSwitcher:
+      relation('generateIntrapageDotSwitcher'),
 
-    data.name = album.name;
-    data.color = album.color;
+    albumGrid:
+      relation('generateAlbumGalleryAlbumGrid', album),
 
-    data.names = [
+    trackGrids:
+      query.recurringTrackArtworkLabels.map(label =>
+        relation('generateAlbumGalleryTrackGrid', album, label)),
+  }),
+
+  data: (query, album) => ({
+    trackGridLabels:
+      query.recurringTrackArtworkLabels,
+
+    trackGridIDs:
+      query.recurringTrackArtworkLabels.map(label =>
+        'track-grid-' +
+          (label
+            ? getKebabCase(label)
+            : 'no-label')),
+
+    name:
       album.name,
-      ...album.tracks.map(track => track.name),
-    ];
 
-    data.coverArtists = [
-      (album.hasCoverArt
-        ? album.coverArtistContribs.map(({artist}) => artist.name)
-        : null),
+    color:
+      album.color,
+  }),
 
-      ...
-        album.tracks.map(track => {
-          if (query.coverArtistsForAllTracks) {
-            return null;
-          }
-
-          if (track.hasUniqueCoverArt) {
-            return track.coverArtistContribs.map(({artist}) => artist.name);
-          }
-
-          return null;
-        }),
-    ];
-
-    data.paths = [
-      (album.hasCoverArt
-        ? ['media.albumCover', album.directory, album.coverArtFileExtension]
-        : null),
-
-      ...
-        album.tracks.map(track =>
-          (track.hasUniqueCoverArt
-            ? ['media.trackCover', track.album.directory, track.directory, track.coverArtFileExtension]
-            : null)),
-    ];
-
-    data.dimensions = [
-      (album.hasCoverArt
-        ? album.coverArtDimensions
-        : null),
-
-      ...
-        album.tracks.map(track =>
-          (track.hasUniqueCoverArt
-            ? track.coverArtDimensions
-            : null)),
-    ];
-
-    return data;
-  },
-
-  generate: (data, relations, {language}) =>
+  generate: (data, relations, {html, language}) =>
     language.encapsulate('albumGalleryPage', pageCapsule =>
       relations.layout.slots({
         title:
@@ -176,34 +111,39 @@ export default {
         mainClasses: ['top-index'],
         mainContent: [
           relations.statsLine,
-          relations.coverArtistsLine,
+
+          relations.albumGrid,
+
           relations.noTrackArtworksLine,
 
-          relations.coverGrid
-            .slots({
-              links: relations.links,
-              names: data.names,
-              images:
-                stitchArrays({
-                  image: relations.images,
-                  path: data.paths,
-                  dimensions: data.dimensions,
-                  name: data.names,
-                }).map(({image, path, dimensions, name}) =>
-                    image.slots({
-                      path,
-                      dimensions,
-                      missingSourceContent:
-                        language.$('misc.albumGalleryGrid.noCoverArt', {name}),
-                    })),
-              info:
-                data.coverArtists.map(names =>
-                  (names === null
-                    ? null
-                    : language.$('misc.coverGrid.details.coverArtists', {
-                        artists: language.formatUnitList(names),
-                      }))),
-            }),
+          data.trackGridIDs.length > 1 &&
+            html.tag('p', {class: 'gallery-set-switcher'},
+              language.encapsulate(pageCapsule, 'setSwitcher', switcherCapsule =>
+                language.$(switcherCapsule, {
+                  sets:
+                    relations.setSwitcher.slots({
+                      initialOptionIndex: 0,
+
+                      titles:
+                        data.trackGridLabels.map(label =>
+                          label ??
+                          language.$(switcherCapsule, 'unlabeledSet')),
+
+                      targetIDs:
+                        data.trackGridIDs,
+                    }),
+                }))),
+
+          stitchArrays({
+            grid: relations.trackGrids,
+            id: data.trackGridIDs,
+          }).map(({grid, id}, index) =>
+              grid.slots({
+                attributes: [
+                  {id},
+                  index >= 1 && {style: 'display: none'},
+                ],
+              })),
         ],
 
         navLinkStyle: 'hierarchical',
