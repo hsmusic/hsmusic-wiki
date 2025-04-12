@@ -1,5 +1,3 @@
-import {stitchArrays} from '#sugar';
-
 import striptags from 'striptags';
 
 export default {
@@ -37,7 +35,7 @@ export default {
 
     coverGridImages:
       act.flashes
-        .map(_flash => relation('image')),
+        .map(flash => relation('image', flash.coverArtwork)),
 
     flashLinks:
       act.flashes
@@ -50,10 +48,6 @@ export default {
 
     flashNames:
       act.flashes.map(flash => flash.name),
-
-    flashCoverPaths:
-      act.flashes.map(flash =>
-        ['media.flashArt', flash.directory, flash.coverArtFileExtension])
   }),
 
   generate: (data, relations, {language}) =>
@@ -71,15 +65,9 @@ export default {
         mainContent: [
           relations.coverGrid.slots({
             links: relations.flashLinks,
+            images: relations.coverGridImages,
             names: data.flashNames,
             lazy: 6,
-
-            images:
-              stitchArrays({
-                image: relations.coverGridImages,
-                path: data.flashCoverPaths,
-              }).map(({image, path}) =>
-                  image.slot('path', path)),
           }),
         ],
 

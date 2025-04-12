@@ -1,5 +1,3 @@
-import {stitchArrays} from '#sugar';
-
 export default {
   contentDependencies: ['generateCoverCarousel', 'image', 'linkAlbum'],
 
@@ -13,27 +11,12 @@ export default {
 
     images:
       row.albums
-        .map(album => relation('image', album.artTags)),
+        .map(album => relation('image', album.coverArtworks[0])),
   }),
 
-  data: (row) => ({
-    paths:
-      row.albums.map(album =>
-        (album.hasCoverArt
-          ? ['media.albumCover', album.directory, album.coverArtFileExtension]
-          : null)),
-  }),
-
-  generate: (data, relations) =>
+  generate: (relations) =>
     relations.coverCarousel.slots({
-      links:
-        relations.links,
-
-      images:
-        stitchArrays({
-          image: relations.images,
-          path: data.paths,
-        }).map(({image, path}) =>
-            image.slot('path', path)),
+      links: relations.links,
+      images: relations.images,
     }),
 };

@@ -11,7 +11,7 @@ export default {
 
   relations: (relation, artwork) => ({
     image:
-      relation('image'),
+      relation('image', artwork),
 
     originDetails:
       relation('generateCoverArtworkOriginDetails', artwork),
@@ -30,16 +30,8 @@ export default {
     color:
       artwork.thing.color ?? null,
 
-    path:
-      artwork.path,
-
     dimensions:
       artwork.dimensions,
-
-    warnings:
-      artwork.artTags
-        .filter(tag => tag.isContentWarning)
-        .map(tag => tag.name),
   }),
 
   slots: {
@@ -69,9 +61,6 @@ export default {
     const {image} = relations;
 
     image.setSlots({
-      path: data.path,
-      warnings: data.warnings,
-
       color: slots.color ?? data.color,
       alt: slots.alt,
     });

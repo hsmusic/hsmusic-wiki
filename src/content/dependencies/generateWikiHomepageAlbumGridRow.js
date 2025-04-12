@@ -45,20 +45,17 @@ export default {
 
     images:
       sprawl.albums
-        .map(album => relation('image', album.artTags)),
+        .map(album =>
+          relation('image',
+            (album.hasCoverArt
+              ? album.coverArtworks[0]
+              : null))),
   }),
 
   data: (sprawl, _row) => ({
     names:
       sprawl.albums
         .map(album => album.name),
-
-    paths:
-      sprawl.albums
-        .map(album =>
-          (album.hasCoverArt
-            ? ['media.albumCover', album.directory, album.coverArtFileExtension]
-            : null)),
   }),
 
   generate: (data, relations, {language}) =>
@@ -69,11 +66,9 @@ export default {
       images:
         stitchArrays({
           image: relations.images,
-          path: data.paths,
           name: data.names,
-        }).map(({image, path, name}) =>
+        }).map(({image, name}) =>
             image.slots({
-              path,
               missingSourceContent:
                 language.$('misc.coverGrid.noCoverArt', {
                   album: name,

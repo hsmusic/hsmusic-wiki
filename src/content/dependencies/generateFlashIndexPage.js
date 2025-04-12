@@ -53,7 +53,7 @@ export default {
     actCoverGridImages:
       query.flashActs
         .map(act => act.flashes
-          .map(() => relation('image'))),
+          .map(flash => relation('image', flash.coverArtwork))),
   }),
 
   data: (query) => ({
@@ -73,11 +73,6 @@ export default {
       query.flashActs
         .map(act => act.flashes
           .map(flash => flash.name)),
-
-    actCoverGridPaths:
-      query.flashActs
-        .map(act => act.flashes
-          .map(flash => ['media.flashArt', flash.directory, flash.coverArtFileExtension])),
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -116,7 +111,6 @@ export default {
             coverGridImages: relations.actCoverGridImages,
             coverGridLinks: relations.actCoverGridLinks,
             coverGridNames: data.actCoverGridNames,
-            coverGridPaths: data.actCoverGridPaths,
           }).map(({
               colorStyle,
               actLink,
@@ -126,7 +120,6 @@ export default {
               coverGridImages,
               coverGridLinks,
               coverGridNames,
-              coverGridPaths,
             }, index) => [
               html.tag('h2',
                 {id: anchor},
@@ -135,15 +128,9 @@ export default {
 
               coverGrid.slots({
                 links: coverGridLinks,
+                images: coverGridImages,
                 names: coverGridNames,
                 lazy: index === 0 ? 4 : true,
-
-                images:
-                  stitchArrays({
-                    image: coverGridImages,
-                    path: coverGridPaths,
-                  }).map(({image, path}) =>
-                      image.slot('path', path)),
               }),
             ]),
         ],

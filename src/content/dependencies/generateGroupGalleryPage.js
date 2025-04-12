@@ -53,7 +53,7 @@ export default {
 
       relations.carouselImages =
         carouselAlbums
-          .map(album => relation('image', album.artTags));
+          .map(album => relation('image', album.coverArtworks[0]));
     }
 
     relations.quickDescription =
@@ -69,7 +69,7 @@ export default {
     relations.gridImages =
       albums.map(album =>
         (album.hasCoverArt
-          ? relation('image', album.artTags)
+          ? relation('image', album.coverArtworks[0])
           : relation('image')));
 
     return relations;
@@ -92,22 +92,6 @@ export default {
     data.gridDurations = albums.map(album => getTotalDuration(album.tracks));
     data.gridNumTracks = albums.map(album => album.tracks.length);
 
-    data.gridPaths =
-      albums.map(album =>
-        (album.hasCoverArt
-          ? ['media.albumCover', album.directory, album.coverArtFileExtension]
-          : null));
-
-    const carouselAlbums = filterItemsForCarousel(group.featuredAlbums);
-
-    if (!empty(group.featuredAlbums)) {
-      data.carouselPaths =
-        carouselAlbums.map(album =>
-          (album.hasCoverArt
-            ? ['media.albumCover', album.directory, album.coverArtFileExtension]
-            : null));
-    }
-
     return data;
   },
 
@@ -124,12 +108,7 @@ export default {
           relations.coverCarousel
             ?.slots({
               links: relations.carouselLinks,
-              images:
-                stitchArrays({
-                  image: relations.carouselImages,
-                  path: data.carouselPaths,
-                }).map(({image, path}) =>
-                    image.slot('path', path)),
+              images: relations.carouselImages,
             }),
 
           relations.quickDescription,
@@ -159,19 +138,19 @@ export default {
             .slots({
               links: relations.gridLinks,
               names: data.gridNames,
+
               images:
                 stitchArrays({
                   image: relations.gridImages,
-                  path: data.gridPaths,
                   name: data.gridNames,
-                }).map(({image, path, name}) =>
+                }).map(({image, name}) =>
                     image.slots({
-                      path,
                       missingSourceContent:
                         language.$('misc.coverGrid.noCoverArt', {
                           album: name,
                         }),
                     })),
+
               info:
                 stitchArrays({
                   numTracks: data.gridNumTracks,

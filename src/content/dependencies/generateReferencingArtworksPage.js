@@ -1,5 +1,3 @@
-import {stitchArrays} from '#sugar';
-
 export default {
   contentDependencies: [
     'generateCoverArtwork',
@@ -27,7 +25,7 @@ export default {
 
     images:
       artwork.referencedByArtworks.map(({artwork}) =>
-        relation('image', artwork.artTags)),
+        relation('image', artwork)),
   }),
 
   data: (artwork) => ({
@@ -40,14 +38,6 @@ export default {
     names:
       artwork.referencedByArtworks
         .map(({artwork}) => artwork.thing.name),
-
-    paths:
-      artwork.referencedByArtworks
-        .map(({artwork}) => artwork.path),
-
-    dimensions:
-      artwork.referencedByArtworks
-        .map(({artwork}) => artwork.dimensions),
 
     coverArtistNames:
       artwork.referencedByArtworks
@@ -91,18 +81,8 @@ export default {
 
           relations.coverGrid.slots({
             links: relations.links,
+            images: relations.images,
             names: data.names,
-
-            images:
-              stitchArrays({
-                image: relations.images,
-                path: data.paths,
-                dimensions: data.dimensions,
-              }).map(({image, path, dimensions}) =>
-                  image.slots({
-                    path,
-                    dimensions,
-                  })),
 
             info:
               data.coverArtistNames.map(names =>

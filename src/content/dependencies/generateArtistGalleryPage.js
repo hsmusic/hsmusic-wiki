@@ -83,8 +83,8 @@ export default {
           relations.coverGrid
             .slots({
               links: relations.links,
-              names: data.names,
               images: relations.images,
+              names: data.names,
 
               info:
                 data.otherCoverArtists.map(names =>
