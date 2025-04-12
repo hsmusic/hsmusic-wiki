@@ -16,67 +16,76 @@ export default {
 
   contentDependencies: ['generateColorStyleAttribute'],
 
-  relations: (relation) => ({
+  relations: (relation, _artwork) => ({
     colorStyle:
       relation('generateColorStyleAttribute'),
   }),
 
-  data(artTags) {
-    const data = {};
+  data: (artwork) => ({
+    path:
+      (artwork
+        ? artwork.path
+        : null),
 
-    if (artTags) {
-      data.contentWarnings =
-        artTags
-          .filter(artTag => artTag.isContentWarning)
-          .map(artTag => artTag.name);
-    } else {
-      data.contentWarnings = null;
-    }
+    warnings:
+      (artwork
+        ? artwork.artTags
+            .filter(artTag => artTag.isContentWarning)
+            .map(artTag => artTag.name)
+        : null),
 
-    return data;
-  },
+    dimensions:
+      (artwork
+        ? artwork.dimensions
+        : null),
+  }),
 
   slots: {
-    src: {type: 'string'},
-
-    path: {
-      validate: v => v.validateArrayItems(v.isString),
-    },
-
     thumb: {type: 'string'},
+
+    reveal: {type: 'boolean', default: true},
+    lazy: {type: 'boolean', default: false},
+    square: {type: 'boolean', default: false},
 
     link: {
       validate: v => v.anyOf(v.isBoolean, v.isString),
       default: false,
     },
 
-    color: {
-      validate: v => v.isColor,
-    },
+    color: {validate: v => v.isColor},
 
-    warnings: {
-      validate: v => v.looseArrayOf(v.isString),
-    },
-
-    reveal: {type: 'boolean', default: true},
-    lazy: {type: 'boolean', default: false},
-
-    square: {type: 'boolean', default: false},
-
-    dimensions: {
-      validate: v => v.isDimensions,
-    },
-
-    alt: {type: 'string'},
-
+    // Added to the .image-container.
     attributes: {
       type: 'attributes',
       mutable: false,
     },
 
+    // Added to the <img> itself.
+    alt: {type: 'string'},
+
+    // Specify 'src' or 'path', or the path will be used from the artwork.
+    // If none of the above is present, the message in missingSourceContent
+    // will be displayed instead.
+
+    src: {type: 'string'},
+
+    path: {
+      validate: v => v.validateArrayItems(v.isString),
+    },
+
     missingSourceContent: {
       type: 'html',
       mutable: false,
+    },
+
+    // These will also be used from the artwork if not specified as slots.
+
+    warnings: {
+      validate: v => v.looseArrayOf(v.isString),
+    },
+
+    dimensions: {
+      validate: v => v.isDimensions,
     },
   },
 
@@ -91,15 +100,14 @@ export default {
     missingImagePaths,
     to,
   }) {
-    let originalSrc;
-
-    if (slots.src) {
-      originalSrc = slots.src;
-    } else if (!empty(slots.path)) {
-      originalSrc = to(...slots.path);
-    } else {
-      originalSrc = '';
-    }
+    const originalSrc =
+      (slots.src
+        ? slots.src
+     : slots.path
+        ? to(...slots.path)
+     : data.path
+        ? to(...data.path)
+        : '');
 
     // TODO: This feels janky. It's necessary to deal with static content that
     // includes strings like <img src="media/misc/foo.png">, but processing the
@@ -121,29 +129,27 @@ export default {
       !isMissingImageFile &&
       (typeof slots.link === 'string' || slots.link);
 
-    const contentWarnings =
-      slots.warnings ??
-      data.contentWarnings;
+    const warnings = slots.warnings ?? data.warnings;
+    const dimensions = slots.dimensions ?? data.dimensions;
 
     const willReveal =
       slots.reveal &&
       originalSrc &&
       !isMissingImageFile &&
-      !empty(contentWarnings);
-
-    const willSquare =
-      slots.square;
+      !empty(warnings);
 
     const imgAttributes = html.attributes([
       {class: 'image'},
 
       slots.alt && {alt: slots.alt},
 
-      slots.dimensions?.[0] &&
-        {width: slots.dimensions[0]},
+      dimensions &&
+      dimensions[0] &&
+        {width: dimensions[0]},
 
-      slots.dimensions?.[1] &&
-        {height: slots.dimensions[1]},
+      dimensions &&
+      dimensions[1] &&
+        {height: dimensions[1]},
     ]);
 
     const isPlaceholder =
@@ -169,7 +175,7 @@ export default {
 
         html.tag('span', {class: 'reveal-warnings'},
           language.$('misc.contentWarnings.warnings', {
-            warnings: language.formatUnitList(contentWarnings),
+            warnings: language.formatUnitList(warnings),
           })),
 
         html.tag('br'),
@@ -323,14 +329,14 @@ export default {
 
       wrapped =
         html.tag('div', {class: 'image-outer-area'},
-          willSquare &&
+          slots.square &&
             {class: 'square-content'},
 
           wrapped);
 
       wrapped =
         html.tag('div', {class: 'image-container'},
-          willSquare &&
+          slots.square &&
             {class: 'square'},
 
           typeof slots.link === 'string' &&
