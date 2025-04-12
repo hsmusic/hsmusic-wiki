@@ -132,6 +132,11 @@ export class Artwork extends Thing {
         ['#value']: '#dimensionsFromThing',
       }),
 
+      exitWithoutDependency({
+        dependency: 'dimensionsFromThingProperty',
+        value: input.value(null),
+      }),
+
       exposeDependencyOrContinue({
         dependency: '#dimensionsFromThing',
       }),
