@@ -89,7 +89,7 @@ export function getPageReferences() {
 
   info.contentCovers =
     info.contentCoverColumns
-      .map(el => el.querySelector('.cover-artwork'));
+      .map(el => el ? el.querySelector('.cover-artwork') : null);
 
   info.contentCoversReveal =
     info.contentCovers
