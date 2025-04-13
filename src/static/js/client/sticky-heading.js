@@ -23,6 +23,7 @@ export const info = {
 
   contentContainers: null,
   contentHeadings: null,
+  contentCoverColumns: null,
   contentCovers: null,
   contentCoversReveal: null,
 
@@ -82,9 +83,13 @@ export function getPageReferences() {
     info.stickyContainers
       .map(el => el.closest('.content-sticky-heading-root').parentElement);
 
-  info.contentCovers =
+  info.contentCoverColumns =
     info.contentContainers
-      .map(el => el.querySelector('#cover-art-container'));
+      .map(el => el.querySelector('#artwork-column'));
+
+  info.contentCovers =
+    info.contentCoverColumns
+      .map(el => el.querySelector('.cover-artwork'));
 
   info.contentCoversReveal =
     info.contentCovers
@@ -212,10 +217,10 @@ function updateCollapseStatus(index) {
 function updateStickyCoverVisibility(index) {
   const stickyCoverContainer = info.stickyCoverContainers[index];
   const stickyContainer = info.stickyContainers[index];
-  const contentCover = info.contentCovers[index];
+  const contentCoverColumn = info.contentCoverColumns[index];
 
-  if (contentCover && stickyCoverContainer) {
-    if (contentCover.getBoundingClientRect().bottom < 4) {
+  if (contentCoverColumn && stickyCoverContainer) {
+    if (contentCoverColumn.getBoundingClientRect().bottom < 4) {
       stickyCoverContainer.classList.add('visible');
       stickyContainer.classList.add('cover-visible');
     } else {
