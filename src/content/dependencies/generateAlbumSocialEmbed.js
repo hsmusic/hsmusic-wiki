@@ -32,8 +32,7 @@ export default {
     data.hasImage = album.hasCoverArt;
 
     if (data.hasImage) {
-      data.coverArtDirectory = album.directory;
-      data.coverArtFileExtension = album.coverArtFileExtension;
+      data.imagePath = album.coverArtworks[0].path;
     }
 
     data.albumName = album.name;
@@ -65,7 +64,7 @@ export default {
 
         imagePath:
           (data.hasImage
-            ? ['media.albumCover', data.coverArtDirectory, data.coverArtFileExtension]
+            ? data.imagePath
             : null),
       })),
 };
