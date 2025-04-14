@@ -59,7 +59,7 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {withTracks} from '#composite/things/album';
+import {withHasCoverArt, withTracks} from '#composite/things/album';
 import {withAlbum, withContinueCountingFrom, withStartCountingFrom}
   from '#composite/things/track-section';
 
@@ -188,9 +188,11 @@ export class Album extends Thing {
     ],
 
     coverArtworks: [
+      withHasCoverArt(),
+
       exitWithoutDependency({
-        dependency: 'coverArtistContribs',
-        mode: input.value('empty'),
+        dependency: '#hasCoverArt',
+        mode: input.value('falsy'),
         value: input.value([]),
       }),
 
@@ -297,7 +299,11 @@ export class Album extends Thing {
 
     commentatorArtists: commentatorArtists(),
 
-    hasCoverArt: contribsPresent({contribs: 'coverArtistContribs'}),
+    hasCoverArt: [
+      withHasCoverArt(),
+      exposeDependency({dependency: '#hasCoverArt'}),
+    ],
+
     hasWallpaperArt: contribsPresent({contribs: 'wallpaperArtistContribs'}),
     hasBannerArt: contribsPresent({contribs: 'bannerArtistContribs'}),
 
@@ -763,12 +769,18 @@ export class Album extends Thing {
       ];
     }
 
+    // TODO: using trackCover here is obviously, badly wrong
+    // but we ought to refactor banners and wallpapers similarly
+    // (i.e. depend on those intrinsic artwork paths rather than
+    // accessing media.{albumBanner,albumWallpaper} from content
+    // or other code directly)
     return [
-      'media.albumCover',
+      'media.trackCover',
+      this.directory,
 
       (artwork.unqualifiedDirectory
-        ? this.directory + '-' + artwork.unqualifiedDirectory
-        : this.directory),
+        ? 'cover-' + artwork.unqualifiedDirectory
+        : 'cover'),
 
       artwork.fileExtension,
     ];

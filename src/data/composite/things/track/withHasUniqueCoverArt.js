@@ -15,7 +15,8 @@ import {input, templateCompositeFrom} from '#composite';
 
 import {raiseOutputWithoutDependency, withResultOfAvailabilityCheck}
   from '#composite/control-flow';
-import {withFlattenedList, withPropertyFromList} from '#composite/data';
+import {fillMissingListItems, withFlattenedList, withPropertyFromList}
+  from '#composite/data';
 
 import withPropertyFromAlbum from './withPropertyFromAlbum.js';
 
@@ -86,6 +87,13 @@ export default templateCompositeFrom({
       internal: input.value(true),
     }),
 
+    // Since we're getting the update value for each artwork's artistContribs,
+    // it may not be set at all, and in that case won't be exposing as [].
+    fillMissingListItems({
+      list: '#trackArtworks.artistContribs',
+      fill: input.value([]),
+    }),
+
     withFlattenedList({
       list: '#trackArtworks.artistContribs',
     }),
@@ -93,17 +101,8 @@ export default templateCompositeFrom({
     withResultOfAvailabilityCheck({
       from: '#flattenedList',
       mode: input.value('empty'),
+    }).outputs({
+      '#availability': '#hasUniqueCoverArt',
     }),
-
-    {
-      dependencies: ['#availability'],
-      compute: (continuation, {
-        ['#availability']: availability,
-      }) =>
-        continuation({
-          ['#hasUniqueCoverArt']:
-            availability,
-        }),
-    },
   ],
 });
