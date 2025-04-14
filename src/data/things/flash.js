@@ -10,6 +10,7 @@ import {anyOf, isColor, isContentString, isDirectory, isNumber, isString}
 import {
   parseArtwork,
   parseAdditionalNames,
+  parseCommentary,
   parseContributors,
   parseDate,
   parseDimensions,
@@ -27,7 +28,6 @@ import {
 import {
   additionalNameList,
   color,
-  commentary,
   commentatorArtists,
   constitutibleArtwork,
   contentString,
@@ -41,6 +41,7 @@ import {
   soupyFind,
   soupyReverse,
   thing,
+  thingList,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -52,6 +53,7 @@ export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';
 
   static [Thing.getPropertyDescriptors] = ({
+    CommentaryEntry,
     Track,
     FlashAct,
     WikiInfo,
@@ -125,8 +127,13 @@ export class Flash extends Thing {
 
     additionalNames: additionalNameList(),
 
-    commentary: commentary(),
-    creditSources: commentary(),
+    commentary: thingList({
+      class: input.value(CommentaryEntry),
+    }),
+
+    creditSources: thingList({
+      class: input.value(CommentaryEntry),
+    }),
 
     // Update only
 
@@ -240,8 +247,15 @@ export class Flash extends Thing {
         transform: parseContributors,
       },
 
-      'Commentary': {property: 'commentary'},
-      'Credit Sources': {property: 'creditSources'},
+      'Commentary': {
+        property: 'commentary',
+        transform: parseCommentary,
+      },
+
+      'Credit Sources': {
+        property: 'creditSources',
+        transform: parseCommentary,
+      },
 
       'Review Points': {ignore: true},
     },
@@ -441,8 +455,18 @@ export class FlashSide extends Thing {
       const flashSideData = results.filter(x => x instanceof FlashSide);
 
       const artworkData = flashData.map(flash => flash.coverArtwork);
+      const commentaryData = flashData.flatMap(flash => flash.commentary);
+      const creditingSourceData = flashData.flatMap(flash => flash.creditSources);
 
-      return {flashData, flashActData, flashSideData, artworkData};
+      return {
+        flashData,
+        flashActData,
+        flashSideData,
+
+        artworkData,
+        commentaryData,
+        creditingSourceData,
+      };
     },
 
     sort({flashData}) {

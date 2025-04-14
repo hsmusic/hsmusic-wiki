@@ -17,7 +17,6 @@ export {default as withConstitutedArtwork} from './withConstitutedArtwork.js';
 export {default as withContributionListSums} from './withContributionListSums.js';
 export {default as withCoverArtDate} from './withCoverArtDate.js';
 export {default as withDirectory} from './withDirectory.js';
-export {default as withParsedCommentaryEntries} from './withParsedCommentaryEntries.js';
 export {default as withParsedContentEntries} from './withParsedContentEntries.js';
 export {default as withParsedLyricsEntries} from './withParsedLyricsEntries.js';
 export {default as withRecontextualizedContributionList} from './withRecontextualizedContributionList.js';

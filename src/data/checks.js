@@ -276,9 +276,8 @@ export function filterReferenceErrors(wikiData, {
               case '_commentary':
                 if (value) {
                   value =
-                    Array.from(value.matchAll(commentaryRegexCaseSensitive))
-                      .map(({groups}) => groups.artistReferences)
-                      .map(text => text.split(',').map(text => text.trim()));
+                    value
+                      .map(entry => CacheableObject.getUpdateValue(entry, 'artists'));
                 }
 
                 writeProperty = false;

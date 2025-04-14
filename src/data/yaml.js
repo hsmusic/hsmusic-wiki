@@ -11,6 +11,7 @@ import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import {sortByName} from '#sort';
 import Thing from '#thing';
 import thingConstructors from '#things';
+import {matchCommentaryEntries} from '#wiki-data';
 
 import {
   aggregateThrows,
@@ -824,6 +825,55 @@ export function parseArtwork({
   return transform;
 }
 
+export function parseCommentary(sourceText, {subdoc, CommentaryEntry}) {
+  const map = matchEntry => ({
+    'Artists':
+      matchEntry.artistReferences
+        .split(',')
+        .map(ref => ref.trim()),
+
+    'Artist Text':
+      matchEntry.artistDisplayText,
+
+    'Annotation':
+      matchEntry.annotation,
+
+    'Date':
+      matchEntry.date,
+
+    'Second Date':
+      matchEntry.secondDate,
+
+    'Date Kind':
+      matchEntry.dateKind,
+
+    'Access Date':
+      matchEntry.accessDate,
+
+    'Access Kind':
+      matchEntry.accessKind,
+
+    'Body':
+      matchEntry.body,
+  });
+
+  const documents =
+    matchCommentaryEntries(sourceText)
+      .map(matchEntry =>
+        withEntries(
+          map(matchEntry),
+          entries => entries
+            .filter(([key, value]) =>
+              value !== undefined &&
+              value !== null)));
+
+  const subdocs =
+    documents.map(document =>
+      subdoc(CommentaryEntry, document, {bindInto: 'thing'}));
+
+  return subdocs;
+}
+
 // documentModes: Symbols indicating sets of behavior for loading and processing
 // data files.
 export const documentModes = {
@@ -1498,6 +1548,10 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
     ['artistData', [/* find, reverse */]],
 
     ['artworkData', ['artworkData']],
+
+    ['commentaryData', [/* find */]],
+
+    ['creditingSourceData', [/* find */]],
 
     ['flashData', [
       'wikiInfo',
