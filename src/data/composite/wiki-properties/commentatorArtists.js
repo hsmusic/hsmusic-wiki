@@ -7,7 +7,6 @@ import {exitWithoutDependency, exposeDependency}
   from '#composite/control-flow';
 import {withFlattenedList, withPropertyFromList, withUniqueItemsOnly}
   from '#composite/data';
-import {withParsedCommentaryEntries} from '#composite/wiki-data';
 
 export default templateCompositeFrom({
   annotation: `commentatorArtists`,
@@ -21,19 +20,13 @@ export default templateCompositeFrom({
       value: input.value([]),
     }),
 
-    withParsedCommentaryEntries({
-      from: 'commentary',
-    }),
-
     withPropertyFromList({
-      list: '#parsedCommentaryEntries',
+      list: 'commentary',
       property: input.value('artists'),
-    }).outputs({
-      '#parsedCommentaryEntries.artists': '#artistLists',
     }),
 
     withFlattenedList({
-      list: '#artistLists',
+      list: '#commentary.artists',
     }).outputs({
       '#flattenedList': '#artists',
     }),

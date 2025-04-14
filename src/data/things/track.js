@@ -12,6 +12,7 @@ import {
   parseAdditionalNames,
   parseAnnotatedReferences,
   parseArtwork,
+  parseCommentary,
   parseContributors,
   parseDate,
   parseDimensions,
@@ -37,7 +38,6 @@ import {
 import {
   additionalFiles,
   additionalNameList,
-  commentary,
   commentatorArtists,
   constitutibleArtworkList,
   contentString,
@@ -57,6 +57,7 @@ import {
   soupyFind,
   soupyReverse,
   thing,
+  thingList,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -87,6 +88,7 @@ export class Track extends Thing {
     Album,
     ArtTag,
     Artwork,
+    CommentaryEntry,
     Flash,
     TrackSection,
     WikiInfo,
@@ -216,8 +218,13 @@ export class Track extends Thing {
       dimensions(),
     ],
 
-    commentary: commentary(),
-    creditSources: commentary(),
+    commentary: thingList({
+      class: input.value(CommentaryEntry),
+    }),
+
+    creditSources: thingList({
+      class: input.value(CommentaryEntry),
+    }),
 
     lyrics: [
       inheritFromMainRelease(),
@@ -482,8 +489,16 @@ export class Track extends Thing {
       'Always Reference By Directory': {property: 'alwaysReferenceByDirectory'},
 
       'Lyrics': {property: 'lyrics'},
-      'Commentary': {property: 'commentary'},
-      'Credit Sources': {property: 'creditSources'},
+
+      'Commentary': {
+        property: 'commentary',
+        transform: parseCommentary,
+      },
+
+      'Credit Sources': {
+        property: 'creditSources',
+        transform: parseCommentary,
+      },
 
       'Additional Files': {
         property: 'additionalFiles',

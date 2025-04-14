@@ -107,6 +107,35 @@ export const commentaryRegexCaseSensitiveOneShot =
 export const oldStyleLyricsDetectionRegex =
   /^<i>.*:<\/i>/m;
 
+export function matchContentEntries(sourceText, caseSensitiveRegex) {
+  const matchEntries = [];
+
+  let previousMatchEntry = null;
+  let previousEndIndex = null;
+
+  for (const {0: matchText, index: startIndex, groups: matchEntry}
+          of sourceText.matchAll(caseSensitiveRegex)) {
+    if (previousMatchEntry) {
+      previousMatchEntry.body = sourceText.slice(previousEndIndex, startIndex);
+    }
+
+    matchEntries.push(matchEntry);
+
+    previousMatchEntry = matchEntry;
+    previousEndIndex = startIndex + matchText.length;
+  }
+
+  if (previousMatchEntry) {
+    previousMatchEntry.body = sourceText.slice(previousEndIndex);
+  }
+
+  return matchEntries;
+}
+
+export function matchCommentaryEntries(sourceText) {
+  return matchContentEntries(sourceText, commentaryRegexCaseSensitive)
+}
+
 export function filterAlbumsByCommentary(albums) {
   return albums
     .filter((album) => [album, ...album.tracks].some((x) => x.commentary));

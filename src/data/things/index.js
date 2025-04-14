@@ -13,6 +13,7 @@ import * as albumClasses from './album.js';
 import * as artTagClasses from './art-tag.js';
 import * as artistClasses from './artist.js';
 import * as artworkClasses from './artwork.js';
+import * as commentaryEntryClasses from './commentary-entry.js';
 import * as contributionClasses from './contribution.js';
 import * as flashClasses from './flash.js';
 import * as groupClasses from './group.js';
@@ -29,6 +30,7 @@ const allClassLists = {
   'art-tag.js': artTagClasses,
   'artist.js': artistClasses,
   'artwork.js': artworkClasses,
+  'commentary-entry.js': commentaryEntryClasses,
   'contribution.js': contributionClasses,
   'flash.js': flashClasses,
   'group.js': groupClasses,

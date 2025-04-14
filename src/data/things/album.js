@@ -16,6 +16,7 @@ import {
   parseAdditionalNames,
   parseAnnotatedReferences,
   parseArtwork,
+  parseCommentary,
   parseContributors,
   parseDate,
   parseDimensions,
@@ -32,7 +33,6 @@ import {exitWithoutContribs, withDirectory, withCoverArtDate}
 import {
   additionalFiles,
   additionalNameList,
-  commentary,
   color,
   commentatorArtists,
   constitutibleArtwork,
@@ -69,6 +69,7 @@ export class Album extends Thing {
   static [Thing.getPropertyDescriptors] = ({
     ArtTag,
     Artwork,
+    CommentaryEntry,
     Group,
     Track,
     TrackSection,
@@ -204,8 +205,14 @@ export class Album extends Thing {
     isListedOnHomepage: flag(true),
     isListedInGalleries: flag(true),
 
-    commentary: commentary(),
-    creditSources: commentary(),
+    commentary: thingList({
+      class: input.value(CommentaryEntry),
+    }),
+
+    creditSources: thingList({
+      class: input.value(CommentaryEntry),
+    }),
+
     additionalFiles: additionalFiles(),
 
     trackSections: thingList({
@@ -596,8 +603,15 @@ export class Album extends Thing {
         transform: parseDimensions,
       },
 
-      'Commentary': {property: 'commentary'},
-      'Credit Sources': {property: 'creditSources'},
+      'Commentary': {
+        property: 'commentary',
+        transform: parseCommentary,
+      },
+
+      'Credit Sources': {
+        property: 'creditSources',
+        transform: parseCommentary,
+      },
 
       'Additional Files': {
         property: 'additionalFiles',
@@ -668,7 +682,10 @@ export class Album extends Thing {
       const albumData = [];
       const trackSectionData = [];
       const trackData = [];
+
       const artworkData = [];
+      const commentaryData = [];
+      const creditingSourceData = [];
 
       for (const {header: album, entries} of results) {
         const trackSections = [];
@@ -715,6 +732,8 @@ export class Album extends Thing {
           entry.album = album;
 
           artworkData.push(...entry.trackArtworks);
+          commentaryData.push(...entry.commentary);
+          creditingSourceData.push(...entry.creditSources);
         }
 
         closeCurrentTrackSection();
@@ -731,6 +750,9 @@ export class Album extends Thing {
           artworkData.push(album.wallpaperArtwork);
         }
 
+        commentaryData.push(...album.commentary);
+        creditingSourceData.push(...album.creditSources);
+
         album.trackSections = trackSections;
       }
 
@@ -738,7 +760,10 @@ export class Album extends Thing {
         albumData,
         trackSectionData,
         trackData,
+
         artworkData,
+        commentaryData,
+        creditingSourceData,
       };
     },
 
