@@ -19,7 +19,6 @@ export {default as duration} from './duration.js';
 export {default as externalFunction} from './externalFunction.js';
 export {default as fileExtension} from './fileExtension.js';
 export {default as flag} from './flag.js';
-export {default as lyrics} from './lyrics.js';
 export {default as name} from './name.js';
 export {default as referenceList} from './referenceList.js';
 export {default as referencedArtworkList} from './referencedArtworkList.js';
