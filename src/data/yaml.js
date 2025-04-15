@@ -11,8 +11,7 @@ import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import {sortByName} from '#sort';
 import Thing from '#thing';
 import thingConstructors from '#things';
-import {matchCommentaryEntries, multipleLyricsDetectionRegex}
-  from '#wiki-data';
+import {matchContentEntries, multipleLyricsDetectionRegex} from '#wiki-data';
 
 import {
   aggregateThrows,
@@ -859,7 +858,7 @@ export function parseContentEntries(thingClass, sourceText, {subdoc}) {
   });
 
   const documents =
-    matchCommentaryEntries(sourceText)
+    matchContentEntries(sourceText)
       .map(matchEntry =>
         withEntries(
           map(matchEntry),
