@@ -107,14 +107,14 @@ export const commentaryRegexCaseSensitiveOneShot =
 export const multipleLyricsDetectionRegex =
   /^<i>.*:<\/i>/m;
 
-export function matchContentEntries(sourceText, caseSensitiveRegex) {
+export function matchContentEntries(sourceText) {
   const matchEntries = [];
 
   let previousMatchEntry = null;
   let previousEndIndex = null;
 
   for (const {0: matchText, index: startIndex, groups: matchEntry}
-          of sourceText.matchAll(caseSensitiveRegex)) {
+          of sourceText.matchAll(commentaryRegexCaseSensitive)) {
     if (previousMatchEntry) {
       previousMatchEntry.body = sourceText.slice(previousEndIndex, startIndex);
     }
@@ -130,10 +130,6 @@ export function matchContentEntries(sourceText, caseSensitiveRegex) {
   }
 
   return matchEntries;
-}
-
-export function matchCommentaryEntries(sourceText) {
-  return matchContentEntries(sourceText, commentaryRegexCaseSensitive)
 }
 
 export function filterAlbumsByCommentary(albums) {
