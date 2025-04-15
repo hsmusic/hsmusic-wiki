@@ -16,7 +16,7 @@ import {
 
 import {withWebArchiveDate} from '#composite/things/commentary-entry';
 
-export class CommentaryEntry extends Thing {
+export class ContentEntry extends Thing {
   static [Thing.getPropertyDescriptors] = ({Artist}) => ({
     // Update & expose
 
@@ -116,3 +116,7 @@ export class CommentaryEntry extends Thing {
     },
   };
 }
+
+export class CommentaryEntry extends ContentEntry {}
+export class LyricsEntry extends ContentEntry {}
+export class CreditingSourcesEntry extends ContentEntry {}

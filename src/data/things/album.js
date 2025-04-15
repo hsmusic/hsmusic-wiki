@@ -3,6 +3,7 @@ export const DATA_ALBUM_DIRECTORY = 'album';
 import * as path from 'node:path';
 import {inspect} from 'node:util';
 
+import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input} from '#composite';
 import {traverse} from '#node-utils';
@@ -18,6 +19,7 @@ import {
   parseArtwork,
   parseCommentary,
   parseContributors,
+  parseCreditingSources,
   parseDate,
   parseDimensions,
   parseWallpaperParts,
@@ -70,6 +72,7 @@ export class Album extends Thing {
     ArtTag,
     Artwork,
     CommentaryEntry,
+    CreditingSourcesEntry,
     Group,
     Track,
     TrackSection,
@@ -210,7 +213,7 @@ export class Album extends Thing {
     }),
 
     creditSources: thingList({
-      class: input.value(CommentaryEntry),
+      class: input.value(CreditingSourcesEntry),
     }),
 
     additionalFiles: additionalFiles(),
@@ -610,7 +613,7 @@ export class Album extends Thing {
 
       'Credit Sources': {
         property: 'creditSources',
-        transform: parseCommentary,
+        transform: parseCreditingSources,
       },
 
       'Additional Files': {
@@ -686,6 +689,7 @@ export class Album extends Thing {
       const artworkData = [];
       const commentaryData = [];
       const creditingSourceData = [];
+      const lyricsData = [];
 
       for (const {header: album, entries} of results) {
         const trackSections = [];
@@ -734,6 +738,11 @@ export class Album extends Thing {
           artworkData.push(...entry.trackArtworks);
           commentaryData.push(...entry.commentary);
           creditingSourceData.push(...entry.creditSources);
+
+          // TODO: As exposed, Track.lyrics tries to inherit from the main
+          // release, which is impossible before the data's been linked.
+          // We just use the update value here. But it's icky!
+          lyricsData.push(...CacheableObject.getUpdateValue(entry, 'lyrics') ?? []);
         }
 
         closeCurrentTrackSection();
@@ -764,6 +773,7 @@ export class Album extends Thing {
         artworkData,
         commentaryData,
         creditingSourceData,
+        lyricsData,
       };
     },
 

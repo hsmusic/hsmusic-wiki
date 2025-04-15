@@ -11,7 +11,8 @@ import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import {sortByName} from '#sort';
 import Thing from '#thing';
 import thingConstructors from '#things';
-import {matchCommentaryEntries} from '#wiki-data';
+import {matchCommentaryEntries, multipleLyricsDetectionRegex}
+  from '#wiki-data';
 
 import {
   aggregateThrows,
@@ -825,7 +826,7 @@ export function parseArtwork({
   return transform;
 }
 
-export function parseCommentary(sourceText, {subdoc, CommentaryEntry}) {
+export function parseContentEntries(thingClass, sourceText, {subdoc}) {
   const map = matchEntry => ({
     'Artists':
       matchEntry.artistReferences
@@ -869,9 +870,27 @@ export function parseCommentary(sourceText, {subdoc, CommentaryEntry}) {
 
   const subdocs =
     documents.map(document =>
-      subdoc(CommentaryEntry, document, {bindInto: 'thing'}));
+      subdoc(thingClass, document, {bindInto: 'thing'}));
 
   return subdocs;
+}
+
+export function parseCommentary(sourceText, {subdoc, CommentaryEntry}) {
+  return parseContentEntries(CommentaryEntry, sourceText, {subdoc});
+}
+
+export function parseCreditingSources(sourceText, {subdoc, CreditingSourcesEntry}) {
+  return parseContentEntries(CreditingSourcesEntry, sourceText, {subdoc});
+}
+
+export function parseLyrics(sourceText, {subdoc, LyricsEntry}) {
+  if (!multipleLyricsDetectionRegex.test(sourceText)) {
+    const document = {'Body': sourceText};
+
+    return [subdoc(LyricsEntry, document, {bindInto: 'thing'})];
+  }
+
+  return parseContentEntries(LyricsEntry, sourceText, {subdoc});
 }
 
 // documentModes: Symbols indicating sets of behavior for loading and processing
@@ -1566,6 +1585,8 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
     ['groupCategoryData', [/* find */]],
 
     ['homepageLayout.sections.rows', [/* find */]],
+
+    ['lyricsData', [/* find */]],
 
     ['trackData', [
       'artworkData',

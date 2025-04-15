@@ -12,6 +12,7 @@ import {
   parseAdditionalNames,
   parseCommentary,
   parseContributors,
+  parseCreditingSources,
   parseDate,
   parseDimensions,
 } from '#yaml';
@@ -54,6 +55,7 @@ export class Flash extends Thing {
 
   static [Thing.getPropertyDescriptors] = ({
     CommentaryEntry,
+    CreditingSourcesEntry,
     Track,
     FlashAct,
     WikiInfo,
@@ -132,7 +134,7 @@ export class Flash extends Thing {
     }),
 
     creditSources: thingList({
-      class: input.value(CommentaryEntry),
+      class: input.value(CreditingSourcesEntry),
     }),
 
     // Update only
@@ -254,7 +256,7 @@ export class Flash extends Thing {
 
       'Credit Sources': {
         property: 'creditSources',
-        transform: parseCommentary,
+        transform: parseCreditingSources,
       },
 
       'Review Points': {ignore: true},
