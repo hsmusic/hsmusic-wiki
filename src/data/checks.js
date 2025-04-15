@@ -184,7 +184,8 @@ export function filterReferenceErrors(wikiData, {
       groups: 'group',
       artTags: '_artTag',
       referencedArtworks: '_artwork',
-      commentary: '_commentary',
+      commentary: '_content',
+      creditSources: '_content',
     }],
 
     ['artTagData', {
@@ -192,7 +193,8 @@ export function filterReferenceErrors(wikiData, {
     }],
 
     ['flashData', {
-      commentary: '_commentary',
+      commentary: '_content',
+      creditSources: '_content',
     }],
 
     ['groupCategoryData', {
@@ -232,7 +234,9 @@ export function filterReferenceErrors(wikiData, {
       artTags: '_artTag',
       referencedArtworks: '_artwork',
       mainReleaseTrack: '_trackMainReleasesOnly',
-      commentary: '_commentary',
+      commentary: '_content',
+      creditSources: '_content',
+      lyrics: '_content',
     }],
 
     ['wikiInfo', {
@@ -267,11 +271,12 @@ export function filterReferenceErrors(wikiData, {
             let writeProperty = true;
 
             switch (findFnKey) {
-              case '_commentary':
+              case '_content':
                 if (value) {
                   value =
-                    value
-                      .map(entry => CacheableObject.getUpdateValue(entry, 'artists'));
+                    value.map(entry =>
+                      CacheableObject.getUpdateValue(entry, 'artists') ??
+                      []);
                 }
 
                 writeProperty = false;
@@ -327,7 +332,7 @@ export function filterReferenceErrors(wikiData, {
                 findFn = boundFind.artTag;
                 break;
 
-              case '_commentary':
+              case '_content':
                 findFn = findArtistOrAlias;
                 break;
 
@@ -459,7 +464,7 @@ export function filterReferenceErrors(wikiData, {
                 }
               }
 
-              if (findFnKey === '_commentary') {
+              if (findFnKey === '_content') {
                 filter(
                   value, {message: errorMessage},
                   decorateErrorWithIndex(refs =>
