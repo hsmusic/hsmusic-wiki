@@ -103,8 +103,8 @@ export const commentaryRegexCaseSensitiveOneShot =
   new RegExp(commentaryRegexRaw);
 
 // The #validators function isOldStyleLyrics() describes
-// what this regular expression detects.
-export const oldStyleLyricsDetectionRegex =
+// what this regular expression detects against.
+export const multipleLyricsDetectionRegex =
   /^<i>.*:<\/i>/m;
 
 export function matchContentEntries(sourceText, caseSensitiveRegex) {

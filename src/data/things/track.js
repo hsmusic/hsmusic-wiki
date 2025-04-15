@@ -14,9 +14,11 @@ import {
   parseArtwork,
   parseCommentary,
   parseContributors,
+  parseCreditingSources,
   parseDate,
   parseDimensions,
   parseDuration,
+  parseLyrics,
 } from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
@@ -46,7 +48,6 @@ import {
   directory,
   duration,
   flag,
-  lyrics,
   name,
   referenceList,
   referencedArtworkList,
@@ -89,7 +90,9 @@ export class Track extends Thing {
     ArtTag,
     Artwork,
     CommentaryEntry,
+    CreditingSourcesEntry,
     Flash,
+    LyricsEntry,
     TrackSection,
     WikiInfo,
   }) => ({
@@ -223,12 +226,18 @@ export class Track extends Thing {
     }),
 
     creditSources: thingList({
-      class: input.value(CommentaryEntry),
+      class: input.value(CreditingSourcesEntry),
     }),
 
     lyrics: [
+      // TODO: Inherited lyrics are literally the same objects, so of course
+      // their .thing properties aren't going to point back to this one, and
+      // certainly couldn't be recontextualized...
       inheritFromMainRelease(),
-      lyrics(),
+
+      thingList({
+        class: input.value(LyricsEntry),
+      }),
     ],
 
     additionalFiles: additionalFiles(),
@@ -488,7 +497,10 @@ export class Track extends Thing {
 
       'Always Reference By Directory': {property: 'alwaysReferenceByDirectory'},
 
-      'Lyrics': {property: 'lyrics'},
+      'Lyrics': {
+        property: 'lyrics',
+        transform: parseLyrics,
+      },
 
       'Commentary': {
         property: 'commentary',
@@ -497,7 +509,7 @@ export class Track extends Thing {
 
       'Credit Sources': {
         property: 'creditSources',
-        transform: parseCommentary,
+        transform: parseCreditingSources,
       },
 
       'Additional Files': {

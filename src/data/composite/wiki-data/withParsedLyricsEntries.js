@@ -1,7 +1,7 @@
 import {input, templateCompositeFrom} from '#composite';
 import {stitchArrays} from '#sugar';
 import {isLyrics} from '#validators';
-import {commentaryRegexCaseSensitive, oldStyleLyricsDetectionRegex}
+import {commentaryRegexCaseSensitive, multipleLyricsDetectionRegex}
   from '#wiki-data';
 
 import {
@@ -45,7 +45,7 @@ export default templateCompositeFrom({
       compute: (continuation, {
         [input('from')]: lyrics,
       }) =>
-        (oldStyleLyricsDetectionRegex.test(lyrics)
+        (multipleLyricsDetectionRegex.test(lyrics)
           ? continuation()
           : continuation.raiseOutput({
               ['#parsedLyricsEntries']:

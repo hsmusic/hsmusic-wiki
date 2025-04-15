@@ -19,12 +19,6 @@ import {
   withAggregate,
 } from '#aggregate';
 
-import {
-  combineWikiDataArrays,
-  commentaryRegexCaseSensitive,
-  oldStyleLyricsDetectionRegex,
-} from '#wiki-data';
-
 function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
 }
@@ -572,7 +566,7 @@ export function reportContentTextErrors(wikiData, {
     annotation: 'commentary annotation',
   };
 
-  const newStyleLyricsShape = {
+  const lyricsShape = {
     body: 'lyrics body',
     artistDisplayText: 'lyrics artist display text',
     annotation: 'lyrics annotation',
@@ -624,7 +618,7 @@ export function reportContentTextErrors(wikiData, {
       additionalFiles: additionalFileShape,
       commentary: commentaryShape,
       creditSources: commentaryShape,
-      lyrics: '_lyrics',
+      lyrics: lyricsShape,
       midiProjectFiles: additionalFileShape,
       sheetMusicFiles: additionalFileShape,
     }],
@@ -748,7 +742,6 @@ export function reportContentTextErrors(wikiData, {
           nest({message: `Content text errors in ${inspect(thing)}`}, ({nest, push}) => {
 
             for (let [property, shape] of Object.entries(propSpec)) {
-              const rawValue = CacheableObject.getUpdateValue(thing, property);
               let value = thing[property];
 
               if (value === undefined) {
@@ -758,15 +751,6 @@ export function reportContentTextErrors(wikiData, {
 
               if (value === null) {
                 continue;
-              }
-
-              if (shape === '_lyrics') {
-                if (oldStyleLyricsDetectionRegex.test(rawValue)) {
-                  value = rawValue;
-                  shape = '_content';
-                } else {
-                  shape = newStyleLyricsShape;
-                }
               }
 
               const fieldPropertyMessage =

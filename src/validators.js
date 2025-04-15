@@ -7,7 +7,7 @@ import {cut, empty, matchMultiline, typeAppearance} from '#sugar';
 import {
   commentaryRegexCaseInsensitive,
   commentaryRegexCaseSensitiveOneShot,
-  oldStyleLyricsDetectionRegex,
+  multipleLyricsDetectionRegex,
 } from '#wiki-data';
 
 function inspect(value) {
@@ -375,7 +375,7 @@ export const isCommentary =
 export function isOldStyleLyrics(content) {
   isContentString(content);
 
-  if (oldStyleLyricsDetectionRegex.test(content)) {
+  if (multipleLyricsDetectionRegex.test(content)) {
     throw new TypeError(
       `Expected old-style lyrics block not to include "<i> ... :</i>" at start of any line`);
   }
