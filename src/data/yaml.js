@@ -1781,14 +1781,16 @@ export function flattenThingLayoutToDocumentOrder(layout) {
 }
 
 export function* splitDocumentsInYAMLSourceText(sourceText) {
-  const dividerRegex = /^-{3,}\n?/gm;
+  // Not multiline!
+  const dividerRegex = /(?:\r\n|\n|^)-{3,}(?:\r\n|\n|$)/g;
+
   let previousDivider = '';
 
   while (true) {
     const {lastIndex} = dividerRegex;
     const match = dividerRegex.exec(sourceText);
     if (match) {
-      const nextDivider = match[0].trim();
+      const nextDivider = match[0];
 
       yield {
         previousDivider,
@@ -1799,11 +1801,12 @@ export function* splitDocumentsInYAMLSourceText(sourceText) {
       previousDivider = nextDivider;
     } else {
       const nextDivider = '';
+      const lineBreak = previousDivider.match(/\r?\n/)?.[0] ?? '';
 
       yield {
         previousDivider,
         nextDivider,
-        text: sourceText.slice(lastIndex).replace(/(?<!\n)$/, '\n'),
+        text: sourceText.slice(lastIndex).replace(/(?<!\n)$/, lineBreak),
       };
 
       return;
@@ -1829,7 +1832,7 @@ export function recombineDocumentsIntoYAMLSourceText(documents) {
 
   for (const document of documents) {
     if (sourceText) {
-      sourceText += divider + '\n';
+      sourceText += divider;
     }
 
     sourceText += document.text;
