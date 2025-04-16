@@ -68,6 +68,7 @@ export class Artwork extends Thing {
     }),
 
     thing: thing(),
+    thingProperty: simpleString(),
 
     label: simpleString(),
     source: contentString(),

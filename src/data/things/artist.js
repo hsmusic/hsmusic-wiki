@@ -213,6 +213,7 @@ export class Artist extends Thing {
         transform:
           parseArtwork({
             single: true,
+            thingProperty: 'avatarArtwork',
             fileExtensionFromThingProperty: 'avatarFileExtension',
           }),
       },

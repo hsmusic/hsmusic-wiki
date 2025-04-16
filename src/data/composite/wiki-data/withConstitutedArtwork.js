@@ -6,6 +6,7 @@ export default templateCompositeFrom({
   annotation: `withConstitutedArtwork`,
 
   inputs: {
+    thingProperty: input({type: 'string', acceptsNull: true}),
     dimensionsFromThingProperty: input({type: 'string', acceptsNull: true}),
     fileExtensionFromThingProperty: input({type: 'string', acceptsNull: true}),
     dateFromThingProperty: input({type: 'string', acceptsNull: true}),
@@ -21,6 +22,7 @@ export default templateCompositeFrom({
     {
       dependencies: [
         input.myself(),
+        input('thingProperty'),
         input('dimensionsFromThingProperty'),
         input('fileExtensionFromThingProperty'),
         input('dateFromThingProperty'),
@@ -32,6 +34,7 @@ export default templateCompositeFrom({
 
       compute: (continuation, {
         [input.myself()]: myself,
+        [input('thingProperty')]: thingProperty,
         [input('dimensionsFromThingProperty')]: dimensionsFromThingProperty,
         [input('fileExtensionFromThingProperty')]: fileExtensionFromThingProperty,
         [input('dateFromThingProperty')]: dateFromThingProperty,
@@ -43,6 +46,7 @@ export default templateCompositeFrom({
         ['#constitutedArtwork']:
           Object.assign(new thingConstructors.Artwork, {
             thing: myself,
+            thingProperty,
             dimensionsFromThingProperty,
             fileExtensionFromThingProperty,
             artistContribsFromThingProperty,

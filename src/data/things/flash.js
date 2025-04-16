@@ -230,6 +230,7 @@ export class Flash extends Thing {
         transform:
           parseArtwork({
             single: true,
+            thingProperty: 'coverArtwork',
             fileExtensionFromThingProperty: 'coverArtFileExtension',
             dimensionsFromThingProperty: 'coverArtDimensions',
           }),

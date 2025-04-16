@@ -792,6 +792,7 @@ export function parseAnnotatedReferences(entries, {
 
 export function parseArtwork({
   single = false,
+  thingProperty = null,
   dimensionsFromThingProperty = null,
   fileExtensionFromThingProperty = null,
   dateFromThingProperty = null,
@@ -801,6 +802,7 @@ export function parseArtwork({
   referencedArtworksFromThingProperty = null,
 }) {
   const provide = {
+    thingProperty,
     dimensionsFromThingProperty,
     fileExtensionFromThingProperty,
     dateFromThingProperty,
