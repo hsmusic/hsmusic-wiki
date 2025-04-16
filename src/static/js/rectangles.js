@@ -510,4 +510,46 @@ export class WikiRect extends DOMRect {
       height: this.height,
     });
   }
+
+  // Other utilities
+
+  #display = null;
+
+  display() {
+    if (!this.#display) {
+      this.#display = document.createElement('div');
+      document.body.appendChild(this.#display);
+    }
+
+    Object.assign(this.#display.style, {
+      position: 'fixed',
+      background: '#000c',
+      border: '3px solid var(--primary-color)',
+      borderRadius: '4px',
+      top: this.top + 'px',
+      left: this.left + 'px',
+      width: this.width + 'px',
+      height: this.height + 'px',
+      pointerEvents: 'none',
+    });
+
+    let i = 0;
+    const int = setInterval(() => {
+      i++;
+      if (i >= 3) clearInterval(int);
+      if (!this.#display) return;
+
+      this.#display.style.display = 'none';
+      setTimeout(() => {
+        this.#display.style.display = '';
+      }, 200);
+    }, 600);
+  }
+
+  hide() {
+    if (this.#display) {
+      this.#display.remove();
+      this.#display = null;
+    }
+  }
 }
