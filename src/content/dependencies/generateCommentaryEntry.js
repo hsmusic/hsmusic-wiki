@@ -98,8 +98,6 @@ export default {
 
                 return language.$(workingCapsule, workingOptions);
               })),
-
-            relations.date,
           ])),
 
         html.tag('blockquote', {class: 'commentary-entry-body'},
@@ -107,6 +105,10 @@ export default {
             relations.colorStyle.clone()
               .slot('color', slots.color),
 
-          relations.bodyContent.slot('mode', 'multiline')),
+          [
+            relations.date,
+
+            relations.bodyContent.slot('mode', 'multiline'),
+          ]),
       ])),
 };

@@ -1556,14 +1556,13 @@ p.image-details.origin-details {
   margin: 0;
 }
 
+/*
 p.content-heading:has(+ .commentary-entry-heading.dated) {
   clear: right;
 }
+*/
 
 .commentary-entry-heading {
-  display: flex;
-  flex-direction: row;
-
   margin-left: 15px;
   padding-left: 5px;
   max-width: 625px;
@@ -1573,7 +1572,7 @@ p.content-heading:has(+ .commentary-entry-heading.dated) {
 }
 
 .commentary-entry-heading-text {
-  flex-grow: 1;
+  display: block;
   padding-left: 1.25ch;
   text-indent: -1.25ch;
 }
@@ -1582,26 +1581,25 @@ p.content-heading:has(+ .commentary-entry-heading.dated) {
   font-style: oblique;
 }
 
-.commentary-entry-heading .commentary-date {
-  flex-shrink: 0;
-
-  margin-left: 0.75ch;
-  align-self: flex-end;
-
-  padding-left: 0.5ch;
-  padding-right: 0.25ch;
-}
-
-.commentary-entry-heading .hoverable {
-  box-shadow: 1px 2px 6px 5px #04040460;
-}
-
 .commentary-entry-body summary {
   list-style-position: outside;
 }
 
 .commentary-entry-body summary > span {
   color: var(--primary-color);
+}
+
+.commentary-date {
+  float: right;
+  margin-top: -0.8em;
+  margin-left: 0.75ch;
+  padding-left: 0.5ch;
+  padding-right: 0.4em;
+  font-size: 0.9em;
+}
+
+.commentary-date .hoverable {
+  box-shadow: 1px 2px 6px 5px #04040460;
 }
 
 .commentary-art {
@@ -1856,7 +1854,7 @@ li .by a {
   display: inline-block;
 }
 
-p code {
+p code, li code {
   font-size: 0.95em;
   font-family: "courier new", monospace;
   font-weight: 800;
