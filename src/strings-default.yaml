@@ -929,6 +929,8 @@ misc:
 
     trackArtFromAlbum: "Album cover for {ALBUM}"
 
+    sameTagsAsMainArtwork: "Same tags as main artwork"
+
   # coverGrid:
   #   Generic strings for various sorts of gallery grids, displayed
   #   on the homepage, album galleries, artist artwork galleries, and
