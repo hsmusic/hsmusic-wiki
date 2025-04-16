@@ -24,7 +24,7 @@ import {
   parseDimensions,
 } from '#yaml';
 
-import {withPropertyFromObject} from '#composite/data';
+import {withIndexInList, withPropertyFromObject} from '#composite/data';
 
 import {
   exitWithoutDependency,
@@ -52,7 +52,7 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {withDate} from '#composite/things/artwork';
+import {withContainingArtworkList, withDate} from '#composite/things/artwork';
 
 export class Artwork extends Thing {
   static [Thing.referenceType] = 'artwork';
@@ -303,6 +303,70 @@ export class Artwork extends Thing {
     referencedByArtworks: reverseReferenceList({
       reverse: soupyReverse.input('artworksWhichReference'),
     }),
+
+    isMainArtwork: [
+      withContainingArtworkList(),
+
+      exitWithoutDependency({
+        dependency: '#containingArtworkList',
+        value: input.value(null),
+      }),
+
+      {
+        dependencies: [input.myself(), '#containingArtworkList'],
+        compute: ({
+          [input.myself()]: myself,
+          ['#containingArtworkList']: list,
+        }) =>
+          list[0] === myself,
+      },
+    ],
+
+    mainArtwork: [
+      withContainingArtworkList(),
+
+      exitWithoutDependency({
+        dependency: '#containingArtworkList',
+        value: input.value(null),
+      }),
+
+      {
+        dependencies: ['#containingArtworkList'],
+        compute: ({'#containingArtworkList': list}) =>
+          list[0],
+      },
+    ],
+
+    siblingArtworks: [
+      withContainingArtworkList(),
+
+      exitWithoutDependency({
+        dependency: '#containingArtworkList',
+        value: input.value(null),
+      }),
+
+      withIndexInList({
+        list: '#containingArtworkList',
+        item: input.myself(),
+      }),
+
+      exitWithoutDependency({
+        dependency: '#index',
+        mode: input.value('index'),
+        value: input.value(null),
+      }),
+
+      {
+        dependencies: ['#containingArtworkList', '#index'],
+        compute: ({
+          ['#containingArtworkList']: list,
+          ['#index']: index,
+        }) => [
+          ...list.slice(0, index),
+          ...list.slice(index + 1),
+        ],
+      },
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {
