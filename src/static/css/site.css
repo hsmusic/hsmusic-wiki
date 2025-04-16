@@ -1119,7 +1119,7 @@ a .normal-content {
   font-size: 0.9rem;
 }
 
-li:not(:first-child:last-child) .tooltip,
+li:not(:first-child:last-child) .tooltip:where(:not(.cover-artwork .tooltip)),
 .offset-tooltips > :not(:first-child:last-child) .tooltip {
   left: 14px;
 }
@@ -1161,7 +1161,7 @@ li:not(:first-child:last-child) .tooltip,
 .thing-name-tooltip,
 .wiki-edits-tooltip {
   padding: 3px 4px 2px 2px;
-  left: -6px !important;
+  left: -6px;
 }
 
 .thing-name-tooltip .tooltip-content,
