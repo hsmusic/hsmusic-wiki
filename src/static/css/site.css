@@ -1169,11 +1169,15 @@ li:not(:first-child:last-child) .tooltip:where(:not(.cover-artwork .tooltip)),
   font-size: 0.85em;
 }
 
-/* Terrifying?
- * https://stackoverflow.com/a/64424759/4633828
- */
-.thing-name-tooltip { margin-right: -120px; }
-.wiki-edits-tooltip { margin-right: -200px; }
+.thing-name-tooltip .tooltip-content {
+  width: max-content;
+  max-width: 120px;
+}
+
+.wiki-edits-tooltip .tooltip-content {
+  width: max-content;
+  max-width: 200px;
+}
 
 .contribution-tooltip .tooltip-content {
   padding: 6px 2px 2px 2px;
