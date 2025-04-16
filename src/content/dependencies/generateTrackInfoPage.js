@@ -311,18 +311,6 @@ export default {
 
           relations.lyricsSection,
 
-          // html.tags([
-          //   relations.contentHeading.clone()
-          //     .slots({
-          //       attributes: {id: 'lyrics'},
-          //       title: language.$('releaseInfo.lyrics'),
-          //     }),
-
-          //   html.tag('blockquote',
-          //     {[html.onlyIfContent]: true},
-          //     relations.lyrics.slot('mode', 'lyrics')),
-          // ]),
-
           html.tags([
             relations.contentHeading.clone()
               .slots({

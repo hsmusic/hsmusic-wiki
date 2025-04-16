@@ -15,7 +15,6 @@ import * as hoverableTooltipModule from './hoverable-tooltip.js';
 import * as imageOverlayModule from './image-overlay.js';
 import * as intrapageDotSwitcherModule from './intrapage-dot-switcher.js';
 import * as liveMousePositionModule from './live-mouse-position.js';
-import * as lyricsSwitcherModule from './lyrics-switcher.js';
 import * as quickDescriptionModule from './quick-description.js';
 import * as scriptedLinkModule from './scripted-link.js';
 import * as sidebarSearchModule from './sidebar-search.js';
@@ -38,7 +37,6 @@ export const modules = [
   imageOverlayModule,
   intrapageDotSwitcherModule,
   liveMousePositionModule,
-  lyricsSwitcherModule,
   quickDescriptionModule,
   scriptedLinkModule,
   sidebarSearchModule,
