@@ -931,7 +931,11 @@ a .normal-content {
 
   background-color: var(--primary-color);
 
-  mask-image: url(/static-4p1/misc/image.svg);
+  /* mask-image is set in content JavaScript,
+   * because we can't identify the correct nor
+   * absolute path to the file from CSS.
+   */
+
   mask-repeat: no-repeat;
   mask-position: calc(100% - 2px);
   vertical-align: text-bottom;

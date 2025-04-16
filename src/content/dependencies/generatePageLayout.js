@@ -583,6 +583,11 @@ export default {
           `    background-image: url("${to('media.path', 'bg.jpg')}");\n` +
           `}`);
 
+    const goshFrigginDarnitStyleRule =
+      `.image-media-link::after {\n` +
+      `    mask-image: url("${to('staticMisc.path', 'image.svg')}");\n` +
+      `}`;
+
     const numWallpaperParts =
       html.resolve(slots.styleRules, {normalize: 'string'})
         .match(/\.wallpaper-part:nth-child/g)
@@ -733,6 +738,7 @@ export default {
                 .slot('color', slots.color ?? data.wikiColor),
 
               fallbackBackgroundStyleRule,
+              goshFrigginDarnitStyleRule,
               slots.styleRules,
             ]),
 
