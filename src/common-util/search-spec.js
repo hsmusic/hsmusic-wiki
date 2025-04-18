@@ -147,10 +147,7 @@ export const searchSpec = {
 
       const contribKeys = [
         'artistContribs',
-        'bannerArtistContribs',
         'contributorContribs',
-        'coverArtistContribs',
-        'wallpaperArtistContribs',
       ];
 
       const contributions =
