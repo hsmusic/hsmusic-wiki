@@ -818,6 +818,13 @@ misc:
       artist: "(artist)"
       group: "(group)"
 
+    resultFilter:
+      album: "Albums"
+      artTag: "Art Tags"
+      artist: "Artists"
+      group: "Groups"
+      track: "Tracks"
+
   # skippers:
   #
   #   These are navigational links that only show up when you're

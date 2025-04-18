@@ -1,7 +1,7 @@
 /* eslint-env browser */
 
 import {getColors} from '../../shared-util/colors.js';
-import {accumulateSum, empty} from '../../shared-util/sugar.js';
+import {accumulateSum, empty, unique} from '../../shared-util/sugar.js';
 
 import {
   cssProp,
@@ -41,6 +41,13 @@ export const info = {
   failedRule: null,
   failedContainer: null,
 
+  filterContainer: null,
+  albumFilterLink: null,
+  artistFilterLink: null,
+  groupFilterLink: null,
+  tagFilterLink: null,
+  trackFilterLink: null,
+
   resultsRule: null,
   resultsContainer: null,
   results: null,
@@ -64,6 +71,12 @@ export const info = {
   artistResultKindString: null,
   groupResultKindString: null,
   tagResultKindString: null,
+
+  albumResultFilterString: null,
+  artistResultFilterString: null,
+  groupResultFilterString: null,
+  tagResultFilterString: null,
+  trackResultFilterString: null,
 
   state: {
     sidebarColumnShownForSearch: null,
@@ -95,6 +108,10 @@ export const info = {
     activeQueryResults: {
       type: 'json',
       maxLength: settings => settings.maxActiveResultsStorage,
+    },
+
+    activeFilterType: {
+      type: 'string',
     },
 
     repeatQueryOnReload: {
@@ -176,6 +193,21 @@ export function getPageReferences() {
 
   info.tagResultKindString =
     findString('tag-result-kind');
+
+  info.albumResultFilterString =
+    findString('album-result-filter');
+
+  info.artistResultFilterString =
+    findString('artist-result-filter');
+
+  info.groupResultFilterString =
+    findString('group-result-filter');
+
+  info.tagResultFilterString =
+    findString('tag-result-filter');
+
+  info.trackResultFilterString =
+    findString('track-result-filter');
 }
 
 export function addInternalListeners() {
@@ -264,6 +296,38 @@ export function mutatePageContent() {
 
   info.searchBox.appendChild(info.failedRule);
   info.searchBox.appendChild(info.failedContainer);
+
+  // Filter section
+
+  info.filterContainer =
+    document.createElement('div');
+
+  info.filterContainer.classList.add('wiki-search-filter-container');
+
+  cssProp(info.filterContainer, 'display', 'none');
+
+  forEachFilter((type, _filterLink) => {
+    // TODO: It's probably a sin to access `session` during this step LOL
+    const {session} = info;
+
+    const filterLink = document.createElement('a');
+
+    filterLink.href = '#';
+    filterLink.classList.add('wiki-search-filter-link');
+
+    if (session.activeFilterType === type) {
+      filterLink.classList.add('active');
+    }
+
+    const string = info[type + 'ResultFilterString'];
+    filterLink.appendChild(templateContent(string));
+
+    info[type + 'FilterLink'] = filterLink;
+
+    info.filterContainer.appendChild(filterLink);
+  });
+
+  info.searchBox.appendChild(info.filterContainer);
 
   // Results section
 
@@ -371,7 +435,7 @@ export function addPageListeners() {
     const {settings, state} = info;
 
     if (!info.searchInput.value) {
-      clearSidebarSearch();
+      clearSidebarSearch(); // ...but don't clear filter
       return;
     }
 
@@ -433,8 +497,16 @@ export function addPageListeners() {
   info.endSearchLink.addEventListener('click', domEvent => {
     domEvent.preventDefault();
     clearSidebarSearch();
+    clearSidebarFilter();
     possiblyHideSearchSidebarColumn();
     restoreSidebarSearchColumn();
+  });
+
+  forEachFilter((type, filterLink) => {
+    filterLink.addEventListener('click', domEvent => {
+      domEvent.preventDefault();
+      toggleSidebarSearchFilter(type);
+    });
   });
 
   info.resultsContainer.addEventListener('scroll', () => {
@@ -518,6 +590,20 @@ function trackSidebarSearchDownloadEnds(event) {
   }
 }
 
+function forEachFilter(callback) {
+  const filterOrder = [
+    'track',
+    'album',
+    'artist',
+    'group',
+    'tag',
+  ];
+
+  for (const type of filterOrder) {
+    callback(type, info[type + 'FilterLink']);
+  }
+}
+
 async function activateSidebarSearch(query) {
   const {session, state} = info;
 
@@ -582,6 +668,14 @@ function clearSidebarSearch() {
   session.resultsScrollOffset = null;
 
   hideSidebarSearchResults();
+}
+
+function clearSidebarFilter() {
+  toggleSidebarSearchFilter(session.activeFilterType);
+
+  forEachFilter((_type, filterLink) => {
+    filterLink.classList.remove('shown', 'hidden');
+  });
 }
 
 function updateSidebarSearchStatus() {
@@ -670,10 +764,42 @@ function showSidebarSearchFailed() {
 }
 
 function showSidebarSearchResults(results) {
-  console.debug(`Showing search results:`, results);
+  const {session} = info;
+
+  console.debug(`Showing search results:`, flattenResults(results));
 
   showSearchSidebarColumn();
 
+  info.searchBox.classList.add('showing-results');
+  info.searchSidebarColumn.classList.add('search-showing-results');
+
+  let filterType = session.activeFilterType;
+  let shownAnyResults =
+    fillResultElements(results, {filterType: session.activeFilterType});
+
+  showFilterElements(results);
+
+  if (!shownAnyResults) {
+    shownAnyResults = toggleSidebarSearchFilter(filterType);
+    filterType = null;
+  }
+
+  if (shownAnyResults) {
+    cssProp(info.endSearchRule, 'display', 'block');
+    cssProp(info.endSearchLine, 'display', 'block');
+
+    tidySidebarSearchColumn();
+  } else {
+    const p = document.createElement('p');
+    p.classList.add('wiki-search-no-results');
+    p.appendChild(templateContent(info.noResultsString));
+    info.results.appendChild(p);
+  }
+
+  restoreSidebarSearchResultsScrollOffset();
+}
+
+function flattenResults(results) {
   const flatResults =
     Object.entries(results)
       .filter(([index]) => index === 'generic')
@@ -686,8 +812,18 @@ function showSidebarSearchResults(results) {
           data: doc,
         })));
 
-  info.searchBox.classList.add('showing-results');
-  info.searchSidebarColumn.classList.add('search-showing-results');
+  return flatResults;
+}
+
+function fillResultElements(results, {
+  filterType = null,
+} = {}) {
+  const flatResults = flattenResults(results);
+
+  const filteredResults =
+    (filterType
+      ? flatResults.filter(result => result.referenceType === filterType)
+      : flatResults);
 
   while (info.results.firstChild) {
     info.results.firstChild.remove();
@@ -696,28 +832,43 @@ function showSidebarSearchResults(results) {
   cssProp(info.resultsRule, 'display', 'block');
   cssProp(info.resultsContainer, 'display', 'block');
 
-  if (empty(flatResults)) {
-    const p = document.createElement('p');
-    p.classList.add('wiki-search-no-results');
-    p.appendChild(templateContent(info.noResultsString));
-    info.results.appendChild(p);
+  if (empty(filteredResults)) {
+    return false;
   }
 
-  for (const result of flatResults) {
+  for (const result of filteredResults) {
     const el = generateSidebarSearchResult(result);
     if (!el) continue;
 
     info.results.appendChild(el);
   }
 
-  if (!empty(flatResults)) {
-    cssProp(info.endSearchRule, 'display', 'block');
-    cssProp(info.endSearchLine, 'display', 'block');
+  return true;
+}
 
-    tidySidebarSearchColumn();
+function showFilterElements(results) {
+  const flatResults = flattenResults(results);
+
+  const allReferenceTypes =
+    unique(flatResults.map(result => result.referenceType));
+
+  let shownAny = false;
+
+  forEachFilter((type, filterLink) => {
+    if (allReferenceTypes.includes(type)) {
+      shownAny = true;
+      cssProp(filterLink, 'display', null);
+    } else {
+      cssProp(filterLink, 'display', 'none');
+      filterLink.classList.remove('shown', 'hidden');
+    }
+  });
+
+  if (shownAny) {
+    cssProp(info.filterContainer, 'display', null);
+  } else {
+    cssProp(info.filterContainer, 'display', 'none');
   }
-
-  restoreSidebarSearchResultsScrollOffset();
 }
 
 function generateSidebarSearchResult(result) {
@@ -908,6 +1059,8 @@ function generateSidebarSearchResultTemplate(slots) {
 }
 
 function hideSidebarSearchResults() {
+  cssProp(info.filterContainer, 'display', 'none');
+
   cssProp(info.resultsRule, 'display', 'none');
   cssProp(info.resultsContainer, 'display', 'none');
 
@@ -1038,6 +1191,34 @@ function tidySidebarSearchColumn() {
       }
     }
   }
+}
+
+function toggleSidebarSearchFilter(toggleType) {
+  const {session} = info;
+
+  if (!toggleType) return null;
+
+  let shownAnyResults = null;
+
+  forEachFilter((type, filterLink) => {
+    if (type === toggleType) {
+      const filterActive = filterLink.classList.toggle('active');
+      const filterType = (filterActive ? type : null);
+
+      if (cssProp(filterLink, 'display') !== 'none') {
+        filterLink.classList.add(filterActive ? 'shown' : 'hidden');
+      }
+
+      shownAnyResults =
+        fillResultElements(session.activeQueryResults, {filterType});
+
+      session.activeFilterType = filterType;
+    } else {
+      filterLink.classList.remove('active');
+    }
+  });
+
+  return shownAnyResults;
 }
 
 function restoreSidebarSearchColumn() {

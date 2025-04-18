@@ -743,6 +743,72 @@ summary.underline-white > span:hover a:not(:hover) {
   cursor: default;
 }
 
+.wiki-search-filter-container {
+  padding: 4px;
+}
+
+.wiki-search-filter-link {
+  margin: 2px;
+  padding: 2px 4px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+}
+
+.wiki-search-filter-link.active.shown {
+  animation:
+    0.15s ease   0.00s forwards normal    show-filter,
+    0.60s linear 0.15s infinite alternate blink-filter;
+}
+
+.wiki-search-filter-link.active:not(.shown) {
+  animation:
+    0.00s linear 0.00s forwards normal    show-filter,
+    0.60s linear 0.00s infinite alternate blink-filter;
+}
+
+.wiki-search-filter-link:not(.active).hidden {
+  /* We can't just reverse the show-filter animation,
+   * because that won't actually start it over again.
+   */
+  animation:
+    0.15s ease   0.00s forwards reverse   show-filter-the-sequel;
+}
+
+@keyframes show-filter {
+  from {
+    background: transparent;
+    border-color: transparent;
+    color: var(--primary-color);
+  }
+
+  to {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: black;
+  }
+}
+
+/* Exactly the same as show-filter above. */
+@keyframes show-filter-the-sequel {
+  from {
+    background: transparent;
+    border-color: transparent;
+    color: var(--primary-color);
+  }
+
+  to {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: black;
+  }
+}
+
+@keyframes blink-filter {
+  to {
+    background: color-mix(in srgb, var(--primary-color) 90%, transparent);
+  }
+}
+
 .wiki-search-result {
   position: relative;
   display: flex;

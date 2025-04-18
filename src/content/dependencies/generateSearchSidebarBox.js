@@ -57,6 +57,23 @@ export default {
             html.tag('template', {class: 'wiki-search-tag-result-kind-string'},
               language.$(capsule, 'artTag')),
           ]),
+
+          language.encapsulate(capsule, 'resultFilter', capsule => [
+            html.tag('template', {class: 'wiki-search-album-result-filter-string'},
+              language.$(capsule, 'album')),
+
+            html.tag('template', {class: 'wiki-search-artist-result-filter-string'},
+              language.$(capsule, 'artist')),
+
+            html.tag('template', {class: 'wiki-search-group-result-filter-string'},
+              language.$(capsule, 'group')),
+
+            html.tag('template', {class: 'wiki-search-track-result-filter-string'},
+              language.$(capsule, 'track')),
+
+            html.tag('template', {class: 'wiki-search-tag-result-filter-string'},
+              language.$(capsule, 'artTag')),
+          ]),
         ],
       })),
 };
