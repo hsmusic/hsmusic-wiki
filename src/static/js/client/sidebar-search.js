@@ -44,6 +44,7 @@ export const info = {
   filterContainer: null,
   albumFilterLink: null,
   artistFilterLink: null,
+  flashFilterLink: null,
   groupFilterLink: null,
   tagFilterLink: null,
   trackFilterLink: null,
@@ -74,6 +75,7 @@ export const info = {
 
   albumResultFilterString: null,
   artistResultFilterString: null,
+  flashResultFilterString: null,
   groupResultFilterString: null,
   tagResultFilterString: null,
   trackResultFilterString: null,
@@ -199,6 +201,9 @@ export function getPageReferences() {
 
   info.artistResultFilterString =
     findString('artist-result-filter');
+
+  info.flashResultFilterString =
+    findString('flash-result-filter');
 
   info.groupResultFilterString =
     findString('group-result-filter');
@@ -596,6 +601,7 @@ function forEachFilter(callback) {
     'album',
     'artist',
     'group',
+    'flash',
     'tag',
   ];
 

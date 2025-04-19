@@ -65,6 +65,9 @@ export default {
             html.tag('template', {class: 'wiki-search-artist-result-filter-string'},
               language.$(capsule, 'artist')),
 
+            html.tag('template', {class: 'wiki-search-flash-result-filter-string'},
+              language.$(capsule, 'flash')),
+
             html.tag('template', {class: 'wiki-search-group-result-filter-string'},
               language.$(capsule, 'group')),
 

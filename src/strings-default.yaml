@@ -822,6 +822,7 @@ misc:
       album: "Albums"
       artTag: "Art Tags"
       artist: "Artists"
+      flash: "Flashes"
       group: "Groups"
       track: "Tracks"
 
