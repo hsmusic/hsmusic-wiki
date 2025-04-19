@@ -371,58 +371,149 @@ function postActionResult(id, status, value) {
 }
 
 function performSearchAction({query, options}) {
-  const {generic, ...otherIndexes} = indexes;
+  const {generic, verbatim} = indexes;
 
   const genericResults =
     queryGenericIndex(generic, query, options);
 
-  const otherResults =
-    withEntries(otherIndexes, entries => entries
-      .map(([indexName, index]) => [
-        indexName,
-        index.search(query, options),
-      ]));
+  const verbatimResults =
+    queryVerbatimIndex(verbatim, query, options);
 
-  return {
-    generic: genericResults,
-    ...otherResults,
-  };
+  const verbatimIDs =
+    new Set(verbatimResults?.map(result => result.id));
+
+  const commonResults =
+    (verbatimResults && genericResults
+      ? genericResults
+          .filter(({id}) => verbatimIDs.has(id))
+      : verbatimResults ?? genericResults);
+
+  return commonResults;
 }
 
+const interestingFieldCombinations = [
+  ['primaryName', 'parentName', 'groups'],
+  ['primaryName', 'parentName'],
+  ['primaryName', 'groups', 'contributors'],
+  ['primaryName', 'groups', 'artTags'],
+  ['primaryName', 'groups'],
+  ['primaryName', 'contributors'],
+  ['primaryName', 'artTags'],
+  ['parentName', 'groups', 'artTags'],
+  ['parentName', 'artTags'],
+  ['groups', 'contributors'],
+  ['groups', 'artTags'],
+
+  // This prevents just matching *everything* tagged "john" if you
+  // only search "john", but it actually supports matching more than
+  // *two* tags at once: "john rose lowas" works! This is thanks to
+  // flexsearch matching multiple field values in a single query.
+  ['artTags', 'artTags'],
+
+  ['contributors', 'parentName'],
+  ['contributors', 'groups'],
+  ['primaryName', 'contributors'],
+  ['primaryName'],
+];
+
 function queryGenericIndex(index, query, options) {
-  const interestingFieldCombinations = [
-    ['primaryName', 'parentName', 'groups'],
-    ['primaryName', 'parentName'],
-    ['primaryName', 'groups', 'contributors'],
-    ['primaryName', 'groups', 'artTags'],
-    ['primaryName', 'groups'],
-    ['primaryName', 'contributors'],
-    ['primaryName', 'artTags'],
-    ['parentName', 'groups', 'artTags'],
-    ['parentName', 'artTags'],
-    ['groups', 'contributors'],
-    ['groups', 'artTags'],
-
-    // This prevents just matching *everything* tagged "john" if you
-    // only search "john", but it actually supports matching more than
-    // *two* tags at once: "john rose lowas" works! This is thanks to
-    // flexsearch matching multiple field values in a single query.
-    ['artTags', 'artTags'],
-
-    ['contributors', 'parentName'],
-    ['contributors', 'groups'],
-    ['primaryName', 'contributors'],
-    ['primaryName'],
-  ];
-
   const interestingFields =
     unique(interestingFieldCombinations.flat());
 
   const {genericTerms, queriedKind} =
     processTerms(query);
 
+  if (empty(genericTerms)) return null;
+
   const particles =
     particulate(genericTerms);
+
+  const groupedParticles =
+    groupArray(particles, ({length}) => length);
+
+  const queriesBy = keys =>
+    (groupedParticles.get(keys.length) ?? [])
+      .flatMap(permutations)
+      .map(values => values.map(({terms}) => terms.join(' ')))
+      .map(values =>
+        stitchArrays({
+          field: keys,
+          query: values,
+        }));
+
+  const boilerplate = queryBoilerplate(index);
+
+  const particleResults =
+    Object.fromEntries(
+      interestingFields.map(field => [
+        field,
+        Object.fromEntries(
+          particles.flat()
+            .map(({terms}) => terms.join(' '))
+            .map(query => [
+              query,
+              new Set(
+                boilerplate
+                  .query(query, {
+                    ...options,
+                    field,
+                    limit: Infinity,
+                  })
+                  .fieldResults[field]),
+            ])),
+      ]));
+
+  const results = new Set();
+
+  for (const interestingFieldCombination of interestingFieldCombinations) {
+    for (const query of queriesBy(interestingFieldCombination)) {
+      const idToMatchingFieldsMap = new Map();
+      for (const {field, query: fieldQuery} of query) {
+        for (const id of particleResults[field][fieldQuery]) {
+          if (idToMatchingFieldsMap.has(id)) {
+            idToMatchingFieldsMap.get(id).push(field);
+          } else {
+            idToMatchingFieldsMap.set(id, [field]);
+          }
+        }
+      }
+
+      const commonAcrossFields =
+        Array.from(idToMatchingFieldsMap.entries())
+          .filter(([id, matchingFields]) =>
+            matchingFields.length === interestingFieldCombination.length)
+          .map(([id]) => id);
+
+      for (const result of commonAcrossFields) {
+        results.add(result);
+      }
+    }
+  }
+
+  const constituted =
+    boilerplate.constitute(results);
+
+  const constitutedAndFiltered =
+    constituted
+      .filter(({id}) =>
+        (queriedKind
+          ? id.split(':')[0] === queriedKind
+          : true));
+
+  return constitutedAndFiltered;
+}
+
+function queryVerbatimIndex(index, query, options) {
+  const interestingFields =
+    unique(interestingFieldCombinations.flat());
+
+  const {verbatimTerms, queriedKind} =
+    processTerms(query);
+
+  if (empty(verbatimTerms)) return null;
+
+  const particles =
+    particulate(verbatimTerms);
 
   const groupedParticles =
     groupArray(particles, ({length}) => length);
@@ -510,11 +601,14 @@ function processTerms(query) {
   ];
 
   const genericTerms = [];
+  const verbatimTerms = [];
   let queriedKind = null;
 
   const termRegexp =
     new RegExp(
       String.raw`(?<kind>${kindTermSpec.flatMap(spec => spec.terms).join('|')})` +
+      String.raw`|(?<=^|\s)(?<quote>["'])(?<regularVerbatim>.+?)\k<quote>(?=$|\s)` +
+      String.raw`|(?<=^|\s)[“”‘’](?<curlyVerbatim>.+?)[“”‘’](?=$|\s)` +
       String.raw`|[^\s\-]+`,
       'gi');
 
@@ -530,10 +624,16 @@ function processTerms(query) {
       continue;
     }
 
+    const verbatim = groups.regularVerbatim || groups.curlyVerbatim;
+    if (verbatim) {
+      verbatimTerms.push(verbatim);
+      continue;
+    }
+
     genericTerms.push(match[0]);
   }
 
-  return {genericTerms, queriedKind};
+  return {genericTerms, verbatimTerms, queriedKind};
 }
 
 function particulate(terms) {

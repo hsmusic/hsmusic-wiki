@@ -772,7 +772,7 @@ function showSidebarSearchFailed() {
 function showSidebarSearchResults(results) {
   const {session} = info;
 
-  console.debug(`Showing search results:`, flattenResults(results));
+  console.debug(`Showing search results:`, tidyResults(results));
 
   showSearchSidebarColumn();
 
@@ -805,31 +805,27 @@ function showSidebarSearchResults(results) {
   restoreSidebarSearchResultsScrollOffset();
 }
 
-function flattenResults(results) {
-  const flatResults =
-    Object.entries(results)
-      .filter(([index]) => index === 'generic')
-      .flatMap(([index, results]) => results
-        .flatMap(({doc, id}) => ({
-          index,
-          reference: id ?? null,
-          referenceType: (id ? id.split(':')[0] : null),
-          directory: (id ? id.split(':')[1] : null),
-          data: doc,
-        })));
+function tidyResults(results) {
+  const tidiedResults =
+    results.map(({doc, id}) => ({
+      reference: id ?? null,
+      referenceType: (id ? id.split(':')[0] : null),
+      directory: (id ? id.split(':')[1] : null),
+      data: doc,
+    }));
 
-  return flatResults;
+  return tidiedResults;
 }
 
 function fillResultElements(results, {
   filterType = null,
 } = {}) {
-  const flatResults = flattenResults(results);
+  const tidiedResults = tidyResults(results);
 
   const filteredResults =
     (filterType
-      ? flatResults.filter(result => result.referenceType === filterType)
-      : flatResults);
+      ? tidiedResults.filter(result => result.referenceType === filterType)
+      : tidiedResults);
 
   while (info.results.firstChild) {
     info.results.firstChild.remove();
@@ -853,10 +849,10 @@ function fillResultElements(results, {
 }
 
 function showFilterElements(results) {
-  const flatResults = flattenResults(results);
+  const tidiedResults = tidyResults(results);
 
   const allReferenceTypes =
-    unique(flatResults.map(result => result.referenceType));
+    unique(tidiedResults.map(result => result.referenceType));
 
   let shownAny = false;
 

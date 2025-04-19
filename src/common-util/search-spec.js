@@ -85,104 +85,132 @@ function prepareArtwork(thing, {
   return serializeSrc;
 }
 
+function baselineProcess(thing, opts) {
+  const fields = {};
+
+  fields.primaryName =
+    thing.name;
+
+  fields.artwork =
+    prepareArtwork(thing, opts);
+
+  fields.color =
+    thing.color;
+
+  return fields;
+}
+
+const baselineStore = [
+  'primaryName',
+  'artwork',
+  'color',
+];
+
+function genericQuery(wikiData) {
+  return [
+    wikiData.albumData,
+
+    wikiData.artTagData,
+
+    wikiData.artistData
+      .filter(artist => !artist.isAlias),
+
+    wikiData.flashData,
+
+    wikiData.groupData,
+
+    wikiData.trackData
+      // Exclude rereleases - there's no reasonable way to differentiate
+      // them from the main release as part of this query.
+      .filter(track => !track.mainReleaseTrack),
+  ].flat();
+}
+
+function genericProcess(thing, opts) {
+  const fields = baselineProcess(thing, opts);
+
+  const kind =
+    thing.constructor[Symbol.for('Thing.referenceType')];
+
+  fields.parentName =
+    (kind === 'track'
+      ? thing.album.name
+   : kind === 'group'
+      ? thing.category.name
+   : kind === 'flash'
+      ? thing.act.name
+      : null);
+
+  fields.artTags =
+    (thing.constructor.hasPropertyDescriptor('artTags')
+      ? thing.artTags.map(artTag => artTag.nameShort)
+      : []);
+
+  fields.additionalNames =
+    (thing.constructor.hasPropertyDescriptor('additionalNames')
+      ? thing.additionalNames.map(entry => entry.name)
+   : thing.constructor.hasPropertyDescriptor('aliasNames')
+      ? thing.aliasNames
+      : []);
+
+  const contribKeys = [
+    'artistContribs',
+    'contributorContribs',
+  ];
+
+  const contributions =
+    contribKeys
+      .filter(key => Object.hasOwn(thing, key))
+      .flatMap(key => thing[key]);
+
+  fields.contributors =
+    contributions
+      .flatMap(({artist}) => [
+        artist.name,
+        ...artist.aliasNames,
+      ]);
+
+  const groups =
+     (Object.hasOwn(thing, 'groups')
+       ? thing.groups
+    : Object.hasOwn(thing, 'album')
+       ? thing.album.groups
+       : []);
+
+  const mainContributorNames =
+    contributions
+      .map(({artist}) => artist.name);
+
+  fields.groups =
+    groups
+      .filter(group => !mainContributorNames.includes(group.name))
+      .map(group => group.name);
+
+  return fields;
+}
+
+const genericStore = baselineStore;
+
 export const searchSpec = {
   generic: {
-    query: ({
-      albumData,
-      artTagData,
-      artistData,
-      flashData,
-      groupData,
-      trackData,
-    }) => [
-      albumData,
+    query: genericQuery,
+    process: genericProcess,
 
-      artTagData,
+    index: [
+      'primaryName',
+      'parentName',
+      'artTags',
+      'additionalNames',
+      'contributors',
+      'groups',
+    ].map(field => ({field, tokenize: 'forward'})),
 
-      artistData
-        .filter(artist => !artist.isAlias),
+    store: genericStore,
+  },
 
-      flashData,
-
-      groupData,
-
-      trackData
-        // Exclude rereleases - there's no reasonable way to differentiate
-        // them from the main release as part of this query.
-        .filter(track => !track.mainReleaseTrack),
-    ].flat(),
-
-    process(thing, opts) {
-      const fields = {};
-
-      fields.primaryName =
-        thing.name;
-
-      const kind =
-        thing.constructor[Symbol.for('Thing.referenceType')];
-
-      fields.parentName =
-        (kind === 'track'
-          ? thing.album.name
-       : kind === 'group'
-          ? thing.category.name
-       : kind === 'flash'
-          ? thing.act.name
-          : null);
-
-      fields.color =
-        thing.color;
-
-      fields.artTags =
-        (thing.constructor.hasPropertyDescriptor('artTags')
-          ? thing.artTags.map(artTag => artTag.nameShort)
-          : []);
-
-      fields.additionalNames =
-        (thing.constructor.hasPropertyDescriptor('additionalNames')
-          ? thing.additionalNames.map(entry => entry.name)
-       : thing.constructor.hasPropertyDescriptor('aliasNames')
-          ? thing.aliasNames
-          : []);
-
-      const contribKeys = [
-        'artistContribs',
-        'contributorContribs',
-      ];
-
-      const contributions =
-        contribKeys
-          .filter(key => Object.hasOwn(thing, key))
-          .flatMap(key => thing[key]);
-
-      fields.contributors =
-        contributions
-          .flatMap(({artist}) => [
-            artist.name,
-            ...artist.aliasNames,
-          ]);
-
-      const groups =
-         (Object.hasOwn(thing, 'groups')
-           ? thing.groups
-        : Object.hasOwn(thing, 'album')
-           ? thing.album.groups
-           : []);
-
-      const mainContributorNames =
-        contributions
-          .map(({artist}) => artist.name);
-
-      fields.groups =
-        groups
-          .filter(group => !mainContributorNames.includes(group.name))
-          .map(group => group.name);
-
-      fields.artwork =
-        prepareArtwork(thing, opts);
-
-      return fields;
-    },
+  verbatim: {
+    query: genericQuery,
+    process: genericProcess,
 
     index: [
       'primaryName',
@@ -193,11 +221,7 @@ export const searchSpec = {
       'groups',
     ],
 
-    store: [
-      'primaryName',
-      'artwork',
-      'color',
-    ],
+    store: genericStore,
   },
 };
 
