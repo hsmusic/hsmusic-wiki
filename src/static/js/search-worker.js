@@ -373,6 +373,8 @@ function postActionResult(id, status, value) {
 function performSearchAction({query, options}) {
   const {generic, verbatim} = indexes;
 
+  const {queriedKind} = processTerms(query);
+
   const genericResults =
     queryGenericIndex(generic, query, options);
 
@@ -388,7 +390,10 @@ function performSearchAction({query, options}) {
           .filter(({id}) => verbatimIDs.has(id))
       : verbatimResults ?? genericResults);
 
-  return commonResults;
+  return {
+    results: commonResults,
+    queriedKind,
+  };
 }
 
 const interestingFieldCombinations = [

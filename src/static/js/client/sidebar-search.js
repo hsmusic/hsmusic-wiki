@@ -809,7 +809,7 @@ function showSidebarSearchResults(results) {
 
 function tidyResults(results) {
   const tidiedResults =
-    results.map(({doc, id}) => ({
+    results.results.map(({doc, id}) => ({
       reference: id ?? null,
       referenceType: (id ? id.split(':')[0] : null),
       directory: (id ? id.split(':')[1] : null),
@@ -851,6 +851,8 @@ function fillResultElements(results, {
 }
 
 function showFilterElements(results) {
+  const {queriedKind} = results;
+
   const tidiedResults = tidyResults(results);
 
   const allReferenceTypes =
@@ -864,6 +866,18 @@ function showFilterElements(results) {
     if (allReferenceTypes.includes(type)) {
       shownAny = true;
       cssProp(filterLink, 'display', null);
+
+      if (queriedKind) {
+        filterLink.setAttribute('inert', 'inert');
+      } else {
+        filterLink.removeAttribute('inert');
+      }
+
+      if (type === queriedKind) {
+        filterLink.classList.add('active-from-query');
+      } else {
+        filterLink.classList.remove('active-from-query');
+      }
     } else {
       cssProp(filterLink, 'display', 'none');
     }

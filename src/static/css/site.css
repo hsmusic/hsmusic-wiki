@@ -754,24 +754,42 @@ summary.underline-white > span:hover a:not(:hover) {
   border-radius: 4px;
 }
 
-.wiki-search-filter-link.active.shown {
+.wiki-search-filter-link:where(.active.shown) {
   animation:
     0.15s ease   0.00s forwards normal    show-filter,
     0.60s linear 0.15s infinite alternate blink-filter;
 }
 
-.wiki-search-filter-link.active:not(.shown) {
+.wiki-search-filter-link:where(.active:not(.shown)) {
   animation:
     0.00s linear 0.00s forwards normal    show-filter,
     0.60s linear 0.00s infinite alternate blink-filter;
 }
 
-.wiki-search-filter-link:not(.active).hidden {
+.wiki-search-filter-link:where(:not(.active).hidden) {
   /* We can't just reverse the show-filter animation,
    * because that won't actually start it over again.
    */
   animation:
     0.15s ease   0.00s forwards reverse   show-filter-the-sequel;
+}
+
+.wiki-search-filter-link.active-from-query {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #000a;
+  animation: none;
+}
+
+.wiki-search-filter-link.active-from-query::after {
+  content: "I";
+  color: black;
+  font-family: monospace;
+  font-weight: 800;
+  font-size: 1.2em;
+  margin-left: 0.5ch;
+  vertical-align: middle;
+  animation: 1s steps(2, jump-none) 0.6s infinite blink-caret;
 }
 
 @keyframes show-filter {
@@ -807,6 +825,11 @@ summary.underline-white > span:hover a:not(:hover) {
   to {
     background: color-mix(in srgb, var(--primary-color) 90%, transparent);
   }
+}
+
+@keyframes blink-caret {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .wiki-search-result {
