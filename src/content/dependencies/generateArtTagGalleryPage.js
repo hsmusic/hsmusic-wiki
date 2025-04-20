@@ -1,5 +1,5 @@
 import {sortArtworksChronologically} from '#sort';
-import {empty, unique} from '#sugar';
+import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -103,10 +103,14 @@ export default {
       query.allArtworks
         .map(artwork => artwork.thing.name);
 
-    data.coverArtists =
+    data.artworkArtists =
       query.allArtworks
         .map(artwork => artwork.artistContribs
           .map(contrib => contrib.artist.name));
+
+    data.artworkLabels =
+      query.allArtworks
+        .map(artwork => artwork.label)
 
     data.onlyFeaturedIndirectly =
       query.allArtworks.map(artwork =>
@@ -204,12 +208,24 @@ export default {
                   (onlyFeaturedIndirectly ? 'featured-indirectly' : '')),
 
               info:
-                data.coverArtists.map(names =>
-                  (names === null
-                    ? null
-                    : language.$('misc.coverGrid.details.coverArtists', {
-                        artists: language.formatUnitList(names),
-                      }))),
+                stitchArrays({
+                  artists: data.artworkArtists,
+                  label: data.artworkLabels,
+                }).map(({artists, label}) =>
+                    language.encapsulate('misc.coverGrid.details.coverArtists', workingCapsule => {
+                      const workingOptions = {};
+
+                      workingOptions[language.onlyIfOptions] = ['artists'];
+                      workingOptions.artists =
+                        language.formatUnitList(artists);
+
+                      if (label) {
+                        workingCapsule += '.customLabel';
+                        workingOptions.label = label;
+                      }
+
+                      return language.$(workingCapsule, workingOptions);
+                    })),
             }),
         ],
 

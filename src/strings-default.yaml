@@ -935,7 +935,10 @@ misc:
       accent: "({DETAILS})"
 
       albumLength: "{TRACKS}, {TIME}"
+
       coverArtists: "Artwork by {ARTISTS}"
+      coverArtists.customLabel: "{LABEL} by {ARTISTS}"
+
       otherCoverArtists: "With {ARTISTS}"
 
   albumGalleryGrid:

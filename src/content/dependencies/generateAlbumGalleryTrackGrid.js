@@ -69,7 +69,7 @@ export default {
       album.tracks
         .map(track => track.name),
 
-    trackArtworkArtists:
+    artworkArtists:
       query.artworks.map(artwork =>
         (query.artistsForAllTrackArtworks
           ? null
@@ -110,7 +110,7 @@ export default {
                 })),
 
           info:
-            data.trackArtworkArtists.map(artists =>
+            data.artworkArtists.map(artists =>
               language.$('misc.coverGrid.details.coverArtists', {
                 [language.onlyIfOptions]: ['artists'],
 
