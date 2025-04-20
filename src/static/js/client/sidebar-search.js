@@ -677,6 +677,8 @@ function clearSidebarSearch() {
 }
 
 function clearSidebarFilter() {
+  const {session} = info;
+
   toggleSidebarSearchFilter(session.activeFilterType);
 
   forEachFilter((_type, filterLink) => {
@@ -857,12 +859,13 @@ function showFilterElements(results) {
   let shownAny = false;
 
   forEachFilter((type, filterLink) => {
+    filterLink.classList.remove('shown', 'hidden');
+
     if (allReferenceTypes.includes(type)) {
       shownAny = true;
       cssProp(filterLink, 'display', null);
     } else {
       cssProp(filterLink, 'display', 'none');
-      filterLink.classList.remove('shown', 'hidden');
     }
   });
 
@@ -1211,8 +1214,10 @@ function toggleSidebarSearchFilter(toggleType) {
         filterLink.classList.add(filterActive ? 'shown' : 'hidden');
       }
 
-      shownAnyResults =
-        fillResultElements(session.activeQueryResults, {filterType});
+      if (session.activeQueryResults) {
+        shownAnyResults =
+          fillResultElements(session.activeQueryResults, {filterType});
+      }
 
       session.activeFilterType = filterType;
     } else {
@@ -1256,6 +1261,8 @@ function forgetRecentSidebarSearch() {
 
   session.activeQuery = null;
   session.activeQueryResults = null;
+
+  clearSidebarFilter();
 }
 
 async function handleDroppedIntoSearchInput(domEvent) {
