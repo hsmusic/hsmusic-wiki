@@ -748,6 +748,7 @@ summary.underline-white > span:hover a:not(:hover) {
 }
 
 .wiki-search-filter-link {
+  display: inline-block;
   margin: 2px;
   padding: 2px 4px;
   border: 2px solid transparent;
