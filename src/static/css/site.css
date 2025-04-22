@@ -1632,14 +1632,6 @@ p.image-details.origin-details {
   margin-bottom: 2px;
 }
 
-.cover-artwork-joiner {
-  /* This z-index must be greater than however an artwork
-   * is raised (within .isolate-tooltip-z-indexing) because
-   * a contained (tooltip) hoverable is hovered.
-   */
-  z-index: 3;
-}
-
 .cover-artwork-joiner::after {
   content: "";
   display: block;
@@ -1647,7 +1639,7 @@ p.image-details.origin-details {
   height: 15px;
   margin-left: auto;
   margin-right: auto;
-  border-right: 1px dashed var(--primary-color);
+  border-right: 3px solid var(--primary-color);
 }
 
 .cover-artwork-joiner + .cover-artwork {
