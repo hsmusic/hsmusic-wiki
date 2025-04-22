@@ -25,15 +25,20 @@ export default {
   }),
 
   data: (query, artwork) => {
-    if (
+    const data = {};
+
+    data.attachAbove = artwork.attachAbove;
+
+    data.sameAsMainArtwork =
       !artwork.isMainArtwork &&
       query.mainArtworkLinkableArtTags &&
       query.mainArtworkLinkableArtTags.length >= 3 &&
       compareArrays(
         query.mainArtworkLinkableArtTags,
-        query.linkableArtTags)
-    ) {
-      return {sameAsMainArtwork: true};
+        query.linkableArtTags);
+
+    if (data.sameAsMainArtwork) {
+      return data;
     }
 
     const seenShortNames = new Set();
@@ -47,11 +52,11 @@ export default {
       }
     }
 
-    const preferShortName =
+    data.preferShortName =
       query.linkableArtTags
         .map(artTag => !duplicateShortNames.has(artTag.nameShort));
 
-    return {preferShortName};
+    return data;
   },
 
   generate: (data, relations, {html, language}) =>
@@ -61,7 +66,9 @@ export default {
 
         {class: 'art-tag-details'},
 
-        (data.sameAsMainArtwork
+        (data.sameAsMainArtwork && data.attachAbove
+          ? html.blank()
+       : data.sameAsMainArtwork
           ? language.$(capsule, 'sameTagsAsMainArtwork')
           : stitchArrays({
               artTagLink: relations.artTagLinks,
