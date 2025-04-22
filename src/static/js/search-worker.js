@@ -480,18 +480,24 @@ function queryIndex({termsKey, indexKey}, query, options) {
 
   for (const interestingFieldCombination of interestingFieldCombinations) {
     for (const query of queriesBy(interestingFieldCombination)) {
-      const commonAcrossFields = new Set();
+      const [firstQueryFieldLine, ...restQueryFieldLines] = query;
 
-      for (const [index, {field, query: fieldQuery}] of query.entries()) {
-        const firstFieldInQuery = (index === 0);
+      const commonAcrossFields =
+        new Set(
+          particleResults
+            [firstQueryFieldLine.field]
+            [firstQueryFieldLine.query]);
+
+      for (const currQueryFieldLine of restQueryFieldLines) {
         const tossResults = new Set(commonAcrossFields);
 
-        for (const result of particleResults[field][fieldQuery]) {
-          if (firstFieldInQuery) {
-            commonAcrossFields.add(result);
-          } else {
-            tossResults.delete(result);
-          }
+        const keepResults =
+          particleResults
+            [currQueryFieldLine.field]
+            [currQueryFieldLine.query];
+
+        for (const result of keepResults) {
+          tossResults.delete(result);
         }
 
         for (const result of tossResults) {
