@@ -53,7 +53,12 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {withContainingArtworkList, withDate} from '#composite/things/artwork';
+import {
+  withContainingArtworkList,
+  withContribsFromMainArtwork,
+  withPropertyFromMainArtwork,
+  withDate,
+} from '#composite/things/artwork';
 
 export class Artwork extends Thing {
   static [Thing.referenceType] = 'artwork';
@@ -173,6 +178,12 @@ export class Artwork extends Thing {
         mode: input.value('empty'),
       }),
 
+      withContribsFromMainArtwork(),
+
+      exposeDependencyOrContinue({
+        dependency: '#mainArtwork.artistContribs',
+      }),
+
       exitWithoutDependency({
         dependency: 'artistContribsFromThingProperty',
         value: input.value([]),
@@ -209,6 +220,15 @@ export class Artwork extends Thing {
       exposeDependencyOrContinue({
         dependency: '#resolvedReferenceList',
         mode: input.value('empty'),
+      }),
+
+      withPropertyFromMainArtwork({
+        property: input.value('artTags'),
+        onlyIfAttached: input.value(true),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#mainArtwork.artTags',
       }),
 
       exitWithoutDependency({
