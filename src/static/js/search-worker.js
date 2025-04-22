@@ -468,44 +468,46 @@ function queryGenericIndex(index, query, options) {
             ])),
       ]));
 
-  const results = new Set();
+  let matchedResults = new Set();
 
   for (const interestingFieldCombination of interestingFieldCombinations) {
     for (const query of queriesBy(interestingFieldCombination)) {
-      const idToMatchingFieldsMap = new Map();
-      for (const {field, query: fieldQuery} of query) {
-        for (const id of particleResults[field][fieldQuery]) {
-          if (idToMatchingFieldsMap.has(id)) {
-            idToMatchingFieldsMap.get(id).push(field);
+      const commonAcrossFields = new Set();
+
+      for (const [index, {field, query: fieldQuery}] of query.entries()) {
+        const firstFieldInQuery = (index === 0);
+        const tossResults = new Set(commonAcrossFields);
+
+        for (const result of particleResults[field][fieldQuery]) {
+          if (firstFieldInQuery) {
+            commonAcrossFields.add(result);
           } else {
-            idToMatchingFieldsMap.set(id, [field]);
+            tossResults.delete(result);
           }
+        }
+
+        for (const result of tossResults) {
+          commonAcrossFields.delete(result);
         }
       }
 
-      const commonAcrossFields =
-        Array.from(idToMatchingFieldsMap.entries())
-          .filter(([id, matchingFields]) =>
-            matchingFields.length === interestingFieldCombination.length)
-          .map(([id]) => id);
-
       for (const result of commonAcrossFields) {
-        results.add(result);
+        matchedResults.add(result);
       }
     }
   }
 
-  const constituted =
-    boilerplate.constitute(results);
+  matchedResults = Array.from(matchedResults);
 
-  const constitutedAndFiltered =
-    constituted
-      .filter(({id}) =>
-        (queriedKind
-          ? id.split(':')[0] === queriedKind
-          : true));
+  const filteredResults =
+    (queriedKind
+      ? matchedResults.filter(id => id.split(':')[0] === queriedKind)
+      : matchedResults);
 
-  return constitutedAndFiltered;
+  const constitutedResults =
+    boilerplate.constitute(filteredResults);
+
+  return constitutedResults;
 }
 
 function queryVerbatimIndex(index, query, options) {
@@ -555,44 +557,46 @@ function queryVerbatimIndex(index, query, options) {
             ])),
       ]));
 
-  const results = new Set();
+  let matchedResults = new Set();
 
   for (const interestingFieldCombination of interestingFieldCombinations) {
     for (const query of queriesBy(interestingFieldCombination)) {
-      const idToMatchingFieldsMap = new Map();
-      for (const {field, query: fieldQuery} of query) {
-        for (const id of particleResults[field][fieldQuery]) {
-          if (idToMatchingFieldsMap.has(id)) {
-            idToMatchingFieldsMap.get(id).push(field);
+      const commonAcrossFields = new Set();
+
+      for (const [index, {field, query: fieldQuery}] of query.entries()) {
+        const firstFieldInQuery = (index === 0);
+        const tossResults = new Set(commonAcrossFields);
+
+        for (const result of particleResults[field][fieldQuery]) {
+          if (firstFieldInQuery) {
+            commonAcrossFields.add(result);
           } else {
-            idToMatchingFieldsMap.set(id, [field]);
+            tossResults.delete(result);
           }
+        }
+
+        for (const result of tossResults) {
+          commonAcrossFields.delete(result);
         }
       }
 
-      const commonAcrossFields =
-        Array.from(idToMatchingFieldsMap.entries())
-          .filter(([id, matchingFields]) =>
-            matchingFields.length === interestingFieldCombination.length)
-          .map(([id]) => id);
-
       for (const result of commonAcrossFields) {
-        results.add(result);
+        matchedResults.add(result);
       }
     }
   }
 
-  const constituted =
-    boilerplate.constitute(results);
+  matchedResults = Array.from(matchedResults);
 
-  const constitutedAndFiltered =
-    constituted
-      .filter(({id}) =>
-        (queriedKind
-          ? id.split(':')[0] === queriedKind
-          : true));
+  const filteredResults =
+    (queriedKind
+      ? matchedResults.filter(id => id.split(':')[0] === queriedKind)
+      : matchedResults);
 
-  return constitutedAndFiltered;
+  const constitutedResults =
+    boilerplate.constitute(filteredResults);
+
+  return constitutedResults;
 }
 
 function processTerms(query) {
