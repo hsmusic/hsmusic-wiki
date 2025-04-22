@@ -13,11 +13,18 @@ export default {
   query: (artwork) => ({
     artworkThingType:
       artwork.thing.constructor[Thing.referenceType],
+
+    mainArtworkArtistContribs:
+      (!artwork.isMainArtwork && artwork.mainArtwork
+        ? artwork.mainArtwork.artistContribs
+        : null)
   }),
 
   relations: (relation, query, artwork) => ({
     credit:
-      relation('generateArtistCredit', artwork.artistContribs, []),
+      relation('generateArtistCredit',
+        artwork.artistContribs,
+        query.mainArtworkArtistContribs ?? []),
 
     source:
       relation('transformContent', artwork.source),
@@ -50,49 +57,67 @@ export default {
 
         {class: 'origin-details'},
 
-        [
-          language.encapsulate(capsule, 'artworkBy', workingCapsule => {
-            const workingOptions = {};
+        (() => {
+          const artworkBy =
+            language.encapsulate(capsule, 'artworkBy', workingCapsule => {
+              const workingOptions = {};
 
-            if (data.label) {
-              workingCapsule += '.customLabel';
-              workingOptions.label = data.label;
-            }
+              if (data.label) {
+                workingCapsule += '.customLabel';
+                workingOptions.label = data.label;
+              }
 
-            if (relations.datetimestamp) {
-              workingCapsule += '.withYear';
-              workingOptions.year =
-                relations.datetimestamp.slots({
-                  style: 'year',
-                  tooltip: true,
-                });
-            }
+              if (relations.datetimestamp) {
+                workingCapsule += '.withYear';
+                workingOptions.year =
+                  relations.datetimestamp.slots({
+                    style: 'year',
+                    tooltip: true,
+                  });
+              }
 
-            return relations.credit.slots({
-              showAnnotation: true,
-              showExternalLinks: true,
-              showChronology: true,
-              showWikiEdits: true,
+              return relations.credit.slots({
+                showAnnotation: true,
+                showExternalLinks: true,
+                showChronology: true,
+                showWikiEdits: true,
 
-              trimAnnotation: false,
+                trimAnnotation: false,
 
-              chronologyKind: 'coverArt',
+                chronologyKind: 'coverArt',
 
-              normalStringKey: workingCapsule,
-              additionalStringOptions: workingOptions,
+                normalStringKey: workingCapsule,
+                additionalStringOptions: workingOptions,
+              });
             });
-          }),
 
-          pagePath[0] === 'track' &&
-          data.artworkThingType === 'album' &&
-            language.$(capsule, 'trackArtFromAlbum', {
-              album:
-                relations.albumLink.slot('color', false),
-            }),
+          const trackArtFromAlbum =
+            pagePath[0] === 'track' &&
+            data.artworkThingType === 'album' &&
+              language.$(capsule, 'trackArtFromAlbum', {
+                album:
+                  relations.albumLink.slot('color', false),
+              });
 
-          language.$(capsule, 'source', {
-            [language.onlyIfOptions]: ['source'],
-            source: relations.source.slot('mode', 'inline'),
-          }),
-        ])),
+          const source =
+            language.encapsulate(capsule, 'source', workingCapsule => {
+              const workingOptions = {
+                [language.onlyIfOptions]: ['source'],
+                source: relations.source.slot('mode', 'inline'),
+              };
+
+              if (html.isBlank(artworkBy) && data.label) {
+                workingCapsule += '.customLabel';
+                workingOptions.label = data.label;
+              }
+
+              return language.$(workingCapsule, workingOptions);
+            });
+
+          return [
+            artworkBy,
+            trackArtFromAlbum,
+            source,
+          ];
+        })())),
 };

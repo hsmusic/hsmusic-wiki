@@ -925,7 +925,11 @@ misc:
     artworkBy.customLabel.withYear: >-
       {LABEL} ({YEAR}) by {ARTISTS}
 
-    source: "Via {SOURCE}"
+    source: >-
+      Via {SOURCE}
+
+    source.customLabel: >-
+      {LABEL} via {SOURCE}
 
     trackArtFromAlbum: "Album cover for {ALBUM}"
 
