@@ -44,6 +44,7 @@ import {
 import {
   contentString,
   directory,
+  flag,
   reverseReferenceList,
   simpleString,
   soupyFind,
@@ -152,6 +153,8 @@ export class Artwork extends Thing {
         value: input.value(null),
       }),
     ],
+
+    attachAbove: flag(false),
 
     artistContribsFromThingProperty: simpleString(),
     artistContribsArtistProperty: simpleString(),
@@ -386,6 +389,8 @@ export class Artwork extends Thing {
         property: 'date',
         transform: parseDate,
       },
+
+      'Attach Above': {property: 'attachAbove'},
 
       'Artists': {
         property: 'artistContribs',
