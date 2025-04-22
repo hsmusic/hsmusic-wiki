@@ -103,6 +103,14 @@ export async function identifyDynamicWebRoutes({
         to: ['thumb.root'],
         statically: 'symlink',
       },
+
+      // {statically: 'copy'} is not workable for individual files
+      // at the moment, so this remains a symlink.
+      {
+        from: path.join(path.resolve(mediaPath), 'favicon.ico'),
+        to: ['shared.path', 'favicon.ico'],
+        statically: 'symlink',
+      },
     ]),
 
     () => {

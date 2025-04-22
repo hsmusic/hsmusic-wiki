@@ -1,14 +1,5 @@
+import {cp, mkdir, stat, symlink, writeFile, unlink} from 'node:fs/promises';
 import * as path from 'node:path';
-
-import {
-  copyFile,
-  cp,
-  mkdir,
-  stat,
-  symlink,
-  writeFile,
-  unlink,
-} from 'node:fs/promises';
 
 import {rimraf} from 'rimraf';
 
@@ -166,11 +157,6 @@ export async function go({
   });
 
   if (writeAll) {
-    await writeFavicon({
-      mediaPath,
-      outputPath,
-    });
-
     await writeSharedFilesAndPages({
       outputPath,
       randomLinkDataJSON: generateRandomLinkDataJSON({wikiData}),
@@ -593,30 +579,6 @@ async function writeWebRouteCopies({
   } else {
     throw new AggregateError(errors, `Errors copying internal files ("web routes")`);
   }
-}
-
-async function writeFavicon({
-  mediaPath,
-  outputPath,
-}) {
-  const faviconFile = 'favicon.ico';
-
-  try {
-    await stat(path.join(mediaPath, faviconFile));
-  } catch (error) {
-    return;
-  }
-
-  try {
-    await copyFile(
-      path.join(mediaPath, faviconFile),
-      path.join(outputPath, faviconFile));
-  } catch (error) {
-    logWarn`Failed to copy favicon! ${error.message}`;
-    return;
-  }
-
-  logInfo`Copied favicon to site root.`;
 }
 
 async function writeSharedFilesAndPages({
