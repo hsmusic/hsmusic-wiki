@@ -1540,10 +1540,14 @@ hr.cute,
     0 0 12px 12px #00000080;
 }
 
-#artwork-column .cover-artwork:not(:first-child) {
-  margin-top: 20px;
+#artwork-column .cover-artwork:not(:first-child),
+#artwork-column .cover-artwork-joiner {
   margin-left: 30px;
   margin-right: 5px;
+}
+
+.cover-artwork:where(#artwork-column .cover-artwork:not(:first-child)) {
+  margin-top: 20px;
 }
 
 #artwork-column .cover-artwork:last-child:not(:first-child) {
@@ -1626,6 +1630,28 @@ p.image-details.illustrator-details {
 
 p.image-details.origin-details {
   margin-bottom: 2px;
+}
+
+.cover-artwork-joiner {
+  /* This z-index must be greater than however an artwork
+   * is raised (within .isolate-tooltip-z-indexing) because
+   * a contained (tooltip) hoverable is hovered.
+   */
+  z-index: 3;
+}
+
+.cover-artwork-joiner::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 15px;
+  margin-left: auto;
+  margin-right: auto;
+  border-right: 1px dashed var(--primary-color);
+}
+
+.cover-artwork-joiner + .cover-artwork {
+  margin-top: 0 !important;
 }
 
 .album-art-info {

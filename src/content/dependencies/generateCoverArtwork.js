@@ -27,6 +27,9 @@ export default {
   }),
 
   data: (artwork) => ({
+    attachAbove:
+      artwork.attachAbove,
+
     color:
       artwork.thing.color ?? null,
 
@@ -76,7 +79,10 @@ export default {
       image.setSlot('dimensions', data.dimensions);
     }
 
-    return (
+    return html.tags([
+      data.attachAbove &&
+        html.tag('div', {class: 'cover-artwork-joiner'}),
+
       html.tag('div', {class: 'cover-artwork'},
         slots.mode === 'commentary' &&
           {class: 'commentary-art'},
@@ -116,6 +122,7 @@ export default {
               link: true,
               lazy: true,
             })
-          : html.blank())));
+          : html.blank())),
+    ]);
   },
 };
