@@ -1,4 +1,4 @@
-import {compareArrays, stitchArrays} from '#sugar';
+import {compareArrays, empty, stitchArrays} from '#sugar';
 
 function linkable(tag) {
   return !tag.isContentWarning;
@@ -32,7 +32,7 @@ export default {
     data.sameAsMainArtwork =
       !artwork.isMainArtwork &&
       query.mainArtworkLinkableArtTags &&
-      query.mainArtworkLinkableArtTags.length >= 3 &&
+      !empty(query.mainArtworkLinkableArtTags) &&
       compareArrays(
         query.mainArtworkLinkableArtTags,
         query.linkableArtTags);
@@ -68,7 +68,7 @@ export default {
 
         (data.sameAsMainArtwork && data.attachAbove
           ? html.blank()
-       : data.sameAsMainArtwork
+       : data.sameAsMainArtwork && relations.artTagLinks.length >= 3
           ? language.$(capsule, 'sameTagsAsMainArtwork')
           : stitchArrays({
               artTagLink: relations.artTagLinks,
