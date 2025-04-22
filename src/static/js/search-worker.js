@@ -601,12 +601,12 @@ function queryVerbatimIndex(index, query, options) {
 
 function processTerms(query) {
   const kindTermSpec = [
-    {kind: 'album', terms: ['album']},
-    {kind: 'artist', terms: ['artist']},
-    {kind: 'flash', terms: ['flash']},
-    {kind: 'group', terms: ['group']},
-    {kind: 'tag', terms: ['art tag', 'tag']},
-    {kind: 'track', terms: ['track']},
+    {kind: 'album', terms: ['album', 'albums']},
+    {kind: 'artist', terms: ['artist', 'artists']},
+    {kind: 'flash', terms: ['flash', 'flashes']},
+    {kind: 'group', terms: ['group', 'groups']},
+    {kind: 'tag', terms: ['art tag', 'art tags', 'tag', 'tags']},
+    {kind: 'track', terms: ['track', 'tracks']},
   ];
 
   const genericTerms = [];
