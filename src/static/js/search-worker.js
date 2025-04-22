@@ -371,15 +371,9 @@ function postActionResult(id, status, value) {
 }
 
 function performSearchAction({query, options}) {
-  const {generic, verbatim} = indexes;
-
   const {queriedKind} = processTerms(query);
-
-  const genericResults =
-    queryGenericIndex(generic, query, options);
-
-  const verbatimResults =
-    queryVerbatimIndex(verbatim, query, options);
+  const genericResults = queryGenericIndex(query, options);
+  const verbatimResults = queryVerbatimIndex(query, options);
 
   const verbatimIDs =
     new Set(verbatimResults?.map(result => result.id));
@@ -421,106 +415,31 @@ const interestingFieldCombinations = [
   ['primaryName'],
 ];
 
-function queryGenericIndex(index, query, options) {
-  const interestingFields =
-    unique(interestingFieldCombinations.flat());
-
-  const {genericTerms, queriedKind} =
-    processTerms(query);
-
-  if (empty(genericTerms)) return null;
-
-  const particles =
-    particulate(genericTerms);
-
-  const groupedParticles =
-    groupArray(particles, ({length}) => length);
-
-  const queriesBy = keys =>
-    (groupedParticles.get(keys.length) ?? [])
-      .flatMap(permutations)
-      .map(values => values.map(({terms}) => terms.join(' ')))
-      .map(values =>
-        stitchArrays({
-          field: keys,
-          query: values,
-        }));
-
-  const boilerplate = queryBoilerplate(index);
-
-  const particleResults =
-    Object.fromEntries(
-      interestingFields.map(field => [
-        field,
-        Object.fromEntries(
-          particles.flat()
-            .map(({terms}) => terms.join(' '))
-            .map(query => [
-              query,
-              new Set(
-                boilerplate
-                  .query(query, {
-                    ...options,
-                    field,
-                    limit: Infinity,
-                  })
-                  .fieldResults[field]),
-            ])),
-      ]));
-
-  let matchedResults = new Set();
-
-  for (const interestingFieldCombination of interestingFieldCombinations) {
-    for (const query of queriesBy(interestingFieldCombination)) {
-      const commonAcrossFields = new Set();
-
-      for (const [index, {field, query: fieldQuery}] of query.entries()) {
-        const firstFieldInQuery = (index === 0);
-        const tossResults = new Set(commonAcrossFields);
-
-        for (const result of particleResults[field][fieldQuery]) {
-          if (firstFieldInQuery) {
-            commonAcrossFields.add(result);
-          } else {
-            tossResults.delete(result);
-          }
-        }
-
-        for (const result of tossResults) {
-          commonAcrossFields.delete(result);
-        }
-      }
-
-      for (const result of commonAcrossFields) {
-        matchedResults.add(result);
-      }
-    }
-  }
-
-  matchedResults = Array.from(matchedResults);
-
-  const filteredResults =
-    (queriedKind
-      ? matchedResults.filter(id => id.split(':')[0] === queriedKind)
-      : matchedResults);
-
-  const constitutedResults =
-    boilerplate.constitute(filteredResults);
-
-  return constitutedResults;
+function queryGenericIndex(query, options) {
+  return queryIndex({
+    indexKey: 'generic',
+    termsKey: 'genericTerms',
+  }, query, options);
 }
 
-function queryVerbatimIndex(index, query, options) {
+function queryVerbatimIndex(query, options) {
+  return queryIndex({
+    indexKey: 'verbatim',
+    termsKey: 'verbatimTerms',
+  }, query, options);
+}
+
+function queryIndex({termsKey, indexKey}, query, options) {
   const interestingFields =
     unique(interestingFieldCombinations.flat());
 
-  const {verbatimTerms, queriedKind} =
+  const {[termsKey]: terms, queriedKind} =
     processTerms(query);
 
-  if (empty(verbatimTerms)) return null;
+  if (empty(terms)) return null;
 
   const particles =
-    particulate(verbatimTerms);
+    particulate(terms);
 
   const groupedParticles =
     groupArray(particles, ({length}) => length);
@@ -535,7 +454,7 @@ function queryVerbatimIndex(index, query, options) {
           query: values,
         }));
 
-  const boilerplate = queryBoilerplate(index);
+  const boilerplate = queryBoilerplate(indexes[indexKey]);
 
   const particleResults =
     Object.fromEntries(
