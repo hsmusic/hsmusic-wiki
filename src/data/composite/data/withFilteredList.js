@@ -2,9 +2,6 @@
 // corresponding items in a list. Items which correspond to a truthy value
 // are kept, and the rest are excluded from the output list.
 //
-// If the flip option is set, only items corresponding with a *falsy* value in
-// the filter are kept.
-//
 // TODO: There should be two outputs - one for the items included according to
 // the filter, and one for the items excluded.
 //
@@ -22,28 +19,19 @@ export default templateCompositeFrom({
   inputs: {
     list: input({type: 'array'}),
     filter: input({type: 'array'}),
-
-    flip: input({
-      type: 'boolean',
-      defaultValue: false,
-    }),
   },
 
   outputs: ['#filteredList'],
 
   steps: () => [
     {
-      dependencies: [input('list'), input('filter'), input('flip')],
+      dependencies: [input('list'), input('filter')],
       compute: (continuation, {
         [input('list')]: list,
         [input('filter')]: filter,
-        [input('flip')]: flip,
       }) => continuation({
         '#filteredList':
-          list.filter((_item, index) =>
-            (flip
-              ? !filter[index]
-              :  filter[index])),
+          list.filter((_item, index) => filter[index]),
       }),
     },
   ],
