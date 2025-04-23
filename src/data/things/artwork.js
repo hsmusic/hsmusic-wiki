@@ -358,37 +358,6 @@ export class Artwork extends Thing {
           list[0],
       },
     ],
-
-    siblingArtworks: [
-      withContainingArtworkList(),
-
-      exitWithoutDependency({
-        dependency: '#containingArtworkList',
-        value: input.value(null),
-      }),
-
-      withIndexInList({
-        list: '#containingArtworkList',
-        item: input.myself(),
-      }),
-
-      exitWithoutDependency({
-        dependency: '#index',
-        mode: input.value('index'),
-        value: input.value(null),
-      }),
-
-      {
-        dependencies: ['#containingArtworkList', '#index'],
-        compute: ({
-          ['#containingArtworkList']: list,
-          ['#index']: index,
-        }) => [
-          ...list.slice(0, index),
-          ...list.slice(index + 1),
-        ],
-      },
-    ],
   });
 
   static [Thing.yamlDocumentSpec] = {
