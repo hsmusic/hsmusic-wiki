@@ -114,10 +114,19 @@ export default {
               return language.$(workingCapsule, workingOptions);
             });
 
+          const label =
+            html.isBlank(artworkBy) &&
+            html.isBlank(source) &&
+            language.$(capsule, 'customLabelAlone', {
+              [language.onlyIfOptions]: ['label'],
+              label: data.label,
+            });
+
           return [
             artworkBy,
             trackArtFromAlbum,
             source,
+            label,
           ];
         })())),
 };

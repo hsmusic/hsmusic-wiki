@@ -931,6 +931,9 @@ misc:
     source.customLabel: >-
       {LABEL} via {SOURCE}
 
+    customLabelAlone: >-
+      {LABEL}
+
     trackArtFromAlbum: "Album cover for {ALBUM}"
 
     sameTagsAsMainArtwork: "Same tags as main artwork"
