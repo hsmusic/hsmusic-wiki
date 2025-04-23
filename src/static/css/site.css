@@ -161,10 +161,9 @@ body::before, .wallpaper-part {
 }
 
 .sidebar-column {
-  flex: 1 1 20%;
+  flex: 1 1 35%;
   min-width: 150px;
   max-width: 250px;
-  flex-basis: 250px;
   align-self: flex-start;
 }
 
@@ -1676,7 +1675,7 @@ p.content-heading:has(+ .commentary-entry-heading.dated) {
   margin-left: 15px;
   padding-left: calc(5px + 1.25ch);
   text-indent: -1.25ch;
-  max-width: 625px;
+  margin-right: min(calc(8vw - 35px), 45px);
   padding-bottom: 0.2em;
 
   border-bottom: 1px solid var(--dim-color);
@@ -1732,7 +1731,6 @@ p.content-heading:has(+ .commentary-entry-heading.dated) {
 
 .lyrics-entry {
   padding-left: 40px;
-  max-width: 600px;
 }
 
 .js-hide,
@@ -1952,7 +1950,6 @@ ul.quick-info li:not(:last-child)::after {
 
 li .by {
   font-style: oblique;
-  max-width: 600px;
 }
 
 li .by a {
@@ -1968,8 +1965,8 @@ p code {
 
 #content blockquote {
   margin-left: 40px;
-  max-width: 600px;
-  margin-right: 0;
+  margin-right: min(8vw, 75px);
+  width: auto;
 }
 
 #content blockquote blockquote {
@@ -2016,7 +2013,6 @@ main.long-content > h1 {
 
 dl dt {
   padding-left: 40px;
-  max-width: 600px;
 }
 
 dl dt {
@@ -3545,7 +3541,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 
 /* Layout - Wide (most computers) */
 
-@media (min-width: 900px) {
+@media (min-width: 850px) {
   #page-container.showing-sidebar-left:not(.sidebars-in-content-column) #secondary-nav:not(.always-visible),
   #page-container.showing-sidebar-right:not(.sidebars-in-content-column) #secondary-nav:not(.always-visible) {
     display: none;
@@ -3559,7 +3555,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
  * if so desired.
  */
 
-@media (min-width: 600px) and (max-width: 899.98px) {
+@media (min-width: 600px) and (max-width: 849.98px) {
   /* Medium layout is mainly defined (to the user) by hiding the sidebar, so
    * don't apply the similar layout change of widening the long-content area
    * if this page doesn't have a sidebar to hide in the first place.
@@ -3590,7 +3586,8 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   #artwork-column {
     float: right;
     width: 40%;
-    max-width: 400px;
+    min-width: 220px;
+    max-width: 280px;
     margin: -60px 0 10px 20px;
 
     position: relative;
@@ -3619,7 +3616,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 
 /* Layout - Medium or Thin */
 
-@media (max-width: 899.98px) {
+@media (max-width: 849.98px) {
   .sidebar.collapsible,
   .sidebar-box-joiner.collapsible,
   .sidebar-column.all-boxes-collapsible {
