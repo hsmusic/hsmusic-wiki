@@ -14,8 +14,8 @@ export default {
     artworkThingType:
       artwork.thing.constructor[Thing.referenceType],
 
-    mainArtworkArtistContribs:
-      (!artwork.isMainArtwork && artwork.mainArtwork
+    attachedArtistContribs:
+      (!artwork.isMainArtwork && artwork.mainArtwork && artwork.attachAbove
         ? artwork.mainArtwork.artistContribs
         : null)
   }),
@@ -24,7 +24,7 @@ export default {
     credit:
       relation('generateArtistCredit',
         artwork.artistContribs,
-        query.mainArtworkArtistContribs ?? []),
+        query.attachedArtistContribs ?? []),
 
     source:
       relation('transformContent', artwork.source),
