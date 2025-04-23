@@ -2052,6 +2052,15 @@ ul > li.has-details {
   margin-left: 0;
 }
 
+.album-group-list li {
+  padding-left: 1.5ch;
+  text-indent: -1.5ch;
+}
+
+.album-group-list li > * {
+  text-indent: 0;
+}
+
 .album-group-list blockquote {
   max-width: 540px;
   margin-bottom: 9px;
