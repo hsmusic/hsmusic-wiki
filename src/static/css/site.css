@@ -1673,21 +1673,13 @@ p.content-heading:has(+ .commentary-entry-heading.dated) {
 }
 
 .commentary-entry-heading {
-  display: flex;
-  flex-direction: row;
-
   margin-left: 15px;
-  padding-left: 5px;
+  padding-left: calc(5px + 1.25ch);
+  text-indent: -1.25ch;
   max-width: 625px;
   padding-bottom: 0.2em;
 
   border-bottom: 1px solid var(--dim-color);
-}
-
-.commentary-entry-heading-text {
-  flex-grow: 1;
-  padding-left: 1.25ch;
-  text-indent: -1.25ch;
 }
 
 .commentary-entry-accent {
@@ -1695,13 +1687,12 @@ p.content-heading:has(+ .commentary-entry-heading.dated) {
 }
 
 .commentary-entry-heading .commentary-date {
-  flex-shrink: 0;
+  display: inline-block;
+  text-indent: 0;
+}
 
-  margin-left: 0.75ch;
-  align-self: flex-end;
-
-  padding-left: 0.5ch;
-  padding-right: 0.25ch;
+.commentary-entry-heading.dated .commentary-entry-heading-text {
+  margin-right: 0.75ch;
 }
 
 .commentary-entry-heading .hoverable {
