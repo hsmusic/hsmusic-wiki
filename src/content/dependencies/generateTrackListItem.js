@@ -97,7 +97,8 @@ export default {
             workingCapsule += '.withArtists';
             workingOptions.by =
               html.tag('span', {class: 'by'},
-                html.metatag('chunkwrap', {split: ','},
+                // TODO: This is obviously evil.
+                html.metatag('chunkwrap', {split: /,| (?=and)/},
                   html.resolve(relations.credit)));
           }
 

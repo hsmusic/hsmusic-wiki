@@ -512,6 +512,10 @@ export class Tag {
     }
   }
 
+  #getAttributeRaw(attribute) {
+    return this.attributes.get(attribute);
+  }
+
   set onlyIfContent(value) {
     this.#setAttributeFlag(onlyIfContent, value);
   }
@@ -662,7 +666,7 @@ export class Tag {
 
     const chunkwrapSplitter =
       (this.chunkwrap
-        ? this.#getAttributeString('split')
+        ? this.#getAttributeRaw('split')
         : null);
 
     let seenChunkwrapSplitter =
@@ -727,7 +731,7 @@ export class Tag {
 
       const chunkwrapChunks =
         (typeof nonTemplateItem === 'string' && chunkwrapSplitter
-          ? itemContent.split(chunkwrapSplitter)
+          ? Array.from(getChunkwrapChunks(itemContent, chunkwrapSplitter))
           : null);
 
       const itemIncludesChunkwrapSplit =
@@ -773,7 +777,7 @@ export class Tag {
 
       appendItemContent: {
         if (itemIncludesChunkwrapSplit) {
-          for (const [index, chunk] of chunkwrapChunks.entries()) {
+          for (const [index, {chunk, following}] of chunkwrapChunks.entries()) {
             if (index === 0) {
               // The first chunk isn't actually a chunk all on its own, it's
               // text that should be appended to the previous chunk. We will
@@ -781,12 +785,27 @@ export class Tag {
               // the next chunk.
               content += chunk;
             } else {
-              const whitespace = chunk.match(/^\s+/) ?? '';
-              content += chunkwrapSplitter;
+              const followingWhitespace = following.match(/\s+$/) ?? '';
+              const chunkWhitespace = chunk.match(/^\s+/) ?? '';
+
+              if (followingWhitespace) {
+                content += following.slice(0, -followingWhitespace.length);
+              } else {
+                content += following;
+              }
+
               content += '</span>';
-              content += whitespace;
+
+              content += followingWhitespace;
+              content += chunkWhitespace;
+
               content += '<span class="chunkwrap">';
-              content += chunk.slice(whitespace.length);
+
+              if (chunkWhitespace) {
+                content += chunk.slice(chunkWhitespace.length);
+              } else {
+                content += chunk;
+              }
             }
           }
 
@@ -1006,6 +1025,49 @@ export class Tag {
     }
 
     return lines.join('\n');
+  }
+}
+
+export function* getChunkwrapChunks(content, splitter) {
+  const splitString =
+    (typeof splitter === 'string'
+      ? splitter
+      : null);
+
+  if (splitString) {
+    let following = '';
+    for (const chunk of content.split(splitString)) {
+      yield {chunk, following};
+      following = splitString;
+    }
+
+    return;
+  }
+
+  const splitRegExp =
+    (splitter instanceof RegExp
+      ? new RegExp(
+          splitter.source,
+          (splitter.flags.includes('g')
+            ? splitter.flags
+            : splitter.flags + 'g'))
+      : null);
+
+  if (splitRegExp) {
+    let following = '';
+    let prevIndex = 0;
+    for (const match of content.matchAll(splitRegExp)) {
+      const chunk = content.slice(prevIndex, match.index);
+      yield {chunk, following};
+
+      following = match[0];
+      prevIndex = match.index + match[0].length;
+    }
+
+    const chunk = content.slice(prevIndex);
+    yield {chunk, following};
+
+    return;
   }
 }
 
@@ -1254,6 +1316,9 @@ export class Attributes {
           return value.some(Boolean);
         } else if (value === null) {
           return false;
+        } else if (value instanceof RegExp) {
+          // Oooooooo.
+          return true;
         } else {
           // Other objects are an error.
           break;
@@ -1285,13 +1350,16 @@ export class Attributes {
       case 'number':
         return value.toString();
 
-      // If it's a kept object, it's an array.
       case 'object': {
-        const joiner =
-          (descriptor?.arraylike && descriptor?.join)
-            ?? ' ';
+        if (Array.isArray(value)) {
+          const joiner =
+            (descriptor?.arraylike && descriptor?.join)
+              ?? ' ';
 
-        return value.filter(Boolean).join(joiner);
+          return value.filter(Boolean).join(joiner);
+        } else {
+          return value;
+        }
       }
 
       default:
@@ -1963,6 +2031,8 @@ export const isAttributeValue =
   anyOf(
     isString, isNumber, isBoolean, isArray,
     isTag, isTemplate,
+    // Evil. Ooooo
+    validateInstanceOf(RegExp),
     validateArrayItems(item => isAttributeValue(item)));
 
 export const isAttributesAdditionPair = pair => {
