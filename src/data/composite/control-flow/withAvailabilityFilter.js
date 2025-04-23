@@ -4,6 +4,7 @@
 // Accepts the same mode options as withResultOfAvailabilityCheck.
 //
 // See also:
+//  - flipFilter
 //  - withFilteredList
 //  - withResultOfAvailabilityCheck
 //

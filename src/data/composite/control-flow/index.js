@@ -10,6 +10,7 @@ export {default as exposeDependency} from './exposeDependency.js';
 export {default as exposeDependencyOrContinue} from './exposeDependencyOrContinue.js';
 export {default as exposeUpdateValueOrContinue} from './exposeUpdateValueOrContinue.js';
 export {default as exposeWhetherDependencyAvailable} from './exposeWhetherDependencyAvailable.js';
+export {default as flipFilter} from './flipFilter.js';
 export {default as raiseOutputWithoutDependency} from './raiseOutputWithoutDependency.js';
 export {default as raiseOutputWithoutUpdateValue} from './raiseOutputWithoutUpdateValue.js';
 export {default as withAvailabilityFilter} from './withAvailabilityFilter.js';
