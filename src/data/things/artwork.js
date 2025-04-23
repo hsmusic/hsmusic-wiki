@@ -54,6 +54,7 @@ import {
 } from '#composite/wiki-properties';
 
 import {
+  withAttachedArtwork,
   withContainingArtworkList,
   withContribsFromAttachedArtwork,
   withPropertyFromAttachedArtwork,
@@ -358,6 +359,18 @@ export class Artwork extends Thing {
           list[0],
       },
     ],
+
+    attachedArtwork: [
+      withAttachedArtwork(),
+
+      exposeDependency({
+        dependency: '#attachedArtwork',
+      }),
+    ],
+
+    attachingArtworks: reverseReferenceList({
+      reverse: soupyReverse.input('artworksWhichAttach'),
+    }),
   });
 
   static [Thing.yamlDocumentSpec] = {
@@ -414,6 +427,18 @@ export class Artwork extends Thing {
       }),
 
       date: ({artwork}) => artwork.date,
+    },
+
+    artworksWhichAttach: {
+      bindTo: 'artworkData',
+
+      referencing: referencingArtwork =>
+        (referencingArtwork.attachAbove
+          ? [referencingArtwork]
+          : []),
+
+      referenced: referencingArtwork =>
+        [referencingArtwork.attachedArtwork],
     },
 
     artworksWhichFeature: {
