@@ -15,8 +15,8 @@ export default {
       artwork.thing.constructor[Thing.referenceType],
 
     attachedArtistContribs:
-      (!artwork.isMainArtwork && artwork.mainArtwork && artwork.attachAbove
-        ? artwork.mainArtwork.artistContribs
+      (artwork.attachedArtwork
+        ? artwork.attachedArtwork.artistContribs
         : null)
   }),
 
