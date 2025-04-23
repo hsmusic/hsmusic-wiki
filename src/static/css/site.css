@@ -1632,6 +1632,10 @@ p.image-details.origin-details {
   margin-bottom: 2px;
 }
 
+.cover-artwork-joiner {
+  z-index: -2;
+}
+
 .cover-artwork-joiner::after {
   content: "";
   display: block;
