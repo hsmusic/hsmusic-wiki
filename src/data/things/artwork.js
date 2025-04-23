@@ -55,8 +55,8 @@ import {
 
 import {
   withContainingArtworkList,
-  withContribsFromMainArtwork,
-  withPropertyFromMainArtwork,
+  withContribsFromAttachedArtwork,
+  withPropertyFromAttachedArtwork,
   withDate,
 } from '#composite/things/artwork';
 
@@ -178,10 +178,10 @@ export class Artwork extends Thing {
         mode: input.value('empty'),
       }),
 
-      withContribsFromMainArtwork(),
+      withContribsFromAttachedArtwork(),
 
       exposeDependencyOrContinue({
-        dependency: '#mainArtwork.artistContribs',
+        dependency: '#attachedArtwork.artistContribs',
       }),
 
       exitWithoutDependency({
@@ -222,13 +222,12 @@ export class Artwork extends Thing {
         mode: input.value('empty'),
       }),
 
-      withPropertyFromMainArtwork({
+      withPropertyFromAttachedArtwork({
         property: input.value('artTags'),
-        onlyIfAttached: input.value(true),
       }),
 
       exposeDependencyOrContinue({
-        dependency: '#mainArtwork.artTags',
+        dependency: '#attachedArtwork.artTags',
       }),
 
       exitWithoutDependency({

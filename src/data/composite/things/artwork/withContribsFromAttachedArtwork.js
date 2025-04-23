@@ -4,26 +4,25 @@ import {raiseOutputWithoutDependency} from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
 import {withRecontextualizedContributionList} from '#composite/wiki-data';
 
-import withPropertyFromMainArtwork from './withPropertyFromMainArtwork.js';
+import withPropertyFromAttachedArtwork from './withPropertyFromAttachedArtwork.js';
 
 export default templateCompositeFrom({
-  annotaion: `withContribsFromMainArtwork`,
+  annotaion: `withContribsFromAttachedArtwork`,
 
-  outputs: ['#mainArtwork.artistContribs'],
+  outputs: ['#attachedArtwork.artistContribs'],
 
   steps: () => [
-    withPropertyFromMainArtwork({
+    withPropertyFromAttachedArtwork({
       property: input.value('artistContribs'),
-      onlyIfAttached: input.value(true),
     }),
 
     raiseOutputWithoutDependency({
-      dependency: '#mainArtwork.artistContribs',
-      output: input.value({'#mainArtwork.artistContribs': null}),
+      dependency: '#attachedArtwork.artistContribs',
+      output: input.value({'#attachedArtwork.artistContribs': null}),
     }),
 
     withRecontextualizedContributionList({
-      list: '#mainArtwork.artistContribs',
+      list: '#attachedArtwork.artistContribs',
     }),
   ],
 });
