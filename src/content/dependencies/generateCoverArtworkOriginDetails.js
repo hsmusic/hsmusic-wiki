@@ -58,6 +58,11 @@ export default {
         {class: 'origin-details'},
 
         (() => {
+          relations.datetimestamp?.setSlots({
+            style: 'year',
+            tooltip: true,
+          });
+
           const artworkBy =
             language.encapsulate(capsule, 'artworkBy', workingCapsule => {
               const workingOptions = {};
@@ -69,11 +74,7 @@ export default {
 
               if (relations.datetimestamp) {
                 workingCapsule += '.withYear';
-                workingOptions.year =
-                  relations.datetimestamp.slots({
-                    style: 'year',
-                    tooltip: true,
-                  });
+                workingOptions.year = relations.datetimestamp;
               }
 
               return relations.credit.slots({
@@ -111,15 +112,38 @@ export default {
                 workingOptions.label = data.label;
               }
 
+              if (html.isBlank(artworkBy) && relations.datetimestamp) {
+                workingCapsule += '.withYear';
+                workingOptions.year = relations.datetimestamp;
+              }
+
               return language.$(workingCapsule, workingOptions);
             });
 
           const label =
             html.isBlank(artworkBy) &&
             html.isBlank(source) &&
-            language.$(capsule, 'customLabelAlone', {
-              [language.onlyIfOptions]: ['label'],
-              label: data.label,
+            language.encapsulate(capsule, 'customLabel', workingCapsule => {
+              const workingOptions = {
+                [language.onlyIfOptions]: ['label'],
+                label: data.label,
+              };
+
+              if (relations.datetimestamp) {
+                workingCapsule += '.withYear';
+                workingOptions.year = relations.datetimestamp;
+              }
+
+              return language.$(workingCapsule, workingOptions);
+            });
+
+          const year =
+            html.isBlank(artworkBy) &&
+            html.isBlank(source) &&
+            html.isBlank(label) &&
+            language.$(capsule, 'year', {
+              [language.onlyIfOptions]: ['year'],
+              year: relations.datetimestamp,
             });
 
           return [
@@ -127,6 +151,7 @@ export default {
             trackArtFromAlbum,
             source,
             label,
+            year,
           ];
         })())),
 };

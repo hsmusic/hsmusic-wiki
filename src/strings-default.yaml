@@ -931,8 +931,20 @@ misc:
     source.customLabel: >-
       {LABEL} via {SOURCE}
 
-    customLabelAlone: >-
+    source.withYear: >-
+      Via {SOURCE} ({YEAR})
+
+    source.customLabel.withYear: >-
+      {LABEL} ({YEAR}) via {SOURCE}
+
+    customLabel: >-
       {LABEL}
+
+    customLabel.withYear: >-
+      {LABEL} ({YEAR})
+
+    year: >-
+      Released {YEAR}
 
     trackArtFromAlbum: "Album cover for {ALBUM}"
 
