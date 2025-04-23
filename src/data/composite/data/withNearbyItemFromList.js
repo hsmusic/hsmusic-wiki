@@ -9,6 +9,10 @@
 //  - If the 'valuePastEdge' input is provided, that value will be output
 //    instead of null.
 //
+//  - If the 'filter' input is provided, corresponding items will be skipped,
+//    and only (repeating `offset`) the next included in the filter will be
+//    returned.
+//
 // Both the list and item must be provided.
 //
 // See also:
@@ -16,7 +20,6 @@
 //
 
 import {input, templateCompositeFrom} from '#composite';
-import {atOffset} from '#sugar';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 
@@ -28,9 +31,12 @@ export default templateCompositeFrom({
   inputs: {
     list: input({acceptsNull: false, type: 'array'}),
     item: input({acceptsNull: false}),
-
     offset: input({type: 'number'}),
+
     wrap: input({type: 'boolean', defaultValue: false}),
+    valuePastEdge: input({defaultValue: null}),
+
+    filter: input({defaultValue: null, type: 'array'}),
   },
 
   outputs: ['#nearbyItem'],
@@ -45,29 +51,55 @@ export default templateCompositeFrom({
       dependency: '#index',
       mode: input.value('index'),
 
-      output: input.value({
-        ['#nearbyItem']:
-          null,
-      }),
+      output: input.value({'#nearbyItem': null}),
     }),
 
     {
       dependencies: [
         input('list'),
         input('offset'),
+
         input('wrap'),
+        input('valuePastEdge'),
+
+        input('filter'),
+
         '#index',
       ],
 
       compute: (continuation, {
         [input('list')]: list,
         [input('offset')]: offset,
+
         [input('wrap')]: wrap,
+        [input('valuePastEdge')]: valuePastEdge,
+
+        [input('filter')]: filter,
+
         ['#index']: index,
-      }) => continuation({
-        ['#nearbyItem']:
-          atOffset(list, index, offset, {wrap}),
-      }),
+      }) => {
+        const startIndex = index;
+
+        do {
+          index += offset;
+
+          if (wrap) {
+            index = index % list.length;
+          } else if (index < 0) {
+            return continuation({'#nearbyItem': valuePastEdge});
+          } else if (index >= list.length) {
+            return continuation({'#nearbyItem': valuePastEdge});
+          }
+
+          if (filter && !filter[index]) {
+            continue;
+          }
+
+          return continuation({'#nearbyItem': list[index]});
+        } while (index !== startIndex);
+
+        return continuation({'#nearbyItem': null});
+      },
     },
   ],
 });
