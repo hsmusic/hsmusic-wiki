@@ -262,16 +262,24 @@ export default {
         ? data.canonicalBase + pagePathStringFromRoot
         : null);
 
-    const firstItemInArtworkColumn =
-      html.smooth(slots.artworkColumnContent)
-        .content[0];
+    const primaryCover = (() => {
+      const apparentFirst = tag => html.smooth(tag).content[0];
 
-    const primaryCover =
-      (firstItemInArtworkColumn &&
-       html.resolve(firstItemInArtworkColumn, {normalize: 'tag'})
-         .attributes.has('class', 'cover-artwork')
-        ? firstItemInArtworkColumn
-        : null);
+      const maybeTemplate =
+        apparentFirst(slots.artworkColumnContent);
+
+      const maybeTemplateContent =
+        html.resolve(maybeTemplate, {normalize: 'tag'});
+
+      const maybeCoverArtwork =
+        apparentFirst(maybeTemplateContent);
+
+      if (maybeCoverArtwork.attributes.has('class', 'cover-artwork')) {
+        return maybeTemplate;
+      } else {
+        return null;
+      }
+    })();
 
     const titleContentsHTML =
       (html.isBlank(slots.title)
