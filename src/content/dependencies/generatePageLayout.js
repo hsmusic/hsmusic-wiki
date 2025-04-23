@@ -268,11 +268,15 @@ export default {
       const maybeTemplate =
         apparentFirst(slots.artworkColumnContent);
 
+      if (!maybeTemplate) return null;
+
       const maybeTemplateContent =
         html.resolve(maybeTemplate, {normalize: 'tag'});
 
       const maybeCoverArtwork =
         apparentFirst(maybeTemplateContent);
+
+      if (!maybeCoverArtwork) return null;
 
       if (maybeCoverArtwork.attributes.has('class', 'cover-artwork')) {
         return maybeTemplate;
