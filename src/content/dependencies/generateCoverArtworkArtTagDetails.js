@@ -37,10 +37,6 @@ export default {
         query.mainArtworkLinkableArtTags,
         query.linkableArtTags);
 
-    if (data.sameAsMainArtwork) {
-      return data;
-    }
-
     const seenShortNames = new Set();
     const duplicateShortNames = new Set();
 
