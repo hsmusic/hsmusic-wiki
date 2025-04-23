@@ -1,4 +1,4 @@
-import {readdir} from 'node:fs/promises';
+import {readdir, stat} from 'node:fs/promises';
 import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
@@ -103,15 +103,22 @@ export async function identifyDynamicWebRoutes({
         to: ['thumb.root'],
         statically: 'symlink',
       },
-
-      // {statically: 'copy'} is not workable for individual files
-      // at the moment, so this remains a symlink.
-      {
-        from: path.join(path.resolve(mediaPath), 'favicon.ico'),
-        to: ['shared.path', 'favicon.ico'],
-        statically: 'symlink',
-      },
     ]),
+
+    () => {
+      const from =
+        path.resolve(path.join(mediaPath, 'favicon.ico'));
+
+      return stat(from).then(
+        // {statically: 'copy'} is not workable for individual files
+        // at the moment, so this remains a symlink.
+        () => [{
+          from,
+          to: ['shared.path', 'favicon.ico'],
+          statically: 'symlink',
+        }],
+        () => []);
+    },
 
     () => {
       if (!wikiCachePath) return [];
