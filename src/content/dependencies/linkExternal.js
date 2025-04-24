@@ -39,6 +39,11 @@ export default {
       default: false,
     },
 
+    disableBrowserTooltip: {
+      type: 'boolean',
+      default: false,
+    },
+
     tab: {
       validate: v => v.is('default', 'separate'),
       default: 'default',
@@ -111,7 +116,9 @@ export default {
       linkAttributes.add('class', 'indicate-external');
 
       let titleText;
-      if (slots.tab === 'separate') {
+      if (slots.disableBrowserTooltip) {
+        titleText = null;
+      } else if (slots.tab === 'separate') {
         if (html.isBlank(slots.content)) {
           titleText =
             language.$('misc.external.opensInNewTab.annotation');
