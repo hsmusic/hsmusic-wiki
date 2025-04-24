@@ -1667,10 +1667,6 @@ p.image-details.origin-details {
   margin: 0;
 }
 
-p.content-heading:has(+ .commentary-entry-heading.dated) {
-  clear: right;
-}
-
 .commentary-entry-heading {
   margin-left: 15px;
   padding-left: calc(5px + 1.25ch);
