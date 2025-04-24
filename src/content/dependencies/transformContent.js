@@ -46,6 +46,14 @@ function getPlaceholder(node, content) {
   return {type: 'text', data: content.slice(node.i, node.iEnd)};
 }
 
+function getArg(node, argKey) {
+  return (
+    node.data.args
+      ?.find(({key}) => key.data === argKey)
+      ?.value ??
+    null);
+}
+
 export default {
   contentDependencies: [
     ...(
@@ -53,6 +61,8 @@ export default {
         .map(description => description.link)
         .filter(Boolean)),
     'image',
+    'generateTextWithTooltip',
+    'generateTooltip',
     'linkExternal',
   ],
 
@@ -134,6 +144,30 @@ export default {
             return {i: node.i, iEnd: node.iEnd, type: 'internal-link', data};
           }
 
+          if (replacerKey === 'tooltip') {
+            // TODO: Again, no recursive nodes. Sorry!
+            // const enteredLabel = node.data.label && transformNode(node.data.label, opts);
+            const enteredLabel = node.data.label?.data;
+
+            return {
+              i: node.i,
+              iEnd: node.iEnd,
+              type: 'tooltip',
+              data: {
+                tooltip:
+                  replacerValue ?? '(empty tooltip...)',
+
+                label:
+                  enteredLabel ?? '(tooltip without label)',
+
+                link:
+                  (getArg(node, 'link')
+                    ? getArg(node, 'link')[0].data
+                    : null),
+              },
+            };
+          }
+
           // This will be another {type: 'tag'} node which gets processed in
           // generate. Extract replacerKey and replacerValue now, since it'd
           // be a pain to deal with later.
@@ -191,6 +225,12 @@ export default {
           : getPlaceholder(node, content));
 
     return {
+      textWithTooltip:
+        relation('generateTextWithTooltip'),
+
+      tooltip:
+        relation('generateTooltip'),
+
       internalLinks:
         nodes
           .filter(({type}) => type === 'internal-link')
@@ -209,11 +249,15 @@ export default {
       externalLinks:
         nodes
           .filter(({type}) => type === 'external-link')
-          .map(node => {
-            const {href} = node.data;
+          .map(({data: {href}}) =>
+            relation('linkExternal', href)),
 
-            return relation('linkExternal', href);
-          }),
+      externalLinksForTooltipNodes:
+        nodes
+          .filter(({type}) => type === 'tooltip')
+          .filter(({data}) => data.link)
+          .map(({data: {link: href}}) =>
+            relation('linkExternal', href)),
 
       images:
         nodes
@@ -259,6 +303,7 @@ export default {
     let imageIndex = 0;
     let internalLinkIndex = 0;
     let externalLinkIndex = 0;
+    let externalLinkForTooltipNodeIndex = 0;
 
     let offsetTextNode = 0;
 
@@ -546,6 +591,52 @@ export default {
             }
 
             return {type: 'processed-external-link', data: externalLink};
+          }
+
+          case 'tooltip': {
+            const {label, link, tooltip: tooltipContent} = node.data;
+
+            const externalLink =
+              (link
+                ? relations.externalLinksForTooltipNodes
+                    .at(externalLinkForTooltipNodeIndex++)
+                : null);
+
+            if (externalLink) {
+              externalLink.setSlots({
+                content: label,
+                fromContent: true,
+              });
+
+              if (slots.indicateExternalLinks) {
+                externalLink.setSlots({
+                  indicateExternal: true,
+                  disableBrowserTooltip: true,
+                  tab: 'separate',
+                  style: 'platform',
+                });
+              }
+            }
+
+            const textWithTooltip = relations.textWithTooltip.clone();
+            const tooltip = relations.tooltip.clone();
+
+            tooltip.setSlots({
+              attributes: {class: 'content-tooltip'},
+              content: tooltipContent, // Not sanitized!
+            });
+
+            textWithTooltip.setSlots({
+              attributes: [
+                {class: 'content-tooltip-guy'},
+                externalLink && {class: 'has-link'},
+              ],
+
+              text: externalLink ?? label,
+              tooltip,
+            });
+
+            return {type: 'processed-tooltip', data: textWithTooltip};
           }
 
           case 'tag': {

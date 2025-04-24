@@ -174,6 +174,11 @@ export const replacerSpec = {
     find: 'trackWithArtwork',
     link: 'linkTrackReferencingArtworks',
   },
+
+  'tooltip': {
+    value: (ref) => ref,
+    link: null,
+  }
 };
 
 // Syntax literals.

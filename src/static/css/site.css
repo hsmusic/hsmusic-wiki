@@ -1246,7 +1246,8 @@ li:not(:first-child:last-child) .tooltip:where(:not(.cover-artwork .tooltip)),
 .missing-duration-tooltip,
 .commentary-date-tooltip,
 .rerelease-tooltip,
-.first-release-tooltip {
+.first-release-tooltip,
+.content-tooltip {
   padding: 3px 4px 2px 2px;
   left: -10px;
 }
@@ -1428,6 +1429,30 @@ li:not(:first-child:last-child) .tooltip:where(:not(.cover-artwork .tooltip)),
   font-size: 0.9em;
 }
 
+.content-tooltip-guy .hoverable a {
+  text-decoration-color: transparent;
+  text-decoration-style: dotted;
+}
+
+.content-tooltip-guy {
+  display: inline-block;
+}
+
+.content-tooltip-guy.has-link .text-with-tooltip-interaction-cue {
+  text-decoration-color: var(--primary-color);
+}
+
+.content-tooltip .tooltip-content {
+  padding: 3px 4.5px;
+  width: 240px;
+}
+
+.cover-artwork .content-tooltip {
+  font-size: 0.85rem;
+  padding: 2px 3px;
+  width: 220px;
+}
+
 .external-icon {
   display: inline-block;
   padding: 0 3px;
@@ -1476,6 +1501,22 @@ s.spoiler::selection {
 s.spoiler::-moz-selection {
   color: black;
   background: white;
+}
+
+span.path {
+  font-size: 0.9em;
+  font-family: "courier new", monospace;
+  font-weight: 800;
+}
+
+span.path i {
+  display: inline-block;
+  font-style: normal;
+}
+
+span.path i::before {
+  content: "\0020/\0020";
+  color: #ccc;
 }
 
 progress {
