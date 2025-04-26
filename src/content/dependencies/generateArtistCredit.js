@@ -36,11 +36,18 @@ export default {
     // Note that the normal contributions will implicitly *always*
     // "differ from context" if no context contributions are given,
     // as in release info lines.
-    query.normalContributionsDifferFromContext =
+
+    query.normalContributionArtistsDifferFromContext =
       !compareArrays(
         query.normalContributions.map(({artist}) => artist),
         contextNormalContributions.map(({artist}) => artist),
-        {checkOrder: false});
+        {checkOrder: true});
+
+    query.normalContributionAnnotationsDifferFromContext =
+      !compareArrays(
+        query.normalContributions.map(({annotation}) => annotation),
+        contextNormalContributions.map(({annotation}) => annotation),
+        {checkOrder: true});
 
     return query;
   },
@@ -60,8 +67,11 @@ export default {
   }),
 
   data: (query, _creditContributions, _contextContributions) => ({
-    normalContributionsDifferFromContext:
-      query.normalContributionsDifferFromContext,
+    normalContributionArtistsDifferFromContext:
+      query.normalContributionArtistsDifferFromContext,
+
+    normalContributionAnnotationsDifferFromContext:
+      query.normalContributionAnnotationsDifferFromContext,
 
     hasWikiEdits:
       !empty(query.wikiEditContributions),
@@ -148,8 +158,12 @@ export default {
         ...relations.featuringContributionLinks,
       ]);
 
+    const effectivelyDiffers =
+      (slots.showAnnotation && data.normalContributionAnnotationsDifferFromContext) ||
+      (data.normalContributionArtistsDifferFromContext);
+
     if (empty(relations.featuringContributionLinks)) {
-      if (data.normalContributionsDifferFromContext) {
+      if (effectivelyDiffers) {
         return language.$(slots.normalStringKey, {
           ...slots.additionalStringOptions,
           artists: artistsList,
@@ -159,7 +173,7 @@ export default {
       }
     }
 
-    if (data.normalContributionsDifferFromContext && slots.normalFeaturingStringKey) {
+    if (effectivelyDiffers && slots.normalFeaturingStringKey) {
       return language.$(slots.normalFeaturingStringKey, {
         ...slots.additionalStringOptions,
         artists: artistsList,
