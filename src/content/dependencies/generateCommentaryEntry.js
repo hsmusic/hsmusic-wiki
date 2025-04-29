@@ -12,14 +12,14 @@ export default {
 
   relations: (relation, entry) => ({
     artistLinks:
-      (!empty(entry.artists) && !entry.artistDisplayText
+      (!empty(entry.artists) && !entry.artistText
         ? entry.artists
             .map(artist => relation('linkArtist', artist))
         : null),
 
     artistsContent:
-      (entry.artistDisplayText
-        ? relation('transformContent', entry.artistDisplayText)
+      (entry.artistText
+        ? relation('transformContent', entry.artistText)
         : null),
 
     annotationContent:

@@ -567,13 +567,13 @@ export function reportContentTextErrors(wikiData, {
 
   const commentaryShape = {
     body: 'commentary body',
-    artistDisplayText: 'commentary artist display text',
+    artistText: 'commentary artist text',
     annotation: 'commentary annotation',
   };
 
   const lyricsShape = {
     body: 'lyrics body',
-    artistDisplayText: 'lyrics artist display text',
+    artistText: 'lyrics artist text',
     annotation: 'lyrics annotation',
   };
 

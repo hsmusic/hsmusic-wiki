@@ -60,7 +60,7 @@ export function getKebabCase(name) {
 // Matches heading details from commentary data in roughly the formats:
 //
 //    <i>artistReference:</i> (annotation, date)
-//    <i>artistReference|artistDisplayText:</i> (annotation, date)
+//    <i>artistReference|artistText:</i> (annotation, date)
 //
 // where capturing group "annotation" can be any text at all, except that the
 // last entry (past a comma or the only content within parentheses), if parsed
@@ -83,8 +83,9 @@ export function getKebabCase(name) {
 // parentheses can be part of the actual annotation content.
 //
 // Capturing group "artistReference" is all the characters between <i> and </i>
-// (apart from the pipe and "artistDisplayText" text, if present), and is either
-// the name of an artist or an "artist:directory"-style reference.
+// (apart from the pipe and the "artistText" group, if present), and is either
+// the name of one or more artist or "artist:directory"-style references,
+// joined by commas, if multiple.
 //
 // This regular expression *doesn't* match bodies, which will need to be parsed
 // out of the original string based on the indices matched using this.
@@ -94,7 +95,7 @@ const dateRegex = groupName =>
   String.raw`(?<${groupName}>[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,4}[-/][0-9]{1,4}[-/][0-9]{1,4})`;
 
 const commentaryRegexRaw =
-  String.raw`^<i>(?<artistReferences>.+?)(?:\|(?<artistDisplayText>.+))?:<\/i>(?: \((?<annotation>(?:.*?(?=,|\)[^)]*$))*?)(?:,? ?(?:(?<dateKind>sometime|throughout|around) )?${dateRegex('date')}(?: ?- ?${dateRegex('secondDate')})?(?: (?<accessKind>captured|accessed) ${dateRegex('accessDate')})?)?\))?`;
+  String.raw`^<i>(?<artistReferences>.+?)(?:\|(?<artistText>.+))?:<\/i>(?: \((?<annotation>(?:.*?(?=,|\)[^)]*$))*?)(?:,? ?(?:(?<dateKind>sometime|throughout|around) )?${dateRegex('date')}(?: ?- ?${dateRegex('secondDate')})?(?: (?<accessKind>captured|accessed) ${dateRegex('accessDate')})?)?\))?`;
 export const commentaryRegexCaseInsensitive =
   new RegExp(commentaryRegexRaw, 'gmi');
 export const commentaryRegexCaseSensitive =

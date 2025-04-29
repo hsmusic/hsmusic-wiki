@@ -835,7 +835,7 @@ export function parseContentEntries(thingClass, sourceText, {subdoc}) {
         .map(ref => ref.trim()),
 
     'Artist Text':
-      matchEntry.artistDisplayText,
+      matchEntry.artistText,
 
     'Annotation':
       matchEntry.annotation,
