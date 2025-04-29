@@ -654,6 +654,7 @@ export function postprocessVideos(inputNodes) {
 
       if (attributes.get('width')) node.width = parseInt(attributes.get('width'));
       if (attributes.get('height')) node.height = parseInt(attributes.get('height'));
+      if (attributes.get('align')) node.align = attributes.get('align');
       if (attributes.get('pixelate')) node.pixelate = true;
 
       return node;
@@ -667,6 +668,7 @@ export function postprocessAudios(inputNodes) {
 
       node.src = attributes.get('src');
       node.inline = attributes.get('inline') ?? inline;
+      if (attributes.get('align')) node.align = attributes.get('align');
 
       return node;
     });

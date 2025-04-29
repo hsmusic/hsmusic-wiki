@@ -1782,9 +1782,7 @@ p.image-details.origin-details {
   margin-bottom: 1em;
 }
 
-.content-image-container.align-center,
-.content-video-container.align-center,
-.content-audio-container.align-center {
+.content-image-container.align-center {
   text-align: center;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
@@ -2508,6 +2506,12 @@ html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:las
 .content-video-container video,
 .content-audio-container audio {
   display: block;
+}
+
+.content-video-container.align-center,
+.content-audio-container.align-center {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .image-text-area {
