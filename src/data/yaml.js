@@ -8,6 +8,7 @@ import {inspect as nodeInspect} from 'node:util';
 import yaml from 'js-yaml';
 
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
+import {parseInput, splitContentNodesAround} from '#replacer';
 import {sortByName} from '#sort';
 import Thing from '#thing';
 import thingConstructors from '#things';
@@ -828,36 +829,81 @@ export function parseArtwork({
 }
 
 export function parseContentEntries(thingClass, sourceText, {subdoc}) {
-  const map = matchEntry => ({
-    'Artists':
-      matchEntry.artistReferences
-        .split(',')
-        .map(ref => ref.trim()),
+  function map(matchEntry) {
+    let artistText = null, artistReferences = null;
 
-    'Artist Text':
-      matchEntry.artistText,
+    const artistTextNodes =
+      Array.from(
+        splitContentNodesAround(
+          parseInput(matchEntry.artistText),
+          /\|/g));
 
-    'Annotation':
-      matchEntry.annotation,
+    const separatorIndices =
+      artistTextNodes
+        .filter(node => node.type === 'separator')
+        .map(node => artistTextNodes.indexOf(node));
 
-    'Date':
-      matchEntry.date,
+    if (empty(separatorIndices)) {
+      if (artistTextNodes.length === 1 && artistTextNodes[0].type === 'text') {
+        artistReferences = matchEntry.artistText;
+      } else {
+        artistText = matchEntry.artistText;
+      }
+    } else {
+      const firstSeparatorIndex =
+        separatorIndices.at(0);
 
-    'Second Date':
-      matchEntry.secondDate,
+      const secondSeparatorIndex =
+        separatorIndices.at(1) ??
+        artistTextNodes.length;
 
-    'Date Kind':
-      matchEntry.dateKind,
+      artistReferences =
+        matchEntry.artistText.slice(
+          artistTextNodes.at(0).i,
+          artistTextNodes.at(firstSeparatorIndex - 1).iEnd);
 
-    'Access Date':
-      matchEntry.accessDate,
+      artistText =
+        matchEntry.artistText.slice(
+          artistTextNodes.at(firstSeparatorIndex).iEnd,
+          artistTextNodes.at(secondSeparatorIndex - 1).iEnd);
+    }
 
-    'Access Kind':
-      matchEntry.accessKind,
+    if (artistReferences) {
+      artistReferences =
+        artistReferences
+          .split(',')
+          .map(ref => ref.trim());
+    }
 
-    'Body':
-      matchEntry.body,
-  });
+    return {
+      'Artists':
+        artistReferences,
+
+      'Artist Text':
+        artistText,
+
+      'Annotation':
+        matchEntry.annotation,
+
+      'Date':
+        matchEntry.date,
+
+      'Second Date':
+        matchEntry.secondDate,
+
+      'Date Kind':
+        matchEntry.dateKind,
+
+      'Access Date':
+        matchEntry.accessDate,
+
+      'Access Kind':
+        matchEntry.accessKind,
+
+      'Body':
+        matchEntry.body,
+    };
+  }
 
   const documents =
     matchContentEntries(sourceText)

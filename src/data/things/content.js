@@ -16,6 +16,7 @@ import {
 } from '#composite/control-flow';
 
 import {
+  contentArtists,
   hasAnnotationPart,
   withAnnotationParts,
   withSourceText,
@@ -29,10 +30,7 @@ export class ContentEntry extends Thing {
 
     thing: thing(),
 
-    artists: referenceList({
-      class: input.value(Artist),
-      find: soupyFind.input('artist'),
-    }),
+    artists: contentArtists(),
 
     artistText: contentString(),
 
