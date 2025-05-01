@@ -15,7 +15,8 @@ import {
   withResultOfAvailabilityCheck,
 } from '#composite/control-flow';
 
-import {withWebArchiveDate, withSourceText} from '#composite/things/content';
+import {withAnnotationParts, withSourceText, withWebArchiveDate}
+  from '#composite/things/content';
 
 export class ContentEntry extends Thing {
   static [Thing.getPropertyDescriptors] = ({Artist}) => ({
@@ -99,6 +100,14 @@ export class ContentEntry extends Thing {
     find: soupyFind(),
 
     // Expose only
+
+    annotationParts: [
+      withAnnotationParts({
+        mode: input.value('strings'),
+      }),
+
+      exposeDependency({dependency: '#annotationParts'}),
+    ],
 
     sourceText: [
       withSourceText(),
