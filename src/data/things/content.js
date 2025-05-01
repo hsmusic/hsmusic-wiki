@@ -19,6 +19,7 @@ import {
   hasAnnotationPart,
   withAnnotationParts,
   withSourceText,
+  withSourceURLs,
   withWebArchiveDate,
 } from '#composite/things/content';
 
@@ -116,6 +117,11 @@ export class ContentEntry extends Thing {
     sourceText: [
       withSourceText(),
       exposeDependency({dependency: '#sourceText'}),
+    ],
+
+    sourceURLs: [
+      withSourceURLs(),
+      exposeDependency({dependency: '#sourceURLs'}),
     ],
   });
 
