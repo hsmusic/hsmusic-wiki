@@ -770,19 +770,32 @@ export function postprocessExternalLinks(inputNodes) {
       continue;
     }
 
-    let textContent = '';
+    let textNode = {
+      i: node.i,
+      iEnd: null,
+      type: 'text',
+      data: '',
+    };
+
     let parseFrom = 0;
     for (const match of matchMarkdownLinks(node.data, {marked})) {
       const {label, href, index, length} = match;
 
-      textContent += node.data.slice(parseFrom, index);
+      textNode.data += node.data.slice(parseFrom, index);
 
       // Split the containing text node into two - the second of these will
       // be filled in and pushed by the next match, or after iterating over
       // all matches.
-      if (textContent.length) {
-        outputNodes.push({type: 'text', data: textContent});
-        textContent = '';
+      if (textNode.data) {
+        textNode.iEnd = textNode.i + textNode.data.length;
+        outputNodes.push(textNode);
+
+        textNode = {
+          i: node.i + index + length,
+          iEnd: null,
+          type: 'text',
+          data: '',
+        };
       }
 
       outputNodes.push({
@@ -796,11 +809,12 @@ export function postprocessExternalLinks(inputNodes) {
     }
 
     if (parseFrom !== node.data.length) {
-      textContent += node.data.slice(parseFrom);
+      textNode.data += node.data.slice(parseFrom);
+      textNode.iEnd = node.iEnd;
     }
 
-    if (textContent.length) {
-      outputNodes.push({type: 'text', data: textContent});
+    if (textNode.data) {
+      outputNodes.push(textNode);
     }
   }
 
