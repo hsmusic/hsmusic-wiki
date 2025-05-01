@@ -14,7 +14,7 @@ import {
   withResultOfAvailabilityCheck,
 } from '#composite/control-flow';
 
-import {withWebArchiveDate} from '#composite/things/commentary-entry';
+import {withWebArchiveDate} from '#composite/things/content';
 
 export class ContentEntry extends Thing {
   static [Thing.getPropertyDescriptors] = ({Artist}) => ({
