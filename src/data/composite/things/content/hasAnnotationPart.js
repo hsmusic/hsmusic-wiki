@@ -1,6 +1,6 @@
 import {input, templateCompositeFrom} from '#composite';
 
-import {exposeWhetherDependencyAvailable} from '#composite/control-flow';
+import {exitWithoutDependency} from '#composite/control-flow';
 
 import withAnnotationParts from './withAnnotationParts.js';
 
@@ -18,14 +18,24 @@ export default templateCompositeFrom({
       mode: input.value('strings'),
     }),
 
-    withIndexInList({
-      item: input('part'),
-      list: '#annotationParts',
+    exitWithoutDependency({
+      dependency: '#annotationParts',
+      value: input.value(false),
     }),
 
-    exposeWhetherDependencyAvailable({
-      dependency: '#index',
-      mode: input.value('index'),
-    }),
+    {
+      dependencies: [
+        input('part'),
+        '#annotationParts',
+      ],
+
+      compute: ({
+        [input('part')]: search,
+        ['#annotationParts']: parts,
+      }) =>
+        parts.some(part =>
+          part.toLowerCase() ===
+          search.toLowerCase()),
+    },
   ],
 });
