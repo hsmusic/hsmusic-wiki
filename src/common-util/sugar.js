@@ -221,6 +221,9 @@ export const compareArrays = (arr1, arr2, {checkOrder = true} = {}) =>
     ? arr1.every((x, i) => arr2[i] === x)
     : arr1.every((x) => arr2.includes(x)));
 
+export const exhaust = (generatorFunction) =>
+  Array.from(generatorFunction());
+
 export function compareObjects(obj1, obj2, {
   checkOrder = false,
   checkSymbols = true,
