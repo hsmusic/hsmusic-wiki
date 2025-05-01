@@ -9,6 +9,7 @@ import * as marked from 'marked';
 
 import * as html from '#html';
 import {escapeRegex, typeAppearance} from '#sugar';
+import {matchMarkdownLinks} from '#wiki-data';
 
 export const replacerSpec = {
   'album': {
@@ -769,49 +770,29 @@ export function postprocessExternalLinks(inputNodes) {
       continue;
     }
 
-    const plausibleLinkRegexp = /\[.*?\)/g;
-
     let textContent = '';
+    let parseFrom = 0;
+    for (const match of matchMarkdownLinks(node.data, {marked})) {
+      const {label, href, index, length} = match;
 
-    let plausibleMatch = null, parseFrom = 0;
-    while (plausibleMatch = plausibleLinkRegexp.exec(node.data)) {
-      textContent += node.data.slice(parseFrom, plausibleMatch.index);
+      textContent += node.data.slice(parseFrom, index);
 
-      // Pedantic rules use more particular parentheses detection in link
-      // destinations - they allow one level of balanced parentheses, and
-      // otherwise, parentheses must be escaped. This allows for entire links
-      // to be wrapped in parentheses, e.g below:
-      //
-      //   This is so cool. ([You know??](https://example.com))
-      //
-      const definiteMatch =
-        marked.Lexer.rules.inline.pedantic.link
-          .exec(node.data.slice(plausibleMatch.index));
-
-      if (definiteMatch) {
-        const {1: label, 2: href} = definiteMatch;
-
-        // Split the containing text node into two - the second of these will
-        // be added after iterating over matches, or by the next match.
-        if (textContent.length) {
-          outputNodes.push({type: 'text', data: textContent});
-          textContent = '';
-        }
-
-        const offset = plausibleMatch.index + definiteMatch.index;
-        const length = definiteMatch[0].length;
-
-        outputNodes.push({
-          i: node.i + offset,
-          iEnd: node.i + offset + length,
-          type: 'external-link',
-          data: {label, href},
-        });
-
-        parseFrom = offset + length;
-      } else {
-        parseFrom = plausibleMatch.index;
+      // Split the containing text node into two - the second of these will
+      // be filled in and pushed by the next match, or after iterating over
+      // all matches.
+      if (textContent.length) {
+        outputNodes.push({type: 'text', data: textContent});
+        textContent = '';
       }
+
+      outputNodes.push({
+        i: node.i + index,
+        iEnd: node.i + index + length,
+        type: 'external-link',
+        data: {label, href},
+      });
+
+      parseFrom = index + length;
     }
 
     if (parseFrom !== node.data.length) {

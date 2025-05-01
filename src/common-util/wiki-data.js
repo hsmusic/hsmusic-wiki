@@ -523,3 +523,30 @@ export function combineWikiDataArrays(arrays) {
     return combined;
   }
 }
+
+// Markdown stuff
+
+export function* matchMarkdownLinks(markdownSource, {marked}) {
+  const plausibleLinkRegexp = /\[.*?\)/g;
+
+  let plausibleMatch = null;
+  while (plausibleMatch = plausibleLinkRegexp.exec(markdownSource)) {
+    // Pedantic rules use more particular parentheses detection in link
+    // destinations - they allow one level of balanced parentheses, and
+    // otherwise, parentheses must be escaped. This allows for entire links
+    // to be wrapped in parentheses, e.g below:
+    //
+    //   This is so cool. ([You know??](https://example.com))
+    //
+    const definiteMatch =
+      marked.Lexer.rules.inline.pedantic.link
+        .exec(markdownSource.slice(plausibleMatch.index));
+
+    if (definiteMatch) {
+      const [{length}, label, href] = definiteMatch;
+      const index = plausibleMatch.index + definiteMatch.index;
+
+      yield {label, href, index, length};
+    }
+  }
+}
