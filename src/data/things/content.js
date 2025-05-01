@@ -15,8 +15,12 @@ import {
   withResultOfAvailabilityCheck,
 } from '#composite/control-flow';
 
-import {withAnnotationParts, withSourceText, withWebArchiveDate}
-  from '#composite/things/content';
+import {
+  hasAnnotationPart,
+  withAnnotationParts,
+  withSourceText,
+  withWebArchiveDate,
+} from '#composite/things/content';
 
 export class ContentEntry extends Thing {
   static [Thing.getPropertyDescriptors] = ({Artist}) => ({
@@ -134,6 +138,24 @@ export class ContentEntry extends Thing {
   };
 }
 
-export class CommentaryEntry extends ContentEntry {}
-export class LyricsEntry extends ContentEntry {}
+export class CommentaryEntry extends ContentEntry {
+  static [Thing.getPropertyDescriptors] = () => ({
+    // Expose only
+
+    isWikiEditorCommentary: hasAnnotationPart({
+      part: input.value('wiki editor'),
+    }),
+  });
+}
+
+export class LyricsEntry extends ContentEntry {
+  static [Thing.getPropertyDescriptors] = () => ({
+    // Expose only
+
+    isWikiLyrics: hasAnnotationPart({
+      part: input.value('wiki lyrics'),
+    }),
+  });
+}
+
 export class CreditingSourcesEntry extends ContentEntry {}
