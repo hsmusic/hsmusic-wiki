@@ -871,3 +871,79 @@ export function parseInput(input) {
     ].join('\n'));
   }
 }
+
+export function* splitContentNodesAround(nodes, splitter) {
+  if (splitter instanceof RegExp) {
+    const regex = splitter;
+
+    splitter = function*(text) {
+      for (const match of text.matchAll(regex)) {
+        yield {
+          index: match.index,
+          length: match[0].length,
+        };
+      }
+    };
+  }
+
+  if (typeof splitter === 'string') {
+    throw new TypeError(`Expected generator or regular expression`);
+  }
+
+  function* splitTextNode(node) {
+    let textNode = {
+      i: node.i,
+      iEnd: null,
+      type: 'text',
+      data: '',
+    };
+
+    let parseFrom = 0;
+    for (const match of splitter(node.data)) {
+      const {index, length} = match;
+
+      textNode.data += node.data.slice(parseFrom, index);
+
+      if (textNode.data) {
+        textNode.iEnd = textNode.i + textNode.data.length;
+        yield textNode;
+      }
+
+      yield {
+        i: node.i + index,
+        iEnd: node.i + index + length,
+        type: 'separator',
+        data: {
+          text: node.data.slice(index, index + length),
+          match,
+        },
+      };
+
+      textNode = {
+        i: node.i + index + length,
+        iEnd: null,
+        type: 'text',
+        data: '',
+      };
+
+      parseFrom = index + length;
+    }
+
+    if (parseFrom !== node.data.length) {
+      textNode.data += node.data.slice(parseFrom);
+      textNode.iEnd = node.iEnd;
+    }
+
+    if (textNode.data) {
+      yield textNode;
+    }
+  }
+
+  for (const node of nodes) {
+    if (node.type === 'text') {
+      yield* splitTextNode(node);
+    } else {
+      yield node;
+    }
+  }
+}
