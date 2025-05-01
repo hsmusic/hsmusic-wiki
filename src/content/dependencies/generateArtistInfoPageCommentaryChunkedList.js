@@ -43,6 +43,7 @@ export default {
         flash,
 
         annotation: entry.annotation,
+        annotationParts: entry.annotationParts,
       },
     });
 
@@ -88,10 +89,10 @@ export default {
           thing.commentary
             .filter(entry => entry.artists.includes(artist))
 
-            .filter(({annotation}) =>
+            .filter(entry =>
               (filterWikiEditorCommentary
-                ? annotation?.match(/^wiki editor/i)
-                : !annotation?.match(/^wiki editor/i)))
+                ? entry.isWikiEditorCommentary
+                : !entry.isWikiEditorCommentary))
 
             .map(entry => processEntry({thing, entry})));
 
@@ -184,11 +185,13 @@ export default {
     itemAnnotations:
       query.chunks
         .map(({chunk}) => chunk
-          .map(({annotation}) =>
+          .map(entry =>
             relation('transformContent',
               (filterWikiEditorCommentary
-                ? annotation?.replace(/^wiki editor(, )?/i, '')
-                : annotation)))),
+                ? entry.annotationParts
+                    .filter(part => part !== 'wiki editor')
+                    .join(', ')
+                : entry.annotation)))),
   }),
 
   data: (query, _artist, _filterWikiEditorCommentary) => ({
