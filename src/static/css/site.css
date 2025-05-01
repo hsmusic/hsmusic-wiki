@@ -1770,6 +1770,11 @@ p.image-details.origin-details {
   padding-left: 40px;
 }
 
+.lyrics-entry .lyrics-details {
+  font-size: 0.9em;
+  font-style: oblique;
+}
+
 .js-hide,
 .js-show-once-data,
 .js-hide-once-data {

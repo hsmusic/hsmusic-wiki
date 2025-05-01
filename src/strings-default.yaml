@@ -711,6 +711,15 @@ misc:
       playlist: "YouTube (playlist)"
       fullAlbum: "YouTube (full album)"
 
+  # lyrics:
+
+  lyrics:
+    source: >-
+      Via {SOURCE}
+
+    contributors: >-
+      Contributions from {CONTRIBUTORS}
+
   # missingImage:
   #   Fallback text displayed in an image when it's sourced to a file
   #   that isn't available under the wiki's media directory. While it

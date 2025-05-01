@@ -1,13 +1,27 @@
 export default {
-  contentDependencies: [
-    'transformContent',
-  ],
-
+  contentDependencies: ['linkArtist', 'linkExternal', 'transformContent'],
   extraDependencies: ['html', 'language'],
 
   relations: (relation, entry) => ({
     content:
       relation('transformContent', entry.body),
+
+    artistText:
+      relation('transformContent', entry.artistText),
+
+    artistLinks:
+      entry.artists
+        .filter(artist => artist.name !== 'HSMusic Wiki') // smh
+        .map(artist => relation('linkArtist', artist)),
+
+    sourceLinks:
+      entry.sourceURLs
+        .map(url => relation('linkExternal', url)),
+  }),
+
+  data: (entry) => ({
+    isWikiLyrics:
+      entry.isWikiLyrics,
   }),
 
   slots: {
@@ -17,9 +31,40 @@ export default {
     },
   },
 
-  generate: (relations, slots, {html}) =>
-    html.tag('div', {class: 'lyrics-entry'},
-      slots.attributes,
+  generate: (data, relations, slots, {html, language}) =>
+    language.encapsulate('misc.lyrics', capsule =>
+      html.tag('div', {class: 'lyrics-entry'},
+        slots.attributes,
 
-      relations.content.slot('mode', 'lyrics')),
+        [
+          html.tag('p', {class: 'lyrics-details'},
+            {[html.onlyIfContent]: true},
+            {[html.joinChildren]: html.tag('br')},
+
+            [
+              language.$(capsule, 'source', {
+                [language.onlyIfOptions]: ['source'],
+
+                source:
+                  language.formatUnitList(
+                    relations.sourceLinks.map(link =>
+                      link.slots({
+                        indicateExternal: true,
+                        tab: 'separate',
+                      }))),
+              }),
+
+              data.isWikiLyrics &&
+                language.$(capsule, 'contributors', {
+                  [language.onlyIfOptions]: ['contributors'],
+
+                  contributors:
+                    (html.isBlank(relations.artistText)
+                      ? language.formatUnitList(relations.artistLinks)
+                      : relations.artistText.slot('mode', 'inline')),
+                }),
+            ]),
+
+          relations.content.slot('mode', 'lyrics'),
+        ])),
 };
