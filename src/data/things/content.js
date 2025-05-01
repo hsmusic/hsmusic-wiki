@@ -9,12 +9,13 @@ import {contentString, referenceList, simpleDate, soupyFind, thing}
 
 import {
   exposeConstant,
+  exposeDependency,
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
   withResultOfAvailabilityCheck,
 } from '#composite/control-flow';
 
-import {withWebArchiveDate} from '#composite/things/content';
+import {withWebArchiveDate, withSourceText} from '#composite/things/content';
 
 export class ContentEntry extends Thing {
   static [Thing.getPropertyDescriptors] = ({Artist}) => ({
@@ -96,6 +97,13 @@ export class ContentEntry extends Thing {
     // Update only
 
     find: soupyFind(),
+
+    // Expose only
+
+    sourceText: [
+      withSourceText(),
+      exposeDependency({dependency: '#sourceText'}),
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {
