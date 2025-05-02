@@ -8,7 +8,7 @@ import {inspect as nodeInspect} from 'node:util';
 import yaml from 'js-yaml';
 
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
-import {parseInput, splitContentNodesAround} from '#replacer';
+import {parseContentNodes, splitContentNodesAround} from '#replacer';
 import {sortByName} from '#sort';
 import Thing from '#thing';
 import thingConstructors from '#things';
@@ -835,7 +835,7 @@ export function parseContentEntries(thingClass, sourceText, {subdoc}) {
     const artistTextNodes =
       Array.from(
         splitContentNodesAround(
-          parseInput(matchEntry.artistText),
+          parseContentNodes(matchEntry.artistText),
           /\|/g));
 
     const separatorIndices =

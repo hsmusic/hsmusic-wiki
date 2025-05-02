@@ -1,5 +1,5 @@
 import {bindFind} from '#find';
-import {replacerSpec, parseInput} from '#replacer';
+import {replacerSpec, parseContentNodes} from '#replacer';
 
 import {Marked} from 'marked';
 import striptags from 'striptags';
@@ -71,7 +71,7 @@ export default {
   sprawl(wikiData, content) {
     const find = bindFind(wikiData);
 
-    const parsedNodes = parseInput(content ?? '');
+    const parsedNodes = parseContentNodes(content ?? '');
 
     return {
       nodes: parsedNodes

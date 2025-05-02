@@ -1,5 +1,5 @@
 import {input, templateCompositeFrom} from '#composite';
-import {parseInput} from '#replacer';
+import {parseContentNodes} from '#replacer';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 

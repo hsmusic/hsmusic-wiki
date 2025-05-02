@@ -1,5 +1,5 @@
 import {input, templateCompositeFrom} from '#composite';
-import {parseInput} from '#replacer';
+import {parseContentNodes} from '#replacer';
 
 export default templateCompositeFrom({
   annotation: `withContentNodes`,
@@ -18,7 +18,7 @@ export default templateCompositeFrom({
         [input('from')]: string,
       }) => continuation({
         ['#contentNodes']:
-          parseInput(string),
+          parseContentNodes(string),
       }),
     },
   ],

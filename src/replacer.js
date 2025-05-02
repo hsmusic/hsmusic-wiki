@@ -821,7 +821,7 @@ export function postprocessExternalLinks(inputNodes) {
   return outputNodes;
 }
 
-export function parseInput(input) {
+export function parseContentNodes(input) {
   if (typeof input !== 'string') {
     throw new TypeError(`Expected input to be string, got ${typeAppearance(input)}`);
   }

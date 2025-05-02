@@ -4,7 +4,7 @@ import {inspect as nodeInspect} from 'node:util';
 import {colors, ENABLE_COLOR} from '#cli';
 
 import CacheableObject from '#cacheable-object';
-import {replacerSpec, parseInput} from '#replacer';
+import {replacerSpec, parseContentNodes} from '#replacer';
 import {compareArrays, cut, cutStart, empty, getNestedProp, iterateMultiline}
   from '#sugar';
 import Thing from '#thing';
@@ -638,7 +638,7 @@ export function reportContentTextErrors(wikiData, {
   const findArtistOrAlias = bindFindArtistOrAlias(boundFind);
 
   function* processContent(input) {
-    const nodes = parseInput(input);
+    const nodes = parseContentNodes(input);
 
     for (const node of nodes) {
       const index = node.i;
