@@ -595,61 +595,73 @@ export class Tag {
     }
 
     const attributesString = this.attributes.toString();
-    const contentStringParts = this.#contentToStringParts();
+    const {content, hasLineBreak} = this.#contentToStringParts();
 
     if (!this.tagName) {
-      return contentStringParts;
+      if (hasLineBreak) {
+        return {content, hasLineBreak: true};
+      } else {
+        return {content};
+      }
     }
 
-    const openTag = (attributesString
-      ? `<${this.tagName} ${attributesString}>`
-      : `<${this.tagName}>`);
+    const open =
+      (attributesString
+        ? `<${this.tagName} ${attributesString}>`
+        : `<${this.tagName}>`);
 
     if (this.selfClosing) {
-      return [openTag];
+      return {open};
     }
 
-    const closeTag = `</${this.tagName}>`;
+    const close = `</${this.tagName}>`;
 
     if (!this.content.length) {
-      return [openTag, closeTag];
+      return {open, close};
     }
 
     returnWithoutLineBreak: {
-      for (const part of contentStringParts) {
-        if (part.includes('\n')) {
+      for (const part of content) {
+        if (part.hasLineBreak) {
           break returnWithoutLineBreak;
         }
       }
 
-      return [openTag, ...contentStringParts, closeTag];
+      return {open, content, close};
     }
 
-    const edgeWhitespace =
+    const edge =
       (this.noEdgeWhitespace ? '' : '\n');
 
-    const parts = [
-      openTag,
-      edgeWhitespace,
-      /*
-      contentString
-        .split('\n')
-        .map((line, i) =>
-          (i === 0 && this.noEdgeWhitespace
-            ? line
-            : '    ' + line))
-        .join('\n'),
-      */
-      ...contentStringParts,
-      edgeWhitespace,
-      closeTag,
-    ];
+    return {open, edge, content, close, hasLineBreak: true};
+  }
 
-    return parts;
+  static stringifyParts(parts) {
+    const {open, edge, content, close} = parts;
+
+    let string = '';
+
+    if (open) string += open;
+    if (edge) string += edge;
+
+    if (content) {
+      for (const item of content) {
+        if (typeof item === 'string') {
+          string += item;
+        } else {
+          string += this.stringifyParts(item);
+        }
+      }
+    }
+
+    if (edge) string += edge;
+    if (close) string += close;
+
+    return string;
   }
 
   toString() {
-    return this.toStringParts().join('');
+    return Tag.stringifyParts(this.toStringParts());
   }
 
   #getContentJoiner() {
@@ -666,13 +678,15 @@ export class Tag {
 
   #contentToStringParts() {
     if (this.selfClosing) {
-      return [];
+      return {content: []};
     }
 
     const joiner = this.#getContentJoiner();
 
     let content = [];
     let blockwrapClosers = [];
+
+    let hasLineBreak = false;
 
     let seenSiblingIndependentContent = false;
 
@@ -706,12 +720,15 @@ export class Tag {
         continue;
       }
 
-      let itemContent;
+      let itemParts;
       try {
         if (nonTemplateItem.toStringParts) {
-          itemContent = nonTemplateItem.toStringParts();
+          itemParts = nonTemplateItem.toStringParts();
+          hasLineBreak ||= itemParts.hasLineBreak;
         } else {
-          itemContent = [nonTemplateItem.toString()];
+          const string = nonTemplateItem.toString();
+          itemParts = {content: [string]};
+          hasLineBreak ||= string.includes('\n')
         }
       } catch (caughtError) {
         const indexPart = colors.yellow(`child #${index + 1}`);
@@ -737,7 +754,7 @@ export class Tag {
         throw error;
       }
 
-      if (empty(itemContent)) {
+      if (!itemParts.open && empty(itemParts.content ?? null)) {
         continue;
       }
 
@@ -746,7 +763,7 @@ export class Tag {
       }
 
       const chunkwrapChunks =
-         /* in this case itemContent is just an array of the item,
+         /* in this case itemParts holds just an array of the item,
           * because nonTemplateItem doesn't have .toStringParts()
           * and string.toString() === string. so we access the item
           * as its own content directly, upholding that reasoning.
@@ -790,7 +807,7 @@ export class Tag {
 
       // Blockwraps only apply if they actually contain some content whose
       // words should be kept together, so it's okay to put them beneath the
-      // itemContent check. They also never apply at the very start of content,
+      // itemParts check. They also never apply at the very start of content,
       // because at that point there aren't any preceding words from which the
       // blockwrap would differentiate its content.
       if (nonTemplateItem instanceof Tag && nonTemplateItem.blockwrap && content) {
@@ -798,7 +815,7 @@ export class Tag {
         blockwrapClosers.push('</span>');
       }
 
-      appendItemContent: {
+      appendItem: {
         if (itemIncludesChunkwrapSplit) {
           for (const [index, {chunk, following}] of chunkwrapChunks.entries()) {
             if (index === 0) {
@@ -832,10 +849,10 @@ export class Tag {
             }
           }
 
-          break appendItemContent;
+          break appendItem;
         }
 
-        content.push(...itemContent);
+        content.push(itemParts);
       }
     }
 
@@ -860,7 +877,7 @@ export class Tag {
 
     content.push(...blockwrapClosers);
 
-    return content;
+    return {content, hasLineBreak};
   }
 
   static normalize(content) {
