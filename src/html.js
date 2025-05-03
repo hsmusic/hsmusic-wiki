@@ -431,7 +431,7 @@ export class Tag {
     }
 
     this.#content = contentArray;
-    this.#content.toString = () => this.#stringifyContent();
+    this.#content.toStringParts = () => this.#contentToStringParts();
   }
 
   get content() {
@@ -592,16 +592,16 @@ export class Tag {
     return this.#getAttributeFlag(imaginarySibling);
   }
 
-  toString() {
+  toStringParts() {
     if (this.onlyIfContent && isBlank(this.content)) {
-      return '';
+      return [];
     }
 
     const attributesString = this.attributes.toString();
-    const contentString = this.content.toString();
+    const contentStringParts = this.content.toStringParts();
 
     if (!this.tagName) {
-      return contentString;
+      return contentStringParts;
     }
 
     const openTag = (attributesString
@@ -609,21 +609,32 @@ export class Tag {
       : `<${this.tagName}>`);
 
     if (this.selfClosing) {
-      return openTag;
+      return [openTag];
     }
 
     const closeTag = `</${this.tagName}>`;
 
     if (!this.content.length) {
-      return openTag + closeTag;
+      return [openTag, closeTag];
     }
 
-    if (!contentString.includes('\n')) {
-      return openTag + contentString + closeTag;
+    returnWithoutLineBreak: {
+      for (const part of contentStringParts) {
+        if (part.includes('\n')) {
+          break returnWithoutLineBreak;
+        }
+      }
+
+      return [openTag, ...contentStringParts, closeTag];
     }
+
+    const edgeWhitespace =
+      (this.noEdgeWhitespace ? '' : '\n');
 
     const parts = [
       openTag,
+      edgeWhitespace,
+      /*
       contentString
         .split('\n')
         .map((line, i) =>
@@ -631,13 +642,17 @@ export class Tag {
             ? line
             : '    ' + line))
         .join('\n'),
+      */
+      ...contentStringParts,
+      edgeWhitespace,
       closeTag,
     ];
 
-    return parts.join(
-      (this.noEdgeWhitespace
-        ? ''
-        : '\n'));
+    return parts;
+  }
+
+  toString() {
+    return this.toStringParts().join('');
   }
 
   #getContentJoiner() {
@@ -652,15 +667,15 @@ export class Tag {
     return `\n${this.joinChildren}\n`;
   }
 
-  #stringifyContent() {
+  #contentToStringParts() {
     if (this.selfClosing) {
-      return '';
+      return [];
     }
 
     const joiner = this.#getContentJoiner();
 
-    let content = '';
-    let blockwrapClosers = '';
+    let content = [];
+    let blockwrapClosers = [];
 
     let seenSiblingIndependentContent = false;
 
@@ -696,7 +711,11 @@ export class Tag {
 
       let itemContent;
       try {
-        itemContent = nonTemplateItem.toString();
+        if (nonTemplateItem.toStringParts) {
+          itemContent = nonTemplateItem.toStringParts();
+        } else {
+          itemContent = [nonTemplateItem.toString()];
+        }
       } catch (caughtError) {
         const indexPart = colors.yellow(`child #${index + 1}`);
 
@@ -721,7 +740,7 @@ export class Tag {
         throw error;
       }
 
-      if (!itemContent) {
+      if (empty(itemContent)) {
         continue;
       }
 
@@ -730,8 +749,13 @@ export class Tag {
       }
 
       const chunkwrapChunks =
+         /* in this case itemContent is just an array of the item,
+          * because nonTemplateItem doesn't have .toStringParts()
+          * and string.toString() === string. so we access the item
+          * as its own content directly, upholding that reasoning.
+          */
         (typeof nonTemplateItem === 'string' && chunkwrapSplitter
-          ? Array.from(getChunkwrapChunks(itemContent, chunkwrapSplitter))
+          ? Array.from(getChunkwrapChunks(nonTemplateItem, chunkwrapSplitter))
           : null);
 
       const itemIncludesChunkwrapSplit =
@@ -739,7 +763,7 @@ export class Tag {
           ? chunkwrapChunks.length > 1
           : null);
 
-      if (content) {
+      if (!empty(content)) {
         if (itemIncludesChunkwrapSplit && !seenChunkwrapSplitter) {
           // The first time we see a chunkwrap splitter, backtrack and wrap
           // the content *so far* in a chunk. This will be treated just like
@@ -748,17 +772,19 @@ export class Tag {
           // chunk as the first chunk included in this content, which makes
           // sense, because that first chink is really just more text that
           // precedes the first split.)
-          content = `<span class="chunkwrap">` + content;
+          content.unshift('<span class="chunkwrap">');
         }
 
-        content += joiner;
+        if (joiner) {
+          content.push(joiner);
+        }
       } else if (itemIncludesChunkwrapSplit) {
         // We've encountered a chunkwrap split before any other content.
         // This means there's no content to wrap, no existing chunkwrap
         // to close, and no reason to add a joiner, but we *do* need to
         // enter a chunkwrap wrapper *now*, so the first chunk of this
         // item will be properly wrapped.
-        content = `<span class="chunkwrap">`;
+        content = ['<span class="chunkwrap">'];
       }
 
       if (itemIncludesChunkwrapSplit) {
@@ -771,8 +797,8 @@ export class Tag {
       // because at that point there aren't any preceding words from which the
       // blockwrap would differentiate its content.
       if (nonTemplateItem instanceof Tag && nonTemplateItem.blockwrap && content) {
-        content += `<span class="blockwrap">`;
-        blockwrapClosers += `</span>`;
+        content.push('<span class="blockwrap">');
+        blockwrapClosers.push('</span>');
       }
 
       appendItemContent: {
@@ -783,28 +809,28 @@ export class Tag {
               // text that should be appended to the previous chunk. We will
               // close this chunk as the first appended content as we process
               // the next chunk.
-              content += chunk;
+              content.push(chunk);
             } else {
               const followingWhitespace = following.match(/\s+$/) ?? '';
               const chunkWhitespace = chunk.match(/^\s+/) ?? '';
 
               if (followingWhitespace) {
-                content += following.slice(0, -followingWhitespace.length);
+                content.push(following.slice(0, -followingWhitespace.length));
               } else {
-                content += following;
+                content.push(following);
               }
 
-              content += '</span>';
+              content.push('</span>');
 
-              content += followingWhitespace;
-              content += chunkWhitespace;
+              content.push(followingWhitespace);
+              content.push(chunkWhitespace);
 
-              content += '<span class="chunkwrap">';
+              content.push('<span class="chunkwrap">');
 
               if (chunkWhitespace) {
-                content += chunk.slice(chunkWhitespace.length);
+                content.push(chunk.slice(chunkWhitespace.length));
               } else {
-                content += chunk;
+                content.push(chunk);
               }
             }
           }
@@ -812,29 +838,30 @@ export class Tag {
           break appendItemContent;
         }
 
-        content += itemContent;
+        content.push(...itemContent);
       }
     }
 
     // If we've only seen sibling-dependent content (or just no content),
     // then the content in total is blank.
     if (!seenSiblingIndependentContent) {
-      return '';
+      return [];
     }
 
     if (chunkwrapSplitter) {
       if (seenChunkwrapSplitter) {
-        content += '</span>';
+        content.push('</span>');
       } else {
         // Since chunkwraps take responsibility for wrapping *away* from the
         // parent element, we generally always want there to be at least one
         // chunk that gets wrapped as a single unit. So if no chunkwrap has
         // been seen at all, just wrap everything in one now.
-        content = `<span class="chunkwrap">${content}</span>`;
+        content.unshift('<span class="chunkwrap">');
+        content.push('</span>');
       }
     }
 
-    content += blockwrapClosers;
+    content.push(...blockwrapClosers);
 
     return content;
   }
