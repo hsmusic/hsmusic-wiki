@@ -599,7 +599,7 @@ export class Tag {
 
     if (!this.tagName) {
       if (hasLineBreak) {
-        return {content, hasLineBreak: true};
+        return {content, hasLineBreak};
       } else {
         return {content};
       }
@@ -620,24 +620,19 @@ export class Tag {
       return {open, close};
     }
 
-    returnWithoutLineBreak: {
-      for (const part of content) {
-        if (part.hasLineBreak) {
-          break returnWithoutLineBreak;
-        }
-      }
+    if (hasLineBreak) {
+      const edge =
+        (this.noEdgeWhitespace ? '' : '\n');
 
+      return {open, edge, content, close, hasLineBreak};
+    } else {
       return {open, content, close};
     }
-
-    const edge =
-      (this.noEdgeWhitespace ? '' : '\n');
-
-    return {open, edge, content, close, hasLineBreak: true};
   }
 
   static stringifyParts(parts) {
     const {open, edge, content, close} = parts;
+    const indentation = ' '.repeat(4);
 
     let string = '';
 
@@ -646,10 +641,22 @@ export class Tag {
 
     if (content) {
       for (const item of content) {
-        if (typeof item === 'string') {
-          string += item;
+        const itemString =
+          (typeof item === 'string'
+            ? item
+            : this.stringifyParts(item));
+
+        if (open) {
+          const lines = itemString.split('\n');
+          if (edge) {
+            string += lines.map(line => line ? indentation + line : line).join('\n');
+          } else {
+            const [first, ...rest] = lines;
+            string += first;
+            string += rest.map(line => '\n' + indentation + line).join('');
+          }
         } else {
-          string += this.stringifyParts(item);
+          string += itemString;
         }
       }
     }
@@ -728,7 +735,7 @@ export class Tag {
         } else {
           const string = nonTemplateItem.toString();
           itemParts = {content: [string]};
-          hasLineBreak ||= string.includes('\n')
+          hasLineBreak ||= string.includes('\n');
         }
       } catch (caughtError) {
         const indexPart = colors.yellow(`child #${index + 1}`);
@@ -791,6 +798,7 @@ export class Tag {
 
         if (joiner) {
           content.push(joiner);
+          hasLineBreak ||= joiner.includes('\n');
         }
       } else if (itemIncludesChunkwrapSplit) {
         // We've encountered a chunkwrap split before any other content.
@@ -859,7 +867,7 @@ export class Tag {
     // If we've only seen sibling-dependent content (or just no content),
     // then the content in total is blank.
     if (!seenSiblingIndependentContent) {
-      return [];
+      return {content: []};
     }
 
     if (chunkwrapSplitter) {
