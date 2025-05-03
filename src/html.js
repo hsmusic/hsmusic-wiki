@@ -1029,46 +1029,50 @@ export class Tag {
 }
 
 export function* getChunkwrapChunks(content, splitter) {
-  const splitString =
-    (typeof splitter === 'string'
-      ? splitter
-      : null);
-
-  if (splitString) {
-    let following = '';
-    for (const chunk of content.split(splitString)) {
-      yield {chunk, following};
-      following = splitString;
+  function first(string) {
+    if (typeof splitter === 'string') {
+      const index = string.indexOf(string);
+      if (index) {
+        return {index, match: string};
+      } else {
+        return null;
+      }
+    } else if (splitter instanceof RegExp) {
+      const match = string.match(splitter);
+      if (match) {
+        return {index: match.index, match: match[0]};
+      } else {
+        return null;
+      }
     }
-
-    return;
   }
 
-  const splitRegExp =
-    (splitter instanceof RegExp
-      ? new RegExp(
-          splitter.source,
-          (splitter.flags.includes('g')
-            ? splitter.flags
-            : splitter.flags + 'g'))
-      : null);
+  if (splitter instanceof RegExp) {
+    splitter =
+      new RegExp(
+        splitter.source,
+        (splitter.flags.includes('g')
+          ? splitter.flags
+          : splitter.flags + 'g'));
+  }
 
-  if (splitRegExp) {
-    let following = '';
-    let prevIndex = 0;
-    for (const match of content.matchAll(splitRegExp)) {
-      const chunk = content.slice(prevIndex, match.index);
+  let chunk = '', following = '', rest = content;
+
+  while (rest) {
+    const split = first(rest);
+    if (split) {
+      chunk += rest.slice(0, split.index);
       yield {chunk, following};
 
-      following = match[0];
-      prevIndex = match.index + match[0].length;
+      chunk = '', following = split.match;
+      rest = rest.slice(split.index + split.match.length);
+    } else {
+      chunk += rest;
+      rest = '';
     }
-
-    const chunk = content.slice(prevIndex);
-    yield {chunk, following};
-
-    return;
   }
+
+  yield {chunk, following};
 }
 
 export function attributes(attributes) {
