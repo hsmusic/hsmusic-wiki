@@ -348,6 +348,8 @@ export class Tag {
   #traceError = null;
 
   constructor(tagName, attributes, content) {
+    this.#content = [];
+
     this.tagName = tagName;
     this.attributes = attributes;
     this.content = content;
@@ -431,14 +433,9 @@ export class Tag {
     }
 
     this.#content = contentArray;
-    this.#content.toStringParts = () => this.#contentToStringParts();
   }
 
   get content() {
-    if (this.#content === null) {
-      this.#content = [];
-    }
-
     return this.#content;
   }
 
@@ -598,7 +595,7 @@ export class Tag {
     }
 
     const attributesString = this.attributes.toString();
-    const contentStringParts = this.content.toStringParts();
+    const contentStringParts = this.#contentToStringParts();
 
     if (!this.tagName) {
       return contentStringParts;
