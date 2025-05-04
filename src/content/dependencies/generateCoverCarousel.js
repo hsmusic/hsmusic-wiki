@@ -19,7 +19,7 @@ export default {
       });
 
     if (empty(stitched)) {
-      return;
+      return html.blank();
     }
 
     const layout = getCarouselLayoutForNumberOfItems(stitched.length);

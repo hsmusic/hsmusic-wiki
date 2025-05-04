@@ -1,5 +1,5 @@
 import {sortChronologically} from '#sort';
-import {empty, stitchArrays} from '#sugar';
+import {stitchArrays} from '#sugar';
 import {filterItemsForCarousel, getTotalDuration} from '#wiki-data';
 
 export default {
@@ -21,79 +21,91 @@ export default {
   sprawl: ({wikiInfo}) =>
     ({enableGroupUI: wikiInfo.enableGroupUI}),
 
-  relations(relation, sprawl, group) {
-    const relations = {};
+  query(_sprawl, group) {
+    const query = {};
 
-    const albums =
+    query.allAlbums =
       sortChronologically(group.albums.slice(), {latestFirst: true});
 
-    relations.layout =
-      relation('generatePageLayout');
+    query.allTracks =
+      query.allAlbums.flatMap((album) => album.tracks);
 
-    relations.navLinks =
-      relation('generateGroupNavLinks', group);
+    query.carouselAlbums =
+      filterItemsForCarousel(group.featuredAlbums);
 
-    if (sprawl.enableGroupUI) {
-      relations.secondaryNav =
-        relation('generateGroupSecondaryNav', group);
+    return query;
+  },
 
-      relations.sidebar =
-        relation('generateGroupSidebar', group);
-    }
+  relations: (relation, query, sprawl, group) => ({
+    layout:
+      relation('generatePageLayout'),
 
-    const carouselAlbums = filterItemsForCarousel(group.featuredAlbums);
+    navLinks:
+      relation('generateGroupNavLinks', group),
 
-    if (!empty(carouselAlbums)) {
-      relations.coverCarousel =
-        relation('generateCoverCarousel');
+    secondaryNav:
+      (sprawl.enableGroupUI
+        ? relation('generateGroupSecondaryNav', group)
+        : null),
 
-      relations.carouselLinks =
-        carouselAlbums
-          .map(album => relation('linkAlbum', album));
+    sidebar:
+      (sprawl.enableGroupUI
+        ? relation('generateGroupSidebar', group)
+        : null),
 
-      relations.carouselImages =
-        carouselAlbums
-          .map(album => relation('image', album.coverArtworks[0]));
-    }
+    coverCarousel:
+      relation('generateCoverCarousel'),
 
-    relations.quickDescription =
-      relation('generateQuickDescription', group);
+    carouselLinks:
+      query.carouselAlbums
+        .map(album => relation('linkAlbum', album)),
 
-    relations.coverGrid =
-      relation('generateCoverGrid');
+    carouselImages:
+      query.carouselAlbums
+        .map(album => relation('image', album.coverArtworks[0])),
 
-    relations.gridLinks =
-      albums
-        .map(album => relation('linkAlbum', album));
+    quickDescription:
+      relation('generateQuickDescription', group),
 
-    relations.gridImages =
-      albums.map(album =>
+    coverGrid:
+      relation('generateCoverGrid'),
+
+    gridLinks:
+      query.allAlbums
+        .map(album => relation('linkAlbum', album)),
+
+    gridImages:
+      query.allAlbums.map(album =>
         (album.hasCoverArt
           ? relation('image', album.coverArtworks[0])
-          : relation('image')));
+          : relation('image'))),
+  }),
 
-    return relations;
-  },
+  data: (query, _sprawl, group) => ({
+    name:
+      group.name,
 
-  data(sprawl, group) {
-    const data = {};
+    color:
+      group.color,
 
-    data.name = group.name;
-    data.color = group.color;
+    numAlbums:
+      query.allAlbums.length,
 
-    const albums = sortChronologically(group.albums.slice(), {latestFirst: true});
-    const tracks = albums.flatMap((album) => album.tracks);
+    numTracks:
+      query.allTracks.length,
 
-    data.numAlbums = albums.length;
-    data.numTracks = tracks.length;
-    data.totalDuration = getTotalDuration(tracks, {mainReleasesOnly: true});
+    totalDuration:
+      getTotalDuration(query.allTracks, {mainReleasesOnly: true}),
 
-    data.gridNames = albums.map(album => album.name);
-    data.gridDurations = albums.map(album => getTotalDuration(album.tracks));
-    data.gridNumTracks = albums.map(album => album.tracks.length);
+    gridNames:
+      query.allAlbums.map(album => album.name),
 
-    return data;
-  },
+    gridDurations:
+      query.allAlbums.map(album => getTotalDuration(album.tracks)),
+
+    gridNumTracks:
+      query.allAlbums.map(album => album.tracks.length),
+  }),
 
   generate: (data, relations, {html, language}) =>
     language.encapsulate('groupGalleryPage', pageCapsule =>
@@ -105,11 +117,10 @@ export default {
 
         mainClasses: ['top-index'],
         mainContent: [
-          relations.coverCarousel
-            ?.slots({
-              links: relations.carouselLinks,
-              images: relations.carouselImages,
-            }),
+          relations.coverCarousel.slots({
+            links: relations.carouselLinks,
+            images: relations.carouselImages,
+          }),
 
           relations.quickDescription,
 
