@@ -135,7 +135,7 @@ export class Artwork extends Thing {
       }),
 
       exitWithoutDependency({
-        dependency: 'artistContribsFromThingProperty',
+        dependency: 'dimensionsFromThingProperty',
         value: input.value(null),
       }),
 
