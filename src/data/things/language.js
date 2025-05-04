@@ -135,6 +135,7 @@ export class Language extends Thing {
     },
 
     intl_date: this.#intlHelper(Intl.DateTimeFormat, {full: true}),
+    intl_dateYear: this.#intlHelper(Intl.DateTimeFormat, {year: 'numeric'}),
     intl_number: this.#intlHelper(Intl.NumberFormat),
     intl_listConjunction: this.#intlHelper(Intl.ListFormat, {type: 'conjunction'}),
     intl_listDisjunction: this.#intlHelper(Intl.ListFormat, {type: 'disjunction'}),
@@ -488,20 +489,42 @@ export class Language extends Thing {
     // or both are undefined, that's just blank content.
     const hasStart = startDate !== null && startDate !== undefined;
     const hasEnd = endDate !== null && endDate !== undefined;
-    if (!hasStart || !hasEnd) {
-      if (startDate === endDate) {
-        return html.blank();
-      } else if (hasStart) {
-        throw new Error(`Expected both start and end of date range, got only start`);
-      } else if (hasEnd) {
-        throw new Error(`Expected both start and end of date range, got only end`);
-      } else {
-        throw new Error(`Got mismatched ${startDate}/${endDate} for start and end`);
-      }
+    if (!hasStart && !hasEnd) {
+      return html.blank();
+    } else if (hasStart && !hasEnd) {
+      throw new Error(`Expected both start and end of date range, got only start`);
+    } else if (!hasStart && hasEnd) {
+      throw new Error(`Expected both start and end of date range, got only end`);
     }
 
     this.assertIntlAvailable('intl_date');
     return this.intl_date.formatRange(startDate, endDate);
+  }
+
+  formatYear(date) {
+    if (date === null || date === undefined) {
+      return html.blank();
+    }
+
+    this.assertIntlAvailable('intl_dateYear');
+    return this.intl_dateYear.format(date);
+  }
+
+  formatYearRange(startDate, endDate) {
+    // formatYearRange expects both values to be present, but if both are null
+    // or both are undefined, that's just blank content.
+    const hasStart = startDate !== null && startDate !== undefined;
+    const hasEnd = endDate !== null && endDate !== undefined;
+    if (!hasStart && !hasEnd) {
+      return html.blank();
+    } else if (hasStart && !hasEnd) {
+      throw new Error(`Expected both start and end of date range, got only start`);
+    } else if (!hasStart && hasEnd) {
+      throw new Error(`Expected both start and end of date range, got only end`);
+    }
+
+    this.assertIntlAvailable('intl_dateYear');
+    return this.intl_dateYear.formatRange(startDate, endDate);
   }
 
   formatDateDuration({

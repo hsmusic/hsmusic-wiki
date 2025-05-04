@@ -4,10 +4,11 @@ import {filterItemsForCarousel, getTotalDuration} from '#wiki-data';
 export default {
   contentDependencies: [
     'generateCoverCarousel',
-    'generateGroupGalleryPageAlbumGrid',
+    'generateGroupGalleryPageAlbumsByDateView',
+    'generateGroupGalleryPageAlbumsBySeriesView',
     'generateGroupNavLinks',
     'generateGroupSecondaryNav',
-    'generateGroupSidebar',
+    'generateIntrapageDotSwitcher',
     'generatePageLayout',
     'generateQuickDescription',
     'image',
@@ -47,11 +48,6 @@ export default {
         ? relation('generateGroupSecondaryNav', group)
         : null),
 
-    sidebar:
-      (sprawl.enableGroupUI
-        ? relation('generateGroupSidebar', group)
-        : null),
-
     coverCarousel:
       relation('generateCoverCarousel'),
 
@@ -66,8 +62,14 @@ export default {
     quickDescription:
       relation('generateQuickDescription', group),
 
-    albumGrid:
-      relation('generateGroupGalleryPageAlbumGrid', query.allAlbums),
+    albumViewSwitcher:
+      relation('generateIntrapageDotSwitcher'),
+
+    albumsBySeriesView:
+      relation('generateGroupGalleryPageAlbumsBySeriesView', group),
+
+    albumsByDateView:
+      relation('generateGroupGalleryPageAlbumsByDateView', group),
   }),
 
   data: (query, _sprawl, group) => ({
@@ -125,15 +127,69 @@ export default {
                   })),
             })),
 
-          relations.albumGrid,
-        ],
+          ([
+            !html.isBlank(relations.albumsBySeriesView),
+            !html.isBlank(relations.albumsByDateView)
+          ]).filter(Boolean).length > 1 &&
 
-        leftSidebar:
-          (relations.sidebar
-            ? relations.sidebar
-                .slot('currentExtra', 'gallery')
-                .content /* TODO: Kludge. */
-            : null),
+            language.encapsulate(pageCapsule, 'albumViewSwitcher', capsule =>
+              html.tag('p', {class: 'gallery-view-switcher'},
+                {[html.onlyIfContent]: true},
+                {[html.joinChildren]: html.tag('br')},
+
+                [
+                  language.$(capsule),
+
+                  relations.albumViewSwitcher.slots({
+                    initialOptionIndex: 0,
+
+                    titles: [
+                      !html.isBlank(relations.albumsBySeriesView) &&
+                        language.$(capsule, 'bySeries'),
+
+                      !html.isBlank(relations.albumsByDateView) &&
+                        language.$(capsule, 'byDate'),
+                    ].filter(Boolean),
+
+                    targetIDs: [
+                      !html.isBlank(relations.albumsBySeriesView) &&
+                        'group-album-gallery-by-series',
+
+                      !html.isBlank(relations.albumsByDateView) &&
+                        'group-album-gallery-by-date',
+                    ].filter(Boolean),
+                  }),
+                ])),
+
+          /*
+          data.trackGridLabels.some(value => value !== null) &&
+            html.tag('p', {class: 'gallery-set-switcher'},
+              language.encapsulate(pageCapsule, 'setSwitcher', switcherCapsule =>
+                language.$(switcherCapsule, {
+                  sets:
+                    relations.setSwitcher.slots({
+                      initialOptionIndex: 0,
+
+                      titles:
+                        data.trackGridLabels.map(label =>
+                          label ??
+                          language.$(switcherCapsule, 'unlabeledSet')),
+
+                      targetIDs:
+                        data.trackGridIDs,
+                    }),
+                }))),
+          */
+
+          relations.albumsBySeriesView,
+
+          relations.albumsByDateView.slots({
+            attributes: [
+              !html.isBlank(relations.albumsBySeriesView) &&
+                {style: 'display: none'},
+            ],
+          }),
+        ],
 
         navLinkStyle: 'hierarchical',
         navLinks:
@@ -141,7 +197,6 @@ export default {
             .slot('currentExtra', 'gallery')
             .content,
 
-        secondaryNav:
-          relations.secondaryNav ?? null,
+        secondaryNav: relations.secondaryNav,
       })),
 };

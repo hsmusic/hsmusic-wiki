@@ -982,6 +982,8 @@ misc:
 
       otherCoverArtists: "With {ARTISTS}"
 
+    expandCollapseCue: "({CUE})"
+
   albumGalleryGrid:
     noCoverArt: "{NAME}"
 
@@ -1664,6 +1666,34 @@ groupGalleryPage:
 
   infoLine: >-
     {TRACKS} across {ALBUMS}, totaling {TIME}.
+
+  albumViewSwitcher:
+    _: "Showing albums:"
+
+    bySeries: "By series"
+    byDate: "By date"
+
+  albumsByDate:
+    title: "All albums"
+
+  albumSection:
+    caption: >-
+      {TRACKS} across {ALBUMS}.
+
+    caption.withDate: >-
+      {TRACKS} across {ALBUMS}, released {DATE}.
+
+    caption.withYear: >-
+      {TRACKS} across {ALBUMS}, released during {YEAR}.
+
+    caption.withYearRange: >-
+      {TRACKS} across {ALBUMS}, released {YEAR_RANGE}.
+
+    expand: >-
+      Show the rest!
+
+    collapse: >-
+      Collapse these
 
 #
 # listingIndex:
