@@ -1943,6 +1943,7 @@ ul.quick-info li:not(:last-child)::after {
 
 .quick-description > blockquote {
   margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 .quick-description .description-content.long hr ~ p {
