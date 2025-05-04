@@ -1,11 +1,10 @@
 import {sortChronologically} from '#sort';
-import {stitchArrays} from '#sugar';
 import {filterItemsForCarousel, getTotalDuration} from '#wiki-data';
 
 export default {
   contentDependencies: [
     'generateCoverCarousel',
-    'generateCoverGrid',
+    'generateGroupGalleryPageAlbumGrid',
     'generateGroupNavLinks',
     'generateGroupSecondaryNav',
     'generateGroupSidebar',
@@ -67,18 +66,8 @@ export default {
     quickDescription:
       relation('generateQuickDescription', group),
 
-    coverGrid:
-      relation('generateCoverGrid'),
-
-    gridLinks:
-      query.allAlbums
-        .map(album => relation('linkAlbum', album)),
-
-    gridImages:
-      query.allAlbums.map(album =>
-        (album.hasCoverArt
-          ? relation('image', album.coverArtworks[0])
-          : relation('image'))),
+    albumGrid:
+      relation('generateGroupGalleryPageAlbumGrid', query.allAlbums),
   }),
 
   data: (query, _sprawl, group) => ({
@@ -96,15 +85,6 @@ export default {
 
     totalDuration:
       getTotalDuration(query.allTracks, {mainReleasesOnly: true}),
-
-    gridNames:
-      query.allAlbums.map(album => album.name),
-
-    gridDurations:
-      query.allAlbums.map(album => getTotalDuration(album.tracks)),
-
-    gridNumTracks:
-      query.allAlbums.map(album => album.tracks.length),
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -145,33 +125,7 @@ export default {
                   })),
             })),
 
-          relations.coverGrid
-            .slots({
-              links: relations.gridLinks,
-              names: data.gridNames,
-
-              images:
-                stitchArrays({
-                  image: relations.gridImages,
-                  name: data.gridNames,
-                }).map(({image, name}) =>
-                    image.slots({
-                      missingSourceContent:
-                        language.$('misc.coverGrid.noCoverArt', {
-                          album: name,
-                        }),
-                    })),
-
-              info:
-                stitchArrays({
-                  numTracks: data.gridNumTracks,
-                  duration: data.gridDurations,
-                }).map(({numTracks, duration}) =>
-                    language.$('misc.coverGrid.details.albumLength', {
-                      tracks: language.countTracks(numTracks, {unit: true}),
-                      time: language.formatDuration(duration),
-                    })),
-            }),
+          relations.albumGrid,
         ],
 
         leftSidebar:
