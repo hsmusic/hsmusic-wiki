@@ -22,6 +22,9 @@ export default {
   data: (entry) => ({
     isWikiLyrics:
       entry.isWikiLyrics,
+
+    hasSquareBracketAnnotations:
+      entry.hasSquareBracketAnnotations,
   }),
 
   slots: {
@@ -63,6 +66,13 @@ export default {
                       ? language.formatUnitList(relations.artistLinks)
                       : relations.artistText.slot('mode', 'inline')),
                 }),
+
+              // This check is doubled up only for clarity: entries are coded
+              // in data so that `hasSquareBracketAnnotations` is only true
+              // if `isWikiLyrics` is also true.
+              data.isWikiLyrics &&
+              data.hasSquareBracketAnnotations &&
+                language.$(capsule, 'squareBracketAnnotations'),
             ]),
 
           relations.content.slot('mode', 'lyrics'),

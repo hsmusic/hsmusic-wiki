@@ -8,6 +8,7 @@ import {contentString, referenceList, simpleDate, soupyFind, thing}
   from '#composite/wiki-properties';
 
 import {
+  exitWithoutDependency,
   exposeConstant,
   exposeDependency,
   exposeDependencyOrContinue,
@@ -19,6 +20,7 @@ import {
   contentArtists,
   hasAnnotationPart,
   withAnnotationParts,
+  withHasAnnotationPart,
   withSourceText,
   withSourceURLs,
   withWebArchiveDate,
@@ -159,6 +161,29 @@ export class LyricsEntry extends ContentEntry {
     isWikiLyrics: hasAnnotationPart({
       part: input.value('wiki lyrics'),
     }),
+
+    hasSquareBracketAnnotations: [
+      withHasAnnotationPart({
+        part: input.value('wiki lyrics'),
+      }),
+
+      exitWithoutDependency({
+        dependency: '#hasAnnotationPart',
+        mode: input.value('falsy'),
+        value: input.value(false),
+      }),
+
+      exitWithoutDependency({
+        dependency: 'body',
+        value: input.value(false),
+      }),
+
+      {
+        dependencies: ['body'],
+        compute: ({body}) =>
+          /\[.*\]/m.test(body),
+      },
+    ],
   });
 }
 

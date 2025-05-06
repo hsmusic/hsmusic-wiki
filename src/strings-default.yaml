@@ -720,6 +720,9 @@ misc:
     contributors: >-
       Contributions from {CONTRIBUTORS}
 
+    squareBracketAnnotations: >-
+      Mind parts marked in [square brackets]
+
   # missingImage:
   #   Fallback text displayed in an image when it's sourced to a file
   #   that isn't available under the wiki's media directory. While it
