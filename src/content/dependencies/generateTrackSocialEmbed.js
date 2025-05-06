@@ -26,14 +26,12 @@ export default {
     data.trackDirectory = track.directory;
     data.albumDirectory = album.directory;
 
+    data.hasImage = track.hasUniqueCoverArt || album.hasCoverArt;
+
     if (track.hasUniqueCoverArt) {
-      data.imageSource = 'track';
-      data.coverArtFileExtension = track.coverArtFileExtension;
+      data.imagePath = track.trackArtworks[0].path;
     } else if (album.hasCoverArt) {
-      data.imageSource = 'album';
-      data.coverArtFileExtension = album.coverArtFileExtension;
-    } else {
-      data.imageSource = 'none';
+      data.imagePath = album.coverArtworks[0].path;
     }
 
     return data;
@@ -59,10 +57,8 @@ export default {
           absoluteTo('localized.album', data.albumDirectory),
 
         imagePath:
-          (data.imageSource === 'album'
-            ? ['media.albumCover', data.albumDirectory, data.coverArtFileExtension]
-         : data.imageSource === 'track'
-            ? ['media.trackCover', data.albumDirectory, data.trackDirectory, data.coverArtFileExtension]
+          (data.hasImage
+            ? data.imagePath
             : null),
       })),
 };
