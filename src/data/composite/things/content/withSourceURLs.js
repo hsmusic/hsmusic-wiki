@@ -29,7 +29,8 @@ export default templateCompositeFrom({
         ['#firstPartWithExternalLink']:
           annotationParts
             .find(nodes => nodes
-              .some(node => node.type === 'external-link')),
+              .some(node => node.type === 'external-link')) ??
+          null,
       }),
     },
 
