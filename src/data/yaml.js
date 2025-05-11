@@ -828,7 +828,7 @@ export function parseArtwork({
   return transform;
 }
 
-export function parseContentEntries(thingClass, sourceText, {subdoc}) {
+export function parseContentEntriesFromSourceText(thingClass, sourceText, {subdoc}) {
   function map(matchEntry) {
     let artistText = null, artistReferences = null;
 
@@ -922,22 +922,35 @@ export function parseContentEntries(thingClass, sourceText, {subdoc}) {
   return subdocs;
 }
 
-export function parseCommentary(sourceText, {subdoc, CommentaryEntry}) {
-  return parseContentEntries(CommentaryEntry, sourceText, {subdoc});
+export function parseContentEntries(thingClass, value, {subdoc}) {
+  if (typeof value === 'string') {
+    return parseContentEntriesFromSourceText(thingClass, value, {subdoc});
+  } else if (Array.isArray(value)) {
+    return value.map(doc => subdoc(thingClass, doc, {bindInto: 'thing'}));
+  } else {
+    return value;
+  }
 }
 
-export function parseCreditingSources(sourceText, {subdoc, CreditingSourcesEntry}) {
-  return parseContentEntries(CreditingSourcesEntry, sourceText, {subdoc});
+export function parseCommentary(value, {subdoc, CommentaryEntry}) {
+  return parseContentEntries(CommentaryEntry, value, {subdoc});
 }
 
-export function parseLyrics(sourceText, {subdoc, LyricsEntry}) {
-  if (!multipleLyricsDetectionRegex.test(sourceText)) {
-    const document = {'Body': sourceText};
+export function parseCreditingSources(value, {subdoc, CreditingSourcesEntry}) {
+  return parseContentEntries(CreditingSourcesEntry, value, {subdoc});
+}
+
+export function parseLyrics(value, {subdoc, LyricsEntry}) {
+  if (
+    typeof value === 'string' &&
+    !multipleLyricsDetectionRegex.test(value)
+  ) {
+    const document = {'Body': value};
 
     return [subdoc(LyricsEntry, document, {bindInto: 'thing'})];
   }
 
-  return parseContentEntries(LyricsEntry, sourceText, {subdoc});
+  return parseContentEntries(LyricsEntry, value, {subdoc});
 }
 
 // documentModes: Symbols indicating sets of behavior for loading and processing
