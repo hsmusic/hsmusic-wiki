@@ -979,14 +979,6 @@ export function validateWikiData({
   };
 }
 
-export function isAdditionalName() {
-  throw new Error('deprecated');
-}
-
-export function isAdditionalNameList() {
-  throw new Error('deprecated');
-}
-
 // Compositional utilities
 
 export function anyOf(...validators) {
