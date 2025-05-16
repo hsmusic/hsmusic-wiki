@@ -7,7 +7,7 @@ export default {
     'generateListAllAdditionalFilesChunk',
     'linkAlbum',
     'linkTrack',
-    'linkAlbumAdditionalFile',
+    'linkAdditionalFile',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
@@ -28,63 +28,37 @@ export default {
     // as though they do implement those fields, but don't have any
     // additional files of that type.
 
-    const albumAdditionalFileObjects =
+    const albumAdditionalFileLists =
       albums
         .map(album => album[property] ?? []);
 
-    const trackAdditionalFileObjects =
+    const trackAdditionalFileLists =
       tracks
         .map(byAlbum => byAlbum
           .map(track => track[property] ?? []));
 
     // Filter out tracks that don't have any additional files.
 
-    stitchArrays({tracks, trackAdditionalFileObjects})
-      .forEach(({tracks, trackAdditionalFileObjects}) => {
-        filterMultipleArrays(tracks, trackAdditionalFileObjects,
-          (track, trackAdditionalFileObjects) => !empty(trackAdditionalFileObjects));
+    stitchArrays({tracks, trackAdditionalFileLists})
+      .forEach(({tracks, trackAdditionalFileLists}) => {
+        filterMultipleArrays(tracks, trackAdditionalFileLists,
+          (track, trackAdditionalFileLists) => !empty(trackAdditionalFileLists));
       });
 
     // Filter out albums that don't have any tracks,
     // nor any additional files of their own.
 
-    filterMultipleArrays(albums, albumAdditionalFileObjects, tracks, trackAdditionalFileObjects,
-      (album, albumAdditionalFileObjects, tracks, trackAdditionalFileObjects) =>
-        !empty(albumAdditionalFileObjects) ||
-        !empty(trackAdditionalFileObjects));
-
-    // Map additional file objects into titles and lists of file names.
-
-    const albumAdditionalFileTitles =
-      albumAdditionalFileObjects
-        .map(byAlbum => byAlbum
-          .map(({title}) => title));
-
-    const albumAdditionalFileFilenames =
-      albumAdditionalFileObjects
-        .map(byAlbum => byAlbum
-          .map(({filenames}) => filenames));
-
-    const trackAdditionalFileTitles =
-      trackAdditionalFileObjects
-        .map(byAlbum => byAlbum
-          .map(byTrack => byTrack
-            .map(({title}) => title)));
-
-    const trackAdditionalFileFilenames =
-      trackAdditionalFileObjects
-        .map(byAlbum => byAlbum
-          .map(byTrack => byTrack
-            .map(({filenames}) => filenames)));
+    filterMultipleArrays(albums, albumAdditionalFileLists, tracks, trackAdditionalFileLists,
+      (album, albumAdditionalFileLists, tracks, trackAdditionalFileLists) =>
+        !empty(albumAdditionalFileLists) ||
+        !empty(trackAdditionalFileLists));
 
     return {
       spec,
       albums,
       tracks,
-      albumAdditionalFileTitles,
-      albumAdditionalFileFilenames,
-      trackAdditionalFileTitles,
-      trackAdditionalFileFilenames,
+      albumAdditionalFileLists,
+      trackAdditionalFileLists,
     };
   },
 
@@ -111,30 +85,41 @@ export default {
           .map(() => relation('generateListAllAdditionalFilesChunk'))),
 
     albumAdditionalFileLinks:
-      stitchArrays({
-        album: query.albums,
-        filenames: query.albumAdditionalFileFilenames,
-      }).map(({album, filenames: byAlbum}) =>
-          byAlbum
-            .map(filenames => filenames
-              .map(filename => relation('linkAlbumAdditionalFile', album, filename)))),
+      query.albumAdditionalFileLists
+        .map(files => files
+          .map(file => file.filenames
+            .map(filename => relation('linkAdditionalFile', file, filename)))),
 
     trackAdditionalFileLinks:
-      stitchArrays({
-        album: query.albums,
-        filenames: query.trackAdditionalFileFilenames,
-      }).map(({album, filenames: byAlbum}) =>
-          byAlbum
-            .map(byTrack => byTrack
-              .map(filenames => filenames
-                .map(filename => relation('linkAlbumAdditionalFile', album, filename))))),
+      query.trackAdditionalFileLists
+        .map(byAlbum => byAlbum
+          .map(files => files
+            .map(file => file.filenames
+              .map(filename => relation('linkAdditionalFile', file, filename))))),
   }),
 
   data: (query) => ({
-    albumAdditionalFileTitles: query.albumAdditionalFileTitles,
-    trackAdditionalFileTitles: query.trackAdditionalFileTitles,
-    albumAdditionalFileFilenames: query.albumAdditionalFileFilenames,
-    trackAdditionalFileFilenames: query.trackAdditionalFileFilenames,
+    albumAdditionalFileTitles:
+      query.albumAdditionalFileLists
+        .map(files => files
+          .map(file => file.title)),
+
+    trackAdditionalFileTitles:
+      query.trackAdditionalFileLists
+        .map(byAlbum => byAlbum
+          .map(files => files
+            .map(file => file.title))),
+
+    albumAdditionalFileFilenames:
+      query.albumAdditionalFileLists
+        .map(files => files
+          .map(file => file.filenames)),
+
+    trackAdditionalFileFilenames:
+      query.trackAdditionalFileLists
+        .map(byAlbum => byAlbum
+          .map(files => files
+            .map(file => file.filenames))),
   }),
 
   slots: {

@@ -5,7 +5,7 @@ export default {
     'generateAdditionalFilesList',
     'generateAdditionalFilesListChunk',
     'generateAdditionalFilesListChunkItem',
-    'linkAlbumAdditionalFile',
+    'linkAdditionalFile',
     'transformContent',
   ],
 
@@ -21,18 +21,17 @@ export default {
 
     chunkDescriptions:
       additionalFiles
-        .map(({description}) =>
-          relation('transformContent', description)),
+        .map(file => relation('transformContent', file.description)),
 
     chunkItems:
       additionalFiles
-        .map(({filenames}) => filenames
+        .map(file => file.paths
           .map(() => relation('generateAdditionalFilesListChunkItem'))),
 
     chunkItemFileLinks:
       additionalFiles
-        .map(({filenames}) => filenames
-          .map(filename => relation('linkAlbumAdditionalFile', album, filename))),
+        .map(file => file.filenames
+          .map(filename => relation('linkAdditionalFile', file, filename))),
   }),
 
   data: (album, additionalFiles) => ({
@@ -40,11 +39,11 @@ export default {
 
     chunkTitles:
       additionalFiles
-        .map(({title}) => title),
+        .map(file => file.title),
 
-    chunkItemFilenames:
+    chunkItemPaths:
       additionalFiles
-        .map(({filenames}) => filenames),
+        .map(file => file.paths),
   }),
 
   slots: {
@@ -71,13 +70,13 @@ export default {
         stitchArrays({
           items: relations.chunkItems,
           fileLinks: relations.chunkItemFileLinks,
-          filenames: data.chunkItemFilenames,
-        }).map(({items, fileLinks, filenames}) =>
+          paths: data.chunkItemPaths,
+        }).map(({items, fileLinks, paths}) =>
             stitchArrays({
               item: items,
               fileLink: fileLinks,
-              filename: filenames,
-            }).map(({item, fileLink, filename}) =>
+              path: paths,
+            }).map(({item, fileLink, path}) =>
                 item.slots({
                   fileLink: fileLink,
                   fileSize:
@@ -85,7 +84,7 @@ export default {
                       ? getSizeOfMediaFile(
                           urls
                             .from('media.root')
-                            .to('media.albumAdditionalFile', data.albumDirectory, filename))
+                            .to(...path))
                       : 0),
                 }))),
     }),
