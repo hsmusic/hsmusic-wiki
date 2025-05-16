@@ -10,6 +10,7 @@ import {withEntries} from '#sugar';
 import Thing from '#thing';
 
 import * as additionalFileClasses from './additional-file.js';
+import * as additionalNameClasses from './additional-name.js';
 import * as albumClasses from './album.js';
 import * as artTagClasses from './art-tag.js';
 import * as artistClasses from './artist.js';
@@ -28,6 +29,7 @@ import * as wikiInfoClasses from './wiki-info.js';
 
 const allClassLists = {
   'additional-file.js': additionalFileClasses,
+  'additional-name.js': additionalNameClasses,
   'album.js': albumClasses,
   'art-tag.js': artTagClasses,
   'artist.js': artistClasses,

@@ -12,7 +12,6 @@ import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
 
 import {
-  additionalNameList,
   annotatedReferenceList,
   color,
   contentString,
@@ -23,6 +22,7 @@ import {
   name,
   soupyFind,
   soupyReverse,
+  thingList,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -34,7 +34,11 @@ export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
   static [Thing.friendlyName] = `Art Tag`;
 
-  static [Thing.getPropertyDescriptors] = ({Album, Track}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    AdditionalName,
+    Album,
+    Track,
+  }) => ({
     // Update & expose
 
     name: name('Unnamed Art Tag'),
@@ -55,7 +59,9 @@ export class ArtTag extends Thing {
       },
     ],
 
-    additionalNames: additionalNameList(),
+    additionalNames: thingList({
+      class: input.value(AdditionalName),
+    }),
 
     description: contentString(),
 

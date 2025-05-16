@@ -979,12 +979,13 @@ export function validateWikiData({
   };
 }
 
-export const isAdditionalName = validateProperties({
-  name: isContentString,
-  annotation: optional(isContentString),
-});
+export function isAdditionalName() {
+  throw new Error('deprecated');
+}
 
-export const isAdditionalNameList = validateArrayItems(isAdditionalName);
+export function isAdditionalNameList() {
+  throw new Error('deprecated');
+}
 
 // Compositional utilities
 

@@ -33,7 +33,6 @@ import {exitWithoutContribs, withDirectory, withCoverArtDate}
   from '#composite/wiki-data';
 
 import {
-  additionalNameList,
   color,
   commentatorArtists,
   constitutibleArtwork,
@@ -69,6 +68,7 @@ export class Album extends Thing {
 
   static [Thing.getPropertyDescriptors] = ({
     AdditionalFile,
+    AdditionalName,
     ArtTag,
     Artwork,
     CommentaryEntry,
@@ -102,7 +102,9 @@ export class Album extends Thing {
     color: color(),
     urls: urls(),
 
-    additionalNames: additionalNameList(),
+    additionalNames: thingList({
+      class: input.value(AdditionalName),
+    }),
 
     bandcampAlbumIdentifier: simpleString(),
     bandcampArtworkIdentifier: simpleString(),

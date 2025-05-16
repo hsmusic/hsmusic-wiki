@@ -619,23 +619,23 @@ export function parseAdditionalFiles(entries, {subdoc, AdditionalFile}) {
   });
 }
 
-export function parseAdditionalNames(entries) {
+export function parseAdditionalNames(entries, {subdoc, AdditionalName}) {
   return parseArrayEntries(entries, item => {
-    if (typeof item === 'object' && typeof item['Name'] === 'string')
-      return {
-        name: item['Name'],
-        annotation: item['Annotation'] ?? null,
-      };
+    if (typeof item === 'object') {
+      return subdoc(AdditionalName, item, {bindInto: 'thing'});
+    }
 
     if (typeof item !== 'string') return item;
 
     const match = item.match(extractAccentRegex);
     if (!match) return item;
 
-    return {
-      name: match.groups.main,
-      annotation: match.groups.accent ?? null,
+    const document = {
+      ['Name']: match.groups.main,
+      ['Annotation']: match.groups.accent ?? null,
     };
+
+    return subdoc(AdditionalName, document, {bindInto: 'thing'});
   });
 }
 

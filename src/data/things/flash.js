@@ -27,7 +27,6 @@ import {
 } from '#composite/control-flow';
 
 import {
-  additionalNameList,
   color,
   commentatorArtists,
   constitutibleArtwork,
@@ -54,6 +53,7 @@ export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';
 
   static [Thing.getPropertyDescriptors] = ({
+    AdditionalName,
     CommentaryEntry,
     CreditingSourcesEntry,
     Track,
@@ -127,7 +127,9 @@ export class Flash extends Thing {
 
     urls: urls(),
 
-    additionalNames: additionalNameList(),
+    additionalNames: thingList({
+      class: input.value(AdditionalName),
+    }),
 
     commentary: thingList({
       class: input.value(CommentaryEntry),
