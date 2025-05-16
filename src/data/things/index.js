@@ -9,6 +9,7 @@ import * as serialize from '#serialize';
 import {withEntries} from '#sugar';
 import Thing from '#thing';
 
+import * as additionalFileClasses from './additional-file.js';
 import * as albumClasses from './album.js';
 import * as artTagClasses from './art-tag.js';
 import * as artistClasses from './artist.js';
@@ -26,6 +27,7 @@ import * as trackClasses from './track.js';
 import * as wikiInfoClasses from './wiki-info.js';
 
 const allClassLists = {
+  'additional-file.js': additionalFileClasses,
   'album.js': albumClasses,
   'art-tag.js': artTagClasses,
   'artist.js': artistClasses,

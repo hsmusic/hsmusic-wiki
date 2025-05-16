@@ -738,14 +738,6 @@ export const isContributionPreset = validateProperties({
 
 export const isContributionPresetList = validateArrayItems(isContributionPreset);
 
-export const isAdditionalFile = validateProperties({
-  title: isName,
-  description: optional(isContentString),
-  files: optional(validateArrayItems(isString)),
-});
-
-export const isAdditionalFileList = validateArrayItems(isAdditionalFile);
-
 export const isTrackSection = validateProperties({
   name: optional(isName),
   color: optional(isColor),

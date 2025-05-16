@@ -33,7 +33,6 @@ import {exitWithoutContribs, withDirectory, withCoverArtDate}
   from '#composite/wiki-data';
 
 import {
-  additionalFiles,
   additionalNameList,
   color,
   commentatorArtists,
@@ -69,6 +68,7 @@ export class Album extends Thing {
   static [Thing.referenceType] = 'album';
 
   static [Thing.getPropertyDescriptors] = ({
+    AdditionalFile,
     ArtTag,
     Artwork,
     CommentaryEntry,
@@ -216,7 +216,9 @@ export class Album extends Thing {
       class: input.value(CreditingSourcesEntry),
     }),
 
-    additionalFiles: additionalFiles(),
+    additionalFiles: thingList({
+      class: input.value(AdditionalFile),
+    }),
 
     trackSections: thingList({
       class: input.value(TrackSection),

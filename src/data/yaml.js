@@ -611,15 +611,11 @@ export function parseContributors(entries) {
   });
 }
 
-export function parseAdditionalFiles(entries) {
+export function parseAdditionalFiles(entries, {subdoc, AdditionalFile}) {
   return parseArrayEntries(entries, item => {
     if (typeof item !== 'object') return item;
 
-    return {
-      title: item['Title'],
-      description: item['Description'] ?? null,
-      files: item['Files'],
-    };
+    return subdoc(AdditionalFile, item);
   });
 }
 

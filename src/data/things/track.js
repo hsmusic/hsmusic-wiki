@@ -38,7 +38,6 @@ import {
 } from '#composite/wiki-data';
 
 import {
-  additionalFiles,
   additionalNameList,
   commentatorArtists,
   constitutibleArtworkList,
@@ -86,6 +85,7 @@ export class Track extends Thing {
   static [Thing.referenceType] = 'track';
 
   static [Thing.getPropertyDescriptors] = ({
+    AdditionalFile,
     Album,
     ArtTag,
     Artwork,
@@ -240,9 +240,17 @@ export class Track extends Thing {
       }),
     ],
 
-    additionalFiles: additionalFiles(),
-    sheetMusicFiles: additionalFiles(),
-    midiProjectFiles: additionalFiles(),
+    additionalFiles: thingList({
+      class: input.value(AdditionalFile),
+    }),
+
+    sheetMusicFiles: thingList({
+      class: input.value(AdditionalFile),
+    }),
+
+    midiProjectFiles: thingList({
+      class: input.value(AdditionalFile),
+    }),
 
     mainReleaseTrack: singleReference({
       class: input.value(Track),
