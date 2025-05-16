@@ -21,7 +21,7 @@ export class AdditionalFile extends Thing {
       }),
 
       exposeConstant({
-        value: input.value(null),
+        value: input.value([]),
       }),
     ],
   });
