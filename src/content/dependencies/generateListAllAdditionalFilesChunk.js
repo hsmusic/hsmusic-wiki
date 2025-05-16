@@ -1,7 +1,25 @@
-import {empty, stitchArrays} from '#sugar';
+import {stitchArrays} from '#sugar';
 
 export default {
+  contentDependencies: ['linkAdditionalFile'],
   extraDependencies: ['html', 'language'],
+
+  relations: (relation, additionalFiles) => ({
+    links:
+      additionalFiles
+        .map(file => file.filenames
+          .map(filename => relation('linkAdditionalFile', file, filename))),
+  }),
+
+  data: (additionalFiles) => ({
+    titles:
+      additionalFiles
+        .map(file => file.title),
+
+    filenames:
+      additionalFiles
+        .map(file => file.filenames),
+  }),
 
   slots: {
     title: {
@@ -9,82 +27,73 @@ export default {
       mutable: false,
     },
 
-    additionalFileTitles: {
-      validate: v => v.strictArrayOf(v.isHTML),
-    },
-
-    additionalFileLinks: {
-      validate: v => v.strictArrayOf(v.strictArrayOf(v.isHTML)),
-    },
-
-    additionalFileFilenames: {
-      validate: v => v.strictArrayOf(v.strictArrayOf(v.isString)),
-    },
-
     stringsKey: {type: 'string'},
   },
 
-  generate(slots, {html, language}) {
-    if (empty(slots.additionalFileLinks)) {
-      return html.blank();
-    }
+  generate: (data, relations, slots, {html, language}) =>
+    language.encapsulate('listingPage', slots.stringsKey, pageCapsule =>
+      html.tags([
+        html.tag('dt',
+          {[html.onlyIfSiblings]: true},
+          slots.title),
 
-    return html.tags([
-      html.tag('dt', slots.title),
-      html.tag('dd',
-        html.tag('ul',
-          stitchArrays({
-            additionalFileTitle: slots.additionalFileTitles,
-            additionalFileLinks: slots.additionalFileLinks,
-            additionalFileFilenames: slots.additionalFileFilenames,
-          }).map(({
-              additionalFileTitle,
-              additionalFileLinks,
-              additionalFileFilenames,
-            }) =>
-              language.encapsulate('listingPage', slots.stringsKey, 'file', capsule =>
-                (additionalFileLinks.length === 1
-                  ? html.tag('li',
-                      additionalFileLinks[0].slots({
-                        content:
-                          language.$(capsule, {
-                            title: additionalFileTitle,
-                          }),
-                      }))
+        html.tag('dd',
+          {[html.onlyIfContent]: true},
 
-               : additionalFileLinks.length === 0
-                  ? html.tag('li',
-                      language.$(capsule, 'withNoFiles', {
-                        title: additionalFileTitle,
-                      }))
+          html.tag('ul',
+          {[html.onlyIfContent]: true},
 
-                  : html.tag('li', {class: 'has-details'},
-                      html.tag('details', [
-                        html.tag('summary',
-                          html.tag('span',
-                            language.$(capsule, 'withMultipleFiles', {
-                              title:
-                                html.tag('b', additionalFileTitle),
+            stitchArrays({
+              title: data.titles,
+              links: relations.links,
+              filenames: data.filenames,
+            }).map(({
+                title,
+                links,
+                filenames,
+              }) =>
+                language.encapsulate(pageCapsule, 'file', capsule =>
+                  (links.length === 1
+                    ? html.tag('li',
+                        links[0].slots({
+                          content:
+                            language.$(capsule, {
+                              title: title,
+                            }),
+                        }))
 
-                              files:
-                                language.countAdditionalFiles(
-                                  additionalFileLinks.length,
-                                  {unit: true}),
-                            }))),
+                 : links.length === 0
+                    ? html.tag('li',
+                        language.$(capsule, 'withNoFiles', {
+                          title: title,
+                        }))
 
-                        html.tag('ul',
-                          stitchArrays({
-                            additionalFileLink: additionalFileLinks,
-                            additionalFileFilebane: additionalFileFilenames,
-                          }).map(({additionalFileLink, additionalFileFilebane}) =>
-                              html.tag('li',
-                                additionalFileLink.slots({
-                                  content:
-                                    language.$(capsule, {
-                                      title: additionalFileFilebane,
-                                    }),
-                                })))),
-                      ]))))))),
-    ]);
-  },
+                    : html.tag('li', {class: 'has-details'},
+                        html.tag('details', [
+                          html.tag('summary',
+                            html.tag('span',
+                              language.$(capsule, 'withMultipleFiles', {
+                                title:
+                                  html.tag('b', title),
+
+                                files:
+                                  language.countAdditionalFiles(
+                                    links.length,
+                                    {unit: true}),
+                              }))),
+
+                          html.tag('ul',
+                            stitchArrays({
+                              link: links,
+                              filename: filenames,
+                            }).map(({link, filename}) =>
+                                html.tag('li',
+                                  link.slots({
+                                    content:
+                                      language.$(capsule, {
+                                        title: filename,
+                                      }),
+                                  })))),
+                        ]))))))),
+      ])),
 };
