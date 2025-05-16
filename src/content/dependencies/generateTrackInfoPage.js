@@ -1,7 +1,7 @@
 export default {
   contentDependencies: [
+    'generateAdditionalFilesList',
     'generateAdditionalNamesBox',
-    'generateAlbumAdditionalFilesList',
     'generateAlbumNavAccent',
     'generateAlbumSecondaryNav',
     'generateAlbumSidebar',
@@ -95,19 +95,13 @@ export default {
       relation('generateLyricsSection', track.lyrics),
 
     sheetMusicFilesList:
-      relation('generateAlbumAdditionalFilesList',
-        track.album,
-        track.sheetMusicFiles),
+      relation('generateAdditionalFilesList', track.sheetMusicFiles),
 
     midiProjectFilesList:
-      relation('generateAlbumAdditionalFilesList',
-        track.album,
-        track.midiProjectFiles),
+      relation('generateAdditionalFilesList', track.midiProjectFiles),
 
     additionalFilesList:
-      relation('generateAlbumAdditionalFilesList',
-        track.album,
-        track.additionalFiles),
+      relation('generateAdditionalFilesList', track.additionalFiles),
 
     artistCommentarySection:
       relation('generateTrackArtistCommentarySection', track),

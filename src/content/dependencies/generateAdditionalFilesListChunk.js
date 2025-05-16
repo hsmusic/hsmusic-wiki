@@ -1,46 +1,81 @@
+import {stitchArrays} from '#sugar';
+
 export default {
-  extraDependencies: ['html', 'language'],
+  contentDependencies: ['linkAdditionalFile', 'transformContent'],
+  extraDependencies: ['getSizeOfMediaFile', 'html', 'language', 'urls'],
+
+  relations: (relation, file) => ({
+    description:
+      relation('transformContent', file.description),
+
+    links:
+      file.filenames
+        .map(filename => relation('linkAdditionalFile', file, filename)),
+  }),
+
+  data: (file) => ({
+    title:
+      file.title,
+
+    paths:
+      file.paths,
+  }),
 
   slots: {
-    title: {
-      type: 'html',
-      mutable: false,
-    },
-
-    description: {
-      type: 'html',
-      mutable: false,
-    },
-
-    items: {
-      validate: v => v.looseArrayOf(v.isHTML),
+    showFileSizes: {
+      type: 'boolean',
     },
   },
 
-  generate: (slots, {html, language}) =>
-    language.encapsulate('releaseInfo.additionalFiles.entry', capsule =>
+  generate: (data, relations, slots, {getSizeOfMediaFile, html, language, urls}) =>
+    language.encapsulate('releaseInfo.additionalFiles', capsule =>
       html.tag('li',
         html.tag('details',
-          html.isBlank(slots.items) &&
+          html.isBlank(relations.links) &&
             {open: true},
 
           [
             html.tag('summary',
               html.tag('span',
-                language.$(capsule, {
+                language.$(capsule, 'entry', {
                   title:
-                    html.tag('b', slots.title),
+                    html.tag('b', data.title),
                 }))),
 
             html.tag('ul', [
               html.tag('li', {class: 'entry-description'},
                 {[html.onlyIfContent]: true},
-                slots.description),
 
-              (html.isBlank(slots.items)
+                relations.description.slot('mode', 'inline')),
+
+              (html.isBlank(relations.links)
                 ? html.tag('li',
-                    language.$(capsule, 'noFilesAvailable'))
-                : slots.items),
+                    language.$(capsule, 'entry.noFilesAvailable'))
+
+                : stitchArrays({
+                    link: relations.links,
+                    path: data.paths,
+                  }).map(({link, path}) =>
+                      html.tag('li',
+                        language.encapsulate(capsule, 'file', workingCapsule => {
+                          const workingOptions = {file: link};
+
+                          if (slots.showFileSizes) {
+                            const fileSize =
+                              getSizeOfMediaFile(
+                                urls
+                                  .from('media.root')
+                                  .to(...path));
+
+                            if (fileSize) {
+                              workingCapsule += '.withSize';
+                              workingOptions.size =
+                                language.formatFileSize(fileSize);
+                            }
+                          }
+
+                          return language.$(workingCapsule, workingOptions);
+                        })))),
             ]),
           ]))),
 };

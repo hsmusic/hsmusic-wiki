@@ -2,8 +2,8 @@ import {empty} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateAdditionalFilesList',
     'generateAdditionalNamesBox',
-    'generateAlbumAdditionalFilesList',
     'generateAlbumArtworkColumn',
     'generateAlbumBanner',
     'generateAlbumNavAccent',
@@ -72,9 +72,7 @@ export default {
       relation('generateAlbumTrackList', album),
 
     additionalFilesList:
-      relation('generateAlbumAdditionalFilesList',
-        album,
-        album.additionalFiles),
+      relation('generateAdditionalFilesList', album.additionalFiles),
 
     artistCommentaryEntries:
       album.commentary

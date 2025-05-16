@@ -1,26 +1,22 @@
-import {stitchArrays} from '#sugar';
-
 export default {
+  contentDependencies: ['generateAdditionalFilesListChunk'],
   extraDependencies: ['html'],
 
-  slots: {
-    chunks: {
-      validate: v => v.strictArrayOf(v.isHTML),
-    },
+  relations: (relation, additionalFiles) => ({
+    chunks:
+      additionalFiles
+        .map(file => relation('generateAdditionalFilesListChunk', file)),
+  }),
 
-    chunkItems: {
-      validate: v => v.strictArrayOf(v.isHTML),
-    },
+  slots: {
+    showFileSizes: {type: 'boolean', default: true},
   },
 
-  generate: (slots, {html}) =>
+  generate: (relations, slots, {html}) =>
     html.tag('ul', {class: 'additional-files-list'},
       {[html.onlyIfContent]: true},
 
-      stitchArrays({
-        chunk: slots.chunks,
-        items: slots.chunkItems,
-      }).map(({chunk, items}) =>
-          chunk.clone()
-            .slot('items', items))),
+      relations.chunks.map(chunk => chunk.slots({
+        showFileSizes: slots.showFileSizes,
+      }))),
 };
