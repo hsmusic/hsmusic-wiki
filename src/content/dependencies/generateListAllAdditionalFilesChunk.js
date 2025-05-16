@@ -17,7 +17,7 @@ export default {
       validate: v => v.strictArrayOf(v.strictArrayOf(v.isHTML)),
     },
 
-    additionalFileFiles: {
+    additionalFileFilenames: {
       validate: v => v.strictArrayOf(v.strictArrayOf(v.isString)),
     },
 
@@ -36,11 +36,11 @@ export default {
           stitchArrays({
             additionalFileTitle: slots.additionalFileTitles,
             additionalFileLinks: slots.additionalFileLinks,
-            additionalFileFiles: slots.additionalFileFiles,
+            additionalFileFilenames: slots.additionalFileFilenames,
           }).map(({
               additionalFileTitle,
               additionalFileLinks,
-              additionalFileFiles,
+              additionalFileFilenames,
             }) =>
               language.encapsulate('listingPage', slots.stringsKey, 'file', capsule =>
                 (additionalFileLinks.length === 1
@@ -75,13 +75,13 @@ export default {
                         html.tag('ul',
                           stitchArrays({
                             additionalFileLink: additionalFileLinks,
-                            additionalFileFile: additionalFileFiles,
-                          }).map(({additionalFileLink, additionalFileFile}) =>
+                            additionalFileFilebane: additionalFileFilenames,
+                          }).map(({additionalFileLink, additionalFileFilebane}) =>
                               html.tag('li',
                                 additionalFileLink.slots({
                                   content:
                                     language.$(capsule, {
-                                      title: additionalFileFile,
+                                      title: additionalFileFilebane,
                                     }),
                                 })))),
                       ]))))))),

@@ -22,21 +22,17 @@ export default {
     chunkDescriptions:
       additionalFiles
         .map(({description}) =>
-          (description
-            ? relation('transformContent', description)
-            : null)),
+          relation('transformContent', description)),
 
     chunkItems:
       additionalFiles
-        .map(({files}) =>
-          (files ?? [])
-            .map(() => relation('generateAdditionalFilesListChunkItem'))),
+        .map(({filenames}) => filenames
+          .map(() => relation('generateAdditionalFilesListChunkItem'))),
 
     chunkItemFileLinks:
       additionalFiles
-        .map(({files}) =>
-          (files ?? [])
-            .map(file => relation('linkAlbumAdditionalFile', album, file))),
+        .map(({filenames}) => filenames
+          .map(filename => relation('linkAlbumAdditionalFile', album, filename))),
   }),
 
   data: (album, additionalFiles) => ({
@@ -46,9 +42,9 @@ export default {
       additionalFiles
         .map(({title}) => title),
 
-    chunkItemLocations:
+    chunkItemFilenames:
       additionalFiles
-        .map(({files}) => files ?? []),
+        .map(({filenames}) => filenames),
   }),
 
   slots: {
@@ -75,13 +71,13 @@ export default {
         stitchArrays({
           items: relations.chunkItems,
           fileLinks: relations.chunkItemFileLinks,
-          locations: data.chunkItemLocations,
-        }).map(({items, fileLinks, locations}) =>
+          filenames: data.chunkItemFilenames,
+        }).map(({items, fileLinks, filenames}) =>
             stitchArrays({
               item: items,
               fileLink: fileLinks,
-              location: locations,
-            }).map(({item, fileLink, location}) =>
+              filename: filenames,
+            }).map(({item, fileLink, filename}) =>
                 item.slots({
                   fileLink: fileLink,
                   fileSize:
@@ -89,7 +85,7 @@ export default {
                       ? getSizeOfMediaFile(
                           urls
                             .from('media.root')
-                            .to('media.albumAdditionalFile', data.albumDirectory, location))
+                            .to('media.albumAdditionalFile', data.albumDirectory, filename))
                       : 0),
                 }))),
     }),

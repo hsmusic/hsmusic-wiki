@@ -7,18 +7,18 @@ export default {
     };
   },
 
-  data(album, file) {
+  data(album, filename) {
     return {
       albumDirectory: album.directory,
-      file,
+      filename,
     };
   },
 
   generate(data, relations) {
     return relations.linkTemplate
       .slots({
-        path: ['media.albumAdditionalFile', data.albumDirectory, data.file],
-        content: data.file,
+        path: ['media.albumAdditionalFile', data.albumDirectory, data.filename],
+        content: data.filename,
       });
   },
 };

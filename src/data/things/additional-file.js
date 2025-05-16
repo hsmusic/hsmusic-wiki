@@ -15,7 +15,7 @@ export class AdditionalFile extends Thing {
 
     description: contentString(),
 
-    files: [
+    filenames: [
       exposeUpdateValueOrContinue({
         validate: input.value(validateArrayItems(isString)),
       }),
@@ -30,7 +30,7 @@ export class AdditionalFile extends Thing {
     fields: {
       'Title': {property: 'title'},
       'Description': {property: 'description'},
-      'Files': {property: 'files'},
+      'Files': {property: 'filenames'},
     },
   };
 }

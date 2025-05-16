@@ -60,10 +60,10 @@ export default {
         .map(byAlbum => byAlbum
           .map(({title}) => title));
 
-    const albumAdditionalFileFiles =
+    const albumAdditionalFileFilenames =
       albumAdditionalFileObjects
         .map(byAlbum => byAlbum
-          .map(({files}) => files ?? []));
+          .map(({filenames}) => filenames));
 
     const trackAdditionalFileTitles =
       trackAdditionalFileObjects
@@ -71,20 +71,20 @@ export default {
           .map(byTrack => byTrack
             .map(({title}) => title)));
 
-    const trackAdditionalFileFiles =
+    const trackAdditionalFileFilenames =
       trackAdditionalFileObjects
         .map(byAlbum => byAlbum
           .map(byTrack => byTrack
-            .map(({files}) => files ?? [])));
+            .map(({filenames}) => filenames)));
 
     return {
       spec,
       albums,
       tracks,
       albumAdditionalFileTitles,
-      albumAdditionalFileFiles,
+      albumAdditionalFileFilenames,
       trackAdditionalFileTitles,
-      trackAdditionalFileFiles,
+      trackAdditionalFileFilenames,
     };
   },
 
@@ -113,28 +113,28 @@ export default {
     albumAdditionalFileLinks:
       stitchArrays({
         album: query.albums,
-        files: query.albumAdditionalFileFiles,
-      }).map(({album, files: byAlbum}) =>
-          byAlbum.map(files => files
-            .map(file =>
-              relation('linkAlbumAdditionalFile', album, file)))),
+        filenames: query.albumAdditionalFileFilenames,
+      }).map(({album, filenames: byAlbum}) =>
+          byAlbum
+            .map(filenames => filenames
+              .map(filename => relation('linkAlbumAdditionalFile', album, filename)))),
 
     trackAdditionalFileLinks:
       stitchArrays({
         album: query.albums,
-        files: query.trackAdditionalFileFiles,
-      }).map(({album, files: byAlbum}) =>
+        filenames: query.trackAdditionalFileFilenames,
+      }).map(({album, filenames: byAlbum}) =>
           byAlbum
             .map(byTrack => byTrack
-              .map(files => files
-                .map(file => relation('linkAlbumAdditionalFile', album, file))))),
+              .map(filenames => filenames
+                .map(filename => relation('linkAlbumAdditionalFile', album, filename))))),
   }),
 
   data: (query) => ({
     albumAdditionalFileTitles: query.albumAdditionalFileTitles,
     trackAdditionalFileTitles: query.trackAdditionalFileTitles,
-    albumAdditionalFileFiles: query.albumAdditionalFileFiles,
-    trackAdditionalFileFiles: query.trackAdditionalFileFiles,
+    albumAdditionalFileFilenames: query.albumAdditionalFileFilenames,
+    trackAdditionalFileFilenames: query.trackAdditionalFileFilenames,
   }),
 
   slots: {
@@ -155,8 +155,8 @@ export default {
           trackAdditionalFileTitles: data.trackAdditionalFileTitles,
           albumAdditionalFileLinks: relations.albumAdditionalFileLinks,
           trackAdditionalFileLinks: relations.trackAdditionalFileLinks,
-          albumAdditionalFileFiles: data.albumAdditionalFileFiles,
-          trackAdditionalFileFiles: data.trackAdditionalFileFiles,
+          albumAdditionalFileFilenames: data.albumAdditionalFileFilenames,
+          trackAdditionalFileFilenames: data.trackAdditionalFileFilenames,
         }).map(({
             albumLink,
             trackLinks,
@@ -166,8 +166,8 @@ export default {
             trackAdditionalFileTitles,
             albumAdditionalFileLinks,
             trackAdditionalFileLinks,
-            albumAdditionalFileFiles,
-            trackAdditionalFileFiles,
+            albumAdditionalFileFilenames,
+            trackAdditionalFileFilenames,
           }) => [
             html.tag('h3', {class: 'content-heading'}, albumLink),
 
@@ -178,7 +178,7 @@ export default {
 
                 additionalFileTitles: albumAdditionalFileTitles,
                 additionalFileLinks: albumAdditionalFileLinks,
-                additionalFileFiles: albumAdditionalFileFiles,
+                additionalFileFilenames: albumAdditionalFileFilenames,
 
                 stringsKey: slots.stringsKey,
               }),
@@ -188,19 +188,19 @@ export default {
                 trackChunk: trackChunks,
                 trackAdditionalFileTitles,
                 trackAdditionalFileLinks,
-                trackAdditionalFileFiles,
+                trackAdditionalFileFilenames,
               }).map(({
                   trackLink,
                   trackChunk,
                   trackAdditionalFileTitles,
                   trackAdditionalFileLinks,
-                  trackAdditionalFileFiles,
+                  trackAdditionalFileFilenames,
                 }) =>
                   trackChunk.slots({
                     title: trackLink,
                     additionalFileTitles: trackAdditionalFileTitles,
                     additionalFileLinks: trackAdditionalFileLinks,
-                    additionalFileFiles: trackAdditionalFileFiles,
+                    additionalFileFilenames: trackAdditionalFileFilenames,
                     stringsKey: slots.stringsKey,
                   })),
             ]),
