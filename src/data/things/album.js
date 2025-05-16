@@ -788,6 +788,14 @@ export class Album extends Thing {
     },
   });
 
+  getOwnAdditionalFilePath(_file, filename) {
+    return [
+      'media.albumAdditionalFile',
+      this.directory,
+      filename,
+    ];
+  }
+
   getOwnArtworkPath(artwork) {
     if (artwork === this.bannerArtwork) {
       return [

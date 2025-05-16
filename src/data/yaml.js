@@ -615,7 +615,7 @@ export function parseAdditionalFiles(entries, {subdoc, AdditionalFile}) {
   return parseArrayEntries(entries, item => {
     if (typeof item !== 'object') return item;
 
-    return subdoc(AdditionalFile, item);
+    return subdoc(AdditionalFile, item, {bindInto: 'thing'});
   });
 }
 
