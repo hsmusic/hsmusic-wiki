@@ -134,6 +134,8 @@ export default {
 
             language.encapsulate(pageCapsule, 'albumViewSwitcher', capsule =>
               html.tag('p', {class: 'gallery-view-switcher'},
+                {class: ['drop', 'shiny']},
+
                 {[html.onlyIfContent]: true},
                 {[html.joinChildren]: html.tag('br')},
 
