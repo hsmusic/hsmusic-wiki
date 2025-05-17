@@ -5,7 +5,7 @@ export default {
   contentDependencies: ['generateCoverGrid', 'image', 'linkAlbum'],
   extraDependencies: ['language'],
 
-  relations: (relation, albums) => ({
+  relations: (relation, albums, _group) => ({
     coverGrid:
       relation('generateCoverGrid'),
 
@@ -20,7 +20,7 @@ export default {
           : relation('image')))
   }),
 
-  data: (albums) => ({
+  data: (albums, group) => ({
     names:
       albums.map(album => album.name),
 
@@ -29,6 +29,9 @@ export default {
 
     tracks:
       albums.map(album => album.tracks.length),
+
+    notFromThisGroup:
+      albums.map(album => !album.groups.includes(group)),
   }),
 
   generate: (data, relations, {language}) =>
@@ -36,6 +39,7 @@ export default {
       relations.coverGrid.slots({
         links: relations.links,
         names: data.names,
+        notFromThisGroup: data.notFromThisGroup,
 
         images:
           stitchArrays({

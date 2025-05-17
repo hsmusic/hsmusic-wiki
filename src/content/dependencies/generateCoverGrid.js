@@ -15,6 +15,7 @@ export default {
     links: {validate: v => v.strictArrayOf(v.isHTML)},
     names: {validate: v => v.strictArrayOf(v.isHTML)},
     info: {validate: v => v.strictArrayOf(v.isHTML)},
+    notFromThisGroup: {validate: v => v.strictArrayOf(v.isBoolean)},
 
     // Differentiating from sparseArrayOf here - this list of classes should
     // have the same length as the items above, i.e. nulls aren't going to be
@@ -44,7 +45,18 @@ export default {
           link: slots.links,
           name: slots.names,
           info: slots.info,
-        }).map(({classes, image, link, name, info}, index) =>
+
+          notFromThisGroup:
+            slots.notFromThisGroup ??
+            Array.from(slots.links).fill(null)
+        }).map(({
+            classes,
+            image,
+            link,
+            name,
+            info,
+            notFromThisGroup,
+          }, index) =>
             link.slots({
               attributes: [
                 {class: ['grid-item', 'box']},
@@ -71,7 +83,15 @@ export default {
                 html.tag('span',
                   {[html.onlyIfContent]: true},
 
-                  language.sanitize(name)),
+                  (notFromThisGroup
+                    ? language.encapsulate('misc.coverGrid.details.notFromThisGroup', capsule =>
+                        language.$(capsule, {
+                          name,
+                          marker:
+                            html.tag('span', {class: 'grid-name-marker'},
+                              language.$(capsule, 'marker')),
+                        }))
+                    : language.sanitize(name))),
 
                 html.tag('span',
                   {[html.onlyIfContent]: true},

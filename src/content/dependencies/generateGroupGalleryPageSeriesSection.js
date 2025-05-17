@@ -21,6 +21,9 @@ export default {
     query.allAlbumsDated =
       series.albums.every(album => album.date);
 
+    query.anyAlbumNotFromThisGroup =
+      series.albums.some(album => !album.groups.includes(series.group));
+
     query.latestAlbum =
       albumsLatestFirst
         .filter(album => album.date)
@@ -36,20 +39,27 @@ export default {
     return query;
   },
 
-  relations: (relation, query, _series) => ({
+  relations: (relation, query, series) => ({
     gallerySection:
       relation('generateExpandableGallerySection'),
 
     gridAboveCut:
-      relation('generateGroupGalleryPageAlbumGrid', query.albumsAboveCut),
+      relation('generateGroupGalleryPageAlbumGrid',
+        query.albumsAboveCut,
+        series.group),
 
     gridBelowCut:
-      relation('generateGroupGalleryPageAlbumGrid', query.albumsBelowCut),
+      relation('generateGroupGalleryPageAlbumGrid',
+        query.albumsBelowCut,
+        series.group),
   }),
 
   data: (query, series) => ({
     name:
       series.name,
+
+    groupName:
+      series.group.name,
 
     albums:
       series.albums.length,
@@ -61,6 +71,9 @@ export default {
 
     allAlbumsDated:
       query.allAlbumsDated,
+
+    anyAlbumNotFromThisGroup:
+      query.anyAlbumNotFromThisGroup,
 
     earliestAlbumDate:
       (query.earliestAlbum
@@ -82,43 +95,57 @@ export default {
         contentBelowCut: relations.gridBelowCut,
 
         caption:
-          language.encapsulate(capsule, 'caption', workingCapsule => {
-            const workingOptions = {};
+          language.encapsulate(capsule, 'caption', captionCapsule =>
+            html.tags([
+              data.anyAlbumNotFromThisGroup &&
+                language.$(captionCapsule, 'seriesAlbumsNotFromGroup', {
+                  marker:
+                    language.$('misc.coverGrid.details.notFromThisGroup.marker'),
 
-            workingOptions.tracks =
-              html.tag('b',
-                language.countTracks(data.tracks, {unit: true}));
+                  series:
+                    html.tag('i', data.name),
 
-            workingOptions.albums =
-              html.tag('b',
-                language.countAlbums(data.albums, {unit: true}));
+                  group: data.groupName,
+                }),
 
-            if (data.allAlbumsDated) {
-              const earliestDate = data.earliestAlbumDate;
-              const latestDate = data.latestAlbumDate;
+              language.encapsulate(captionCapsule, workingCapsule => {
+                const workingOptions = {};
 
-              const earliestYear = earliestDate.getFullYear();
-              const latestYear = latestDate.getFullYear();
+                workingOptions.tracks =
+                  html.tag('b',
+                    language.countTracks(data.tracks, {unit: true}));
 
-              if (earliestYear === latestYear) {
-                if (data.albums === 1) {
-                  workingCapsule += '.withDate';
-                  workingOptions.date =
-                    language.formatDate(earliestDate);
-                } else {
-                  workingCapsule += '.withYear';
-                  workingOptions.year =
-                    language.formatYear(earliestDate);
+                workingOptions.albums =
+                  html.tag('b',
+                    language.countAlbums(data.albums, {unit: true}));
+
+                if (data.allAlbumsDated) {
+                  const earliestDate = data.earliestAlbumDate;
+                  const latestDate = data.latestAlbumDate;
+
+                  const earliestYear = earliestDate.getFullYear();
+                  const latestYear = latestDate.getFullYear();
+
+                  if (earliestYear === latestYear) {
+                    if (data.albums === 1) {
+                      workingCapsule += '.withDate';
+                      workingOptions.date =
+                        language.formatDate(earliestDate);
+                    } else {
+                      workingCapsule += '.withYear';
+                      workingOptions.year =
+                        language.formatYear(earliestDate);
+                    }
+                  } else {
+                    workingCapsule += '.withYearRange';
+                    workingOptions.yearRange =
+                      language.formatYearRange(earliestDate, latestDate);
+                  }
                 }
-              } else {
-                workingCapsule += '.withYearRange';
-                workingOptions.yearRange =
-                  language.formatYearRange(earliestDate, latestDate);
-              }
-            }
 
-            return language.$(workingCapsule, workingOptions);
-          }),
+                return language.$(workingCapsule, workingOptions);
+              }),
+            ], {[html.joinChildren]: html.tag('br')})),
 
         expandCue:
           language.$(capsule, 'expand'),

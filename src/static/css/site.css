@@ -2874,6 +2874,10 @@ video.pixelate, .pixelate video {
   max-width: 200px;
 }
 
+.grid-name-marker {
+  color: white;
+}
+
 .grid-actions {
   display: flex;
   flex-direction: row;

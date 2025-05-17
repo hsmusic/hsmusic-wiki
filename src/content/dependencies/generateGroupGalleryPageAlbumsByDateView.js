@@ -9,9 +9,11 @@ export default {
       sortChronologically(group.albums, {latestFirst: true}),
   }),
 
-  relations: (relation, query, _group) => ({
+  relations: (relation, query, group) => ({
     albumGrid:
-      relation('generateGroupGalleryPageAlbumGrid', query.albums),
+      relation('generateGroupGalleryPageAlbumGrid',
+        query.albums,
+        group),
   }),
 
   slots: {

@@ -973,6 +973,9 @@ misc:
     noCoverArt: "{ALBUM}"
 
     details:
+      notFromThisGroup: "{NAME}{MARKER}"
+      notFromThisGroup.marker: "*"
+
       accent: "({DETAILS})"
 
       albumLength: "{TRACKS}, {TIME}"
@@ -1688,6 +1691,9 @@ groupGalleryPage:
 
     caption.withYearRange: >-
       {TRACKS} across {ALBUMS}, released {YEAR_RANGE}.
+
+    caption.seriesAlbumsNotFromGroup: >-
+      Albums marked {MARKER} are part of {SERIES}, but not from {GROUP}.
 
     expand: >-
       Show the rest!
