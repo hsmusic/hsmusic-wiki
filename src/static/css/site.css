@@ -1586,6 +1586,13 @@ hr.cute,
   margin-right: 5px;
 }
 
+#artwork-column .cover-artwork:first-child + .cover-artwork-joiner,
+#artwork-column .cover-artwork.attached-artwork-is-main-artwork,
+#artwork-column .cover-artwork.attached-artwork-is-main-artwork + .cover-artwork-joiner {
+  margin-left: 17.5px;
+  margin-right: 17.5px;
+}
+
 .cover-artwork:where(#artwork-column .cover-artwork:not(:first-child)) {
   margin-top: 20px;
 }

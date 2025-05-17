@@ -30,6 +30,11 @@ export default {
     attachAbove:
       artwork.attachAbove,
 
+    attachedArtworkIsMainArtwork:
+      (artwork.attachAbove
+        ? artwork.attachedArtwork.isMainArtwork
+        : null),
+
     color:
       artwork.thing.color ?? null,
 
@@ -86,6 +91,10 @@ export default {
       html.tag('div', {class: 'cover-artwork'},
         slots.mode === 'commentary' &&
           {class: 'commentary-art'},
+
+        data.attachAbove &&
+        data.attachedArtworkIsMainArtwork &&
+          {class: 'attached-artwork-is-main-artwork'},
 
         (slots.mode === 'primary'
           ? [
