@@ -144,19 +144,19 @@ export default {
                     initialOptionIndex: 0,
 
                     titles: [
-                      !html.isBlank(relations.albumsBySeriesView) &&
-                        language.$(capsule, 'bySeries'),
-
                       !html.isBlank(relations.albumsByDateView) &&
                         language.$(capsule, 'byDate'),
+
+                      !html.isBlank(relations.albumsBySeriesView) &&
+                        language.$(capsule, 'bySeries'),
                     ].filter(Boolean),
 
                     targetIDs: [
-                      !html.isBlank(relations.albumsBySeriesView) &&
-                        'group-album-gallery-by-series',
-
                       !html.isBlank(relations.albumsByDateView) &&
                         'group-album-gallery-by-date',
+
+                      !html.isBlank(relations.albumsBySeriesView) &&
+                        'group-album-gallery-by-series',
                     ].filter(Boolean),
                   }),
                 ])),
@@ -181,9 +181,9 @@ export default {
                 }))),
           */
 
-          relations.albumsBySeriesView,
+          relations.albumsByDateView,
 
-          relations.albumsByDateView.slots({
+          relations.albumsBySeriesView.slots({
             attributes: [
               !html.isBlank(relations.albumsBySeriesView) &&
                 {style: 'display: none'},
