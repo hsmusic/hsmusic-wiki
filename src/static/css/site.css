@@ -3840,6 +3840,12 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
     max-width: unset;
   }
 
+  #artwork-column .cover-artwork:not(:first-child),
+  #artwork-column .cover-artwork-joiner {
+    margin-left: 30px;
+    margin-right: 30px;
+  }
+
   #additional-names-box {
     width: unset;
     max-width: unset;
