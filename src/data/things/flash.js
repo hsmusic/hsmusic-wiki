@@ -4,7 +4,7 @@ import {input} from '#composite';
 import {empty} from '#sugar';
 import {sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
-import {anyOf, isColor, isContentString, isDirectory, isNumber, isString}
+import {anyOf, isColor, isDirectory, isNumber, isString, isStringNonEmpty}
   from '#validators';
 
 import {
@@ -288,7 +288,7 @@ export class FlashAct extends Thing {
 
     listTerminology: [
       exposeUpdateValueOrContinue({
-        validate: input.value(isContentString),
+        validate: input.value(isStringNonEmpty),
       }),
 
       withFlashSide(),
