@@ -1,7 +1,7 @@
 import {input, templateCompositeFrom} from '#composite';
 
 import {
-  isContentString,
+  isStringNonEmpty,
   optional,
   validateArrayItems,
   validateProperties,
@@ -42,7 +42,7 @@ export default templateCompositeFrom({
         validateArrayItems(
           validateProperties({
             [referenceProperty]: validateReference(type),
-            [annotationProperty]: optional(isContentString),
+            [annotationProperty]: optional(isStringNonEmpty),
           })),
     })(staticInputs);
   },

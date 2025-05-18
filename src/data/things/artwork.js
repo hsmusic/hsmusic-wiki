@@ -5,11 +5,11 @@ import find from '#find';
 import Thing from '#thing';
 
 import {
-  isContentString,
   isContributionList,
   isDate,
   isDimensions,
   isFileExtension,
+  isStringNonEmpty,
   optional,
   validateArrayItems,
   validateProperties,
@@ -275,7 +275,7 @@ export class Artwork extends Thing {
             validateArrayItems(
               validateProperties({
                 reference: validateReference(['album', 'track']),
-                annotation: optional(isContentString),
+                annotation: optional(isStringNonEmpty),
               })),
         }),
 
