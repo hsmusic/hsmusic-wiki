@@ -1,5 +1,8 @@
 export const GROUP_DATA_FILE = 'groups.yaml';
 
+import {inspect} from 'node:util';
+
+import {colors} from '#cli';
 import {input} from '#composite';
 import Thing from '#thing';
 import {is} from '#validators';
@@ -285,4 +288,31 @@ export class Series extends Thing {
       'Albums': {property: 'albums'},
     },
   };
+
+  [inspect.custom](depth, options, inspect) {
+    const parts = [];
+
+    parts.push(Thing.prototype[inspect.custom].apply(this));
+
+    if (depth >= 0) showGroup: {
+      let group = null;
+      try {
+        group = this.group;
+      } catch {
+        break showGroup;
+      }
+
+      const groupName = group.name;
+      const groupIndex = group.serieses.indexOf(this);
+
+      const num =
+        (groupIndex === -1
+          ? 'indeterminate position'
+          : `#${groupIndex + 1}`);
+
+      parts.push(` (${colors.yellow(num)} in ${colors.green(`"${groupName}"`)})`);
+    }
+
+    return parts.join('');
+  }
 }

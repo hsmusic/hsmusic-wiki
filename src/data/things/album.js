@@ -970,11 +970,13 @@ export class TrackSection extends Thing {
 
     parts.push(Thing.prototype[inspect.custom].apply(this));
 
-    if (depth >= 0) {
+    if (depth >= 0) showAlbum: {
       let album = null;
       try {
         album = this.album;
-      } catch {}
+      } catch {
+        break showAlbum;
+      }
 
       let first = null;
       try {
@@ -986,22 +988,20 @@ export class TrackSection extends Thing {
         last = this.tracks.at(-1).trackNumber;
       } catch {}
 
-      if (album) {
-        const albumName = album.name;
-        const albumIndex = album.trackSections.indexOf(this);
+      const albumName = album.name;
+      const albumIndex = album.trackSections.indexOf(this);
 
-        const num =
-          (albumIndex === -1
-            ? 'indeterminate position'
-            : `#${albumIndex + 1}`);
+      const num =
+        (albumIndex === -1
+          ? 'indeterminate position'
+          : `#${albumIndex + 1}`);
 
-        const range =
-          (albumIndex >= 0 && first !== null && last !== null
-            ? `: ${first}-${last}`
-            : '');
+      const range =
+        (albumIndex >= 0 && first !== null && last !== null
+          ? `: ${first}-${last}`
+          : '');
 
-        parts.push(` (${colors.yellow(num + range)} in ${colors.green(albumName)})`);
-      }
+      parts.push(` (${colors.yellow(num + range)} in ${colors.green(`"${albumName}"`)})`);
     }
 
     return parts.join('');
