@@ -811,7 +811,7 @@ export function isLanguageCode(string) {
 }
 
 export function isName(name) {
-  return isContentString(name);
+  return isString(name);
 }
 
 export function isURL(string) {
