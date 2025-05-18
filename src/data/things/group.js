@@ -2,6 +2,7 @@ export const GROUP_DATA_FILE = 'groups.yaml';
 
 import {input} from '#composite';
 import Thing from '#thing';
+import {is} from '#validators';
 import {parseAnnotatedReferences, parseSerieses} from '#yaml';
 
 import {
@@ -11,8 +12,9 @@ import {
   directory,
   name,
   referenceList,
-  seriesList,
   soupyFind,
+  thing,
+  thingList,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -20,7 +22,7 @@ import {
 export class Group extends Thing {
   static [Thing.referenceType] = 'group';
 
-  static [Thing.getPropertyDescriptors] = ({Album, Artist}) => ({
+  static [Thing.getPropertyDescriptors] = ({Album, Artist, Series}) => ({
     // Update & expose
 
     name: name('Unnamed Group'),
@@ -43,8 +45,8 @@ export class Group extends Thing {
       find: soupyFind.input('album'),
     }),
 
-    serieses: seriesList({
-      group: input.myself(),
+    serieses: thingList({
+      class: input.value(Series),
     }),
 
     // Update only
@@ -192,8 +194,9 @@ export class Group extends Thing {
 
       const groupData = results.filter(x => x instanceof Group);
       const groupCategoryData = results.filter(x => x instanceof GroupCategory);
+      const seriesData = groupData.flatMap(group => group.serieses);
 
-      return {groupData, groupCategoryData};
+      return {groupData, groupCategoryData, seriesData};
     },
 
     // Groups aren't sorted at all, always preserving the order in the data
@@ -237,6 +240,49 @@ export class GroupCategory extends Thing {
     fields: {
       'Category': {property: 'name'},
       'Color': {property: 'color'},
+    },
+  };
+}
+
+export class Series extends Thing {
+  static [Thing.getPropertyDescriptors] = ({Album, Group}) => ({
+    // Update & expose
+
+    name: name('Unnamed Series'),
+
+    showAlbumArtists: {
+      flags: {update: true, expose: true},
+      update: {
+        validate:
+          is('all', 'differing', 'none'),
+      },
+    },
+
+    description: contentString(),
+
+    group: thing({
+      class: input.value(Group),
+    }),
+
+    albums: referenceList({
+      class: input.value(Album),
+      find: soupyFind.input('album'),
+    }),
+
+    // Update only
+
+    find: soupyFind(),
+  });
+
+  static [Thing.yamlDocumentSpec] = {
+    fields: {
+      'Name': {property: 'name'},
+
+      'Description': {property: 'description'},
+
+      'Show Album Artists': {property: 'showAlbumArtists'},
+
+      'Albums': {property: 'albums'},
     },
   };
 }

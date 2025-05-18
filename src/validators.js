@@ -748,17 +748,6 @@ export const isTrackSection = validateProperties({
 
 export const isTrackSectionList = validateArrayItems(isTrackSection);
 
-export const isSeries = validateProperties({
-  name: isName,
-  description: optional(isContentString),
-  albums: optional(validateReferenceList('album')),
-
-  showAlbumArtists:
-    optional(is('all', 'differing', 'none')),
-});
-
-export const isSeriesList = validateArrayItems(isSeries);
-
 export const isWallpaperPart = validateProperties({
   asset: optional(isString),
   style: optional(isString),

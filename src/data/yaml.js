@@ -639,17 +639,11 @@ export function parseAdditionalNames(entries, {subdoc, AdditionalName}) {
   });
 }
 
-export function parseSerieses(entries) {
+export function parseSerieses(entries, {subdoc, Series}) {
   return parseArrayEntries(entries, item => {
     if (typeof item !== 'object') return item;
 
-    return {
-      name: item['Name'],
-      description: item['Description'] ?? null,
-      albums: item['Albums'] ?? null,
-
-      showAlbumArtists: item['Show Album Artists'] ?? null,
-    };
+    return subdoc(Series, item, {bindInto: 'group'});
   });
 }
 
@@ -1643,6 +1637,8 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
     ['homepageLayout.sections.rows', [/* find */]],
 
     ['lyricsData', [/* find */]],
+
+    ['seriesData', [/* find */]],
 
     ['trackData', [
       'artworkData',
