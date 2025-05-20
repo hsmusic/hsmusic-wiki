@@ -1789,7 +1789,8 @@ p.image-details.origin-details {
 }
 
 .content-image-container,
-.content-video-container {
+.content-video-container,
+.content-audio-container {
   margin-top: 1em;
   margin-bottom: 1em;
 }
