@@ -568,6 +568,7 @@ export function reportContentTextErrors(wikiData, {
     ['albumData', {
       additionalFiles: additionalFileShape,
       commentary: commentaryShape,
+      creditingSources: commentaryShape,
     }],
 
     ['artTagData', {
@@ -580,6 +581,7 @@ export function reportContentTextErrors(wikiData, {
 
     ['flashData', {
       commentary: commentaryShape,
+      creditingSources: commentaryShape,
     }],
 
     ['flashActData', {
