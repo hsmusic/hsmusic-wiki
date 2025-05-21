@@ -79,7 +79,7 @@ export default {
         .map(entry => relation('generateCommentaryEntry', entry)),
 
     creditSourceEntries:
-      album.creditSources
+      album.creditingSources
         .map(entry => relation('generateCommentaryEntry', entry)),
   }),
 
@@ -157,7 +157,7 @@ export default {
                 : html.blank()),
 
               !html.isBlank(relations.creditSourceEntries) &&
-                language.encapsulate(capsule, 'readCreditSources', capsule =>
+                language.encapsulate(capsule, 'readCreditingSources', capsule =>
                   language.$(capsule, {
                     link:
                       html.tag('a',
@@ -204,7 +204,7 @@ export default {
             relations.contentHeading.clone()
               .slots({
                 attributes: {id: 'credit-sources'},
-                title: language.$('misc.creditSources'),
+                title: language.$('misc.creditingSources'),
               }),
 
             relations.creditSourceEntries,

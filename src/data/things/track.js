@@ -227,7 +227,7 @@ export class Track extends Thing {
       class: input.value(CommentaryEntry),
     }),
 
-    creditSources: thingList({
+    creditingSources: thingList({
       class: input.value(CreditingSourcesEntry),
     }),
 
@@ -517,8 +517,8 @@ export class Track extends Thing {
         transform: parseCommentary,
       },
 
-      'Credit Sources': {
-        property: 'creditSources',
+      'Crediting Sources': {
+        property: 'creditingSources',
         transform: parseCreditingSources,
       },
 

@@ -135,7 +135,7 @@ export class Flash extends Thing {
       class: input.value(CommentaryEntry),
     }),
 
-    creditSources: thingList({
+    creditingSources: thingList({
       class: input.value(CreditingSourcesEntry),
     }),
 
@@ -257,8 +257,8 @@ export class Flash extends Thing {
         transform: parseCommentary,
       },
 
-      'Credit Sources': {
-        property: 'creditSources',
+      'Crediting Sources': {
+        property: 'creditingSources',
         transform: parseCreditingSources,
       },
 
@@ -461,7 +461,7 @@ export class FlashSide extends Thing {
 
       const artworkData = flashData.map(flash => flash.coverArtwork);
       const commentaryData = flashData.flatMap(flash => flash.commentary);
-      const creditingSourceData = flashData.flatMap(flash => flash.creditSources);
+      const creditingSourceData = flashData.flatMap(flash => flash.creditingSources);
 
       return {
         flashData,

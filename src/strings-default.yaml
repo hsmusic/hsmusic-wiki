@@ -370,7 +370,7 @@ releaseInfo:
     _: "Read {LINK}."
     link: "artist commentary"
 
-  readCreditSources:
+  readCreditingSources:
     _: "Read {LINK}."
     link: "crediting sources"
 
@@ -618,7 +618,7 @@ misc:
       trackArt: "{INDEX} track art by {ARTIST}"
       onlyIndex: "Only"
 
-  creditSources:
+  creditingSources:
     _: "Crediting sources:"
 
   # external:
@@ -865,7 +865,7 @@ misc:
     # Displayed on various info pages.
 
     artistCommentary: "Artist commentary"
-    creditSources: "Crediting sources"
+    creditingSources: "Crediting sources"
 
     # Displayed on artist info page.
 

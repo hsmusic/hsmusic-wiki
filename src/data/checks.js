@@ -185,7 +185,7 @@ export function filterReferenceErrors(wikiData, {
       artTags: '_artTag',
       referencedArtworks: '_artwork',
       commentary: '_content',
-      creditSources: '_content',
+      creditingSources: '_content',
     }],
 
     ['artTagData', {
@@ -194,7 +194,7 @@ export function filterReferenceErrors(wikiData, {
 
     ['flashData', {
       commentary: '_content',
-      creditSources: '_content',
+      creditingSources: '_content',
     }],
 
     ['groupCategoryData', {
@@ -235,7 +235,7 @@ export function filterReferenceErrors(wikiData, {
       referencedArtworks: '_artwork',
       mainReleaseTrack: '_trackMainReleasesOnly',
       commentary: '_content',
-      creditSources: '_content',
+      creditingSources: '_content',
       lyrics: '_content',
     }],
 
@@ -609,7 +609,7 @@ export function reportContentTextErrors(wikiData, {
     ['trackData', {
       additionalFiles: additionalFileShape,
       commentary: commentaryShape,
-      creditSources: commentaryShape,
+      creditingSources: commentaryShape,
       lyrics: lyricsShape,
       midiProjectFiles: additionalFileShape,
       sheetMusicFiles: additionalFileShape,

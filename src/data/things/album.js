@@ -214,7 +214,7 @@ export class Album extends Thing {
       class: input.value(CommentaryEntry),
     }),
 
-    creditSources: thingList({
+    creditingSources: thingList({
       class: input.value(CreditingSourcesEntry),
     }),
 
@@ -618,8 +618,8 @@ export class Album extends Thing {
         transform: parseCommentary,
       },
 
-      'Credit Sources': {
-        property: 'creditSources',
+      'Crediting Sources': {
+        property: 'creditingSources',
         transform: parseCreditingSources,
       },
 
@@ -744,7 +744,7 @@ export class Album extends Thing {
 
           artworkData.push(...entry.trackArtworks);
           commentaryData.push(...entry.commentary);
-          creditingSourceData.push(...entry.creditSources);
+          creditingSourceData.push(...entry.creditingSources);
 
           // TODO: As exposed, Track.lyrics tries to inherit from the main
           // release, which is impossible before the data's been linked.
@@ -767,7 +767,7 @@ export class Album extends Thing {
         }
 
         commentaryData.push(...album.commentary);
-        creditingSourceData.push(...album.creditSources);
+        creditingSourceData.push(...album.creditingSources);
 
         album.trackSections = trackSections;
       }
