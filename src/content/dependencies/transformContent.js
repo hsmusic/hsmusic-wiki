@@ -1,3 +1,5 @@
+import {basename} from 'node:path';
+
 import {bindFind} from '#find';
 import {replacerSpec, parseContentNodes} from '#replacer';
 
@@ -483,7 +485,13 @@ export default {
                     align === 'center' &&
                       {class: 'align-center'},
 
-                    audio));
+                    [
+                      html.tag('a', {class: 'filename'},
+                        src && {href: src},
+                        language.sanitize(basename(node.src))),
+
+                      audio,
+                    ]));
 
             return {
               type: 'processed-audio',

@@ -2580,7 +2580,7 @@ html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:las
 /* Videos and audios (in content) get a lite version of image-container. */
 .content-video-container,
 .content-audio-container {
-  width: min-content;
+  width: fit-content;
   background-color: var(--dark-color);
   border: 2px solid var(--primary-color);
   border-radius: 2.5px 2.5px 3px 3px;
@@ -2596,6 +2596,18 @@ html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:las
 .content-audio-container.align-center {
   margin-left: auto;
   margin-right: auto;
+}
+
+.content-audio-container .filename {
+  color: white;
+  font-family: monospace;
+  display: block;
+  font-size: 0.9em;
+  padding-left: 1ch;
+  padding-right: 1ch;
+  padding-bottom: 0.25em;
+  margin-bottom: 0.5em;
+  border-bottom: 1px solid #fff4;
 }
 
 .image-text-area {
