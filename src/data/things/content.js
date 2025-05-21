@@ -188,3 +188,5 @@ export class LyricsEntry extends ContentEntry {
 }
 
 export class CreditingSourcesEntry extends ContentEntry {}
+
+export class ReferencingSourcesEntry extends ContentEntry {}

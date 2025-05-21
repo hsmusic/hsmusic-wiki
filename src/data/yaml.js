@@ -930,6 +930,10 @@ export function parseCreditingSources(value, {subdoc, CreditingSourcesEntry}) {
   return parseContentEntries(CreditingSourcesEntry, value, {subdoc});
 }
 
+export function parseReferencingSources(value, {subdoc, ReferencingSourcesEntry}) {
+  return parseContentEntries(ReferencingSourcesEntry, value, {subdoc});
+}
+
 export function parseLyrics(value, {subdoc, LyricsEntry}) {
   if (
     typeof value === 'string' &&
@@ -1637,6 +1641,8 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
     ['homepageLayout.sections.rows', [/* find */]],
 
     ['lyricsData', [/* find */]],
+
+    ['referencingSourceData', [/* find */]],
 
     ['seriesData', [/* find */]],
 

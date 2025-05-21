@@ -696,6 +696,7 @@ export class Album extends Thing {
       const artworkData = [];
       const commentaryData = [];
       const creditingSourceData = [];
+      const referencingSourceData = [];
       const lyricsData = [];
 
       for (const {header: album, entries} of results) {
@@ -745,6 +746,7 @@ export class Album extends Thing {
           artworkData.push(...entry.trackArtworks);
           commentaryData.push(...entry.commentary);
           creditingSourceData.push(...entry.creditingSources);
+          referencingSourceData.push(...entry.referencingSources);
 
           // TODO: As exposed, Track.lyrics tries to inherit from the main
           // release, which is impossible before the data's been linked.
@@ -780,6 +782,7 @@ export class Album extends Thing {
         artworkData,
         commentaryData,
         creditingSourceData,
+        referencingSourceData,
         lyricsData,
       };
     },

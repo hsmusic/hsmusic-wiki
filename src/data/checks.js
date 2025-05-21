@@ -236,6 +236,7 @@ export function filterReferenceErrors(wikiData, {
       mainReleaseTrack: '_trackMainReleasesOnly',
       commentary: '_content',
       creditingSources: '_content',
+      referencingSources: '_content',
       lyrics: '_content',
     }],
 
@@ -612,6 +613,7 @@ export function reportContentTextErrors(wikiData, {
       additionalFiles: additionalFileShape,
       commentary: commentaryShape,
       creditingSources: commentaryShape,
+      referencingSources: commentaryShape,
       lyrics: lyricsShape,
       midiProjectFiles: additionalFileShape,
       sheetMusicFiles: additionalFileShape,

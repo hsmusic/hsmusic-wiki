@@ -109,6 +109,10 @@ export default {
     creditingSourceEntries:
       track.creditingSources
         .map(entry => relation('generateCommentaryEntry', entry)),
+
+    referencingSourceEntries:
+      track.referencingSources
+        .map(entry => relation('generateCommentaryEntry', entry)),
   }),
 
   data: (_query, track) => ({
@@ -187,6 +191,15 @@ export default {
                     link:
                       html.tag('a',
                         {href: '#crediting-sources'},
+                        language.$(capsule, 'link')),
+                  })),
+
+              !html.isBlank(relations.referencingSourceEntries) &&
+                language.encapsulate(capsule, 'readReferencingSources', capsule =>
+                  language.$(capsule, {
+                    link:
+                      html.tag('a',
+                        {href: '#referencing-sources'},
                         language.$(capsule, 'link')),
                   })),
             ])),
@@ -345,6 +358,16 @@ export default {
               }),
 
             relations.creditingSourceEntries,
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'referencing-sources'},
+                title: language.$('misc.referencingSources'),
+              }),
+
+            relations.referencingSourceEntries,
           ]),
         ],
 

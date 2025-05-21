@@ -374,6 +374,10 @@ releaseInfo:
     _: "Read {LINK}."
     link: "crediting sources"
 
+  readReferencingSources:
+    _: "Read {LINK}."
+    link: "referencing sources"
+
   additionalFiles:
     heading: "View or download additional files:"
 
@@ -838,6 +842,9 @@ misc:
       group: "Groups"
       track: "Tracks"
 
+  referencingSources:
+    _: "Referencing sources:"
+
   # skippers:
   #
   #   These are navigational links that only show up when you're
@@ -886,6 +893,7 @@ misc:
     sampledBy: "Sampled by..."
     features: "Features..."
     featuredIn: "Featured in..."
+    referencingSources: "Referencing sources"
 
     lyrics: "Lyrics"
 

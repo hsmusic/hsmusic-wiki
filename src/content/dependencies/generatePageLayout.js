@@ -582,6 +582,7 @@ export default {
               {id: 'commentary', string: 'commentary'},
               {id: 'artist-commentary', string: 'artistCommentary'},
               {id: 'crediting-sources', string: 'creditingSources'},
+              {id: 'referencing-sources', string: 'referencingSources'},
             ])),
         ]);
 

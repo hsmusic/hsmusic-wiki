@@ -15,6 +15,7 @@ import {
   parseCommentary,
   parseContributors,
   parseCreditingSources,
+  parseReferencingSources,
   parseDate,
   parseDimensions,
   parseDuration,
@@ -93,6 +94,7 @@ export class Track extends Thing {
     CreditingSourcesEntry,
     Flash,
     LyricsEntry,
+    ReferencingSourcesEntry,
     TrackSection,
     WikiInfo,
   }) => ({
@@ -229,6 +231,10 @@ export class Track extends Thing {
 
     creditingSources: thingList({
       class: input.value(CreditingSourcesEntry),
+    }),
+
+    referencingSources: thingList({
+      class: input.value(ReferencingSourcesEntry),
     }),
 
     lyrics: [
@@ -520,6 +526,11 @@ export class Track extends Thing {
       'Crediting Sources': {
         property: 'creditingSources',
         transform: parseCreditingSources,
+      },
+
+      'Referencing Sources': {
+        property: 'referencingSources',
+        transform: parseReferencingSources,
       },
 
       'Additional Files': {
