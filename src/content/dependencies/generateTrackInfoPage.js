@@ -106,7 +106,7 @@ export default {
     artistCommentarySection:
       relation('generateTrackArtistCommentarySection', track),
 
-    creditSourceEntries:
+    creditingSourceEntries:
       track.creditingSources
         .map(entry => relation('generateCommentaryEntry', entry)),
   }),
@@ -181,12 +181,12 @@ export default {
                         language.$(capsule, 'link')),
                   })),
 
-              !html.isBlank(relations.creditSourceEntries) &&
+              !html.isBlank(relations.creditingSourceEntries) &&
                 language.encapsulate(capsule, 'readCreditingSources', capsule =>
                   language.$(capsule, {
                     link:
                       html.tag('a',
-                        {href: '#credit-sources'},
+                        {href: '#crediting-sources'},
                         language.$(capsule, 'link')),
                   })),
             ])),
@@ -340,11 +340,11 @@ export default {
           html.tags([
             relations.contentHeading.clone()
               .slots({
-                attributes: {id: 'credit-sources'},
+                attributes: {id: 'crediting-sources'},
                 title: language.$('misc.creditingSources'),
               }),
 
-            relations.creditSourceEntries,
+            relations.creditingSourceEntries,
           ]),
         ],
 
