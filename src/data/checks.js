@@ -757,6 +757,31 @@ export function reportContentTextErrors(wikiData, {
               const topMessage =
                 `Content text errors` + fieldPropertyMessage;
 
+              const checkShapeEntries = (entry, callProcessContentOpts) => {
+                for (const [key, annotation] of Object.entries(shape)) {
+                  const value = entry[key];
+
+                  // TODO: This should be an undefined/null check, like above,
+                  // but it's not, because sometimes the stuff we're checking
+                  // here isn't actually coded as a Thing - so the properties
+                  // might really be undefined instead of null. Terrifying and
+                  // awful. And most of all, citation needed.
+                  if (!value) continue;
+
+                  callProcessContent({
+                    ...callProcessContentOpts,
+
+                    // TODO: `nest` isn't provided by `callProcessContentOpts`
+                    //`but `push` is - this is to match the old code, but
+                    // what's the deal here?
+                    nest,
+
+                    value,
+                    message: `Error in ${colors.green(annotation)}`,
+                  });
+                }
+              };
+
               if (shape === '_content') {
                 callProcessContent({
                   nest,
@@ -764,26 +789,18 @@ export function reportContentTextErrors(wikiData, {
                   value,
                   message: topMessage,
                 });
-              } else {
+              } else if (Array.isArray(value)) {
                 nest({message: topMessage}, ({push}) => {
                   for (const [index, entry] of value.entries()) {
-                    for (const [key, annotation] of Object.entries(shape)) {
-                      const value = entry[key];
-
-                      // TODO: Should this check undefined/null similar to above?
-                      if (!value) continue;
-
-                      callProcessContent({
-                        nest,
-                        push,
-                        value,
-                        message: `Error in ${colors.green(annotation)}`,
-                        annotateError: error =>
-                          annotateErrorWithIndex(error, index),
-                      });
-                    }
+                    checkShapeEntries(entry, {
+                      push,
+                      annotateError: error =>
+                        annotateErrorWithIndex(error, index),
+                    });
                   }
                 });
+              } else {
+                checkShapeEntries(value, {push});
               }
             }
           });
