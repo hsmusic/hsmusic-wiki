@@ -1679,6 +1679,11 @@ p.image-details.origin-details {
   margin-bottom: 2px;
 }
 
+p.image-details.origin-details .extra-details {
+  display: block;
+  margin-top: 0.25em;
+}
+
 .cover-artwork-joiner {
   z-index: -2;
 }

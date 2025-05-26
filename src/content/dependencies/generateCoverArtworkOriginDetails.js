@@ -29,6 +29,9 @@ export default {
     source:
       relation('transformContent', artwork.source),
 
+    extraDetails:
+      relation('transformContent', artwork.extraDetails),
+
     albumLink:
       (query.artworkThingType === 'album'
         ? relation('linkAlbum', artwork.thing)
@@ -146,12 +149,19 @@ export default {
               year: relations.datetimestamp,
             });
 
+          const extraDetails =
+            html.tag('span', {class: 'extra-details'},
+              {[html.onlyIfContent]: true},
+
+              relations.extraDetails.slot('mode', 'inline'));
+
           return [
             artworkBy,
             trackArtFromAlbum,
             source,
             label,
             year,
+            extraDetails,
           ];
         })())),
 };
