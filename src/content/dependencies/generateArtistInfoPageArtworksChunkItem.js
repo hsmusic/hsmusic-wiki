@@ -3,6 +3,7 @@ export default {
     'generateArtistInfoPageChunkItem',
     'generateArtistInfoPageOtherArtistLinks',
     'linkTrack',
+    'transformContent',
   ],
 
   extraDependencies: ['html', 'language'],
@@ -29,6 +30,9 @@ export default {
 
     otherArtistLinks:
       relation('generateArtistInfoPageOtherArtistLinks', [contrib]),
+
+    extraDetails:
+      relation('transformContent', contrib.thing.extraDetails),
   }),
 
   data: (query, contrib) => ({
@@ -68,5 +72,8 @@ export default {
                  : data.kind === 'banner'
                     ? language.$(capsule, 'bannerArt')
                     : language.$(capsule, 'coverArt')))))),
+
+      extraDetails:
+        relations.extraDetails.slot('mode', 'inline'),
     }),
 };

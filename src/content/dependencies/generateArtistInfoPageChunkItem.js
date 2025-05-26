@@ -33,6 +33,11 @@ export default {
       type: 'html',
       mutable: false,
     },
+
+    extraDetails: {
+      type: 'html',
+      mutable: false,
+    },
   },
 
   generate: (relations, slots, {html, language}) =>
@@ -40,52 +45,59 @@ export default {
       html.tag('li',
         slots.rerelease && {class: 'rerelease'},
 
-        language.encapsulate(entryCapsule, workingCapsule => {
-          const workingOptions = {entry: slots.content};
+        html.tags([
+          language.encapsulate(entryCapsule, workingCapsule => {
+            const workingOptions = {entry: slots.content};
 
-          if (!html.isBlank(slots.rereleaseTooltip)) {
-            workingCapsule += '.rerelease';
-            workingOptions.rerelease =
-              relations.textWithTooltip.slots({
-                attributes: {class: 'rerelease'},
-                text: language.$(entryCapsule, 'rerelease.term'),
-                tooltip: slots.rereleaseTooltip,
-              });
+            if (!html.isBlank(slots.rereleaseTooltip)) {
+              workingCapsule += '.rerelease';
+              workingOptions.rerelease =
+                relations.textWithTooltip.slots({
+                  attributes: {class: 'rerelease'},
+                  text: language.$(entryCapsule, 'rerelease.term'),
+                  tooltip: slots.rereleaseTooltip,
+                });
 
-            return language.$(workingCapsule, workingOptions);
-          }
+              return language.$(workingCapsule, workingOptions);
+            }
 
-          if (!html.isBlank(slots.firstReleaseTooltip)) {
-            workingCapsule += '.firstRelease';
-            workingOptions.firstRelease =
-              relations.textWithTooltip.slots({
-                attributes: {class: 'first-release'},
-                text: language.$(entryCapsule, 'firstRelease.term'),
-                tooltip: slots.firstReleaseTooltip,
-              });
+            if (!html.isBlank(slots.firstReleaseTooltip)) {
+              workingCapsule += '.firstRelease';
+              workingOptions.firstRelease =
+                relations.textWithTooltip.slots({
+                  attributes: {class: 'first-release'},
+                  text: language.$(entryCapsule, 'firstRelease.term'),
+                  tooltip: slots.firstReleaseTooltip,
+                });
 
-            return language.$(workingCapsule, workingOptions);
-          }
+              return language.$(workingCapsule, workingOptions);
+            }
 
-          let anyAccent = false;
+            let anyAccent = false;
 
-          if (!empty(slots.otherArtistLinks)) {
-            anyAccent = true;
-            workingCapsule += '.withArtists';
-            workingOptions.artists =
-              language.formatConjunctionList(slots.otherArtistLinks);
-          }
+            if (!empty(slots.otherArtistLinks)) {
+              anyAccent = true;
+              workingCapsule += '.withArtists';
+              workingOptions.artists =
+                language.formatConjunctionList(slots.otherArtistLinks);
+            }
 
-          if (!html.isBlank(slots.annotation)) {
-            anyAccent = true;
-            workingCapsule += '.withAnnotation';
-            workingOptions.annotation = slots.annotation;
-          }
+            if (!html.isBlank(slots.annotation)) {
+              anyAccent = true;
+              workingCapsule += '.withAnnotation';
+              workingOptions.annotation = slots.annotation;
+            }
 
-          if (anyAccent) {
-            return language.$(workingCapsule, workingOptions);
-          } else {
-            return slots.content;
-          }
-        }))),
+            if (anyAccent) {
+              return language.$(workingCapsule, workingOptions);
+            } else {
+              return slots.content;
+            }
+          }),
+
+          html.tag('span', {class: 'extra-details'},
+            {[html.onlyIfContent]: true},
+
+            slots.extraDetails),
+        ]))),
 };

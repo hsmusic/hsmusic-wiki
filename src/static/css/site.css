@@ -2148,6 +2148,13 @@ ul > li.has-details {
   margin-left: -17px;
 }
 
+li .extra-details {
+  display: block;
+  margin-left: 2ch;
+  font-size: 0.9em;
+  font-style: oblique;
+}
+
 .album-group-list dt,
 .group-series-list dt {
   font-style: oblique;
