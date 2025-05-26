@@ -1679,7 +1679,7 @@ p.image-details.origin-details {
   margin-bottom: 2px;
 }
 
-p.image-details.origin-details .extra-details {
+p.image-details.origin-details .origin-details {
   display: block;
   margin-top: 0.25em;
 }
@@ -2148,7 +2148,7 @@ ul > li.has-details {
   margin-left: -17px;
 }
 
-li .extra-details {
+li .origin-details {
   display: block;
   margin-left: 2ch;
   font-size: 0.9em;

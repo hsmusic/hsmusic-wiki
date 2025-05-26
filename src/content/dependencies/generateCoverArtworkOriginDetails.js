@@ -29,8 +29,8 @@ export default {
     source:
       relation('transformContent', artwork.source),
 
-    extraDetails:
-      relation('transformContent', artwork.extraDetails),
+    originDetails:
+      relation('transformContent', artwork.originDetails),
 
     albumLink:
       (query.artworkThingType === 'album'
@@ -149,11 +149,11 @@ export default {
               year: relations.datetimestamp,
             });
 
-          const extraDetails =
-            html.tag('span', {class: 'extra-details'},
+          const originDetails =
+            html.tag('span', {class: 'origin-details'},
               {[html.onlyIfContent]: true},
 
-              relations.extraDetails.slot('mode', 'inline'));
+              relations.originDetails.slot('mode', 'inline'));
 
           return [
             artworkBy,
@@ -161,7 +161,7 @@ export default {
             source,
             label,
             year,
-            extraDetails,
+            originDetails,
           ];
         })())),
 };

@@ -34,7 +34,7 @@ export default {
       mutable: false,
     },
 
-    extraDetails: {
+    originDetails: {
       type: 'html',
       mutable: false,
     },
@@ -95,9 +95,9 @@ export default {
             }
           }),
 
-          html.tag('span', {class: 'extra-details'},
+          html.tag('span', {class: 'origin-details'},
             {[html.onlyIfContent]: true},
 
-            slots.extraDetails),
+            slots.originDetails),
         ]))),
 };

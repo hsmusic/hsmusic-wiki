@@ -31,8 +31,8 @@ export default {
     otherArtistLinks:
       relation('generateArtistInfoPageOtherArtistLinks', [contrib]),
 
-    extraDetails:
-      relation('transformContent', contrib.thing.extraDetails),
+    originDetails:
+      relation('transformContent', contrib.thing.originDetails),
   }),
 
   data: (query, contrib) => ({
@@ -73,7 +73,7 @@ export default {
                     ? language.$(capsule, 'bannerArt')
                     : language.$(capsule, 'coverArt')))))),
 
-      extraDetails:
-        relations.extraDetails.slot('mode', 'inline'),
+      originDetails:
+        relations.originDetails.slot('mode', 'inline'),
     }),
 };
