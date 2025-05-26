@@ -553,6 +553,11 @@ export function reportContentTextErrors(wikiData, {
     description: 'description',
   };
 
+  const artworkShape = {
+    source: 'artwork source',
+    originDetails: 'artwork origin details',
+  };
+
   const commentaryShape = {
     body: 'commentary body',
     artistText: 'commentary artist text',
@@ -570,6 +575,7 @@ export function reportContentTextErrors(wikiData, {
       additionalFiles: additionalFileShape,
       commentary: commentaryShape,
       creditingSources: commentaryShape,
+      coverArtworks: artworkShape,
     }],
 
     ['artTagData', {
@@ -583,6 +589,7 @@ export function reportContentTextErrors(wikiData, {
     ['flashData', {
       commentary: commentaryShape,
       creditingSources: commentaryShape,
+      coverArtwork: artworkShape,
     }],
 
     ['flashActData', {
@@ -617,6 +624,7 @@ export function reportContentTextErrors(wikiData, {
       lyrics: lyricsShape,
       midiProjectFiles: additionalFileShape,
       sheetMusicFiles: additionalFileShape,
+      trackArtworks: artworkShape,
     }],
 
     ['wikiInfo', {
