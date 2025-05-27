@@ -259,7 +259,7 @@ export class Contribution extends Thing {
       let artist;
       try {
         artist = this.artist;
-      } catch (_error) {
+      } catch {
         // Computing artist might crash for any reason - don't distract from
         // other errors as a result of inspecting this contribution.
       }

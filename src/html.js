@@ -583,7 +583,7 @@ export class Tag {
 
     try {
       this.content = this.content;
-    } catch (error) {
+    } catch {
       this.#setAttributeFlag(imaginarySibling, false);
     }
   }

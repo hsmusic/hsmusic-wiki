@@ -253,7 +253,7 @@ export async function go({
     let url;
     try {
       url = new URL(request.url, `http://${request.headers.host}`);
-    } catch (error) {
+    } catch {
       response.writeHead(500, contentTypePlain);
       response.end('Failed to parse request URL\n');
       return;
@@ -300,7 +300,7 @@ export async function go({
       let filePath;
       try {
         filePath = path.resolve(localDirectory, decodeURI(safePath.split('/').join(path.sep)));
-      } catch (error) {
+      } catch {
         response.writeHead(404, contentTypePlain);
         response.end(`File not found for: ${safePath}`);
         console.log(`${requestHead} [404] ${pathname}`);

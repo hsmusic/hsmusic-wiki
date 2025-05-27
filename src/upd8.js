@@ -117,7 +117,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 let COMMIT;
 try {
   COMMIT = execSync('git log --format="%h %B" -n 1 HEAD', {cwd: __dirname}).toString().trim();
-} catch (error) {
+} catch {
   COMMIT = '(failed to detect)';
 }
 
@@ -2419,7 +2419,7 @@ async function main() {
       });
 
       internalDefaultLanguage = internalDefaultLanguageWatcher.language;
-    } catch (_error) {
+    } catch {
       // No need to display the error here - it's already printed by
       // watchLanguageFile.
       errorLoadingInternalDefaultLanguage = true;

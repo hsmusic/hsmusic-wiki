@@ -55,7 +55,7 @@ export default {
     try {
       new URL(data.url);
       urlIsValid = true;
-    } catch (error) {
+    } catch {
       urlIsValid = false;
     }
 

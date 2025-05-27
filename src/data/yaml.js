@@ -1022,7 +1022,7 @@ export const documentModes = {
 export function getAllDataSteps() {
   try {
     thingConstructors;
-  } catch (error) {
+  } catch {
     throw new Error(`Thing constructors aren't ready yet, can't get all data steps`);
   }
 

@@ -60,7 +60,7 @@ export default class Thing extends CacheableObject {
       if (this.name) {
         name = colors.green(`"${this.name}"`);
       }
-    } catch (error) {
+    } catch {
       name = colors.yellow(`couldn't get name`);
     }
 
@@ -69,7 +69,7 @@ export default class Thing extends CacheableObject {
       if (this.directory) {
         reference = colors.blue(Thing.getReference(this));
       }
-    } catch (error) {
+    } catch {
       reference = colors.yellow(`couldn't get reference`);
     }
 

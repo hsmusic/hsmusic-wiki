@@ -243,13 +243,13 @@ export class CacheableObjectPropertyValueError extends Error {
 
     try {
       inspectOldValue = inspect(oldValue);
-    } catch (error) {
+    } catch {
       inspectOldValue = colors.red(`(couldn't inspect)`);
     }
 
     try {
       inspectNewValue = inspect(newValue);
-    } catch (error) {
+    } catch {
       inspectNewValue = colors.red(`(couldn't inspect)`);
     }
 

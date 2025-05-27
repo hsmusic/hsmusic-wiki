@@ -11,7 +11,7 @@ export function getAllSpecs({
 }) {
   try {
     thingConstructors;
-  } catch (error) {
+  } catch {
     throw new Error(`Thing constructors aren't ready yet, can't get all ${word} specs`);
   }
 
@@ -52,7 +52,7 @@ export function findSpec(key, {
 
   try {
     thingConstructors;
-  } catch (error) {
+  } catch {
     throw new Error(`Thing constructors aren't ready yet, can't check if "${word}.${key}" available`);
   }
 

@@ -286,7 +286,7 @@ export class Artist extends Thing {
       let aliasedArtist;
       try {
         aliasedArtist = this.aliasedArtist.name;
-      } catch (_error) {
+      } catch {
         aliasedArtist = CacheableObject.getUpdateValue(this, 'aliasedArtist');
       }
 

@@ -537,7 +537,7 @@ export default {
             try {
               link.getSlotDescription('preferShortName');
               hasPreferShortNameSlot = true;
-            } catch (error) {
+            } catch {
               hasPreferShortNameSlot = false;
             }
 
@@ -550,7 +550,7 @@ export default {
             try {
               link.getSlotDescription('tooltipStyle');
               hasTooltipStyleSlot = true;
-            } catch (error) {
+            } catch {
               hasTooltipStyleSlot = false;
             }
 

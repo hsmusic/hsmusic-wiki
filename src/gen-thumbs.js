@@ -446,7 +446,7 @@ async function getImageMagickVersion(binary) {
 
   try {
     await promisifyProcess(proc, false);
-  } catch (error) {
+  } catch {
     return null;
   }
 
@@ -627,7 +627,7 @@ export async function determineMediaCachePath({
   try {
     const files = await readdir(mediaPath);
     mediaIncludesThumbnailCache = files.includes(CACHE_FILE);
-  } catch (error) {
+  } catch {
     mediaIncludesThumbnailCache = false;
   }
 
@@ -860,7 +860,7 @@ export async function migrateThumbsIntoDedicatedCacheDirectory({
         path.join(mediaPath, CACHE_FILE),
         path.join(mediaCachePath, CACHE_FILE));
       logInfo`Moved thumbnail cache file.`;
-    } catch (error) {
+    } catch {
       logWarn`Failed to move cache file. (${CACHE_FILE})`;
       logWarn`Check its permissions, or try copying/pasting.`;
     }

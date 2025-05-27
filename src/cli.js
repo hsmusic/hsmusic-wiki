@@ -469,7 +469,7 @@ export async function logicalCWD() {
 
   try {
     await stat('/bin/sh');
-  } catch (error) {
+  } catch {
     // Not logical, so sad.
     return process.cwd();
   }

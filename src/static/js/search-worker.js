@@ -130,7 +130,7 @@ async function loadDatabase() {
 
   try {
     idb = await promisifyIDBRequest(request);
-  } catch (error) {
+  } catch {
     console.warn(`Couldn't load search IndexedDB - won't use an internal cache.`);
     console.warn(request.error);
     idb = null;

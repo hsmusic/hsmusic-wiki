@@ -1305,7 +1305,7 @@ async function handleDroppedIntoSearchInput(domEvent) {
   let droppedURL;
   try {
     droppedURL = new URL(droppedText);
-  } catch (error) {
+  } catch {
     droppedURL = null;
   }
 

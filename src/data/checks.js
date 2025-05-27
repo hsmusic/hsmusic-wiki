@@ -686,7 +686,7 @@ export function reportContentTextErrors(wikiData, {
       } else if (node.type === 'external-link') {
         try {
           new URL(node.data.href);
-        } catch (error) {
+        } catch {
           yield {
             index, length,
             message:
