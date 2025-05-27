@@ -1251,6 +1251,11 @@ export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
         .filter(part => part.asset)
         .map(part =>
           fromRoot.to('media.albumWallpaperPart', album.directory, part.asset))),
+
+    wikiData.wikiInfo.wikiWallpaperParts
+      .filter(part => part.asset)
+      .map(part =>
+        fromRoot.to('media.path', part.asset)),
   ].flat();
 
   sortByName(paths, {getName: path => path});
