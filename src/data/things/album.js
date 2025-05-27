@@ -592,8 +592,9 @@ export class Album extends Thing {
         transform: parseContributors,
       },
 
-      'Wallpaper Style': {property: 'wallpaperStyle'},
       'Wallpaper File Extension': {property: 'wallpaperFileExtension'},
+
+      'Wallpaper Style': {property: 'wallpaperStyle'},
 
       'Wallpaper Parts': {
         property: 'wallpaperParts',

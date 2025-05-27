@@ -2,7 +2,7 @@ export const WIKI_INFO_FILE = 'wiki-info.yaml';
 
 import {input} from '#composite';
 import Thing from '#thing';
-import {parseContributionPresets} from '#yaml';
+import {parseContributionPresets, parseWallpaperParts} from '#yaml';
 
 import {
   isBoolean,
@@ -14,8 +14,17 @@ import {
 } from '#validators';
 
 import {exitWithoutDependency} from '#composite/control-flow';
-import {contentString, fileExtension, flag, name, referenceList, soupyFind}
-  from '#composite/wiki-properties';
+
+import {
+  contentString,
+  fileExtension,
+  flag,
+  name,
+  referenceList,
+  simpleString,
+  soupyFind,
+  wallpaperParts,
+} from '#composite/wiki-properties';
 
 export class WikiInfo extends Thing {
   static [Thing.friendlyName] = `Wiki Info`;
@@ -69,6 +78,8 @@ export class WikiInfo extends Thing {
     },
 
     wikiWallpaperFileExtension: fileExtension('jpg'),
+    wikiWallpaperStyle: simpleString(),
+    wikiWallpaperParts: wallpaperParts(),
 
     divideTrackListsByGroups: referenceList({
       class: input.value(Group),
@@ -114,20 +125,33 @@ export class WikiInfo extends Thing {
     fields: {
       'Name': {property: 'name'},
       'Short Name': {property: 'nameShort'},
+
       'Color': {property: 'color'},
+
       'Description': {property: 'description'},
+
       'Footer Content': {property: 'footerContent'},
+
       'Default Language': {property: 'defaultLanguage'},
+
       'Canonical Base': {property: 'canonicalBase'},
+
       'Wiki Wallpaper File Extension': {property: 'wikiWallpaperFileExtension'},
 
-      'Divide Track Lists By Groups': {property: 'divideTrackListsByGroups'},
+      'Wiki Wallpaper Style': {property: 'wikiWallpaperStyle'},
+
+      'Wiki Wallpaper Parts': {
+        property: 'wikiWallpaperParts',
+        transform: parseWallpaperParts,
+      },
 
       'Enable Flashes & Games': {property: 'enableFlashesAndGames'},
       'Enable Listings': {property: 'enableListings'},
       'Enable News': {property: 'enableNews'},
       'Enable Art Tag UI': {property: 'enableArtTagUI'},
       'Enable Group UI': {property: 'enableGroupUI'},
+
+      'Divide Track Lists By Groups': {property: 'divideTrackListsByGroups'},
 
       'Contribution Presets': {
         property: 'contributionPresets',
