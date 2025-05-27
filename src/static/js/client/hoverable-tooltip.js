@@ -118,17 +118,17 @@ export function registerTooltipElement(tooltip) {
     handleTooltipMouseLeft(tooltip);
   });
 
-  tooltip.addEventListener('focusin', event => {
-    handleTooltipReceivedFocus(tooltip, event.relatedTarget);
+  tooltip.addEventListener('focusin', domEvent => {
+    handleTooltipReceivedFocus(tooltip, domEvent.relatedTarget);
   });
 
-  tooltip.addEventListener('focusout', event => {
+  tooltip.addEventListener('focusout', domEvent => {
     // This event gets activated for tabbing *between* links inside the
     // tooltip, which is no good and certainly doesn't represent the focus
     // leaving the tooltip.
-    if (currentlyShownTooltipHasFocus(event.relatedTarget)) return;
+    if (currentlyShownTooltipHasFocus(domEvent.relatedTarget)) return;
 
-    handleTooltipLostFocus(tooltip, event.relatedTarget);
+    handleTooltipLostFocus(tooltip, domEvent.relatedTarget);
   });
 }
 
@@ -158,20 +158,20 @@ export function registerTooltipHoverableElement(hoverable, tooltip) {
     handleTooltipHoverableMouseLeft(hoverable);
   });
 
-  hoverable.addEventListener('focusin', event => {
-    handleTooltipHoverableReceivedFocus(hoverable, event);
+  hoverable.addEventListener('focusin', domEvent => {
+    handleTooltipHoverableReceivedFocus(hoverable, domEvent);
   });
 
-  hoverable.addEventListener('focusout', event => {
-    handleTooltipHoverableLostFocus(hoverable, event);
+  hoverable.addEventListener('focusout', domEvent => {
+    handleTooltipHoverableLostFocus(hoverable, domEvent);
   });
 
-  hoverable.addEventListener('touchend', event => {
-    handleTooltipHoverableTouchEnded(hoverable, event);
+  hoverable.addEventListener('touchend', domEvent => {
+    handleTooltipHoverableTouchEnded(hoverable, domEvent);
   });
 
-  hoverable.addEventListener('click', event => {
-    handleTooltipHoverableClicked(hoverable, event);
+  hoverable.addEventListener('click', domEvent => {
+    handleTooltipHoverableClicked(hoverable, domEvent);
   });
 }
 
@@ -416,7 +416,7 @@ function handleTooltipHoverableTouchEnded(hoverable, domEvent) {
     }, 1200);
 }
 
-function handleTooltipHoverableClicked(hoverable) {
+function handleTooltipHoverableClicked(hoverable, domEvent) {
   const {state} = info;
 
   // Don't navigate away from the page if the this hoverable was recently
@@ -426,7 +426,7 @@ function handleTooltipHoverableClicked(hoverable) {
     state.currentlyActiveHoverable === hoverable &&
     state.hoverableWasRecentlyTouched
   ) {
-    event.preventDefault();
+    domEvent.preventDefault();
   }
 }
 
