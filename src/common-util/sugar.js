@@ -119,7 +119,7 @@ export function accumulateSum(array, fn = x => x) {
   return array.reduce(
     (accumulator, value, index, array) =>
       accumulator +
-        fn(value, index, array) ?? 0,
+      (fn(value, index, array) ?? 0),
     0);
 }
 
