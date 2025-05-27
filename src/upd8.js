@@ -3269,7 +3269,7 @@ async function main() {
 }
 
 // TODO: isMain detection isn't consistent across platforms here
-/* eslint-disable-next-line no-constant-condition */
+// eslint-disable-next-line no-constant-binary-expression
 if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmusic') {
   (async () => {
     let result;
