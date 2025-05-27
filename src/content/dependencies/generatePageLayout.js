@@ -8,6 +8,7 @@ export default {
     'generateImageOverlay',
     'generatePageSidebar',
     'generateSearchSidebarBox',
+    'generateStaticURLStyleTag',
     'generateStickyHeadingContainer',
     'transformContent',
   ],
@@ -62,6 +63,9 @@ export default {
 
     relations.colorStyleTag =
       relation('generateColorStyleTag');
+
+    relations.staticURLStyleTag =
+      relation('generateStaticURLStyleTag');
 
     relations.imageOverlay =
       relation('generateImageOverlay');
@@ -598,11 +602,6 @@ export default {
           `    background-image: url("${to('media.path', 'bg.' + data.wikiWallpaperFileExtension)}");\n` +
           `}`);
 
-    const goshFrigginDarnitStyleRule =
-      `.image-media-link::after {\n` +
-      `    mask-image: url("${to('staticMisc.path', 'image.svg')}");\n` +
-      `}`;
-
     const numWallpaperParts =
       html.resolve(slots.styleRules, {normalize: 'string'})
         .match(/\.wallpaper-part:nth-child/g)
@@ -751,9 +750,10 @@ export default {
             relations.colorStyleTag
               .slot('color', slots.color ?? data.wikiColor),
 
+            relations.staticURLStyleTag,
+
             html.tag('style', [
               fallbackBackgroundStyleRule,
-              goshFrigginDarnitStyleRule,
               slots.styleRules,
             ]),
 
