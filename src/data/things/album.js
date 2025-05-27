@@ -709,8 +709,6 @@ export class Album extends Thing {
           isDefaultTrackSection: true,
         });
 
-        const albumRef = Thing.getReference(album);
-
         const closeCurrentTrackSection = () => {
           if (
             currentTrackSection.isDefaultTrackSection &&

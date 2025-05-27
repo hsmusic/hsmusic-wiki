@@ -129,6 +129,9 @@ export function generateURLs(urlSpec) {
         if (template === null) {
           // Self-diagnose, brutally.
 
+          // TODO: This variable isn't used, and has never been used,
+          // but it might have been *meant* to be used?
+          // eslint-disable-next-line no-unused-vars
           const otherTemplateKey = (device ? 'posix' : 'device');
 
           const {value: {[templateKey]: otherTemplate}} =
