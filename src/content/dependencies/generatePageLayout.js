@@ -603,9 +603,10 @@ export default {
           `}`);
 
     const numWallpaperParts =
-      html.resolve(slots.styleRules, {normalize: 'string'})
+      styleRulesCSS
         .match(/\.wallpaper-part:nth-child/g)
-        ?.length ?? 0;
+        ?.length ??
+      0;
 
     const wallpaperPartsHTML =
       html.tag('div', {class: 'wallpaper-parts'},
