@@ -47,7 +47,7 @@ export default {
   }),
 
   slots: {
-    styleRules: {type: 'html', mutable: false},
+    styleTags: {type: 'html', mutable: false},
 
     title: {type: 'html', mutable: false},
 
@@ -62,7 +62,7 @@ export default {
         subtitle: language.$(pageCapsule, 'subtitle'),
 
         color: data.color,
-        styleRules: slots.styleRules,
+        styleTags: slots.styleTags,
 
         artworkColumnContent:
           relations.cover.slots({

@@ -5,7 +5,7 @@ export default {
     'generateAlbumCommentarySidebar',
     'generateAlbumNavAccent',
     'generateAlbumSecondaryNav',
-    'generateAlbumStyleRules',
+    'generateAlbumStyleTags',
     'generateCommentaryEntry',
     'generateContentHeading',
     'generateCoverArtwork',
@@ -44,8 +44,8 @@ export default {
     relations.sidebar =
       relation('generateAlbumCommentarySidebar', album);
 
-    relations.albumStyleRules =
-      relation('generateAlbumStyleRules', album, null);
+    relations.albumStyleTags =
+      relation('generateAlbumStyleTags', album, null);
 
     relations.albumLink =
       relation('linkAlbum', album);
@@ -151,7 +151,7 @@ export default {
         headingMode: 'sticky',
 
         color: data.color,
-        styleRules: [relations.albumStyleRules],
+        styleTags: relations.albumStyleTags,
 
         mainClasses: ['long-content'],
         mainContent: [

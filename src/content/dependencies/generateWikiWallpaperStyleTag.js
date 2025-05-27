@@ -1,8 +1,14 @@
 export default {
-  extraDependencies: ['html', 'to', 'wikiData'],
+  contentDependencies: ['generateWallpaperStyleTag'],
+  extraDependencies: ['wikiData'],
 
   sprawl: ({wikiInfo}) => ({
     wikiWallpaperFileExtension: wikiInfo.wikiWallpaperFileExtension,
+  }),
+
+  relations: (relation) => ({
+    wallpaperStyle:
+      relation('generateWallpaperStyleTag'),
   }),
 
   data: (sprawl) => ({
@@ -12,9 +18,8 @@ export default {
     ],
   }),
 
-  generate: (data, {html, to}) =>
-    html.tag('style', {class: 'wiki-wallpaper-style'},
-      `body::before {\n` +
-      `    background-image: url("${to(...data.path)}");\n` +
-      `}`),
+  generate: (data, relations) =>
+    relations.wallpaperStyle.slots({
+      singleWallpaperPath: data.path,
+    }),
 };

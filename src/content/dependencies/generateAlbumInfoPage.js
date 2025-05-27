@@ -11,7 +11,7 @@ export default {
     'generateAlbumSecondaryNav',
     'generateAlbumSidebar',
     'generateAlbumSocialEmbed',
-    'generateAlbumStyleRules',
+    'generateAlbumStyleTags',
     'generateAlbumTrackList',
     'generateCommentaryEntry',
     'generateContentHeading',
@@ -26,8 +26,8 @@ export default {
     layout:
       relation('generatePageLayout'),
 
-    albumStyleRules:
-      relation('generateAlbumStyleRules', album, null),
+    albumStyleTags:
+      relation('generateAlbumStyleTags', album, null),
 
     socialEmbed:
       relation('generateAlbumSocialEmbed', album),
@@ -104,7 +104,7 @@ export default {
 
         color: data.color,
         headingMode: 'sticky',
-        styleRules: [relations.albumStyleRules],
+        styleTags: relations.albumStyleTags,
 
         additionalNames: relations.additionalNamesBox,
 

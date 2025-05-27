@@ -9,7 +9,7 @@ export default {
     'generateAlbumGalleryTrackGrid',
     'generateAlbumNavAccent',
     'generateAlbumSecondaryNav',
-    'generateAlbumStyleRules',
+    'generateAlbumStyleTags',
     'generateIntrapageDotSwitcher',
     'generatePageLayout',
     'linkAlbum',
@@ -46,8 +46,8 @@ export default {
     layout:
       relation('generatePageLayout'),
 
-    albumStyleRules:
-      relation('generateAlbumStyleRules', album, null),
+    albumStyleTags:
+      relation('generateAlbumStyleTags', album, null),
 
     albumLink:
       relation('linkAlbum', album),
@@ -106,7 +106,7 @@ export default {
         headingMode: 'static',
 
         color: data.color,
-        styleRules: [relations.albumStyleRules],
+        styleTags: relations.albumStyleTags,
 
         mainClasses: ['top-index'],
         mainContent: [

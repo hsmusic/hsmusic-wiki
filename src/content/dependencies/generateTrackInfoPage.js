@@ -5,7 +5,7 @@ export default {
     'generateAlbumNavAccent',
     'generateAlbumSecondaryNav',
     'generateAlbumSidebar',
-    'generateAlbumStyleRules',
+    'generateAlbumStyleTags',
     'generateCommentaryEntry',
     'generateContentHeading',
     'generateContributionList',
@@ -38,8 +38,8 @@ export default {
     layout:
       relation('generatePageLayout'),
 
-    albumStyleRules:
-      relation('generateAlbumStyleRules', track.album, track),
+    albumStyleTags:
+      relation('generateAlbumStyleTags', track.album, track),
 
     socialEmbed:
       relation('generateTrackSocialEmbed', track),
@@ -136,7 +136,7 @@ export default {
         additionalNames: relations.additionalNamesBox,
 
         color: data.color,
-        styleRules: [relations.albumStyleRules],
+        styleTags: relations.albumStyleTags,
 
         artworkColumnContent:
           relations.artworkColumn,

@@ -115,11 +115,6 @@ export default {
 
     color: {validate: v => v.isColor},
 
-    styleRules: {
-      validate: v => v.sparseArrayOf(v.isHTML),
-      default: [],
-    },
-
     styleTags: {
       type: 'html',
       mutable: false,
@@ -599,28 +594,23 @@ export default {
             ])),
         ]);
 
-    const slottedStyleTags = html.tags([
-      slots.styleRules.map(rule => html.tag('style', rule)),
-      slots.styleTags,
-    ]);
+    const slottedStyleTags =
+      html.smush(slots.styleTags);
 
-    const styleTagsCSS =
-      html.smush(slottedStyleTags)
-        .content
-        .map(tag =>
-          html.resolve(tag.content, {normalize: 'string'}))
-        .join('\n\n');
+    const slottedWallpaperStyleTag =
+      slottedStyleTags.content
+        .find(tag => tag.attributes.has('class', 'wallpaper-style'));
 
     const fallbackWallpaperStyleTag =
-      (styleTagsCSS.match(/body::before[^}]*background-image:/)
+      (slottedWallpaperStyleTag
         ? ''
         : relations.wikiWallpaperStyleTag);
 
     const numWallpaperParts =
-      styleTagsCSS
-        .match(/\.wallpaper-part:nth-child/g)
-        ?.length ??
-      0;
+      (slottedWallpaperStyleTag &&
+       slottedWallpaperStyleTag.attributes.has('data-wallpaper-mode', 'parts')
+        ? parseInt(slottedWallpaperStyleTag.attributes.get('data-num-wallpaper-parts'))
+        : 0);
 
     const wallpaperPartsHTML =
       html.tag('div', {class: 'wallpaper-parts'},

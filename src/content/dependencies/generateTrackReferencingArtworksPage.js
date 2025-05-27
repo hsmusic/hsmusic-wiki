@@ -1,6 +1,6 @@
 export default {
   contentDependencies: [
-    'generateAlbumStyleRules',
+    'generateAlbumStyleTags',
     'generateBackToTrackLink',
     'generateReferencingArtworksPage',
     'generateTrackNavLinks',
@@ -12,8 +12,8 @@ export default {
     page:
       relation('generateReferencingArtworksPage', track.trackArtworks[0]),
 
-    albumStyleRules:
-      relation('generateAlbumStyleRules', track.album, track),
+    albumStyleTags:
+      relation('generateAlbumStyleTags', track.album, track),
 
     navLinks:
       relation('generateTrackNavLinks', track),
@@ -35,7 +35,7 @@ export default {
             data.name,
         }),
 
-      styleRules: [relations.albumStyleRules],
+      styleTags: relations.albumStyleTags,
 
       navLinks:
         html.resolve(
