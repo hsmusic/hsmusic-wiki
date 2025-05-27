@@ -3,7 +3,7 @@ import {atOffset, empty, repeat} from '#sugar';
 
 export default {
   contentDependencies: [
-    'generateColorStyleRules',
+    'generateColorStyleTag',
     'generateFooterLocalizationLinks',
     'generateImageOverlay',
     'generatePageSidebar',
@@ -60,8 +60,8 @@ export default {
         relation('transformContent', sprawl.footerContent);
     }
 
-    relations.colorStyleRules =
-      relation('generateColorStyleRules');
+    relations.colorStyleTag =
+      relation('generateColorStyleTag');
 
     relations.imageOverlay =
       relation('generateImageOverlay');
@@ -748,10 +748,10 @@ export default {
               href: to('staticCSS.path', 'site.css'),
             }),
 
-            html.tag('style', [
-              relations.colorStyleRules
-                .slot('color', slots.color ?? data.wikiColor),
+            relations.colorStyleTag
+              .slot('color', slots.color ?? data.wikiColor),
 
+            html.tag('style', [
               fallbackBackgroundStyleRule,
               goshFrigginDarnitStyleRule,
               slots.styleRules,

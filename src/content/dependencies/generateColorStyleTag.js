@@ -18,16 +18,19 @@ export default {
     },
   },
 
-  generate(data, relations, slots) {
-    const color = data.color ?? slots.color;
+  generate(data, relations, slots, {html}) {
+    const color =
+      data.color ?? slots.color;
 
     if (!color) {
-      return '';
+      return html.blank();
     }
 
-    return [
-      `:root {`,
-      ...(
+    const style =
+      html.tag('style', {class: 'color-style'},
+        {'data-color': color},
+
+        `:root {\n` +
         relations.variables
           .slots({
             color,
@@ -35,8 +38,10 @@ export default {
             mode: 'property-list',
           })
           .content
-          .map(line => line + ';')),
-      `}`,
-    ].join('\n');
+          .map(line => '    ' + line + ';\n')
+          .join('') +
+        `}`);
+
+    return style;
   },
 };
