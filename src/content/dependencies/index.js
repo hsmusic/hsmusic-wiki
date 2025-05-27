@@ -11,6 +11,11 @@ import {colors, logWarn} from '#cli';
 import contentFunction, {ContentFunctionSpecError} from '#content-function';
 import {annotateFunction} from '#sugar';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const codeSrcPath = path.resolve(__dirname, '..');
+const codeRootPath = path.resolve(codeSrcPath, '..');
+
 function cachebust(filePath) {
   if (filePath in cachebust.cache) {
     cachebust.cache[filePath] += 1;
@@ -42,7 +47,9 @@ export function watchContentDependencies({
     close,
   });
 
-  const eslint = new ESLint();
+  const eslint = new ESLint({
+    cwd: codeRootPath,
+  });
 
   const metaPath = fileURLToPath(import.meta.url);
   const metaDirname = path.dirname(metaPath);
