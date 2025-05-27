@@ -23,17 +23,19 @@ export default {
         title: data.name,
         headingMode: 'sticky',
 
-        styleRules:
-          (data.stylesheet
-            ? [data.stylesheet]
-            : []),
+        styleTags: [
+          html.tag('style', {class: 'static-page-style'},
+            {[html.onlyIfContent]: true},
+            data.stylesheet),
+        ],
 
         mainClasses: ['long-content'],
         mainContent: [
           relations.content,
 
-          data.script &&
-            html.tag('script', data.script),
+          html.tag('script',
+            {[html.onlyIfContent]: true},
+            data.script),
         ],
 
         navLinkStyle: 'hierarchical',
