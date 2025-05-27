@@ -594,16 +594,23 @@ export default {
             ])),
         ]);
 
-    const styleRulesCSS =
-      html.resolve(slots.styleRules, {normalize: 'string'});
+    const fakeStyleTags =
+      slots.styleRules.map(rule => html.tag('style', rule));
+
+    const styleTagsCSS =
+      html.smush(/*slots.styleTags*/ fakeStyleTags)
+        .content
+        .map(tag =>
+          html.resolve(tag.content, {normalize: 'string'}))
+        .join('\n\n');
 
     const fallbackWallpaperStyleTag =
-      (styleRulesCSS.match(/body::before[^}]*background-image:/)
+      (styleTagsCSS.match(/body::before[^}]*background-image:/)
         ? ''
         : relations.wikiWallpaperStyleTag);
 
     const numWallpaperParts =
-      styleRulesCSS
+      styleTagsCSS
         .match(/\.wallpaper-part:nth-child/g)
         ?.length ??
       0;
@@ -755,9 +762,7 @@ export default {
 
             fallbackWallpaperStyleTag,
 
-            html.tag('style', [
-              slots.styleRules,
-            ]),
+            fakeStyleTags,
 
             html.tag('script', {
               src: to('staticLib.path', 'chroma-js/chroma.min.js'),
