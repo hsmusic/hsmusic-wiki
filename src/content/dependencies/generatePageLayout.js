@@ -10,6 +10,7 @@ export default {
     'generateSearchSidebarBox',
     'generateStaticURLStyleTag',
     'generateStickyHeadingContainer',
+    'generateWikiWallpaperStyleTag',
     'transformContent',
   ],
 
@@ -29,14 +30,12 @@ export default {
     wikiColor: wikiInfo.color,
     wikiName: wikiInfo.nameShort,
     canonicalBase: wikiInfo.canonicalBase,
-    wikiWallpaperFileExtension: wikiInfo.wikiWallpaperFileExtension,
   }),
 
   data: (sprawl) => ({
     wikiColor: sprawl.wikiColor,
     wikiName: sprawl.wikiName,
     canonicalBase: sprawl.canonicalBase,
-    wikiWallpaperFileExtension: sprawl.wikiWallpaperFileExtension,
   }),
 
   relations(relation, sprawl) {
@@ -66,6 +65,9 @@ export default {
 
     relations.staticURLStyleTag =
       relation('generateStaticURLStyleTag');
+
+    relations.wikiWallpaperStyleTag =
+      relation('generateWikiWallpaperStyleTag');
 
     relations.imageOverlay =
       relation('generateImageOverlay');
@@ -595,12 +597,10 @@ export default {
     const styleRulesCSS =
       html.resolve(slots.styleRules, {normalize: 'string'});
 
-    const fallbackBackgroundStyleRule =
+    const fallbackWallpaperStyleTag =
       (styleRulesCSS.match(/body::before[^}]*background-image:/)
         ? ''
-        : `body::before {\n` +
-          `    background-image: url("${to('media.path', 'bg.' + data.wikiWallpaperFileExtension)}");\n` +
-          `}`);
+        : relations.wikiWallpaperStyleTag);
 
     const numWallpaperParts =
       styleRulesCSS
@@ -753,8 +753,9 @@ export default {
 
             relations.staticURLStyleTag,
 
+            fallbackWallpaperStyleTag,
+
             html.tag('style', [
-              fallbackBackgroundStyleRule,
               slots.styleRules,
             ]),
 
