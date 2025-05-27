@@ -9,7 +9,7 @@
     },
     "scripts": {
         "test": "tap",
-        "dev": "eslint src && node src/upd8.js"
+        "lint": "eslint src"
     },
     "imports": {
         "#aggregate": "./src/aggregate.js",
