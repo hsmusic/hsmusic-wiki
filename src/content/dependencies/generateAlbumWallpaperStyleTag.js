@@ -3,7 +3,7 @@ export default {
   extraDependencies: ['html'],
 
   relations: (relation, album) => ({
-    wallpaperStyle:
+    wallpaperStyleTag:
       (album.hasWallpaperArt
         ? relation('generateWallpaperStyleTag')
         : null),
@@ -27,8 +27,8 @@ export default {
   }),
 
   generate: (data, relations, {html}) =>
-    (relations.wallpaperStyle
-      ? relations.wallpaperStyle.slots({
+    (relations.wallpaperStyleTag
+      ? relations.wallpaperStyleTag.slots({
           singleWallpaperPath: data.singleWallpaperPath,
           singleWallpaperStyle: data.singleWallpaperStyle,
           wallpaperPartPaths: data.wallpaperPartPaths,

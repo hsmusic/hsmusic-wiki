@@ -7,7 +7,7 @@ export default {
   }),
 
   relations: (relation) => ({
-    wallpaperStyle:
+    wallpaperStyleTag:
       relation('generateWallpaperStyleTag'),
   }),
 
@@ -19,7 +19,7 @@ export default {
   }),
 
   generate: (data, relations) =>
-    relations.wallpaperStyle.slots({
+    relations.wallpaperStyleTag.slots({
       singleWallpaperPath: data.path,
     }),
 };
