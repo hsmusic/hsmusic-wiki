@@ -3,9 +3,6 @@
 
 import {input, templateCompositeFrom} from '#composite';
 
-import {exitWithoutDependency} from '#composite/control-flow';
-import {withPropertyFromObject} from '#composite/data';
-
 import withAllReleases from './withAllReleases.js';
 
 export default templateCompositeFrom({

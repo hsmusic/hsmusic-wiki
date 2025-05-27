@@ -1,6 +1,5 @@
 import {input, templateCompositeFrom} from '#composite';
 import find from '#find';
-import {isDate} from '#validators';
 
 import annotatedReferenceList from './annotatedReferenceList.js';
 

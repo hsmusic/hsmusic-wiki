@@ -1,4 +1,4 @@
-import {input, templateCompositeFrom} from '#composite';
+import {templateCompositeFrom} from '#composite';
 
 import withStartCountingFrom from './withStartCountingFrom.js';
 

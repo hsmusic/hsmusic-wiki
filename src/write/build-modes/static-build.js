@@ -106,8 +106,6 @@ export async function go({
 
   universalUtilities,
 
-  mediaPath,
-
   defaultLanguage,
   languages,
   urls,

@@ -1,5 +1,4 @@
 import {input, templateCompositeFrom} from '#composite';
-import {stitchArrays} from '#sugar';
 
 function getOutputName({
   [input.staticDependency('list')]: list,

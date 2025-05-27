@@ -4,8 +4,10 @@ import {fileURLToPath} from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/* eslint-disable no-unused-vars */
 const codeSrcPath = __dirname;
 const codeRootPath = path.resolve(codeSrcPath, '..');
+/* eslint-enable no-unused-vars */
 
 function getNodeDependencyRootPath(dependencyName) {
   return (

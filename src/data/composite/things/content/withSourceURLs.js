@@ -1,5 +1,4 @@
 import {input, templateCompositeFrom} from '#composite';
-import {parseContentNodes} from '#replacer';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 import {withFilteredList, withMappedList} from '#composite/data';

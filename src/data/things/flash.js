@@ -43,7 +43,6 @@ import {
   thing,
   thingList,
   urls,
-  wikiData,
 } from '#composite/wiki-properties';
 
 import {withFlashAct} from '#composite/things/flash';
@@ -57,7 +56,6 @@ export class Flash extends Thing {
     CommentaryEntry,
     CreditingSourcesEntry,
     Track,
-    FlashAct,
     WikiInfo,
   }) => ({
     // Update & expose

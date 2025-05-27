@@ -1,5 +1,6 @@
 import {inspect} from 'node:util';
 
+import {colors} from '#cli';
 import {input} from '#composite';
 import find from '#find';
 import Thing from '#thing';
@@ -24,7 +25,7 @@ import {
   parseDimensions,
 } from '#yaml';
 
-import {withIndexInList, withPropertyFromObject} from '#composite/data';
+import {withPropertyFromObject} from '#composite/data';
 
 import {
   exitWithoutDependency,
@@ -64,10 +65,7 @@ import {
 export class Artwork extends Thing {
   static [Thing.referenceType] = 'artwork';
 
-  static [Thing.getPropertyDescriptors] = ({
-    ArtTag,
-    Contribution,
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({ArtTag}) => ({
     // Update & expose
 
     unqualifiedDirectory: directory({

@@ -1,9 +1,9 @@
 import Thing from '#thing';
 
-import {contentString, simpleString, thing} from '#composite/wiki-properties';
+import {contentString, thing} from '#composite/wiki-properties';
 
 export class AdditionalName extends Thing {
-  static [Thing.getPropertyDescriptors] = ({}) => ({
+  static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
     thing: thing(),

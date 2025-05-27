@@ -1,8 +1,7 @@
 export const ART_TAG_DATA_FILE = 'tags.yaml';
 
 import {input} from '#composite';
-import find from '#find';
-import {sortAlphabetically, sortAlbumsTracksChronologically} from '#sort';
+import {sortAlphabetically} from '#sort';
 import Thing from '#thing';
 import {unique} from '#sugar';
 import {isName} from '#validators';
@@ -24,7 +23,6 @@ import {
   soupyReverse,
   thingList,
   urls,
-  wikiData,
 } from '#composite/wiki-properties';
 
 import {withAllDescendantArtTags, withAncestorArtTagBaobabTree}
@@ -34,11 +32,7 @@ export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
   static [Thing.friendlyName] = `Art Tag`;
 
-  static [Thing.getPropertyDescriptors] = ({
-    AdditionalName,
-    Album,
-    Track,
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({AdditionalName}) => ({
     // Update & expose
 
     name: name('Unnamed Art Tag'),

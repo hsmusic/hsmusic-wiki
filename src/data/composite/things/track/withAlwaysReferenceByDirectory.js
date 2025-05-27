@@ -9,7 +9,6 @@ import {isBoolean} from '#validators';
 
 import {withPropertyFromObject} from '#composite/data';
 import {withResolvedReference} from '#composite/wiki-data';
-import {soupyFind} from '#composite/wiki-properties';
 
 import {
   exitWithoutDependency,

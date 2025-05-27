@@ -1,6 +1,5 @@
 import {input, templateCompositeFrom} from '#composite';
 import thingConstructors from '#things';
-import {isContributionList} from '#validators';
 
 export default templateCompositeFrom({
   annotation: `withConstitutedArtwork`,

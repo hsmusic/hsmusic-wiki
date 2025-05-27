@@ -1,5 +1,4 @@
 import {input, templateCompositeFrom} from '#composite';
-import {parseContentNodes} from '#replacer';
 import {transposeArrays} from '#sugar';
 import {is} from '#validators';
 

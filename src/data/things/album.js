@@ -8,7 +8,7 @@ import {colors} from '#cli';
 import {input} from '#composite';
 import {traverse} from '#node-utils';
 import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
-import {accumulateSum, empty} from '#sugar';
+import {empty} from '#sugar';
 import Thing from '#thing';
 import {isColor, isDate, isDirectory, isNumber} from '#validators';
 
@@ -47,7 +47,6 @@ import {
   name,
   referencedArtworkList,
   referenceList,
-  reverseReferenceList,
   simpleDate,
   simpleString,
   soupyFind,
@@ -74,7 +73,6 @@ export class Album extends Thing {
     CommentaryEntry,
     CreditingSourcesEntry,
     Group,
-    Track,
     TrackSection,
     WikiInfo,
   }) => ({
@@ -845,7 +843,7 @@ export class TrackSection extends Thing {
   static [Thing.friendlyName] = `Track Section`;
   static [Thing.referenceType] = `track-section`;
 
-  static [Thing.getPropertyDescriptors] = ({Album, Track}) => ({
+  static [Thing.getPropertyDescriptors] = ({Track}) => ({
     // Update & expose
 
     name: name('Unnamed Track Section'),

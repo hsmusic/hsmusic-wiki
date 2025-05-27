@@ -1,7 +1,6 @@
 import {input, templateCompositeFrom} from '#composite';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
-import {withPropertyFromObject} from '#composite/data';
 import {withRecontextualizedContributionList} from '#composite/wiki-data';
 
 import withPropertyFromAttachedArtwork from './withPropertyFromAttachedArtwork.js';

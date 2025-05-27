@@ -19,7 +19,6 @@ import {
   thing,
   thingList,
   urls,
-  wikiData,
 } from '#composite/wiki-properties';
 
 export class Group extends Thing {

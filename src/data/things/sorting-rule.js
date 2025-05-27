@@ -3,7 +3,6 @@ export const SORTING_RULE_DATA_FILE = 'sorting-rules.yaml';
 import {readFile, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
-import {input} from '#composite';
 import {chunkByProperties, compareArrays, unique} from '#sugar';
 import Thing from '#thing';
 import {isObject, isStringNonEmpty, anyOf, strictArrayOf} from '#validators';

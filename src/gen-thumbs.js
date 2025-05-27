@@ -162,7 +162,6 @@ import {
 
 import dimensionsOf from 'image-size';
 
-import CacheableObject from '#cacheable-object';
 import {stringifyCache} from '#cli';
 import {commandExists, isMain, promisifyProcess, traverse} from '#node-utils';
 import {sortByName} from '#sort';

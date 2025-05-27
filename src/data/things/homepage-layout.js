@@ -63,7 +63,6 @@ export class HomepageLayout extends Thing {
     thingConstructors: {
       HomepageLayout,
       HomepageLayoutSection,
-      HomepageLayoutAlbumsRow,
     },
   }) => ({
     title: `Process homepage layout file`,
@@ -250,7 +249,7 @@ export class HomepageLayoutActionsRow extends HomepageLayoutRow {
 export class HomepageLayoutAlbumCarouselRow extends HomepageLayoutRow {
   static [Thing.friendlyName] = `Homepage Album Carousel Row`;
 
-  static [Thing.getPropertyDescriptors] = (opts, {Album, Group} = opts) => ({
+  static [Thing.getPropertyDescriptors] = (opts, {Album} = opts) => ({
     ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
 
     // Update & expose

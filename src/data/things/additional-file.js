@@ -8,7 +8,7 @@ import {exposeConstant, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
 
 export class AdditionalFile extends Thing {
-  static [Thing.getPropertyDescriptors] = ({}) => ({
+  static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
     thing: thing(),

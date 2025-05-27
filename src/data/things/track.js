@@ -41,7 +41,6 @@ import {
 import {
   commentatorArtists,
   constitutibleArtworkList,
-  contentString,
   contributionList,
   dimensions,
   directory,
@@ -92,10 +91,8 @@ export class Track extends Thing {
     Artwork,
     CommentaryEntry,
     CreditingSourcesEntry,
-    Flash,
     LyricsEntry,
     ReferencingSourcesEntry,
-    TrackSection,
     WikiInfo,
   }) => ({
     // Update & expose

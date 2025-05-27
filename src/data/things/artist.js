@@ -26,7 +26,6 @@ import {
   soupyFind,
   soupyReverse,
   urls,
-  wikiData,
 } from '#composite/wiki-properties';
 
 import {artistTotalDuration} from '#composite/things/artist';
@@ -35,7 +34,7 @@ export class Artist extends Thing {
   static [Thing.referenceType] = 'artist';
   static [Thing.wikiDataArray] = 'artistData';
 
-  static [Thing.getPropertyDescriptors] = ({Album, Flash, Group, Track}) => ({
+  static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
     name: name('Unnamed Artist'),

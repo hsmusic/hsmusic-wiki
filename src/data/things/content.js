@@ -1,10 +1,9 @@
 import {input} from '#composite';
-import find from '#find';
 import Thing from '#thing';
 import {is, isDate} from '#validators';
 import {parseDate} from '#yaml';
 
-import {contentString, referenceList, simpleDate, soupyFind, thing}
+import {contentString, simpleDate, soupyFind, thing}
   from '#composite/wiki-properties';
 
 import {
@@ -27,7 +26,7 @@ import {
 } from '#composite/things/content';
 
 export class ContentEntry extends Thing {
-  static [Thing.getPropertyDescriptors] = ({Artist}) => ({
+  static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
     thing: thing(),

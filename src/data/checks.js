@@ -381,7 +381,7 @@ export function filterReferenceErrors(wikiData, {
                 break;
             }
 
-            const suppress = fn => conditionallySuppressError(error => {
+            const suppress = fn => conditionallySuppressError(_error => {
               // We're not suppressing any errors at the moment.
               // An old suppression is kept below for reference.
 

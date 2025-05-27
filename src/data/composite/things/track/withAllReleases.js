@@ -8,7 +8,6 @@
 import {input, templateCompositeFrom} from '#composite';
 import {sortByDate} from '#sort';
 
-import {exitWithoutDependency} from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
 
 import withMainRelease from './withMainRelease.js';
