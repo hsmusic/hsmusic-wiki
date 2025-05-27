@@ -120,6 +120,11 @@ export default {
       default: [],
     },
 
+    styleTags: {
+      type: 'html',
+      mutable: false,
+    },
+
     mainClasses: {
       validate: v => v.sparseArrayOf(v.isString),
       default: [],
@@ -594,11 +599,13 @@ export default {
             ])),
         ]);
 
-    const fakeStyleTags =
-      slots.styleRules.map(rule => html.tag('style', rule));
+    const slottedStyleTags = html.tags([
+      slots.styleRules.map(rule => html.tag('style', rule)),
+      slots.styleTags,
+    ]);
 
     const styleTagsCSS =
-      html.smush(/*slots.styleTags*/ fakeStyleTags)
+      html.smush(slottedStyleTags)
         .content
         .map(tag =>
           html.resolve(tag.content, {normalize: 'string'}))
@@ -762,7 +769,7 @@ export default {
 
             fallbackWallpaperStyleTag,
 
-            fakeStyleTags,
+            slottedStyleTags,
 
             html.tag('script', {
               src: to('staticLib.path', 'chroma-js/chroma.min.js'),
