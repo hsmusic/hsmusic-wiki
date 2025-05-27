@@ -1,17 +1,10 @@
-import path from 'node:path';
+import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 import {defineConfig} from 'eslint/config';
-import {FlatCompat} from '@eslint/eslintrc';
 import js from '@eslint/js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
 
 const CLIENT_JAVASCRIPT_PATHS = [
   'src/static/js/**/*.js',
@@ -40,7 +33,8 @@ export default defineConfig([
 
   {
     files: ['src/**/*.js'],
-    extends: compat.extends('eslint:recommended'),
+    extends: ['js/recommended'],
+    plugins: {js},
 
     rules: {
       indent: ['off'],
