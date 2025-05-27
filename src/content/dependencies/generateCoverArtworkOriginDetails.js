@@ -153,7 +153,10 @@ export default {
             html.tag('span', {class: 'origin-details'},
               {[html.onlyIfContent]: true},
 
-              relations.originDetails.slot('mode', 'inline'));
+              relations.originDetails.slots({
+                mode: 'inline',
+                absorbPunctuationFollowingExternalLinks: false,
+              }));
 
           return [
             artworkBy,

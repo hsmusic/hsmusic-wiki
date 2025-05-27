@@ -74,6 +74,9 @@ export default {
                     : language.$(capsule, 'coverArt')))))),
 
       originDetails:
-        relations.originDetails.slot('mode', 'inline'),
+        relations.originDetails.slots({
+          mode: 'inline',
+          absorbPunctuationFollowingExternalLinks: false,
+        }),
     }),
 };
