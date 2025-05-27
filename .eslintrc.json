@@ -21,6 +21,8 @@
     }],
     "no-cond-assign": ["off"],
     "no-constant-condition": ["off"],
-    "no-unsafe-finally": ["off"]
+    "no-unsafe-finally": ["off"],
+    "no-self-assign": ["off"],
+    "require-yield": ["off"]
   }
 }
