@@ -14,7 +14,7 @@ import {
 } from '#validators';
 
 import {exitWithoutDependency} from '#composite/control-flow';
-import {contentString, flag, name, referenceList, soupyFind}
+import {contentString, fileExtension, flag, name, referenceList, soupyFind}
   from '#composite/wiki-properties';
 
 export class WikiInfo extends Thing {
@@ -68,6 +68,8 @@ export class WikiInfo extends Thing {
       },
     },
 
+    wikiWallpaperFileExtension: fileExtension('jpg'),
+
     divideTrackListsByGroups: referenceList({
       class: input.value(Group),
       find: soupyFind.input('group'),
@@ -117,7 +119,10 @@ export class WikiInfo extends Thing {
       'Footer Content': {property: 'footerContent'},
       'Default Language': {property: 'defaultLanguage'},
       'Canonical Base': {property: 'canonicalBase'},
+      'Wiki Wallpaper File Extension': {property: 'wikiWallpaperFileExtension'},
+
       'Divide Track Lists By Groups': {property: 'divideTrackListsByGroups'},
+
       'Enable Flashes & Games': {property: 'enableFlashesAndGames'},
       'Enable Listings': {property: 'enableListings'},
       'Enable News': {property: 'enableNews'},

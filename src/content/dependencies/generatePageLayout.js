@@ -28,12 +28,14 @@ export default {
     wikiColor: wikiInfo.color,
     wikiName: wikiInfo.nameShort,
     canonicalBase: wikiInfo.canonicalBase,
+    wikiWallpaperFileExtension: wikiInfo.wikiWallpaperFileExtension,
   }),
 
   data: (sprawl) => ({
     wikiColor: sprawl.wikiColor,
     wikiName: sprawl.wikiName,
     canonicalBase: sprawl.canonicalBase,
+    wikiWallpaperFileExtension: sprawl.wikiWallpaperFileExtension,
   }),
 
   relations(relation, sprawl) {
@@ -593,7 +595,7 @@ export default {
       (styleRulesCSS.match(/body::before[^}]*background-image:/)
         ? ''
         : `body::before {\n` +
-          `    background-image: url("${to('media.path', 'bg.jpg')}");\n` +
+          `    background-image: url("${to('media.path', 'bg.' + data.wikiWallpaperFileExtension)}");\n` +
           `}`);
 
     const goshFrigginDarnitStyleRule =
