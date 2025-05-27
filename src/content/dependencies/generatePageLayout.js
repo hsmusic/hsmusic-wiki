@@ -603,13 +603,18 @@ export default {
 
     const fallbackWallpaperStyleTag =
       (slottedWallpaperStyleTag
-        ? ''
+        ? html.blank()
         : relations.wikiWallpaperStyleTag);
 
+    const usingWallpaperStyleTag =
+      (slottedWallpaperStyleTag
+        ? slottedWallpaperStyleTag
+        : html.resolve(fallbackWallpaperStyleTag, {normalize: 'tag'}));
+
     const numWallpaperParts =
-      (slottedWallpaperStyleTag &&
-       slottedWallpaperStyleTag.attributes.has('data-wallpaper-mode', 'parts')
-        ? parseInt(slottedWallpaperStyleTag.attributes.get('data-num-wallpaper-parts'))
+      (usingWallpaperStyleTag &&
+       usingWallpaperStyleTag.attributes.has('data-wallpaper-mode', 'parts')
+        ? parseInt(usingWallpaperStyleTag.attributes.get('data-num-wallpaper-parts'))
         : 0);
 
     const wallpaperPartsHTML =

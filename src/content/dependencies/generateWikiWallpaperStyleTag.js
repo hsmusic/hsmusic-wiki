@@ -2,24 +2,37 @@ export default {
   contentDependencies: ['generateWallpaperStyleTag'],
   extraDependencies: ['wikiData'],
 
-  sprawl: ({wikiInfo}) => ({
-    wikiWallpaperFileExtension: wikiInfo.wikiWallpaperFileExtension,
-  }),
+  sprawl: ({wikiInfo}) => ({wikiInfo}),
 
   relations: (relation) => ({
     wallpaperStyleTag:
       relation('generateWallpaperStyleTag'),
   }),
 
-  data: (sprawl) => ({
-    path: [
+  data: ({wikiInfo}) => ({
+    singleWallpaperPath: [
       'media.path',
-      'bg.' + sprawl.wikiWallpaperFileExtension,
+      'bg.' + wikiInfo.wikiWallpaperFileExtension,
     ],
+
+    singleWallpaperStyle:
+      wikiInfo.wikiWallpaperStyle,
+
+    wallpaperPartPaths:
+      wikiInfo.wikiWallpaperParts.map(part =>
+        (part.asset
+          ? ['media.path', part.asset]
+          : null)),
+
+    wallpaperPartStyles:
+      wikiInfo.wikiWallpaperParts.map(part => part.style),
   }),
 
   generate: (data, relations) =>
     relations.wallpaperStyleTag.slots({
-      singleWallpaperPath: data.path,
+      singleWallpaperPath: data.singleWallpaperPath,
+      singleWallpaperStyle: data.singleWallpaperStyle,
+      wallpaperPartPaths: data.wallpaperPartPaths,
+      wallpaperPartStyles: data.wallpaperPartStyles,
     }),
 };
