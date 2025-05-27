@@ -1,8 +1,11 @@
 export default {
-  contentDependencies: ['generateColorStyleVariables'],
+  contentDependencies: ['generateColorStyleVariables', 'generateStyleTag'],
   extraDependencies: ['html'],
 
   relations: (relation) => ({
+    styleTag:
+      relation('generateStyleTag'),
+
     variables:
       relation('generateColorStyleVariables'),
   }),
@@ -26,22 +29,23 @@ export default {
       return html.blank();
     }
 
-    const style =
-      html.tag('style', {class: 'color-style'},
+    return relations.styleTag.slots({
+      attributes: [
+        {class: 'color-style'},
         {'data-color': color},
+      ],
 
-        `:root {\n` +
-        relations.variables
-          .slots({
-            color,
-            context: 'page-root',
-            mode: 'property-list',
-          })
-          .content
-          .map(line => '    ' + line + ';\n')
-          .join('') +
-        `}`);
-
-    return style;
+      rules: [
+        {
+          select: ':root',
+          declare:
+            relations.variables.slots({
+              color,
+              context: 'page-root',
+              mode: 'declarations',
+            }).content,
+        },
+      ],
+    });
   },
 };

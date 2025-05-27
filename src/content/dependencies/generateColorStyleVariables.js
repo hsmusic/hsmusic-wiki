@@ -18,7 +18,7 @@ export default {
     },
 
     mode: {
-      validate: v => v.is('style', 'property-list'),
+      validate: v => v.is('style', 'declarations'),
       default: 'style',
     },
   },
@@ -50,15 +50,15 @@ export default {
       `--shadow-color: ${shadow}`,
     ];
 
-    let selectedProperties;
+    let selectedDeclarations;
 
     switch (slots.context) {
       case 'any-content':
-        selectedProperties = anyContent;
+        selectedDeclarations = anyContent;
         break;
 
       case 'image-box':
-        selectedProperties = [
+        selectedDeclarations = [
           `--primary-color: ${primary}`,
           `--dim-color: ${dim}`,
           `--deep-color: ${deep}`,
@@ -67,14 +67,14 @@ export default {
         break;
 
       case 'page-root':
-        selectedProperties = [
+        selectedDeclarations = [
           ...anyContent,
           `--page-primary-color: ${primary}`,
         ];
         break;
 
       case 'primary-only':
-        selectedProperties = [
+        selectedDeclarations = [
           `--primary-color: ${primary}`,
         ];
         break;
@@ -82,10 +82,10 @@ export default {
 
     switch (slots.mode) {
       case 'style':
-        return selectedProperties.join('; ');
+        return selectedDeclarations.join('; ');
 
-      case 'property-list':
-        return selectedProperties;
+      case 'declarations':
+        return selectedDeclarations.map(declaration => declaration + ';');
     }
   },
 };
