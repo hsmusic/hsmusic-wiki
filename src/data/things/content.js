@@ -155,6 +155,10 @@ export class CommentaryEntry extends ContentEntry {
 
 export class LyricsEntry extends ContentEntry {
   static [Thing.getPropertyDescriptors] = () => ({
+    // Update & expose
+
+    originDetails: contentString(),
+
     // Expose only
 
     isWikiLyrics: hasAnnotationPart({
@@ -183,6 +187,12 @@ export class LyricsEntry extends ContentEntry {
           /\[.*\]/m.test(body),
       },
     ],
+  });
+
+  static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(ContentEntry, {
+    fields: {
+      'Origin Details': {property: 'originDetails'},
+    },
   });
 }
 

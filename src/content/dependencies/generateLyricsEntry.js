@@ -17,6 +17,9 @@ export default {
     sourceLinks:
       entry.sourceURLs
         .map(url => relation('linkExternal', url)),
+
+    originDetails:
+      relation('transformContent', entry.originDetails),
   }),
 
   data: (entry) => ({
@@ -74,6 +77,14 @@ export default {
               data.hasSquareBracketAnnotations &&
                 language.$(capsule, 'squareBracketAnnotations'),
             ]),
+
+          html.tag('p', {class: 'origin-details'},
+            {[html.onlyIfContent]: true},
+
+            relations.originDetails.slots({
+              mode: 'inline',
+              absorbPunctuationFollowingExternalLinks: false,
+            })),
 
           relations.content.slot('mode', 'lyrics'),
         ])),

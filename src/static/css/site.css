@@ -1777,9 +1777,18 @@ p.image-details.origin-details {
   padding-left: 40px;
 }
 
-.lyrics-entry .lyrics-details {
+.lyrics-entry .lyrics-details,
+.lyrics-entry .origin-details {
   font-size: 0.9em;
   font-style: oblique;
+}
+
+.lyrics-entry .lyrics-details {
+  margin-bottom: 0;
+}
+
+.lyrics-entry .origin-details {
+  margin-top: 0.25em;
 }
 
 .js-hide,
