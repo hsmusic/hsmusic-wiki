@@ -70,7 +70,7 @@ export default {
         .map(entry => relation('generateCommentaryEntry', entry)),
 
     creditSourceEntries:
-      flash.commentary
+      flash.creditingSources
         .map(entry => relation('generateCommentaryEntry', entry)),
   }),
 
