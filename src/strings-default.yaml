@@ -1330,6 +1330,16 @@ artistPage:
       flash:
         _: "{FLASH}"
 
+      artwork.accent:
+        withLabel: >-
+          {LABEL}
+
+        withAnnotation: >-
+          {ANNOTATION}
+
+        withLabel.withAnnotation: >-
+          {LABEL}: {ANNOTATION}
+
   # contributedDurationLine:
   #   This is shown at the top of the artist's track list, provided
   #   any of their tracks have durations at all.

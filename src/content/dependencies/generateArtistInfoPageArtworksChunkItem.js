@@ -1,3 +1,5 @@
+import {empty} from '#sugar';
+
 export default {
   contentDependencies: [
     'generateArtistInfoPageChunkItem',
@@ -41,6 +43,9 @@ export default {
 
     annotation:
       contrib.annotation,
+
+    label:
+      contrib.thing.label,
   }),
 
   slots: {
@@ -55,9 +60,33 @@ export default {
       otherArtistLinks: relations.otherArtistLinks,
 
       annotation:
-        (slots.filterEditsForWiki
-          ? data.annotation?.replace(/^edits for wiki(: )?/, '')
-          : data.annotation),
+        language.encapsulate('artistPage.creditList.entry.artwork.accent', workingCapsule => {
+          const workingOptions = {};
+
+          const artworkLabel = data.label;
+
+          if (artworkLabel) {
+            workingCapsule += '.withLabel';
+            workingOptions.label =
+              language.typicallyLowerCase(artworkLabel);
+          }
+
+          const contribAnnotation =
+            (slots.filterEditsForWiki
+              ? data.annotation?.replace(/^edits for wiki(: )?/, '')
+              : data.annotation);
+
+          if (contribAnnotation) {
+            workingCapsule += '.withAnnotation';
+            workingOptions.annotation = contribAnnotation;
+          }
+
+          if (empty(Object.keys(workingOptions))) {
+            return html.blank();
+          }
+
+          return language.$(workingCapsule, workingOptions);
+        }),
 
       content:
         language.encapsulate('artistPage.creditList.entry', capsule =>
