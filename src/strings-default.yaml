@@ -519,13 +519,10 @@ misc:
 
     info:
       fromMainRelease: >-
-        This commentary is properly placed on this track's main release, {ALBUM}.
+        The following commentary is properly placed on this track's main release, {ALBUM}.
 
       fromMainRelease.namedDifferently: >-
-        This commentary is properly placed on this track's main release, {ALBUM}, where it's named {NAME}.
-
-      releaseSpecific: >-
-        This commentary is specific to this release, {ALBUM}.
+        The following commentary is properly placed on this track's main release, {ALBUM}, where it's named {NAME}.
 
       seeSpecificReleases: >-
         For release-specific commentary, check out: {ALBUMS}.

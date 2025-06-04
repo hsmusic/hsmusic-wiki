@@ -84,19 +84,7 @@ export default {
             title: language.$('misc.artistCommentary'),
           }),
 
-        html.tags([
-          data.isSecondaryRelease &&
-          !html.isBlank(relations.mainReleaseArtistCommentaryEntries) &&
-            html.tag('p', {class: ['drop', 'commentary-drop']},
-              {[html.onlyIfSiblings]: true},
-
-              language.$(capsule, 'info.releaseSpecific', {
-                album:
-                  relations.thisReleaseAlbumLink,
-              })),
-
-          relations.artistCommentaryEntries,
-        ]),
+        relations.artistCommentaryEntries,
 
         data.isSecondaryRelease &&
           html.tags([
