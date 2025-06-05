@@ -170,6 +170,7 @@ export class Artwork extends Thing {
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
         date: '#date',
+        thingProperty: input.thisProperty(),
         artistProperty: 'artistContribsArtistProperty',
       }),
 
