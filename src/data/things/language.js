@@ -867,14 +867,14 @@ export class Language extends Thing {
 
   typicallyLowerCase(string) {
     // Utter nonsense implementation, so this only works on strings,
-    // not actual HTML content, and will loudly disrespect *intentful*
+    // not actual HTML content, and may rudely disrespect *intentful*
     // capitalization of whatever goes into it.
 
-    if (typeof string === 'string') {
-      return string[0].toLowerCase() + string.slice(1).toLowerCase();
-    } else {
-      return string;
-    }
+    if (typeof string !== 'string') return string;
+    if (string.length <= 1) return string;
+    if (/^\S+?[A-Z]/.test(string)) return string;
+
+    return string[0].toLowerCase() + string.slice(1);
   }
 
   // Utility function to quickly provide a useful string key
