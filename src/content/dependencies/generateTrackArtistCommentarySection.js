@@ -87,33 +87,36 @@ export default {
         relations.artistCommentaryEntries,
 
         data.isSecondaryRelease &&
-          html.tags([
-            html.tag('p', {class: ['drop', 'commentary-drop']},
-              {[html.onlyIfSiblings]: true},
+          html.tag('div', {class: 'inherited-commentary-section'},
+            {[html.onlyIfContent]: true},
 
-              language.encapsulate(capsule, 'info.fromMainRelease', workingCapsule => {
-                const workingOptions = {};
+            [
+              html.tag('p', {class: ['drop', 'commentary-drop']},
+                {[html.onlyIfSiblings]: true},
 
-                workingOptions.album =
-                  relations.mainReleaseTrackLink.slots({
-                    content:
-                      data.mainReleaseAlbumName,
+                language.encapsulate(capsule, 'info.fromMainRelease', workingCapsule => {
+                  const workingOptions = {};
 
-                    color:
-                      data.mainReleaseAlbumColor,
-                  });
+                  workingOptions.album =
+                    relations.mainReleaseTrackLink.slots({
+                      content:
+                        data.mainReleaseAlbumName,
 
-                if (data.name !== data.mainReleaseName) {
-                  workingCapsule += '.namedDifferently';
-                  workingOptions.name =
-                    html.tag('i', data.mainReleaseName);
-                }
+                      color:
+                        data.mainReleaseAlbumColor,
+                    });
 
-                return language.$(workingCapsule, workingOptions);
-              })),
+                  if (data.name !== data.mainReleaseName) {
+                    workingCapsule += '.namedDifferently';
+                    workingOptions.name =
+                      html.tag('i', data.mainReleaseName);
+                  }
 
-            relations.mainReleaseArtistCommentaryEntries,
-          ]),
+                  return language.$(workingCapsule, workingOptions);
+                })),
+
+              relations.mainReleaseArtistCommentaryEntries,
+            ]),
 
         html.tag('p', {class: ['drop', 'commentary-drop']},
           {[html.onlyIfContent]: true},

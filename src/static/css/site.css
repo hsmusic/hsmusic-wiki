@@ -1755,6 +1755,15 @@ p.image-details.origin-details .origin-details {
   color: var(--primary-color);
 }
 
+.inherited-commentary-section {
+  clear: right;
+  margin-top: 1em;
+  margin-right: min(4vw, 60px);
+  border: 2px solid var(--deep-color);
+  border-radius: 4px;
+  background: #ffffff07;
+}
+
 .commentary-art {
   float: right;
   width: 30%;
