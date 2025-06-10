@@ -50,6 +50,10 @@ export class ContentEntry extends Thing {
     },
 
     accessKind: [
+      exitWithoutDependency({
+        dependency: 'accessDate',
+      }),
+
       exposeUpdateValueOrContinue({
         validate: input.value(
           is(...[
@@ -73,7 +77,7 @@ export class ContentEntry extends Thing {
       },
 
       exposeConstant({
-        value: input.value(null),
+        value: input.value('accessed'),
       }),
     ],
 
