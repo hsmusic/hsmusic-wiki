@@ -124,6 +124,25 @@ function oopsNameCapitalizationMismatch(mode, {
   matchingName,
   matchedName,
 }) {
+  if (matchingName.length === matchedName.length) {
+    let a = '', b = '';
+    for (let i = 0; i < matchingName.length; i++) {
+      if (
+        matchingName[i] === matchedName[i] ||
+        matchingName[i].toLowerCase() !== matchingName[i].toLowerCase()
+      ) {
+        a += matchingName[i];
+        b += matchedName[i];
+      } else {
+        a += colors.bright(colors.red(matchingName[i]));
+        b += colors.bright(colors.green(matchedName[i]));
+      }
+    }
+
+    matchingName = a;
+    matchedName = b;
+  }
+
   return warnOrThrow(mode,
     `Provided capitalization differs from the matched name. Please resolve:\n` +
     `- provided: ${matchingName}\n` +
