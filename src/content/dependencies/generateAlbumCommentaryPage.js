@@ -266,7 +266,10 @@ export default {
                       }),
                   })),
 
-              cover?.slots({mode: 'commentary'}),
+              cover?.slots({
+                mode: 'commentary',
+                color: true,
+              }),
 
               trackDate &&
               trackDate !== data.date &&

@@ -1,5 +1,6 @@
 export default {
   contentDependencies: [
+    'generateColorStyleAttribute',
     'generateCoverArtworkArtTagDetails',
     'generateCoverArtworkArtistDetails',
     'generateCoverArtworkOriginDetails',
@@ -10,6 +11,9 @@ export default {
   extraDependencies: ['html'],
 
   relations: (relation, artwork) => ({
+    colorStyleAttribute:
+      relation('generateColorStyleAttribute'),
+
     image:
       relation('image', artwork),
 
@@ -46,7 +50,8 @@ export default {
     alt: {type: 'string'},
 
     color: {
-      validate: v => v.isColor,
+      validate: v => v.anyOf(v.isBoolean, v.isColor),
+      default: false,
     },
 
     mode: {
@@ -68,10 +73,7 @@ export default {
   generate(data, relations, slots, {html}) {
     const {image} = relations;
 
-    image.setSlots({
-      color: slots.color ?? data.color,
-      alt: slots.alt,
-    });
+    image.setSlot('alt', slots.alt);
 
     const square =
       (data.dimensions
@@ -82,6 +84,22 @@ export default {
       image.setSlot('square', true);
     } else {
       image.setSlot('dimensions', data.dimensions);
+    }
+
+    const attributes = html.attributes();
+
+    let color = null;
+    if (typeof slots.color === 'boolean') {
+      if (slots.color) {
+        color = data.color;
+      }
+    } else if (slots.color) {
+      color = slots.color;
+    }
+
+    if (color) {
+      relations.colorStyleAttribute.setSlot('color', color);
+      attributes.add(relations.colorStyleAttribute);
     }
 
     return html.tags([
@@ -95,6 +113,8 @@ export default {
         data.attachAbove &&
         data.attachedArtworkIsMainArtwork &&
           {class: 'attached-artwork-is-main-artwork'},
+
+        attributes,
 
         (slots.mode === 'primary'
           ? [
