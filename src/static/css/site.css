@@ -1503,10 +1503,20 @@ s.spoiler::-moz-selection {
   background: white;
 }
 
-span.path {
-  font-size: 0.9em;
+span.path, code.filename {
+  font-size: 0.95em;
   font-family: "courier new", monospace;
   font-weight: 800;
+  background: #ccc3;
+
+  padding: 0.05em 0.5ch;
+  border: 1px solid #ccce;
+  border-radius: 2px;
+  line-height: 1.4;
+}
+
+.image-details code.filename {
+  margin-left: -0.4ch;
 }
 
 span.path i {
