@@ -1,13 +1,6 @@
 import {sortAlphabetically, sortByCount} from '#sort';
-
-import {
-  accumulateSum,
-  empty,
-  filterByCount,
-  filterMultipleArrays,
-  stitchArrays,
-  unique,
-} from '#sugar';
+import {empty, filterByCount, filterMultipleArrays, stitchArrays}
+  from '#sugar';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtist'],
@@ -41,37 +34,46 @@ export default {
       query[countsKey] = counts;
     };
 
+    const countContributions = (artist, keys) => {
+      const contribs =
+        keys
+          .flatMap(key => artist[key])
+          .filter(contrib => contrib.countInContributionTotals);
+
+      const things =
+        new Set(contribs.map(contrib => contrib.thing));
+
+      return things.size;
+    };
+
     queryContributionInfo(
       'artistsByTrackContributions',
       'countsByTrackContributions',
       artist =>
-        (unique(
-          ([
-            artist.trackArtistContributions,
-            artist.trackContributorContributions,
-          ]).flat()
-            .map(({thing}) => thing)
-        )).length);
+        countContributions(artist, [
+          'trackArtistContributions',
+          'trackContributorContributions',
+        ]));
 
     queryContributionInfo(
       'artistsByArtworkContributions',
       'countsByArtworkContributions',
       artist =>
-        accumulateSum(
-          [
-            artist.albumCoverArtistContributions,
-            artist.albumWallpaperArtistContributions,
-            artist.albumBannerArtistContributions,
-            artist.trackCoverArtistContributions,
-          ],
-          contribs => contribs.length));
+        countContributions(artist, [
+          'albumCoverArtistContributions',
+          'albumWallpaperArtistContributions',
+          'albumBannerArtistContributions',
+          'trackCoverArtistContributions',
+        ]));
 
     if (sprawl.enableFlashesAndGames) {
       queryContributionInfo(
         'artistsByFlashContributions',
         'countsByFlashContributions',
         artist =>
-          artist.flashContributorContributions.length);
+          countContributions(artist, [
+            'flashContributorContributions',
+          ]));
     }
 
     return query;
