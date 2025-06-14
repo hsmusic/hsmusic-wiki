@@ -492,7 +492,8 @@ misc:
   # artistCommentary:
 
   artistCommentary:
-    _: "Artist commentary:"
+    _: "Artist commentary for {THING}:"
+    sticky: "Artist commentary:"
 
     entry:
       title:
@@ -620,7 +621,8 @@ misc:
       onlyIndex: "Only"
 
   creditingSources:
-    _: "Crediting sources:"
+    _: "Crediting sources for {THING}:"
+    sticky: "Crediting sources:"
 
   # external:
   #   Links which will generally bring you somewhere off of the wiki.
@@ -840,7 +842,8 @@ misc:
       track: "Tracks"
 
   referencingSources:
-    _: "Referencing sources:"
+    _: "Referencing sources for {THING}:"
+    sticky: "Referencing sources:"
 
   # skippers:
   #

@@ -14,6 +14,7 @@ export default {
     'generateAlbumStyleTags',
     'generateAlbumTrackList',
     'generateCommentaryEntry',
+    'generateContentContentHeading',
     'generateContentHeading',
     'generatePageLayout',
     'linkAlbumCommentary',
@@ -54,6 +55,9 @@ export default {
 
     contentHeading:
       relation('generateContentHeading'),
+
+    contentContentHeading:
+      relation('generateContentContentHeading', album),
 
     releaseInfo:
       relation('generateAlbumReleaseInfo', album),
@@ -191,10 +195,10 @@ export default {
             ])),
 
           html.tags([
-            relations.contentHeading.clone()
+            relations.contentContentHeading.clone()
               .slots({
                 attributes: {id: 'artist-commentary'},
-                title: language.$('misc.artistCommentary'),
+                string: 'misc.artistCommentary',
               }),
 
             relations.artistCommentaryEntries,

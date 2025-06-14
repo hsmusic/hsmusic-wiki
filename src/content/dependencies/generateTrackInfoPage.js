@@ -7,6 +7,7 @@ export default {
     'generateAlbumSidebar',
     'generateAlbumStyleTags',
     'generateCommentaryEntry',
+    'generateContentContentHeading',
     'generateContentHeading',
     'generateContributionList',
     'generateLyricsSection',
@@ -64,6 +65,9 @@ export default {
 
     contentHeading:
       relation('generateContentHeading'),
+
+    contentContentHeading:
+      relation('generateContentContentHeading', track),
 
     releaseInfo:
       relation('generateTrackReleaseInfo', track),
@@ -351,20 +355,20 @@ export default {
           relations.artistCommentarySection,
 
           html.tags([
-            relations.contentHeading.clone()
+            relations.contentContentHeading.clone()
               .slots({
                 attributes: {id: 'crediting-sources'},
-                title: language.$('misc.creditingSources'),
+                string: 'misc.creditingSources',
               }),
 
             relations.creditingSourceEntries,
           ]),
 
           html.tags([
-            relations.contentHeading.clone()
+            relations.contentContentHeading.clone()
               .slots({
                 attributes: {id: 'referencing-sources'},
-                title: language.$('misc.referencingSources'),
+                string: 'misc.referencingSources',
               }),
 
             relations.referencingSourceEntries,
