@@ -441,6 +441,16 @@ export class Track extends Thing {
       exposeDependency({dependency: '#otherReleases'}),
     ],
 
+    groups: [
+      withPropertyFromAlbum({
+        property: input.value('groups'),
+      }),
+
+      exposeDependency({
+        dependency: '#album.groups',
+      }),
+    ],
+
     referencedByTracks: reverseReferenceList({
       reverse: soupyReverse.input('tracksWhichReference'),
     }),

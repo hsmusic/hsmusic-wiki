@@ -371,6 +371,21 @@ export class Artwork extends Thing {
     attachingArtworks: reverseReferenceList({
       reverse: soupyReverse.input('artworksWhichAttach'),
     }),
+
+    groups: [
+      withPropertyFromObject({
+        object: 'thing',
+        property: input.value('groups'),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#thing.groups',
+      }),
+
+      exposeConstant({
+        value: input.value([]),
+      }),
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {

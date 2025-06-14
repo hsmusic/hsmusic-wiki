@@ -14,6 +14,7 @@ import {
   exitWithoutDependency,
   exposeConstant,
   exposeDependency,
+  exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
 } from '#composite/control-flow';
 
@@ -292,6 +293,21 @@ export class Contribution extends Thing {
 
       exposeDependency({
         dependency: '#nearbyItem',
+      }),
+    ],
+
+    groups: [
+      withPropertyFromObject({
+        object: 'thing',
+        property: input.value('groups'),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#thing.groups',
+      }),
+
+      exposeConstant({
+        value: input.value([]),
       }),
     ],
   });
