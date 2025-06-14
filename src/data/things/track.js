@@ -170,6 +170,18 @@ export class Track extends Thing {
       exposeDependency({dependency: '#alwaysReferenceByDirectory'}),
     ],
 
+    countInArtistTotals: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      withPropertyFromAlbum({
+        property: input.value('countTracksInArtistTotals'),
+      }),
+
+      exposeDependency({dependency: '#album.countTracksInArtistTotals'}),
+    ],
+
     // Disables presenting the track as though it has its own unique artwork.
     // This flag should only be used in select circumstances, i.e. to override
     // an album's trackCoverArtists. This flag supercedes that property, as well
@@ -485,6 +497,8 @@ export class Track extends Thing {
         transform: String,
       },
 
+      'Count In Artist Totals': {property: 'countInArtistTotals'},
+
       'Duration': {
         property: 'duration',
         transform: parseDuration,
@@ -603,6 +617,11 @@ export class Track extends Thing {
     },
 
     invalidFieldCombinations: [
+      {message: `Secondary releases never count in artist totals`, fields: [
+        'Main Release',
+        'Count In Artist Totals',
+      ]},
+
       {message: `Secondary releases inherit references from the main one`, fields: [
         'Main Release',
         'Referenced Tracks',
@@ -790,6 +809,10 @@ export class Track extends Thing {
   }
 
   countOwnContributionInContributionTotals(_contrib) {
+    if (!this.countInArtistTotals) {
+      return false;
+    }
+
     if (this.isSecondaryRelease) {
       return false;
     }
@@ -798,6 +821,10 @@ export class Track extends Thing {
   }
 
   countOwnContributionInDurationTotals(_contrib) {
+    if (!this.countInArtistTotals) {
+      return false;
+    }
+
     if (this.isSecondaryRelease) {
       return false;
     }

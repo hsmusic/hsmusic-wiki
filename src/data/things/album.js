@@ -97,6 +97,8 @@ export class Album extends Thing {
     alwaysReferenceTracksByDirectory: flag(false),
     suffixTrackDirectories: flag(false),
 
+    countTracksInArtistTotals: flag(true),
+
     color: color(),
     urls: urls(),
 
@@ -501,6 +503,8 @@ export class Album extends Thing {
         property: 'bandcampArtworkIdentifier',
         transform: String,
       },
+
+      'Count Tracks In Artist Totals': {property: 'countInArtistTotals'},
 
       'Date': {
         property: 'date',
