@@ -2230,29 +2230,52 @@ li .origin-details {
 
 #content hr {
   border: 1px inset #808080;
-  width: 100%;
+}
+
+#content hr.split {
+  color: #808080;
 }
 
 #content hr.split::before {
   content: "(split)";
-  color: #808080;
 }
 
-#content hr.split {
+#content hr.main-separator {
+  color: var(--dim-color);
+  clear: none;
+  margin-top: -0.25em;
+  margin-bottom: 1.75em;
+}
+
+#content hr.main-separator::before {
+  content: "♦";
+  font-size: 1.2em;
+}
+
+#content hr.split,
+#content hr.main-separator {
   position: relative;
   overflow: hidden;
   border: none;
 }
 
-#content hr.split::after {
+#content hr.split::after,
+#content hr.main-separator::after {
   display: inline-block;
   content: "";
-  border: 1px inset #808080;
-  width: 100%;
+  width: calc(100% - min(calc(8vw - 35px), 45px));
   position: absolute;
   top: 50%;
-  margin-top: -2px;
   margin-left: 10px;
+}
+
+#content hr.split::after {
+  border: 1px inset currentColor;
+  margin-top: -2px;
+}
+
+#content hr.main-separator::after {
+  border-bottom: 1px solid currentColor;
 }
 
 li > ul {

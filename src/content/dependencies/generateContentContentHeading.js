@@ -36,4 +36,4 @@ export default {
       stickyTitle:
         language.$(slots.string, 'sticky'),
     }),
-}
+};

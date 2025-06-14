@@ -183,6 +183,11 @@ export default {
               }),
             ])),
 
+          (!html.isBlank(relations.artistCommentaryEntries) ||
+           !html.isBlank(relations.creditSourceEntries))
+          &&
+            html.tag('hr', {class: 'main-separator'}),
+
           language.encapsulate('releaseInfo.additionalFiles', capsule =>
             html.tags([
               relations.contentHeading.clone()
