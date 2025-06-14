@@ -50,13 +50,11 @@ export default {
 
     const groupsSortedByCount =
       allGroupsOrdered
-        .slice()
+        .filter(group => groupToTotalContributions.get(group) > 0)
         .sort((a, b) =>
           (groupToTotalContributions.get(b)
          - groupToTotalContributions.get(a)));
 
-    // The filter here ensures all displayed groups have at least some duration
-    // when sorting by duration.
     const groupsSortedByDuration =
       allGroupsOrdered
         .filter(group => groupToTotalDuration.get(group) > 0)
