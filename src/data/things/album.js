@@ -835,6 +835,12 @@ export class Album extends Thing {
       artwork.fileExtension,
     ];
   }
+
+  // As of writing, albums don't even have a `duration` property...
+  // so this function will never be called... but the message stands...
+  countOwnContributionInDurationTotals(_contrib) {
+    return false;
+  }
 }
 
 export class TrackSection extends Thing {

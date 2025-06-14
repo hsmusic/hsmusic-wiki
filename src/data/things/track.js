@@ -789,6 +789,22 @@ export class Track extends Thing {
     ];
   }
 
+  countOwnContributionInContributionTotals(_contrib) {
+    if (this.isSecondaryRelease) {
+      return false;
+    }
+
+    return true;
+  }
+
+  countOwnContributionInDurationTotals(_contrib) {
+    if (this.isSecondaryRelease) {
+      return false;
+    }
+
+    return true;
+  }
+
   [inspect.custom](depth) {
     const parts = [];
 

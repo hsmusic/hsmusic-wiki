@@ -472,6 +472,18 @@ export class Artwork extends Thing {
     return this.thing.getOwnArtworkPath(this);
   }
 
+  countOwnContributionInContributionTotals(contrib) {
+    if (this.attachAbove) {
+      return false;
+    }
+
+    if (contrib.annotation?.startsWith('edits for wiki')) {
+      return false;
+    }
+
+    return true;
+  }
+
   [inspect.custom](depth, options, inspect) {
     const parts = [];
 
