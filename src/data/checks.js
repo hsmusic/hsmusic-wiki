@@ -192,6 +192,10 @@ export function filterReferenceErrors(wikiData, {
       directDescendantArtTags: 'artTag',
     }],
 
+    ['artworkData', {
+      referencedArtworks: '_artwork',
+    }],
+
     ['flashData', {
       commentary: '_content',
       creditingSources: '_content',
