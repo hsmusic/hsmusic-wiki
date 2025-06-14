@@ -20,29 +20,17 @@ export default {
   extraDependencies: ['html', 'language'],
 
   query: (artist) => ({
-    // Even if an artist has served as both "artist" (compositional) and
-    // "contributor" (instruments, production, etc) on the same track, that
-    // track only counts as one unique contribution in the list.
-    allTracks:
-      unique(
-        ([
-          artist.trackArtistContributions,
-          artist.trackContributorContributions,
-        ]).flat()
-          .map(({thing}) => thing)),
+    trackContributions: [
+      ...artist.trackArtistContributions,
+      ...artist.trackContributorContributions,
+    ],
 
-    // Artworks are different, though. We intentionally duplicate album data
-    // objects when the artist has contributed some combination of cover art,
-    // wallpaper, and banner - these each count as a unique contribution.
-    allArtworkThings:
-      ([
-        artist.albumCoverArtistContributions,
-        artist.albumWallpaperArtistContributions,
-        artist.albumBannerArtistContributions,
-        artist.trackCoverArtistContributions,
-      ]).flat()
-        .filter(({annotation}) => !annotation?.startsWith('edits for wiki'))
-        .map(({thing}) => thing.thing),
+    artworkContributions: [
+      ...artist.albumCoverArtistContributions,
+      ...artist.albumWallpaperArtistContributions,
+      ...artist.albumBannerArtistContributions,
+      ...artist.trackCoverArtistContributions,
+    ],
 
     // Banners and wallpapers don't show up in the artist gallery page, only
     // cover art.
@@ -93,7 +81,7 @@ export default {
       relation('generateArtistInfoPageTracksChunkedList', artist),
 
     tracksGroupInfo:
-      relation('generateArtistGroupContributionsInfo', query.allTracks),
+      relation('generateArtistGroupContributionsInfo', query.trackContributions),
 
     artworksChunkedList:
       relation('generateArtistInfoPageArtworksChunkedList', artist, false),
@@ -102,7 +90,7 @@ export default {
       relation('generateArtistInfoPageArtworksChunkedList', artist, true),
 
     artworksGroupInfo:
-      relation('generateArtistGroupContributionsInfo', query.allArtworkThings),
+      relation('generateArtistGroupContributionsInfo', query.artworkContributions),
 
     artistGalleryLink:
       (query.hasGallery
@@ -128,7 +116,11 @@ export default {
         .map(({annotation}) => annotation),
 
     totalTrackCount:
-      query.allTracks.length,
+      unique(
+        query.trackContributions
+          .filter(contrib => contrib.countInContributionTotals)
+          .map(contrib => contrib.thing))
+        .length,
 
     totalDuration:
       artist.totalDuration,

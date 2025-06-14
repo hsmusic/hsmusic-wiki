@@ -1,83 +1,92 @@
-import {empty, filterProperties, stitchArrays, unique} from '#sugar';
+import {accumulateSum, empty, stitchArrays, withEntries} from '#sugar';
 
 export default {
   contentDependencies: ['linkGroup'],
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl({groupCategoryData}) {
-    return {
-      groupOrder: groupCategoryData.flatMap(category => category.groups),
-    }
-  },
+  sprawl: ({groupCategoryData}) => ({
+    groupOrder:
+      groupCategoryData.flatMap(category => category.groups),
+  }),
 
-  query(sprawl, tracksAndAlbums) {
-    const filteredAlbums = tracksAndAlbums.filter(thing => !thing.album);
-    const filteredTracks = tracksAndAlbums.filter(thing => thing.album);
+  query(sprawl, contributions) {
+    const allGroupsUnordered =
+      new Set(contributions.flatMap(contrib => contrib.groups));
 
-    const allAlbums = unique([
-      ...filteredAlbums,
-      ...filteredTracks.map(track => track.album),
-    ]);
+    const allGroupsOrdered =
+      sprawl.groupOrder.filter(group => allGroupsUnordered.has(group));
 
-    const allGroupsUnordered = new Set(Array.from(allAlbums).flatMap(album => album.groups));
-    const allGroupsOrdered = sprawl.groupOrder.filter(group => allGroupsUnordered.has(group));
+    const groupToThingsCountedForContributions =
+      new Map(allGroupsOrdered.map(group => [group, new Set]));
 
-    const mapTemplate = allGroupsOrdered.map(group => [group, 0]);
-    const groupToCountMap = new Map(mapTemplate);
-    const groupToDurationMap = new Map(mapTemplate);
-    const groupToDurationCountMap = new Map(mapTemplate);
+    const groupToThingsCountedForDuration =
+      new Map(allGroupsOrdered.map(group => [group, new Set]));
 
-    for (const album of filteredAlbums) {
-      for (const group of album.groups) {
-        groupToCountMap.set(group, groupToCountMap.get(group) + 1);
-      }
-    }
+    for (const contrib of contributions) {
+      for (const group of contrib.groups) {
+        if (contrib.countInContributionTotals) {
+          groupToThingsCountedForContributions.get(group).add(contrib.thing);
+        }
 
-    for (const track of filteredTracks) {
-      for (const group of track.album.groups) {
-        groupToCountMap.set(group, groupToCountMap.get(group) + 1);
-        if (track.duration && track.mainReleaseTrack === null) {
-          groupToDurationMap.set(group, groupToDurationMap.get(group) + track.duration);
-          groupToDurationCountMap.set(group, groupToDurationCountMap.get(group) + 1);
+        if (contrib.countInDurationTotals) {
+          groupToThingsCountedForDuration.get(group).add(contrib.thing);
         }
       }
     }
 
+    const groupToTotalContributions =
+      withEntries(
+        groupToThingsCountedForContributions,
+        entries => entries.map(
+          ([group, things]) =>
+          ([group, things.size])));
+
+    const groupToTotalDuration =
+      withEntries(
+        groupToThingsCountedForDuration,
+        entries => entries.map(
+          ([group, things]) =>
+          ([group, accumulateSum(things, thing => thing.duration)])))
+
     const groupsSortedByCount =
       allGroupsOrdered
         .slice()
-        .sort((a, b) => groupToCountMap.get(b) - groupToCountMap.get(a));
+        .sort((a, b) =>
+          (groupToTotalContributions.get(b)
+         - groupToTotalContributions.get(a)));
 
     // The filter here ensures all displayed groups have at least some duration
     // when sorting by duration.
     const groupsSortedByDuration =
       allGroupsOrdered
-        .filter(group => groupToDurationMap.get(group) > 0)
-        .sort((a, b) => groupToDurationMap.get(b) - groupToDurationMap.get(a));
+        .filter(group => groupToTotalDuration.get(group) > 0)
+        .sort((a, b) =>
+          (groupToTotalDuration.get(b)
+         - groupToTotalDuration.get(a)));
 
     const groupCountsSortedByCount =
       groupsSortedByCount
-        .map(group => groupToCountMap.get(group));
+        .map(group => groupToTotalContributions.get(group));
 
     const groupDurationsSortedByCount =
       groupsSortedByCount
-        .map(group => groupToDurationMap.get(group));
+        .map(group => groupToTotalDuration.get(group));
 
     const groupDurationsApproximateSortedByCount =
       groupsSortedByCount
-        .map(group => groupToDurationCountMap.get(group) > 1);
+        .map(group => groupToThingsCountedForDuration.get(group).size > 1);
 
     const groupCountsSortedByDuration =
       groupsSortedByDuration
-        .map(group => groupToCountMap.get(group));
+        .map(group => groupToTotalContributions.get(group));
 
     const groupDurationsSortedByDuration =
       groupsSortedByDuration
-        .map(group => groupToDurationMap.get(group));
+        .map(group => groupToTotalDuration.get(group));
 
     const groupDurationsApproximateSortedByDuration =
       groupsSortedByDuration
-        .map(group => groupToDurationCountMap.get(group) > 1);
+        .map(group => groupToThingsCountedForDuration.get(group).size > 1);
 
     return {
       groupsSortedByCount,
@@ -93,29 +102,35 @@ export default {
     };
   },
 
-  relations(relation, query) {
-    return {
-      groupLinksSortedByCount:
-        query.groupsSortedByCount
-          .map(group => relation('linkGroup', group)),
+  relations: (relation, query) => ({
+    groupLinksSortedByCount:
+      query.groupsSortedByCount
+        .map(group => relation('linkGroup', group)),
 
-      groupLinksSortedByDuration:
-        query.groupsSortedByDuration
-          .map(group => relation('linkGroup', group)),
-    };
-  },
+    groupLinksSortedByDuration:
+      query.groupsSortedByDuration
+        .map(group => relation('linkGroup', group)),
+  }),
 
-  data(query) {
-    return filterProperties(query, [
-      'groupCountsSortedByCount',
-      'groupDurationsSortedByCount',
-      'groupDurationsApproximateSortedByCount',
+  data: (query) => ({
+    groupCountsSortedByCount:
+      query.groupCountsSortedByCount,
 
-      'groupCountsSortedByDuration',
-      'groupDurationsSortedByDuration',
-      'groupDurationsApproximateSortedByDuration',
-    ]);
-  },
+    groupDurationsSortedByCount:
+      query.groupDurationsSortedByCount,
+
+    groupDurationsApproximateSortedByCount:
+      query.groupDurationsApproximateSortedByCount,
+
+    groupCountsSortedByDuration:
+      query.groupCountsSortedByDuration,
+
+    groupDurationsSortedByDuration:
+      query.groupDurationsSortedByDuration,
+
+    groupDurationsApproximateSortedByDuration:
+      query.groupDurationsApproximateSortedByDuration,
+  }),
 
   slots: {
     title: {
