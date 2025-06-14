@@ -108,6 +108,17 @@ export class Contribution extends Thing {
         validate: input.value(isBoolean),
       }),
 
+      withPropertyFromObject({
+        object: 'thing',
+        property: input.value('duration'),
+      }),
+
+      exitWithoutDependency({
+        dependency: '#thing.duration',
+        mode: input.value('falsy'),
+        value: input.value(false),
+      }),
+
       {
         dependencies: ['thing', input.myself()],
         compute: (continuation, {
