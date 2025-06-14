@@ -254,11 +254,20 @@ export function compareObjects(obj1, obj2, {
 
 // Stolen from jq! Which pro8a8ly stole the concept from other places. Nice.
 export const withEntries = (obj, fn) => {
-  const result = fn(Object.entries(obj));
-  if (result instanceof Promise) {
-    return result.then(entries => Object.fromEntries(entries));
+  if (obj instanceof Map) {
+    const result = fn(Array.from(obj.entries()));
+    if (result instanceof Promise) {
+      return result.then(entries => new map(entries));
+    } else {
+      return new Map(result);
+    }
   } else {
-    return Object.fromEntries(result);
+    const result = fn(Object.entries(obj));
+    if (result instanceof Promise) {
+      return result.then(entries => Object.fromEntries(entries));
+    } else {
+      return Object.fromEntries(result);
+    }
   }
 }
 
