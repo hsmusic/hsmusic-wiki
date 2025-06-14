@@ -116,6 +116,10 @@ export function findIndexOrEnd(array, fn) {
 // returns null (or values in the array are nullish), they'll just be skipped in
 // the sum.
 export function accumulateSum(array, fn = x => x) {
+  if (!Array.isArray(array)) {
+    return accumulateSum(Array.from(array, fn));
+  }
+
   return array.reduce(
     (accumulator, value, index, array) =>
       accumulator +
