@@ -1517,6 +1517,12 @@ span.path, code.filename {
 
 .image-details code.filename {
   margin-left: -0.4ch;
+  opacity: 0.8;
+}
+
+.image-details code.filename:hover {
+  opacity: 1;
+  cursor: text;
 }
 
 span.path i {
