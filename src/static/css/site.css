@@ -2733,6 +2733,12 @@ img {
   object-fit: cover;
 }
 
+p > img {
+  max-width: 100%;
+  object-fit: contain;
+  height: auto;
+}
+
 .image-inner-area::after {
   content: "";
   display: block;
