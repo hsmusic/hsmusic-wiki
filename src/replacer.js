@@ -849,54 +849,108 @@ export function postprocessExternalLinks(inputNodes) {
   return outputNodes;
 }
 
-export function parseContentNodes(input) {
+export function parseContentNodes(input, {
+  errorMode = 'throw',
+} = {}) {
   if (typeof input !== 'string') {
     throw new TypeError(`Expected input to be string, got ${typeAppearance(input)}`);
   }
 
-  try {
-    let output = parseNodes(input, 0);
-    output = postprocessComments(output);
-    output = postprocessImages(output);
-    output = postprocessVideos(output);
-    output = postprocessAudios(output);
-    output = postprocessHeadings(output);
-    output = postprocessSummaries(output);
-    output = postprocessExternalLinks(output);
-    return output;
-  } catch (errorNode) {
-    if (errorNode.type !== 'error') {
-      throw errorNode;
+  let result = null, error = null;
+
+  process: {
+    try {
+      result = parseNodes(input, 0);
+    } catch (caughtError) {
+      if (caughtError.type === 'error') {
+        const {i, data: {message}} = caughtError;
+
+        let lineStart = input.slice(0, i).lastIndexOf('\n');
+        if (lineStart >= 0) {
+          lineStart += 1;
+        } else {
+          lineStart = 0;
+        }
+
+        let lineEnd = input.slice(i).indexOf('\n');
+        if (lineEnd >= 0) {
+          lineEnd += i;
+        } else {
+          lineEnd = input.length;
+        }
+
+        const line = input.slice(lineStart, lineEnd);
+
+        const cursor = i - lineStart;
+
+        error =
+          new SyntaxError(
+            `Parse error (at pos ${i}): ${message}\n` +
+            line + `\n` +
+            '-'.repeat(cursor) + '^');
+      } else {
+        error = caughtError;
+      }
+
+      // A parse error means there's no output to continue with at all,
+      // so stop here.
+      break process;
     }
 
-    const {
-      i,
-      data: {message},
-    } = errorNode;
+    const postprocessErrors = [];
 
-    let lineStart = input.slice(0, i).lastIndexOf('\n');
-    if (lineStart >= 0) {
-      lineStart += 1;
+    for (const postprocess of [
+      postprocessComments,
+      postprocessImages,
+      postprocessVideos,
+      postprocessAudios,
+      postprocessHeadings,
+      postprocessSummaries,
+      postprocessExternalLinks,
+    ]) {
+      try {
+        result = postprocess(result);
+      } catch (caughtError) {
+        const error =
+          new Error(
+            `Error in step ${`"${postprocess.name}"`}`,
+            {cause: caughtError});
+
+        error[Symbol.for('hsmusic.aggregate.translucent')] = true;
+
+        postprocessErrors.push(error);
+      }
+    }
+
+    if (!empty(postprocessErrors)) {
+      error =
+        new AggregateError(
+          postprocessErrors,
+        `Errors postprocessing content text`);
+
+      error[Symbol.for('hsmusic.aggregate.translucent')] = 'single';
+    }
+  }
+
+  if (errorMode === 'throw') {
+    if (error) {
+      throw error;
     } else {
-      lineStart = 0;
+      return result;
+    }
+  } else if (errorMode === 'return') {
+    if (!result) {
+      result = [{
+        i: 0,
+        iEnd: input.length,
+        type: 'text',
+        data: input,
+      }];
     }
 
-    let lineEnd = input.slice(i).indexOf('\n');
-    if (lineEnd >= 0) {
-      lineEnd += i;
-    } else {
-      lineEnd = input.length;
-    }
-
-    const line = input.slice(lineStart, lineEnd);
-
-    const cursor = i - lineStart;
-
-    throw new SyntaxError([
-      `Parse error (at pos ${i}): ${message}`,
-      line,
-      '-'.repeat(cursor) + '^',
-    ].join('\n'));
+    return {error, result};
+  } else {
+    throw new Error(`Unknown errorMode ${errorMode}`);
   }
 }
 
