@@ -379,9 +379,8 @@ export default {
                   height && {height},
                   style && {style},
 
-                  align === 'center' &&
-                  !link &&
-                    {class: 'align-center'},
+                  align && !link &&
+                    {class: 'align-' + align},
 
                   pixelate &&
                     {class: 'pixelate'});
@@ -392,8 +391,8 @@ export default {
                     {href: link},
                     {target: '_blank'},
 
-                    align === 'center' &&
-                      {class: 'align-center'},
+                    align &&
+                      {class: 'align-' + align},
 
                     {title:
                       language.encapsulate('misc.external.opensInNewTab', capsule =>
@@ -443,8 +442,8 @@ export default {
               inline: false,
               data:
                 html.tag('div', {class: 'content-image-container'},
-                  align === 'center' &&
-                    {class: 'align-center'},
+                  align &&
+                    {class: 'align-' + align},
 
                   image),
             };
@@ -456,22 +455,31 @@ export default {
                 ? to('media.path', node.src.slice('media/'.length))
                 : node.src);
 
-            const {width, height, align, pixelate} = node;
+            const {width, height, align, inline, pixelate} = node;
+
+            const video =
+              html.tag('video',
+                src && {src},
+                width && {width},
+                height && {height},
+
+                {controls: true},
+
+                align && inline &&
+                  {class: 'align-' + align},
+
+                pixelate &&
+                  {class: 'pixelate'});
 
             const content =
-              html.tag('div', {class: 'content-video-container'},
-                align === 'center' &&
-                  {class: 'align-center'},
+              (inline
+                ? video
+                : html.tag('div', {class: 'content-video-container'},
+                    align &&
+                      {class: 'align-' + align},
 
-                html.tag('video',
-                  src && {src},
-                  width && {width},
-                  height && {height},
+                    video));
 
-                  {controls: true},
-
-                  pixelate &&
-                    {class: 'pixelate'}));
 
             return {
               type: 'processed-video',
@@ -485,15 +493,14 @@ export default {
                 ? to('media.path', node.src.slice('media/'.length))
                 : node.src);
 
-            const {align, inline} = node;
+            const {align, inline, nameless} = node;
 
             const audio =
               html.tag('audio',
                 src && {src},
 
-                align === 'center' &&
-                inline &&
-                  {class: 'align-center'},
+                align && inline &&
+                  {class: 'align-' + align},
 
                 {controls: true});
 
@@ -501,13 +508,14 @@ export default {
               (inline
                 ? audio
                 : html.tag('div', {class: 'content-audio-container'},
-                    align === 'center' &&
-                      {class: 'align-center'},
+                    align &&
+                      {class: 'align-' + align},
 
                     [
-                      html.tag('a', {class: 'filename'},
-                        src && {href: src},
-                        language.sanitize(basename(node.src))),
+                      !nameless &&
+                        html.tag('a', {class: 'filename'},
+                          src && {href: src},
+                          language.sanitize(basename(node.src))),
 
                       audio,
                     ]));

@@ -1840,10 +1840,18 @@ p.image-details.origin-details .origin-details {
   margin-bottom: 1.5em;
 }
 
-a.align-center, img.align-center, audio.align-center {
+.content-image-container.align-full {
+  width: 100%;
+}
+
+a.align-center, img.align-center, audio.align-center, video.align-center {
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+
+a.align-full, img.align-full, video.align-full {
+  width: 100%;
 }
 
 center {
@@ -2650,6 +2658,7 @@ html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:las
 .content-video-container,
 .content-audio-container {
   width: fit-content;
+  max-width: 100%;
   background-color: var(--dark-color);
   border: 2px solid var(--primary-color);
   border-radius: 2.5px 2.5px 3px 3px;
@@ -2659,12 +2668,18 @@ html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:las
 .content-video-container video,
 .content-audio-container audio {
   display: block;
+  max-width: 100%;
 }
 
 .content-video-container.align-center,
 .content-audio-container.align-center {
   margin-left: auto;
   margin-right: auto;
+}
+
+.content-video-container.align-full,
+.content-audio-container.align-full {
+  width: 100%;
 }
 
 .content-audio-container .filename {

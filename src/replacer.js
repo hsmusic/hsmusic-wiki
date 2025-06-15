@@ -673,11 +673,13 @@ export function postprocessImages(inputNodes) {
 
 export function postprocessVideos(inputNodes) {
   return postprocessHTMLTags(inputNodes, 'video',
-    attributes => {
+    (attributes, {inline}) => {
       const node = {type: 'video'};
 
       node.src = attributes.get('src');
       complainAboutMediaSrc(node.src);
+
+      node.inline = attributes.get('inline') ?? inline;
 
       if (attributes.get('width')) node.width = parseInt(attributes.get('width'));
       if (attributes.get('height')) node.height = parseInt(attributes.get('height'));
@@ -699,6 +701,7 @@ export function postprocessAudios(inputNodes) {
       node.inline = attributes.get('inline') ?? inline;
 
       if (attributes.get('align')) node.align = attributes.get('align');
+      if (attributes.get('nameless')) node.nameless = true;
 
       return node;
     });
