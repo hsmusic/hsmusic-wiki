@@ -604,7 +604,7 @@ export function showAggregate(topError, {
       headerPart += ` ${colors.dim(tracePart)}`;
     }
 
-    const head1 = level % 2 === 0 ? '\u21aa' : colors.dim('\u21aa');
+    const head1 = '\u21aa';
     const bar1 = ' ';
 
     const causePart =
