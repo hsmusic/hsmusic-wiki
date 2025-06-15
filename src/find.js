@@ -391,7 +391,13 @@ function findMixedHelper(config) {
           });
         }
 
-        return byDirectory[referenceType][directory];
+        const match = byDirectory[referenceType][directory];
+
+        if (match) {
+          return match.thing;
+        } else {
+          return null;
+        }
       },
 
       matchByName:
