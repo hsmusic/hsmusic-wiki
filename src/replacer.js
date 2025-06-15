@@ -635,16 +635,23 @@ function postprocessHTMLTags(inputNodes, tagName, callback) {
   return outputNodes;
 }
 
+function complainAboutMediaSrc(src) {
+  if (!src) {
+    throw new Error(`Missing "src" attribute`);
+  }
+
+  if (src.startsWith('/media/')) {
+    throw new Error(`Start "src" with "media/", not "/media/"`);
+  }
+}
+
 export function postprocessImages(inputNodes) {
   return postprocessHTMLTags(inputNodes, 'img',
     (attributes, {inline}) => {
       const node = {type: 'image'};
 
       node.src = attributes.get('src');
-
-      if (!node.src) {
-        throw new Error('<img> missing src attribute');
-      }
+      complainAboutMediaSrc(node.src);
 
       node.inline = attributes.get('inline') ?? inline;
 
@@ -670,10 +677,7 @@ export function postprocessVideos(inputNodes) {
       const node = {type: 'video'};
 
       node.src = attributes.get('src');
-
-      if (!node.src) {
-        throw new Error('<video> missing src attribute');
-      }
+      complainAboutMediaSrc(node.src);
 
       if (attributes.get('width')) node.width = parseInt(attributes.get('width'));
       if (attributes.get('height')) node.height = parseInt(attributes.get('height'));
@@ -690,10 +694,7 @@ export function postprocessAudios(inputNodes) {
       const node = {type: 'audio'};
 
       node.src = attributes.get('src');
-
-      if (!node.src) {
-        throw new Error('<audio> missing src attribute');
-      }
+      complainAboutMediaSrc(node.src);
 
       node.inline = attributes.get('inline') ?? inline;
 
