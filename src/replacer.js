@@ -8,7 +8,7 @@
 import * as marked from 'marked';
 
 import * as html from '#html';
-import {escapeRegex, typeAppearance} from '#sugar';
+import {empty, escapeRegex, typeAppearance} from '#sugar';
 import {matchMarkdownLinks} from '#wiki-data';
 
 export const replacerSpec = {
@@ -526,6 +526,7 @@ export function postprocessComments(inputNodes) {
 
 function postprocessHTMLTags(inputNodes, tagName, callback) {
   const outputNodes = [];
+  const errors = [];
 
   const lastNode = inputNodes.at(-1);
 
@@ -593,10 +594,16 @@ function postprocessHTMLTags(inputNodes, tagName, callback) {
           return false;
         })();
 
-        outputNodes.push(
-          callback(attributes, {
-            inline,
-          }));
+        try {
+          outputNodes.push(
+            callback(attributes, {
+              inline,
+            }));
+        } catch (caughtError) {
+          errors.push(new Error(
+            `Failed to process ${match[0]}`,
+            {cause: caughtError}));
+        }
 
         // No longer at the start of a line after the tag - there will at
         // least be text with only '\n' before the next of this tag that's
@@ -619,6 +626,12 @@ function postprocessHTMLTags(inputNodes, tagName, callback) {
     outputNodes.push(node);
   }
 
+  if (!empty(errors)) {
+    throw new AggregateError(
+      errors,
+    `Errors postprocessing <${tagName}> tags`);
+  }
+
   return outputNodes;
 }
 
@@ -628,6 +641,11 @@ export function postprocessImages(inputNodes) {
       const node = {type: 'image'};
 
       node.src = attributes.get('src');
+
+      if (!node.src) {
+        throw new Error('<img> missing src attribute');
+      }
+
       node.inline = attributes.get('inline') ?? inline;
 
       if (attributes.get('link')) node.link = attributes.get('link');
@@ -653,6 +671,10 @@ export function postprocessVideos(inputNodes) {
 
       node.src = attributes.get('src');
 
+      if (!node.src) {
+        throw new Error('<video> missing src attribute');
+      }
+
       if (attributes.get('width')) node.width = parseInt(attributes.get('width'));
       if (attributes.get('height')) node.height = parseInt(attributes.get('height'));
       if (attributes.get('align')) node.align = attributes.get('align');
@@ -668,7 +690,13 @@ export function postprocessAudios(inputNodes) {
       const node = {type: 'audio'};
 
       node.src = attributes.get('src');
+
+      if (!node.src) {
+        throw new Error('<audio> missing src attribute');
+      }
+
       node.inline = attributes.get('inline') ?? inline;
+
       if (attributes.get('align')) node.align = attributes.get('align');
 
       return node;
