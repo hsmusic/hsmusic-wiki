@@ -1,5 +1,6 @@
 import {basename} from 'node:path';
 
+import {logWarn} from '#cli';
 import {bindFind} from '#find';
 import {replacerSpec, parseContentNodes} from '#replacer';
 
@@ -62,20 +63,30 @@ export default {
       Object.values(replacerSpec)
         .map(description => description.link)
         .filter(Boolean)),
+
     'image',
     'generateTextWithTooltip',
     'generateTooltip',
     'linkExternal',
   ],
 
-  extraDependencies: ['html', 'language', 'to', 'wikiData'],
+  extraDependencies: [
+    'html',
+    'language',
+    'niceShowAggregate',
+    'to',
+    'wikiData',
+  ],
 
   sprawl(wikiData, content) {
     const find = bindFind(wikiData);
 
-    const parsedNodes = parseContentNodes(content ?? '');
+    const {result: parsedNodes, error} =
+      parseContentNodes(content ?? '', {errorMode: 'return'});
 
     return {
+      error,
+
       nodes: parsedNodes
         .map(node => {
           if (node.type !== 'tag') {
@@ -189,6 +200,9 @@ export default {
     return {
       content,
 
+      error:
+        sprawl.error,
+
       nodes:
         sprawl.nodes
           .map(node => {
@@ -301,7 +315,12 @@ export default {
     },
   },
 
-  generate(data, relations, slots, {html, language, to}) {
+  generate(data, relations, slots, {html, language, niceShowAggregate, to}) {
+    if (data.error) {
+      logWarn`Error in content text.`;
+      niceShowAggregate(data.error);
+    }
+
     let imageIndex = 0;
     let internalLinkIndex = 0;
     let externalLinkIndex = 0;
