@@ -3207,6 +3207,7 @@ async function main() {
     developersComment,
     languages,
     missingImagePaths,
+    niceShowAggregate,
     thumbsCache,
     urlSpec,
     urls,
