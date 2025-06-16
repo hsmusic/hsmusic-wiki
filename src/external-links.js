@@ -30,6 +30,9 @@ export const externalLinkContexts = [
   'generic',
   'group',
   'track',
+
+  'artistRelease',
+  'officialRelease',
 ];
 
 export const isExternalLinkContext =
@@ -250,6 +253,30 @@ export const externalLinkSpec = [
     platform: 'bandcamp',
     handle: {domain: /.+/},
     unusualDomain: true,
+
+    icon: 'bandcamp',
+  },
+
+  {
+    match: {
+      domain: '.bandcamp.com',
+      context: 'artistRelease',
+    },
+
+    platform: 'bandcamp.artistRelease',
+    handle: {domain: /^[^.]+/},
+
+    icon: 'bandcamp',
+  },
+
+  {
+    match: {
+      domain: '.bandcamp.com',
+      context: 'officialRelease',
+    },
+
+    platform: 'bandcamp.officialRelease',
+    handle: {domain: /^[^.]+/},
 
     icon: 'bandcamp',
   },
