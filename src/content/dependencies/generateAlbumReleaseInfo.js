@@ -3,7 +3,7 @@ import {accumulateSum, empty} from '#sugar';
 export default {
   contentDependencies: [
     'generateReleaseInfoContributionsLine',
-    'linkExternal',
+    'generateReleaseInfoListenLine',
   ],
 
   extraDependencies: ['html', 'language'],
@@ -14,9 +14,8 @@ export default {
     relations.artistContributionsLine =
       relation('generateReleaseInfoContributionsLine', album.artistContribs);
 
-    relations.externalLinks =
-      album.urls.map(url =>
-        relation('linkExternal', url));
+    relations.listenLine =
+      relation('generateReleaseInfoListenLine', album);
 
     return relations;
   },
@@ -81,21 +80,16 @@ export default {
         html.tag('p',
           {[html.onlyIfContent]: true},
 
-          language.$(capsule, 'listenOn', {
-            [language.onlyIfOptions]: ['links'],
+          relations.listenLine.slots({
+            context: [
+              'album',
 
-            links:
-              language.formatDisjunctionList(
-                relations.externalLinks
-                  .map(link =>
-                    link.slot('context', [
-                      'album',
-                      (data.numTracks === 0
-                        ? 'albumNoTracks'
-                     : data.numTracks === 1
-                        ? 'albumOneTrack'
-                        : 'albumMultipleTracks'),
-                    ]))),
+              (data.numTracks === 0
+                ? 'albumNoTracks'
+             : data.numTracks === 1
+                ? 'albumOneTrack'
+                : 'albumMultipleTracks'),
+            ],
           })),
       ])),
 };

@@ -1,9 +1,7 @@
-import {empty} from '#sugar';
-
 export default {
   contentDependencies: [
     'generateReleaseInfoContributionsLine',
-    'linkExternal',
+    'generateReleaseInfoListenLine',
   ],
 
   extraDependencies: ['html', 'language'],
@@ -11,14 +9,11 @@ export default {
   relations(relation, track) {
     const relations = {};
 
-    relations.artistContributionLinks =
+    relations.artistContributionsLine =
       relation('generateReleaseInfoContributionsLine', track.artistContribs);
 
-    if (!empty(track.urls)) {
-      relations.externalLinks =
-        track.urls.map(url =>
-          relation('linkExternal', url));
-    }
+    relations.listenLine =
+      relation('generateReleaseInfoListenLine', track);
 
     return relations;
   },
@@ -48,7 +43,7 @@ export default {
           {[html.joinChildren]: html.tag('br')},
 
           [
-            relations.artistContributionLinks.slots({
+            relations.artistContributionsLine.slots({
               stringKey: capsule + '.by',
               featuringStringKey: capsule + '.by.featuring',
               chronologyKind: 'track',
@@ -66,17 +61,9 @@ export default {
           ]),
 
         html.tag('p',
-          language.encapsulate(capsule, 'listenOn', capsule =>
-            (relations.externalLinks
-              ? language.$(capsule, {
-                  links:
-                    language.formatDisjunctionList(
-                      relations.externalLinks
-                        .map(link => link.slot('context', 'track'))),
-                })
-              : language.$(capsule, 'noLinks', {
-                  name:
-                    html.tag('i', data.name),
-                })))),
+          relations.listenLine.slots({
+            visibleWithoutLinks: true,
+            context: ['track'],
+          })),
       ])),
 };
