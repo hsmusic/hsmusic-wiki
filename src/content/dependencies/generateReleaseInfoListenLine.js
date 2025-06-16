@@ -43,25 +43,36 @@ export default {
         .filter(url => url.hostname.endsWith('.bandcamp.com'))
         .map(url => url.hostname);
 
+    const getReleaseContext = urlString => {
+      const url = new URL(urlString);
+
+      if (url.hostname === 'homestuck.bandcamp.com') {
+        return 'officialRelease';
+      }
+
+      if (artistBandcampDomains.includes(url.hostname)) {
+        return 'artistRelease';
+      }
+
+      return null;
+    };
+
     let releaseContexts =
-      thing.urls.map(urlString => {
-        const url = new URL(urlString);
+      thing.urls.map(getReleaseContext);
 
-        if (url.hostname === 'homestuck.bandcamp.com') {
-          return 'officialRelease';
-        }
-
-        if (artistBandcampDomains.includes(url.hostname)) {
-          return 'artistRelease';
-        }
-
-        return null;
-      });
+    const albumReleaseContexts =
+      query.album.urls.map(getReleaseContext);
 
     const presentReleaseContexts =
       unique(releaseContexts.filter(Boolean));
 
-    if (presentReleaseContexts.length <= 1) {
+    const presentAlbumReleaseContexts =
+      unique(albumReleaseContexts.filter(Boolean));
+
+    if (
+      presentReleaseContexts.length <= 1 &&
+      presentAlbumReleaseContexts.length <= 1
+    ) {
       releaseContexts =
         thing.urls.map(() => null);
     }
