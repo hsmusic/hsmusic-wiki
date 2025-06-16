@@ -647,7 +647,12 @@ misc:
     amazonMusic: "Amazon Music"
     appleMusic: "Apple Music"
     artstation: "ArtStation"
-    bandcamp: "Bandcamp"
+
+    bandcamp:
+      _: "Bandcamp"
+
+      artistRelease: "Bandcamp (artist's release)"
+      officialRelease: "Bandcamp (official release)"
 
     bgreco:
       _: "bgreco.net"
