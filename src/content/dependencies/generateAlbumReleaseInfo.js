@@ -14,12 +14,6 @@ export default {
     relations.artistContributionsLine =
       relation('generateReleaseInfoContributionsLine', album.artistContribs);
 
-    relations.wallpaperArtistContributionsLine =
-      relation('generateReleaseInfoContributionsLine', album.wallpaperArtistContribs);
-
-    relations.bannerArtistContributionsLine =
-      relation('generateReleaseInfoContributionsLine', album.bannerArtistContribs);
-
     relations.externalLinks =
       album.urls.map(url =>
         relation('linkExternal', url));
