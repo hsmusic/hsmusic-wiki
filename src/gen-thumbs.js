@@ -462,6 +462,32 @@ async function getImageMagickVersion(binary) {
   return match[1];
 }
 
+// Write all requested thumbtacks for a source image in one pass
+// This saves a lot of disk reads which are probably the main bottleneck
+function buildMultiThumbArgs({src, dstDir, baseName, thumbtacks}) {
+  const args = [src, '-strip'];
+
+  // do larger sizes first
+  thumbtacks
+    .sort((a, b) => thumbnailSpec[b].size - thumbnailSpec[a].size)
+    .forEach(tack => {
+      const {size, quality} = thumbnailSpec[tack];
+      const outFile = path.join(dstDir, `${baseName}.${tack}.jpg`);
+      args.push(
+        '(', '+clone',
+        '-resize', `${size}x${size}>`,
+        '-interlace', 'Plane',
+        '-quality', `${quality}%`,
+        '-write', outFile,
+        '+delete', ')',
+      );
+    });
+
+  // throw away the (already written) image stream
+  args.push('null:');
+  return args;
+}
+
 async function getSpawnMagick(tool) {
   if (tool !== 'identify' && tool !== 'convert') {
     throw new Error(`Expected identify or convert`);
@@ -555,43 +581,28 @@ async function determineThumbtacksNeededForFile({
   return mismatchedWithinRightSize;
 }
 
-async function generateImageThumbnail(imagePath, thumbtack, {
+async function generateImageThumbnails(imagePath, thumbtacks, {
   mediaPath,
   mediaCachePath,
   spawnConvert,
 }) {
-  const filePathInMedia =
-    path.join(mediaPath, imagePath);
+  if (!thumbtacks.length) return;
 
-  const dirnameInCache =
-    path.join(mediaCachePath, path.dirname(imagePath));
+  const filePathInMedia = path.join(mediaPath, imagePath);
+  const dstDir          = path.join(mediaCachePath, path.dirname(imagePath));
+  await mkdir(dstDir, {recursive: true});
 
-  const filename =
-    path.basename(imagePath, path.extname(imagePath)) +
-    `.${thumbtack}.jpg`;
+  const baseName  = path.basename(imagePath, path.extname(imagePath));
+  const convertArgs = buildMultiThumbArgs({
+    src: filePathInMedia,
+    dstDir,
+    baseName,
+    thumbtacks,
+  });
 
-  const filePathInCache =
-    path.join(dirnameInCache, filename);
-
-  await mkdir(dirnameInCache, {recursive: true});
-
-  const specEntry = thumbnailSpec[thumbtack];
-  const {size, quality} = specEntry;
-
-  const convertProcess = spawnConvert([
-    filePathInMedia,
-    '-strip',
-    '-resize',
-    `${size}x${size}>`,
-    '-interlace',
-    'Plane',
-    '-quality',
-    `${quality}%`,
-    filePathInCache,
-  ]);
-
-  await promisifyProcess(convertProcess, false);
+  await promisifyProcess(spawnConvert(convertArgs), false);
 }
+
 
 export async function determineMediaCachePath({
   mediaPath,
@@ -1111,21 +1122,19 @@ export default async function genThumbs({
   const generateCallThumbtacks =
     imageThumbtacksNeeded.flat();
 
-  const generateCallFns =
-    stitchArrays({
-      imagePath: generateCallImagePaths,
-      thumbtack: generateCallThumbtacks,
-    }).map(({imagePath, thumbtack}) => () =>
-        generateImageThumbnail(imagePath, thumbtack, {
-          mediaPath,
-          mediaCachePath,
-          spawnConvert,
-        }).catch(error => {
-            numFailed++;
-            return ({error});
-          }));
+  const generateCallFns = imagePaths.map((imagePath, idx) => () => {
+    return generateImageThumbnails(imagePath, imageThumbtacksNeeded[idx], {
+      mediaPath,
+      mediaCachePath,
+      spawnConvert,
+    }).catch(error => {
+        numFailed++;
+        return {error};
+      })});
 
-  logInfo`Generating ${generateCallFns.length} thumbnails for ${imagePaths.length} media files.`;
+  const totalThumbs = imageThumbtacksNeeded.reduce((sum, tacks) => sum + tacks.length, 0);
+
+  logInfo`Generating ${totalThumbs} thumbnails for ${imagePaths.length} media files.`;
   if (generateCallFns.length > 500) {
     logInfo`Go get a latte - this could take a while!`;
   }
