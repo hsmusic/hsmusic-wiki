@@ -464,27 +464,32 @@ async function getImageMagickVersion(binary) {
 
 // Write all requested thumbtacks for a source image in one pass
 // This saves a lot of disk reads which are probably the main bottleneck
-function buildMultiThumbArgs({src, dstDir, baseName, thumbtacks}) {
-  const args = [src, '-strip'];
+function prepareConvertArgs(filePathInMedia, dirnameInCache, thumbtacks) {
+  const args = [filePathInMedia, '-strip'];
+
+  const basename =
+    path.basename(filePathInMedia, path.extname(filePathInMedia));
 
   // do larger sizes first
-  thumbtacks
-    .sort((a, b) => thumbnailSpec[b].size - thumbnailSpec[a].size)
-    .forEach(tack => {
-      const {size, quality} = thumbnailSpec[tack];
-      const outFile = path.join(dstDir, `${baseName}.${tack}.jpg`);
-      args.push(
-        '(', '+clone',
-        '-resize', `${size}x${size}>`,
-        '-interlace', 'Plane',
-        '-quality', `${quality}%`,
-        '-write', outFile,
-        '+delete', ')',
-      );
-    });
+  thumbtacks.sort((a, b) => thumbnailSpec[b].size - thumbnailSpec[a].size);
+
+  for (const tack of thumbtacks) {
+    const {size, quality} = thumbnailSpec[tack];
+    const filename = `${basename}.${tack}.jpg`;
+    const filePathInCache = path.join(dirnameInCache, filename);
+    args.push(
+      '(', '+clone',
+      '-resize', `${size}x${size}>`,
+      '-interlace', 'Plane',
+      '-quality', `${quality}%`,
+      '-write', filePathInCache,
+      '+delete', ')',
+    );
+  }
 
   // throw away the (already written) image stream
   args.push('null:');
+
   return args;
 }
 
@@ -586,19 +591,18 @@ async function generateImageThumbnails(imagePath, thumbtacks, {
   mediaCachePath,
   spawnConvert,
 }) {
-  if (!thumbtacks.length) return;
+  if (empty(thumbtacks)) return;
 
-  const filePathInMedia = path.join(mediaPath, imagePath);
-  const dstDir          = path.join(mediaCachePath, path.dirname(imagePath));
-  await mkdir(dstDir, {recursive: true});
+  const filePathInMedia =
+    path.join(mediaPath, imagePath);
 
-  const baseName  = path.basename(imagePath, path.extname(imagePath));
-  const convertArgs = buildMultiThumbArgs({
-    src: filePathInMedia,
-    dstDir,
-    baseName,
-    thumbtacks,
-  });
+  const dirnameInCache =
+    path.join(mediaCachePath, path.dirname(imagePath));
+
+  await mkdir(dirnameInCache, {recursive: true});
+
+  const convertArgs =
+    prepareConvertArgs(filePathInMedia, dirnameInCache, thumbtacks);
 
   await promisifyProcess(spawnConvert(convertArgs), false);
 }
