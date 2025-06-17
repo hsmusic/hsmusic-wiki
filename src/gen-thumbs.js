@@ -1114,27 +1114,19 @@ export default async function genThumbs({
   const writeMessageFn = () =>
     `Writing image thumbnails. [failed: ${numFailed}]`;
 
-  const generateCallImageIndices =
-    imageThumbtacksNeeded
-      .flatMap(({length}, index) =>
-        Array.from({length}, () => index));
-
-  const generateCallImagePaths =
-    generateCallImageIndices
-      .map(index => imagePaths[index]);
-
-  const generateCallThumbtacks =
-    imageThumbtacksNeeded.flat();
-
-  const generateCallFns = imagePaths.map((imagePath, idx) => () => {
-    return generateImageThumbnails(imagePath, imageThumbtacksNeeded[idx], {
-      mediaPath,
-      mediaCachePath,
-      spawnConvert,
-    }).catch(error => {
-        numFailed++;
-        return {error};
-      })});
+  const generateCallFns =
+    stitchArrays({
+      imagePath: imagePaths,
+      thumbtacks: imageThumbtacksNeeded,
+    }).map(({imagePath, thumbtacks}) => () =>
+        generateImageThumbnails(imagePath, thumbtacks, {
+          mediaPath,
+          mediaCachePath,
+          spawnConvert,
+        }).catch(error => {
+            numFailed++;
+            return {error};
+          }));
 
   const totalThumbs = imageThumbtacksNeeded.reduce((sum, tacks) => sum + tacks.length, 0);
 
@@ -1147,37 +1139,30 @@ export default async function genThumbs({
     await progressPromiseAll(writeMessageFn,
       queue(generateCallFns, magickThreads));
 
-  let successfulIndices;
+  let successfulPaths;
 
   {
-    const erroredIndices = generateCallImageIndices.slice();
-    const erroredPaths = generateCallImagePaths.slice();
-    const erroredThumbtacks = generateCallThumbtacks.slice();
+    const erroredPaths = imagePaths.slice();
     const errors = generateCallResults.map(result => result?.error);
 
     const {removed} =
       filterMultipleArrays(
-        erroredIndices,
         erroredPaths,
-        erroredThumbtacks,
         errors,
-        (_index, _imagePath, _thumbtack, error) => error);
+        (_imagePath, error) => error);
 
-    successfulIndices = new Set(removed[0]);
-
-    const chunks =
-      chunkMultipleArrays(erroredPaths, erroredThumbtacks, errors,
-        (imagePath, lastImagePath) => imagePath !== lastImagePath);
+    ([successfulPaths] = removed);
 
     // TODO: This should obviously be an aggregate error.
     // ...Just like every other error report here, and those dang aggregates
     // should be constructable from within the queue, rather than after.
-    for (const [[imagePath], thumbtacks, errors] of chunks) {
-      logError`Failed to generate thumbnails for ${imagePath}:`;
-      for (const {thumbtack, error} of stitchArrays({thumbtack: thumbtacks, error: errors})) {
-        logError`- ${thumbtack}: ${error}`;
-      }
-    }
+    stitchArrays({
+      imagePath: erroredPaths,
+      error: errors,
+    }).forEach(({imagePath, error}) => {
+        logError`Failed to generate thumbnails for ${imagePath}:`;
+        logError`- ${error}`;
+      });
 
     if (empty(errors)) {
       logInfo`All needed thumbnails generated successfully - nice!`;
@@ -1191,8 +1176,8 @@ export default async function genThumbs({
     imagePaths,
     imageThumbtacksNeeded,
     imageDimensions,
-    (_imagePath, _thumbtacksNeeded, _dimensions, index) =>
-      successfulIndices.has(index));
+    (imagePath, _thumbtacksNeeded, _dimensions) =>
+      successfulPaths.includes(imagePath));
 
   for (const {
     imagePath,
