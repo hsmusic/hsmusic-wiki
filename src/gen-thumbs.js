@@ -462,37 +462,6 @@ async function getImageMagickVersion(binary) {
   return match[1];
 }
 
-// Write all requested thumbtacks for a source image in one pass
-// This saves a lot of disk reads which are probably the main bottleneck
-function prepareConvertArgs(filePathInMedia, dirnameInCache, thumbtacks) {
-  const args = [filePathInMedia, '-strip'];
-
-  const basename =
-    path.basename(filePathInMedia, path.extname(filePathInMedia));
-
-  // do larger sizes first
-  thumbtacks.sort((a, b) => thumbnailSpec[b].size - thumbnailSpec[a].size);
-
-  for (const tack of thumbtacks) {
-    const {size, quality} = thumbnailSpec[tack];
-    const filename = `${basename}.${tack}.jpg`;
-    const filePathInCache = path.join(dirnameInCache, filename);
-    args.push(
-      '(', '+clone',
-      '-resize', `${size}x${size}>`,
-      '-interlace', 'Plane',
-      '-quality', `${quality}%`,
-      '-write', filePathInCache,
-      '+delete', ')',
-    );
-  }
-
-  // throw away the (already written) image stream
-  args.push('null:');
-
-  return args;
-}
-
 async function getSpawnMagick(tool) {
   if (tool !== 'identify' && tool !== 'convert') {
     throw new Error(`Expected identify or convert`);
@@ -586,6 +555,37 @@ async function determineThumbtacksNeededForFile({
   return mismatchedWithinRightSize;
 }
 
+// Write all requested thumbtacks for a source image in one pass
+// This saves a lot of disk reads which are probably the main bottleneck
+function prepareConvertArgs(filePathInMedia, dirnameInCache, thumbtacks) {
+  const args = [filePathInMedia, '-strip'];
+
+  const basename =
+    path.basename(filePathInMedia, path.extname(filePathInMedia));
+
+  // do larger sizes first
+  thumbtacks.sort((a, b) => thumbnailSpec[b].size - thumbnailSpec[a].size);
+
+  for (const tack of thumbtacks) {
+    const {size, quality} = thumbnailSpec[tack];
+    const filename = `${basename}.${tack}.jpg`;
+    const filePathInCache = path.join(dirnameInCache, filename);
+    args.push(
+      '(', '+clone',
+      '-resize', `${size}x${size}>`,
+      '-interlace', 'Plane',
+      '-quality', `${quality}%`,
+      '-write', filePathInCache,
+      '+delete', ')',
+    );
+  }
+
+  // throw away the (already written) image stream
+  args.push('null:');
+
+  return args;
+}
+
 async function generateImageThumbnails(imagePath, thumbtacks, {
   mediaPath,
   mediaCachePath,
@@ -606,7 +606,6 @@ async function generateImageThumbnails(imagePath, thumbtacks, {
 
   await promisifyProcess(spawnConvert(convertArgs), false);
 }
-
 
 export async function determineMediaCachePath({
   mediaPath,
