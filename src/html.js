@@ -352,12 +352,13 @@ export class Tag {
   #traceError = null;
 
   constructor(tagName, attributes, content) {
-    this.tagName = tagName;
-    this.attributes = attributes;
-    this.content = content;
-
+  this.tagName = tagName;
+  this.attributes = attributes;
+  this.content = content;
+  if (process.env.DEBUG) { 
     this.#traceError = new Error();
   }
+}
 
   clone() {
     return Reflect.construct(this.constructor, [
