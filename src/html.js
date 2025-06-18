@@ -53,6 +53,11 @@ export const attributeSpec = {
   },
 };
 
+// Validation keeps running even after we validate
+// all of data, this let us turn it off and let build run free
+let VALIDATION_DISABLED = false;
+export function finishValidation() { VALIDATION_DISABLED = true; }
+
 // Pass to tag() as an attributes key to make tag() return a 8lank tag if the
 // provided content is empty. Useful for when you'll only 8e showing an element
 // according to the presence of content that would 8elong there.
@@ -1773,6 +1778,10 @@ export class Template {
   }
 
   static validateSlotValueAgainstDescription(value, description) {
+    if (VALIDATION_DISABLED) {
+      return true;
+    }
+
     if (value === undefined) {
       throw new TypeError(`Specify value as null or don't specify at all`);
     }

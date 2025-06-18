@@ -233,6 +233,8 @@ export async function go({
     return false;
   }
 
+  html.finishValidation();
+
   /*
   await progressPromiseAll(`Writing data files shared across languages.`, queue(
     dataWrites.map(({path, data}) => () => {
