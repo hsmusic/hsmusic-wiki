@@ -1136,6 +1136,34 @@ export class Attributes {
   }
 
   add(...args) {
+    // Very common case: add({class: 'foo', id: 'bar'})¡
+    // The argument is a plain object (no Template, no Attributes,
+    // no blessAttributes symbol). We can skip the expensive
+    // isAttributesAdditionSinglet() validation and flatten/array handling.
+    if (
+      args.length === 1 &&
+      args[0] &&
+      typeof args[0] === 'object' &&
+      !Array.isArray(args[0]) &&
+      !(args[0] instanceof Attributes) &&
+      !(args[0] instanceof Template) &&
+      !Object.hasOwn(args[0], blessAttributes)
+    ) {
+      const obj = args[0];
+
+      // Preserve existing merge semantics by funnelling each key through
+      // the internal #addOneAttribute helper (handles class/style union,
+      // unique merging, etc.) but avoid *per-object* validation overhead.
+      for (const [key, val] of Object.entries(obj)) {
+        this.#addOneAttribute(key, val);
+      }
+
+      // Match the original return style (list of results) so callers that
+      // inspect the return continue to work.
+      return obj;
+    }
+
+    // Fall back to the original slow-but-thorough implementation
     switch (args.length) {
       case 1:
         isAttributesAdditionSinglet(args[0]);
@@ -1147,9 +1175,10 @@ export class Attributes {
 
       default:
         throw new Error(
-          `Expected array or object, or attribute and value`);
+          'Expected array or object, or attribute and value');
     }
   }
+
 
   with(...args) {
     const clone = this.clone();
