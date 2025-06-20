@@ -376,77 +376,79 @@ decorateTime.displayTime = function () {
   }
 };
 
-export function progressPromiseAll(msgOrMsgFn, array) {
+const progressUpdateInterval = 1000 / 60;
+
+function progressShow(message, total) {
+  let start = Date.now(), last = 0, done = 0;
+
+  const progress = () => {
+    const messagePart =
+      (typeof message === 'function'
+        ? message()
+        : message);
+
+    const percent =
+      Math.round((done / total) * 1000) / 10 + '%';
+
+    const percentPart =
+      percent.padEnd('99.9%'.length, ' ');
+
+    return `${messagePart} [${percentPart}]`;
+  };
+
+  process.stdout.write(`\r` + progress());
+
+  return () => {
+    done++;
+
+    if (done === total) {
+      process.stdout.write(
+        `\r\x1b[2m` + progress() +
+        `\x1b[0;32m Done! ` +
+        `\x1b[0;2m(${formatDuration(Date.now() - start)}) ` +
+        `\x1b[0m\n`
+      );
+    } else if (Date.now() - last >= progressUpdateInterval) {
+      process.stdout.write('\r' + progress());
+      last = Date.now();
+    }
+  };
+}
+
+export function progressPromiseAll(message, array) {
   if (!array.length) {
     return Promise.resolve([]);
   }
 
-  const msgFn =
-    typeof msgOrMsgFn === 'function' ? msgOrMsgFn : () => msgOrMsgFn;
+  const show = progressShow(message, array.length);
 
-  let done = 0,
-    total = array.length;
-  process.stdout.write(`\r${msgFn()} [0/${total}]`);
-  const start = Date.now();
-  return Promise.all(
-    array.map((promise) =>
-      Promise.resolve(promise).then((val) => {
-        done++;
-        // const pc = `${done}/${total}`;
-        const pc = (Math.round((done / total) * 1000) / 10 + '%').padEnd(
-          '99.9%'.length,
-          ' '
-        );
-        if (done === total) {
-          const time = Date.now() - start;
-          process.stdout.write(
-            `\r\x1b[2m${msgFn()} [${pc}] \x1b[0;32mDone! \x1b[0;2m(${time} ms) \x1b[0m\n`
-          );
-        } else {
-          process.stdout.write(`\r${msgFn()} [${pc}] `);
-        }
-        return val;
-      })
-    )
-  );
+  const next = value => {
+    show();
+
+    return value;
+  };
+
+  const promises =
+    array.map(promise => Promise.resolve(promise).then(next));
+
+  return Promise.all(promises);
 }
 
-export function progressCallAll(msgOrMsgFn, array) {
+export function progressCallAll(message, array) {
   if (!array.length) {
     return [];
   }
 
-  const msgFn =
-    typeof msgOrMsgFn === 'function' ? msgOrMsgFn : () => msgOrMsgFn;
+  const show = progressShow(message, array.length);
 
-  const updateInterval = 1000 / 60;
-
-  let done = 0,
-    total = array.length;
-  process.stdout.write(`\r${msgFn()} [0/${total}]`);
-  const start = Date.now();
-  const vals = [];
-  let lastTime = 0;
+  const values = [];
 
   for (const fn of array) {
-    const val = fn();
-    done++;
-
-    if (done === total) {
-      const pc = '100%'.padEnd('99.9%'.length, ' ');
-      const time = Date.now() - start;
-      process.stdout.write(
-        `\r\x1b[2m${msgFn()} [${pc}] \x1b[0;32mDone! \x1b[0;2m(${time} ms) \x1b[0m\n`
-      );
-    } else if (Date.now() - lastTime >= updateInterval) {
-      const pc = (Math.round((done / total) * 1000) / 10 + '%').padEnd('99.9%'.length, ' ');
-      process.stdout.write(`\r${msgFn()} [${pc}] `);
-      lastTime = Date.now();
-    }
-    vals.push(val);
+    values.push(fn());
+    show();
   }
 
-  return vals;
+  return values;
 }
 
 export function fileIssue({
