@@ -360,13 +360,27 @@ export function queue(functionList, queueSize = 50) {
       thisReject(error);
     } finally {
       running--;
-      next();
+
+      // If the cursor is at 1, this is the first promise that resolved,
+      // so we're now done the "kick start", and can start the remaining
+      // promises (up to queueSize).
+      if (cursor === 1) {
+        // Since only one promise is used for the "kick start", and that one
+        // has just resolved, we know there's none running at all right now,
+        // and can start as many as specified in the queueSize right away.
+        for (let i = 0; i < queueSize; i++) {
+          setTimeout(next);
+        }
+      } else {
+        setTimeout(next);
+      }
     }
   };
 
-  for (let i = 0; i < queueSize; i++) {
-    next();
-  }
+  // Only start a single promise, as a "kick start", so that it resolves as
+  // early as possible (it will resolve before we use CPU to start the rest
+  // of the promises, up to queueSize).
+  next();
 
   return promiseList;
 }
