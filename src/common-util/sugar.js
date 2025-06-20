@@ -369,10 +369,10 @@ export function queue(functionList, queueSize = 50) {
         // has just resolved, we know there's none running at all right now,
         // and can start as many as specified in the queueSize right away.
         for (let i = 0; i < queueSize; i++) {
-          setTimeout(next);
+          next();
         }
       } else {
-        setTimeout(next);
+        next();
       }
     }
   };
