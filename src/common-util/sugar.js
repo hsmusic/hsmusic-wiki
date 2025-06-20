@@ -315,34 +315,56 @@ export function filterProperties(object, properties, {
   return filteredObject;
 }
 
-export function queue(array, max = 50) {
-  if (max === 0) {
-    return array.map((fn) => fn());
+export function queue(functionList, queueSize = 50) {
+  if (queueSize === 0) {
+    return functionList.map(fn => fn());
   }
 
-  const begin = [];
-  let current = 0;
-  const ret = array.map(
-    (fn) =>
-      new Promise((resolve, reject) => {
-        begin.push(() => {
-          current++;
-          Promise.resolve(fn()).then((value) => {
-            current--;
-            if (current < max && begin.length) {
-              begin.shift()();
-            }
-            resolve(value);
-          }, reject);
-        });
-      })
-  );
+  const promiseList = [];
+  const resolveList = [];
+  const rejectList = [];
 
-  for (let i = 0; i < max && begin.length; i++) {
-    begin.shift()();
+  for (let i = 0; i < functionList.length; i++) {
+    const promiseWithResolvers = Promise.withResolvers();
+    promiseList.push(promiseWithResolvers.promise);
+    resolveList.push(promiseWithResolvers.resolve);
+    rejectList.push(promiseWithResolvers.reject);
   }
 
-  return ret;
+  let cursor = 0;
+  let running = 0;
+
+  const next = async () => {
+    if (running >= queueSize) {
+      return;
+    }
+
+    if (cursor === functionList.length) {
+      return;
+    }
+
+    const thisFunction = functionList[cursor];
+    const thisResolve = resolveList[cursor];
+    const thisReject = rejectList[cursor];
+
+    cursor++;
+    running++;
+
+    try {
+      thisResolve(await thisFunction());
+    } catch (error) {
+      thisReject(error);
+    } finally {
+      running--;
+      next();
+    }
+  };
+
+  for (let i = 0; i < queueSize; i++) {
+    next();
+  }
+
+  return promiseList;
 }
 
 export function delay(ms) {
