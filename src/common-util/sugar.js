@@ -347,6 +347,10 @@ export function queue(functionList, queueSize = 50) {
     const thisResolve = resolveList[cursor];
     const thisReject = rejectList[cursor];
 
+    delete functionList[cursor];
+    delete resolveList[cursor];
+    delete rejectList[cursor];
+
     cursor++;
     running++;
 
