@@ -79,7 +79,7 @@ export default {
   ],
 
   sprawl(wikiData, content) {
-    const find = bindFind(wikiData);
+    const find = bindFind(wikiData, {mode: 'quiet'});
 
     const {result: parsedNodes, error} =
       parseContentNodes(content ?? '', {errorMode: 'return'});
