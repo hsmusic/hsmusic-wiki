@@ -459,6 +459,24 @@ export function fileIssue({
   console.error(colors.red(`- https://github.com/hsmusic/hsmusic-wiki/issues/`));
 }
 
+// Quick'n dirty function to present a duration nicely for command-line use.
+export function formatDuration(timeDelta) {
+  const seconds = timeDelta / 1000;
+
+  if (seconds > 90) {
+    const modSeconds = Math.floor(seconds % 60);
+    const minutes = Math.floor(seconds - seconds % 60) / 60;
+    return `${minutes}m${modSeconds}s`;
+  }
+
+  if (seconds < 0.1) {
+    return 'instant';
+  }
+
+  const precision = (seconds > 1 ? 3 : 2);
+  return `${seconds.toPrecision(precision)}s`;
+}
+
 export async function logicalCWD() {
   if (process.env.PWD) {
     return process.env.PWD;

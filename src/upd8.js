@@ -42,7 +42,7 @@ import wrap from 'word-wrap';
 
 import {mapAggregate, openAggregate, showAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
-import {stringifyCache} from '#cli';
+import {formatDuration, stringifyCache} from '#cli';
 import {displayCompositeCacheAnalysis} from '#composite';
 import find, {bindFind, getAllFindSpecs} from '#find';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
@@ -3362,23 +3362,6 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
 
     process.exit(0);
   })();
-}
-
-function formatDuration(timeDelta) {
-  const seconds = timeDelta / 1000;
-
-  if (seconds > 90) {
-    const modSeconds = Math.floor(seconds % 60);
-    const minutes = Math.floor(seconds - seconds % 60) / 60;
-    return `${minutes}m${modSeconds}s`;
-  }
-
-  if (seconds < 0.1) {
-    return 'instant';
-  }
-
-  const precision = (seconds > 1 ? 3 : 2);
-  return `${seconds.toPrecision(precision)}s`;
 }
 
 function showStepStatusSummary() {
