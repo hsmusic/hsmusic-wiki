@@ -44,6 +44,7 @@ import {mapAggregate, openAggregate, showAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
 import {formatDuration, stringifyCache} from '#cli';
 import {displayCompositeCacheAnalysis} from '#composite';
+import * as html from '#html';
 import find, {bindFind, getAllFindSpecs} from '#find';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
@@ -518,6 +519,11 @@ async function main() {
       type: 'flag',
     },
 
+    'skip-self-diagnosis': {
+      help: `Disable some runtime validation for the wiki's own code, which speeds up long builds, but may allow unpredicted corner cases to fail strangely and silently`,
+      type: 'flag',
+    },
+
     'queue-size': {
       help: `Process more or fewer disk files at once to optimize performance or avoid I/O errors, unlimited if set to 0 (between 500 and 700 is usually a safe range for building HSMusic on Windows machines)\nDefaults to ${defaultQueueSize}`,
       type: 'value',
@@ -656,7 +662,8 @@ async function main() {
   const thumbsOnly = cliOptions['thumbs-only'] ?? false;
   const noInput = cliOptions['no-input'] ?? false;
 
-  const showAggregateTraces = cliOptions['show-traces'] ?? false;
+  const skipSelfDiagnosis = cliOptions['skip-self-diagnosis'] ?? false;
+  const showTraces = cliOptions['show-traces'] ?? false;
 
   const precacheMode = cliOptions['precache-mode'] ?? 'common';
 
@@ -1156,6 +1163,18 @@ async function main() {
     return false;
   }
 
+  if (skipSelfDiagnosis) {
+    logWarn`${'Skipping code self-diagnosis.'} (--skip-self-diagnosis provided)`;
+    logWarn`This build should run substantially faster, but corner cases`;
+    logWarn`not previously predicted may fail strangely and silently.`;
+
+    html.disableSlotValidation();
+  }
+
+  if (!showTraces) {
+    html.disableTagTracing();
+  }
+
   Object.assign(stepStatusSummary.determineMediaCachePath, {
     status: STATUS_STARTED_NOT_DONE,
     timeStart: Date.now(),
@@ -1334,7 +1353,7 @@ async function main() {
 
   const niceShowAggregate = (error, ...opts) => {
     showAggregate(error, {
-      showTraces: showAggregateTraces,
+      showTraces,
       pathToFileURL: (f) => path.relative(__dirname, fileURLToPath(f)),
       ...opts,
     });

@@ -53,10 +53,16 @@ export const attributeSpec = {
   },
 };
 
-// Validation keeps running even after we validate
-// all of data, this let us turn it off and let build run free
-let VALIDATION_DISABLED = false;
-export function finishValidation() { VALIDATION_DISABLED = true; }
+let disabledSlotValidation = false;
+let disabledTagTracing = false;
+
+export function disableSlotValidation() {
+  disabledSlotValidation = true;
+}
+
+export function disableTagTracing() {
+  disabledTagTracing = true;
+}
 
 // Pass to tag() as an attributes key to make tag() return a 8lank tag if the
 // provided content is empty. Useful for when you'll only 8e showing an element
@@ -357,12 +363,13 @@ export class Tag {
   #traceError = null;
 
   constructor(tagName, attributes, content) {
-  this.tagName = tagName;
-  this.attributes = attributes;
-  this.content = content;
-  if (process.env.DEBUG) { 
-    this.#traceError = new Error();
-  }
+    this.tagName = tagName;
+    this.attributes = attributes;
+    this.content = content;
+
+    if (!disabledTagTracing) {
+      this.#traceError = new Error();
+    }
 }
 
   clone() {
@@ -716,17 +723,19 @@ export class Tag {
             `of ${inspect(this, {compact: true})}`,
             {cause: caughtError});
 
-        error[Symbol.for(`hsmusic.aggregate.alwaysTrace`)] = true;
-        error[Symbol.for(`hsmusic.aggregate.traceFrom`)] = this.#traceError;
+        if (this.#traceError && !disabledTagTracing) {
+          error[Symbol.for(`hsmusic.aggregate.alwaysTrace`)] = true;
+          error[Symbol.for(`hsmusic.aggregate.traceFrom`)] = this.#traceError;
 
-        error[Symbol.for(`hsmusic.aggregate.unhelpfulTraceLines`)] = [
-          /content-function\.js/,
-          /util\/html\.js/,
-        ];
+          error[Symbol.for(`hsmusic.aggregate.unhelpfulTraceLines`)] = [
+            /content-function\.js/,
+            /util\/html\.js/,
+          ];
 
-        error[Symbol.for(`hsmusic.aggregate.helpfulTraceLines`)] = [
-          /content\/dependencies\/(.*\.js:.*(?=\)))/,
-        ];
+          error[Symbol.for(`hsmusic.aggregate.helpfulTraceLines`)] = [
+            /content\/dependencies\/(.*\.js:.*(?=\)))/,
+          ];
+        }
 
         throw error;
       }
@@ -1778,7 +1787,7 @@ export class Template {
   }
 
   static validateSlotValueAgainstDescription(value, description) {
-    if (VALIDATION_DISABLED) {
+    if (disabledSlotValidation) {
       return true;
     }
 
