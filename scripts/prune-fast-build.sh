@@ -5,16 +5,16 @@
 set -euo pipefail
 
 # albums (YAML files)
-find "$HSMUSIC_DATA/album" -type f -name '*.yaml'          \
-  | sort | awk '/ad-astra.yaml/ {exit} {print}' \
+find "$HSMUSIC_DATA/album" -type f -name '*.yaml' | sort \
+  | awk '/ad-astra.yaml/{found=1; next} found{print}' \
   | xargs --no-run-if-empty rm -f
 
 # album-art folders
-find "$HSMUSIC_MEDIA/album-art" -maxdepth 1 -mindepth 1 -type d \
-  | sort | awk '/ad-astra$/ {exit} NR>1 {print}' \
+find "$HSMUSIC_MEDIA/album-art" -maxdepth 1 -mindepth 1 -type d | sort \
+  | awk '/ad-astra$/{found=1; next} found{print}' \
   | xargs --no-run-if-empty rm -rf
 
 # album-additional folders
-find "$HSMUSIC_MEDIA/album-additional" -maxdepth 1 -mindepth 1 -type d \
-  | sort | awk '/act-8-volume-1$/ {exit} NR>1 {print}' \
+find "$HSMUSIC_MEDIA/album-additional" -maxdepth 1 -mindepth 1 -type d | sort \
+  | awk '/act-8-volume-1$/{found=1; next} found{print}' \
   | xargs --no-run-if-empty rm -rf
