@@ -48,9 +48,9 @@ jobs:
             [media]="${{ inputs.media_branch }}" \
             [lang]="${{ inputs.lang_branch }}" )
           for repo in code data media lang; do
-            git -C "$HSMUSIC_BASE/$repo" fetch --prune
-            git -C "$HSMUSIC_BASE/$repo" checkout "${B[$repo]}"
-            git -C "$HSMUSIC_BASE/$repo" reset --hard "origin/${B[$repo]}"
+            git -C "$HSMUSIC_BASE/$repo" fetch --prune -q
+            git -C "$HSMUSIC_BASE/$repo" checkout -q "${B[$repo]}"
+            git -C "$HSMUSIC_BASE/$repo" reset --hard -q "origin/${B[$repo]}"
           done
 
       - name: Prune for fast build
