@@ -464,7 +464,7 @@ export function squashBackslashes(text) {
   // a set of characters where the backslash carries meaning
   // into later formatting (i.e. markdown). Note that we do
   // NOT compress double backslashes into single backslashes.
-  return text.replace(/([^\\](?:\\{2})*)\\(?![\\*_~>-])/g, '$1');
+  return text.replace(/([^\\](?:\\{2})*)\\(?![\\*_~>.-])/g, '$1');
 }
 
 export function restoreRawHTMLTags(text) {
