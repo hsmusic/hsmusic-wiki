@@ -1168,8 +1168,8 @@ export class Attributes {
       // Preserve existing merge semantics by funnelling each key through
       // the internal #addOneAttribute helper (handles class/style union,
       // unique merging, etc.) but avoid *per-object* validation overhead.
-      for (const [key, val] of Object.entries(obj)) {
-        this.#addOneAttribute(key, val);
+      for (const key of Reflect.ownKeys(obj)) {
+        this.#addOneAttribute(key, obj[key]);
       }
 
       // Match the original return style (list of results) so callers that
