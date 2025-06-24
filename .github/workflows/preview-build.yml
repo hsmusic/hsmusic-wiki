@@ -67,14 +67,14 @@ jobs:
           cd "$HSMUSIC_BASE"
           hsmusic --thumbs-only
           hsmusic --skip-thumbs --live-dev-server --skip-serving
-          aws s3 cp cache/media-cache/thumbnail-cache.json "$HSMUSIC_MEDIA_BUCKET/" --acl public-read
-          aws s3 cp media/file-size-cache.json             "$HSMUSIC_MEDIA_BUCKET/" --acl public-read
+          aws s3 cp cache/media-cache/thumbnail-cache.json "$HSMUSIC_MEDIA_BUCKET/" --acl public-read --no-cli-pager
+          aws s3 cp media/file-size-cache.json "$HSMUSIC_MEDIA_BUCKET/" --acl public-read --no-cli-pager
 
       - name: Sync originals & thumbs
         run: |
           cd "$HSMUSIC_BASE"
-          aws s3 sync media            "$HSMUSIC_MEDIA_BUCKET" --acl public-read --exclude '.git/*'
-          aws s3 sync cache/media-cache "$HSMUSIC_MEDIA_BUCKET" --acl public-read
+          aws s3 sync media "$HSMUSIC_MEDIA_BUCKET" --acl public-read --exclude '.git/*' --no-cli-pager
+          aws s3 sync cache/media-cache "$HSMUSIC_MEDIA_BUCKET" --acl public-read --no-cli-pager
 
   build:
     needs: prepare
@@ -91,4 +91,4 @@ jobs:
           cd "$HSMUSIC_BASE"
           rm -rf out && mkdir out
           hsmusic --lang "${{ matrix.language }}" --skip-thumbs --urls online-media --static-build
-          aws s3 sync out "$HSMUSIC_PREVIEW_BUCKET" --acl public-read
+          aws s3 sync out "$HSMUSIC_PREVIEW_BUCKET" --acl public-read --no-cli-pager
