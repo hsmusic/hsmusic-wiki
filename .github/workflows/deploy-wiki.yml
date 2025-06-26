@@ -1,0 +1,135 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: Which GitHub Environment to use (must exist in repo → Settings → Environments)
+        type: string
+        default: preview
+      fast_build:
+        description: Prune data/media for ~20-min build
+        type: boolean
+        default: false
+      languages:
+        description: JSON array of language codes
+        type: string
+        default: '["en"]'
+      code_branch:
+        description: Branch for hsmusic-wiki
+        type: string
+        default: preview
+      data_branch:
+        description: Branch for hsmusic-data
+        type: string
+        default: preview
+      media_branch:
+        description: Branch for hsmusic-media
+        type: string
+        default: preview
+      lang_branch:
+        description: Branch for hsmusic-lang
+        type: string
+        default: preview
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout wiki
+        uses: actions/checkout@v4
+        with:
+          repository: hsmusic/hsmusic-wiki
+          ref: ${{ inputs.code_branch }}
+          path: code
+      - name: Checkout data
+        uses: actions/checkout@v4
+        with:
+          repository: hsmusic/hsmusic-data
+          ref: ${{ inputs.data_branch }}
+          path: data
+      - name: Checkout media
+        uses: actions/checkout@v4
+        with:
+          repository: hsmusic/hsmusic-media
+          ref: ${{ inputs.media_branch }}
+          path: media
+      - name: Checkout lang
+        uses: actions/checkout@v4
+        with:
+          repository: hsmusic/hsmusic-lang
+          ref: ${{ inputs.lang_branch }}
+          path: lang
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Install & link CLI
+        run: |
+          cd code
+          npm ci --no-audit --prefer-offline --progress=false
+          npm link
+      - name: Prune for fast build
+        if: ${{ inputs.fast_build }}
+        run: |
+          cd code
+          scripts/prune-fast-build.sh
+      - name: Generate thumbnails & size cache
+        run: |
+          cd code
+          hsmusic --thumbs-only --data-path ../data --media-path ../media --cache-path ../cache
+          hsmusic --skip-thumbs --live-dev-server --skip-serving --data-path ../data --media-path ../media --cache-path ../cache
+      - name: Upload media caches & thumbnails
+        run: |
+          aws --endpoint-url "$AWS_ENDPOINT_URL" s3 cp \
+            cache/media-cache/thumbnail-cache.json "$AWS_MEDIA_BUCKET"/ \
+            --acl public-read --quiet
+          aws --endpoint-url "$AWS_ENDPOINT_URL" s3 cp \
+            media/file-size-cache.json "$AWS_MEDIA_BUCKET"/ \
+            --acl public-read --quiet
+          aws --endpoint-url "$AWS_ENDPOINT_URL" s3 sync \
+            media "$AWS_MEDIA_BUCKET" --acl public-read --exclude '.git/*' --quiet
+          aws --endpoint-url "$AWS_ENDPOINT_URL" s3 sync \
+            cache/media-cache "$AWS_MEDIA_BUCKET" --acl public-read --quiet
+      - name: Archive workspace
+        uses: actions/upload-artifact@v3
+        with:
+          name: hsmusic-workspace
+          path: |
+            code
+            data
+            media
+            lang
+            cache
+
+  build_and_deploy:
+    needs: prepare
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    timeout-minutes: 360
+    strategy:
+      matrix:
+        language: ${{ fromJson(inputs.languages) }}
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v3
+        with:
+          name: hsmusic-workspace
+          path: workspace
+      - name: Build & deploy (${{ matrix.language }})
+        run: |
+          cd workspace/code
+          rm -rf ../out && mkdir ../out
+          hsmusic \
+            --lang "${{ matrix.language }}" \
+            --skip-thumbs \
+            --urls online-media \
+            --static-build \
+            --data-path ../data \
+            --media-path ../media \
+            --cache-path ../cache \
+            --out-path ../out
+          aws --endpoint-url "$AWS_ENDPOINT_URL" s3 sync \
+            ../out "$AWS_SITE_BUCKET" \
+            --acl public-read --quiet
