@@ -76,10 +76,25 @@ body::before, .wallpaper-part {
   height: unset;
 }
 
+@property --banner-shine {
+  syntax: '<percentage>';
+  initial-value: 0%;
+  inherits: false;
+}
+
 #banner {
   margin: 10px 0;
   width: 100%;
   position: relative;
+
+  --banner-shine: 4%;
+  -webkit-box-reflect: below -12px linear-gradient(transparent, color-mix(in srgb, transparent, var(--banner-shine) white));
+  transition: --banner-shine 0.8s;
+}
+
+#banner:hover {
+  --banner-shine: 35%;
+  transition-delay: 0.3s;
 }
 
 #banner::after {
