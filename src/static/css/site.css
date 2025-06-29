@@ -61,7 +61,7 @@ body::before, .wallpaper-part {
 
 #page-container {
   max-width: 1100px;
-  margin: 0 auto 40px;
+  margin: 0 auto 38px;
   padding: 15px 0;
 }
 
@@ -261,7 +261,11 @@ body::before, .wallpaper-part {
 #page-container {
   background-color: var(--bg-color, rgba(35, 35, 35, 0.8));
   color: #ffffff;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  border-bottom: 2px solid #fff1;
+  box-shadow:
+    0 0 40px #0008,
+    0 2px 15px -3px #2221,
+    0 2px 6px 2px #1113;
 }
 
 #skippers > * {
