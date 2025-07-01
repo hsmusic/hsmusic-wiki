@@ -75,7 +75,13 @@ export class Album extends Thing {
     TrackSection,
     WikiInfo,
   }) => ({
-    // Update & expose
+    // > Update & expose - Internal relationships
+
+    trackSections: thingList({
+      class: input.value(TrackSection),
+    }),
+
+    // > Update & expose - Identifying metadata
 
     name: name('Unnamed Album'),
     directory: directory(),
@@ -96,21 +102,62 @@ export class Album extends Thing {
     alwaysReferenceTracksByDirectory: flag(false),
     suffixTrackDirectories: flag(false),
 
-    countTracksInArtistTotals: flag(true),
-
-    color: color(),
-    urls: urls(),
+    bandcampAlbumIdentifier: simpleString(),
+    bandcampArtworkIdentifier: simpleString(),
 
     additionalNames: thingList({
       class: input.value(AdditionalName),
     }),
 
-    bandcampAlbumIdentifier: simpleString(),
-    bandcampArtworkIdentifier: simpleString(),
-
     date: simpleDate(),
-    trackArtDate: simpleDate(),
     dateAddedToWiki: simpleDate(),
+
+    // > Update & expose - Credits and contributors
+
+    artistContribs: contributionList({
+      date: 'date',
+      artistProperty: input.value('albumArtistContributions'),
+    }),
+
+    // > Update & expose - General configuration
+
+    countTracksInArtistTotals: flag(true),
+
+    hasTrackNumbers: flag(true),
+    isListedOnHomepage: flag(true),
+    isListedInGalleries: flag(true),
+
+    // > Update & expose - General metadata
+
+    color: color(),
+
+    urls: urls(),
+
+    // > Update & expose - Artworks
+
+    coverArtworks: [
+      // This works, lol, because this array describes `expose.transform` for
+      // the coverArtworks property, and compositions generally access the
+      // update value, not what's exposed by property access out in the open.
+      // There's no recursion going on here.
+      exitWithoutArtwork({
+        contribs: 'coverArtistContribs',
+        artworks: 'coverArtworks',
+        value: input.value([]),
+      }),
+
+      constitutibleArtworkList.fromYAMLFieldSpec
+        .call(this, 'Cover Artwork'),
+    ],
+
+    coverArtistContribs: [
+      withCoverArtDate(),
+
+      contributionList({
+        date: '#coverArtDate',
+        artistProperty: input.value('albumCoverArtistContributions'),
+      }),
+    ],
 
     coverArtDate: [
       withCoverArtDate({
@@ -131,21 +178,78 @@ export class Album extends Thing {
       fileExtension('jpg'),
     ],
 
+    coverArtDimensions: [
+      exitWithoutArtwork({
+        contribs: 'coverArtistContribs',
+        artworks: 'coverArtworks',
+      }),
+
+      dimensions(),
+    ],
+
+    artTags: [
+      exitWithoutArtwork({
+        contribs: 'coverArtistContribs',
+        artworks: 'coverArtworks',
+        value: input.value([]),
+      }),
+
+      referenceList({
+        class: input.value(ArtTag),
+        find: soupyFind.input('artTag'),
+      }),
+    ],
+
+    referencedArtworks: [
+      exitWithoutArtwork({
+        contribs: 'coverArtistContribs',
+        artworks: 'coverArtworks',
+        value: input.value([]),
+      }),
+
+      referencedArtworkList(),
+    ],
+
+    trackCoverArtistContribs: contributionList({
+      // May be null, indicating cover art was added for tracks on the date
+      // each track specifies, or else the track's own release date.
+      date: 'trackArtDate',
+
+      // This is the "correct" value, but it gets overwritten - with the same
+      // value - regardless.
+      artistProperty: input.value('trackCoverArtistContributions'),
+    }),
+
+    trackArtDate: simpleDate(),
+
     trackCoverArtFileExtension: fileExtension('jpg'),
+
+    trackDimensions: dimensions(),
+
+    wallpaperArtwork: [
+      exitWithoutDependency({
+        dependency: 'wallpaperArtistContribs',
+        mode: input.value('empty'),
+        value: input.value(null),
+      }),
+
+      constitutibleArtwork.fromYAMLFieldSpec
+        .call(this, 'Wallpaper Artwork'),
+    ],
+
+    wallpaperArtistContribs: [
+      withCoverArtDate(),
+
+      contributionList({
+        date: '#coverArtDate',
+        artistProperty: input.value('albumWallpaperArtistContributions'),
+      }),
+    ],
 
     wallpaperFileExtension: [
       exitWithoutArtwork({
         contribs: 'wallpaperArtistContribs',
         artwork: 'wallpaperArtwork',
-      }),
-
-      fileExtension('jpg'),
-    ],
-
-    bannerFileExtension: [
-      exitWithoutArtwork({
-        contribs: 'bannerArtistContribs',
-        artwork: 'bannerArtwork',
       }),
 
       fileExtension('jpg'),
@@ -171,46 +275,6 @@ export class Album extends Thing {
       wallpaperParts(),
     ],
 
-    bannerStyle: [
-      exitWithoutArtwork({
-        contribs: 'bannerArtistContribs',
-        artwork: 'bannerArtwork',
-      }),
-
-      simpleString(),
-    ],
-
-    coverArtDimensions: [
-      exitWithoutArtwork({
-        contribs: 'coverArtistContribs',
-        artworks: 'coverArtworks',
-      }),
-
-      dimensions(),
-    ],
-
-    trackDimensions: dimensions(),
-
-    bannerDimensions: [
-      exitWithoutArtwork({
-        contribs: 'bannerArtistContribs',
-        artwork: 'bannerArtwork',
-      }),
-
-      dimensions(),
-    ],
-
-    wallpaperArtwork: [
-      exitWithoutDependency({
-        dependency: 'wallpaperArtistContribs',
-        mode: input.value('empty'),
-        value: input.value(null),
-      }),
-
-      constitutibleArtwork.fromYAMLFieldSpec
-        .call(this, 'Wallpaper Artwork'),
-    ],
-
     bannerArtwork: [
       exitWithoutDependency({
         dependency: 'bannerArtistContribs',
@@ -222,74 +286,6 @@ export class Album extends Thing {
         .call(this, 'Banner Artwork'),
     ],
 
-    coverArtworks: [
-      // This works, lol, because this array describes `expose.transform` for
-      // the coverArtworks property, and compositions generally access the
-      // update value, not what's exposed by property access out in the open.
-      // There's no recursion going on here.
-      exitWithoutArtwork({
-        contribs: 'coverArtistContribs',
-        artworks: 'coverArtworks',
-        value: input.value([]),
-      }),
-
-      constitutibleArtworkList.fromYAMLFieldSpec
-        .call(this, 'Cover Artwork'),
-    ],
-
-    hasTrackNumbers: flag(true),
-    isListedOnHomepage: flag(true),
-    isListedInGalleries: flag(true),
-
-    commentary: thingList({
-      class: input.value(CommentaryEntry),
-    }),
-
-    creditingSources: thingList({
-      class: input.value(CreditingSourcesEntry),
-    }),
-
-    additionalFiles: thingList({
-      class: input.value(AdditionalFile),
-    }),
-
-    trackSections: thingList({
-      class: input.value(TrackSection),
-    }),
-
-    artistContribs: contributionList({
-      date: 'date',
-      artistProperty: input.value('albumArtistContributions'),
-    }),
-
-    coverArtistContribs: [
-      withCoverArtDate(),
-
-      contributionList({
-        date: '#coverArtDate',
-        artistProperty: input.value('albumCoverArtistContributions'),
-      }),
-    ],
-
-    trackCoverArtistContribs: contributionList({
-      // May be null, indicating cover art was added for tracks on the date
-      // each track specifies, or else the track's own release date.
-      date: 'trackArtDate',
-
-      // This is the "correct" value, but it gets overwritten - with the same
-      // value - regardless.
-      artistProperty: input.value('trackCoverArtistContributions'),
-    }),
-
-    wallpaperArtistContribs: [
-      withCoverArtDate(),
-
-      contributionList({
-        date: '#coverArtDate',
-        artistProperty: input.value('albumWallpaperArtistContributions'),
-      }),
-    ],
-
     bannerArtistContribs: [
       withCoverArtDate(),
 
@@ -299,33 +295,55 @@ export class Album extends Thing {
       }),
     ],
 
+    bannerFileExtension: [
+      exitWithoutArtwork({
+        contribs: 'bannerArtistContribs',
+        artwork: 'bannerArtwork',
+      }),
+
+      fileExtension('jpg'),
+    ],
+
+    bannerDimensions: [
+      exitWithoutArtwork({
+        contribs: 'bannerArtistContribs',
+        artwork: 'bannerArtwork',
+      }),
+
+      dimensions(),
+    ],
+
+    bannerStyle: [
+      exitWithoutArtwork({
+        contribs: 'bannerArtistContribs',
+        artwork: 'bannerArtwork',
+      }),
+
+      simpleString(),
+    ],
+
+    // > Update & expose - Groups
+
     groups: referenceList({
       class: input.value(Group),
       find: soupyFind.input('group'),
     }),
 
-    artTags: [
-      exitWithoutArtwork({
-        contribs: 'coverArtistContribs',
-        artworks: 'coverArtworks',
-        value: input.value([]),
-      }),
+    // > Update & expose - Content entries
 
-      referenceList({
-        class: input.value(ArtTag),
-        find: soupyFind.input('artTag'),
-      }),
-    ],
+    commentary: thingList({
+      class: input.value(CommentaryEntry),
+    }),
 
-    referencedArtworks: [
-      exitWithoutArtwork({
-        contribs: 'coverArtistContribs',
-        artworks: 'coverArtworks',
-        value: input.value([]),
-      }),
+    creditingSources: thingList({
+      class: input.value(CreditingSourcesEntry),
+    }),
 
-      referencedArtworkList(),
-    ],
+    // Additional files
+
+    additionalFiles: thingList({
+      class: input.value(AdditionalFile),
+    }),
 
     // Update only
 
@@ -515,21 +533,14 @@ export class Album extends Thing {
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
-      'Album': {property: 'name'},
+      // Identifying metadata
 
+      'Album': {property: 'name'},
       'Directory': {property: 'directory'},
       'Directory Suffix': {property: 'directorySuffix'},
       'Suffix Track Directories': {property: 'suffixTrackDirectories'},
-
       'Always Reference By Directory': {property: 'alwaysReferenceByDirectory'},
-      'Always Reference Tracks By Directory': {
-        property: 'alwaysReferenceTracksByDirectory',
-      },
-
-      'Additional Names': {
-        property: 'additionalNames',
-        transform: parseAdditionalNames,
-      },
+      'Always Reference Tracks By Directory': {property: 'alwaysReferenceTracksByDirectory'},
 
       'Bandcamp Album ID': {
         property: 'bandcampAlbumIdentifier',
@@ -541,19 +552,45 @@ export class Album extends Thing {
         transform: String,
       },
 
-      'Count Tracks In Artist Totals': {property: 'countInArtistTotals'},
+      'Additional Names': {
+        property: 'additionalNames',
+        transform: parseAdditionalNames,
+      },
 
       'Date': {
         property: 'date',
         transform: parseDate,
       },
 
-      'Color': {property: 'color'},
-      'URLs': {property: 'urls'},
+      'Date Added': {
+        property: 'dateAddedToWiki',
+        transform: parseDate,
+      },
+
+      // Credits and contributors
+
+      'Artists': {
+        property: 'artistContribs',
+        transform: parseContributors,
+      },
+
+      // General configuration
+
+      'Count Tracks In Artist Totals': {property: 'countInArtistTotals'},
 
       'Has Track Numbers': {property: 'hasTrackNumbers'},
       'Listed on Homepage': {property: 'isListedOnHomepage'},
       'Listed in Galleries': {property: 'isListedInGalleries'},
+
+      // General metadata
+
+      'Color': {property: 'color'},
+
+      'URLs': {property: 'urls'},
+
+      // Artworks
+      //  (Note - this YAML section is deliberately ordered differently
+      //   than the corresponding property descriptors.)
 
       'Cover Artwork': {
         property: 'coverArtworks',
@@ -598,27 +635,29 @@ export class Album extends Thing {
           }),
       },
 
+      'Cover Artists': {
+        property: 'coverArtistContribs',
+        transform: parseContributors,
+      },
+
       'Cover Art Date': {
         property: 'coverArtDate',
         transform: parseDate,
       },
 
-      'Default Track Cover Art Date': {
-        property: 'trackArtDate',
-        transform: parseDate,
-      },
-
-      'Date Added': {
-        property: 'dateAddedToWiki',
-        transform: parseDate,
-      },
-
-      'Cover Art File Extension': {property: 'coverArtFileExtension'},
-      'Track Art File Extension': {property: 'trackCoverArtFileExtension'},
-
       'Cover Art Dimensions': {
         property: 'coverArtDimensions',
         transform: parseDimensions,
+      },
+
+      'Default Track Cover Artists': {
+        property: 'trackCoverArtistContribs',
+        transform: parseContributors,
+      },
+
+      'Default Track Cover Art Date': {
+        property: 'trackArtDate',
+        transform: parseDate,
       },
 
       'Default Track Dimensions': {
@@ -630,8 +669,6 @@ export class Album extends Thing {
         property: 'wallpaperArtistContribs',
         transform: parseContributors,
       },
-
-      'Wallpaper File Extension': {property: 'wallpaperFileExtension'},
 
       'Wallpaper Style': {property: 'wallpaperStyle'},
 
@@ -645,13 +682,30 @@ export class Album extends Thing {
         transform: parseContributors,
       },
 
-      'Banner Style': {property: 'bannerStyle'},
-      'Banner File Extension': {property: 'bannerFileExtension'},
-
       'Banner Dimensions': {
         property: 'bannerDimensions',
         transform: parseDimensions,
       },
+
+      'Banner Style': {property: 'bannerStyle'},
+
+      'Cover Art File Extension': {property: 'coverArtFileExtension'},
+      'Track Art File Extension': {property: 'trackCoverArtFileExtension'},
+      'Wallpaper File Extension': {property: 'wallpaperFileExtension'},
+      'Banner File Extension': {property: 'bannerFileExtension'},
+
+      'Art Tags': {property: 'artTags'},
+
+      'Referenced Artworks': {
+        property: 'referencedArtworks',
+        transform: parseAnnotatedReferences,
+      },
+
+      // Groups
+
+      'Groups': {property: 'groups'},
+
+      // Content entries
 
       'Commentary': {
         property: 'commentary',
@@ -663,36 +717,16 @@ export class Album extends Thing {
         transform: parseCreditingSources,
       },
 
+      // Additional files
+
       'Additional Files': {
         property: 'additionalFiles',
         transform: parseAdditionalFiles,
       },
 
-      'Referenced Artworks': {
-        property: 'referencedArtworks',
-        transform: parseAnnotatedReferences,
-      },
+      // Shenanigans
 
       'Franchises': {ignore: true},
-
-      'Artists': {
-        property: 'artistContribs',
-        transform: parseContributors,
-      },
-
-      'Cover Artists': {
-        property: 'coverArtistContribs',
-        transform: parseContributors,
-      },
-
-      'Default Track Cover Artists': {
-        property: 'trackCoverArtistContribs',
-        transform: parseContributors,
-      },
-
-      'Groups': {property: 'groups'},
-      'Art Tags': {property: 'artTags'},
-
       'Review Points': {ignore: true},
     },
 
