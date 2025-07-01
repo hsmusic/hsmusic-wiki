@@ -28,8 +28,7 @@ import {
 import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
-
-import {exitWithoutContribs, withDirectory, withCoverArtDate}
+import {exitWithoutArtwork, withDirectory, withHasArtwork}
   from '#composite/wiki-data';
 
 import {
@@ -58,7 +57,7 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {withHasCoverArt, withTracks} from '#composite/things/album';
+import {withCoverArtDate, withTracks} from '#composite/things/album';
 import {withAlbum, withContinueCountingFrom, withStartCountingFrom}
   from '#composite/things/track-section';
 
@@ -124,30 +123,48 @@ export class Album extends Thing {
     ],
 
     coverArtFileExtension: [
-      exitWithoutContribs({contribs: 'coverArtistContribs'}),
+      exitWithoutArtwork({
+        contribs: 'coverArtistContribs',
+        artworks: 'coverArtworks',
+      }),
+
       fileExtension('jpg'),
     ],
 
     trackCoverArtFileExtension: fileExtension('jpg'),
 
     wallpaperFileExtension: [
-      exitWithoutContribs({contribs: 'wallpaperArtistContribs'}),
+      exitWithoutArtwork({
+        contribs: 'wallpaperArtistContribs',
+        artwork: 'wallpaperArtwork',
+      }),
+
       fileExtension('jpg'),
     ],
 
     bannerFileExtension: [
-      exitWithoutContribs({contribs: 'bannerArtistContribs'}),
+      exitWithoutArtwork({
+        contribs: 'bannerArtistContribs',
+        artwork: 'bannerArtwork',
+      }),
+
       fileExtension('jpg'),
     ],
 
     wallpaperStyle: [
-      exitWithoutContribs({contribs: 'wallpaperArtistContribs'}),
+      exitWithoutArtwork({
+        contribs: 'wallpaperArtistContribs',
+        artwork: 'wallpaperArtwork',
+      }),
+
       simpleString(),
     ],
 
     wallpaperParts: [
-      exitWithoutContribs({
+      // kinda nonsensical or at least unlikely lol, but y'know
+      exitWithoutArtwork({
         contribs: 'wallpaperArtistContribs',
+        artwork: 'wallpaperArtwork',
         value: input.value([]),
       }),
 
@@ -155,19 +172,31 @@ export class Album extends Thing {
     ],
 
     bannerStyle: [
-      exitWithoutContribs({contribs: 'bannerArtistContribs'}),
+      exitWithoutArtwork({
+        contribs: 'bannerArtistContribs',
+        artwork: 'bannerArtwork',
+      }),
+
       simpleString(),
     ],
 
     coverArtDimensions: [
-      exitWithoutContribs({contribs: 'coverArtistContribs'}),
+      exitWithoutArtwork({
+        contribs: 'coverArtistContribs',
+        artworks: 'coverArtworks',
+      }),
+
       dimensions(),
     ],
 
     trackDimensions: dimensions(),
 
     bannerDimensions: [
-      exitWithoutContribs({contribs: 'bannerArtistContribs'}),
+      exitWithoutArtwork({
+        contribs: 'bannerArtistContribs',
+        artwork: 'bannerArtwork',
+      }),
+
       dimensions(),
     ],
 
@@ -194,11 +223,13 @@ export class Album extends Thing {
     ],
 
     coverArtworks: [
-      withHasCoverArt(),
-
-      exitWithoutDependency({
-        dependency: '#hasCoverArt',
-        mode: input.value('falsy'),
+      // This works, lol, because this array describes `expose.transform` for
+      // the coverArtworks property, and compositions generally access the
+      // update value, not what's exposed by property access out in the open.
+      // There's no recursion going on here.
+      exitWithoutArtwork({
+        contribs: 'coverArtistContribs',
+        artworks: 'coverArtworks',
         value: input.value([]),
       }),
 
@@ -274,8 +305,9 @@ export class Album extends Thing {
     }),
 
     artTags: [
-      exitWithoutContribs({
+      exitWithoutArtwork({
         contribs: 'coverArtistContribs',
+        artworks: 'coverArtworks',
         value: input.value([]),
       }),
 
@@ -286,8 +318,9 @@ export class Album extends Thing {
     ],
 
     referencedArtworks: [
-      exitWithoutContribs({
+      exitWithoutArtwork({
         contribs: 'coverArtistContribs',
+        artworks: 'coverArtworks',
         value: input.value([]),
       }),
 
@@ -314,8 +347,12 @@ export class Album extends Thing {
     commentatorArtists: commentatorArtists(),
 
     hasCoverArt: [
-      withHasCoverArt(),
-      exposeDependency({dependency: '#hasCoverArt'}),
+      withHasArtwork({
+        contribs: 'coverArtistContribs',
+        artworks: 'coverArtworks',
+      }),
+
+      exposeDependency({dependency: '#hasArtwork'}),
     ],
 
     hasWallpaperArt: contribsPresent({contribs: 'wallpaperArtistContribs'}),

@@ -2,8 +2,7 @@ import {input, templateCompositeFrom} from '#composite';
 import {isDate} from '#validators';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
-
-import withResolvedContribs from './withResolvedContribs.js';
+import {withHasArtwork} from '#composite/wiki-data';
 
 export default templateCompositeFrom({
   annotation: `withCoverArtDate`,
@@ -19,14 +18,14 @@ export default templateCompositeFrom({
   outputs: ['#coverArtDate'],
 
   steps: () => [
-    withResolvedContribs({
-      from: 'coverArtistContribs',
-      date: input.value(null),
+    withHasArtwork({
+      contribs: 'coverArtistContribs',
+      artworks: 'coverArtworks',
     }),
 
     raiseOutputWithoutDependency({
-      dependency: '#resolvedContribs',
-      mode: input.value('empty'),
+      dependency: '#hasArtwork',
+      mode: input.value('falsy'),
       output: input.value({'#coverArtDate': null}),
     }),
 
