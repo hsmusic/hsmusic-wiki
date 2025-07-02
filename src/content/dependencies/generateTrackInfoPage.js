@@ -387,16 +387,20 @@ export default {
           (data.singleTrackSingle
             ? [
                 {auto: 'home'},
-                {html: relations.albumNavLink},
+                {
+                  html: relations.albumNavLink,
+                  accent:
+                    relations.albumNavAccent.slots({
+                      showTrackNavigation: false,
+                      showExtraLinks: true,
+                    }),
+                },
               ]
             : html.resolve(relations.navLinks)),
 
         navBottomRowContent:
           (data.singleTrackSingle
-            ? relations.albumNavAccent.slots({
-                showTrackNavigation: false,
-                showExtraLinks: true,
-              })
+            ? null
             : relations.albumNavAccent.slots({
                 showTrackNavigation: true,
                 showExtraLinks: false,
