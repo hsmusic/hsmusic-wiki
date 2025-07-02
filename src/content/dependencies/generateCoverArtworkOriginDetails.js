@@ -50,6 +50,10 @@ export default {
 
     artworkThingType:
       query.artworkThingType,
+
+    forSingleStyleAlbum:
+      query.artworkThingType === 'album' &&
+      artwork.thing.style === 'single',
   }),
 
   generate: (data, relations, {html, language, pagePath}) =>
@@ -98,6 +102,7 @@ export default {
           const trackArtFromAlbum =
             pagePath[0] === 'track' &&
             data.artworkThingType === 'album' &&
+            !data.forSingleStyleAlbum &&
               language.$(capsule, 'trackArtFromAlbum', {
                 album:
                   relations.albumLink.slot('color', false),
