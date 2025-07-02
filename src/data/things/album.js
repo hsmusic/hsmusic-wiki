@@ -576,7 +576,7 @@ export class Album extends Thing {
 
       // General configuration
 
-      'Count Tracks In Artist Totals': {property: 'countInArtistTotals'},
+      'Count Tracks In Artist Totals': {property: 'countTracksInArtistTotals'},
 
       'Has Track Numbers': {property: 'hasTrackNumbers'},
       'Listed on Homepage': {property: 'isListedOnHomepage'},
