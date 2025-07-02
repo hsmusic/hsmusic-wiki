@@ -48,6 +48,9 @@ export default {
     navLinks:
       relation('generateTrackNavLinks', track),
 
+    albumNavLink:
+      relation('linkAlbum', track.album),
+
     albumNavAccent:
       relation('generateAlbumNavAccent', track.album, track),
 
@@ -125,6 +128,10 @@ export default {
 
     color:
       track.color,
+
+    singleTrackSingle:
+      track.album.style === 'single' &&
+      track.album.tracks.length === 1,
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -376,17 +383,28 @@ export default {
         ],
 
         navLinkStyle: 'hierarchical',
-        navLinks: html.resolve(relations.navLinks),
+        navLinks:
+          (data.singleTrackSingle
+            ? [
+                {auto: 'home'},
+                {html: relations.albumNavLink},
+              ]
+            : html.resolve(relations.navLinks)),
 
         navBottomRowContent:
-          relations.albumNavAccent.slots({
-            showTrackNavigation: true,
-            showExtraLinks: false,
-          }),
+          (data.singleTrackSingle
+            ? relations.albumNavAccent.slots({
+                showTrackNavigation: false,
+                showExtraLinks: true,
+              })
+            : relations.albumNavAccent.slots({
+                showTrackNavigation: true,
+                showExtraLinks: false,
+              })),
 
         secondaryNav:
           relations.secondaryNav
-            .slot('mode', 'track'),
+            .slot('mode', data.singleTrackSingle ? 'album' : 'track'),
 
         leftSidebar: relations.sidebar,
 

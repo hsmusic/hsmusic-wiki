@@ -108,24 +108,29 @@ export default {
         : null),
   }),
 
-  data: (_query, _sprawl, _album, track) => ({
+  data: (_query, _sprawl, album, track) => ({
     isAlbumPage: !track,
     isTrackPage: !!track,
+
+    albumStyle: album.style,
   }),
 
   generate(data, relations, {html}) {
+    const presentGroupsLikeAlbum =
+      data.isAlbumPage ||
+      data.albumStyle === 'single';
+
     for (const box of [
       ...relations.groupBoxes,
       ...relations.seriesBoxes.flat(),
       ...relations.disconnectedSeriesBoxes,
     ]) {
-      box.setSlot('mode',
-        data.isAlbumPage ? 'album' : 'track');
+      box.setSlot('mode', presentGroupsLikeAlbum ? 'album' : 'track');
     }
 
     return relations.sidebar.slots({
       boxes: [
-        data.isAlbumPage && [
+        presentGroupsLikeAlbum && [
           relations.disconnectedSeriesBoxes,
 
           stitchArrays({
@@ -150,7 +155,7 @@ export default {
         data.isTrackPage &&
           relations.laterTrackReleaseBoxes,
 
-        data.isTrackPage &&
+        !presentGroupsLikeAlbum &&
           relations.conjoinedBox.slots({
             attributes: {class: 'conjoined-group-sidebar-box'},
             boxes:

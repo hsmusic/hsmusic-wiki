@@ -22,10 +22,12 @@ export default {
       !empty(trackSection.tracks);
 
     data.isTrackPage = !!track;
+    data.albumStyle = album.style;
 
     data.name = trackSection.name;
     data.color = trackSection.color;
     data.isDefaultTrackSection = trackSection.isDefaultTrackSection;
+    data.hasSiblingSections = album.trackSections.length > 1;
 
     data.firstTrackNumber =
       (data.hasTrackNumbers
@@ -115,6 +117,21 @@ export default {
                   : trackLink),
             })));
 
+    const list =
+      (data.hasTrackNumbers
+        ? html.tag('ol',
+            {start: data.firstTrackNumber},
+            trackListItems)
+        : html.tag('ul', trackListItems));
+
+    if (data.albumStyle === 'single' && !data.hasSiblingSections) {
+      if (trackListItems.length <= 1) {
+        return html.blank();
+      } else {
+        return list;
+      }
+    }
+
     return html.tag('details',
       data.includesCurrentTrack &&
         {class: 'current'},
@@ -157,11 +174,7 @@ export default {
                 return language.$(workingCapsule, workingOptions);
               })))),
 
-        (data.hasTrackNumbers
-          ? html.tag('ol',
-              {start: data.firstTrackNumber},
-              trackListItems)
-          : html.tag('ul', trackListItems)),
+        list,
       ]);
   },
 };

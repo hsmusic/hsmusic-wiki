@@ -8,15 +8,22 @@ export function targets({wikiData}) {
 
 export function pathsForTarget(album) {
   return [
-    {
-      type: 'page',
-      path: ['album', album.directory],
+    (album.style === 'single'
+      ? {
+          type: 'redirect',
+          fromPath: ['album', album.directory],
+          toPath: ['track', album.tracks[0].directory],
+          title: album.name,
+        }
+      : {
+          type: 'page',
+          path: ['album', album.directory],
 
-      contentFunction: {
-        name: 'generateAlbumInfoPage',
-        args: [album],
-      },
-    },
+          contentFunction: {
+            name: 'generateAlbumInfoPage',
+            args: [album],
+          },
+        }),
 
     {
       type: 'page',

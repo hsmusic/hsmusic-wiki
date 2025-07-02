@@ -19,12 +19,18 @@ export default {
         relation('generateAlbumSidebarTrackSection', album, track, trackSection)),
   }),
 
-  generate: (relations, {html}) =>
+  data: (album) => ({
+    albumStyle: album.style,
+  }),
+
+  generate: (data, relations, {html}) =>
     relations.box.slots({
       attributes: {class: 'track-list-sidebar-box'},
 
       content: [
-        html.tag('h1', relations.albumLink),
+        html.tag('h1', {[html.onlyIfSiblings]: true},
+          relations.albumLink),
+
         relations.trackSections,
       ],
     })

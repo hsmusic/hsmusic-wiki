@@ -1,8 +1,12 @@
 export default {
-  contentDependencies: ['linkThing'],
+  contentDependencies: ['linkThing', 'linkTrack'],
 
-  relations: (relation, album) =>
-    ({link: relation('linkThing', 'localized.album', album)}),
+  relations: (relation, album) => ({
+    link:
+      (album.style === 'single'
+        ? relation('linkTrack', album.tracks[0])
+        : relation('linkThing', 'localized.album', album)),
+  }),
 
   generate: (relations) => relations.link,
 };

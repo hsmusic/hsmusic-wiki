@@ -10,7 +10,7 @@ import {traverse} from '#node-utils';
 import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {empty} from '#sugar';
 import Thing from '#thing';
-import {isColor, isDate, isDirectory, isNumber} from '#validators';
+import {is, isColor, isDate, isDirectory, isNumber} from '#validators';
 
 import {
   parseAdditionalFiles,
@@ -25,11 +25,16 @@ import {
   parseWallpaperParts,
 } from '#yaml';
 
-import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
-  from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
 import {exitWithoutArtwork, withDirectory, withHasArtwork}
   from '#composite/wiki-data';
+
+import {
+  exitWithoutDependency,
+  exposeConstant,
+  exposeDependency,
+  exposeUpdateValueOrContinue,
+} from '#composite/control-flow';
 
 import {
   color,
@@ -101,6 +106,19 @@ export class Album extends Thing {
     alwaysReferenceByDirectory: flag(false),
     alwaysReferenceTracksByDirectory: flag(false),
     suffixTrackDirectories: flag(false),
+
+    style: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(is(...[
+          'album',
+          'single',
+        ])),
+      }),
+
+      exposeConstant({
+        value: input.value('album'),
+      }),
+    ],
 
     bandcampAlbumIdentifier: simpleString(),
     bandcampArtworkIdentifier: simpleString(),
@@ -541,6 +559,7 @@ export class Album extends Thing {
       'Suffix Track Directories': {property: 'suffixTrackDirectories'},
       'Always Reference By Directory': {property: 'alwaysReferenceByDirectory'},
       'Always Reference Tracks By Directory': {property: 'alwaysReferenceTracksByDirectory'},
+      'Style': {property: 'style'},
 
       'Bandcamp Album ID': {
         property: 'bandcampAlbumIdentifier',
