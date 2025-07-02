@@ -3434,15 +3434,12 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   grid-template-columns: 1fr min(40%, 90px);
 }
 
-.content-sticky-heading-root.has-cover {
-  padding-right: min(40%, 400px);
-}
-
 .content-sticky-heading-row h1 {
   position: relative;
   margin: 0;
   padding-right: 20px;
   line-height: 1.4;
+  overflow-x: hidden;
 }
 
 .content-sticky-heading-row h1 .reference-collapsed-heading {
@@ -3582,7 +3579,9 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 }
 
 #content, .sidebar {
-  contain: paint;
+  /* In the year of our pizza 2025, we try commenting this out.
+   */
+  /*contain: paint;*/
 }
 
 /* Sticky sidebar */
