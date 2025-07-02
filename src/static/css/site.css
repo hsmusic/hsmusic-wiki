@@ -1840,6 +1840,29 @@ p.image-details.origin-details .origin-details {
   margin-top: 0.25em;
 }
 
+.lyrics-entry {
+  clip-path: inset(-15px -20px);
+}
+
+.lyrics-entry::after {
+  content: "";
+  pointer-events: none;
+  display: block;
+
+  /* Slight stretching past the bottom of the screen seems
+   * to make resizing the window (and "revealing" that area)
+   * a bit smoother.
+   */
+  position: fixed;
+  bottom: -20px;
+  left: 0;
+  right: 0;
+
+  height: calc(20px + min(90px, 13.5vh));
+  background: linear-gradient(to bottom, transparent, black 70%, black);
+  opacity: 0.6;
+}
+
 .js-hide,
 .js-show-once-data,
 .js-hide-once-data {
