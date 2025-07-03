@@ -48,6 +48,7 @@ export default {
                         showAnnotation: slots.showAnnotation,
                         trimAnnotation: true,
                         preventTooltip: true,
+                        preventWrapping: true,
                       }))),
                 }),
           }),

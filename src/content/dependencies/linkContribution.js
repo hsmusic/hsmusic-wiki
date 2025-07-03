@@ -30,7 +30,7 @@ export default {
 
     trimAnnotation: {type: 'boolean', default: false},
 
-    preventWrapping: {type: 'boolean', default: true},
+    preventWrapping: {type: 'boolean', default: false},
     preventTooltip: {type: 'boolean', default: false},
 
     chronologyKind: {type: 'string'},
