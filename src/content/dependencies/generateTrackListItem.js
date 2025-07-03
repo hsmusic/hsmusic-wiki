@@ -97,9 +97,7 @@ export default {
             workingCapsule += '.withArtists';
             workingOptions.by =
               html.tag('span', {class: 'by'},
-                // TODO: This is obviously evil.
-                html.metatag('chunkwrap', {split: /,| (?=and)/},
-                  html.resolve(relations.credit)));
+                relations.credit);
           }
 
           return language.$(workingCapsule, workingOptions);

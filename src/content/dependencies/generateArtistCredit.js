@@ -162,33 +162,42 @@ export default {
       (slots.showAnnotation && data.normalContributionAnnotationsDifferFromContext) ||
       (data.normalContributionArtistsDifferFromContext);
 
+    let content;
+
     if (empty(relations.featuringContributionLinks)) {
       if (effectivelyDiffers) {
-        return language.$(slots.normalStringKey, {
-          ...slots.additionalStringOptions,
-          artists: artistsList,
-        });
+        content =
+          language.$(slots.normalStringKey, {
+            ...slots.additionalStringOptions,
+            artists: artistsList,
+          });
       } else {
         return html.blank();
       }
-    }
-
-    if (effectivelyDiffers && slots.normalFeaturingStringKey) {
-      return language.$(slots.normalFeaturingStringKey, {
-        ...slots.additionalStringOptions,
-        artists: artistsList,
-        featuring: featuringList,
+    } else if (effectivelyDiffers && slots.normalFeaturingStringKey) {
+      content =
+        language.$(slots.normalFeaturingStringKey, {
+          ...slots.additionalStringOptions,
+          artists: artistsList,
+          featuring: featuringList,
       });
     } else if (slots.featuringStringKey) {
-      return language.$(slots.featuringStringKey, {
-        ...slots.additionalStringOptions,
-        artists: featuringList,
-      });
+      content =
+        language.$(slots.featuringStringKey, {
+          ...slots.additionalStringOptions,
+          artists: featuringList,
+        });
     } else {
-      return language.$(slots.normalStringKey, {
-        ...slots.additionalStringOptions,
-        artists: everyoneList,
-      });
+      content =
+        language.$(slots.normalStringKey, {
+          ...slots.additionalStringOptions,
+          artists: everyoneList,
+        });
     }
+
+    // TODO: This is obviously evil.
+    return (
+      html.metatag('chunkwrap', {split: /,| (?=and)/},
+        html.resolve(content)));
   },
 };
