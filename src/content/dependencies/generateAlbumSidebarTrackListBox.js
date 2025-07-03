@@ -19,10 +19,6 @@ export default {
         relation('generateAlbumSidebarTrackSection', album, track, trackSection)),
   }),
 
-  data: (album) => ({
-    albumStyle: album.style,
-  }),
-
   generate: (data, relations, {html}) =>
     relations.box.slots({
       attributes: {class: 'track-list-sidebar-box'},
