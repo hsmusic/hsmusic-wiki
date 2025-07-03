@@ -14,7 +14,7 @@ export default {
       wikiInfo.divideTrackListsByGroups,
   }),
 
-  query(sprawl, tracks) {
+  query(sprawl, tracks, _contextTrack) {
     const dividingGroups = sprawl.divideTrackListsByGroups;
 
     const groupings = new Map();
@@ -50,10 +50,10 @@ export default {
     return {groups, groupedTracks, ungroupedTracks};
   },
 
-  relations: (relation, query, sprawl, tracks) => ({
+  relations: (relation, query, sprawl, tracks, contextTrack) => ({
     flatList:
       (empty(sprawl.divideTrackListsByGroups)
-        ? relation('generateTrackList', tracks)
+        ? relation('generateTrackList', tracks, contextTrack)
         : null),
 
     contentHeading:
@@ -65,12 +65,12 @@ export default {
 
     groupedTrackLists:
       query.groupedTracks
-        .map(tracks => relation('generateTrackList', tracks)),
+        .map(tracks => relation('generateTrackList', tracks, contextTrack)),
 
     ungroupedTrackList:
       (empty(query.ungroupedTracks)
         ? null
-        : relation('generateTrackList', query.ungroupedTracks)),
+        : relation('generateTrackList', query.ungroupedTracks, contextTrack)),
   }),
 
   data: (query, _sprawl, _tracks) => ({

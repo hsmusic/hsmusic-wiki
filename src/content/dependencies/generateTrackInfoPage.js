@@ -82,18 +82,20 @@ export default {
       relation('generateContributionList', track.contributorContribs),
 
     referencedTracksList:
-      relation('generateTrackList', track.referencedTracks),
+      relation('generateTrackList', track.referencedTracks, track),
 
     sampledTracksList:
-      relation('generateTrackList', track.sampledTracks),
+      relation('generateTrackList', track.sampledTracks, track),
 
     referencedByTracksList:
       relation('generateTrackListDividedByGroups',
-        query.mainReleaseTrack.referencedByTracks),
+        query.mainReleaseTrack.referencedByTracks,
+        track),
 
     sampledByTracksList:
       relation('generateTrackListDividedByGroups',
-        query.mainReleaseTrack.sampledByTracks),
+        query.mainReleaseTrack.sampledByTracks,
+        track),
 
     flashesThatFeatureList:
       relation('generateTrackInfoPageFeaturedByFlashesList', track),
