@@ -142,6 +142,9 @@ export default {
     color:
       track.color,
 
+    dateAlbumAddedToWiki:
+      track.album.dateAddedToWiki,
+
     singleTrackSingle:
       query.singleTrackSingle,
 
@@ -341,6 +344,15 @@ export default {
 
             relations.flashesThatFeatureList,
           ]),
+
+          data.firstTrackInSingle &&
+            html.tag('p',
+              {[html.onlyIfContent]: true},
+
+              language.$('releaseInfo.addedToWiki', {
+                [language.onlyIfOptions]: ['date'],
+                date: language.formatDate(data.dateAlbumAddedToWiki),
+              })),
 
           data.firstTrackInSingle &&
           (!html.isBlank(relations.lyricsSection) ||

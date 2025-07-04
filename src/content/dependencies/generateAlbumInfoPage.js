@@ -174,14 +174,11 @@ export default {
 
           html.tag('p',
             {[html.onlyIfContent]: true},
-            {[html.joinChildren]: html.tag('br')},
 
-            language.encapsulate('releaseInfo', capsule => [
-              language.$(capsule, 'addedToWiki', {
-                [language.onlyIfOptions]: ['date'],
-                date: language.formatDate(data.dateAddedToWiki),
-              }),
-            ])),
+            language.$('releaseInfo.addedToWiki', {
+              [language.onlyIfOptions]: ['date'],
+              date: language.formatDate(data.dateAddedToWiki),
+            })),
 
           (!html.isBlank(relations.artistCommentaryEntries) ||
            !html.isBlank(relations.creditSourceEntries))
