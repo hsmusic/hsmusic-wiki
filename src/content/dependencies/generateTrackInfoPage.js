@@ -33,6 +33,14 @@ export default {
       (track.isMainRelease
         ? track
         : track.mainReleaseTrack),
+
+    singleTrackSingle:
+      track.album.style === 'single' &&
+      track.album.tracks.length === 1,
+
+    firstTrackInSingle:
+      track.album.style === 'single' &&
+      track === track.album.tracks[0],
   }),
 
   relations: (relation, query, track) => ({
@@ -124,7 +132,7 @@ export default {
         .map(entry => relation('generateCommentaryEntry', entry)),
   }),
 
-  data: (_query, track) => ({
+  data: (query, track) => ({
     name:
       track.name,
 
@@ -132,8 +140,10 @@ export default {
       track.color,
 
     singleTrackSingle:
-      track.album.style === 'single' &&
-      track.album.tracks.length === 1,
+      query.singleTrackSingle,
+
+    firstTrackInSingle:
+      query.firstTrackInSingle,
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -330,6 +340,12 @@ export default {
           ]),
 
           relations.lyricsSection,
+
+          data.firstTrackInSingle &&
+          (!html.isBlank(relations.artistCommentaryEntries) ||
+           !html.isBlank(relations.creditingSourceEntries) ||
+           !html.isBlank(relations.referencingSourceEntries)) &&
+            html.tag('hr', {class: 'main-separator'}),
 
           html.tags([
             relations.contentHeading.clone()
