@@ -342,13 +342,14 @@ export default {
             relations.flashesThatFeatureList,
           ]),
 
-          relations.lyricsSection,
-
           data.firstTrackInSingle &&
-          (!html.isBlank(relations.artistCommentaryEntries) ||
+          (!html.isBlank(relations.lyricsSection) ||
+           !html.isBlank(relations.artistCommentaryEntries) ||
            !html.isBlank(relations.creditingSourceEntries) ||
            !html.isBlank(relations.referencingSourceEntries)) &&
             html.tag('hr', {class: 'main-separator'}),
+
+          relations.lyricsSection,
 
           html.tags([
             relations.contentHeading.clone()
