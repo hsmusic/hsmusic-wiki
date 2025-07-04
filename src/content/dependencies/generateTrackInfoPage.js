@@ -410,11 +410,7 @@ export default {
                 {auto: 'home'},
                 {
                   html: relations.albumNavLink,
-                  accent:
-                    relations.albumNavAccent.slots({
-                      showTrackNavigation: false,
-                      showExtraLinks: true,
-                    }),
+                  accent: language.$(pageCapsule, 'nav.singleAccent'),
                 },
               ]
             : html.resolve(relations.navLinks)),

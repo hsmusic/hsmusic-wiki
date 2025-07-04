@@ -2462,6 +2462,8 @@ trackPage:
 
     backToTrack: "Return to track page"
 
+    singleAccent: "single"
+
     track:
       _: "{TRACK}"
       withNumber: "{NUMBER}. {TRACK}"
