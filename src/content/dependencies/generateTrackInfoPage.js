@@ -2,6 +2,7 @@ export default {
   contentDependencies: [
     'generateAdditionalFilesList',
     'generateAdditionalNamesBox',
+    'generateAlbumArtworkColumn',
     'generateAlbumNavAccent',
     'generateAlbumSecondaryNav',
     'generateAlbumSidebar',
@@ -72,7 +73,9 @@ export default {
       relation('generateAdditionalNamesBox', track.additionalNames),
 
     artworkColumn:
-      relation('generateTrackArtworkColumn', track),
+      (query.firstTrackInSingle
+        ? relation('generateAlbumArtworkColumn', track.album)
+        : relation('generateTrackArtworkColumn', track)),
 
     contentHeading:
       relation('generateContentHeading'),
