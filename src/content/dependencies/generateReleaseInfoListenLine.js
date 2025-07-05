@@ -35,6 +35,15 @@ export default {
         ? thing.album
         : thing);
 
+    query.urls =
+      (!empty(thing.urls)
+        ? thing.urls
+     : thing.album &&
+       thing.album.style === 'single' &&
+       thing.album.tracks[0] === thing
+        ? thing.album.urls
+        : []);
+
     query.artists =
       thing.artistContribs
         .map(contrib => contrib.artist);
@@ -56,9 +65,9 @@ export default {
     return query;
   },
 
-  relations: (relation, _query, thing) => ({
+  relations: (relation, query, _thing) => ({
     links:
-      thing.urls.map(url => relation('linkExternal', url)),
+      query.urls.map(url => relation('linkExternal', url)),
   }),
 
   data(query, thing) {
@@ -85,7 +94,7 @@ export default {
       });
 
     let releaseContexts =
-      thing.urls.map(boundGetReleaseContext);
+      query.urls.map(boundGetReleaseContext);
 
     const albumReleaseContexts =
       query.album.urls.map(boundGetReleaseContext);
@@ -101,7 +110,7 @@ export default {
       presentAlbumReleaseContexts.length <= 1
     ) {
       releaseContexts =
-        thing.urls.map(() => null);
+        query.urls.map(() => null);
     }
 
     data.releaseContexts = releaseContexts;
