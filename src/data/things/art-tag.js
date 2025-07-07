@@ -1,6 +1,9 @@
-export const ART_TAG_DATA_FILE = 'tags.yaml';
+export const DATA_ART_TAGS_DIRECTORY = 'art-tags';
+
+import * as path from 'node:path';
 
 import {input} from '#composite';
+import {traverse} from '#node-utils';
 import {sortAlphabetically} from '#sort';
 import Thing from '#thing';
 import {unique} from '#sugar';
@@ -184,13 +187,18 @@ export class ArtTag extends Thing {
   };
 
   static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {allInOne},
+    documentModes: {allTogether},
     thingConstructors: {ArtTag},
   }) => ({
     title: `Process art tags file`,
-    file: ART_TAG_DATA_FILE,
 
-    documentMode: allInOne,
+    files: dataPath =>
+      traverse(path.join(dataPath, DATA_ART_TAGS_DIRECTORY), {
+        filterFile: name => path.extname(name) === '.yaml',
+        prefixPath: DATA_ART_TAGS_DIRECTORY,
+      }),
+
+    documentMode: allTogether,
     documentThing: ArtTag,
 
     save: (results) => ({artTagData: results}),
