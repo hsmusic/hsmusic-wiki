@@ -1009,6 +1009,12 @@ export const documentModes = {
   // array of processed documents (wiki objects).
   allInOne: Symbol('Document mode: allInOne'),
 
+  // allTogether: One or more documens, spread across any number of files.
+  // Expects files array (or function) and processDocument function.
+  // Calls save with an array of processed documents (wiki objects) - this is
+  // a flat array, *not* an array of the documents processed from *each* file.
+  allTogether: Symbol('Document mode: allTogether'),
+
   // oneDocumentTotal: Just a single document, represented in one file.
   // Expects file string (or function) and processDocument function. Calls
   // save with the single processed wiki document (data object).
@@ -1119,6 +1125,7 @@ export async function getFilesFromDataStep(dataStep, {dataPath}) {
       }
     }
 
+    case documentModes.allTogether:
     case documentModes.headerAndEntries:
     case documentModes.onePerFile: {
       if (!dataStep.files) {
@@ -1274,7 +1281,8 @@ export function processThingsFromDataStep(documents, dataStep) {
   const {documentMode} = dataStep;
 
   switch (documentMode) {
-    case documentModes.allInOne: {
+    case documentModes.allInOne:
+    case documentModes.allTogether: {
       const result = [];
       const aggregate = openAggregate({message: `Errors processing documents`});
 
@@ -1547,6 +1555,10 @@ export function saveThingsFromDataStep(thingLists, dataStep) {
           : thingLists[0]);
 
       return dataStep.save(thing);
+    }
+
+    case documentModes.allTogether: {
+      return dataStep.save(thingLists.flat());
     }
 
     case documentModes.headerAndEntries:
