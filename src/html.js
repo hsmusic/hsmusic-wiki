@@ -1968,16 +1968,10 @@ export class Template {
     return this.content.toString();
   }
 
-  static resolve(tagOrTemplate) {
+  static resolve(content) {
     // Flattens contents of a template, recursively "resolving" until a
     // non-template is ready (or just returns a provided non-template
     // argument as-is).
-
-    if (!(tagOrTemplate instanceof Template)) {
-      return tagOrTemplate;
-    }
-
-    let {content} = tagOrTemplate;
 
     while (content instanceof Template) {
       content = content.content;
@@ -1986,7 +1980,7 @@ export class Template {
     return content;
   }
 
-  static resolveForSlots(tagOrTemplate, slots) {
+  static resolveForSlots(content, slots) {
     if (!slots || typeof slots !== 'object') {
       throw new Error(
         `Expected slots to be an object or array, ` +
@@ -1994,18 +1988,18 @@ export class Template {
     }
 
     if (!Array.isArray(slots)) {
-      return Template.resolveForSlots(tagOrTemplate, Object.keys(slots)).slots(slots);
+      return Template.resolveForSlots(content, Object.keys(slots)).slots(slots);
     }
 
-    while (tagOrTemplate && tagOrTemplate instanceof Template) {
+    while (content instanceof Template) {
       try {
         for (const slot of slots) {
-          tagOrTemplate.getSlotDescription(slot);
+          content.getSlotDescription(slot);
         }
 
-        return tagOrTemplate;
+        return content;
       } catch {
-        tagOrTemplate = tagOrTemplate.content;
+        content = content.content;
       }
     }
 
