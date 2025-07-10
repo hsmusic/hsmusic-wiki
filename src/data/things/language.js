@@ -387,26 +387,24 @@ export class Language extends Thing {
 
       partInProgress += template.slice(lastIndex, match.index);
 
-      // Sanitize string arguments in particular. These are taken to come from
-      // (raw) data and may include special characters that aren't meant to be
-      // rendered as HTML markup.
-      const sanitizedInsertion =
-        this.#sanitizeValueForInsertion(insertion);
+      for (const insertionItem of html.smush(insertion).content) {
+        // Sanitize string arguments in particular. These are taken to come from
+        // (raw) data and may include special characters that aren't meant to be
+        // rendered as HTML markup.
+        // (XXX: This actually sanitizes every value, stringifying numbers
+        //  and booleans also. We haven't checked what impact that has.)
+        const sanitizedInsertionItem =
+          this.#sanitizeValueForInsertion(insertionItem);
 
-      if (typeof sanitizedInsertion === 'string') {
-        // Join consecutive strings together.
-        partInProgress += sanitizedInsertion;
-      } else if (
-        sanitizedInsertion instanceof html.Tag &&
-        sanitizedInsertion.contentOnly
-      ) {
-        // Collapse string-only tag contents onto the current string part.
-        partInProgress += sanitizedInsertion.toString();
-      } else {
-        // Push the string part in progress, then the insertion as-is.
-        outputParts.push(partInProgress);
-        outputParts.push(sanitizedInsertion);
-        partInProgress = '';
+        if (typeof sanitizedInsertionItem === 'string') {
+          // Join consecutive strings together.
+          partInProgress += sanitizedInsertionItem;
+        } else {
+          // Push the string part in progress, then the insertion as-is.
+          outputParts.push(partInProgress);
+          outputParts.push(sanitizedInsertionItem);
+          partInProgress = '';
+        }
       }
 
       lastIndex = match.index + match[0].length;
