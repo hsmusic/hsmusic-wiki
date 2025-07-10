@@ -1315,6 +1315,15 @@ li:not(:first-child:last-child) .tooltip:where(:not(.cover-artwork .tooltip)),
   height: 1.4em;
 }
 
+.contribution-tooltip .chronology-heading {
+  grid-column-start: handle-start;
+  grid-column-end: platform-end;
+
+  font-size: 0.85em;
+  font-style: oblique;
+  margin-bottom: 2px;
+}
+
 .contribution-tooltip .chronology-link {
   display: grid;
   grid-column-start: icon-start;

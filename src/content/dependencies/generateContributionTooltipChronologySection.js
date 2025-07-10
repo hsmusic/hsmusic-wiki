@@ -49,12 +49,19 @@ export default {
   }),
 
   slots: {
+    heading: {type: 'html', mutable: false},
     kind: {type: 'string'},
   },
 
   generate: (data, relations, slots, {html, language}) =>
     language.encapsulate('misc.artistLink.chronology', capsule =>
       html.tags([
+        html.tag('span', {class: 'chronology-heading'},
+          {[html.onlyIfContent]: true},
+          {[html.onlyIfSiblings]: true},
+
+          slots.heading),
+
         html.tags([
           relations.previousLink?.slots({
             attributes: {class: 'chronology-link'},
