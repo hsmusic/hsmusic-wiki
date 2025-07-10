@@ -1,5 +1,3 @@
-import Thing from '#thing';
-
 export default {
   contentDependencies: [
     'generateArtistCredit',
@@ -11,9 +9,6 @@ export default {
   extraDependencies: ['html', 'language', 'pagePath'],
 
   query: (artwork) => ({
-    artworkThingType:
-      artwork.thing.constructor[Thing.referenceType],
-
     attachedArtistContribs:
       (artwork.attachedArtwork
         ? artwork.attachedArtwork.artistContribs
@@ -33,7 +28,7 @@ export default {
       relation('transformContent', artwork.originDetails),
 
     albumLink:
-      (query.artworkThingType === 'album'
+      (artwork.thing.isAlbum
         ? relation('linkAlbum', artwork.thing)
         : null),
 
@@ -48,11 +43,11 @@ export default {
     label:
       artwork.label,
 
-    artworkThingType:
-      query.artworkThingType,
+    forAlbum:
+      artwork.thing.isAlbum,
 
     forSingleStyleAlbum:
-      query.artworkThingType === 'album' &&
+      artwork.thing.isAlbum &&
       artwork.thing.style === 'single',
   }),
 
@@ -101,7 +96,7 @@ export default {
 
           const trackArtFromAlbum =
             pagePath[0] === 'track' &&
-            data.artworkThingType === 'album' &&
+            data.forAlbum &&
             !data.forSingleStyleAlbum &&
               language.$(capsule, 'trackArtFromAlbum', {
                 album:

@@ -6,19 +6,15 @@ export default {
     'linkTrack',
   ],
 
-  query: (thing) => ({
-    referenceType: thing.constructor[Symbol.for('Thing.referenceType')],
-  }),
-
-  relations: (relation, query, thing) => ({
+  relations: (relation, thing) => ({
     link:
-      (query.referenceType === 'album'
+      (thing.isAlbum
         ? relation('linkAlbum', thing)
-     : query.referenceType === 'artwork'
+     : thing.isArtwork
         ? relation('linkArtwork', thing)
-     : query.referenceType === 'flash'
+     : thing.isFlash
         ? relation('linkFlash', thing)
-     : query.referenceType === 'track'
+     : thing.isTrack
         ? relation('linkTrack', thing)
         : null),
   }),

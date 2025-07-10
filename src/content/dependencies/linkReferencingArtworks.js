@@ -1,21 +1,14 @@
-import Thing from '#thing';
-
 export default {
   contentDependencies: [
     'linkAlbumReferencingArtworks',
     'linkTrackReferencingArtworks',
   ],
 
-  query: (artwork) => ({
-    referenceType:
-      artwork.thing.constructor[Thing.referenceType],
-  }),
-
-  relations: (relation, query, artwork) => ({
+  relations: (relation, artwork) => ({
     link:
-      (query.referenceType === 'album'
+      (artwork.thing.isAlbum
         ? relation('linkAlbumReferencingArtworks', artwork.thing)
-     : query.referenceType === 'track'
+     : artwork.thing.isTrack
         ? relation('linkTrackReferencingArtworks', artwork.thing)
         : null),
   }),

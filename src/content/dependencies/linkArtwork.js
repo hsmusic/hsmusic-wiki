@@ -1,16 +1,11 @@
 export default {
   contentDependencies: ['linkAlbum', 'linkTrack'],
 
-  query: (artwork) => ({
-    referenceType:
-      artwork.thing.constructor[Symbol.for('Thing.referenceType')],
-  }),
-
-  relations: (relation, query, artwork) => ({
+  relations: (relation, artwork) => ({
     link:
-      (query.referenceType === 'album'
+      (artwork.thing.isAlbum
         ? relation('linkAlbum', artwork.thing)
-     : query.referenceType === 'track'
+     : artwork.thing.isTrack
         ? relation('linkTrack', artwork.thing)
         : null),
   }),

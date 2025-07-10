@@ -1,13 +1,9 @@
-import Thing from '#thing';
-
 function getName(thing) {
   if (!thing) {
     return null;
   }
 
-  const referenceType = thing.constructor[Thing.referenceType];
-
-  if (referenceType === 'artwork') {
+  if (thing.isArtwork) {
     return thing.thing.name;
   }
 
