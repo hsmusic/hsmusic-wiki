@@ -10,23 +10,27 @@ function getName(thing) {
   return thing.name;
 }
 
+function getSiblings(contribution) {
+  let previous = contribution;
+  while (previous && previous.thing === contribution.thing) {
+    previous = previous.previousBySameArtist;
+  }
+
+  let next = contribution;
+  while (next && next.thing === contribution.thing) {
+    next = next.nextBySameArtist;
+  }
+
+  return {previous, next};
+}
+
 export default {
   contentDependencies: ['linkAnythingMan'],
   extraDependencies: ['html', 'language'],
 
-  query(contribution) {
-    let previous = contribution;
-    while (previous && previous.thing === contribution.thing) {
-      previous = previous.previousBySameArtist;
-    }
-
-    let next = contribution;
-    while (next && next.thing === contribution.thing) {
-      next = next.nextBySameArtist;
-    }
-
-    return {previous, next};
-  },
+  query: (contribution) => ({
+    ...getSiblings(contribution),
+  }),
 
   relations: (relation, query, _contribution) => ({
     previousLink:

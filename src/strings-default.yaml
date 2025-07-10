@@ -564,6 +564,10 @@ misc:
     noExternalLinkPlatformName: "Other"
 
     chronology:
+      heading:
+        artistReleases: "Releases by {ARTIST}:"
+        artistTracks: "Tracks by {ARTIST}:"
+
       previous:
         symbol: "←"
         info:
@@ -581,6 +585,7 @@ misc:
         bannerArt: "banner art"
         coverArt: "cover art"
         flash: "flash"
+        release: "release"
         track: "track"
         trackArt: "track art"
         trackContribution: "track contribution"
