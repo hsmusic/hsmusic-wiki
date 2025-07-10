@@ -8,6 +8,8 @@ import Thing from '#thing';
 import {is} from '#validators';
 import {parseAnnotatedReferences, parseSerieses} from '#yaml';
 
+import {exposeConstant} from '#composite/control-flow';
+
 import {
   annotatedReferenceList,
   color,
@@ -57,6 +59,12 @@ export class Group extends Thing {
     reverse: soupyFind(),
 
     // Expose only
+
+    isGroup: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
 
     descriptionShort: {
       flags: {expose: true},
@@ -227,6 +235,14 @@ export class GroupCategory extends Thing {
     // Update only
 
     find: soupyFind(),
+
+    // Expose only
+
+    isGroupCategory: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
   });
 
   static [Thing.reverseSpecs] = {

@@ -413,6 +413,12 @@ export class Track extends Thing {
 
     // > Expose only
 
+    isTrack: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
+
     commentatorArtists: commentatorArtists(),
 
     date: [

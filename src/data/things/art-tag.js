@@ -7,8 +7,12 @@ import {unique} from '#sugar';
 import {isName} from '#validators';
 import {parseAdditionalNames, parseAnnotatedReferences} from '#yaml';
 
-import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
-  from '#composite/control-flow';
+import {
+  exitWithoutDependency,
+  exposeConstant,
+  exposeDependency,
+  exposeUpdateValueOrContinue,
+} from '#composite/control-flow';
 
 import {
   annotatedReferenceList,
@@ -78,6 +82,12 @@ export class ArtTag extends Thing {
     reverse: soupyReverse(),
 
     // Expose only
+
+    isArtTag: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
 
     descriptionShort: [
       exitWithoutDependency({

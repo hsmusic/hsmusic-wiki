@@ -1,8 +1,9 @@
-import { Temporal, toTemporalInstant } from '@js-temporal/polyfill';
+import {Temporal, toTemporalInstant} from '@js-temporal/polyfill';
 
 import {withAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
 import {logWarn} from '#cli';
+import {input} from '#composite';
 import * as html from '#html';
 import {empty} from '#sugar';
 import {isLanguageCode} from '#validators';
@@ -16,6 +17,7 @@ import {
   isExternalLinkStyle,
 } from '#external-links';
 
+import {exposeConstant} from '#composite/control-flow';
 import {externalFunction, flag, name} from '#composite/wiki-properties';
 
 export const languageOptionRegex = /{(?<name>[A-Z0-9_]+)}/g;
@@ -126,6 +128,12 @@ export class Language extends Thing {
     escapeHTML: externalFunction(),
 
     // Expose only
+
+    isLanguage: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
 
     onlyIfOptions: {
       flags: {expose: true},

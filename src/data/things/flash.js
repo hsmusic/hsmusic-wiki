@@ -149,6 +149,12 @@ export class Flash extends Thing {
 
     // Expose only
 
+    isFlash: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
+
     commentatorArtists: commentatorArtists(),
 
     act: [
@@ -317,6 +323,12 @@ export class FlashAct extends Thing {
 
     // Expose only
 
+    isFlashAct: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
+
     side: [
       withFlashSide(),
       exposeDependency({dependency: '#flashSide'}),
@@ -372,6 +384,14 @@ export class FlashSide extends Thing {
     // Update only
 
     find: soupyFind(),
+
+    // Expose only
+
+    isFlashSide: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {

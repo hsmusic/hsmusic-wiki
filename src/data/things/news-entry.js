@@ -1,9 +1,11 @@
 export const NEWS_DATA_FILE = 'news.yaml';
 
+import {input} from '#composite';
 import {sortChronologically} from '#sort';
 import Thing from '#thing';
 import {parseDate} from '#yaml';
 
+import {exposeConstant} from '#composite/control-flow';
 import {contentString, directory, name, simpleDate}
   from '#composite/wiki-properties';
 
@@ -21,6 +23,12 @@ export class NewsEntry extends Thing {
     content: contentString(),
 
     // Expose only
+
+    isNewsEntry: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
 
     contentShort: {
       flags: {expose: true},

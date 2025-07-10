@@ -12,7 +12,7 @@ import {isName, validateArrayItems} from '#validators';
 import {getKebabCase} from '#wiki-data';
 import {parseArtwork} from '#yaml';
 
-import {exitWithoutDependency} from '#composite/control-flow';
+import {exitWithoutDependency, exposeConstant} from '#composite/control-flow';
 
 import {
   constitutibleArtwork,
@@ -75,6 +75,12 @@ export class Artist extends Thing {
     reverse: soupyReverse(),
 
     // Expose only
+
+    isArtist: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
 
     trackArtistContributions: reverseReferenceList({
       reverse: soupyReverse.input('trackArtistContributionsBy'),

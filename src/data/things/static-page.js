@@ -2,11 +2,13 @@ export const DATA_STATIC_PAGE_DIRECTORY = 'static-page';
 
 import * as path from 'node:path';
 
+import {input} from '#composite';
 import {traverse} from '#node-utils';
 import {sortAlphabetically} from '#sort';
 import Thing from '#thing';
 import {isName} from '#validators';
 
+import {exposeConstant} from '#composite/control-flow';
 import {contentString, directory, flag, name, simpleString}
   from '#composite/wiki-properties';
 
@@ -36,6 +38,14 @@ export class StaticPage extends Thing {
     content: contentString(),
 
     absoluteLinks: flag(),
+
+    // Expose only
+
+    isStaticPage: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
   });
 
   static [Thing.findSpecs] = {

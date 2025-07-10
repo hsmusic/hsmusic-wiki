@@ -323,6 +323,12 @@ export class Artwork extends Thing {
 
     // Expose only
 
+    isArtwork: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
+
     referencedByArtworks: reverseReferenceList({
       reverse: soupyReverse.input('artworksWhichReference'),
     }),

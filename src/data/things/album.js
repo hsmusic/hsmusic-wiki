@@ -357,13 +357,13 @@ export class Album extends Thing {
       class: input.value(CreditingSourcesEntry),
     }),
 
-    // Additional files
+    // > Update & expose - Additional files
 
     additionalFiles: thingList({
       class: input.value(AdditionalFile),
     }),
 
-    // Update only
+    // > Update only
 
     find: soupyFind(),
     reverse: soupyReverse(),
@@ -378,7 +378,13 @@ export class Album extends Thing {
       class: input.value(WikiInfo),
     }),
 
-    // Expose only
+    // > Expose only
+
+    isAlbum: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
 
     commentatorArtists: commentatorArtists(),
 
@@ -991,6 +997,12 @@ export class TrackSection extends Thing {
     reverse: soupyReverse(),
 
     // Expose only
+
+    isTrackSection: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
 
     directory: [
       withAlbum(),

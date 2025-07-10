@@ -144,6 +144,12 @@ export class Contribution extends Thing {
 
     // Expose only
 
+    isContribution: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
+
     context: [
       withContributionContext(),
 

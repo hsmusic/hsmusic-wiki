@@ -13,7 +13,7 @@ import {
   isURL,
 } from '#validators';
 
-import {exitWithoutDependency} from '#composite/control-flow';
+import {exitWithoutDependency, exposeConstant} from '#composite/control-flow';
 
 import {
   contentString,
@@ -119,6 +119,14 @@ export class WikiInfo extends Thing {
         default: false,
       },
     },
+
+    // Expose only
+
+    isWikiInfo: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {

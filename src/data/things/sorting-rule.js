@@ -3,6 +3,7 @@ export const SORTING_RULE_DATA_FILE = 'sorting-rules.yaml';
 import {readFile, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
+import {input} from '#composite';
 import {chunkByProperties, compareArrays, unique} from '#sugar';
 import Thing from '#thing';
 import {isObject, isStringNonEmpty, anyOf, strictArrayOf} from '#validators';
@@ -21,6 +22,7 @@ import {
   reorderDocumentsInYAMLSourceText,
 } from '#yaml';
 
+import {exposeConstant} from '#composite/control-flow';
 import {flag} from '#composite/wiki-properties';
 
 function isSelectFollowingEntry(value) {
@@ -46,6 +48,14 @@ export class SortingRule extends Thing {
       flags: {update: true, expose: true},
       update: {validate: isStringNonEmpty},
     },
+
+    // Expose only
+
+    isSortingRule: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {
@@ -118,6 +128,14 @@ export class ThingSortingRule extends SortingRule {
         validate: strictArrayOf(isStringNonEmpty),
       },
     },
+
+    // Expose only
+
+    isThingSortingRule: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(SortingRule, {
@@ -217,6 +235,14 @@ export class DocumentSortingRule extends ThingSortingRule {
       flags: {update: true, expose: true},
       update: {validate: isStringNonEmpty},
     },
+
+    // Expose only
+
+    isDocumentSortingRule: [
+      exposeConstant({
+        value: input.value(true),
+      }),
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(ThingSortingRule, {
