@@ -438,7 +438,7 @@ export default {
 
         secondaryNav:
           relations.secondaryNav
-            .slot('mode', data.singleTrackSingle ? 'album' : 'track'),
+            .slot('mode', data.firstTrackInSingle ? 'album' : 'track'),
 
         leftSidebar: relations.sidebar,
 
