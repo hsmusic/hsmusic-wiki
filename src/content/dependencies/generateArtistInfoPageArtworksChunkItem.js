@@ -12,11 +12,15 @@ export default {
 
   query: (contrib) => ({
     kind:
-      (contrib.isBannerArtistContribution
+      (contrib.thingProperty === 'bannerArtistContribs' ||
+       (contrib.thing.isArtwork &&
+        contrib.thing.thingProperty === 'bannerArtwork')
         ? 'banner'
-     : contrib.isWallpaperArtistContribution
+     : contrib.thingProperty === 'wallpaperArtistContribs' ||
+       (contrib.thing.isArtwork &&
+        contrib.thing.thingProperty === 'wallpaperArtwork')
         ? 'wallpaper'
-     : contrib.isForAlbum
+     : contrib.thing.isAlbum
         ? 'album-cover'
         : 'track-cover'),
   }),

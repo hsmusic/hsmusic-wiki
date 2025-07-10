@@ -22,11 +22,11 @@ export default {
 
     const creditedAsArtist =
       contribs
-        .some(contrib => contrib.isArtistContribution);
+        .some(contrib => contrib.thingProperty === 'artistContribs');
 
     const creditedAsContributor =
       contribs
-        .some(contrib => contrib.isContributorContribution);
+        .some(contrib => contrib.thingProperty === 'contributorContribs');
 
     const annotatedContribs =
       contribs
@@ -34,11 +34,11 @@ export default {
 
     const annotatedArtistContribs =
       annotatedContribs
-        .filter(contrib => contrib.isArtistContribution);
+        .filter(contrib => contrib.thingProperty === 'artistContribs');
 
     const annotatedContributorContribs =
       annotatedContribs
-        .filter(contrib => contrib.isContributorContribution);
+        .filter(contrib => contrib.thingProperty === 'contributorContribs');
 
     // Don't display annotations associated with crediting in the
     // Contributors field if the artist is also credited as an Artist
