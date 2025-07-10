@@ -212,6 +212,10 @@ export class Language extends Thing {
   }
 
   formatString(...args) {
+    if (typeof args.at(-1) === 'function') {
+      throw new Error(`Passed function - did you mean language.encapsulate() instead?`);
+    }
+
     const hasOptions =
       typeof args.at(-1) === 'object' &&
       args.at(-1) !== null;
