@@ -6,10 +6,10 @@ function compareReleaseContributions(a, b) {
   const {previous: aPrev, next: aNext} = getSiblings(a);
   const {previous: bPrev, next: bNext} = getSiblings(b);
 
-  const effective = thing =>
-    (thing?.isAlbum && thing.style === 'single'
-      ? thing.tracks[0]
-      : thing);
+  const effective = contrib =>
+    (contrib?.thing.isAlbum && contrib.thing.style === 'single'
+      ? contrib.thing.tracks[0]
+      : contrib?.thing);
 
   return (
     effective(aPrev) === effective(bPrev) &&
@@ -81,7 +81,7 @@ export default {
 
     artistReleaseChronologySectionDiffers:
       (query.albumArtistContribution
-        ? compareReleaseContributions(contribution, query.albumArtistContribution)
+        ? !compareReleaseContributions(contribution, query.albumArtistContribution)
         : null),
   }),
 
