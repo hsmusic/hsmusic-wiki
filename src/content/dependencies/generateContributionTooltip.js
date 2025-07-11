@@ -127,15 +127,6 @@ export default {
                 data.isSingleFirstTrackArtistContribution &&
                 !html.isBlank(relations.artistReleaseChronologySection)
               ) {
-                if (data.artistReleaseChronologySectionDiffers) {
-                  relations.ownChronologySection.setSlot('heading',
-                    language.$(capsule, 'heading.artistTracks', {
-                      artist: data.artistName,
-                    }));
-
-                  chronologySections.push(relations.ownChronologySection);
-                }
-
                 relations.artistReleaseChronologySection.setSlot('kind', 'release');
 
                 relations.artistReleaseChronologySection.setSlot('heading',
@@ -144,6 +135,15 @@ export default {
                   }));
 
                 chronologySections.push(relations.artistReleaseChronologySection);
+
+                if (data.artistReleaseChronologySectionDiffers) {
+                  relations.ownChronologySection.setSlot('heading',
+                    language.$(capsule, 'heading.artistTracks', {
+                      artist: data.artistName,
+                    }));
+
+                  chronologySections.push(relations.ownChronologySection);
+                }
               } else {
                 chronologySections.push(relations.ownChronologySection);
               }
