@@ -1,4 +1,4 @@
-import {sortChronologically} from '#sort';
+import {sortAlbumsTracksChronologically} from '#sort';
 import {empty} from '#sugar';
 
 export default {
@@ -73,7 +73,7 @@ export default {
     // different - and it's the latter that determines whether the
     // track is a rerelease!
     const allReleasesChronologically =
-      sortChronologically(query.track.allReleases);
+      sortAlbumsTracksChronologically(query.track.allReleases);
 
     query.isFirstRelease =
       allReleasesChronologically[0] === query.track;
