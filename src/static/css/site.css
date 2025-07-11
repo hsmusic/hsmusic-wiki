@@ -2431,6 +2431,8 @@ html[data-url-key="localized.artistRollingWindow"] #content input[type=number] {
 }
 
 html[data-url-key="localized.artistRollingWindow"] #timeframe-selection-control a {
+  display: inline-block;
+  padding: 5px;
   text-decoration: underline;
   text-decoration-style: dotted;
 }

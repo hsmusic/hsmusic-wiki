@@ -145,8 +145,9 @@ export default {
             ? (thing.coverArtworks ?? thing.trackArtworks ?? [])
                 .find(artwork => artwork.artistContribs
                   .some(contrib => contrib.artist === artist))
-            : (thing.coverArtworks ?? thing.trackArtworks)
-                ?.[0] ?? null));
+            : (thing.coverArtworks ?? thing.trackArtworks)?.[0] ??
+              thing.album?.coverArtworks[0] ??
+              null));
 
     const allGroups =
       unique(query.thingGroups.flat());

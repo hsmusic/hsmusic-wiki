@@ -1444,8 +1444,8 @@ artistRollingWindowPage:
 
   timeframeSelectionControl:
     _: "{PREVIOUS} {TIMEFRAMES} {NEXT}"
-    previous: "(← Previous)"
-    next: "(Next →)"
+    previous: "← Previous"
+    next: "Next →"
 
   contributionKind:
     artwork: "Artwork"
