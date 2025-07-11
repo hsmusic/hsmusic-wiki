@@ -388,21 +388,13 @@ export class Language extends Thing {
       partInProgress += template.slice(lastIndex, match.index);
 
       for (const insertionItem of html.smush(insertion).content) {
-        // Sanitize string arguments in particular. These are taken to come from
-        // (raw) data and may include special characters that aren't meant to be
-        // rendered as HTML markup.
-        // (XXX: This actually sanitizes every value, stringifying numbers
-        //  and booleans also. We haven't checked what impact that has.)
-        const sanitizedInsertionItem =
-          this.#sanitizeValueForInsertion(insertionItem);
-
-        if (typeof sanitizedInsertionItem === 'string') {
+        if (typeof insertionItem === 'string') {
           // Join consecutive strings together.
-          partInProgress += sanitizedInsertionItem;
+          partInProgress += insertionItem;
         } else {
           // Push the string part in progress, then the insertion as-is.
           outputParts.push(partInProgress);
-          outputParts.push(sanitizedInsertionItem);
+          outputParts.push(insertionItem);
           partInProgress = '';
         }
       }
