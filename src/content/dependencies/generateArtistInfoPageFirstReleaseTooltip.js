@@ -1,4 +1,4 @@
-import {sortChronologically} from '#sort';
+import {sortAlbumsTracksChronologically} from '#sort';
 import {stitchArrays} from '#sugar';
 
 export default {
@@ -12,7 +12,7 @@ export default {
 
   query: (track) => ({
     rereleases:
-      sortChronologically(track.allReleases).slice(1),
+      sortAlbumsTracksChronologically(track.allReleases).slice(1),
   }),
 
   relations: (relation, query, track, artist) => ({

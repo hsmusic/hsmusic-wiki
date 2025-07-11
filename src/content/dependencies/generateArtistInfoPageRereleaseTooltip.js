@@ -1,4 +1,4 @@
-import {sortChronologically} from '#sort';
+import {sortAlbumsTracksChronologically} from '#sort';
 
 export default {
   contentDependencies: [
@@ -11,7 +11,7 @@ export default {
 
   query: (track) => ({
     firstRelease:
-      sortChronologically(track.allReleases)[0],
+      sortAlbumsTracksChronologically(track.allReleases)[0],
   }),
 
   relations: (relation, query, track, artist) => ({
