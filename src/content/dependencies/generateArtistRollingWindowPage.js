@@ -16,9 +16,7 @@ export default {
     'generateArtistNavLinks',
     'generateCoverGrid',
     'generatePageLayout',
-    'linkAlbum',
-    'linkFlash',
-    'linkTrack',
+    'linkAnythingMan',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
@@ -138,6 +136,18 @@ export default {
     query.firstKind =
       query.kinds.at(0);
 
+    query.thingArtworks =
+      stitchArrays({
+        thing: query.things,
+        kinds: query.thingContributionKinds,
+      }).map(({thing, kinds}) =>
+          (kinds.includes('artwork')
+            ? (thing.coverArtworks ?? thing.trackArtworks ?? [])
+                .find(artwork => artwork.artistContribs
+                  .some(contrib => contrib.artist === artist))
+            : (thing.coverArtworks ?? thing.trackArtworks)
+                ?.[0] ?? null));
+
     const allGroups =
       unique(query.thingGroups.flat());
 
@@ -185,26 +195,12 @@ export default {
       relation('generateCoverGrid'),
 
     sourceGridImages:
-      query.things.map(thing =>
-         (thing.constructor[Thing.referenceType] === 'album' && thing.hasCoverArt
-           ? relation('image', thing.artTags)
-        : thing.constructor[Thing.referenceType] === 'track'
-           ? (thing.hasUniqueCoverArt
-               ? relation('image', thing.artTags)
-            : thing.album.hasCoverArt
-               ? relation('image', thing.album.artTags)
-               : relation('image'))
-           : relation('image'))),
+      query.thingArtworks
+        .map(artwork => relation('image', artwork)),
 
     sourceGridLinks:
-      query.things.map(thing =>
-        (thing.constructor[Thing.referenceType] === 'album'
-          ? relation('linkAlbum', thing)
-       : thing.constructor[Thing.referenceType] === 'track'
-          ? relation('linkTrack', thing)
-       : thing.constructor[Thing.referenceType] === 'flash'
-          ? relation('linkFlash', thing)
-          : null)),
+      query.things
+        .map(thing => relation('linkAnythingMan', thing)),
   }),
 
   data: (query, sprawl, artist) => ({
@@ -249,20 +245,6 @@ export default {
       query.thingGroups
         .map(groups => groups
           .map(group => group.name)),
-
-    sourceGridPaths:
-      query.things.map(thing =>
-         (thing.constructor[Thing.referenceType] === 'album' && thing.hasCoverArt
-           ? ['media.albumCover', thing.directory, thing.coverArtFileExtension]
-        : thing.constructor[Thing.referenceType] === 'track'
-           ? (thing.hasUniqueCoverArt
-               ? ['media.trackCover', thing.album.directory, thing.directory, thing.coverArtFileExtension]
-            : thing.album.hasCoverArt
-               ? ['media.albumCover', thing.album.directory, thing.album.coverArtFileExtension]
-               : null)
-        : thing.constructor[Thing.referenceType] === 'flash'
-           ? ['media.flashCover', thing.directory, thing.coverArtFileExtension]
-           : null)),
 
     sourceGridContributionKinds:
       query.thingContributionKinds,
@@ -399,11 +381,7 @@ export default {
               data.sourceGridNames,
 
             images:
-              stitchArrays({
-                image: relations.sourceGridImages,
-                path: data.sourceGridPaths,
-              }).map(({image, path}) =>
-                  image.slot('path', path)),
+              relations.sourceGridImages,
 
             info:
               stitchArrays({
