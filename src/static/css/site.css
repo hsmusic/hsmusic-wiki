@@ -2462,9 +2462,17 @@ html[data-url-key="localized.artistRollingWindow"] .grid-item.peeking {
   background: #ffffff24;
 }
 
-/* This is a pretty snazzy selector. */
+html[data-url-key="localized.artistRollingWindow"] .grid-item > span:not(:first-of-type) {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 html[data-url-key="localized.artistRollingWindow"] .grid-item > span:not(:first-of-type) > *:not([style*="display: none"]) ~ *::before {
-  content: '\0020\00b7\0020';
+  content: '\00b7';
+  margin-left: 0.5ch;
+  margin-right: 0.5ch;
 }
 
 html[data-url-key="localized.groupInfo"] .by a {
