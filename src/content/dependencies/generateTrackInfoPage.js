@@ -209,7 +209,19 @@ export default {
                         language.$(capsule, 'link')),
                   })),
 
-              relations.readCommentaryLine,
+              (!html.isBlank(relations.additionalFilesList) ||
+               !html.isBlank(relations.contributorContributionList) ||
+               !html.isBlank(relations.creditingSourceEntries) ||
+               !html.isBlank(relations.flashesThatFeatureList) ||
+               !html.isBlank(relations.lyricsSection)
+               !html.isBlank(relations.midiProjectFilesList) ||
+               !html.isBlank(relations.referencedByTracksList) ||
+               !html.isBlank(relations.referencedTracksList) ||
+               !html.isBlank(relations.referencingSourceEntries) ||
+               !html.isBlank(relations.sampledByTracksList) ||
+               !html.isBlank(relations.sampledTracksList) ||
+               !html.isBlank(relations.sheetMusicFilesList)) &&
+                relations.readCommentaryLine,
 
               !html.isBlank(relations.creditingSourceEntries) &&
                 language.encapsulate(capsule, 'readCreditingSources', capsule =>
