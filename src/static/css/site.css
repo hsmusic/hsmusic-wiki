@@ -3136,7 +3136,6 @@ video.pixelate, .pixelate video {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: -20;
   background-color: var(--dim-color);
   filter: brightness(0.6);
 }
