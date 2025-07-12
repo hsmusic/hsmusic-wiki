@@ -368,7 +368,11 @@ releaseInfo:
 
   readCommentary:
     _: "Read {LINK}."
-    link: "artist commentary"
+
+    link:
+      _: "artist commentary"
+      withWikiCommentary: "artist and wiki commentary"
+      onlyWikiCommentary: "wiki commentary"
 
   readCreditingSources:
     _: "Read {LINK}."
@@ -494,6 +498,14 @@ misc:
   artistCommentary:
     _: "Artist commentary for {THING}:"
     sticky: "Artist commentary:"
+
+    withWikiCommentary:
+      _: "Artist and wiki commentary for {THING}:"
+      sticky: "Artist and wiki commentary:"
+
+    onlyWikiCommentary:
+      _: "Wiki commentary for {THING}:"
+      sticky: "Wiki commentary:"
 
     entry:
       title:

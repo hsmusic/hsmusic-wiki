@@ -2,7 +2,7 @@ import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
-    'generateContentContentHeading',
+    'generateCommentaryContentHeading',
     'generateCommentaryEntry',
     'linkAlbum',
     'linkTrack',
@@ -18,8 +18,8 @@ export default {
   }),
 
   relations: (relation, query, track) => ({
-    contentContentHeading:
-      relation('generateContentContentHeading', track),
+    commentaryContentHeading:
+      relation('generateCommentaryContentHeading', track),
 
     mainReleaseTrackLink:
       (track.isSecondaryRelease
@@ -78,11 +78,7 @@ export default {
   generate: (data, relations, {html, language}) =>
     language.encapsulate('misc.artistCommentary', capsule =>
       html.tags([
-        relations.contentContentHeading.slots({
-          attributes: {id: 'artist-commentary'},
-          string: 'misc.artistCommentary',
-        }),
-
+        relations.commentaryContentHeading,
         relations.artistCommentaryEntries,
 
         data.isSecondaryRelease &&

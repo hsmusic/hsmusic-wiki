@@ -13,6 +13,7 @@ export default {
     'generateContributionList',
     'generateLyricsSection',
     'generatePageLayout',
+    'generateReadCommentaryLine',
     'generateTrackArtistCommentarySection',
     'generateTrackArtworkColumn',
     'generateTrackInfoPageFeaturedByFlashesList',
@@ -85,6 +86,9 @@ export default {
 
     releaseInfo:
       relation('generateTrackReleaseInfo', track),
+
+    readCommentaryLine:
+      relation('generateReadCommentaryLine', track),
 
     otherReleasesList:
       relation('generateTrackInfoPageOtherReleasesList', track),
@@ -205,14 +209,7 @@ export default {
                         language.$(capsule, 'link')),
                   })),
 
-              !html.isBlank(relations.artistCommentarySection) &&
-                language.encapsulate(capsule, 'readCommentary', capsule =>
-                  language.$(capsule, {
-                    link:
-                      html.tag('a',
-                        {href: '#artist-commentary'},
-                        language.$(capsule, 'link')),
-                  })),
+              relations.readCommentaryLine,
 
               !html.isBlank(relations.creditingSourceEntries) &&
                 language.encapsulate(capsule, 'readCreditingSources', capsule =>
