@@ -370,11 +370,12 @@ export function sortAlbumsTracksChronologically(data, {
   getDate,
 } = {}) {
   // Sort albums before tracks...
-  sortByConditions(data, [(t) => t.album === undefined]);
+  sortByConditions(data, [t => t.isAlbum]);
 
-  // Group tracks by album...
-  sortByDirectory(data, {
-    getDirectory: (t) => (t.album ? t.album.directory : t.directory),
+  // Put albums alphabetically, and group with them...
+  sortAlphabetically(data, {
+    getDirectory: t => t.isTrack ? t.album.directory : t.directory,
+    getName: t => t.isTrack ? t.album.name : t.name,
   });
 
   // Sort tracks by position in album...
