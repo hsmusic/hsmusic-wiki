@@ -28,7 +28,7 @@ export default {
 
     mainReleaseArtistCommentaryEntries:
       (track.isSecondaryRelease
-        ? track.mainReleaseTrack.commentary
+        ? track.commentaryFromMainRelease
             .map(entry => relation('generateCommentaryEntry', entry))
         : null),
 

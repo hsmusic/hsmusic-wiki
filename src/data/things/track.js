@@ -25,6 +25,7 @@ import {
 import {withPropertyFromObject} from '#composite/data';
 
 import {
+  exitWithoutDependency,
   exposeConstant,
   exposeDependency,
   exposeDependencyOrContinue,
@@ -467,6 +468,24 @@ export class Track extends Thing {
     otherReleases: [
       withOtherReleases(),
       exposeDependency({dependency: '#otherReleases'}),
+    ],
+
+    commentaryFromMainRelease: [
+      withMainRelease(),
+
+      exitWithoutDependency({
+        dependency: '#mainRelease',
+        value: input.value([]),
+      }),
+
+      withPropertyFromObject({
+        object: '#mainRelease',
+        property: input.value('commentary'),
+      }),
+
+      exposeDependency({
+        dependency: '#mainRelease.commentary',
+      }),
     ],
 
     groups: [
