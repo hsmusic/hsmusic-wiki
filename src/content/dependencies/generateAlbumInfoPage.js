@@ -18,6 +18,7 @@ export default {
     'generateContentContentHeading',
     'generateContentHeading',
     'generatePageLayout',
+    'generateReadCommentaryLine',
     'linkAlbumCommentary',
     'linkAlbumGallery',
   ],
@@ -69,9 +70,12 @@ export default {
         : null),
 
     commentaryLink:
-      ([album, ...album.tracks].some(({commentary}) => !empty(commentary))
+      (album.tracks.some(track => !empty(track.commentary))
         ? relation('linkAlbumCommentary', album)
         : null),
+
+    readCommentaryLine:
+      relation('generateReadCommentaryLine', album),
 
     trackList:
       relation('generateAlbumTrackList', album),
@@ -163,6 +167,10 @@ export default {
                     }))
 
                 : html.blank()),
+
+              !relations.commentaryLink &&
+              !html.isBlank(relations.artistCommentaryEntries) &&
+                relations.readCommentaryLine,
 
               !html.isBlank(relations.creditSourceEntries) &&
                 language.encapsulate(capsule, 'readCreditingSources', capsule =>

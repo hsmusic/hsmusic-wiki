@@ -64,9 +64,8 @@ export default {
     hasMultipleTracks:
       album.tracks.length > 1,
 
-    commentaryPageIsStub:
-      [album, ...album.tracks]
-        .every(({commentary}) => empty(commentary)),
+    hasSubstantialCommentaryPage:
+      album.tracks.some(track => !empty(track.commentary)),
 
     galleryIsStub:
       album.tracks.every(t => !t.hasUniqueCoverArt),
@@ -97,14 +96,16 @@ export default {
         relations.nextLink.slot('link', relations.nextTrackLink);
 
     const galleryLink =
-      (!data.galleryIsStub || slots.currentExtra === 'gallery') &&
+      (!data.galleryIsStub ||
+       slots.currentExtra === 'gallery') &&
         relations.albumGalleryLink.slots({
           attributes: {class: slots.currentExtra === 'gallery' && 'current'},
           content: language.$(albumNavCapsule, 'gallery'),
         });
 
     const commentaryLink =
-      (!data.commentaryPageIsStub || slots.currentExtra === 'commentary') &&
+      (data.hasSubstantialCommentaryPage ||
+       slots.currentExtra === 'commentary') &&
         relations.albumCommentaryLink.slots({
           attributes: {class: slots.currentExtra === 'commentary' && 'current'},
           content: language.$(albumNavCapsule, 'commentary'),
