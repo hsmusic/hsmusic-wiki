@@ -13,6 +13,7 @@ export default {
     'generateAlbumSocialEmbed',
     'generateAlbumStyleTags',
     'generateAlbumTrackList',
+    'generateCommentaryContentHeading',
     'generateCommentaryEntry',
     'generateContentContentHeading',
     'generateContentHeading',
@@ -77,6 +78,9 @@ export default {
 
     additionalFilesList:
       relation('generateAdditionalFilesList', album.additionalFiles),
+
+    commentaryContentHeading:
+      relation('generateCommentaryContentHeading', album),
 
     artistCommentaryEntries:
       album.commentary
@@ -197,12 +201,7 @@ export default {
             ])),
 
           html.tags([
-            relations.contentContentHeading.clone()
-              .slots({
-                attributes: {id: 'artist-commentary'},
-                string: 'misc.artistCommentary',
-              }),
-
+            relations.commentaryContentHeading,
             relations.artistCommentaryEntries,
           ]),
 
