@@ -73,11 +73,10 @@ export default {
       contribution.thing.isAlbum &&
       contribution.thingProperty === 'artistContribs',
 
-    isSingleFirstTrackArtistContribution:
+    isSingleTrackArtistContribution:
       contribution.thing.isTrack &&
       contribution.thingProperty === 'artistContribs' &&
-      contribution.thing.album.style === 'single' &&
-      contribution.thing.album.tracks[0] === contribution.thing,
+      contribution.thing.album.style === 'single',
 
     artistReleaseChronologySectionDiffers:
       (query.albumArtistContribution
@@ -124,7 +123,7 @@ export default {
               }
 
               if (
-                data.isSingleFirstTrackArtistContribution &&
+                data.isSingleTrackArtistContribution &&
                 !html.isBlank(relations.artistReleaseChronologySection)
               ) {
                 relations.artistReleaseChronologySection.setSlot('kind', 'release');
