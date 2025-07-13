@@ -213,7 +213,7 @@ export default {
                !html.isBlank(relations.contributorContributionList) ||
                !html.isBlank(relations.creditingSourceEntries) ||
                !html.isBlank(relations.flashesThatFeatureList) ||
-               !html.isBlank(relations.lyricsSection)
+               !html.isBlank(relations.lyricsSection) ||
                !html.isBlank(relations.midiProjectFilesList) ||
                !html.isBlank(relations.referencedByTracksList) ||
                !html.isBlank(relations.referencedTracksList) ||
