@@ -756,6 +756,21 @@ export class Album extends Thing {
     },
 
     invalidFieldCombinations: [
+      {message: `Move commentary on singles to the track`, fields: [
+        ['Style', 'single'],
+        'Commentary',
+      ]},
+
+      {message: `Move crediting sources on singles to the track`, fields: [
+        ['Style', 'single'],
+        'Crediting Sources',
+      ]},
+
+      {message: `Move referencing sources on singles to the track`, fields: [
+        ['Style', 'single'],
+        'Referencing Sources',
+      ]},
+
       {message: `Specify one wallpaper style or multiple wallpaper parts, not both`, fields: [
         'Wallpaper Parts',
         'Wallpaper Style',
