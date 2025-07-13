@@ -2860,10 +2860,11 @@ img {
   object-fit: cover;
 }
 
-p > img {
+p > img, li > img {
   max-width: 100%;
   object-fit: contain;
   height: auto;
+  vertical-align: text-bottom;
 }
 
 .image-inner-area::after {
