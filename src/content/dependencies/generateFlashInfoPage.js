@@ -4,6 +4,7 @@ export default {
   contentDependencies: [
     'generateAdditionalNamesBox',
     'generateCommentaryEntry',
+    'generateCommentaryContentHeading',
     'generateContentContentHeading',
     'generateContentHeading',
     'generateContributionList',
@@ -56,6 +57,9 @@ export default {
 
     contentContentHeading:
       relation('generateContentContentHeading', flash),
+
+    commentaryContentHeading:
+      relation('generateCommentaryContentHeading', flash),
 
     flashActLink:
       relation('linkFlashAct', flash.act),
@@ -172,12 +176,7 @@ export default {
           ]),
 
           html.tags([
-            relations.contentContentHeading.clone()
-              .slots({
-                attributes: {id: 'artist-commentary'},
-                string: 'misc.artistCommentary',
-              }),
-
+            relations.commentaryContentHeading,
             relations.artistCommentaryEntries,
           ]),
 
