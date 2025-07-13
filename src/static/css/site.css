@@ -1032,10 +1032,13 @@ a .normal-content {
 }
 
 .image-media-link::after {
-  content: '';
-  display: inline-block;
-  width: 22px;
-  height: 1em;
+  /* Thanks to Jay Freestone for being awesome:
+   * https://www.jayfreestone.com/writing/wrapping-and-inline-pseudo-elements/
+   */
+
+  pointer-events: none;
+  content: '\200b';
+  padding-left: 22px;
 
   background-color: var(--primary-color);
 
@@ -1046,7 +1049,6 @@ a .normal-content {
 
   mask-repeat: no-repeat;
   mask-position: calc(100% - 2px);
-  vertical-align: text-bottom;
 }
 
 .image-media-link:hover::after {
