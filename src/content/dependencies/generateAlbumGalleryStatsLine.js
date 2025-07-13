@@ -3,36 +3,56 @@ import {getTotalDuration} from '#wiki-data';
 export default {
   extraDependencies: ['html', 'language'],
 
-  data(album) {
-    return {
-      name: album.name,
-      date: album.date,
-      duration: getTotalDuration(album.tracks),
-      numTracks: album.tracks.length,
-    };
-  },
+  data: (album) => ({
+    date:
+      album.date,
 
-  generate(data, {html, language}) {
-    const parts = ['albumGalleryPage.statsLine'];
-    const options = {};
+    hideDuration:
+      album.hideDuration,
 
-    options.tracks =
-      html.tag('b',
-        language.countTracks(data.numTracks, {unit: true}));
+    duration:
+      (album.hideDuration
+        ? null
+        : getTotalDuration(album.tracks)),
 
-    options.duration =
-      html.tag('b',
-        language.formatDuration(data.duration, {unit: true}));
+    tracks:
+      (album.hideDuration
+        ? null
+        : album.tracks.length),
+  }),
 
-    if (data.date) {
-      parts.push('withDate');
-      options.date =
-        html.tag('b',
-          language.formatDate(data.date));
-    }
+  generate: (data, {html, language}) =>
+    html.tag('p', {class: 'quick-info'},
+      {[html.onlyIfContent]: true},
 
-    return (
-      html.tag('p', {class: 'quick-info'},
-        language.formatString(...parts, options)));
-  },
+      language.encapsulate('albumGalleryPage.statsLine', workingCapsule => {
+        const workingOptions = {};
+
+        if (data.hideDuration && !data.date) {
+          return html.blank();
+        }
+
+        if (!data.hideDuration) {
+          workingOptions.tracks =
+            html.tag('b',
+              language.countTracks(data.tracks, {unit: true}));
+
+          workingOptions.duration =
+            html.tag('b',
+              language.formatDuration(data.duration, {unit: true}));
+        }
+
+        if (data.date) {
+          workingCapsule += '.withDate';
+          workingOptions.date =
+            html.tag('b',
+              language.formatDate(data.date));
+        }
+
+        if (data.hideDuration) {
+          workingCapsule += '.noDuration';
+        }
+
+        return language.$(workingCapsule, workingOptions);
+      })),
 };

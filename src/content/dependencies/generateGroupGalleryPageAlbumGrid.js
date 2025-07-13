@@ -25,7 +25,10 @@ export default {
       albums.map(album => album.name),
 
     durations:
-      albums.map(album => getTotalDuration(album.tracks)),
+      albums.map(album =>
+        (album.hideDuration
+          ? null
+          : getTotalDuration(album.tracks))),
 
     tracks:
       albums.map(album => album.tracks.length),
@@ -58,9 +61,11 @@ export default {
             tracks: data.tracks,
             duration: data.durations,
           }).map(({tracks, duration}) =>
-              language.$(capsule, 'details.albumLength', {
-                tracks: language.countTracks(tracks, {unit: true}),
-                time: language.formatDuration(duration),
-              })),
+              (duration
+                ? language.$(capsule, 'details.albumLength', {
+                    tracks: language.countTracks(tracks, {unit: true}),
+                    time: language.formatDuration(duration),
+                  })
+                : null)),
       })),
 };

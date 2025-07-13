@@ -11,8 +11,12 @@ export default {
   },
 
   query({albumData}, spec) {
-    const albums = sortAlphabetically(albumData.slice());
-    const durations = albums.map(album => getTotalDuration(album.tracks));
+    const albums =
+      sortAlphabetically(
+        albumData.filter(album => !album.hideDuration));
+
+    const durations =
+      albums.map(album => getTotalDuration(album.tracks));
 
     filterByCount(albums, durations);
     sortByCount(albums, durations, {greatestFirst: true});

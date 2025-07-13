@@ -36,7 +36,7 @@ export default {
         .map(track => track.duration)
         .filter(value => value > 0);
 
-    if (empty(durationTerms)) {
+    if (empty(durationTerms) || album.hideDuration) {
       data.duration = null;
       data.durationApproximate = null;
     } else {

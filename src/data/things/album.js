@@ -145,6 +145,8 @@ export class Album extends Thing {
     isListedOnHomepage: flag(true),
     isListedInGalleries: flag(true),
 
+    hideDuration: flag(false),
+
     // > Update & expose - General metadata
 
     color: color(),
@@ -606,6 +608,8 @@ export class Album extends Thing {
       'Has Track Numbers': {property: 'hasTrackNumbers'},
       'Listed on Homepage': {property: 'isListedOnHomepage'},
       'Listed in Galleries': {property: 'isListedInGalleries'},
+
+      'Hide Duration': {property: 'hideDuration'},
 
       // General metadata
 

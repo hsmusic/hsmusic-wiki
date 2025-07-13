@@ -1178,6 +1178,9 @@ albumGalleryPage:
   statsLine.withDate: >-
     {TRACKS} totaling {DURATION}. Released {DATE}.
 
+  statsLine.withDate.noDuration: >-
+    Released {DATE}.
+
   # coverArtistsLine:
   #   This is displayed if every track (which has artwork at all)
   #   has the same illustration credits.
