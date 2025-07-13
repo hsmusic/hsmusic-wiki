@@ -771,6 +771,11 @@ export class Album extends Thing {
         'Referencing Sources',
       ]},
 
+      {message: `Move additional names on singles to the track`, fields: [
+        ['Style', 'single'],
+        'Additional Names',
+      ]},
+
       {message: `Specify one wallpaper style or multiple wallpaper parts, not both`, fields: [
         'Wallpaper Parts',
         'Wallpaper Style',
