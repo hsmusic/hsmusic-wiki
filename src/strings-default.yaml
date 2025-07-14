@@ -1872,6 +1872,7 @@ listingPage:
       title: "Albums - by Tracks"
       title.short: "...by Tracks"
       item: "{ALBUM} ({TRACKS})"
+      item.single: "{ALBUM} ({TRACKS}—single)"
 
     # listAlbums.byDuration:
     #   Lists albums by total duration of all tracks, longest to
