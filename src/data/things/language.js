@@ -322,7 +322,7 @@ export class Language extends Thing {
           return undefined;
         }
 
-        return optionValue;
+        return this.sanitize(optionValue);
       },
     });
 
