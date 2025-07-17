@@ -10,7 +10,8 @@ import {traverse} from '#node-utils';
 import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {empty} from '#sugar';
 import Thing from '#thing';
-import {is, isColor, isDate, isDirectory, isNumber} from '#validators';
+import {is, isColor, isContributionList, isDate, isDirectory, isNumber}
+  from '#validators';
 
 import {
   parseAdditionalFiles,
@@ -26,15 +27,21 @@ import {
 } from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
-import {exitWithoutArtwork, withDirectory, withHasArtwork}
-  from '#composite/wiki-data';
 
 import {
   exitWithoutDependency,
   exposeConstant,
   exposeDependency,
+  exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
 } from '#composite/control-flow';
+
+import {
+  exitWithoutArtwork,
+  withDirectory,
+  withHasArtwork,
+  withResolvedContribs,
+} from '#composite/wiki-data';
 
 import {
   color,
@@ -136,6 +143,33 @@ export class Album extends Thing {
       date: 'date',
       artistProperty: input.value('albumArtistContributions'),
     }),
+
+    trackArtistContribs: [
+      withResolvedContribs({
+        from: input.updateValue({validate: isContributionList}),
+        thingProperty: input.thisProperty(),
+        artistProperty: input.value('albumTrackArtistContributions'),
+        date: 'date',
+      }).outputs({
+        '#resolvedContribs': '#trackArtistContribs',
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#trackArtistContribs',
+        mode: input.value('empty'),
+      }),
+
+      withResolvedContribs({
+        from: 'artistContribs',
+        thingProperty: input.thisProperty(),
+        artistProperty: input.value('albumTrackArtistContributions'),
+        date: 'date',
+      }).outputs({
+        '#resolvedContribs': '#trackArtistContribs',
+      }),
+
+      exposeDependency({dependency: '#trackArtistContribs'}),
+    ],
 
     // > Update & expose - General configuration
 
@@ -540,6 +574,9 @@ export class Album extends Thing {
     albumArtistContributionsBy:
       soupyReverse.contributionsBy('albumData', 'artistContribs'),
 
+    albumTrackArtistContributionsBy:
+      soupyReverse.contributionsBy('albumData', 'trackArtistContribs'),
+
     albumCoverArtistContributionsBy:
       soupyReverse.artworkContributionsBy('albumData', 'coverArtworks'),
 
@@ -598,6 +635,11 @@ export class Album extends Thing {
 
       'Artists': {
         property: 'artistContribs',
+        transform: parseContributors,
+      },
+
+      'Track Artists': {
+        property: 'trackArtistContribs',
         transform: parseContributors,
       },
 

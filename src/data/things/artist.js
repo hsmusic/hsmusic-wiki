@@ -109,6 +109,10 @@ export class Artist extends Thing {
       reverse: soupyReverse.input('albumArtistContributionsBy'),
     }),
 
+    albumTrackArtistContributions: reverseReferenceList({
+      reverse: soupyReverse.input('albumTrackArtistContributionsBy'),
+    }),
+
     albumCoverArtistContributions: reverseReferenceList({
       reverse: soupyReverse.input('albumCoverArtistContributionsBy'),
     }),

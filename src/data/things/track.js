@@ -177,20 +177,20 @@ export class Track extends Thing {
       }),
 
       withPropertyFromAlbum({
-        property: input.value('artistContribs'),
+        property: input.value('trackArtistContribs'),
       }),
 
       withRecontextualizedContributionList({
-        list: '#album.artistContribs',
+        list: '#album.trackArtistContribs',
         artistProperty: input.value('trackArtistContributions'),
       }),
 
       withRedatedContributionList({
-        list: '#album.artistContribs',
+        list: '#album.trackArtistContribs',
         date: '#date',
       }),
 
-      exposeDependency({dependency: '#album.artistContribs'}),
+      exposeDependency({dependency: '#album.trackArtistContribs'}),
     ],
 
     contributorContribs: [
