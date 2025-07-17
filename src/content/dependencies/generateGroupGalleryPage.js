@@ -183,7 +183,10 @@ export default {
                 }))),
           */
 
-          relations.albumsByDateView,
+          relations.albumsByDateView.slots({
+            showTitle:
+              !html.isBlank(relations.albumsBySeriesView),
+          }),
 
           relations.albumsBySeriesView.slots({
             attributes: [

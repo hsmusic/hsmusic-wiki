@@ -33,6 +33,9 @@ export default {
     tracks:
       albums.map(album => album.tracks.length),
 
+    styles:
+      albums.map(album => album.style),
+
     notFromThisGroup:
       albums.map(album => !album.groups.includes(group)),
   }),
@@ -55,6 +58,9 @@ export default {
                     album: name,
                   }),
               })),
+
+        itemAttributes:
+          data.styles.map(style => ({'data-style': style})),
 
         info:
           stitchArrays({

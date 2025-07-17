@@ -1756,6 +1756,17 @@ groupGalleryPage:
     bySeries: "By series"
     byDate: "By date"
 
+  albumStyleSwitcher:
+    _: "Showing these releases:"
+
+    album: "Albums"
+    single: "Singles"
+
+    count:
+      all: "all {TOTAL}"
+      filtered: "{COUNT} of {TOTAL}"
+      none: "none at all"
+
   albumsByDate:
     title: "All albums"
 

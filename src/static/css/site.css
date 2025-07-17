@@ -1130,6 +1130,15 @@ a .normal-content {
   text-decoration: none !important;
 }
 
+label:hover span {
+  text-decoration: underline;
+  text-decoration-style: solid;
+}
+
+label > input[type=checkbox]:not(:checked) + span {
+  opacity: 0.8;
+}
+
 #secondary-nav {
   text-align: center;
 
@@ -2021,11 +2030,30 @@ ul.quick-info li:not(:last-child)::after {
   text-align: center;
 }
 
-.gallery-view-switcher {
+.gallery-view-switcher,
+.gallery-style-selector {
   margin-left: auto;
   margin-right: auto;
   text-align: center;
   line-height: 1.4;
+}
+
+.gallery-style-selector .styles {
+  display: inline-flex;
+  justify-content: center;
+}
+
+.gallery-style-selector .styles label:not(:last-child) {
+  margin-right: 1.25ch;
+}
+
+.gallery-style-selector .count {
+  font-size: 0.85em;
+
+  position: relative;
+  bottom: -0.25em;
+
+  opacity: 0.9;
 }
 
 #content.top-index section {
@@ -3028,6 +3056,13 @@ video.pixelate, .pixelate video {
   box-sizing: border-box;
 }
 
+.grid-listing:not(:has(.grid-item:not([class*="hidden-by-"]))) {
+  padding-bottom: 140px;
+  background: #cccccc07;
+  border-radius: 10px;
+  border: 1px dashed #fff3;
+}
+
 .grid-item {
   font-size: 0.9em;
 }
@@ -3040,6 +3075,10 @@ video.pixelate, .pixelate video {
   border-radius: 2px;
   padding: 5px;
   margin: 10px;
+}
+
+.grid-item[class*="hidden-by-"] {
+  display: none;
 }
 
 .grid-item .image-container {

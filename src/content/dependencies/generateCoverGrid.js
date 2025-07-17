@@ -32,6 +32,12 @@ export default {
               v.isString))),
     },
 
+    itemAttributes: {
+      validate: v =>
+        v.strictArrayOf(
+          v.optional(v.isAttributes)),
+    },
+
     lazy: {validate: v => v.anyOf(v.isWholeNumber, v.isBoolean)},
     actionLinks: {validate: v => v.sparseArrayOf(v.isHTML)},
   },
@@ -44,6 +50,7 @@ export default {
       [
         stitchArrays({
           classes: slots.classes,
+          attributes: slots.itemAttributes,
           image: slots.images,
           link: slots.links,
           name: slots.names,
@@ -54,6 +61,7 @@ export default {
             Array.from(slots.links).fill(null)
         }).map(({
             classes,
+            attributes,
             image,
             link,
             name,
@@ -65,6 +73,8 @@ export default {
                 link.getSlotValue('attributes'),
 
                 {class: ['grid-item', 'box']},
+
+                attributes,
 
                 (classes
                   ? {class: classes}

@@ -15,6 +15,7 @@ import {
   color,
   contentString,
   directory,
+  flag,
   name,
   referenceList,
   soupyFind,
@@ -31,6 +32,8 @@ export class Group extends Thing {
 
     name: name('Unnamed Group'),
     directory: directory(),
+
+    divideAlbumsByStyle: flag(false),
 
     description: contentString(),
 
@@ -141,6 +144,9 @@ export class Group extends Thing {
     fields: {
       'Group': {property: 'name'},
       'Directory': {property: 'directory'},
+
+      'Divide Albums By Style': {property: 'divideAlbumsByStyle'},
+
       'Description': {property: 'description'},
       'URLs': {property: 'urls'},
 

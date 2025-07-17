@@ -12,6 +12,7 @@ import * as cssCompatibilityAssistantModule from './css-compatibility-assistant.
 import * as datetimestampTooltipModule from './datetimestamp-tooltip.js';
 import * as draggedLinkModule from './dragged-link.js';
 import * as expandableGallerySectionModule from './expandable-gallery-section.js';
+import * as galleryStyleSelectorModule from './gallery-style-selector.js';
 import * as hashLinkModule from './hash-link.js';
 import * as hoverableTooltipModule from './hoverable-tooltip.js';
 import * as imageOverlayModule from './image-overlay.js';
@@ -36,6 +37,7 @@ export const modules = [
   datetimestampTooltipModule,
   draggedLinkModule,
   expandableGallerySectionModule,
+  galleryStyleSelectorModule,
   hashLinkModule,
   hoverableTooltipModule,
   imageOverlayModule,
