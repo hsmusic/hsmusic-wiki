@@ -1,5 +1,7 @@
 export const DATA_ART_TAGS_DIRECTORY = 'art-tags';
+export const ART_TAG_DATA_FILE = 'tags.yaml';
 
+import {readFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
 import {input} from '#composite';
@@ -193,10 +195,17 @@ export class ArtTag extends Thing {
     title: `Process art tags file`,
 
     files: dataPath =>
-      traverse(path.join(dataPath, DATA_ART_TAGS_DIRECTORY), {
-        filterFile: name => path.extname(name) === '.yaml',
-        prefixPath: DATA_ART_TAGS_DIRECTORY,
-      }),
+      Promise.allSettled([
+        readFile(path.join(dataPath, ART_TAG_DATA_FILE))
+          .then(() => [ART_TAG_DATA_FILE]),
+
+        traverse(path.join(dataPath, DATA_ART_TAGS_DIRECTORY), {
+          filterFile: name => path.extname(name) === '.yaml',
+          prefixPath: DATA_ART_TAGS_DIRECTORY,
+        }),
+      ]).then(results => results
+          .filter(({status}) => status === 'fulfilled')
+          .flatMap(({value}) => value)),
 
     documentMode: allTogether,
     documentThing: ArtTag,
