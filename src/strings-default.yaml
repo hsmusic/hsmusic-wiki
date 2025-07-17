@@ -1004,6 +1004,11 @@ misc:
   coverGrid:
     noCoverArt: "{ALBUM}"
 
+    tab:
+      group: "{GROUP}"
+      artists: "{ARTISTS}"
+      artists.featuring: "{ARTISTS} feat. {FEATURING}"
+
     details:
       notFromThisGroup: "{NAME}{MARKER}"
       notFromThisGroup.marker: "*"

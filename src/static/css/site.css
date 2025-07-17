@@ -3064,17 +3064,39 @@ video.pixelate, .pixelate video {
 }
 
 .grid-item {
+  line-height: 1.2;
   font-size: 0.9em;
 }
 
 .grid-item {
+  --tab-pull: 0px;
+  --tabnt-offset: 0px;
+
   display: inline-block;
   text-align: center;
   background-color: #111111;
   border: 1px dotted var(--primary-color);
   border-radius: 2px;
   padding: 5px;
+
   margin: 10px;
+  margin-top:
+    calc(
+       10px
+     - var(--tab-pull)
+     + var(--tabnt-offset));
+}
+
+.grid-item.has-tab {
+  border-radius: 8px 8px 3px 3px;
+}
+
+.grid-item.has-tab:hover {
+  --tab-pull: 3px;
+}
+
+.grid-item:not(.has-tab) {
+  --tabnt-offset: calc(1.2em - 4px);
 }
 
 .grid-item[class*="hidden-by-"] {
@@ -3115,20 +3137,27 @@ video.pixelate, .pixelate video {
   hyphens: auto;
 }
 
-.grid-item > span:not(:first-child) {
+/* tab */
+.grid-item > span:first-child {
+  margin-bottom: calc(3px + var(--tab-pull));
+
+  font-style: oblique;
+}
+
+/* info */
+.grid-item > .image-container + span ~ span {
   margin-top: 2px;
-}
 
-.grid-item > span:first-of-type {
-  margin-top: 6px;
-}
-
-.grid-item > span:not(:first-of-type) {
   font-size: 0.9em;
   opacity: 0.8;
 }
 
-.grid-item:hover > span:first-of-type {
+/* title */
+.grid-item > .image-container + span {
+  margin-top: 6px;
+}
+
+.grid-item:hover > .image-container + span {
   text-decoration: underline;
 }
 
@@ -3571,7 +3600,6 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   position: relative;
   margin: 0;
   padding-right: 20px;
-  line-height: 1.4;
   overflow-x: hidden;
 }
 

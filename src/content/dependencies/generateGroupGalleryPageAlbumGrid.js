@@ -1,26 +1,65 @@
-import {stitchArrays} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 import {getTotalDuration} from '#wiki-data';
 
 export default {
-  contentDependencies: ['generateCoverGrid', 'image', 'linkAlbum'],
-  extraDependencies: ['language'],
+  contentDependencies: [
+    'generateArtistCredit',
+    'generateCoverGrid',
+    'image',
+    'linkAlbum',
+  ],
 
-  relations: (relation, albums, _group) => ({
+  extraDependencies: ['language', 'wikiData'],
+
+  query: (albums, group) => ({
+    notedGroups:
+      albums.map(album => {
+        const contextGroup = group;
+
+        const candidateGroups =
+          album.groups
+            .filter(group => !group.excludeFromGalleryTabs)
+            .filter(group => group.category !== contextGroup.category);
+
+        return candidateGroups.at(0) ?? null;
+      }),
+
+    notedArtistContribs:
+      albums.map(album => {
+        if (
+          album.artistContribs.length === 1 &&
+          !empty(group.closelyLinkedArtists) &&
+          (album.artistContribs[0].artist.name ===
+           group.closelyLinkedArtists[0].artist.name)
+        ) {
+          return [];
+        }
+
+        return album.artistContribs;
+      }),
+  }),
+
+  relations: (relation, query, albums, _group) => ({
     coverGrid:
       relation('generateCoverGrid'),
 
+    artistCredits:
+      query.notedArtistContribs
+        .map(contribs => relation('generateArtistCredit', contribs, [])),
+
     links:
-      albums.map(album =>
-        relation('linkAlbum', album)),
+      albums
+        .map(album => relation('linkAlbum', album)),
 
     images:
-      albums.map(album =>
-        (album.hasCoverArt
-          ? relation('image', album.coverArtworks[0])
-          : relation('image')))
+      albums
+        .map(album =>
+          (album.hasCoverArt
+            ? relation('image', album.coverArtworks[0])
+            : relation('image')))
   }),
 
-  data: (albums, group) => ({
+  data: (query, albums, group) => ({
     names:
       albums.map(album => album.name),
 
@@ -35,6 +74,10 @@ export default {
         (album.hideDuration
           ? null
           : getTotalDuration(album.tracks))),
+
+    groupNames:
+      query.notedGroups
+        .map(group => group ? group.name : null),
 
     notFromThisGroup:
       albums.map(album => !album.groups.includes(group)),
@@ -61,6 +104,26 @@ export default {
 
         itemAttributes:
           data.styles.map(style => ({'data-style': style})),
+
+        tab:
+          language.encapsulate(capsule, 'tab', capsule =>
+            stitchArrays({
+              groupName: data.groupNames,
+              artistCredit: relations.artistCredits,
+            }).map(({groupName, artistCredit}) =>
+                (groupName
+                  ? language.$(capsule, 'group', {
+                      group: groupName,
+                    })
+               : artistCredit
+                  ? artistCredit?.slots({
+                      normalStringKey:
+                        capsule + '.artists',
+
+                      normalFeaturingStringKey:
+                        capsule + '.artists.featuring',
+                    })
+                  : null))),
 
         info:
           stitchArrays({

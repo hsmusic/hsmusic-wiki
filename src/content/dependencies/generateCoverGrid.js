@@ -17,6 +17,7 @@ export default {
     links: {validate: v => v.strictArrayOf(v.isHTML)},
     names: {validate: v => v.strictArrayOf(v.isHTML)},
     info: {validate: v => v.strictArrayOf(v.isHTML)},
+    tab: {validate: v => v.strictArrayOf(v.isHTML)},
     notFromThisGroup: {validate: v => v.strictArrayOf(v.isBoolean)},
 
     // Differentiating from sparseArrayOf here - this list of classes should
@@ -55,6 +56,7 @@ export default {
           link: slots.links,
           name: slots.names,
           info: slots.info,
+          tab: slots.tab,
 
           notFromThisGroup:
             slots.notFromThisGroup ??
@@ -66,6 +68,7 @@ export default {
             link,
             name,
             info,
+            tab,
             notFromThisGroup,
           }, index) =>
             link.slots({
@@ -73,6 +76,9 @@ export default {
                 link.getSlotValue('attributes'),
 
                 {class: ['grid-item', 'box']},
+
+                !html.isBlank(tab) &&
+                  {class: 'has-tab'},
 
                 attributes,
 
@@ -84,6 +90,11 @@ export default {
               colorContext: 'image-box',
 
               content: [
+                html.tag('span',
+                  {[html.onlyIfContent]: true},
+
+                  tab),
+
                 image.slots({
                   thumb: 'medium',
                   square: true,

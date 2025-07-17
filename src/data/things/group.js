@@ -33,6 +33,7 @@ export class Group extends Thing {
     name: name('Unnamed Group'),
     directory: directory(),
 
+    excludeFromGalleryTabs: flag(false),
     divideAlbumsByStyle: flag(false),
 
     description: contentString(),
@@ -145,6 +146,7 @@ export class Group extends Thing {
       'Group': {property: 'name'},
       'Directory': {property: 'directory'},
 
+      'Exclude From Gallery Tabs': {property: 'excludeFromGalleryTabs'},
       'Divide Albums By Style': {property: 'divideAlbumsByStyle'},
 
       'Description': {property: 'description'},
