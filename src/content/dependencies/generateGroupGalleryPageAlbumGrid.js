@@ -24,17 +24,17 @@ export default {
     names:
       albums.map(album => album.name),
 
+    styles:
+      albums.map(album => album.style),
+
+    tracks:
+      albums.map(album => album.tracks.length),
+
     durations:
       albums.map(album =>
         (album.hideDuration
           ? null
           : getTotalDuration(album.tracks))),
-
-    tracks:
-      albums.map(album => album.tracks.length),
-
-    styles:
-      albums.map(album => album.style),
 
     notFromThisGroup:
       albums.map(album => !album.groups.includes(group)),
@@ -64,10 +64,15 @@ export default {
 
         info:
           stitchArrays({
+            style: data.styles,
             tracks: data.tracks,
             duration: data.durations,
-          }).map(({tracks, duration}) =>
-              (duration
+          }).map(({style, tracks, duration}) =>
+              (style === 'single' && duration
+                ? language.$(capsule, 'details.albumLength.single', {
+                    time: language.formatDuration(duration),
+                  })
+             : duration
                 ? language.$(capsule, 'details.albumLength', {
                     tracks: language.countTracks(tracks, {unit: true}),
                     time: language.formatDuration(duration),
