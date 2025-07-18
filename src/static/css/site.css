@@ -1116,7 +1116,16 @@ a .normal-content {
   font-weight: 800;
 }
 
+.dot-switcher > span {
+  color: #ffffffcc;
+}
+
 .dot-switcher > span.current {
+  font-weight: normal;
+  color: white;
+}
+
+.dot-switcher > span.current a {
   font-weight: 800;
 }
 

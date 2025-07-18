@@ -39,11 +39,32 @@ export default {
         stitchArrays({
           title: slots.titles,
           targetID: slots.targetIDs,
-        }).map(({title, targetID}) =>
-            html.tag('a', {href: '#'},
-              {'data-target-id': targetID},
-              {[html.onlyIfContent]: true},
+        }).map(({title, targetID}) => {
+            const {content} = html.smush(title);
 
-              language.sanitize(title))),
+            const customCue =
+              content.find(item =>
+                item?.tagName === 'span' &&
+                item.attributes.has('class', 'dot-switcher-interaction-cue'));
+
+            const cue =
+              (customCue && !html.isBlank(customCue)
+                ? customCue.content
+                : language.sanitize(title));
+
+            const a =
+              html.tag('a', {href: '#'},
+                {'data-target-id': targetID},
+                {[html.onlyIfContent]: true},
+
+                cue);
+
+            if (customCue) {
+              content.splice(content.indexOf(customCue), 1, a);
+              return html.tags(content, {[html.joinChildren]: ''});
+            } else {
+              return a;
+            }
+          }),
     }),
 };
