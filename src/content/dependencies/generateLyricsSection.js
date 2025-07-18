@@ -21,10 +21,10 @@ export default {
       entries
         .map(entry => relation('generateLyricsEntry', entry)),
 
-    annotations:
+    annotationParts:
       entries
-        .map(entry => entry.annotation)
-        .map(annotation => relation('transformContent', annotation)),
+        .map(entry => entry.annotationParts
+          .map(part => relation('transformContent', part))),
   }),
 
   data: (entries) => ({
@@ -54,11 +54,24 @@ export default {
                 initialOptionIndex: 0,
 
                 titles:
-                  relations.annotations.map(annotation =>
-                    annotation.slots({
-                      mode: 'inline',
-                      textOnly: true,
-                    })),
+                  relations.annotationParts
+                    .map(([first, ...rest]) =>
+                      language.formatUnitList([
+                        html.tag('span',
+                          {class: 'dot-switcher-interaction-cue'},
+                          {[html.onlyIfContent]: true},
+
+                          first?.slots({
+                            mode: 'inline',
+                            textOnly: true,
+                          })),
+
+                        ...rest.map(part =>
+                          part.slots({
+                            mode: 'inline',
+                            textOnly: true,
+                          })),
+                      ])),
 
                 targetIDs:
                   data.ids,
