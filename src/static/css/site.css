@@ -1892,6 +1892,12 @@ p.image-details.origin-details .origin-details {
   opacity: 0.6;
 }
 
+.lyrics-entry sup {
+  vertical-align: text-top;
+  opacity: 0.8;
+  cursor: default;
+}
+
 .js-hide,
 .js-show-once-data,
 .js-hide-once-data {
