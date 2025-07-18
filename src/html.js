@@ -286,7 +286,11 @@ export const validators = {
   },
 };
 
-export function blank() {
+export function blank(...args) {
+  if (args.length) {
+    throw new Error(`Passed arguments - did you mean isBlank() instead?`)
+  }
+
   return [];
 }
 
