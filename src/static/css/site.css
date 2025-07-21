@@ -3078,6 +3078,40 @@ video.pixelate, .pixelate video {
   border: 1px dashed #fff3;
 }
 
+.grid-listing .reveal-all-container {
+  flex-basis: 100%;
+}
+
+.grid-listing:not(:has(.grid-item:not([class*="hidden-by-"]))) .reveal-all-container {
+  display: none;
+}
+
+.grid-listing .reveal-all-container.has-nearby-tab {
+  margin-bottom: 0.6em;
+}
+
+.grid-listing .reveal-all {
+  max-width: 400px;
+  margin: 0.20em auto 0;
+  text-align: center;
+}
+
+.grid-listing .reveal-all .warnings:not(.reveal-all:hover *) {
+  opacity: 0.4;
+}
+
+.grid-listing .reveal-all a {
+  display: inline-block;
+  margin-bottom: 0.15em;
+
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.grid-listing .reveal-all b {
+  white-space: nowrap;
+}
+
 .grid-item {
   line-height: 1.2;
   font-size: 0.9em;

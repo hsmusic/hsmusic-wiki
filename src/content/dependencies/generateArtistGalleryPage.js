@@ -58,6 +58,10 @@ export default {
         .map(artwork => artwork.artistContribs
           .filter(contrib => contrib.artist !== artist)
           .map(contrib => contrib.artist.name)),
+
+    allWarnings:
+      query.artworks
+        .flatMap(artwork => artwork.contentWarnings),
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -93,6 +97,8 @@ export default {
 
                     artists: language.formatUnitList(names),
                   })),
+
+              revealAllWarnings: data.allWarnings,
             }),
         ],
 

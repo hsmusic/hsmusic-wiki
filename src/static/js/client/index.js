@@ -19,6 +19,7 @@ import * as imageOverlayModule from './image-overlay.js';
 import * as intrapageDotSwitcherModule from './intrapage-dot-switcher.js';
 import * as liveMousePositionModule from './live-mouse-position.js';
 import * as quickDescriptionModule from './quick-description.js';
+import * as revealAllGridControlModule from './reveal-all-grid-control.js';
 import * as scriptedLinkModule from './scripted-link.js';
 import * as sidebarSearchModule from './sidebar-search.js';
 import * as stickyHeadingModule from './sticky-heading.js';
@@ -44,6 +45,7 @@ export const modules = [
   intrapageDotSwitcherModule,
   liveMousePositionModule,
   quickDescriptionModule,
+  revealAllGridControlModule,
   scriptedLinkModule,
   sidebarSearchModule,
   stickyHeadingModule,

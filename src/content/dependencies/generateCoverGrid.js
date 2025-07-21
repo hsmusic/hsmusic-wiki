@@ -1,4 +1,4 @@
-import {stitchArrays} from '#sugar';
+import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
   contentDependencies: ['generateGridActionLinks'],
@@ -41,6 +41,10 @@ export default {
 
     lazy: {validate: v => v.anyOf(v.isWholeNumber, v.isBoolean)},
     actionLinks: {validate: v => v.sparseArrayOf(v.isHTML)},
+
+    revealAllWarnings: {
+      validate: v => v.looseArrayOf(v.isString),
+    },
   },
 
   generate: (relations, slots, {html, language}) =>
@@ -49,6 +53,37 @@ export default {
       {[html.onlyIfContent]: true},
 
       [
+        !empty((slots.revealAllWarnings ?? []).filter(Boolean)) &&
+          language.encapsulate('misc.coverGrid.revealAll', capsule =>
+            html.tag('div', {class: 'reveal-all-container'},
+              ((slots.tab ?? [])
+                .slice(0, 4)
+                .some(tab => tab && !html.isBlank(tab))) &&
+
+                {class: 'has-nearby-tab'},
+
+              html.tag('p', {class: 'reveal-all'}, [
+                html.tag('a', {href: '#'}, [
+                  html.tag('span', {class: 'reveal-label'},
+                    language.$(capsule, 'reveal')),
+
+                  html.tag('span', {class: 'conceal-label'},
+                    {style: 'display: none'},
+                    language.$(capsule, 'conceal')),
+                ]),
+
+                html.tag('br'),
+
+                html.tag('span', {class: 'warnings'},
+                  language.$(capsule, 'warnings', {
+                    warnings:
+                      language.formatUnitList(
+                        unique(slots.revealAllWarnings.filter(Boolean))
+                          .sort()
+                          .map(warning => html.tag('b', warning))),
+                  })),
+              ]))),
+
         stitchArrays({
           classes: slots.classes,
           attributes: slots.itemAttributes,

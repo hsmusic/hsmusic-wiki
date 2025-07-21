@@ -1002,6 +1002,11 @@ misc:
   #   that thing.
 
   coverGrid:
+    revealAll:
+      reveal: "Reveal all artworks"
+      conceal: "Conceal all artworks"
+      warnings: "In this gallery: {WARNINGS}"
+
     noCoverArt: "{ALBUM}"
 
     tab:

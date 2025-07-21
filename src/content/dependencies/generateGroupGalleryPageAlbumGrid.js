@@ -37,6 +37,12 @@ export default {
 
         return album.artistContribs;
       }),
+
+    artworks:
+      albums.map(album =>
+        (album.hasCoverArt
+          ? album.coverArtworks[0]
+          : null)),
   }),
 
   relations: (relation, query, albums, _group) => ({
@@ -52,11 +58,8 @@ export default {
         .map(album => relation('linkAlbum', album)),
 
     images:
-      albums
-        .map(album =>
-          (album.hasCoverArt
-            ? relation('image', album.coverArtworks[0])
-            : relation('image')))
+      query.artworks
+        .map(artwork => relation('image', artwork)),
   }),
 
   data: (query, albums, group) => ({
@@ -68,6 +71,9 @@ export default {
 
     tracks:
       albums.map(album => album.tracks.length),
+
+    allWarnings:
+      query.artworks.flatMap(artwork => artwork?.contentWarnings),
 
     durations:
       albums.map(album =>
@@ -141,5 +147,7 @@ export default {
                     time: language.formatDuration(duration),
                   })
                 : null)),
+
+        revealAllWarnings: data.allWarnings,
       })),
 };

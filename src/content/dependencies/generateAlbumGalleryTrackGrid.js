@@ -77,6 +77,9 @@ export default {
           ? artwork.artistContribs
               .map(contrib => contrib.artist.name)
           : null)),
+
+    allWarnings:
+      query.artworks.flatMap(artwork => artwork?.contentWarnings),
   }),
 
   slots: {
@@ -117,6 +120,9 @@ export default {
                 artists:
                   language.formatUnitList(artists),
               })),
+
+          revealAllWarnings:
+            data.allWarnings,
         }),
       ]),
 };
