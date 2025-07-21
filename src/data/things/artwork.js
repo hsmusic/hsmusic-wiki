@@ -55,6 +55,7 @@ import {
 } from '#composite/wiki-properties';
 
 import {
+  withArtTags,
   withAttachedArtwork,
   withContainingArtworkList,
   withContribsFromAttachedArtwork,
@@ -209,46 +210,15 @@ export class Artwork extends Thing {
     artTagsFromThingProperty: simpleString(),
 
     artTags: [
-      withResolvedReferenceList({
-        list: input.updateValue({
+      withArtTags({
+        from: input.updateValue({
           validate:
             validateReferenceList(ArtTag[Thing.referenceType]),
         }),
-
-        find: soupyFind.input('artTag'),
       }),
 
-      exposeDependencyOrContinue({
-        dependency: '#resolvedReferenceList',
-        mode: input.value('empty'),
-      }),
-
-      withPropertyFromAttachedArtwork({
-        property: input.value('artTags'),
-      }),
-
-      exposeDependencyOrContinue({
-        dependency: '#attachedArtwork.artTags',
-      }),
-
-      exitWithoutDependency({
-        dependency: 'artTagsFromThingProperty',
-        value: input.value([]),
-      }),
-
-      withPropertyFromObject({
-        object: 'thing',
-        property: 'artTagsFromThingProperty',
-      }).outputs({
-        ['#value']: '#artTags',
-      }),
-
-      exposeDependencyOrContinue({
+      exposeDependency({
         dependency: '#artTags',
-      }),
-
-      exposeConstant({
-        value: input.value([]),
       }),
     ],
 

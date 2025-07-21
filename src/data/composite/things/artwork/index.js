@@ -1,3 +1,4 @@
+export {default as withArtTags} from './withArtTags.js';
 export {default as withAttachedArtwork} from './withAttachedArtwork.js';
 export {default as withContainingArtworkList} from './withContainingArtworkList.js';
 export {default as withContribsFromAttachedArtwork} from './withContribsFromAttachedArtwork.js';
