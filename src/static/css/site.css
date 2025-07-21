@@ -2903,6 +2903,16 @@ img {
   object-fit: cover;
 }
 
+.image {
+  --reveal-filter: ;
+  --shadow-filter: ;
+
+  backdrop-filter: blur(0);
+  filter:
+    var(--reveal-filter)
+    var(--shadow-filter);
+}
+
 p > img, li > img {
   max-width: 100%;
   object-fit: contain;
@@ -2969,9 +2979,9 @@ video.pixelate, .pixelate video {
   text-decoration-style: dotted;
 }
 
-.reveal .image {
+.reveal:not(.revealed) .image {
   opacity: 0.7;
-  filter: blur(20px) brightness(0.7);
+  --reveal-filter: blur(20px) brightness(0.7);
 }
 
 .reveal .image.reveal-thumbnail {
@@ -2995,7 +3005,6 @@ video.pixelate, .pixelate video {
 }
 
 .reveal.revealed .image {
-  filter: none;
   opacity: 1;
 }
 
@@ -3006,7 +3015,6 @@ video.pixelate, .pixelate video {
 .reveal:not(.revealed) .image-outer-area > * {
   --reveal-border-radius: 6px;
   position: relative;
-  overflow: hidden;
   border-radius: var(--reveal-border-radius);
 }
 
@@ -3042,7 +3050,7 @@ video.pixelate, .pixelate video {
 }
 
 .reveal:not(.revealed) .image-outer-area > *:hover .image {
-  filter: blur(20px) brightness(0.6);
+  --reveal-filter: blur(20px) brightness(0.6);
   opacity: 0.6;
 }
 
@@ -3166,10 +3174,16 @@ video.pixelate, .pixelate video {
 }
 
 .grid-item .image {
+  --shadow-filter:
+    drop-shadow(0 3px 2px #0004)
+    drop-shadow(0 1px 5px #0001)
+    drop-shadow(0 3px 4px #0001);
+
   width: 100%;
   height: 100% !important;
   margin-top: auto;
   margin-bottom: auto;
+  object-fit: contain;
 }
 
 .grid-item:hover {
