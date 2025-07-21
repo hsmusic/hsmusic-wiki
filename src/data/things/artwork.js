@@ -25,7 +25,7 @@ import {
   parseDimensions,
 } from '#yaml';
 
-import {withPropertyFromObject} from '#composite/data';
+import {withPropertyFromList, withPropertyFromObject} from '#composite/data';
 
 import {
   exitWithoutDependency,
@@ -58,6 +58,7 @@ import {
   withArtTags,
   withAttachedArtwork,
   withContainingArtworkList,
+  withContentWarningArtTags,
   withContribsFromAttachedArtwork,
   withPropertyFromAttachedArtwork,
   withDate,
@@ -360,6 +361,27 @@ export class Artwork extends Thing {
 
       exposeConstant({
         value: input.value([]),
+      }),
+    ],
+
+    contentWarningArtTags: [
+      withContentWarningArtTags(),
+
+      exposeDependency({
+        dependency: '#contentWarningArtTags',
+      }),
+    ],
+
+    contentWarnings: [
+      withContentWarningArtTags(),
+
+      withPropertyFromList({
+        list: '#contentWarningArtTags',
+        property: input.value('name'),
+      }),
+
+      exposeDependency({
+        dependency: '#contentWarningArtTags.name',
       }),
     ],
   });
