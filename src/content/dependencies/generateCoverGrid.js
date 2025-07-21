@@ -77,6 +77,7 @@ export default {
 
                 {class: ['grid-item', 'box']},
 
+                tab &&
                 !html.isBlank(tab) &&
                   {class: 'has-tab'},
 
