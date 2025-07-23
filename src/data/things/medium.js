@@ -54,12 +54,8 @@ export class Medium extends Thing {
       reverse: soupyReverse.input('mediaWhichDirectlyAncestor'),
     }),
 
-    officiallyRepresentedByTracks: reverseReferenceList({
-      reverse: soupyReverse.input('tracksWhichOfficiallyRepresent'),
-    }),
-
-    fannishlyRepresentedByTracks: reverseReferenceList({
-      reverse: soupyReverse.input('tracksWhichFannishlyRepresent'),
+    representedByTracks: reverseReferenceList({
+      reverse: soupyReverse.input('tracksWhichRepresent'),
     }),
   });
 

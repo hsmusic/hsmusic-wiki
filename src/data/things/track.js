@@ -205,14 +205,9 @@ export class Track extends Thing {
       }),
     ],
 
-    // > Update & expose - Represented media
+    // > Update & expose - Media
 
-    officiallyRepresentedMedia: referenceList({
-      class: input.value(Medium),
-      find: soupyFind.input('medium'),
-    }),
-
-    fannishlyRepresentedMedia: referenceList({
+    representedMedia: referenceList({
       class: input.value(Medium),
       find: soupyFind.input('medium'),
     }),
@@ -566,10 +561,9 @@ export class Track extends Thing {
         transform: parseContributors,
       },
 
-      // Represented media
+      // Media
 
-      'Officially Represented Media': {property: 'officiallyRepresentedMedia'},
-      'Fannishly Represented Media': {property: 'fannishlyRepresentedMedia'},
+      'Media': {property: 'representedMedia'},
 
       // General configuration
 
@@ -819,18 +813,11 @@ export class Track extends Thing {
       referenced: track => track.sampledTracks,
     },
 
-    tracksWhichOfficiallyRepresent: {
+    tracksWhichRepresent: {
       bindTo: 'trackData',
 
       referencing: track => [track],
-      referenced: track => track.officiallyRepresentedMedia,
-    },
-
-    tracksWhichFannishlyRepresent: {
-      bindTo: 'trackData',
-
-      referencing: track => [track],
-      referenced: track => track.fannishlyRepresentedMedia,
+      referenced: track => track.representedMedia,
     },
 
     tracksWhoseArtworksFeature: {

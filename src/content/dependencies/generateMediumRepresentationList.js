@@ -1,12 +1,11 @@
 export default {
   contentDependencies: ['generateTrackList'],
-  extraDependencies: ['html'],
 
-  relations: (relation, tracks) => ({
+  relations: (relation, medium) => ({
     trackList:
-      relation('generateTrackList', tracks, null),
+      relation('generateTrackList', medium.representedByTracks, null),
   }),
 
-  generate: (relations, {html}) =>
+  generate: (relations) =>
     relations.trackList,
 };

@@ -31,13 +31,8 @@ export default {
       medium.directDescendantMedia
         .map(medium => relation('linkMedium', medium)),
 
-    officialRepresentationList:
-      relation('generateMediumRepresentationList',
-        medium.officiallyRepresentedByTracks),
-
-    fannishRepresentationList:
-      relation('generateMediumRepresentationList',
-        medium.fannishlyRepresentedByTracks),
+    representationList:
+      relation('generateMediumRepresentationList', medium),
   }),
 
   data: (sprawl, medium) => ({
@@ -89,7 +84,7 @@ export default {
                     language.$(listCapsule, 'item', {medium: link})))),
             ])),
 
-          language.encapsulate('releaseInfo.musicThatOfficiallyRepresents', capsule =>
+          language.encapsulate('releaseInfo.musicThatRepresents', capsule =>
             html.tags([
               relations.contentHeading.clone()
                 .slots({
@@ -102,23 +97,7 @@ export default {
                     language.$(capsule, 'sticky'),
                 }),
 
-              relations.officialRepresentationList,
-            ])),
-
-          language.encapsulate('releaseInfo.musicThatFannishlyRepresents', capsule =>
-            html.tags([
-              relations.contentHeading.clone()
-                .slots({
-                  attributes: {id: 'fannishly-represented-by'},
-
-                  title:
-                    language.$(capsule, {medium: data.name}),
-
-                  stickyTitle:
-                    language.$(capsule, 'sticky'),
-                }),
-
-              relations.fannishRepresentationList,
+              relations.representationList,
             ])),
         ],
 

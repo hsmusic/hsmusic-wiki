@@ -97,11 +97,8 @@ export default {
     contributorContributionList:
       relation('generateContributionList', track.contributorContribs),
 
-    officiallyRepresentedMediaList:
-      relation('generateRepresentedMediaList', track.officiallyRepresentedMedia),
-
-    fannishlyRepresentedMediaList:
-      relation('generateRepresentedMediaList', track.fannishlyRepresentedMedia),
+    representedMediaList:
+      relation('generateRepresentedMediaList', track.representedMedia),
 
     referencedTracksList:
       relation('generateTrackList', track.referencedTracks, track),
@@ -263,7 +260,7 @@ export default {
             }),
           ]),
 
-          language.encapsulate('releaseInfo.mediaOfficiallyRepresented', capsule =>
+          language.encapsulate('releaseInfo.mediaRepresented', capsule =>
             html.tags([
               relations.contentHeading.clone()
                 .slots({
@@ -277,24 +274,7 @@ export default {
                     language.$(capsule, 'sticky'),
                 }),
 
-              relations.officiallyRepresentedMediaList,
-            ])),
-
-          language.encapsulate('releaseInfo.mediaFannishlyRepresented', capsule =>
-            html.tags([
-              relations.contentHeading.clone()
-                .slots({
-                  title:
-                    language.$(capsule, {
-                      track:
-                        html.tag('i', data.name),
-                    }),
-
-                  stickyTitle:
-                    language.$(capsule, 'sticky'),
-                }),
-
-              relations.fannishlyRepresentedMediaList,
+              relations.representedMediaList,
             ])),
 
           html.tags([
