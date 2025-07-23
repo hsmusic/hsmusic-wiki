@@ -12,6 +12,11 @@ export default {
       mutable: false,
     },
 
+    subtitle: {
+      type: 'html',
+      mutable: false,
+    },
+
     cover: {
       type: 'html',
       mutable: true,
@@ -40,6 +45,9 @@ export default {
 
                 slots.title,
               ]),
+
+              html.tag('h2', {[html.onlyIfContent]: true},
+                slots.subtitle),
 
               html.tag('div', {class: 'content-sticky-heading-cover-container'},
                 {[html.onlyIfContent]: true},

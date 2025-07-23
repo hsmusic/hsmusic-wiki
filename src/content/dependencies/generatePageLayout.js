@@ -303,6 +303,11 @@ export default {
             title: language.$('misc.additionalNames.tooltip').toString(),
           }, language.sanitize(slots.title)));
 
+    const subtitleContentsHTML =
+      (html.isBlank(slots.subtitle)
+        ? null
+        : language.sanitize(slots.subtitle));
+
     const titleHTML =
       (html.isBlank(slots.title)
         ? null
@@ -310,6 +315,7 @@ export default {
         ? [
             relations.stickyHeadingContainer.slots({
               title: titleContentsHTML,
+              subtitle: subtitleContentsHTML,
               cover: primaryCover,
             }),
 
@@ -319,13 +325,13 @@ export default {
           ]
         : html.tag('h1', titleContentsHTML));
 
-    // TODO: There could be neat interactions with the sticky heading here,
-    // but for now subtitle is totally separate.
     const subtitleHTML =
       (html.isBlank(slots.subtitle)
         ? null
+     : slots.headingMode === 'sticky'
+        ? null
         : html.tag('h2', {class: 'page-subtitle'},
-            language.sanitize(slots.subtitle)));
+            subtitleContentsHTML));
 
     let footerContent = slots.footerContent;
 
@@ -673,7 +679,10 @@ export default {
 
                 workingOptions.title = slots.title;
 
-                if (!html.isBlank(slots.subtitle)) {
+                considerSubtitle: {
+                  if (html.isBlank(slots.subtitle)) break considerSubtitle;
+                  if (slots.headingMode === 'sticky') break considerSubtitle;
+
                   workingCapsule += '.withSubtitle';
                   workingOptions.subtitle = slots.subtitle;
                 }

@@ -3652,7 +3652,8 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 .content-sticky-heading-container.has-cover .content-sticky-subheading-row {
   display: grid;
   grid-template-areas:
-    "title cover";
+    "title cover"
+    "subtitle cover";
   grid-template-columns: 1fr min(40%, 400px);
 }
 
@@ -3661,6 +3662,8 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 }
 
 .content-sticky-heading-row h1 {
+  grid-area: title;
+
   position: relative;
   margin: 0;
   padding-right: 20px;
@@ -3668,9 +3671,28 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 }
 
 .content-sticky-heading-row h1 .reference-collapsed-heading {
+  grid-area: title;
+
   position: absolute;
   white-space: nowrap;
   visibility: hidden;
+}
+
+.content-sticky-heading-row h2 {
+  grid-area: subtitle;
+
+  margin: 0.3em 0 0;
+  padding-right: 25px;
+
+  font-size: 0.9em;
+  font-weight: normal;
+  font-style: oblique;
+  opacity: 0.8;
+}
+
+.content-sticky-heading-row h2 a {
+  color: white;
+  font-weight: 800;
 }
 
 .content-sticky-heading-container.collapse h1 {
@@ -3709,9 +3731,15 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 }
 
 .content-sticky-heading-cover-container {
+  grid-area: cover;
+
   position: relative;
   height: 0;
   margin: -15px 0px -5px -5px;
+}
+
+h2 + .content-sticky-heading-cover-container {
+  margin-top: -5px;
 }
 
 .content-sticky-heading-cover-needs-reveal {
