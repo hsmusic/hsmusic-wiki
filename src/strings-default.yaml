@@ -2467,6 +2467,20 @@ newsIndex:
   entry:
     viewRest: "(View rest of entry!)"
 
+mediumPage:
+  title: "{MEDIUM}"
+
+  descendsFromMedia:
+    _: "Media which '{MEDIUM}' falls under:"
+    item: "{MEDIUM}"
+
+  descendantMedia:
+    _: "Media which fall under '{MEDIUM}':"
+    item: "{MEDIUM}"
+
+  nav:
+    medium: "Medium: {MEDIUM}"
+
 #
 # newsEntryPage:
 #   The news entry page displays all the content of a news entry,

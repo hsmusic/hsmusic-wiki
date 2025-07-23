@@ -7,6 +7,7 @@ export * as flashAct from './flash-act.js';
 export * as group from './group.js';
 export * as homepage from './homepage.js';
 export * as listing from './listing.js';
+export * as medium from './medium.js';
 export * as news from './news.js';
 export * as static from './static.js';
 export * as track from './track.js';

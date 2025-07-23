@@ -58,6 +58,8 @@ localized:
 
     listing: 'list/<>/'
 
+    medium: 'medium/<>/'
+
     newsIndex: 'news/'
 
     newsEntry: 'news/<>/'
