@@ -2558,6 +2558,7 @@ referencingArtworksPage:
 #
 trackPage:
   title: "{TRACK}"
+  subtitle.media: "{MEDIA}"
 
   nav:
     random: "Random"

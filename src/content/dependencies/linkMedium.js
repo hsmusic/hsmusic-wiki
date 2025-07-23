@@ -1,8 +1,31 @@
 export default {
   contentDependencies: ['linkThing'],
+  extraDependencies: ['html'],
 
-  relations: (relation, medium) =>
-    ({link: relation('linkThing', 'localized.medium', medium)}),
+  relations: (relation, medium) => ({
+    link:
+      relation('linkThing', 'localized.medium', medium),
+  }),
 
-  generate: (relations) => relations.link,
+  data: (medium) => ({
+    nameWithoutType:
+      medium.name.replace(/\s*\([^()]*\)$/, ''),
+  }),
+
+  slots: {
+    trimType: {
+      type: 'boolean',
+      default: false,
+    },
+  },
+
+  generate(data, relations, slots) {
+    const {link} = relations;
+
+    if (slots.trimType) {
+      link.setSlot('content', data.nameWithoutType);
+    }
+
+    return link;
+  },
 };
