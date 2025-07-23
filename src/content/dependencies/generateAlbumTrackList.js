@@ -38,6 +38,7 @@ export default {
   contentDependencies: [
     'generateAlbumTrackListItem',
     'generateContentHeading',
+    'linkMedium',
     'transformContent',
   ],
 
@@ -55,24 +56,32 @@ export default {
     switch (query.displayMode) {
       case 'trackSections':
         relations.trackSectionHeadings =
-          album.trackSections.map(() =>
-            relation('generateContentHeading'));
+          album.trackSections
+            .map(() => relation('generateContentHeading'));
 
         relations.trackSectionDescriptions =
-          album.trackSections.map(section =>
-            relation('transformContent', section.description));
+          album.trackSections
+            .map(section =>
+              relation('transformContent', section.description));
+
+        relations.trackSectionMediumLinks =
+          album.trackSections
+            .map(section => section.representedMedia
+              .map(medium => relation('linkMedium', medium)));
 
         relations.trackSectionItems =
-          album.trackSections.map(section =>
-            section.tracks.map(track =>
-              relation('generateAlbumTrackListItem', track, album)));
+          album.trackSections
+            .map(section => section.tracks
+              .map(track =>
+                relation('generateAlbumTrackListItem', track, album)));
 
         break;
 
       case 'tracks':
         relations.items =
-          album.tracks.map(track =>
-            relation('generateAlbumTrackListItem', track, album));
+          album.tracks
+            .map(track =>
+              relation('generateAlbumTrackListItem', track, album));
 
         break;
     }
@@ -111,6 +120,13 @@ export default {
               .map(() => null);
         }
 
+        data.trackSectionColors =
+          album.trackSections
+            .map(section =>
+              (section.color === album.color
+                ? null
+                : section.color));
+
         break;
     }
 
@@ -142,21 +158,25 @@ export default {
           stitchArrays({
             heading: relations.trackSectionHeadings,
             description: relations.trackSectionDescriptions,
+            mediumLinks: relations.trackSectionMediumLinks,
             items: relations.trackSectionItems,
 
             name: data.trackSectionNames,
             duration: data.trackSectionDurations,
             durationApproximate: data.trackSectionDurationsApproximate,
             startCountingFrom: data.trackSectionsStartCountingFrom,
+            color: data.trackSectionColors,
           }).map(({
               heading,
               description,
+              mediumLinks,
               items,
 
               name,
               duration,
               durationApproximate,
               startCountingFrom,
+              color,
             }) => [
               language.encapsulate('trackList.section', capsule =>
                 heading.slots({
@@ -186,7 +206,23 @@ export default {
               html.tag('dd', [
                 html.tag('blockquote',
                   {[html.onlyIfContent]: true},
+
                   description),
+
+                html.tag('p', {class: 'track-section-media'},
+                  {[html.onlyIfContent]: true},
+
+                  language.$('trackList.section.media', {
+                    [language.onlyIfOptions]: ['media'],
+
+                    media:
+                      language.formatUnitList(
+                        mediumLinks.map(link =>
+                          link.slots({
+                            trimType: true,
+                            linkSlots: {color},
+                          }))),
+                  })),
 
                 html.tag(listTag,
                   data.hasTrackNumbers &&

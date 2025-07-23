@@ -437,6 +437,8 @@ trackList:
     withDuration: "{SECTION}: ({DURATION})"
     sticky: "{SECTION}:"
 
+    media: "{MEDIA}"
+
   fromGroup: "From {GROUP}:"
   fromOther: "From somewhere else:"
 

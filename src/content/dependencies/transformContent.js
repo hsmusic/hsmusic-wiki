@@ -532,6 +532,9 @@ export default {
               return {type: 'text', data: nodeFromRelations.data};
             }
 
+            // TODO: Try `link.setSlot('linkSlots')` as another
+            // way to provide the stuff below.
+
             // TODO: This is a bit hacky, like the stuff below,
             // but since we dressed it up in a utility function
             // maybe it's okay...

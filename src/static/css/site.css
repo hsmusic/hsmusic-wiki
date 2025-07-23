@@ -2319,6 +2319,20 @@ li .origin-details {
   margin-bottom: 0;
 }
 
+/* frankenstein selector */
+.album-group-list .track-section-media {
+  margin-left: 40px;
+  max-width: 540px;
+  font-size: 0.95em;
+  margin-top: 0;
+  margin-bottom: 9px;
+}
+
+.album-group-list .track-section-media a {
+  font-style: oblique;
+  font-weight: 800;
+}
+
 .group-chronology-link,
 .series-chronology-link {
   font-style: oblique;

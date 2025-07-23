@@ -18,6 +18,10 @@ export default {
   }),
 
   slots: {
+    linkSlots: {
+      validate: v => v.isObject,
+    },
+
     trimType: {
       type: 'boolean',
       default: false,
@@ -39,6 +43,10 @@ export default {
 
         if (slots.trimType) {
           link.setSlot('content', data.nameWithoutType);
+        }
+
+        if (slots.linkSlots) {
+          link.setSlots(slots.linkSlots);
         }
 
         workingOptions.medium = link;

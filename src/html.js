@@ -1995,6 +1995,8 @@ export class Template {
       return Template.resolveForSlots(content, Object.keys(slots)).slots(slots);
     }
 
+    const initialContent = content;
+
     while (content instanceof Template) {
       try {
         for (const slot of slots) {
@@ -2009,7 +2011,7 @@ export class Template {
 
     throw new Error(
       `Didn't find slots ${inspect(slots, {compact: true})} ` +
-      `resolving ${inspect(tagOrTemplate, {compact: true})}`);
+      `resolving ${inspect(initialContent, {compact: true})}`);
   }
 
   [inspect.custom]() {

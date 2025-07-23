@@ -10,16 +10,8 @@ import {traverse} from '#node-utils';
 import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {empty} from '#sugar';
 import Thing from '#thing';
-
-import {
-  is,
-  isColor,
-  isContributionList,
-  isDate,
-  isDirectory,
-  isNumber,
-  validateReferenceList,
-} from '#validators';
+import {is, isColor, isContributionList, isDate, isDirectory, isNumber}
+  from '#validators';
 
 import {
   parseAdditionalFiles,
@@ -42,7 +34,6 @@ import {
   exposeDependency,
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
-  withResultOfAvailabilityCheck,
 } from '#composite/control-flow';
 
 import {
@@ -50,7 +41,6 @@ import {
   withDirectory,
   withHasArtwork,
   withResolvedContribs,
-  withResolvedReferenceList,
 } from '#composite/wiki-data';
 
 import {
@@ -79,7 +69,8 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {withCoverArtDate, withTracks} from '#composite/things/album';
+import {trackRepresentedMedia, withCoverArtDate, withTracks}
+  from '#composite/things/album';
 import {withAlbum, withContinueCountingFrom, withStartCountingFrom}
   from '#composite/things/track-section';
 
@@ -189,41 +180,7 @@ export class Album extends Thing {
       find: soupyFind.input('medium'),
     }),
 
-    trackRepresentedMedia: [
-      // An empty list is a valid override.
-      withResultOfAvailabilityCheck({
-        from: input.updateValue(),
-        mode: input.value('null'),
-      }),
-
-      withResolvedReferenceList({
-        list: input.updateValue({
-          validate: validateReferenceList(Medium[Thing.referenceType]),
-        }),
-
-        find: soupyFind.input('medium'),
-      }),
-
-      {
-        dependencies: ['#availability', '#resolvedReferenceList'],
-        compute: (continuation, {
-          ['#availability']: availability,
-          ['#resolvedReferenceList']: resolvedReferenceList,
-        }) =>
-          (availability
-            ? continuation.exit(resolvedReferenceList)
-            : continuation()),
-      },
-
-      withResolvedReferenceList({
-        list: 'representedMedia',
-        find: soupyFind.input('medium'),
-      }),
-
-      exposeDependency({
-        dependency: '#resolvedReferenceList',
-      }),
-    ],
+    trackRepresentedMedia: trackRepresentedMedia(),
 
     // > Update & expose - General configuration
 
@@ -1079,7 +1036,7 @@ export class TrackSection extends Thing {
   static [Thing.friendlyName] = `Track Section`;
   static [Thing.referenceType] = `track-section`;
 
-  static [Thing.getPropertyDescriptors] = ({Track}) => ({
+  static [Thing.getPropertyDescriptors] = ({Medium, Track}) => ({
     // Update & expose
 
     name: name('Unnamed Track Section'),
@@ -1109,6 +1066,30 @@ export class TrackSection extends Thing {
       exposeDependency({dependency: '#startCountingFrom'}),
     ],
 
+    representedMedia: referenceList({
+      class: input.value(Medium),
+      find: soupyFind.input('medium'),
+    }),
+
+    trackRepresentedMedia: [
+      {
+        dependencies: ['representedMedia', input.updateValue()],
+        compute: (continuation, {
+          ['representedMedia']: representedMedia,
+          [input.updateValue()]: trackRepresentedMedia,
+        }) => continuation({
+          ['#value']: trackRepresentedMedia ?? representedMedia,
+        }),
+      },
+
+      exitWithoutDependency({
+        dependency: '#value',
+        mode: input.value('null'),
+      }),
+
+      trackRepresentedMedia(),
+    ],
+
     dateOriginallyReleased: simpleDate(),
 
     isDefaultTrackSection: flag(false),
@@ -1126,6 +1107,7 @@ export class TrackSection extends Thing {
 
     // Update only
 
+    find: soupyFind(),
     reverse: soupyReverse(),
 
     // Expose only
@@ -1199,6 +1181,9 @@ export class TrackSection extends Thing {
       'Section': {property: 'name'},
       'Color': {property: 'color'},
       'Start Counting From': {property: 'startCountingFrom'},
+
+      'Media': {property: 'representedMedia'},
+      'Track Media': {property: 'trackRepresentedMedia'},
 
       'Date Originally Released': {
         property: 'dateOriginallyReleased',

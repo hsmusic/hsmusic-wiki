@@ -1699,7 +1699,7 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
       'wikiInfo',
     ]],
 
-    ['trackSectionData', [/* reverse */]],
+    ['trackSectionData', [/* find, reverse */]],
 
     ['wikiInfo', [/* find */]],
   ]);
