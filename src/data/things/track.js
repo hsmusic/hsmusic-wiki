@@ -4,8 +4,15 @@ import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input} from '#composite';
 import Thing from '#thing';
-import {isBoolean, isColor, isContributionList, isDate, isFileExtension}
-  from '#validators';
+
+import {
+  isBoolean,
+  isColor,
+  isContributionList,
+  isDate,
+  isFileExtension,
+  validateReferenceList,
+} from '#validators';
 
 import {
   parseAdditionalFiles,
@@ -74,8 +81,10 @@ import {
   withDirectorySuffix,
   withHasUniqueCoverArt,
   withMainRelease,
+  withInheritedMedia,
   withOtherReleases,
   withPropertyFromAlbum,
+  withRepresentedMedia,
   withSuffixDirectoryFromAlbum,
   withTrackArtDate,
   withTrackNumber,
@@ -207,10 +216,19 @@ export class Track extends Thing {
 
     // > Update & expose - Media
 
-    representedMedia: referenceList({
-      class: input.value(Medium),
-      find: soupyFind.input('medium'),
-    }),
+    inheritMedia: flag(true),
+
+    representedMedia: [
+      withRepresentedMedia({
+        from: input.updateValue({
+          validate: validateReferenceList(Medium[Thing.referenceType]),
+        }),
+      }),
+
+      exposeDependency({
+        dependency: '#representedMedia',
+      }),
+    ],
 
     // > Update & expose - General configuration
 
@@ -496,6 +514,14 @@ export class Track extends Thing {
       }),
     ],
 
+    inheritedMedia: [
+      withInheritedMedia(),
+
+      exposeDependency({
+        dependency: '#inheritedMedia',
+      }),
+    ],
+
     groups: [
       withPropertyFromAlbum({
         property: input.value('groups'),
@@ -562,6 +588,8 @@ export class Track extends Thing {
       },
 
       // Media
+
+      'Inherit Media': {property: 'inheritMedia'},
 
       'Media': {property: 'representedMedia'},
 

@@ -173,12 +173,11 @@ export default {
             pageCapsule,
           }),
 
+        color: data.color,
+        styleTags: relations.albumStyleTags,
         headingMode: 'sticky',
 
         additionalNames: relations.additionalNamesBox,
-
-        color: data.color,
-        styleTags: relations.albumStyleTags,
 
         artworkColumnContent:
           relations.artworkColumn,

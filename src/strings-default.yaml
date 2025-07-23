@@ -1148,6 +1148,7 @@ albumSecondaryNav:
 #
 albumPage:
   title: "{ALBUM}"
+  subtitle.media: "{MEDIA}"
 
   nav:
     album: "{ALBUM}"

@@ -10,8 +10,16 @@ import {traverse} from '#node-utils';
 import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {empty} from '#sugar';
 import Thing from '#thing';
-import {is, isColor, isContributionList, isDate, isDirectory, isNumber}
-  from '#validators';
+
+import {
+  is,
+  isColor,
+  isContributionList,
+  isDate,
+  isDirectory,
+  isNumber,
+  validateReferenceList,
+} from '#validators';
 
 import {
   parseAdditionalFiles,
@@ -34,6 +42,7 @@ import {
   exposeDependency,
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
+  withResultOfAvailabilityCheck,
 } from '#composite/control-flow';
 
 import {
@@ -41,6 +50,7 @@ import {
   withDirectory,
   withHasArtwork,
   withResolvedContribs,
+  withResolvedReferenceList,
 } from '#composite/wiki-data';
 
 import {
@@ -84,6 +94,7 @@ export class Album extends Thing {
     CommentaryEntry,
     CreditingSourcesEntry,
     Group,
+    Medium,
     TrackSection,
     WikiInfo,
   }) => ({
@@ -169,6 +180,49 @@ export class Album extends Thing {
       }),
 
       exposeDependency({dependency: '#trackArtistContribs'}),
+    ],
+
+    // > Update & expose - Media
+
+    representedMedia: referenceList({
+      class: input.value(Medium),
+      find: soupyFind.input('medium'),
+    }),
+
+    trackRepresentedMedia: [
+      // An empty list is a valid override.
+      withResultOfAvailabilityCheck({
+        from: input.updateValue(),
+        mode: input.value('null'),
+      }),
+
+      withResolvedReferenceList({
+        list: input.updateValue({
+          validate: validateReferenceList(Medium[Thing.referenceType]),
+        }),
+
+        find: soupyFind.input('medium'),
+      }),
+
+      {
+        dependencies: ['#availability', '#resolvedReferenceList'],
+        compute: (continuation, {
+          ['#availability']: availability,
+          ['#resolvedReferenceList']: resolvedReferenceList,
+        }) =>
+          (availability
+            ? continuation.exit(resolvedReferenceList)
+            : continuation()),
+      },
+
+      withResolvedReferenceList({
+        list: 'representedMedia',
+        find: soupyFind.input('medium'),
+      }),
+
+      exposeDependency({
+        dependency: '#resolvedReferenceList',
+      }),
     ],
 
     // > Update & expose - General configuration
@@ -557,6 +611,13 @@ export class Album extends Thing {
       referenced: album => album.trackSections,
     },
 
+    albumsWhichRepresent: {
+      bindTo: 'albumData',
+
+      referencing: album => [album],
+      referenced: album => album.representedMedia,
+    },
+
     albumsWhoseArtworksFeature: {
       bindTo: 'albumData',
 
@@ -642,6 +703,11 @@ export class Album extends Thing {
         property: 'trackArtistContribs',
         transform: parseContributors,
       },
+
+      // Media
+
+      'Media': {property: 'representedMedia'},
+      'Track Media': {property: 'trackRepresentedMedia'},
 
       // General configuration
 

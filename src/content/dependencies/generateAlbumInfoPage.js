@@ -17,6 +17,7 @@ export default {
     'generateCommentaryEntry',
     'generateContentContentHeading',
     'generateContentHeading',
+    'generateMediaSubtitle',
     'generatePageLayout',
     'generateReadCommentaryLine',
     'linkAlbumCommentary',
@@ -43,6 +44,9 @@ export default {
 
     sidebar:
       relation('generateAlbumSidebar', album, null),
+
+    mediaSubtitle:
+      relation('generateMediaSubtitle', album),
 
     additionalNamesBox:
       relation('generateAdditionalNamesBox', album.additionalNames),
@@ -112,6 +116,11 @@ export default {
         title:
           language.$(pageCapsule, 'title', {
             album: data.name,
+          }),
+
+        subtitle:
+          relations.mediaSubtitle.slots({
+            pageCapsule,
           }),
 
         color: data.color,

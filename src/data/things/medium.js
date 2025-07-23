@@ -54,6 +54,10 @@ export class Medium extends Thing {
       reverse: soupyReverse.input('mediaWhichDirectlyAncestor'),
     }),
 
+    representedByAlbums: reverseReferenceList({
+      reverse: soupyReverse.input('albumsWhichRepresent'),
+    }),
+
     representedByTracks: reverseReferenceList({
       reverse: soupyReverse.input('tracksWhichRepresent'),
     }),

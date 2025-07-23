@@ -181,6 +181,8 @@ export function filterReferenceErrors(wikiData, {
       trackCoverArtistContribs: '_contrib',
       wallpaperArtistContribs: '_contrib',
       bannerArtistContribs: '_contrib',
+      representedMedia: 'medium',
+      trackRepresentedMedia: 'medium',
       groups: 'group',
       artTags: '_artTag',
       referencedArtworks: '_artwork',
