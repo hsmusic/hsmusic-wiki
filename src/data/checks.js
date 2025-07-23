@@ -225,6 +225,10 @@ export function filterReferenceErrors(wikiData, {
       flashes: 'flash',
     }],
 
+    ['mediaData', {
+      directDescendantMedia: 'media',
+    }],
+
     ['seriesData', {
       albums: 'album',
     }],

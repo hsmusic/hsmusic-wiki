@@ -1661,7 +1661,7 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
       'wikiInfo',
     ]],
 
-    ['artTagData', [/* reverse */]],
+    ['artTagData', [/* find, reverse */]],
 
     ['artistData', [/* find, reverse */]],
 
@@ -1686,6 +1686,8 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
     ['homepageLayout.sections.rows', [/* find */]],
 
     ['lyricsData', [/* find */]],
+
+    ['mediaData', [/* find, reverse */]],
 
     ['referencingSourceData', [/* find */]],
 

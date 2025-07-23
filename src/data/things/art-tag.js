@@ -192,7 +192,7 @@ export class ArtTag extends Thing {
     documentModes: {allTogether},
     thingConstructors: {ArtTag},
   }) => ({
-    title: `Process art tags file`,
+    title: `Process art tag list files`,
 
     files: dataPath =>
       Promise.allSettled([
