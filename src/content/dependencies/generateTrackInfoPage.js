@@ -12,6 +12,7 @@ export default {
     'generateContentHeading',
     'generateContributionList',
     'generateLyricsSection',
+    'generateMediaSubtitle',
     'generatePageLayout',
     'generateReadCommentaryLine',
     'generateTrackArtistCommentarySection',
@@ -24,7 +25,6 @@ export default {
     'generateTrackReleaseInfo',
     'generateTrackSocialEmbed',
     'linkAlbum',
-    'linkMedium',
     'linkTrack',
     'transformContent',
   ],
@@ -71,9 +71,8 @@ export default {
     sidebar:
       relation('generateAlbumSidebar', track.album, track),
 
-    mediumLinks:
-      track.representedMedia
-        .map(medium => relation('linkMedium', medium)),
+    mediaSubtitle:
+      relation('generateMediaSubtitle', track),
 
     additionalNamesBox:
       relation('generateAdditionalNamesBox', track.additionalNames),
@@ -170,15 +169,8 @@ export default {
           }),
 
         subtitle:
-          language.$(pageCapsule, 'subtitle.media', {
-            [language.onlyIfOptions]: ['media'],
-
-            media:
-              language.formatUnitList(
-                relations.mediumLinks.map(link => link
-                  .slots({
-                    trimType: true,
-                  }))),
+          relations.mediaSubtitle.slots({
+            pageCapsule,
           }),
 
         headingMode: 'sticky',
