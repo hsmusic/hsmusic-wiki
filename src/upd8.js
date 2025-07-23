@@ -1599,7 +1599,7 @@ async function main() {
       logThings('groupData', 'groups');
       logThings('groupCategoryData', 'group categories');
       logThings('artTagData', 'art tags');
-      logThings('mediaData', 'media');
+      logThings('mediumData', 'media');
       if (wikiData.newsData) {
         logThings('newsData', 'news entries');
       }

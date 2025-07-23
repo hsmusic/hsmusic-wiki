@@ -225,8 +225,8 @@ export function filterReferenceErrors(wikiData, {
       flashes: 'flash',
     }],
 
-    ['mediaData', {
-      directDescendantMedia: 'media',
+    ['mediumData', {
+      directDescendantMedia: 'medium',
     }],
 
     ['seriesData', {

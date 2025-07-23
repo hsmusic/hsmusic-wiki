@@ -1687,7 +1687,7 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
 
     ['lyricsData', [/* find */]],
 
-    ['mediaData', [/* find, reverse */]],
+    ['mediumData', [/* find, reverse */]],
 
     ['referencingSourceData', [/* find */]],
 

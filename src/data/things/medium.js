@@ -20,21 +20,21 @@ import {
   soupyReverse,
 } from '#composite/wiki-properties';
 
-export class Media extends Thing {
-  static [Thing.referenceType] = 'media';
-  static [Thing.friendlyName] = `Media`;
+export class Medium extends Thing {
+  static [Thing.referenceType] = 'medium';
+  static [Thing.friendlyName] = `Medium`;
 
-  static [Thing.getPropertyDescriptors] = ({Media}) => ({
+  static [Thing.getPropertyDescriptors] = ({Medium}) => ({
     // > Update & expose - Identifying metadata
 
-    name: name('Unnamed Media'),
+    name: name('Unnamed Medium'),
     directory: directory(),
 
-    // > Update & expose - Media relationships
+    // > Update & expose - Medium relationships
 
     directDescendantMedia: referenceList({
-      class: input.value(Media),
-      find: soupyFind.input('media'),
+      class: input.value(Medium),
+      find: soupyFind.input('medium'),
     }),
 
     // > Update only
@@ -44,7 +44,7 @@ export class Media extends Thing {
 
     // > Expose only
 
-    isMedia: [
+    isMedium: [
       exposeConstant({
         value: input.value(true),
       }),
@@ -56,18 +56,18 @@ export class Media extends Thing {
   });
 
   static [Thing.findSpecs] = {
-    media: {
-      referenceTypes: ['media'],
-      bindTo: 'mediaData',
+    medium: {
+      referenceTypes: ['medium'],
+      bindTo: 'mediumData',
     },
   };
 
   static [Thing.reverseSpecs] = {
     mediaWhichDirectlyAncestor: {
-      bindTo: 'mediaData',
+      bindTo: 'mediumData',
 
-      referencing: media => [media],
-      referenced: media => media.directDescendantMedia,
+      referencing: medium => [medium],
+      referenced: medium => medium.directDescendantMedia,
     },
   };
 
@@ -75,10 +75,10 @@ export class Media extends Thing {
     fields: {
       // Identifying metadata
 
-      'Media': {property: 'name'},
+      'Medium': {property: 'name'},
       'Directory': {property: 'directory'},
 
-      // Media relationships
+      // Medium relationships
 
       'Direct Descendant Media': {property: 'directDescendantMedia'},
     },
@@ -86,7 +86,7 @@ export class Media extends Thing {
 
   static [Thing.getYamlLoadingSpec] = ({
     documentModes: {allTogether},
-    thingConstructors: {Media},
+    thingConstructors: {Medium},
   }) => ({
     title: `Process media list files`,
 
@@ -104,12 +104,12 @@ export class Media extends Thing {
           .flatMap(({value}) => value)),
 
     documentMode: allTogether,
-    documentThing: Media,
+    documentThing: Medium,
 
-    save: (results) => ({mediaData: results}),
+    save: (results) => ({mediumData: results}),
 
-    sort({mediaData}) {
-      sortAlphabetically(mediaData);
+    sort({mediumData}) {
+      sortAlphabetically(mediumData);
     },
   });
 }
