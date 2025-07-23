@@ -278,6 +278,7 @@ releaseInfo:
   wallpaperArtBy: "Wallpaper by {ARTISTS}"
   bannerArtBy: "Banner by {ARTISTS}"
 
+  dated: "Dated {DATE}."
   released: "Released {DATE}."
   albumReleased: "Album released {DATE}."
   trackReleased: "Track released {DATE}."
@@ -610,6 +611,10 @@ misc:
         trackArt: "track art"
         trackContribution: "track contribution"
         wallpaperArt: "wallpaper art"
+
+  mediumLink:
+    _: "{MEDIUM}"
+    withYear: "{MEDIUM} ({YEAR})"
 
   # chronology:
   #

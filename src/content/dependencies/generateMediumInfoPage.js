@@ -41,6 +41,9 @@ export default {
 
     name:
       medium.name,
+
+    date:
+      medium.date,
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -52,6 +55,18 @@ export default {
         headingMode: 'sticky',
 
         mainContent: [
+          language.encapsulate('releaseInfo', capsule =>
+            html.tag('p',
+              {[html.joinChildren]: html.tag('br')},
+              {[html.onlyIfContent]: true},
+
+              [
+                language.$(capsule, 'dated', {
+                  [language.onlyIfOptions]: ['date'],
+                  date: language.formatDate(data.date),
+                }),
+              ])),
+
           language.encapsulate(pageCapsule, 'descendsFromMedia', listCapsule =>
             html.tags([
               relations.contentHeading.clone()

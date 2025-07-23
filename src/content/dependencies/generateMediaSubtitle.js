@@ -2,9 +2,14 @@ export default {
   contentDependencies: ['linkMedium'],
   extraDependencies: ['html', 'language'],
 
-  relations: (relation, thing) => ({
+  query: (thing) => ({
+    media:
+      thing.representedMedia,
+  }),
+
+  relations: (relation, query, _thing) => ({
     mediumLinks:
-      thing.representedMedia
+      query.media
         .map(medium => relation('linkMedium', medium)),
   }),
 
@@ -12,15 +17,21 @@ export default {
     pageCapsule: {type: 'string'},
   },
 
-  generate: (relations, slots, {language}) =>
+  generate: (relations, slots, {html, language}) =>
     language.$(slots.pageCapsule, 'subtitle.media', {
       [language.onlyIfOptions]: ['media'],
 
       media:
-        language.formatUnitList(
-          relations.mediumLinks.map(link => link
-            .slots({
-              trimType: true,
-            }))),
+        // XXX: Kludge. The span here is necessary to make chunkwrap
+        // work at all within the string, but that seems ridiculous??
+        html.tag('span',
+          html.metatag('chunkwrap', {split: /,/},
+            html.resolve(
+              language.formatUnitList(
+                relations.mediumLinks.map(link =>
+                  link.slots({
+                    trimType: true,
+                    showYear: true,
+                  })))))),
     }),
 }

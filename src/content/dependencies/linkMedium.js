@@ -1,6 +1,6 @@
 export default {
   contentDependencies: ['linkThing'],
-  extraDependencies: ['html'],
+  extraDependencies: ['html', 'language'],
 
   relations: (relation, medium) => ({
     link:
@@ -10,6 +10,11 @@ export default {
   data: (medium) => ({
     nameWithoutType:
       medium.name.replace(/\s*\([^()]*\)$/, ''),
+
+    year:
+      (medium.date
+        ? medium.date.getFullYear()
+        : null),
   }),
 
   slots: {
@@ -17,15 +22,32 @@ export default {
       type: 'boolean',
       default: false,
     },
+
+    showYear: {
+      type: 'boolean',
+      default: false,
+    },
   },
 
-  generate(data, relations, slots) {
-    const {link} = relations;
+  generate: (data, relations, slots, {html, language}) =>
+    html.tag('span', {class: 'medium'},
+      {[html.noEdgeWhitespace]: true},
 
-    if (slots.trimType) {
-      link.setSlot('content', data.nameWithoutType);
-    }
+      language.encapsulate('misc.mediumLink', workingCapsule => {
+        const workingOptions = {};
+        const {link} = relations;
 
-    return link;
-  },
+        if (slots.trimType) {
+          link.setSlot('content', data.nameWithoutType);
+        }
+
+        workingOptions.medium = link;
+
+        if (slots.showYear && data.year) {
+          workingCapsule += '.withYear';
+          workingOptions.year = data.year;
+        }
+
+        return language.$(workingCapsule, workingOptions);
+      })),
 };

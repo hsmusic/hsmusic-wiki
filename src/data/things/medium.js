@@ -8,6 +8,7 @@ import {input} from '#composite';
 import {traverse} from '#node-utils';
 import {sortAlphabetically} from '#sort';
 import Thing from '#thing';
+import {parseDate} from '#yaml';
 
 import {exposeConstant} from '#composite/control-flow';
 
@@ -16,6 +17,7 @@ import {
   name,
   referenceList,
   reverseReferenceList,
+  simpleDate,
   soupyFind,
   soupyReverse,
 } from '#composite/wiki-properties';
@@ -29,6 +31,8 @@ export class Medium extends Thing {
 
     name: name('Unnamed Medium'),
     directory: directory(),
+
+    date: simpleDate(),
 
     // > Update & expose - Medium relationships
 
@@ -85,6 +89,11 @@ export class Medium extends Thing {
 
       'Medium': {property: 'name'},
       'Directory': {property: 'directory'},
+
+      'Date': {
+        property: 'date',
+        transform: parseDate,
+      },
 
       // Medium relationships
 
