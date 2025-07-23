@@ -93,6 +93,7 @@ export class Track extends Thing {
     CommentaryEntry,
     CreditingSourcesEntry,
     LyricsEntry,
+    Medium,
     ReferencingSourcesEntry,
     WikiInfo,
   }) => ({
@@ -203,6 +204,18 @@ export class Track extends Thing {
         artistProperty: input.value('trackContributorContributions'),
       }),
     ],
+
+    // > Update & expose - Represented media
+
+    officiallyRepresentedMedia: referenceList({
+      class: input.value(Medium),
+      find: soupyFind.input('medium'),
+    }),
+
+    fannishlyRepresentedMedia: referenceList({
+      class: input.value(Medium),
+      find: soupyFind.input('medium'),
+    }),
 
     // > Update & expose - General configuration
 
@@ -553,6 +566,11 @@ export class Track extends Thing {
         transform: parseContributors,
       },
 
+      // Represented media
+
+      'Officially Represented Media': {property: 'officiallyRepresentedMedia'},
+      'Fannishly Represented Media': {property: 'fannishlyRepresentedMedia'},
+
       // General configuration
 
       'Count In Artist Totals': {property: 'countInArtistTotals'},
@@ -799,6 +817,20 @@ export class Track extends Thing {
 
       referencing: track => track.isMainRelease ? [track] : [],
       referenced: track => track.sampledTracks,
+    },
+
+    tracksWhichOfficiallyRepresent: {
+      bindTo: 'trackData',
+
+      referencing: track => [track],
+      referenced: track => track.officiallyRepresentedMedia,
+    },
+
+    tracksWhichFannishlyRepresent: {
+      bindTo: 'trackData',
+
+      referencing: track => [track],
+      referenced: track => track.fannishlyRepresentedMedia,
     },
 
     tracksWhoseArtworksFeature: {

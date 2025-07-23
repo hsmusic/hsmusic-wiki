@@ -1,6 +1,7 @@
 export default {
   contentDependencies: [
     'generateContentHeading',
+    'generateMediumRepresentationList',
     'generatePageLayout',
     'linkMedium',
   ],
@@ -29,6 +30,14 @@ export default {
     directDescendantLinks:
       medium.directDescendantMedia
         .map(medium => relation('linkMedium', medium)),
+
+    officialRepresentationList:
+      relation('generateMediumRepresentationList',
+        medium.officiallyRepresentedByTracks),
+
+    fannishRepresentationList:
+      relation('generateMediumRepresentationList',
+        medium.fannishlyRepresentedByTracks),
   }),
 
   data: (sprawl, medium) => ({
@@ -43,9 +52,7 @@ export default {
     language.encapsulate('mediumPage', pageCapsule =>
       relations.layout.slots({
         title:
-          language.$(pageCapsule, 'title', {
-            medium: language.sanitize(data.name),
-          }),
+          language.$(pageCapsule, 'title', {medium: data.name}),
 
         headingMode: 'sticky',
 
@@ -55,9 +62,7 @@ export default {
               relations.contentHeading.clone()
                 .slots({
                   title:
-                    language.$(listCapsule, {
-                      medium: language.sanitize(data.name),
-                    }),
+                    language.$(listCapsule, {medium: data.name}),
                 }),
 
               html.tag('ul',
@@ -65,9 +70,7 @@ export default {
 
                 relations.directAncestorLinks.map(link =>
                   html.tag('li',
-                    language.$(listCapsule, 'item', {
-                      medium: link,
-                    })))),
+                    language.$(listCapsule, 'item', {medium: link})))),
             ])),
 
           language.encapsulate(pageCapsule, 'descendantMedia', listCapsule =>
@@ -75,9 +78,7 @@ export default {
               relations.contentHeading.clone()
                 .slots({
                   title:
-                    language.$(listCapsule, {
-                      medium: language.sanitize(data.name),
-                    }),
+                    language.$(listCapsule, {medium: data.name}),
                 }),
 
               html.tag('ul',
@@ -85,9 +86,39 @@ export default {
 
                 relations.directDescendantLinks.map(link =>
                   html.tag('li',
-                    language.$(listCapsule, 'item', {
-                      medium: link,
-                    })))),
+                    language.$(listCapsule, 'item', {medium: link})))),
+            ])),
+
+          language.encapsulate('releaseInfo.musicThatOfficiallyRepresents', capsule =>
+            html.tags([
+              relations.contentHeading.clone()
+                .slots({
+                  attributes: {id: 'offically-represented-by'},
+
+                  title:
+                    language.$(capsule, {medium: data.name}),
+
+                  stickyTitle:
+                    language.$(capsule, 'sticky'),
+                }),
+
+              relations.officialRepresentationList,
+            ])),
+
+          language.encapsulate('releaseInfo.musicThatFannishlyRepresents', capsule =>
+            html.tags([
+              relations.contentHeading.clone()
+                .slots({
+                  attributes: {id: 'fannishly-represented-by'},
+
+                  title:
+                    language.$(capsule, {medium: data.name}),
+
+                  stickyTitle:
+                    language.$(capsule, 'sticky'),
+                }),
+
+              relations.fannishRepresentationList,
             ])),
         ],
 

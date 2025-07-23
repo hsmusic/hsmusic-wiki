@@ -331,6 +331,22 @@ releaseInfo:
   referencesArtworks: "References {ARTWORKS}."
   referencedByArtworks: "Referenced by {ARTWORKS}."
 
+  mediaOfficiallyRepresented:
+    _: "Media that {TRACK} officially represents:"
+    sticky: "Media that this track officially represents:"
+
+  mediaFannishlyRepresented:
+    _: "Media that {TRACK} fannishly represents:"
+    sticky: "Media that this track fannishly represents:"
+
+  musicThatOfficiallyRepresents:
+    _: "Music that officially represents '{MEDIUM}':"
+    sticky: "Music that officially represents this medium:"
+
+  musicThatFannishlyRepresents:
+    _: "Music that fannishly represents '{MEDIUM}':"
+    sticky: "Music that fannishly represents this medium:"
+
   # Note that there's no sticky variant here,
   # such as "Tracks that this flash features",
   # because not all flashes are *called* flashes!

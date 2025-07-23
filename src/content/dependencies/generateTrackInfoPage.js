@@ -14,6 +14,7 @@ export default {
     'generateLyricsSection',
     'generatePageLayout',
     'generateReadCommentaryLine',
+    'generateRepresentedMediaList',
     'generateTrackArtistCommentarySection',
     'generateTrackArtworkColumn',
     'generateTrackInfoPageFeaturedByFlashesList',
@@ -95,6 +96,12 @@ export default {
 
     contributorContributionList:
       relation('generateContributionList', track.contributorContribs),
+
+    officiallyRepresentedMediaList:
+      relation('generateRepresentedMediaList', track.officiallyRepresentedMedia),
+
+    fannishlyRepresentedMediaList:
+      relation('generateRepresentedMediaList', track.fannishlyRepresentedMedia),
 
     referencedTracksList:
       relation('generateTrackList', track.referencedTracks, track),
@@ -255,6 +262,40 @@ export default {
               chronologyKind: 'trackContribution',
             }),
           ]),
+
+          language.encapsulate('releaseInfo.mediaOfficiallyRepresented', capsule =>
+            html.tags([
+              relations.contentHeading.clone()
+                .slots({
+                  title:
+                    language.$(capsule, {
+                      track:
+                        html.tag('i', data.name),
+                    }),
+
+                  stickyTitle:
+                    language.$(capsule, 'sticky'),
+                }),
+
+              relations.officiallyRepresentedMediaList,
+            ])),
+
+          language.encapsulate('releaseInfo.mediaFannishlyRepresented', capsule =>
+            html.tags([
+              relations.contentHeading.clone()
+                .slots({
+                  title:
+                    language.$(capsule, {
+                      track:
+                        html.tag('i', data.name),
+                    }),
+
+                  stickyTitle:
+                    language.$(capsule, 'sticky'),
+                }),
+
+              relations.fannishlyRepresentedMediaList,
+            ])),
 
           html.tags([
             language.encapsulate('releaseInfo.tracksReferenced', capsule =>
