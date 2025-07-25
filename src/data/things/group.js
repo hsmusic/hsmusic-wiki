@@ -19,6 +19,7 @@ import {
   name,
   referenceList,
   soupyFind,
+  soupyReverse,
   thing,
   thingList,
   urls,
@@ -60,7 +61,7 @@ export class Group extends Thing {
     // Update only
 
     find: soupyFind(),
-    reverse: soupyFind(),
+    reverse: soupyReverse(),
 
     // Expose only
 
