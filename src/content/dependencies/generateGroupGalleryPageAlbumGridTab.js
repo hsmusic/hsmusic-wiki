@@ -5,50 +5,64 @@ export default {
   extraDependencies: ['language'],
 
   query(album, group) {
-    const query = {};
+    if (album.groups.length > 1) {
+      const contextGroup = group;
 
-    const contextGroup = group;
+      const candidateGroups =
+        album.groups
+          .filter(group => !group.excludeFromGalleryTabs)
+          .filter(group => group.category !== contextGroup.category);
 
-    const candidateGroups =
-      album.groups
-        .filter(group => !group.excludeFromGalleryTabs)
-        .filter(group => group.category !== contextGroup.category);
-
-    query.notedGroup = candidateGroups.at(0) ?? null;
-
-    if (
-      album.artistContribs.length === 1 &&
-      !empty(group.closelyLinkedArtists) &&
-      (album.artistContribs[0].artist.name ===
-       group.closelyLinkedArtists[0].artist.name)
-    ) {
-      query.notedArtistContribs = [];
-    } else {
-      query.notedArtistContribs = album.artistContribs;
+      if (!empty(candidateGroups)) {
+        return {
+          mode: 'group',
+          notedGroup: candidateGroups.at(0),
+        };
+      }
     }
 
-    return query;
+    if (!empty(album.artistContribs)) {
+      if (
+        album.artistContribs.length === 1 &&
+        !empty(group.closelyLinkedArtists) &&
+        (album.artistContribs[0].artist.name ===
+         group.closelyLinkedArtists[0].artist.name)
+      ) {
+        return {mode: null};
+      }
+
+      return {
+        mode: 'artists',
+        notedArtistContribs: album.artistContribs,
+      };
+    }
+
+    return {mode: null};;
   },
 
   relations: (relation, query, _album, _group) => ({
     artistCredit:
-      relation('generateArtistCredit', query.notedArtistContribs, []),
+      (query.mode === 'artists'
+        ? relation('generateArtistCredit', query.notedArtistContribs, [])
+        : null),
   }),
 
   data: (query, _album, _group) => ({
+    mode: query.mode,
+
     groupName:
-      (query.notedGroup
+      (query.mode === 'group'
         ? query.notedGroup.name
         : null),
   }),
 
   generate: (data, relations, {language}) =>
     language.encapsulate('misc.coverGrid.tab', capsule =>
-      (data.groupName
+      (data.mode === 'group'
         ? language.$(capsule, 'group', {
             group: data.groupName,
           })
-     : relations.artistCredit
+     : data.mode === 'artists'
         ? relations.artistCredit.slots({
             normalStringKey:
               capsule + '.artists',
