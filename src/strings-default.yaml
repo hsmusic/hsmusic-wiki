@@ -1010,7 +1010,7 @@ misc:
     noCoverArt: "{ALBUM}"
 
     tab:
-      group: "{GROUP}"
+      groups: "{GROUPS}"
       artists: "{ARTISTS}"
       artists.featuring: "{ARTISTS} feat. {FEATURING}"
 

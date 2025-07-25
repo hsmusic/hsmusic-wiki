@@ -8,15 +8,22 @@ export default {
     if (album.groups.length > 1) {
       const contextGroup = group;
 
+      const candidateGroupCategory =
+        album.groups
+          .filter(group => !group.excludeFromGalleryTabs)
+          .find(group => group.category !== contextGroup.category)
+          ?.category ??
+        null;
+
       const candidateGroups =
         album.groups
           .filter(group => !group.excludeFromGalleryTabs)
-          .filter(group => group.category !== contextGroup.category);
+          .filter(group => group.category === candidateGroupCategory);
 
       if (!empty(candidateGroups)) {
         return {
-          mode: 'group',
-          notedGroup: candidateGroups.at(0),
+          mode: 'groups',
+          notedGroups: candidateGroups,
         };
       }
     }
@@ -50,17 +57,18 @@ export default {
   data: (query, _album, _group) => ({
     mode: query.mode,
 
-    groupName:
-      (query.mode === 'group'
-        ? query.notedGroup.name
+    groupNames:
+      (query.mode === 'groups'
+        ? query.notedGroups.map(group => group.name)
         : null),
   }),
 
   generate: (data, relations, {language}) =>
     language.encapsulate('misc.coverGrid.tab', capsule =>
-      (data.mode === 'group'
-        ? language.$(capsule, 'group', {
-            group: data.groupName,
+      (data.mode === 'groups'
+        ? language.$(capsule, 'groups', {
+            groups:
+              language.formatConjunctionList(data.groupNames),
           })
      : data.mode === 'artists'
         ? relations.artistCredit.slots({
