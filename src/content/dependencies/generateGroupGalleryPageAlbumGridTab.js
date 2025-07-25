@@ -68,7 +68,7 @@ export default {
       (data.mode === 'groups'
         ? language.$(capsule, 'groups', {
             groups:
-              language.formatConjunctionList(data.groupNames),
+              language.formatUnitList(data.groupNames),
           })
      : data.mode === 'artists'
         ? relations.artistCredit.slots({
