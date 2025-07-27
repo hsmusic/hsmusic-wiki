@@ -11,6 +11,9 @@ export default {
   }),
 
   data: (track) => ({
+    albumStyle:
+      track.album.style,
+
     hasTrackNumbers:
       track.album.hasTrackNumbers,
 
@@ -28,7 +31,13 @@ export default {
     language.encapsulate('trackPage.nav', navCapsule => [
       {auto: 'home'},
 
-      {html: relations.albumLink.slot('color', false)},
+      {
+        html: relations.albumLink.slot('color', false),
+        accent:
+          (data.albumStyle === 'single'
+            ? language.$(navCapsule, 'singleAccent')
+            : null),
+      },
 
       {
         html:
