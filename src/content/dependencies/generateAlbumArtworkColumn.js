@@ -2,37 +2,53 @@ export default {
   contentDependencies: ['generateAlbumArtInfoBox', 'generateCoverArtwork'],
   extraDependencies: ['html'],
 
-  relations: (relation, album) => ({
-    firstCover:
+  query: (album) => ({
+    nonAttachingArtworkIndex:
       (album.hasCoverArt
-        ? relation('generateCoverArtwork', album.coverArtworks[0])
+        ? album.coverArtworks.findIndex((artwork, index) =>
+            index > 1 &&
+            !artwork.attachAbove)
         : null),
+  }),
 
-    restCovers:
-      (album.hasCoverArt
-        ? album.coverArtworks.slice(1).map(artwork =>
-            relation('generateCoverArtwork', artwork))
+  relations: (relation, query, album) => ({
+    firstCovers:
+      (album.hasCoverArt && query.nonAttachingArtworkIndex >= 1
+        ? album.coverArtworks
+            .slice(0, query.nonAttachingArtworkIndex)
+            .map(artwork => relation('generateCoverArtwork', artwork))
+
+     : album.hasCoverArt
+        ? album.coverArtworks
+            .map(artwork => relation('generateCoverArtwork', artwork))
+
         : []),
 
     albumArtInfoBox:
       relation('generateAlbumArtInfoBox', album),
+
+    restCovers:
+      (album.hasCoverArt && query.nonAttachingArtworkIndex >= 1
+        ? album.coverArtworks
+            .slice(query.nonAttachingArtworkIndex)
+            .map(artwork => relation('generateCoverArtwork', artwork))
+
+        : []),
   }),
 
-  generate: (relations, {html}) =>
-    html.tags([
-      relations.firstCover?.slots({
+  generate(relations, {html}) {
+    for (const cover of [...relations.firstCovers, ...relations.restCovers]) {
+      cover.setSlots({
         showOriginDetails: true,
         showArtTagDetails: true,
         showReferenceDetails: true,
-      }),
+      });
+    }
 
+    return html.tags([
+      relations.firstCovers,
       relations.albumArtInfoBox,
-
-      relations.restCovers.map(cover =>
-        cover.slots({
-          showOriginDetails: true,
-          showArtTagDetails: true,
-          showReferenceDetails: true,
-        })),
-    ]),
+      relations.restCovers,
+    ]);
+  },
 };
