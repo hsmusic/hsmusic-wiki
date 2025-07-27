@@ -371,11 +371,12 @@ export function _withAggregate(mode, aggregateOpts, fn) {
 }
 
 export const unhelpfulTraceLines = [
-  /sugar/,
-  /sort/,
-  /aggregate/,
-  /composite/,
-  /cacheable-object/,
+  /sugar\.js/,
+  /sort\.js/,
+  /aggregate\.js/,
+  /composite\.js/,
+  /cacheable-object\.js/,
+  /html\.js/,
   /node:/,
   /<anonymous>/,
 ];
