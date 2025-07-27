@@ -1928,7 +1928,7 @@ a.align-center, img.align-center, audio.align-center, video.align-center {
   margin-right: auto;
 }
 
-a.align-full, img.align-full, video.align-full {
+a.align-full, a.align-full img, img.align-full, video.align-full {
   width: 100%;
 }
 
