@@ -1870,11 +1870,11 @@ p.image-details.origin-details .origin-details {
   margin-top: 0.25em;
 }
 
-.lyrics-entry {
+.lyrics-entry.long-lyrics {
   clip-path: inset(-15px -20px);
 }
 
-.lyrics-entry::after {
+.lyrics-entry.long-lyrics::after {
   content: "";
   pointer-events: none;
   display: block;
