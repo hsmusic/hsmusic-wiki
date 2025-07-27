@@ -10,7 +10,7 @@ export default {
 
   query: (group) => ({
     albums:
-      sortChronologically(group.albums, {latestFirst: true}),
+      sortChronologically(group.albums.slice(), {latestFirst: true}),
   }),
 
   relations: (relation, query, group) => ({
