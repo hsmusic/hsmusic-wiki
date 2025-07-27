@@ -365,7 +365,7 @@ export default {
 
           data.firstTrackInSingle &&
           (!html.isBlank(relations.lyricsSection) ||
-           !html.isBlank(relations.artistCommentaryEntries) ||
+           !html.isBlank(relations.artistCommentarySection) ||
            !html.isBlank(relations.creditingSourceEntries) ||
            !html.isBlank(relations.referencingSourceEntries)) &&
             html.tag('hr', {class: 'main-separator'}),
