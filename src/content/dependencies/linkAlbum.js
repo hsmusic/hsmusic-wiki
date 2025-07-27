@@ -1,5 +1,6 @@
 export default {
   contentDependencies: ['linkThing', 'linkTrack'],
+  extraDependencies: ['language'],
 
   relations: (relation, album) => ({
     link:
@@ -8,5 +9,13 @@ export default {
         : relation('linkThing', 'localized.album', album)),
   }),
 
-  generate: (relations) => relations.link,
+  data: (album) => ({
+    style: album.style,
+    name: album.name,
+  }),
+
+  generate: (data, relations, {language}) =>
+    (data.style === 'single'
+      ? relations.link.slot('content', language.sanitize(data.name))
+      : relations.link),
 };
