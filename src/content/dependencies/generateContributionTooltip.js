@@ -124,7 +124,7 @@ export default {
 
               if (
                 data.isSingleTrackArtistContribution &&
-                !html.isBlank(relations.artistReleaseChronologySection)
+                relations.artistReleaseChronologySection
               ) {
                 relations.artistReleaseChronologySection.setSlot('kind', 'release');
 
