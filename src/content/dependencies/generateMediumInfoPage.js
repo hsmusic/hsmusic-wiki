@@ -1,9 +1,12 @@
 export default {
   contentDependencies: [
     'generateContentHeading',
+    'generateDatetimestampTemplate',
     'generateMediumRepresentationList',
     'generatePageLayout',
+    'generateTooltip',
     'linkMedium',
+    'transformContent',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
@@ -22,6 +25,15 @@ export default {
 
     navLink:
       relation('linkMedium', medium),
+
+    datetimestamp:
+      relation('generateDatetimestampTemplate'),
+
+    datetimestampTooltip:
+      relation('generateTooltip'),
+
+    dateDescription:
+      relation('transformContent', medium.dateDescription),
 
     directAncestorLinks:
       medium.directAncestorMedia
@@ -63,7 +75,22 @@ export default {
               [
                 language.$(capsule, 'dated', {
                   [language.onlyIfOptions]: ['date'],
-                  date: language.formatDate(data.date),
+
+                  date:
+                    data.date &&
+                    relations.datetimestamp.slots({
+                      mainContent:
+                        language.formatDate(data.date),
+
+                      tooltip:
+                        relations.datetimestampTooltip.slots({
+                          content:
+                            relations.dateDescription.slot('mode', 'inline'),
+                        }),
+
+                      datetime:
+                        data.date.toISOString(),
+                    }),
                 }),
               ])),
 

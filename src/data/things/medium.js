@@ -13,6 +13,7 @@ import {parseDate} from '#yaml';
 import {exposeConstant} from '#composite/control-flow';
 
 import {
+  contentString,
   directory,
   name,
   referenceList,
@@ -33,6 +34,7 @@ export class Medium extends Thing {
     directory: directory(),
 
     date: simpleDate(),
+    dateDescription: contentString(),
 
     // > Update & expose - Medium relationships
 
@@ -94,6 +96,8 @@ export class Medium extends Thing {
         property: 'date',
         transform: parseDate,
       },
+
+      'Date Description': {property: 'dateDescription'},
 
       // Medium relationships
 
