@@ -23,6 +23,7 @@ import {
   parseCreditingSources,
   parseDate,
   parseDimensions,
+  parseRepresentedMedia,
   parseWallpaperParts,
 } from '#yaml';
 
@@ -58,6 +59,7 @@ import {
   name,
   referencedArtworkList,
   referenceList,
+  representedMedia,
   simpleDate,
   simpleString,
   soupyFind,
@@ -175,11 +177,7 @@ export class Album extends Thing {
 
     // > Update & expose - Media
 
-    representedMedia: referenceList({
-      class: input.value(Medium),
-      find: soupyFind.input('medium'),
-    }),
-
+    representedMedia: representedMedia(),
     trackRepresentedMedia: trackRepresentedMedia(),
 
     // > Update & expose - General configuration
@@ -663,8 +661,15 @@ export class Album extends Thing {
 
       // Media
 
-      'Media': {property: 'representedMedia'},
-      'Track Media': {property: 'trackRepresentedMedia'},
+      'Media': {
+        property: 'representedMedia',
+        transform: parseRepresentedMedia,
+      },
+
+      'Track Media': {
+        property: 'trackRepresentedMedia',
+        transform: parseRepresentedMedia,
+      },
 
       // General configuration
 
@@ -1066,10 +1071,7 @@ export class TrackSection extends Thing {
       exposeDependency({dependency: '#startCountingFrom'}),
     ],
 
-    representedMedia: referenceList({
-      class: input.value(Medium),
-      find: soupyFind.input('medium'),
-    }),
+    representedMedia: representedMedia(),
 
     trackRepresentedMedia: [
       {
@@ -1182,8 +1184,15 @@ export class TrackSection extends Thing {
       'Color': {property: 'color'},
       'Start Counting From': {property: 'startCountingFrom'},
 
-      'Media': {property: 'representedMedia'},
-      'Track Media': {property: 'trackRepresentedMedia'},
+      'Media': {
+        property: 'representedMedia',
+        transform: parseRepresentedMedia,
+      },
+
+      'Track Media': {
+        property: 'trackRepresentedMedia',
+        transform: parseRepresentedMedia,
+      },
 
       'Date Originally Released': {
         property: 'dateOriginallyReleased',

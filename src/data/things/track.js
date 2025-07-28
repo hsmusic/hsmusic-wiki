@@ -8,10 +8,11 @@ import Thing from '#thing';
 import {
   isBoolean,
   isColor,
+  isContentString,
   isContributionList,
   isDate,
   isFileExtension,
-  validateReferenceList,
+  isRepresentedMedia,
 } from '#validators';
 
 import {
@@ -27,6 +28,7 @@ import {
   parseDimensions,
   parseDuration,
   parseLyrics,
+  parseRepresentedMedia,
 } from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
@@ -220,9 +222,7 @@ export class Track extends Thing {
 
     representedMedia: [
       withRepresentedMedia({
-        from: input.updateValue({
-          validate: validateReferenceList(Medium[Thing.referenceType]),
-        }),
+        from: input.updateValue({validate: isRepresentedMedia}),
       }),
 
       exposeDependency({
@@ -591,7 +591,10 @@ export class Track extends Thing {
 
       'Inherit Media': {property: 'inheritMedia'},
 
-      'Media': {property: 'representedMedia'},
+      'Media': {
+        property: 'representedMedia',
+        transform: parseRepresentedMedia,
+      },
 
       // General configuration
 
@@ -841,12 +844,8 @@ export class Track extends Thing {
       referenced: track => track.sampledTracks,
     },
 
-    tracksWhichRepresent: {
-      bindTo: 'trackData',
-
-      referencing: track => [track],
-      referenced: track => track.representedMedia,
-    },
+    tracksWhichRepresent:
+      soupyReverse.represents('trackData', 'track'),
 
     tracksWhoseArtworksFeature: {
       bindTo: 'trackData',

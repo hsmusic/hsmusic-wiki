@@ -879,6 +879,13 @@ export function validateThing({
   };
 }
 
+export const isRepresentedMedia =
+  validateArrayItems(
+    validateProperties({
+      reference: validateReference('medium'),
+      annotation: optional(isContentString),
+    }));
+
 const validateWikiData_cache = {};
 
 export function validateWikiData({

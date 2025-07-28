@@ -332,14 +332,6 @@ releaseInfo:
   referencesArtworks: "References {ARTWORKS}."
   referencedByArtworks: "Referenced by {ARTWORKS}."
 
-  mediaRepresented:
-    _: "Media that {TRACK} represents:"
-    sticky: "Media that this track represents:"
-
-  musicThatRepresents:
-    _: "Music that represents '{MEDIUM}':"
-    sticky: "Music that represents this medium:"
-
   # Note that there's no sticky variant here,
   # such as "Tracks that this flash features",
   # because not all flashes are *called* flashes!
@@ -615,8 +607,17 @@ misc:
         wallpaperArt: "wallpaper art"
 
   mediumLink:
-    _: "{MEDIUM}"
-    withYear: "{MEDIUM} ({YEAR})"
+    _: >-
+      {MEDIUM}
+
+    withYear: >-
+      {MEDIUM} ({YEAR})
+
+    withAnnotation: >-
+      {MEDIUM} - {ANNOTATION}
+
+    withYear.withAnnotation: >-
+      {MEDIUM} ({YEAR}) - {ANNOTATION}
 
   # chronology:
   #
@@ -2493,6 +2494,16 @@ mediumPage:
   descendantMedia:
     _: "Media which fall under '{MEDIUM}':"
     item: "{MEDIUM}"
+
+  musicThatRepresents:
+    _: "Music that represents '{MEDIUM}':"
+    sticky: "Music that represents this medium:"
+
+    item:
+      track: "{TRACK}"
+
+      withAccent: "{ACCENT} {ITEM}"
+      accent.withAnnotation: "({ANNOTATION})"
 
   nav:
     medium: "Medium: {MEDIUM}"

@@ -264,23 +264,6 @@ export default {
             }),
           ]),
 
-          language.encapsulate('releaseInfo.mediaRepresented', capsule =>
-            html.tags([
-              relations.contentHeading.clone()
-                .slots({
-                  title:
-                    language.$(capsule, {
-                      track:
-                        html.tag('i', data.name),
-                    }),
-
-                  stickyTitle:
-                    language.$(capsule, 'sticky'),
-                }),
-
-              relations.representedMediaList,
-            ])),
-
           html.tags([
             language.encapsulate('releaseInfo.tracksReferenced', capsule =>
               relations.contentHeading.clone()

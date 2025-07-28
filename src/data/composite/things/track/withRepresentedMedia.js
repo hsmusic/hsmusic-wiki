@@ -1,6 +1,6 @@
 import {input, templateCompositeFrom} from '#composite';
 
-import {withResolvedReferenceList} from '#composite/wiki-data';
+import {withResolvedAnnotatedReferenceList} from '#composite/wiki-data';
 import {soupyFind} from '#composite/wiki-properties';
 
 import withInheritedMedia from './withInheritedMedia.js';
@@ -21,25 +21,27 @@ export default templateCompositeFrom({
   steps: () => [
     withInheritedMedia(),
 
-    withResolvedReferenceList({
+    withResolvedAnnotatedReferenceList({
       list: input('from'),
       find: soupyFind.input('medium'),
+
+      thing: input.value('medium'),
     }),
 
     {
       dependencies: [
         '#inheritedMedia',
-        '#resolvedReferenceList',
+        '#resolvedAnnotatedReferenceList',
       ],
 
       compute: (continuation, {
         ['#inheritedMedia']: inheritedMedia,
-        ['#resolvedReferenceList']: resolvedReferenceList,
+        ['#resolvedAnnotatedReferenceList']: resolvedAnnotatedReferenceList,
       }) => continuation({
         ['#representedMedia']:
           [
             ...inheritedMedia,
-            ...resolvedReferenceList,
+            ...resolvedAnnotatedReferenceList,
           ],
       }),
     },

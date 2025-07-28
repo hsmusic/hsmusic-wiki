@@ -1,3 +1,5 @@
+import {stitchArrays} from '#sugar';
+
 export default {
   contentDependencies: ['linkMedium'],
   extraDependencies: ['html', 'language'],
@@ -10,14 +12,20 @@ export default {
   relations: (relation, query, _thing) => ({
     mediumLinks:
       query.media
-        .map(medium => relation('linkMedium', medium)),
+        .map(({medium}) => relation('linkMedium', medium)),
+  }),
+
+  data: (query, _thing) => ({
+    mediumAnnotations:
+      query.media
+        .map(({annotation}) => annotation),
   }),
 
   slots: {
     pageCapsule: {type: 'string'},
   },
 
-  generate: (relations, slots, {html, language}) =>
+  generate: (data, relations, slots, {html, language}) =>
     language.$(slots.pageCapsule, 'subtitle.media', {
       [language.onlyIfOptions]: ['media'],
 
@@ -28,10 +36,14 @@ export default {
           html.metatag('chunkwrap', {split: /,/},
             html.resolve(
               language.formatUnitList(
-                relations.mediumLinks.map(link =>
-                  link.slots({
-                    trimType: true,
-                    showYear: true,
-                  })))))),
+                stitchArrays({
+                  link: relations.mediumLinks,
+                  annotation: data.mediumAnnotations,
+                }).map(({link, annotation}) =>
+                    link.slots({
+                      trimType: true,
+                      showYear: true,
+                      annotation,
+                    })))))),
     }),
 }

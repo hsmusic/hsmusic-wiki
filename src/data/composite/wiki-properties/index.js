@@ -21,6 +21,7 @@ export {default as name} from './name.js';
 export {default as referenceList} from './referenceList.js';
 export {default as referencedArtworkList} from './referencedArtworkList.js';
 export {default as reverseReferenceList} from './reverseReferenceList.js';
+export {default as representedMedia} from './representedMedia.js';
 export {default as simpleDate} from './simpleDate.js';
 export {default as simpleString} from './simpleString.js';
 export {default as singleReference} from './singleReference.js';

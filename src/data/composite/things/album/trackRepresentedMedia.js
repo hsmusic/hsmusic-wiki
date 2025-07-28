@@ -1,9 +1,9 @@
 import {input, templateCompositeFrom} from '#composite';
-import {validateReferenceList} from '#validators';
+import {isRepresentedMedia} from '#validators';
 
 import {exposeDependency, withResultOfAvailabilityCheck}
   from '#composite/control-flow';
-import {withResolvedReferenceList} from '#composite/wiki-data';
+import {withResolvedAnnotatedReferenceList} from '#composite/wiki-data';
 import {soupyFind} from '#composite/wiki-properties';
 
 export default templateCompositeFrom({
@@ -18,32 +18,33 @@ export default templateCompositeFrom({
       mode: input.value('null'),
     }),
 
-    withResolvedReferenceList({
-      list: input.updateValue({
-        validate: validateReferenceList('medium'),
-      }),
-
+    withResolvedAnnotatedReferenceList({
+      list: input.updateValue({validate: isRepresentedMedia}),
       find: soupyFind.input('medium'),
+
+      thing: input.value('medium'),
     }),
 
     {
-      dependencies: ['#availability', '#resolvedReferenceList'],
+      dependencies: ['#availability', '#resolvedAnnotatedReferenceList'],
       compute: (continuation, {
         ['#availability']: availability,
-        ['#resolvedReferenceList']: resolvedReferenceList,
+        ['#resolvedAnnotatedReferenceList']: resolvedAnnotatedReferenceList,
       }) =>
         (availability
-          ? continuation.exit(resolvedReferenceList)
+          ? continuation.exit(resolvedAnnotatedReferenceList)
           : continuation()),
     },
 
-    withResolvedReferenceList({
+    withResolvedAnnotatedReferenceList({
       list: 'representedMedia',
       find: soupyFind.input('medium'),
+
+      thing: input.value('medium'),
     }),
 
     exposeDependency({
-      dependency: '#resolvedReferenceList',
+      dependency: '#resolvedAnnotatedReferenceList',
     }),
   ],
 });

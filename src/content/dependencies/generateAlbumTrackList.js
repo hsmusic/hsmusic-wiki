@@ -67,7 +67,7 @@ export default {
         relations.trackSectionMediumLinks =
           album.trackSections
             .map(section => section.representedMedia
-              .map(medium => relation('linkMedium', medium)));
+              .map(({medium}) => relation('linkMedium', medium)));
 
         relations.trackSectionItems =
           album.trackSections

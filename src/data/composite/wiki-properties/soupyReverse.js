@@ -34,4 +34,22 @@ soupyReverse.artworkContributionsBy =
     referenced: contrib => [contrib.artist],
   });
 
+soupyReverse.represents =
+  (bindTo, thingProperty) => ({
+    bindTo,
+
+    referencing: thing =>
+      thing.representedMedia
+        .map(({medium, ...referenceDetails}) => ({
+          thing,
+          medium,
+          referenceDetails,
+        })),
+
+    referenced: ({medium}) => [medium],
+
+    tidy: ({thing, referenceDetails}) =>
+      ({[thingProperty]: thing, ...referenceDetails}),
+  });
+
 export default soupyReverse;

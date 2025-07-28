@@ -126,7 +126,7 @@ export default {
                     language.$(listCapsule, 'item', {medium: link})))),
             ])),
 
-          language.encapsulate('releaseInfo.musicThatRepresents', capsule =>
+          language.encapsulate(pageCapsule, 'musicThatRepresents', capsule =>
             html.tags([
               relations.contentHeading.clone()
                 .slots({

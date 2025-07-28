@@ -821,6 +821,15 @@ export function parseAnnotatedReferences(entries, {
   });
 }
 
+export function parseRepresentedMedia(entries) {
+  return parseAnnotatedReferences(entries, {
+    accentPlacement: 'prefix',
+
+    referenceField: 'Medium',
+    annotationField: 'Annotation',
+  });
+}
+
 export function parseArtwork({
   single = false,
   thingProperty = null,

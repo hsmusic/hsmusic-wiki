@@ -31,6 +31,11 @@ export default {
       type: 'boolean',
       default: false,
     },
+
+    annotation: {
+      type: 'html',
+      mutable: false,
+    },
   },
 
   generate: (data, relations, slots, {html, language}) =>
@@ -54,6 +59,11 @@ export default {
         if (slots.showYear && data.year) {
           workingCapsule += '.withYear';
           workingOptions.year = data.year;
+        }
+
+        if (!html.isBlank(slots.annotation)) {
+          workingCapsule += '.withAnnotation';
+          workingOptions.annotation = slots.annotation;
         }
 
         return language.$(workingCapsule, workingOptions);

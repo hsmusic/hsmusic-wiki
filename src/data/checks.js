@@ -181,8 +181,8 @@ export function filterReferenceErrors(wikiData, {
       trackCoverArtistContribs: '_contrib',
       wallpaperArtistContribs: '_contrib',
       bannerArtistContribs: '_contrib',
-      representedMedia: 'medium',
-      trackRepresentedMedia: 'medium',
+      representedMedia: '_medium',
+      trackRepresentedMedia: '_medium',
       groups: 'group',
       artTags: '_artTag',
       referencedArtworks: '_artwork',
@@ -239,6 +239,7 @@ export function filterReferenceErrors(wikiData, {
       artistContribs: '_contrib',
       contributorContribs: '_contrib',
       coverArtistContribs: '_contrib',
+      representedMedia: '_medium',
       referencedTracks: '_trackMainReleasesOnly',
       sampledTracks: '_trackMainReleasesOnly',
       artTags: '_artTag',
@@ -248,6 +249,10 @@ export function filterReferenceErrors(wikiData, {
       creditingSources: '_content',
       referencingSources: '_content',
       lyrics: '_content',
+    }],
+
+    ['trackSectionData', {
+      representedMedia: '_medium',
     }],
 
     ['wikiInfo', {
@@ -301,6 +306,11 @@ export function filterReferenceErrors(wikiData, {
                 // need writing, humm...)
                 writeProperty = false;
                 break;
+
+              case '_medium':
+                // Flee from reference-related property writing. Scary.
+                writeProperty = false;
+                break;
             }
 
             if (value === undefined) {
@@ -350,6 +360,10 @@ export function filterReferenceErrors(wikiData, {
 
                   return boundFind.group(groupRef);
                 };
+                break;
+
+              case '_medium':
+                findFn = ref => boundFind.medium(ref.reference);
                 break;
 
               case '_trackArtwork':
