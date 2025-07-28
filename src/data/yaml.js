@@ -587,6 +587,11 @@ export const extractAccentRegex =
 export const extractPrefixAccentRegex =
   /^(?:\((?<accent>.*)\) )?(?<main>.*?)$/;
 
+export const extractAccentRegexen = {
+  suffix: extractAccentRegex,
+  prefix: extractPrefixAccentRegex,
+};
+
 // TODO: Should this fit better within actual YAML loading infrastructure??
 export function parseArrayEntries(entries, mapFn) {
   // If this isn't something we can parse, just return it as-is.
@@ -786,6 +791,8 @@ export function parseContributionPresets(list) {
 }
 
 export function parseAnnotatedReferences(entries, {
+  accentPlacement = 'suffix',
+
   referenceField = 'References',
   annotationField = 'Annotation',
   referenceProperty = 'reference',
@@ -800,7 +807,7 @@ export function parseAnnotatedReferences(entries, {
 
     if (typeof item !== 'string') return item;
 
-    const match = item.match(extractAccentRegex);
+    const match = item.match(extractAccentRegexen[accentPlacement]);
     if (!match)
       return {
         [referenceProperty]: item,
