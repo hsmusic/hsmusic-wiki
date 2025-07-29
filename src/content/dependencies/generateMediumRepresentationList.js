@@ -1,52 +1,31 @@
-import {empty, stitchArrays} from '#sugar';
+import {sortChronologically} from '#sort';
+import {unique} from '#sugar';
 
 export default {
-  contentDependencies: ['linkTrack'],
-  extraDependencies: ['html', 'language'],
+  contentDependencies: ['generateMediumRepresentationListAlbumChunk'],
+  extraDependencies: ['html'],
 
-  relations: (relation, medium) => ({
-    trackLinks:
-      medium.representedByTracks
-        .map(({track}) => relation('linkTrack', track)),
+  query: (medium) => ({
+    albums:
+      sortChronologically(
+        unique([
+          ...medium.representedByTracks.map(({track}) => track.album),
+          ...medium.representedByAlbums.map(({album}) => album),
+        ])),
   }),
 
-  data: (medium) => ({
-    trackAnnotations:
-      medium.representedByTracks
-        .map(({annotation}) => annotation),
+  relations: (relation, query, medium) => ({
+    albumChunks:
+      query.albums
+        .map(album =>
+          relation('generateMediumRepresentationListAlbumChunk',
+            album,
+            medium)),
   }),
 
-  generate: (data, relations, {html, language}) =>
-    language.encapsulate('mediumPage.musicThatRepresents', listCapsule =>
-      html.tag('ul',
-        {[html.onlyIfContent]: true},
+  generate: (relations, {html}) =>
+    html.tag('dl',
+      {[html.onlyIfContent]: true},
 
-        stitchArrays({
-          link: relations.trackLinks,
-          annotation: data.trackAnnotations,
-        }).map(({link, annotation}) =>
-            html.tag('li',
-              language.encapsulate(listCapsule, 'item', itemCapsule => {
-                let item = language.$(itemCapsule, 'track', {track: link});
-
-                let accentParts = [], accentOptions = {};
-
-                if (annotation) {
-                  accentParts.push('withAnnotation');
-                  accentOptions.annotation = annotation;
-                }
-
-                if (!empty(accentParts)) {
-                  item = language.$(itemCapsule, 'withAccent', {
-                    item,
-
-                    accent:
-                      language.$(
-                        itemCapsule, 'accent', ...accentParts,
-                        accentOptions),
-                  });
-                }
-
-                return item;
-              }))))),
+      relations.albumChunks),
 };

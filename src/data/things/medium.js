@@ -64,6 +64,10 @@ export class Medium extends Thing {
       reverse: soupyReverse.input('albumsWhichRepresent'),
     }),
 
+    representedByTrackSections: reverseReferenceList({
+      reverse: soupyReverse.input('trackSectionsWhichRepresent'),
+    }),
+
     representedByTracks: reverseReferenceList({
       reverse: soupyReverse.input('tracksWhichRepresent'),
     }),

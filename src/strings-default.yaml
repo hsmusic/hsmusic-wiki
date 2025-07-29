@@ -2500,6 +2500,12 @@ mediumPage:
     sticky: "Music that represents this medium:"
 
     item:
+      album: "{ALBUM}"
+      album.tracksFrom: "Tracks from {ALBUM}:"
+
+      album.allTracksRepresent: >-
+        All tracks represent '{MEDIUM}'.
+
       track: "{TRACK}"
 
       withAccent: "{ACCENT} {ITEM}"

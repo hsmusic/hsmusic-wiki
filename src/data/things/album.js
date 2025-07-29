@@ -566,12 +566,8 @@ export class Album extends Thing {
       referenced: album => album.trackSections,
     },
 
-    albumsWhichRepresent: {
-      bindTo: 'albumData',
-
-      referencing: album => [album],
-      referenced: album => album.representedMedia,
-    },
+    albumsWhichRepresent:
+      soupyReverse.represents('albumData', 'album'),
 
     albumsWhoseArtworksFeature: {
       bindTo: 'albumData',
@@ -1176,6 +1172,9 @@ export class TrackSection extends Thing {
       referencing: trackSection => [trackSection],
       referenced: trackSection => trackSection.tracks,
     },
+
+    trackSectionsWhichRepresent:
+      soupyReverse.represents('trackSectionData', 'trackSection'),
   };
 
   static [Thing.yamlDocumentSpec] = {
