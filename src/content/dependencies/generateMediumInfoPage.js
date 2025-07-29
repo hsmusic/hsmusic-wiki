@@ -123,7 +123,13 @@ export default {
 
                 relations.directDescendantLinks.map(link =>
                   html.tag('li',
-                    language.$(listCapsule, 'item', {medium: link})))),
+                    language.$(listCapsule, 'item', {
+                      medium:
+                        link.slots({
+                          style: 'list',
+                          showYear: true,
+                        }),
+                    })))),
             ])),
 
           language.encapsulate(pageCapsule, 'musicThatRepresents', capsule =>

@@ -22,6 +22,11 @@ export default {
       validate: v => v.isObject,
     },
 
+    style: {
+      validate: v => v.is('inline', 'list'),
+      default: 'inline',
+    },
+
     trimType: {
       type: 'boolean',
       default: false,
@@ -45,6 +50,10 @@ export default {
       language.encapsulate('misc.mediumLink', workingCapsule => {
         const workingOptions = {};
         const {link} = relations;
+
+        if (slots.style === 'list') {
+          workingCapsule += '.list';
+        }
 
         if (slots.trimType) {
           link.setSlot('content', data.nameWithoutType);

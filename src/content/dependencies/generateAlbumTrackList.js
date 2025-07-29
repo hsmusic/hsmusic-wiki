@@ -219,7 +219,6 @@ export default {
                       language.formatUnitList(
                         mediumLinks.map(link =>
                           link.slots({
-                            trimType: true,
                             linkSlots: {color},
                           }))),
                   })),

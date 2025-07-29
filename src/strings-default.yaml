@@ -619,6 +619,18 @@ misc:
     withYear.withAnnotation: >-
       {MEDIUM} ({YEAR}) - {ANNOTATION}
 
+    list: >-
+      {MEDIUM}
+
+    list.withYear: >-
+      ({YEAR}) {MEDIUM}
+
+    list.withAnnotation: >-
+      ({ANNOTATION}) {MEDIUM}
+
+    list.withYear.withAnnotation: >-
+      ({YEAR} - {ANNOTATION}) {MEDIUM}
+
   # chronology:
   #
   #   "Chronology links" are a section that appear in the nav bar for
