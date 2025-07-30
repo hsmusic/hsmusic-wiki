@@ -37,7 +37,7 @@ export function cssProp(el, ...args) {
   }
 }
 
-export function templateContent(el) {
+export function templateContent(el, slots = {}) {
   if (el === null) {
     return null;
   }
@@ -46,7 +46,25 @@ export function templateContent(el) {
     throw new Error(`Expected a <template> element`);
   }
 
-  return el.content.cloneNode(true);
+  const content = el.content.cloneNode(true);
+
+  for (const [key, value] of Object.entries(slots)) {
+    const slot = content.querySelector(`slot[name="${key}"]`);
+
+    if (!slot) {
+      console.warn(`Slot ${key} missing in template:`, el);
+      continue;
+    }
+
+    if (value === null || value === undefined) {
+      console.warn(`Valueless slot ${key} in template:`, el);
+      continue;
+    }
+
+    slot.replaceWith(value);
+  }
+
+  return content;
 }
 
 // Curry-style, so multiple points can more conveniently be tested at once.
