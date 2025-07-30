@@ -391,6 +391,8 @@ function performSearchAction({query, options}) {
 }
 
 const interestingFieldCombinations = [
+  ['primaryName'],
+
   ['primaryName', 'parentName', 'groups'],
   ['primaryName', 'parentName'],
   ['primaryName', 'groups', 'contributors'],
@@ -412,7 +414,6 @@ const interestingFieldCombinations = [
   ['contributors', 'parentName'],
   ['contributors', 'groups'],
   ['primaryName', 'contributors'],
-  ['primaryName'],
 ];
 
 function queryGenericIndex(query, options) {
