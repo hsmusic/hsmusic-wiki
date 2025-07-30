@@ -94,6 +94,8 @@ export function watchContentDependencies({
     const filePaths = files.map(file => path.join(watchPath, file));
     for (const filePath of filePaths) {
       if (filePath === metaPath) continue;
+      if (filePath.endsWith('.DS_Store')) continue;
+
       const functionName = getFunctionName(filePath);
       if (!isMocked(functionName)) {
         contentDependencies[functionName] = null;
@@ -105,8 +107,9 @@ export function watchContentDependencies({
     watcher.on('all', (event, filePath) => {
       if (!['add', 'change'].includes(event)) return;
       if (filePath === metaPath) return;
-      handlePathUpdated(filePath);
+      if (filePath.endsWith('.DS_Store')) return;
 
+      handlePathUpdated(filePath);
     });
 
     watcher.on('unlink', (filePath) => {
@@ -114,6 +117,8 @@ export function watchContentDependencies({
         console.error(`Yeowzers content dependencies just got nuked.`);
         return;
       }
+
+      if (filePath.endsWith('.DS_Store')) return;
 
       handlePathRemoved(filePath);
     });
