@@ -73,8 +73,29 @@ const baselineStore = [
 ];
 
 function genericQuery(wikiData) {
+  const groupOrder =
+    wikiData.wikiInfo.divideTrackListsByGroups;
+
+  const getGroupRank = thing => {
+    const relevantRanks =
+      Array.from(groupOrder.entries())
+        .filter(({1: group}) => thing.groups.includes(group))
+        .map(({0: index}) => index);
+
+    if (relevantRanks.length === 0) {
+      return Infinity;
+    } else if (relevantRanks.length === 1) {
+      return relevantRanks[0];
+    } else {
+      return relevantRanks[0] + 0.5;
+    }
+  }
+
+  const sortByGroupRank = things =>
+    things.sort((a, b) => getGroupRank(a) - getGroupRank(b));
+
   return [
-    wikiData.albumData,
+    sortByGroupRank(wikiData.albumData.slice()),
 
     wikiData.artTagData,
 
@@ -85,10 +106,9 @@ function genericQuery(wikiData) {
 
     wikiData.groupData,
 
-    wikiData.trackData
-      // Exclude rereleases - there's no reasonable way to differentiate
-      // them from the main release as part of this query.
-      .filter(track => !track.mainReleaseTrack),
+    sortByGroupRank(
+      wikiData.trackData
+        .filter(track => !track.mainReleaseTrack)),
   ].flat();
 }
 
