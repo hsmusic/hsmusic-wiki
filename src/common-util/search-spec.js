@@ -97,11 +97,15 @@ function baselineProcess(thing, opts) {
   fields.color =
     thing.color;
 
+  fields.disambiguator =
+    null;
+
   return fields;
 }
 
 const baselineStore = [
   'primaryName',
+  'disambiguator',
   'artwork',
   'color',
 ];
@@ -140,6 +144,9 @@ function genericProcess(thing, opts) {
    : kind === 'flash'
       ? thing.act.name
       : null);
+
+  fields.disambiguator =
+    fields.parentName;
 
   fields.artTags =
     (thing.constructor.hasPropertyDescriptor('artTags')

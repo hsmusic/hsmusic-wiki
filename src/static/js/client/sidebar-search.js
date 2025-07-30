@@ -73,6 +73,10 @@ export const info = {
   groupResultKindString: null,
   tagResultKindString: null,
 
+  groupResultDisambiguatorString: null,
+  flashResultDisambiguatorString: null,
+  trackResultDisambiguatorString: null,
+
   albumResultFilterString: null,
   artistResultFilterString: null,
   flashResultFilterString: null,
@@ -195,6 +199,15 @@ export function getPageReferences() {
 
   info.tagResultKindString =
     findString('tag-result-kind');
+
+  info.groupResultDisambiguatorString =
+    findString('group-result-disambiguator');
+
+  info.flashResultDisambiguatorString =
+    findString('flash-result-disambiguator');
+
+  info.trackResultDisambiguatorString =
+    findString('track-result-disambiguator');
 
   info.albumResultFilterString =
     findString('album-result-filter');
@@ -841,7 +854,7 @@ function fillResultElements(results, {
   }
 
   for (const result of filteredResults) {
-    const el = generateSidebarSearchResult(result);
+    const el = generateSidebarSearchResult(result, filteredResults);
     if (!el) continue;
 
     info.results.appendChild(el);
@@ -890,13 +903,13 @@ function showFilterElements(results) {
   }
 }
 
-function generateSidebarSearchResult(result) {
+function generateSidebarSearchResult(result, results) {
   const preparedSlots = {
     color:
       result.data.color ?? null,
 
     name:
-      result.data.name ?? result.data.primaryName ?? null,
+      getSearchResultName(result),
 
     imageSource:
       getSearchResultImageSource(result),
@@ -961,7 +974,35 @@ function generateSidebarSearchResult(result) {
       return null;
   }
 
+  const compareReferenceType = otherResult =>
+    otherResult.referenceType === result.referenceType;
+
+  const compareName = otherResult =>
+    getSearchResultName(otherResult) === getSearchResultName(result);
+
+  const ambiguous =
+    results.some(otherResult =>
+      otherResult !== result &&
+      compareReferenceType(otherResult) &&
+      compareName(otherResult));
+
+  if (ambiguous) {
+    preparedSlots.disambiguate =
+      result.data.disambiguator;
+
+    preparedSlots.disambiguatorString =
+      info[result.referenceType + 'ResultDisambiguatorString'];
+  }
+
   return generateSidebarSearchResultTemplate(preparedSlots);
+}
+
+function getSearchResultName(result) {
+  return (
+    result.data.name ??
+    result.data.primaryName ??
+    null
+  );
 }
 
 function getSearchResultImageSource(result) {
@@ -1037,6 +1078,15 @@ function generateSidebarSearchResultTemplate(slots) {
       accentSpan.classList.add('wiki-search-current-result-text');
       accentSpan.appendChild(templateContent(info.currentResultString));
     }
+  }
+
+  if (!accentSpan && slots.disambiguate) {
+    accentSpan = document.createElement('span');
+    accentSpan.classList.add('wiki-search-result-disambiguator');
+    accentSpan.appendChild(
+      templateContent(slots.disambiguatorString, {
+        disambiguator: slots.disambiguate,
+      }));
   }
 
   if (!accentSpan && slots.kindString) {

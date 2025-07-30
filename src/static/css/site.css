@@ -918,6 +918,11 @@ summary.underline-white > span:hover a:not(:hover) {
   display: inline-block;
 }
 
+.wiki-search-result-disambiguator {
+  opacity: 0.9;
+  display: inline-block;
+}
+
 .wiki-search-result-image-container {
   align-self: flex-start;
   flex-shrink: 0;

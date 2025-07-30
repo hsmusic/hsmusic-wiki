@@ -857,6 +857,11 @@ misc:
       artist: "(artist)"
       group: "(group)"
 
+    resultDisambiguator:
+      group: "({DISAMBIGUATOR})"
+      flash: "(in {DISAMBIGUATOR})"
+      track: "(from {DISAMBIGUATOR})"
+
     resultFilter:
       album: "Albums"
       artTag: "Art Tags"

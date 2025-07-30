@@ -58,6 +58,23 @@ export default {
               language.$(capsule, 'artTag')),
           ]),
 
+          language.encapsulate(capsule, 'resultDisambiguator', capsule => [
+            html.tag('template', {class: 'wiki-search-group-result-disambiguator-string'},
+              language.$(capsule, 'group', {
+                disambiguator: html.tag('slot', {name: 'disambiguator'}),
+              })),
+
+            html.tag('template', {class: 'wiki-search-flash-result-disambiguator-string'},
+              language.$(capsule, 'flash', {
+                disambiguator: html.tag('slot', {name: 'disambiguator'}),
+              })),
+
+            html.tag('template', {class: 'wiki-search-track-result-disambiguator-string'},
+              language.$(capsule, 'track', {
+                disambiguator: html.tag('slot', {name: 'disambiguator'}),
+              })),
+          ]),
+
           language.encapsulate(capsule, 'resultFilter', capsule => [
             html.tag('template', {class: 'wiki-search-album-result-filter-string'},
               language.$(capsule, 'album')),
