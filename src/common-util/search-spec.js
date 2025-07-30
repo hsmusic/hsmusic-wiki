@@ -1,57 +1,19 @@
 // Index structures shared by client and server, and relevant interfaces.
 
-function getArtworkPath(thing) {
-  switch (thing.constructor[Symbol.for('Thing.referenceType')]) {
-    case 'album': {
-      return [
-        'media.albumCover',
-        thing.directory,
-        thing.coverArtFileExtension,
-      ];
-    }
-
-    case 'flash': {
-      return [
-        'media.flashArt',
-        thing.directory,
-        thing.coverArtFileExtension,
-      ];
-    }
-
-    case 'track': {
-      if (thing.hasUniqueCoverArt) {
-        return [
-          'media.trackCover',
-          thing.album.directory,
-          thing.directory,
-          thing.coverArtFileExtension,
-        ];
-      } else if (thing.album.hasCoverArt) {
-        return [
-          'media.albumCover',
-          thing.album.directory,
-          thing.album.coverArtFileExtension,
-        ];
-      } else {
-        return null;
-      }
-    }
-
-    default:
-      return null;
-  }
-}
-
-function prepareArtwork(thing, {
+function prepareArtwork(artwork, thing, {
   checkIfImagePathHasCachedThumbnails,
   getThumbnailEqualOrSmaller,
   urls,
 }) {
+  if (!artwork) {
+    return undefined;
+  }
+
   const hasWarnings =
-    thing.artTags?.some(artTag => artTag.isContentWarning);
+    artwork.artTags?.some(artTag => artTag.isContentWarning);
 
   const artworkPath =
-    getArtworkPath(thing);
+    artwork.path;
 
   if (!artworkPath) {
     return undefined;
@@ -92,7 +54,7 @@ function baselineProcess(thing, opts) {
     thing.name;
 
   fields.artwork =
-    prepareArtwork(thing, opts);
+    null;
 
   fields.color =
     thing.color;
@@ -136,6 +98,20 @@ function genericProcess(thing, opts) {
   const kind =
     thing.constructor[Symbol.for('Thing.referenceType')];
 
+  const boundPrepareArtwork = artwork =>
+    prepareArtwork(artwork, thing, opts);
+
+  fields.artwork =
+    (kind === 'track' && thing.hasUniqueCoverArt
+      ? boundPrepareArtwork(thing.trackArtworks[0])
+   : kind === 'track'
+      ? boundPrepareArtwork(thing.album.coverArtworks[0])
+   : kind === 'album'
+      ? boundPrepareArtwork(thing.coverArtworks[0])
+   : kind === 'flash'
+      ? boundPrepareArtwork(thing.coverArtwork)
+      : null);
+
   fields.parentName =
     (kind === 'track'
       ? thing.album.name
@@ -149,9 +125,14 @@ function genericProcess(thing, opts) {
     fields.parentName;
 
   fields.artTags =
-    (thing.constructor.hasPropertyDescriptor('artTags')
-      ? thing.artTags.map(artTag => artTag.nameShort)
-      : []);
+    (Array.from(new Set(
+      (kind === 'track'
+        ? thing.trackArtworks.flatMap(artwork => artwork.artTags)
+     : kind === 'album'
+        ? thing.coverArtworks.flatMap(artwork => artwork.artTags)
+        : []))))
+
+      .map(artTag => artTag.nameShort);
 
   fields.additionalNames =
     (thing.constructor.hasPropertyDescriptor('additionalNames')
