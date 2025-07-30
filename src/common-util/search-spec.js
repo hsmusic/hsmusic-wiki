@@ -238,6 +238,10 @@ export function makeSearchIndex(descriptor, {FlexSearch}) {
     id: 'reference',
     index: descriptor.index,
     store: descriptor.store,
+
+    // Disable scoring, always return results according to provided order
+    // (specified above in `genericQuery`, etc).
+    resolution: 1,
   });
 }
 
