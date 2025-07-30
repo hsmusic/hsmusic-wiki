@@ -1232,7 +1232,12 @@ label > input[type=checkbox]:not(:checked) + span {
   white-space: nowrap;
 }
 
-.isolate-tooltip-z-indexing > * {
+:where(.isolate-tooltip-z-indexing) {
+  position: relative;
+  z-index: 1;
+}
+
+:where(.isolate-tooltip-z-indexing > *) {
   position: relative;
   z-index: -1;
 }
@@ -1640,15 +1645,21 @@ hr.cute,
 }
 
 #artwork-column .cover-artwork {
+  --normal-shadow: 0 0 12px 12px #00000080;
+
   box-shadow:
     0 2px 14px -6px var(--primary-color),
-    0 0 12px 12px #00000080;
+    var(--normal-shadow);
 }
 
 #artwork-column .cover-artwork:not(:first-child),
 #artwork-column .cover-artwork-joiner {
   margin-left: 30px;
   margin-right: 5px;
+}
+
+#artwork-column .cover-artwork:not(:first-child) {
+  --normal-shadow: 0 0 9px 9px #00000068;
 }
 
 #artwork-column .cover-artwork:first-child + .cover-artwork-joiner,
@@ -4199,6 +4210,10 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
     margin: 25px 0 5px 0;
     width: 100%;
     max-width: unset;
+  }
+
+  #artwork-column .cover-artwork {
+    --normal-shadow: 0 0 transparent;
   }
 
   #artwork-column .cover-artwork:not(:first-child),
