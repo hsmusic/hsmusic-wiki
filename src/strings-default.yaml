@@ -1007,6 +1007,10 @@ misc:
       conceal: "Conceal all artworks"
       warnings: "In this gallery: {WARNINGS}"
 
+    expandCollapseCue: "({CUE})"
+    expand: "Show the rest!"
+    collapse: "Collapse these"
+
     noCoverArt: "{ALBUM}"
 
     tab:
@@ -1027,8 +1031,6 @@ misc:
       coverArtists.customLabel: "{LABEL} by {ARTISTS}"
 
       otherCoverArtists: "With {ARTISTS}"
-
-    expandCollapseCue: "({CUE})"
 
   albumGalleryGrid:
     noCoverArt: "{NAME}"
@@ -1796,12 +1798,6 @@ groupGalleryPage:
 
     caption.seriesAlbumsNotFromGroup: >-
       Albums marked {MARKER} are part of {SERIES}, but not from {GROUP}.
-
-    expand: >-
-      Show the rest!
-
-    collapse: >-
-      Collapse these
 
 #
 # listingIndex:

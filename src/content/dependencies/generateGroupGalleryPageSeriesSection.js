@@ -2,7 +2,7 @@ import {sortChronologically} from '#sort';
 
 export default {
   contentDependencies: [
-    'generateExpandableGallerySection',
+    'generateContentHeading',
     'generateGroupGalleryPageAlbumGrid',
   ],
 
@@ -11,12 +11,8 @@ export default {
   query(series) {
     const query = {};
 
-    // Includes undated albums.
-    const albumsLatestFirst =
-      sortChronologically(series.albums, {latestFirst: true});
-
-    query.albumsAboveCut = albumsLatestFirst.slice(0, 4);
-    query.albumsBelowCut = albumsLatestFirst.slice(4);
+    query.albums =
+      sortChronologically(series.albums.slice(), {latestFirst: true});
 
     query.allAlbumsDated =
       series.albums.every(album => album.date);
@@ -25,13 +21,13 @@ export default {
       series.albums.some(album => !album.groups.includes(series.group));
 
     query.latestAlbum =
-      albumsLatestFirst
+      query.albums
         .filter(album => album.date)
         .at(0) ??
       null;
 
     query.earliestAlbum =
-      albumsLatestFirst
+      query.albums
         .filter(album => album.date)
         .at(-1) ??
       null;
@@ -40,17 +36,12 @@ export default {
   },
 
   relations: (relation, query, series) => ({
-    gallerySection:
-      relation('generateExpandableGallerySection'),
+    contentHeading:
+      relation('generateContentHeading'),
 
-    gridAboveCut:
+    grid:
       relation('generateGroupGalleryPageAlbumGrid',
-        query.albumsAboveCut,
-        series.group),
-
-    gridBelowCut:
-      relation('generateGroupGalleryPageAlbumGrid',
-        query.albumsBelowCut,
+        query.albums,
         series.group),
   }),
 
@@ -88,69 +79,67 @@ export default {
 
   generate: (data, relations, {html, language}) =>
     language.encapsulate('groupGalleryPage.albumSection', capsule =>
-      relations.gallerySection.slots({
-        title: data.name,
+      html.tags([
+        relations.contentHeading.slots({
+          tag: 'h2',
+          title: language.sanitize(data.name),
+        }),
 
-        contentAboveCut: relations.gridAboveCut,
-        contentBelowCut: relations.gridBelowCut,
+        relations.grid.slots({
+          cutIndex: 4,
 
-        caption:
-          language.encapsulate(capsule, 'caption', captionCapsule =>
-            html.tags([
-              data.anyAlbumNotFromThisGroup &&
-                language.$(captionCapsule, 'seriesAlbumsNotFromGroup', {
-                  marker:
-                    language.$('misc.coverGrid.details.notFromThisGroup.marker'),
+          bottomCaption:
+            language.encapsulate(capsule, 'caption', captionCapsule =>
+              html.tags([
+                data.anyAlbumNotFromThisGroup &&
+                  language.$(captionCapsule, 'seriesAlbumsNotFromGroup', {
+                    marker:
+                      language.$('misc.coverGrid.details.notFromThisGroup.marker'),
 
-                  series:
-                    html.tag('i', data.name),
+                    series:
+                      html.tag('i', data.name),
 
-                  group: data.groupName,
-                }),
+                    group: data.groupName,
+                  }),
 
-              language.encapsulate(captionCapsule, workingCapsule => {
-                const workingOptions = {};
+                language.encapsulate(captionCapsule, workingCapsule => {
+                  const workingOptions = {};
 
-                workingOptions.tracks =
-                  html.tag('b',
-                    language.countTracks(data.tracks, {unit: true}));
+                  workingOptions.tracks =
+                    html.tag('b',
+                      language.countTracks(data.tracks, {unit: true}));
 
-                workingOptions.albums =
-                  html.tag('b',
-                    language.countAlbums(data.albums, {unit: true}));
+                  workingOptions.albums =
+                    html.tag('b',
+                      language.countAlbums(data.albums, {unit: true}));
 
-                if (data.allAlbumsDated) {
-                  const earliestDate = data.earliestAlbumDate;
-                  const latestDate = data.latestAlbumDate;
+                  if (data.allAlbumsDated) {
+                    const earliestDate = data.earliestAlbumDate;
+                    const latestDate = data.latestAlbumDate;
 
-                  const earliestYear = earliestDate.getFullYear();
-                  const latestYear = latestDate.getFullYear();
+                    const earliestYear = earliestDate.getFullYear();
+                    const latestYear = latestDate.getFullYear();
 
-                  if (earliestYear === latestYear) {
-                    if (data.albums === 1) {
-                      workingCapsule += '.withDate';
-                      workingOptions.date =
-                        language.formatDate(earliestDate);
+                    if (earliestYear === latestYear) {
+                      if (data.albums === 1) {
+                        workingCapsule += '.withDate';
+                        workingOptions.date =
+                          language.formatDate(earliestDate);
+                      } else {
+                        workingCapsule += '.withYear';
+                        workingOptions.year =
+                          language.formatYear(earliestDate);
+                      }
                     } else {
-                      workingCapsule += '.withYear';
-                      workingOptions.year =
-                        language.formatYear(earliestDate);
+                      workingCapsule += '.withYearRange';
+                      workingOptions.yearRange =
+                        language.formatYearRange(earliestDate, latestDate);
                     }
-                  } else {
-                    workingCapsule += '.withYearRange';
-                    workingOptions.yearRange =
-                      language.formatYearRange(earliestDate, latestDate);
                   }
-                }
 
-                return language.$(workingCapsule, workingOptions);
-              }),
-            ], {[html.joinChildren]: html.tag('br')})),
-
-        expandCue:
-          language.$(capsule, 'expand'),
-
-        collapseCue:
-          language.$(capsule, 'collapse'),
-      })),
+                  return language.$(workingCapsule, workingOptions);
+                }),
+              ], {[html.joinChildren]: html.tag('br')})),
+        }),
+      ])),
 };

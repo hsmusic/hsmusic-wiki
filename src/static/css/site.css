@@ -2076,39 +2076,6 @@ ul.quick-info li:not(:last-child)::after {
   margin-bottom: 1.5em;
 }
 
-.expandable-gallery-section .section-expando {
-  margin-top: 1em;
-  margin-bottom: 2em;
-
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-}
-
-.expandable-gallery-section .section-expando-content {
-  text-align: center;
-  line-height: 1.5;
-}
-
-.expandable-gallery-section .section-expando-toggle {
-  text-decoration: underline;
-  text-decoration-style: dotted;
-}
-
-.expandable-gallery-section.expanded .section-content-below-cut {
-  animation: expand-gallery-section 0.8s forwards;
-}
-
-@keyframes expand-gallery-section {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
 .quick-description:not(.has-external-links-only) {
   --clamped-padding-ratio: max(var(--responsive-padding-ratio), 0.06);
   margin-left: auto;
@@ -3249,6 +3216,47 @@ video.pixelate, .pixelate video {
   width: 120px;
   --primary-color: inherit !important;
   --dim-color: inherit !important;
+}
+
+.grid-caption {
+  flex-basis: 100%;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.grid-expando {
+  margin-top: 1em;
+  margin-bottom: 2em;
+  flex-basis: 100%;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.grid-expando-content {
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.grid-expando-toggle {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.grid-item.shown-by-expandable-cut {
+  animation: expand-cover-grid 0.8s forwards;
+}
+
+@keyframes expand-cover-grid {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 /* Carousel */

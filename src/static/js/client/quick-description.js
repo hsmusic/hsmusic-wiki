@@ -1,7 +1,5 @@
 /* eslint-env browser */
 
-// TODO: Combine this and expandable-gallery-section.js
-
 import {stitchArrays} from '../../shared-util/sugar.js';
 
 export const info = {

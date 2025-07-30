@@ -1,14 +1,16 @@
 import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
-  contentDependencies: ['generateGridActionLinks'],
+  contentDependencies: ['generateGridActionLinks', 'generateGridExpando'],
   extraDependencies: ['html', 'language'],
 
-  relations(relation) {
-    return {
-      actionLinks: relation('generateGridActionLinks'),
-    };
-  },
+  relations: (relation) => ({
+    actionLinks:
+      relation('generateGridActionLinks'),
+
+    expando:
+      relation('generateGridExpando'),
+  }),
 
   slots: {
     attributes: {type: 'attributes', mutable: false},
@@ -45,6 +47,13 @@ export default {
     revealAllWarnings: {
       validate: v => v.looseArrayOf(v.isString),
     },
+
+    bottomCaption: {
+      type: 'html',
+      mutable: false,
+    },
+
+    cutIndex: {validate: v => v.isWholeNumber},
   },
 
   generate: (relations, slots, {html, language}) =>
@@ -121,6 +130,10 @@ export default {
                 (classes
                   ? {class: classes}
                   : null),
+
+                slots.cutIndex >= 1 &&
+                index >= slots.cutIndex &&
+                  {class: 'hidden-by-expandable-cut'},
               ],
 
               colorContext: 'image-box',
@@ -168,5 +181,17 @@ export default {
 
         relations.actionLinks
           .slot('actionLinks', slots.actionLinks),
+
+        (slots.cutIndex >= 1 &&
+         slots.cutIndex < slots.links.length
+          ? relations.expando.slots({
+              caption: slots.bottomCaption,
+            })
+
+       : !html.isBlank(relations.bottomCaption)
+          ? html.tag('p', {class: 'grid-caption'},
+              slots.caption)
+
+          : html.blank()),
       ]),
 };

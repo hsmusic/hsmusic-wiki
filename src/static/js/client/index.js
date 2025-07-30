@@ -11,7 +11,7 @@ import * as artistRollingWindowModule from './artist-rolling-window.js';
 import * as cssCompatibilityAssistantModule from './css-compatibility-assistant.js';
 import * as datetimestampTooltipModule from './datetimestamp-tooltip.js';
 import * as draggedLinkModule from './dragged-link.js';
-import * as expandableGallerySectionModule from './expandable-gallery-section.js';
+import * as expandableGridSectionModule from './expandable-grid-section.js';
 import * as galleryStyleSelectorModule from './gallery-style-selector.js';
 import * as hashLinkModule from './hash-link.js';
 import * as hoverableTooltipModule from './hoverable-tooltip.js';
@@ -37,7 +37,7 @@ export const modules = [
   cssCompatibilityAssistantModule,
   datetimestampTooltipModule,
   draggedLinkModule,
-  expandableGallerySectionModule,
+  expandableGridSectionModule,
   galleryStyleSelectorModule,
   hashLinkModule,
   hoverableTooltipModule,
