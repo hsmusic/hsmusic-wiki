@@ -60,6 +60,12 @@ export default {
       mutable: false,
     },
 
+    // Added to the <img>.
+    imgAttributes: {
+      type: 'attributes',
+      mutable: false,
+    },
+
     // Added to the <img> itself.
     alt: {type: 'string'},
 
@@ -140,6 +146,8 @@ export default {
 
     const imgAttributes = html.attributes([
       {class: 'image'},
+
+      slots.imgAttributes,
 
       slots.alt && {alt: slots.alt},
 

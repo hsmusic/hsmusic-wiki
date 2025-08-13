@@ -208,6 +208,8 @@ export class Artwork extends Thing {
       }),
     ],
 
+    style: simpleString(),
+
     artTagsFromThingProperty: simpleString(),
 
     artTags: [
@@ -411,6 +413,8 @@ export class Artwork extends Thing {
         property: 'artistContribs',
         transform: parseContributors,
       },
+
+      'Style': {property: 'style'},
 
       'Tags': {property: 'artTags'},
 

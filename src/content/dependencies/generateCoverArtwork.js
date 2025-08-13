@@ -44,6 +44,9 @@ export default {
 
     dimensions:
       artwork.dimensions,
+
+    style:
+      artwork.style,
   }),
 
   slots: {
@@ -72,6 +75,14 @@ export default {
 
   generate(data, relations, slots, {html}) {
     const {image} = relations;
+
+    const imgAttributes = html.attributes();
+
+    if (data.style) {
+      imgAttributes.add('style', data.style.split('\n').join(' '));
+    }
+
+    image.setSlot('imgAttributes', imgAttributes);
 
     image.setSlot('alt', slots.alt);
 
