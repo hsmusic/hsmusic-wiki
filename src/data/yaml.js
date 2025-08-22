@@ -266,7 +266,9 @@ function makeProcessDocument(thingConstructor, {
 
       // This variable would like to certify itself as "not into capitalism".
       let propertyValue =
-        (fieldSpecs[field].transform
+        (documentValue === null
+          ? null
+       : fieldSpecs[field].transform
           ? fieldSpecs[field].transform(documentValue, transformUtilities)
           : documentValue);
 
