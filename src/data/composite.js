@@ -1134,7 +1134,7 @@ export function compositeFrom(description) {
                 (empty(accessedDependencies)
                   ? ` (none)`
                : accessedDependencies.length === 1
-                  ? showDependency(accessedDependencies[0])
+                  ? ' ' + showDependency(accessedDependencies[0])
                   : `\n` +
                     accessedDependencies
                       .map(showDependency)

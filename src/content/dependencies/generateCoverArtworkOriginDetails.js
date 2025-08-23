@@ -33,11 +33,10 @@ export default {
         : null),
 
     datetimestamp:
-      (artwork.date && artwork.date !== artwork.thing.date
+      (artwork.date && +artwork.date !== +artwork.thing.date
         ? relation('generateAbsoluteDatetimestamp', artwork.date)
         : null),
   }),
-
 
   data: (query, artwork) => ({
     label:

@@ -64,7 +64,7 @@ export default {
           return;
         }
 
-        if (latest.date === date) {
+        if (+latest.date === +date) {
           if (latest.thing === thing) {
             // May combine differnt contributions to the same thing and date.
             latest.contribution.add(contribution);
@@ -168,7 +168,7 @@ export default {
 
     sortMultipleArrays(artistThings, artistDates, artistContributions, artists,
       (thing1, thing2, date1, date2, contrib1, contrib2, artist1, artist2) => {
-        if (date1 === date2 && thing1 === thing2) {
+        if (+date1 === +date2 && thing1 === thing2) {
           // Move artwork-only contribs after contribs with tracks.
           if (!contrib1.has('track') && contrib2.has('track')) return 1;
           if (!contrib2.has('track') && contrib1.has('track')) return -1;
@@ -184,7 +184,7 @@ export default {
           return index1 - index2;
         } else {
           // Move later dates before earlier ones.
-          if (date1 !== date2) return date2 - date1;
+          if (+date1 !== +date2) return date2 - date1;
 
           // Move albums before flashes.
           if (thing1 instanceof Album && thing2 instanceof Flash) return -1;

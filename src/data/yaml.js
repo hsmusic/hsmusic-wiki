@@ -564,6 +564,27 @@ export class SubdocAggregateError extends AggregateError {
   }
 }
 
+export function parseWikiDates(value, {subdoc, WikiDate}) {
+  if (!Array.isArray(value)) {
+    value = [value];
+  }
+
+  return parseArrayEntries(value, item => {
+    const match = item.match(extractAccentRegex);
+    if (!match) return item;
+
+    const date = parseDate(match.groups.main);
+    const properties = WikiDate.propertiesFromDate(date);
+
+    const fields = {
+      'Annotation':
+        match.groups.accent ?? null,
+    };
+
+    return subdoc(WikiDate, fields, {provide: properties});
+  });
+}
+
 export function parseDate(date) {
   return new Date(date);
 }

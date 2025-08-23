@@ -4,6 +4,8 @@ import {isDate} from '#validators';
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 import {withHasArtwork} from '#composite/wiki-data';
 
+import withDate from './withDate.js';
+
 export default templateCompositeFrom({
   annotation: `withCoverArtDate`,
 
@@ -39,12 +41,8 @@ export default templateCompositeFrom({
           : continuation()),
     },
 
-    {
-      dependencies: ['date'],
-      compute: (continuation, {date}) =>
-        (date
-          ? continuation({'#coverArtDate': date})
-          : continuation({'#coverArtDate': null})),
-    },
+    withDate().outputs({
+      '#date': '#coverArtDate',
+    }),
   ],
 });
