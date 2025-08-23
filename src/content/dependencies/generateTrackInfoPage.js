@@ -149,6 +149,9 @@ export default {
     dateAlbumAddedToWiki:
       track.album.dateAddedToWiki,
 
+    needsLyrics:
+      track.needsLyrics,
+
     singleTrackSingle:
       query.singleTrackSingle,
 
@@ -369,6 +372,11 @@ export default {
            !html.isBlank(relations.creditingSourceEntries) ||
            !html.isBlank(relations.referencingSourceEntries)) &&
             html.tag('hr', {class: 'main-separator'}),
+
+          data.needsLyrics &&
+          html.isBlank(relations.lyricsSection) &&
+            html.tag('p',
+              language.$(pageCapsule, 'needsLyrics')),
 
           relations.lyricsSection,
 

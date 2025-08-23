@@ -2555,6 +2555,9 @@ trackPage:
         wiki: "across this wiki"
         album: "within this album"
 
+  needsLyrics: >-
+    This track has vocals, but there aren't lyrics available for it on this wiki, yet!
+
   socialEmbed:
     heading: "{ALBUM}"
     title: "{TRACK}"
