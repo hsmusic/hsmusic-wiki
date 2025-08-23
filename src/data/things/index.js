@@ -25,6 +25,7 @@ import * as newsEntryClasses from './news-entry.js';
 import * as sortingRuleClasses from './sorting-rule.js';
 import * as staticPageClasses from './static-page.js';
 import * as trackClasses from './track.js';
+import * as wikiDateClasses from './wiki-date.js';
 import * as wikiInfoClasses from './wiki-info.js';
 
 const allClassLists = {
@@ -44,6 +45,7 @@ const allClassLists = {
   'sorting-rule.js': sortingRuleClasses,
   'static-page.js': staticPageClasses,
   'track.js': trackClasses,
+  'wiki-date.js': wikiDateClasses,
   'wiki-info.js': wikiInfoClasses,
 };
 
