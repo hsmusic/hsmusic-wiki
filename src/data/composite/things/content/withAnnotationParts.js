@@ -1,5 +1,5 @@
 import {input, templateCompositeFrom} from '#composite';
-import {transposeArrays} from '#sugar';
+import {empty, transposeArrays} from '#sugar';
 import {is} from '#validators';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
@@ -31,6 +31,16 @@ export default templateCompositeFrom({
       nodes: '#contentNodes',
       around: input.value(/, */g),
     }),
+
+    {
+      dependencies: ['#contentNodeLists'],
+      compute: (continuation, {
+        ['#contentNodeLists']: nodeLists,
+      }) => continuation({
+        ['#contentNodeLists']:
+          nodeLists.filter(list => !empty(list)),
+      }),
+    },
 
     {
       dependencies: ['#contentNodeLists', input('mode')],
