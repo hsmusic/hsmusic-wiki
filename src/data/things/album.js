@@ -24,6 +24,7 @@ import {
   parseDate,
   parseDimensions,
   parseWallpaperParts,
+  parseWikiDates,
 } from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
@@ -69,7 +70,7 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {withCoverArtDate, withTracks} from '#composite/things/album';
+import {withCoverArtDate, withDate, withTracks} from '#composite/things/album';
 import {withAlbum, withContinueCountingFrom, withStartCountingFrom}
   from '#composite/things/track-section';
 
@@ -85,6 +86,7 @@ export class Album extends Thing {
     CreditingSourcesEntry,
     Group,
     TrackSection,
+    WikiDate,
     WikiInfo,
   }) => ({
     // > Update & expose - Internal relationships
@@ -134,22 +136,31 @@ export class Album extends Thing {
       class: input.value(AdditionalName),
     }),
 
-    date: simpleDate(),
+    wikiDates: thingList({
+      class: input.value(WikiDate),
+    }),
+
     dateAddedToWiki: simpleDate(),
 
     // > Update & expose - Credits and contributors
 
-    artistContribs: contributionList({
-      date: 'date',
-      artistProperty: input.value('albumArtistContributions'),
-    }),
+    artistContribs: [
+      withDate(),
+
+      contributionList({
+        date: '#date',
+        artistProperty: input.value('albumArtistContributions'),
+      }),
+    ],
 
     trackArtistContribs: [
+      withDate(),
+
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
         thingProperty: input.thisProperty(),
         artistProperty: input.value('albumTrackArtistContributions'),
-        date: 'date',
+        date: '#date',
       }).outputs({
         '#resolvedContribs': '#trackArtistContribs',
       }),
@@ -163,7 +174,7 @@ export class Album extends Thing {
         from: 'artistContribs',
         thingProperty: input.thisProperty(),
         artistProperty: input.value('albumTrackArtistContributions'),
-        date: 'date',
+        date: '#date',
       }).outputs({
         '#resolvedContribs': '#trackArtistContribs',
       }),
@@ -422,6 +433,17 @@ export class Album extends Thing {
       }),
     ],
 
+    date: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['wikiDates'],
+        compute: ({wikiDates}) =>
+          (empty(wikiDates)
+            ? null
+            : wikiDates.at(0).toDate()),
+      },
+    },
+
     commentatorArtists: commentatorArtists(),
 
     hasCoverArt: [
@@ -622,8 +644,8 @@ export class Album extends Thing {
       },
 
       'Date': {
-        property: 'date',
-        transform: parseDate,
+        property: 'wikiDates',
+        transform: parseWikiDates,
       },
 
       'Date Added': {
