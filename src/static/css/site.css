@@ -1574,6 +1574,10 @@ span.path, code.filename {
   line-height: 1.4;
 }
 
+blockquote :is(span.path, code.filename) {
+  font-size: 0.9em;
+}
+
 .image-details code.filename {
   margin-left: -0.4ch;
   opacity: 0.8;
