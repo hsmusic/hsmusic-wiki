@@ -570,9 +570,18 @@ export function parseWikiDates(value, {subdoc, WikiDate}) {
   }
 
   return parseArrayEntries(value, item => {
-    const date = parseDate(item);
+    const match = item.match(extractAccentRegex);
+    if (!match) return item;
+
+    const date = parseDate(match.groups.main);
     const properties = WikiDate.propertiesFromDate(date);
-    return subdoc(WikiDate, {}, {provide: properties});
+
+    const fields = {
+      'Annotation':
+        match.groups.accent ?? null,
+    };
+
+    return subdoc(WikiDate, fields, {provide: properties});
   });
 }
 

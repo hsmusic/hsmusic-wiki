@@ -1,7 +1,10 @@
 import {inspect} from 'node:util';
 
+import {colors} from '#cli';
 import Thing from '#thing';
 import {isInteger} from '#validators';
+
+import {contentString} from '#composite/wiki-properties';
 
 function range(a, b) {
   return number => {
@@ -51,6 +54,8 @@ export class WikiDate extends Thing {
     minute: zeroedRangeDescriptor(0, 59),
     second: zeroedRangeDescriptor(0, 59),
     millisecond: zeroedRangeDescriptor(0, 999),
+
+    annotation: contentString(),
   });
 
   static [Thing.yamlDocumentSpec] = {
@@ -62,6 +67,8 @@ export class WikiDate extends Thing {
       'Minute': {property: 'minute'},
       'Second': {property: 'second'},
       'Millisecond': {property: 'millisecond'},
+
+      'Annotation': {property: 'annotation'},
     },
   };
 
@@ -183,6 +190,11 @@ export class WikiDate extends Thing {
     parts.push(Thing.prototype[inspect.custom].apply(this));
     parts.push(': ');
     parts.push(this.toString());
+
+    if (this.annotation) {
+      const annotation = colors.green(`"${this.annotation}"`);
+      parts.push(` ${annotation}`);
+    }
 
     return parts.join('');
   }
