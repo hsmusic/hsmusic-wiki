@@ -187,6 +187,10 @@ export class LyricsEntry extends ContentEntry {
       part: input.value('wiki lyrics'),
     }),
 
+    helpNeeded: hasAnnotationPart({
+      part: input.value('help needed'),
+    }),
+
     hasSquareBracketAnnotations: [
       withHasAnnotationPart({
         part: input.value('wiki lyrics'),

@@ -22,7 +22,7 @@ import {
   parseLyrics,
 } from '#yaml';
 
-import {withPropertyFromObject} from '#composite/data';
+import {withPropertyFromList, withPropertyFromObject} from '#composite/data';
 
 import {
   exitWithoutDependency,
@@ -243,6 +243,32 @@ export class Track extends Thing {
       }),
 
       exposeDependency({dependency: '#album.color'}),
+    ],
+
+    needsLyrics: [
+      exposeUpdateValueOrContinue({
+        mode: input.value('falsy'),
+        validate: input.value(isBoolean),
+      }),
+
+      exitWithoutDependency({
+        dependency: 'lyrics',
+        mode: input.value('empty'),
+        value: input.value(false),
+      }),
+
+      withPropertyFromList({
+        list: 'lyrics',
+        property: input.value('helpNeeded'),
+      }),
+
+      {
+        dependencies: ['#lyrics.helpNeeded'],
+        compute: ({
+          ['#lyrics.helpNeeded']: helpNeeded,
+        }) =>
+          helpNeeded.includes(true)
+      },
     ],
 
     urls: urls(),
@@ -573,6 +599,10 @@ export class Track extends Thing {
       },
 
       'Color': {property: 'color'},
+
+      'Needs Lyrics': {
+        property: 'needsLyrics',
+      },
 
       'URLs': {property: 'urls'},
 
