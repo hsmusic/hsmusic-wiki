@@ -113,10 +113,16 @@ export function matchContentEntries(sourceText) {
   let previousMatchEntry = null;
   let previousEndIndex = null;
 
+  const trimBody = body =>
+    body
+      .replace(/^\n*/, '')
+      .replace(/\n*$/, '');
+
   for (const {0: matchText, index: startIndex, groups: matchEntry}
           of sourceText.matchAll(commentaryRegexCaseSensitive)) {
     if (previousMatchEntry) {
-      previousMatchEntry.body = sourceText.slice(previousEndIndex, startIndex);
+      previousMatchEntry.body =
+        trimBody(sourceText.slice(previousEndIndex, startIndex));
     }
 
     matchEntries.push(matchEntry);
@@ -126,7 +132,8 @@ export function matchContentEntries(sourceText) {
   }
 
   if (previousMatchEntry) {
-    previousMatchEntry.body = sourceText.slice(previousEndIndex);
+    previousMatchEntry.body =
+      trimBody(sourceText.slice(previousEndIndex));
   }
 
   return matchEntries;
