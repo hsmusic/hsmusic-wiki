@@ -178,6 +178,7 @@ listingSpec.push({
   directory: 'tracks/with-lyrics',
   stringsKey: 'listTracks.withLyrics',
   contentFunction: 'listTracksWithLyrics',
+  seeAlso: ['tracks/needing-lyrics'],
 });
 
 listingSpec.push({
@@ -192,6 +193,13 @@ listingSpec.push({
   stringsKey: 'listTracks.withMidiProjectFiles',
   contentFunction: 'listTracksWithMidiProjectFiles',
   seeAlso: ['all-midi-project-files'],
+});
+
+listingSpec.push({
+  directory: 'tracks/needing-lyrics',
+  stringsKey: 'listTracks.needingLyrics',
+  contentFunction: 'listTracksNeedingLyrics',
+  seeAlso: ['tracks/with-lyrics'],
 });
 
 listingSpec.push({
