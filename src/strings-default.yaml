@@ -719,6 +719,11 @@ misc:
     nintendoMusic: "Nintendo Music"
     patreon: "Patreon"
     poetryFoundation: "Poetry Foundation"
+
+    reddit:
+      _: "Reddit"
+      subreddit: "Reddit ({SUBREDDIT})"
+
     soundcloud: "SoundCloud"
     spotify: "Spotify"
     steam: "Steam"

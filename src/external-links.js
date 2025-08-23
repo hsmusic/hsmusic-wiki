@@ -582,6 +582,17 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domains: ['reddit.com', 'old.reddit.com']},
+    platform: 'reddit',
+    icon: 'globe',
+
+    detail: {
+      substring: 'subreddit',
+      subreddit: {pathname: /^r\/[^\/]+(?=\/)?/},
+    },
+  },
+
+  {
     match: {domain: 'soundcloud.com'},
 
     platform: 'soundcloud',
