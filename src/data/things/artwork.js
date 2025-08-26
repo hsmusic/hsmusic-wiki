@@ -80,6 +80,7 @@ export class Artwork extends Thing {
     label: simpleString(),
     source: contentString(),
     originDetails: contentString(),
+    showFilename: simpleString(),
 
     dateFromThingProperty: simpleString(),
 
@@ -401,6 +402,7 @@ export class Artwork extends Thing {
       'Label': {property: 'label'},
       'Source': {property: 'source'},
       'Origin Details': {property: 'originDetails'},
+      'Show Filename': {property: 'showFilename'},
 
       'Date': {
         property: 'date',

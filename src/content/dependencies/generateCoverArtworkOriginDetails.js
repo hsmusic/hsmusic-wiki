@@ -49,6 +49,9 @@ export default {
     forSingleStyleAlbum:
       artwork.thing.isAlbum &&
       artwork.thing.style === 'single',
+
+    showFilename:
+      artwork.showFilename,
   }),
 
   generate: (data, relations, {html, language, pagePath}) =>
@@ -149,8 +152,8 @@ export default {
               year: relations.datetimestamp,
             });
 
-          const originDetails =
-            html.tag('span', {class: 'origin-details'},
+          const originDetailsLine =
+            html.tag('span', {class: 'origin-details-line'},
               {[html.onlyIfContent]: true},
 
               relations.originDetails.slots({
@@ -158,13 +161,24 @@ export default {
                 absorbPunctuationFollowingExternalLinks: false,
               }));
 
+          const filenameLine =
+            html.tag('span', {class: 'filename-line'},
+              {[html.onlyIfContent]: true},
+
+              html.tag('code', {class: 'filename'},
+                {[html.onlyIfContent]: true},
+
+                language.sanitize(data.showFilename)));
+
           return [
             artworkBy,
             trackArtFromAlbum,
             source,
             label,
             year,
-            originDetails,
+
+            originDetailsLine,
+            filenameLine,
           ];
         })())),
 };
