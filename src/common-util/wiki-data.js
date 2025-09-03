@@ -533,7 +533,7 @@ export function combineWikiDataArrays(arrays) {
 // Markdown stuff
 
 export function* matchMarkdownLinks(markdownSource, {marked}) {
-  const plausibleLinkRegexp = /\[.*?\)/g;
+  const plausibleLinkRegexp = /\[(?=.*?\))/g;
 
   let plausibleMatch = null;
   while (plausibleMatch = plausibleLinkRegexp.exec(markdownSource)) {
