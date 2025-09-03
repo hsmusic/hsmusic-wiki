@@ -52,6 +52,7 @@ export default templateCompositeFrom({
     withMappedList({
       list: '#artistTags',
       map: input.value(node =>
+        'artist:' +
         node.data.replacerValue[0].data),
     }).outputs({
       '#mappedList': '#artistReferences',
