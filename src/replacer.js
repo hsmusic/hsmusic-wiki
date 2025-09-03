@@ -9,7 +9,7 @@ import * as marked from 'marked';
 
 import * as html from '#html';
 import {empty, escapeRegex, typeAppearance} from '#sugar';
-import {matchMarkdownLinks} from '#wiki-data';
+import {matchInlineLinks, matchMarkdownLinks} from '#wiki-data';
 
 export const replacerSpec = {
   'album': {
@@ -794,7 +794,7 @@ export function postprocessSummaries(inputNodes) {
 }
 
 export function postprocessExternalLinks(inputNodes) {
-  const outputNodes = [];
+  let outputNodes = [];
 
   for (const node of inputNodes) {
     if (node.type !== 'text') {
@@ -835,6 +835,64 @@ export function postprocessExternalLinks(inputNodes) {
         iEnd: node.i + index + length,
         type: 'external-link',
         data: {label, href},
+      });
+
+      parseFrom = index + length;
+    }
+
+    if (parseFrom !== node.data.length) {
+      textNode.data += node.data.slice(parseFrom);
+      textNode.iEnd = node.iEnd;
+    }
+
+    if (textNode.data) {
+      outputNodes.push(textNode);
+    }
+  }
+
+  // Repeat everything, but for inline links, which are just a URL on its own,
+  // not formatted as a Markdown link. These don't have provided labels, and
+  // get labels automatically filled in by content code.
+
+  inputNodes = outputNodes;
+  outputNodes = [];
+
+  for (const node of inputNodes) {
+    if (node.type !== 'text') {
+      outputNodes.push(node);
+      continue;
+    }
+
+    let textNode = {
+      i: node.i,
+      iEnd: null,
+      type: 'text',
+      data: '',
+    };
+
+    let parseFrom = 0;
+    for (const match of matchInlineLinks(node.data)) {
+      const {href, index, length} = match;
+
+      textNode.data += node.data.slice(parseFrom, index);
+
+      if (textNode.data) {
+        textNode.iEnd = textNode.i + textNode.data.length;
+        outputNodes.push(textNode);
+
+        textNode = {
+          i: node.i + index + length,
+          iEnd: null,
+          type: 'text',
+          data: '',
+        };
+      }
+
+      outputNodes.push({
+        i: node.i + index,
+        iEnd: node.i + index + length,
+        type: 'external-link',
+        data: {label: null, href},
       });
 
       parseFrom = index + length;

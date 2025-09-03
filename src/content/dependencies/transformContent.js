@@ -601,8 +601,11 @@ export default {
           }
 
           case 'external-link': {
-            const {label} = node.data;
             const externalLink = relations.externalLinks[externalLinkIndex++];
+
+            const label =
+              node.data.label ??
+              node.data.href.replace(/^https?:\/\//, '');
 
             if (slots.textOnly) {
               return {type: 'text', data: label};
