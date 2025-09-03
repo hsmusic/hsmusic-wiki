@@ -1,9 +1,22 @@
 import {isExternalLinkContext, isExternalLinkStyle} from '#external-links';
 
 export default {
-  extraDependencies: ['html', 'language', 'wikiData'],
+  extraDependencies: ['html', 'language', 'to', 'wikiData'],
 
-  data: (url) => ({url}),
+  sprawl: ({wikiInfo}) => ({
+    canonicalBase:
+      wikiInfo.canonicalBase,
+
+    canonicalMediaBase:
+      wikiInfo.canonicalMediaBase,
+  }),
+
+  data: (sprawl, url) => ({
+    url,
+
+    canonicalBase:
+      sprawl.canonicalBase,
+  }),
 
   slots: {
     content: {
@@ -50,19 +63,33 @@ export default {
     },
   },
 
-  generate(data, slots, {html, language}) {
+  generate(data, slots, {html, language, to}) {
+    const {url} = data;
+
     let urlIsValid;
     try {
-      new URL(data.url);
+      new URL(url);
       urlIsValid = true;
     } catch {
       urlIsValid = false;
     }
 
+    let href;
+    if (urlIsValid) {
+      const {canonicalBase, canonicalMediaBase} = data;
+      if (canonicalMediaBase && url.startsWith(canonicalMediaBase)) {
+        href = to('media.path', url.slice(canonicalMediaBase.length));
+      } else if (canonicalBase && url.startsWith(canonicalBase)) {
+        href = to('shared.path', url.slice(canonicalBase.length));
+      } else {
+        href = url;
+      }
+    }
+
     let formattedLink;
     if (urlIsValid) {
       formattedLink =
-        language.formatExternalLink(data.url, {
+        language.formatExternalLink(url, {
           style: slots.style,
           context: slots.context,
         });
@@ -70,7 +97,7 @@ export default {
       // Fall back to platform if nothing matched the desired style.
       if (html.isBlank(formattedLink) && slots.style !== 'platform') {
         formattedLink =
-          language.formatExternalLink(data.url, {
+          language.formatExternalLink(url, {
             style: 'platform',
             context: slots.context,
           });
@@ -85,7 +112,7 @@ export default {
 
     let linkContent;
     if (urlIsValid) {
-      linkAttributes.set('href', data.url);
+      linkAttributes.set('href', href);
 
       if (html.isBlank(slots.content)) {
         linkContent = formattedLink;
