@@ -4,6 +4,7 @@
 // #composite/data, and #composite/wiki-data.
 
 export {default as annotatedReferenceList} from './annotatedReferenceList.js';
+export {default as canonicalBase} from './canonicalBase.js';
 export {default as color} from './color.js';
 export {default as commentatorArtists} from './commentatorArtists.js';
 export {default as constitutibleArtwork} from './constitutibleArtwork.js';

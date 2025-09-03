@@ -10,12 +10,12 @@ import {
   isContributionPresetList,
   isLanguageCode,
   isName,
-  isURL,
 } from '#validators';
 
 import {exitWithoutDependency, exposeConstant} from '#composite/control-flow';
 
 import {
+  canonicalBase,
   contentString,
   fileExtension,
   flag,
@@ -64,18 +64,8 @@ export class WikiInfo extends Thing {
       update: {validate: isLanguageCode},
     },
 
-    canonicalBase: {
-      flags: {update: true, expose: true},
-      update: {validate: isURL},
-      expose: {
-        transform: (value) =>
-          (value === null
-            ? null
-         : value.endsWith('/')
-            ? value
-            : value + '/'),
-      },
-    },
+    canonicalBase: canonicalBase(),
+    canonicalMediaBase: canonicalBase(),
 
     wikiWallpaperFileExtension: fileExtension('jpg'),
     wikiWallpaperStyle: simpleString(),
@@ -143,6 +133,7 @@ export class WikiInfo extends Thing {
       'Default Language': {property: 'defaultLanguage'},
 
       'Canonical Base': {property: 'canonicalBase'},
+      'Canonical Media Base': {property: 'canonicalMediaBase'},
 
       'Wiki Wallpaper File Extension': {property: 'wikiWallpaperFileExtension'},
 
