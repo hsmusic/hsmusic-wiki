@@ -63,7 +63,7 @@ export default {
 
   generate: (data, relations, slots, {html, language}) =>
     language.encapsulate('misc.lyrics', capsule =>
-      html.tag('div', {class: 'lyrics-entry'},
+      html.tag('blockquote', {class: 'lyrics-entry'},
         slots.attributes,
 
         {'data-stanzas': data.numStanzas},
