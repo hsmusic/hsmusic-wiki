@@ -58,7 +58,6 @@ export default {
     language.encapsulate('misc.coverArtwork', capsule =>
       html.tag('p', {class: 'image-details'},
         {[html.onlyIfContent]: true},
-        {[html.joinChildren]: html.tag('br')},
 
         {class: 'origin-details'},
 
@@ -171,11 +170,13 @@ export default {
                 language.sanitize(data.showFilename)));
 
           return [
-            artworkBy,
-            trackArtFromAlbum,
-            source,
-            label,
-            year,
+            html.tags([
+              artworkBy,
+              trackArtFromAlbum,
+              source,
+              label,
+              year,
+            ], {[html.joinChildren]: html.tag('br')}),
 
             originDetailsLine,
             filenameLine,
