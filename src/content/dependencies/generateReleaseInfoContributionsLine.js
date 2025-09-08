@@ -2,9 +2,9 @@ export default {
   contentDependencies: ['generateArtistCredit'],
   extraDependencies: ['html'],
 
-  relations: (relation, contributions) => ({
+  relations: (relation, contributions, formatText) => ({
     credit:
-      relation('generateArtistCredit', contributions, []),
+      relation('generateArtistCredit', contributions, [], formatText),
   }),
 
   slots: {

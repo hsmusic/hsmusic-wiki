@@ -10,7 +10,9 @@ export default {
     const relations = {};
 
     relations.artistContributionsLine =
-      relation('generateReleaseInfoContributionsLine', track.artistContribs);
+      relation('generateReleaseInfoContributionsLine',
+        track.artistContribs,
+        track.artistText);
 
     relations.listenLine =
       relation('generateReleaseInfoListenLine', track);
