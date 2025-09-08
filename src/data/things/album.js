@@ -144,6 +144,8 @@ export class Album extends Thing {
       artistProperty: input.value('albumArtistContributions'),
     }),
 
+    trackArtistText: contentString(),
+
     trackArtistContribs: [
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
@@ -636,6 +638,10 @@ export class Album extends Thing {
       'Artists': {
         property: 'artistContribs',
         transform: parseContributors,
+      },
+
+      'Track Artist Text': {
+        property: 'trackArtistText',
       },
 
       'Track Artists': {

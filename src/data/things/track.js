@@ -4,8 +4,15 @@ import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input} from '#composite';
 import Thing from '#thing';
-import {isBoolean, isColor, isContributionList, isDate, isFileExtension}
-  from '#validators';
+
+import {
+  isBoolean,
+  isColor,
+  isContentString,
+  isContributionList,
+  isDate,
+  isFileExtension,
+} from '#validators';
 
 import {
   parseAdditionalFiles,
@@ -156,6 +163,20 @@ export class Track extends Thing {
     dateFirstReleased: simpleDate(),
 
     // > Update & expose - Credits and contributors
+
+    artistText: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isContentString),
+      }),
+
+      withPropertyFromAlbum({
+        property: input.value('trackArtistText'),
+      }),
+
+      exposeDependency({
+        dependency: '#album.trackArtistText',
+      }),
+    ],
 
     artistContribs: [
       inheritContributionListFromMainRelease(),
@@ -568,6 +589,10 @@ export class Track extends Thing {
       },
 
       // Credits and contributors
+
+      'Artist Text': {
+        property: 'artistText',
+      },
 
       'Artists': {
         property: 'artistContribs',
