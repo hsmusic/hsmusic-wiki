@@ -146,6 +146,16 @@ export default {
 
       relations.formatText.setSlots({
         mode: 'inline',
+
+        substitute: [
+          {
+            match: {
+              replacerKey: 'artist',
+              replacerValue: 'screamcatcher',
+            },
+            substitute: 'YAYAS!',
+          },
+        ],
       });
     }
 

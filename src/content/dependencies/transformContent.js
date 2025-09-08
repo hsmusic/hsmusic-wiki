@@ -109,7 +109,7 @@ export default {
           }
 
           if (spec.link) {
-            let data = {link: spec.link};
+            let data = {link: spec.link, replacerKey, replacerValue};
 
             determineData: {
               // No value at all: this is an index link.
@@ -188,8 +188,8 @@ export default {
             ...node,
             data: {
               ...node.data,
-              replacerKey: node.data.replacerKey.data,
-              replacerValue: node.data.replacerValue[0].data,
+              replacerKey,
+              replacerValue,
             },
           };
         }),
@@ -204,24 +204,7 @@ export default {
         sprawl.error,
 
       nodes:
-        sprawl.nodes
-          .map(node => {
-            switch (node.type) {
-              // Replace internal link nodes with a stub. It'll be replaced
-              // (by position) with an item from relations.
-              //
-              // TODO: This should be where label and hash get passed through,
-              // rather than in relations... (in which case there's no need to
-              // handle it specially here, and we can really just return
-              // data.nodes = sprawl.nodes)
-              case 'internal-link':
-                return {type: 'internal-link'};
-
-              // Other nodes will get processed in generate.
-              default:
-                return node;
-            }
-          }),
+        sprawl.nodes,
     };
   },
 
@@ -313,6 +296,19 @@ export default {
       validate: v => v.is('small', 'medium', 'large'),
       default: 'large',
     },
+
+    substitute: {
+      validate: v =>
+        v.strictArrayOf(
+          v.validateProperties({
+            match: v.validateProperties({
+              replacerKey: v.isString,
+              replacerValue: v.isString,
+            }),
+
+            substitute: v.isHTML,
+          })),
+    },
   },
 
   generate(data, relations, slots, {html, language, niceShowAggregate, to}) {
@@ -327,6 +323,24 @@ export default {
     let externalLinkForTooltipNodeIndex = 0;
 
     let offsetTextNode = 0;
+
+    const substitutions =
+      (slots.substitute
+        ? slots.substitute.slice()
+        : []);
+
+    const pickSubstitution = node => {
+      const index =
+        substitutions.findIndex(({match}) =>
+          match.replacerKey === node.data.replacerKey &&
+          match.replacerValue === node.data.replacerValue);
+
+      if (index === -1) {
+        return null;
+      }
+
+      return substitutions.splice(index, 1).at(0);
+    };
 
     const contentFromNodes =
       data.nodes.map((node, index) => {
@@ -345,6 +359,12 @@ export default {
             offsetTextNode = suffix.length;
           }
         };
+
+        const substitution = pickSubstitution(node);
+
+        if (substitution) {
+          return {type: 'substitution', data: substitution.substitute};
+        }
 
         switch (node.type) {
           case 'text': {
