@@ -15,7 +15,8 @@ export default {
     credit:
       relation('generateArtistCredit',
         track.artistContribs,
-        contextContributions),
+        contextContributions,
+        track.artistText),
 
     colorStyle:
       relation('generateColorStyleAttribute', track.color),

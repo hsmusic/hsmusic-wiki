@@ -120,6 +120,10 @@ export default {
   generate(data, relations, slots, {html, language}) {
     if (!slots.normalStringKey) return html.blank();
 
+    const effectivelyDiffers =
+      (slots.showAnnotation && data.normalContributionAnnotationsDifferFromContext) ||
+      (data.normalContributionArtistsDifferFromContext);
+
     for (const link of [
       ...relations.normalContributionLinks,
       ...relations.featuringContributionLinks,
@@ -183,11 +187,13 @@ export default {
     let content;
 
     if (formattedArtistList) {
-      content =
-        language.$(slots.normalStringKey, {
-          ...slots.additionalStringOptions,
-          artists: formattedArtistList,
-        });
+      if (effectivelyDiffers) {
+        content =
+          language.$(slots.normalStringKey, {
+            ...slots.additionalStringOptions,
+            artists: formattedArtistList,
+          });
+      }
     } else {
       if (empty(relations.normalContributionLinks)) {
         return html.blank();
@@ -215,12 +221,6 @@ export default {
           ...relations.normalContributionLinks,
           ...relations.featuringContributionLinks,
         ]);
-
-      const effectivelyDiffers =
-        (formattedArtistList
-          ? null
-          : (slots.showAnnotation && data.normalContributionAnnotationsDifferFromContext) ||
-            (data.normalContributionArtistsDifferFromContext));
 
       if (empty(relations.featuringContributionLinks)) {
         if (effectivelyDiffers) {
