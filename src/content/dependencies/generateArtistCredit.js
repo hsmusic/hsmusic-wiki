@@ -1,4 +1,4 @@
-import {compareArrays, empty} from '#sugar';
+import {compareArrays, empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -80,6 +80,14 @@ export default {
     normalContributionAnnotationsDifferFromContext:
       query.normalContributionAnnotationsDifferFromContext,
 
+    normalContributionArtistDirectories:
+      query.normalContributions
+        .map(contrib => contrib.artist.directory),
+
+    featuringContributionArtistDirectories:
+      query.featuringContributions
+        .map(contrib => contrib.artist.directory),
+
     hasWikiEdits:
       !empty(query.wikiEditContributions),
   }),
@@ -144,18 +152,31 @@ export default {
     if (!html.isBlank(relations.formatText)) {
       formattedArtistList = relations.formatText;
 
+      const substituteContrib = ({link, directory}) => ({
+        match: {replacerKey: 'artist', replacerValue: directory},
+        substitute: link,
+
+        apply(link, node) {
+          if (node.data.label) {
+            link.setSlot('content', language.sanitize(node.data.label));
+          }
+        },
+      });
+
       relations.formatText.setSlots({
         mode: 'inline',
 
         substitute: [
-          {
-            match: {
-              replacerKey: 'artist',
-              replacerValue: 'screamcatcher',
-            },
-            substitute: 'YAYAS!',
-          },
-        ],
+          stitchArrays({
+            link: relations.normalContributionLinks,
+            directory: data.normalContributionArtistDirectories,
+          }).map(substituteContrib),
+
+          stitchArrays({
+            link: relations.featuringContributionLinks,
+            directory: data.featuringContributionArtistDirectories,
+          }).map(substituteContrib),
+        ].flat(),
       });
     }
 

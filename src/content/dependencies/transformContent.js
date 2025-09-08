@@ -307,6 +307,8 @@ export default {
             }),
 
             substitute: v.isHTML,
+
+            apply: v.optional(v.isFunction),
           })),
     },
   },
@@ -363,7 +365,20 @@ export default {
         const substitution = pickSubstitution(node);
 
         if (substitution) {
-          return {type: 'substitution', data: substitution.substitute};
+          const source =
+            substitution.substitute;
+
+          let substitute = source;
+
+          if (substitution.apply) {
+            const result = substitution.apply(source, node);
+
+            if (result !== undefined) {
+              substitute = result;
+            }
+          }
+
+          return {type: 'substitution', data: substitute};
         }
 
         switch (node.type) {

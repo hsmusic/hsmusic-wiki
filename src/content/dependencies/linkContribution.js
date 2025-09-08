@@ -24,6 +24,8 @@ export default {
   }),
 
   slots: {
+    content: {type: 'html', mutable: false},
+
     showAnnotation: {type: 'boolean', default: false},
     showExternalLinks: {type: 'boolean', default: false},
     showChronology: {type: 'boolean', default: false},
@@ -45,6 +47,10 @@ export default {
 
       language.encapsulate('misc.artistLink', workingCapsule => {
         const workingOptions = {};
+
+        if (!html.isBlank(slots.content)) {
+          relations.artistLink.setSlot('content', slots.content);
+        }
 
         // Filling slots early is necessary to actually give the tooltip
         // content. Otherwise, the coming-up html.isBlank() always reports
