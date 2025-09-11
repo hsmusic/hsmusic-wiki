@@ -269,9 +269,14 @@ releaseInfo:
 
   # Descriptions
 
-  by:
-    _: "By {ARTISTS}."
-    featuring: "By {ARTISTS}, featuring {FEATURING}."
+  by: >-
+    By {ARTISTS}.
+  by.featuring: >-
+    By {ARTISTS}, featuring {FEATURING}.
+  by.withAlbum: >-
+    From {ALBUM}, by {ARTISTS}.
+  by.featuring.withAlbum: >-
+    From {ALBUM}, by {ARTISTS} feat. {FEATURING}.
 
   from: "From {ALBUM}."
 

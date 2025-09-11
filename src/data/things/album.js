@@ -185,6 +185,8 @@ export class Album extends Thing {
 
     countTracksInArtistTotals: flag(true),
 
+    showAlbumInTracksWithoutArtists: flag(false),
+
     hasTrackNumbers: flag(true),
     isListedOnHomepage: flag(true),
     isListedInGalleries: flag(true),
@@ -660,6 +662,10 @@ export class Album extends Thing {
       // General configuration
 
       'Count Tracks In Artist Totals': {property: 'countTracksInArtistTotals'},
+
+      'Show Album In Tracks Without Artists': {
+        property: 'showAlbumInTracksWithoutArtists',
+      },
 
       'Has Track Numbers': {property: 'hasTrackNumbers'},
       'Listed on Homepage': {property: 'isListedOnHomepage'},
