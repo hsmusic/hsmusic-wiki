@@ -232,11 +232,14 @@ export class Track extends Thing {
         validate: input.value(isBoolean),
       }),
 
-      withPropertyFromAlbum({
+      withContainingTrackSection(),
+
+      withPropertyFromObject({
+        object: '#trackSection',
         property: input.value('countTracksInArtistTotals'),
       }),
 
-      exposeDependency({dependency: '#album.countTracksInArtistTotals'}),
+      exposeDependency({dependency: '#trackSection.countTracksInArtistTotals'}),
     ],
 
     disableUniqueCoverArt: flag(),

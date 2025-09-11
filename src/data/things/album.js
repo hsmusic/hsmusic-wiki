@@ -10,8 +10,16 @@ import {traverse} from '#node-utils';
 import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {empty} from '#sugar';
 import Thing from '#thing';
-import {is, isColor, isContributionList, isDate, isDirectory, isNumber}
-  from '#validators';
+
+import {
+  is,
+  isBoolean,
+  isColor,
+  isContributionList,
+  isDate,
+  isDirectory,
+  isNumber,
+} from '#validators';
 
 import {
   parseAdditionalFiles,
@@ -1051,6 +1059,21 @@ export class TrackSection extends Thing {
 
     dateOriginallyReleased: simpleDate(),
 
+    countTracksInArtistTotals: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      withAlbum(),
+
+      withPropertyFromObject({
+        object: '#album',
+        property: input.value('countTracksInArtistTotals'),
+      }),
+
+      exposeDependency({dependency: '#album.countTracksInArtistTotals'}),
+    ],
+
     isDefaultTrackSection: flag(false),
 
     description: contentString(),
@@ -1144,6 +1167,8 @@ export class TrackSection extends Thing {
         property: 'dateOriginallyReleased',
         transform: parseDate,
       },
+
+      'Count Tracks In Artist Totals': {property: 'countTracksInArtistTotals'},
 
       'Description': {property: 'description'},
     },
