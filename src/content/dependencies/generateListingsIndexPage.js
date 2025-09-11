@@ -14,7 +14,9 @@ export default {
       wikiName: wikiInfo.name,
       numTracks: trackData.length,
       numAlbums: albumData.length,
-      totalDuration: getTotalDuration(trackData),
+      totalDuration:
+        getTotalDuration(
+          trackData.filter(track => track.countInArtistTotals)),
     };
   },
 
