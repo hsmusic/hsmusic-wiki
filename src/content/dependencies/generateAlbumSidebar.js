@@ -46,7 +46,8 @@ export default {
 
       const allReleaseAlbums =
         sortAlbumsTracksChronologically(
-          Array.from(albumTrackMap.keys()));
+          Array.from(albumTrackMap.keys()),
+          {getDate: album => albumTrackMap.get(album).date});
 
       const currentReleaseIndex =
         allReleaseAlbums.indexOf(track.album);
