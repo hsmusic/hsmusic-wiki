@@ -37,6 +37,13 @@ export function pathsForTarget(artist) {
       type: 'page',
       path: ['artistRollingWindow', artist.directory],
 
+      condition: () =>
+        artist.musicContributions.some(contrib => contrib.date) ||
+        artist.artworkContributions.some(contrib =>
+          contrib.date &&
+          contrib.thingProperty !== 'wallpaperArtistContribs' &&
+          contrib.thingProperty !== 'bannerArtistContribs'),
+
       contentFunction: {
         name: 'generateArtistRollingWindowPage',
         args: [artist],
