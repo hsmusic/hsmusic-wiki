@@ -6,6 +6,7 @@
 import {input, templateCompositeFrom} from '#composite';
 import find from '#find';
 import {isBoolean} from '#validators';
+import {getKebabCase} from '#wiki-data';
 
 import {withPropertyFromObject} from '#composite/data';
 import {withResolvedReference} from '#composite/wiki-data';
@@ -89,7 +90,8 @@ export default templateCompositeFrom({
         ['#mainRelease.name']: mainReleaseName,
       }) => continuation({
         ['#alwaysReferenceByDirectory']:
-          name === mainReleaseName,
+          getKebabCase(name) ===
+          getKebabCase(mainReleaseName),
       }),
     },
   ],
