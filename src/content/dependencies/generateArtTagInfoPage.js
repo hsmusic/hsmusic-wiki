@@ -182,12 +182,12 @@ export default {
                       artTagLink: relations.relatedArtTagLinks,
                       annotation: data.relatedArtTagAnnotations,
                     }).map(({artTagLink, annotation}) =>
-                        (html.isBlank(annotation)
-                          ? artTagLink
-                          : language.$(capsule, 'tagWithAnnotation', {
+                        (annotation
+                          ? language.$(capsule, 'tagWithAnnotation', {
                               tag: artTagLink,
                               annotation,
-                            })))),
+                            })
+                          : artTagLink))),
               }))),
 
           html.tag('blockquote',
