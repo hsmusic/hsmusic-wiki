@@ -39,11 +39,16 @@ export default {
       relation('generateCommentaryEntryDate', entry),
   }),
 
+  data: (entry) => ({
+    isWikiEditorCommentary:
+      entry.isWikiEditorCommentary,
+  }),
+
   slots: {
     color: {validate: v => v.isColor},
   },
 
-  generate: (relations, slots, {html, language}) =>
+  generate: (data, relations, slots, {html, language}) =>
     language.encapsulate('misc.artistCommentary.entry', entryCapsule =>
       html.tags([
         html.tag('p', {class: 'commentary-entry-heading'},
@@ -106,6 +111,9 @@ export default {
           slots.color &&
             relations.colorStyle.clone()
               .slot('color', slots.color),
+
+          data.isWikiEditorCommentary &&
+            {class: 'wiki-commentary'},
 
           relations.bodyContent.slot('mode', 'multiline')),
       ])),

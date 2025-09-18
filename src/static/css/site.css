@@ -1542,6 +1542,12 @@ li:not(:first-child:last-child) .tooltip:where(:not(.cover-artwork .tooltip)),
   color: var(--page-primary-color);
 }
 
+.wiki-commentary s:not(.spoiler) {
+  text-decoration-color: #fff9;
+  text-decoration-thickness: 1.4px;
+  color: #fffb;
+}
+
 s.spoiler {
   display: inline-block;
   color: transparent;
