@@ -12,6 +12,14 @@ export default templateCompositeFrom({
 
   steps: () => [
     {
+      dependencies: ['disableDate'],
+      compute: (continuation, {disableDate}) =>
+        (disableDate
+          ? continuation.raiseOutput({'#date': null})
+          : continuation()),
+    },
+
+    {
       dependencies: ['dateFirstReleased'],
       compute: (continuation, {dateFirstReleased}) =>
         (dateFirstReleased

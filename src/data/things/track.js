@@ -243,6 +243,7 @@ export class Track extends Thing {
     ],
 
     disableUniqueCoverArt: flag(),
+    disableDate: flag(),
 
     // > Update & expose - General metadata
 
@@ -613,6 +614,14 @@ export class Track extends Thing {
 
       'Has Cover Art': {
         property: 'disableUniqueCoverArt',
+        transform: value =>
+          (typeof value === 'boolean'
+            ? !value
+            : value),
+      },
+
+      'Has Date': {
+        property: 'disableDate',
         transform: value =>
           (typeof value === 'boolean'
             ? !value
