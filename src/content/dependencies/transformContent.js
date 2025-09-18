@@ -89,6 +89,20 @@ export default {
 
       nodes: parsedNodes
         .map(node => {
+          if (node.type === 'tooltip') {
+            return {
+              i: node.i,
+              iEnd: node.iEnd,
+              type: 'tooltip',
+              data: {
+                // No recursion yet. Sorry!
+                tooltip: node.data.content[0].data,
+                label: node.data.label[0].data,
+                link: null,
+              },
+            };
+          }
+
           if (node.type !== 'tag') {
             return node;
           }

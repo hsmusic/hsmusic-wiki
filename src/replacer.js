@@ -190,6 +190,9 @@ const tagHash = '#';
 const tagArgument = '*';
 const tagArgumentValue = '=';
 const tagLabel = '|';
+const tooltipBeginning = '<<';
+const tooltipEnding = '>>';
+const tooltipContent = ':';
 
 const noPrecedingWhitespace = '(?<!\\s)';
 
@@ -207,6 +210,14 @@ const R_tagArgument = escapeRegex(tagArgument);
 const R_tagArgumentValue = escapeRegex(tagArgumentValue);
 
 const R_tagLabel = escapeRegex(tagLabel);
+
+const R_tooltipBeginning =
+  '(?<=[^<]|^)' + escapeRegex(tooltipBeginning) + '(?!<)';
+
+const R_tooltipEnding =
+  '(?<=[^>]|^)' + escapeRegex(tooltipEnding) + '(?!>)';
+
+const R_tooltipContent = escapeRegex(tooltipContent);
 
 const regexpCache = {};
 
@@ -247,9 +258,13 @@ function parseNodes(input, i, stopAt, textOnly) {
     }
   };
 
-  const literalsToMatch = stopAt
-    ? stopAt.concat([R_tagBeginning])
-    : [R_tagBeginning];
+  const beginnings = [tagBeginning, tooltipBeginning];
+  const R_beginnings = [R_tagBeginning, R_tooltipBeginning];
+
+  const literalsToMatch =
+    (stopAt
+      ? stopAt.concat(R_beginnings)
+      : R_beginnings);
 
   // The 8ackslash stuff here is to only match an even (or zero) num8er
   // of sequential 'slashes. Even amounts always cancel out! Odd amounts
@@ -300,8 +315,10 @@ function parseNodes(input, i, stopAt, textOnly) {
 
     if (textOnly && closestMatch === tagBeginning)
       throw makeError(i, `Unexpected [[tag]] - expected only text here.`);
+    if (textOnly && closestMatch === tooltipBeginning)
+      throw makeError(i, `Unexpected <<tooltip>> - expected only text here.`);
 
-    const stopHere = closestMatch !== tagBeginning;
+    const stopHere = !beginnings.includes(closestMatch);
 
     iString = i;
     i = closestMatchIndex;
@@ -449,6 +466,51 @@ function parseNodes(input, i, stopAt, textOnly) {
         iEnd: i,
         type: 'tag',
         data: {replacerKey, replacerValue, hash, args, label},
+      });
+
+      continue;
+    }
+
+    if (closestMatch === tooltipBeginning) {
+      const iTooltip = closestMatchIndex;
+
+      let N;
+
+      // Label (hoverable text)
+
+      let label;
+
+      N = parseNodes(input, i, [R_tooltipContent, R_tooltipEnding]);
+
+      if (!stopped)
+        throw endOfInput(i, `reading tooltip label`);
+      if (input.slice(i).startsWith(tooltipEnding))
+        throw makeError(i, `Expected tooltip label and content.`);
+      if (!N.length)
+        throw makeError(i, `Expected tooltip label before content.`);
+
+      label = N;
+      i = stop_iParse;
+
+      // Content (tooltip text)
+
+      let content;
+
+      N = parseNodes(input, i, [R_tooltipEnding]);
+
+      if (!stopped)
+        throw endOfInput(i, `reading tooltip content`);
+      if (!N.length)
+        throw makeError(i, `Expected tooltip content`);
+
+      content = N;
+      i = stop_iParse;
+
+      nodes.push({
+        i: iTooltip,
+        iEnd: i,
+        type: 'tooltip',
+        data: {label, content},
       });
 
       continue;
