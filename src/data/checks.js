@@ -637,7 +637,15 @@ export function reportContentTextErrors(wikiData, {
     }],
   ];
 
-  const boundFind = bindFind(wikiData, {mode: 'error'});
+  const boundFind =
+    bindFind(wikiData, {
+      mode: 'error',
+      fuzz: {
+        capitalization: true,
+        kebab: true,
+      },
+    });
+
   const findArtistOrAlias = bindFindArtistOrAlias(boundFind);
 
   function* processContent(input) {

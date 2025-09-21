@@ -4,6 +4,7 @@ import {colors, logWarn} from '#cli';
 import {compareObjects, stitchArrays, typeAppearance} from '#sugar';
 import thingConstructors from '#things';
 import {isFunction, validateArrayItems} from '#validators';
+import {getCaseSensitiveKebabCase} from '#wiki-data';
 
 import * as fr from './find-reverse.js';
 
@@ -30,7 +31,34 @@ function warnOrThrow(mode, message) {
 export const keyRefRegex =
   new RegExp(String.raw`^(?:(?<key>[a-z-]*):(?=\S))?(?<ref>.*)$`);
 
-export function processAvailableMatchesByName(data, {
+function getFuzzHash(fuzz = {}) {
+  if (!fuzz) {
+    return 0;
+  }
+
+  return (
+    fuzz.capitalization << 0 +
+    fuzz.kebab << 1
+  );
+}
+
+export function fuzzName(name, fuzz = {}) {
+  if (!fuzz) {
+    return name;
+  }
+
+  if (fuzz.capitalization) {
+    name = name.toLowerCase();
+  }
+
+  if (fuzz.kebab) {
+    name = getCaseSensitiveKebabCase(name);
+  }
+
+  return name;
+}
+
+export function processAvailableMatchesByName(data, fuzz, {
   include = _thing => true,
 
   getMatchableNames = thing =>
@@ -50,7 +78,7 @@ export function processAvailableMatchesByName(data, {
         continue;
       }
 
-      const normalizedName = name.toLowerCase();
+      const normalizedName = fuzzName(name, fuzz);
 
       if (normalizedName in results) {
         if (normalizedName in multipleNameMatches) {
@@ -97,9 +125,9 @@ export function processAvailableMatchesByDirectory(data, {
   return {results};
 }
 
-export function processAllAvailableMatches(data, spec) {
+export function processAllAvailableMatches(data, fuzz, spec) {
   const {results: byName, multipleNameMatches} =
-    processAvailableMatchesByName(data, spec);
+    processAvailableMatchesByName(data, fuzz, spec);
 
   const {results: byDirectory} =
     processAvailableMatchesByDirectory(data, spec);
@@ -150,19 +178,23 @@ function oopsNameCapitalizationMismatch(mode, {
     `Returning null for this reference.`);
 }
 
-export function prepareMatchByName(mode, {byName, multipleNameMatches}) {
+export function prepareMatchByName(mode, fuzz, {byName, multipleNameMatches}) {
   return (name) => {
-    const normalizedName = name.toLowerCase();
+    const normalizedName = fuzzName(name, fuzz);
     const match = byName[normalizedName];
 
     if (match) {
-      if (name === match.name) {
-        return match.thing;
-      } else {
+      if (
+        !fuzz?.capitalization &&
+        name !== match.name &&
+        name.toLowerCase === match.name.toLowerCase()
+      ) {
         return oopsNameCapitalizationMismatch(mode, {
           matchingName: name,
           matchedName: match.name,
         });
+      } else {
+        return match.thing;
       }
     } else if (multipleNameMatches[normalizedName]) {
       return oopsMultipleNameMatches(mode, {
@@ -242,11 +274,18 @@ function findHelper({
   // hasn't changed!
   const cache = new WeakMap();
 
-  // The mode argument here may be 'warn', 'error', or 'quiet'. 'error' throws
-  // errors for null matches (with details about the error), while 'warn' and
-  // 'quiet' both return null, with 'warn' logging details directly to the
-  // console.
-  return (fullRef, data, {mode = 'warn'} = {}) => {
+  return (fullRef, data, {
+    // The mode argument here may be 'warn', 'error', or 'quiet'. 'error' throws
+    // errors for null matches (with details about the error), while 'warn' and
+    // 'quiet' both return null, with 'warn' logging details directly to the
+    // console.
+    mode = 'warn',
+
+    fuzz = {
+      capitalization: false,
+      kebab: false,
+    },
+  } = {}) => {
     if (!fullRef) return null;
 
     if (typeof fullRef !== 'string') {
@@ -257,19 +296,23 @@ function findHelper({
       throw new TypeError(`Expected data to be present`);
     }
 
-    let subcache = cache.get(data);
-    if (!subcache) {
-      subcache =
-        processAllAvailableMatches(data, {
+    let dataSubcache = cache.get(data);
+    if (!dataSubcache) {
+      cache.set(data, dataSubcache = new Map());
+    }
+
+    const fuzzHash = getFuzzHash(fuzz);
+    let fuzzSubcache = dataSubcache.get(fuzzHash);
+    if (!fuzzSubcache) {
+      dataSubcache.set(fuzzHash, fuzzSubcache =
+        processAllAvailableMatches(data, fuzz, {
           include,
           getMatchableNames,
           getMatchableDirectories,
-        });
-
-      cache.set(data, subcache);
+        }));
     }
 
-    const {byDirectory, byName, multipleNameMatches} = subcache;
+    const {byDirectory, byName, multipleNameMatches} = fuzzSubcache;
 
     return matchHelper(fullRef, mode, {
       matchByDirectory:
@@ -279,7 +322,7 @@ function findHelper({
         }),
 
       matchByName:
-        prepareMatchByName(mode, {
+        prepareMatchByName(mode, fuzz, {
           byName,
           multipleNameMatches,
         }),
@@ -358,7 +401,7 @@ function findMixedHelper(config) {
       const multipleNameMatches = Object.create(null);
 
       for (const spec of specs) {
-        processAvailableMatchesByName(data, {
+        processAvailableMatchesByName(data, null, {
           ...spec,
 
           results: byName,
@@ -401,7 +444,7 @@ function findMixedHelper(config) {
       },
 
       matchByName:
-        prepareMatchByName(mode, {
+        prepareMatchByName(mode, null, {
           byName,
           multipleNameMatches,
         }),

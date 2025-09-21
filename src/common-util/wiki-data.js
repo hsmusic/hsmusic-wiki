@@ -11,7 +11,7 @@ export {filterMultipleArrays} from './sugar.js';
 
 // Generic value operations
 
-export function getKebabCase(name) {
+export function getCaseSensitiveKebabCase(name) {
   return name
 
     // Spaces to dashes
@@ -53,9 +53,10 @@ export function getKebabCase(name) {
 
     // Trim dashes on boundaries
     .replace(/^-+|-+$/g, '')
+}
 
-    // Always lowercase
-    .toLowerCase();
+export function getKebabCase(name) {
+  return getCaseSensitiveKebabCase(name).toLowerCase();
 }
 
 // Specific data utilities
