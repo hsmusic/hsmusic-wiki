@@ -1503,13 +1503,15 @@ li:not(:first-child:last-child) .tooltip:where(:not(.cover-artwork .tooltip)),
 
 .content-tooltip .tooltip-content {
   padding: 3px 4.5px;
-  width: 240px;
+  width: max-content;
+  max-width: 240px;
 }
 
 .cover-artwork .content-tooltip {
   font-size: 0.85rem;
   padding: 2px 3px;
-  width: 220px;
+  width: max-content;
+  max-width: 220px;
 }
 
 .external-icon {
