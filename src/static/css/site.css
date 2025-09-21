@@ -1497,6 +1497,10 @@ li:not(:first-child:last-child) .tooltip:where(:not(.cover-artwork .tooltip)),
   display: inline-block;
 }
 
+.content-tooltip-guy:not(.has-link) {
+  cursor: default;
+}
+
 .content-tooltip-guy.has-link .text-with-tooltip-interaction-cue {
   text-decoration-color: var(--primary-color);
 }
