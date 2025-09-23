@@ -1,20 +1,31 @@
+import {empty} from '#sugar';
+
 export default {
   contentDependencies: ['generateContentContentHeading'],
   extraDependencies: ['language'],
 
-  relations: (relation, thing) => ({
+  query: (thing) => ({
+    entries:
+      (thing.isTrack
+        ? [...thing.commentary, ...thing.commentaryFromMainRelease]
+        : thing.commentary),
+  }),
+
+  relations: (relation, _query, thing) => ({
     contentContentHeading:
       relation('generateContentContentHeading', thing),
   }),
 
-  data: (thing) => ({
+  data: (query, _thing) => ({
     hasWikiEditorCommentary:
-      thing.commentary
-        .some(entry => entry.isWikiEditorCommentary),
+      query.entries.some(entry => entry.isWikiEditorCommentary),
 
     onlyWikiEditorCommentary:
-      thing.commentary
-        .every(entry => entry.isWikiEditorCommentary),
+      !empty(query.entries) &&
+      query.entries.every(entry => entry.isWikiEditorCommentary),
+
+    hasAnyCommentary:
+      !empty(query.entries),
   }),
 
   generate: (data, relations, {language}) =>
@@ -28,6 +39,8 @@ export default {
             ? language.encapsulate(capsule, 'onlyWikiCommentary')
          : data.hasWikiEditorCommentary
             ? language.encapsulate(capsule, 'withWikiCommentary')
-            : capsule)),
+         : data.hasAnyCommentary
+            ? capsule
+            : null)),
     }),
 };

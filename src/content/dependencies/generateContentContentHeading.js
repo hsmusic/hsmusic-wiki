@@ -28,12 +28,14 @@ export default {
       attributes: slots.attributes,
 
       title:
+        slots.string &&
         language.$(slots.string, {
           thing:
             html.tag('i', data.name),
         }),
 
       stickyTitle:
+        slots.string &&
         language.$(slots.string, 'sticky'),
     }),
 };
