@@ -1497,7 +1497,7 @@ li:not(:first-child:last-child) .tooltip:where(:not(.cover-artwork .tooltip)),
   display: inline-block;
 }
 
-.content-tooltip-guy:not(.has-link) {
+.content-tooltip-guy:not(.has-link) .hoverable {
   cursor: default;
 }
 
