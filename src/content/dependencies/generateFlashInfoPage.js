@@ -12,6 +12,7 @@ export default {
     'generateFlashArtworkColumn',
     'generateFlashNavAccent',
     'generatePageLayout',
+    'generateReadCommentaryLine',
     'generateTrackList',
     'linkExternal',
     'linkFlashAct',
@@ -60,6 +61,9 @@ export default {
 
     commentaryContentHeading:
       relation('generateCommentaryContentHeading', flash),
+
+    readCommentaryLine:
+      relation('generateReadCommentaryLine', flash),
 
     flashActLink:
       relation('linkFlashAct', flash.act),
@@ -131,14 +135,9 @@ export default {
             {[html.joinChildren]: html.tag('br')},
 
             language.encapsulate('releaseInfo', capsule => [
-              !html.isBlank(relations.artistCommentaryEntries) &&
-                language.encapsulate(capsule, 'readCommentary', capsule =>
-                  language.$(capsule, {
-                    link:
-                      html.tag('a',
-                        {href: '#artist-commentary'},
-                        language.$(capsule, 'link')),
-                  })),
+              (!html.isBlank(relations.contributorContributionList) ||
+               !html.isBlank(relations.featuredTracksList)) &&
+                relations.readCommentaryLine,
 
               !html.isBlank(relations.creditSourceEntries) &&
                 language.encapsulate(capsule, 'readCreditingSources', capsule =>
