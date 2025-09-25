@@ -40,11 +40,17 @@ export default {
     name:
       motif.name,
 
+    directory:
+      motif.directory,
+
+    hasStaff:
+      motif.hasStaff,
+
     color:
       motif.color,
   }),
 
-  generate: (data, relations, {html, language}) =>
+  generate: (data, relations, {html, language, to}) =>
     language.encapsulate('motifInfoPage', pageCapsule =>
       relations.layout.slots({
         title:
@@ -58,6 +64,10 @@ export default {
         additionalNames: relations.additionalNamesBox,
 
         mainContent: [
+          data.hasStaff &&
+            html.tag('img', {class: 'motif-staff'},
+              {src: to('media.motifStaff', data.directory)}),
+
           html.tag('p',
             {[html.onlyIfContent]: true},
 

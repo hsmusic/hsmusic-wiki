@@ -8,6 +8,7 @@ import {
   color,
   contentString,
   directory,
+  flag,
   name,
   referenceList,
   reverseReferenceList,
@@ -31,6 +32,8 @@ export class Motif extends Thing {
     additionalNames: thingList({
       class: input.value(AdditionalName),
     }),
+
+    hasStaff: flag(V(false)),
 
     description: contentString(),
 
@@ -70,6 +73,8 @@ export class Motif extends Thing {
         property: 'additionalNames',
         transform: parseAdditionalNames,
       },
+
+      'Has Staff': {property: 'hasStaff'},
 
       'Description': {property: 'description'},
 

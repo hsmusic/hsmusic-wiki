@@ -2097,6 +2097,14 @@
 }
 */
 
+/* Motifs */
+
+@layer layout {
+  img.motif-staff {
+    max-width: min(100%, 500px);
+  }
+}
+
 /* Quick description */
 
 @layer layout {
