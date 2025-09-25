@@ -39,6 +39,7 @@ import {
   parseDate,
   parseDimensions,
   parseDuration,
+  parseFeaturedMotifs,
   parseLyrics,
   parseMidiProjectFiles,
   parseMusicVideos,
@@ -126,6 +127,7 @@ export class Track extends Thing {
     Artwork,
     CommentaryEntry,
     CreditingSourcesEntry,
+    FeaturedMotifConnection,
     LyricsEntry,
     MidiProjectFile,
     MiscellaneousAdditionalFile,
@@ -614,6 +616,14 @@ export class Track extends Thing {
         find: soupyFind.input('trackReference'),
       }),
     ],
+
+    // TODO: inheritance??? (means recontextualizing the connections to be on
+    // this track, and means adapting reverse.tracksWhichFeatureMotif to...
+    // actually be based on trackData... instead of bloody "connectionData")
+    // (Can you tell this note is written post-hoc)
+    featuredMotifs: thingList({
+      class: input.value(FeaturedMotifConnection),
+    }),
 
     // > Update & expose - Music videos
 
@@ -1247,6 +1257,11 @@ export class Track extends Thing {
       'Referenced Tracks': {property: 'referencedTracks'},
       'Sampled Tracks': {property: 'sampledTracks'},
 
+      'Featured Motifs': {
+        property: 'featuredMotifs',
+        transform: parseFeaturedMotifs,
+      },
+
       // Music videos
 
       'Music Videos': {
@@ -1485,6 +1500,19 @@ export class Track extends Thing {
           : []),
 
       referenced: track => track.sampledTracks,
+    },
+
+    // TODO: see note above about motif connection inheritence
+    // no idea why this is coded based on. connectionData
+    // except to be spicy I guess
+    tracksWhichFeatureMotif: {
+      bindTo: 'connectionData',
+
+      include: (connection, {FeaturedMotifConnection}) =>
+        connection instanceof FeaturedMotifConnection,
+
+      referencing: connection => [connection],
+      referenced: connection => [connection.motif],
     },
 
     tracksWhoseArtworksFeature: {

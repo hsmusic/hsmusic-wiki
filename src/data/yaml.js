@@ -1192,6 +1192,50 @@ export function parseArtistAliases(value, {subdoc, Artist}) {
   });
 }
 
+export function parseFeaturedMotifs(value, {subdoc, FeaturedMotifConnection}) {
+  return parseArrayEntries(value, {flatMap: true}, item => {
+    let documents = [item];
+
+    if (typeof item === 'string') {
+      const match = item.match(extractPrefixAccentRegex);
+      if (!match) return item;
+
+      const accentParts = match.groups.accent?.split(', ') ?? [];
+
+      const timeRanges =
+        accentParts
+          .map(part => part.match(timeRangeRegex)?.groups)
+          .filter(Boolean)
+          .map(groups => ({
+            start: groups.time1,
+            end: groups.time2,
+          }));
+
+      const basicDocument = {
+        'Motif':
+          match.groups.main,
+      };
+
+      if (empty(timeRanges)) {
+        documents = [basicDocument];
+      } else {
+        documents = timeRanges.map(range => ({
+          ...basicDocument,
+
+          'Start Time':
+            range.start,
+
+          'End Time':
+            range.end,
+        }));
+      }
+    }
+
+    return documents.map(document =>
+      subdoc(FeaturedMotifConnection, document, {bindInto: 'track'}));
+  });
+}
+
 export const durationRegexRaw =
   String.raw`(?:(?<hour>\d\d?):)?(?<minute>\d\d?):(?<second>\d\d)`;
 
@@ -1914,6 +1958,8 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
 
     ['commentaryData', [/* find */]],
 
+    ['connectionData', [/* find and/or reverse */]],
+
     ['creditingSourceData', [/* find */]],
 
     ['flashData', [
@@ -1935,6 +1981,8 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
     ['midiProjectFileData', [/* find */]],
 
     ['miscellaneousAdditionalFileData', [/* find */]],
+
+    ['motifData', [/* reverse */]],
 
     ['musicVideoData', [/* find */]],
 

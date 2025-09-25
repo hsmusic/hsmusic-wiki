@@ -1,3 +1,5 @@
+import {sortMotifConnectionsByTimeInTrack} from '#sort';
+
 function checkInterrupted(which, relations, {html}) {
   if (
     !html.isBlank(relations.additionalFilesList) ||
@@ -5,6 +7,7 @@ function checkInterrupted(which, relations, {html}) {
     !html.isBlank(relations.flashesThatFeatureList) ||
     !html.isBlank(relations.lyricsSection) ||
     !html.isBlank(relations.midiProjectFilesList) ||
+    !html.isBlank(relations.featuredMotifsList) ||
     !html.isBlank(relations.referencedByTracksList) ||
     !html.isBlank(relations.referencedTracksList) ||
     !html.isBlank(relations.sampledByTracksList) ||
@@ -101,6 +104,11 @@ export default {
 
     sampledTracksList:
       relation('generateNearbyTrackList', track.sampledTracks, track, []),
+
+    featuredMotifsList:
+      relation('generateMotifConnectionList',
+        sortMotifConnectionsByTimeInTrack(track.featuredMotifs.slice()),
+        track),
 
     referencedByTracksList:
       relation('generateDividedTrackList',
@@ -291,6 +299,16 @@ export default {
             }),
 
             relations.sampledTracksList,
+          ]),
+
+          html.tags([
+            language.encapsulate('releaseInfo.motifsFeatured', capsule =>
+              relations.relationsContentHeading.clone().slots({
+                attributes: {id: 'features-motifs'},
+                string: capsule,
+              })),
+
+            relations.featuredMotifsList,
           ]),
 
           language.encapsulate('releaseInfo.tracksThatReference', capsule =>

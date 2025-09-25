@@ -388,6 +388,14 @@ releaseInfo:
       fromGroup: "Tracks that sample this one — from {GROUP}:"
       fromOther: "Tracks that sample this one — from somewhere else:"
 
+  motifsFeatured:
+    _: "Motifs that {TRACK} features:"
+    sticky: "Motifs that this track features:"
+
+  tracksThatFeatureMotif:
+    _: "Tracks that feature '{MOTIF}':"
+    sticky: "Tracks that feature this motif:"
+
   flashesThatFeature:
     _: "Flashes that feature {TRACK}:"
     withoutName: "Flashes that feature this track:"
@@ -580,6 +588,14 @@ flashList:
   item:
     _: "{FLASH}"
     asDifferentRelease: "{FLASH} (as {TRACK})"
+
+motifConnectionList:
+  item:
+    track: "{TRACK}"
+    motif: "{MOTIF}"
+
+    track.withTimeRange: "({TIME_RANGE}) {TRACK}"
+    motif.withTimeRange: "({TIME_RANGE}) {MOTIF}"
 
 #
 # misc:
@@ -3106,6 +3122,12 @@ listingPage:
 
           randomAlbumWholeSite: "Random Album (whole site)"
           randomTrackWholeSite: "Random Track (whole site)"
+
+motifInfoPage:
+  title: "{MOTIF}"
+
+  nav:
+    motif: "Motif: {MOTIF}"
 
 #
 # newsIndex:

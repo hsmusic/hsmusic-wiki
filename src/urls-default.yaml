@@ -58,6 +58,8 @@ localized:
 
     listing: 'list/<>/'
 
+    motifInfo: 'motif/<>/'
+
     newsIndex: 'news/'
 
     newsEntry: 'news/<>/'

@@ -501,3 +501,48 @@ export function sortContributionsChronologically(data, sortThings, {
 export function nativeGetContributionThing(contrib, _nativeGetContributionThing) {
   return contrib.thing;
 }
+
+// Sort motif connections (usages) from the perspective of a track.
+export function sortMotifConnectionsByTimeInTrack(data) {
+  sortAlphabetically(data, {
+    getName: ({motif}) => motif.name,
+    getDirectory: ({motif}) => motif.directory,
+  });
+
+  data.sort((a, b) => {
+    if (a.startTime < b.startTime) return -1;
+    if (a.startTime > b.startTime) return +1;
+    if (a.endTime < b.endTime) return -1;
+    if (b.endTime > b.endTime) return +1;
+    return 0;
+  });
+
+  return data;
+}
+
+// Sort motif connections (usages) from the perspective of a motif.
+export function sortMotifConnectionsChronologically(data, {
+  latestFirst = false,
+} = {}) {
+  const trackMap = new Map();
+
+  for (const connection of data) {
+    if (trackMap.has(connection.track)) {
+      trackMap.get(connection.track).push(connection);
+    } else {
+      trackMap.set(connection.track, [connection]);
+    }
+  }
+
+  for (const connections of trackMap.values()) {
+    sortMotifConnectionsByTimeInTrack(connections);
+  }
+
+  const tracks = unique(data.map(({track}) => track));
+
+  sortAlbumsTracksChronologically(tracks);
+
+  data.splice(0, data.length, ...tracks.flatMap(track => trackMap.get(track)));
+
+  return data;
+}

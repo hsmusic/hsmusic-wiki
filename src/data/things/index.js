@@ -6,6 +6,7 @@ export * from './content/index.js';
 export * from './contrib/index.js';
 export * from './flash/index.js';
 export * from './group/index.js';
+export * from './motif/index.js';
 export * from './homepage-layout/index.js';
 export * from './sorting-rule/index.js';
 

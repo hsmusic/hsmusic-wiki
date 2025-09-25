@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['transformContent'],
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, thing) => ({
     customName:
       (thing.nameText

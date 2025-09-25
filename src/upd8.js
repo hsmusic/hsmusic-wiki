@@ -1715,6 +1715,7 @@ async function main() {
       }
       logThings('groupData', 'groups');
       logThings('groupCategoryData', 'group categories');
+      logThings('motifData', 'motifs');
       logThings('artTagData', 'art tags');
       if (wikiData.newsData) {
         logThings('newsData', 'news entries');
