@@ -678,7 +678,16 @@ export const asNameRegex =
   /^as (?<name>\S.+?)(?:(?<=\S)[,:] | +- |$)(?: *(?<annotation>.*))?$/;
 
 // TODO: Should this fit better within actual YAML loading infrastructure??
-export function parseArrayEntries(entries, mapFn) {
+export function parseArrayEntries(entries, ...args) {
+  const [opts, mapFn] =
+    (typeof args[0] === 'object'
+      ? [args[0], args[1]]
+      : [{}, args[0]]);
+
+  const {
+    flatMap = false,
+  } = opts;
+
   // If this isn't something we can parse, just return it as-is.
   // The Thing object's validators will handle the data error better
   // than we're able to here.
@@ -702,7 +711,11 @@ export function parseArrayEntries(entries, mapFn) {
     return null;
   }
 
-  return nonNullEntries.map(mapFn);
+  if (opts.flatMap) {
+    return nonNullEntries.flatMap(mapFn);
+  } else {
+    return nonNullEntries.map(mapFn);
+  }
 }
 
 export function parseContributors(entries) {
