@@ -740,6 +740,49 @@ export class Language extends Thing {
       : duration;
   }
 
+  formatTimeIntoDuration(secCur, secTotal) {
+    if (secCur === null || secCur === undefined) {
+      return html.blank();
+    }
+
+    if (secTotal === null || secTotal === undefined) {
+      throw new Error(`Expected two numbers of seconds, not just one`);
+    }
+
+    const showHours = Math.floor(secTotal / 3600) >= 1;
+
+    const hour = Math.floor(secCur / 3600);
+    const min = Math.floor((secCur - hour * 3600) / 60);
+    const sec = Math.floor(secCur - hour * 3600 - min * 60);
+
+    const pad = (val) => val.toString().padStart(2, '0');
+
+    const time =
+      showHours
+        ? this.formatString('count.duration.hours', {
+            hours: hour,
+            minutes: pad(min),
+            seconds: pad(sec),
+          })
+        : this.formatString('count.duration.minutes', {
+            minutes: min,
+            seconds: pad(sec),
+          });
+
+    return time;
+  }
+
+  formatTimeIntoDurationRange(secStart, secEnd, secTotal) {
+    if (secTotal === null || secTotal === undefined) {
+      throw new Error(`Expected start, end, and total numbers of seconds`);
+    }
+
+    return this.formatString('count.timeIntoDurationRange', {
+      start: this.formatTimeIntoDuration(secStart, secTotal),
+      end: this.formatTimeIntoDuration(secEnd, secTotal),
+    });
+  }
+
   formatExternalLink(urlEntry, {
     style = 'platform',
     context = 'generic',

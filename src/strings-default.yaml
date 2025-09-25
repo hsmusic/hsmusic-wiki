@@ -253,6 +253,10 @@ count:
     kilobytes: "{KILOBYTES} kB"
     bytes: "{BYTES} bytes"
 
+  # Ranges
+
+  timeIntoDurationRange: "{START}–{END}"
+
   # Indexes in a list
   # These use "Type: ordinal" on CLDR's chart of plural rules.
 

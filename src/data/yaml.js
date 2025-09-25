@@ -663,6 +663,11 @@ export function parseAlwaysReferenceByDirectory(value) {
   }
 }
 
+export function parseTimeIntoDuration(string) {
+  // lol
+  return parseDuration(string);
+}
+
 export const extractAccentRegex =
   /^(?<main>.*?)(?: \((?<accent>.*)\))?$/;
 
@@ -1173,6 +1178,20 @@ export function parseArtistAliases(value, {subdoc, Artist}) {
     }
   });
 }
+
+export const durationRegexRaw =
+  String.raw`(?:(?<hour>\d\d?):)?(?<minute>\d\d?):(?<second>\d\d)`;
+
+export const timeRangeRegexRaw =
+  '(?<time1>' + durationRegexRaw.replace(/hour|minute|second/g, '$&1') + ')' +
+  '-' +
+  '(?<time2>' + durationRegexRaw.replace(/hour|minute|second/g, '$&2') + ')';
+
+export const duragionRegex =
+  new RegExp('^' + durationRegexRaw + '$');
+
+export const timeRangeRegex =
+  new RegExp('^' + timeRangeRegexRaw + '$');
 
 // documentModes: Symbols indicating sets of behavior for loading and processing
 // data files.

@@ -695,6 +695,13 @@ export function isDuration(duration) {
   return true;
 }
 
+export function isTimeIntoDuration(time) {
+  isNumber(time);
+  isPositiveOrZero(time);
+
+  return true;
+}
+
 export function isFileExtension(string) {
   isStringNonEmpty(string);
 
