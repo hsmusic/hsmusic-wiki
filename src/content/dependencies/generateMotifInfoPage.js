@@ -40,6 +40,9 @@ export default {
     name:
       motif.name,
 
+    abcNotation:
+      motif.abcNotation,
+
     directory:
       motif.directory,
 
@@ -77,6 +80,15 @@ export default {
               motifs:
                 language.formatConjunctionList(relations.derivesFromMotifLinks),
             })),
+
+          data.abcNotation &&
+            html.tag('p',
+              html.tag('code', {class: 'abc'},
+                {[html.joinChildren]: html.tag('br')},
+
+                data.abcNotation
+                  .split('\n')
+                  .map(line => language.sanitize(line)))),
 
           html.tags([
             relations.connectionsContentHeading.clone().slots({

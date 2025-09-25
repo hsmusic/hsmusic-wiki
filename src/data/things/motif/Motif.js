@@ -12,6 +12,7 @@ import {
   name,
   referenceList,
   reverseReferenceList,
+  simpleString,
   soupyFind,
   soupyReverse,
   thingList,
@@ -32,6 +33,8 @@ export class Motif extends Thing {
     additionalNames: thingList({
       class: input.value(AdditionalName),
     }),
+
+    abcNotation: simpleString(),
 
     hasStaff: flag(V(false)),
 
@@ -73,6 +76,8 @@ export class Motif extends Thing {
         property: 'additionalNames',
         transform: parseAdditionalNames,
       },
+
+      'ABC Notation': {property: 'abcNotation'},
 
       'Has Staff': {property: 'hasStaff'},
 
