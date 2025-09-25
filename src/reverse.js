@@ -2,6 +2,7 @@ import * as fr from './find-reverse.js';
 
 import {sortByDate} from '#sort';
 import {stitchArrays} from '#sugar';
+import thingConstructors from '#things';
 
 function checkUnique(value) {
   if (value.length === 0) {
@@ -46,7 +47,14 @@ function reverseHelper(spec) {
     const interstitialReferencingThings =
       (spec.bindTo === 'wikiData'
         ? Array.from(spec.referencing(data))
-        : data.flatMap(thing => Array.from(spec.referencing(thing))));
+
+        : data.flatMap(thing => {
+            if (spec.include && !spec.include(thing, thingConstructors)) {
+              return [];
+            }
+
+            return Array.from(spec.referencing(thing));
+          }));
 
     const referencedThings =
       interstitialReferencingThings
