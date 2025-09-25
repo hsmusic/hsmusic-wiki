@@ -9,7 +9,9 @@ import {
   contentString,
   directory,
   name,
+  referenceList,
   reverseReferenceList,
+  soupyFind,
   soupyReverse,
   thingList,
 } from '#composite/wiki-properties';
@@ -19,7 +21,7 @@ export class Motif extends Thing {
   static [Thing.friendlyName] = `Motif`;
   static [Thing.wikiData] = 'motifData';
 
-  static [Thing.getPropertyDescriptors] = ({AdditionalName}) => ({
+  static [Thing.getPropertyDescriptors] = ({AdditionalName, Motif}) => ({
     // Update & expose
 
     name: name(V('Unnamed Motif')),
@@ -32,8 +34,14 @@ export class Motif extends Thing {
 
     description: contentString(),
 
+    derivesFromMotifs: referenceList({
+      class: input.value(Motif),
+      find: soupyFind.input('motif'),
+    }),
+
     // Update only
 
+    find: soupyFind(),
     reverse: soupyReverse(),
 
     // Expose only
@@ -46,6 +54,10 @@ export class Motif extends Thing {
 
     featuredInTracks: reverseReferenceList({
       reverse: soupyReverse.input('tracksWhichFeatureMotif'),
+    }),
+
+    derivedForMotifs: reverseReferenceList({
+      reverse: soupyReverse.input('motifsWhichDeriveFrom'),
     }),
   });
 
@@ -60,6 +72,8 @@ export class Motif extends Thing {
       },
 
       'Description': {property: 'description'},
+
+      'Derives From': {property: 'derivesFromMotifs'},
     },
   };
 
@@ -67,6 +81,15 @@ export class Motif extends Thing {
     motif: {
       referenceTypes: ['motif'],
       bindTo: 'motifData',
+    },
+  };
+
+  static [Thing.reverseSpecs] = {
+    motifsWhichDeriveFrom: {
+      bindTo: 'motifData',
+
+      referencing: motif => [motif],
+      referenced: motif => motif.derivesFromMotifs,
     },
   };
 }

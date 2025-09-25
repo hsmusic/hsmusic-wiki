@@ -19,6 +19,14 @@ export default {
     connectionsContentHeading:
       relation('generateMotifConnectionsContentHeading', motif),
 
+    derivesFromMotifLinks:
+      motif.derivesFromMotifs
+        .map(motif => relation('linkMotif', motif)),
+
+    derivedForMotifLinks:
+      motif.derivedForMotifs
+        .map(motif => relation('linkMotif', motif)),
+
     featuringTracksList:
       relation('generateMotifConnectionList',
         sortMotifConnectionsChronologically(motif.featuredInTracks.slice()),
@@ -50,6 +58,29 @@ export default {
         additionalNames: relations.additionalNamesBox,
 
         mainContent: [
+          html.tag('p',
+            {[html.onlyIfContent]: true},
+
+            language.$('releaseInfo.derivesFromMotifs', {
+              [language.onlyIfOptions]: ['motifs'],
+
+              motifs:
+                language.formatConjunctionList(relations.derivesFromMotifLinks),
+            })),
+
+          html.tags([
+            relations.connectionsContentHeading.clone().slots({
+              attributes: {id: 'derived-for-motifs'},
+              string: 'releaseInfo.motifsThatDeriveFromMotif',
+            }),
+
+            html.tag('ul',
+              {[html.onlyIfContent]: true},
+
+              relations.derivedForMotifLinks
+                .map(link => html.tag('li', link))),
+          ]),
+
           html.tags([
             relations.connectionsContentHeading.clone().slots({
               attributes: {id: 'featured-in-tracks'},

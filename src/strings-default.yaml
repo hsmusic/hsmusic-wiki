@@ -360,6 +360,8 @@ releaseInfo:
       differentName: "as {NAME}"
       differentName.onSingle: "{NAME}"
 
+  derivesFromMotifs: "Derives from {MOTIFS}."
+
   tracksReferenced:
     _: "Tracks that {TRACK} references:"
     withoutName: "Tracks that this one references:"
@@ -397,6 +399,11 @@ releaseInfo:
     _: "Tracks that feature '{MOTIF}':"
     withoutName: "Tracks that feature this motif:"
     sticky: "Tracks that feature this motif:"
+
+  motifsThatDeriveFromMotif:
+    _: "Motifs that derive from '{MOTIF}':"
+    withoutName: "Motifs that derive from this one:"
+    sticky: "Motifs that derive from this one:"
 
   flashesThatFeature:
     _: "Flashes that feature {TRACK}:"

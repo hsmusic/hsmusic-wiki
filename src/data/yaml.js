@@ -1982,7 +1982,7 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
 
     ['miscellaneousAdditionalFileData', [/* find */]],
 
-    ['motifData', [/* reverse */]],
+    ['motifData', [/* find, reverse */]],
 
     ['musicVideoData', [/* find */]],
 
