@@ -1,8 +1,11 @@
+import {sortMotifConnectionsChronologically} from '#sort';
+
 export default {
   relations: (relation, connections, context) => ({
     items:
-      connections.map(connection =>
-        relation('generateMotifConnectionListItem', connection, context)),
+      sortMotifConnectionsChronologically(connections.slice())
+        .map(connection =>
+          relation('generateMotifConnectionListItem', connection, context)),
   }),
 
   generate: (relations, {html}) =>

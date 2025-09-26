@@ -1,5 +1,3 @@
-import {sortMotifConnectionsChronologically} from '#sort';
-
 export default {
   sprawl: ({wikiInfo}) => ({
     enableListings:
@@ -29,7 +27,7 @@ export default {
 
     featuringTracksList:
       relation('generateMotifConnectionList',
-        sortMotifConnectionsChronologically(motif.featuredInTracks.slice()),
+        motif.featuredInTracks,
         motif),
   }),
 
