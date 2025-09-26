@@ -57,6 +57,8 @@ export default {
             motif: language.sanitize(data.name),
           }),
 
+        loadLibraries: ['abcjs'],
+
         headingMode: 'sticky',
         color: data.color,
 
@@ -80,12 +82,6 @@ export default {
                 html.tag('div', {class: 'motif-control'})
               ]
             ),
-
-          // I tried VERY HARD to get js/client/abc-render.js to work properly...
-          data.abcNotation &&
-            html.tag('script', {src: "../../static-5p14/lib/abcjs/dist/abcjs-basic.js"}),
-          data.abcNotation &&
-            html.tag('link', {rel: "stylesheet", href: "../../static-5p14/lib/abcjs/abcjs-audio.css"}),
 
           html.tags([
             relations.connectionsContentHeading.clone().slots({

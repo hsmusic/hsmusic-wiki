@@ -77,6 +77,13 @@ export default {
       mutable: false,
     },
 
+    loadLibraries: {
+      validate: v =>
+        v.strictArrayOf(v.is(...[
+          'abcjs',
+        ])),
+    },
+
     showSearch: {
       type: 'boolean',
       default: true,
@@ -764,6 +771,12 @@ export default {
             href: to('staticCSS.path', 'site.css'),
           }),
 
+          slots.loadLibraries?.includes('abcjs') &&
+            html.tag('link', {
+              rel: 'stylesheet',
+              href: to('staticLib.path', 'abcjs/abcjs-audio.css'),
+            }),
+
           relations.colorStyleTag
             .slot('color', slots.color ?? data.wikiColor),
 
@@ -776,6 +789,11 @@ export default {
           html.tag('script', {
             src: to('staticLib.path', 'chroma-js/chroma.min.cjs'),
           }),
+
+          slots.loadLibraries?.includes('abcjs') &&
+            html.tag('script', {
+              src: to('staticLib.path', 'abcjs/dist/abcjs-basic-min.js'),
+            }),
 
           html.tag('script', {
             blocking: 'render',

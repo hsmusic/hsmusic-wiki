@@ -6,32 +6,7 @@ export const info = {
   status: "unloaded"
 };
 
-let abcjs;
-
-Promise.all([
-  loadDependencies(),
-])
-  .then(
-    () => {
-      info.status = 'ready'
-    },
-    error => {
-      console.error(error)
-      info.status = 'error'
-    });
-
-
-async function loadDependencies() {
-  // PRETEND WINDOW.ABCJS iS DEFINED HERE
-
-  // window.abcjs = abcjs
-  if (window.ABCJS) {
-    abcjs = window.ABCJS
-    console.log("Loaded abcjs")
-  } else {
-    console.error("Didn't load")
-  }
-}
+const abcjs = window.ABCJS;
 
 var visualParams = {
   add_classes: true,
@@ -136,6 +111,8 @@ function buildPlayer(tune, el_visual, el_control) {
 }
 
 export function mutatePageContent() {
+  if (!abcjs) return;
+
   for (const abcwrapper of document.querySelectorAll(".abc-full[data-notation]")) {
     var tune = JSON.parse(abcwrapper.dataset.notation);
     let el_visual = abcwrapper.querySelector(".motif-sheet");
