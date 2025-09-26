@@ -2104,10 +2104,6 @@
     font-family: monospace;
     font-size: 2em;
   }
-
-  img.motif-staff {
-    max-width: min(100%, 500px);
-  }
 }
 
 /* Quick description */

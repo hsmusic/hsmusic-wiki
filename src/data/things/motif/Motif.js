@@ -8,7 +8,6 @@ import {
   color,
   contentString,
   directory,
-  flag,
   name,
   referenceList,
   reverseReferenceList,
@@ -35,8 +34,6 @@ export class Motif extends Thing {
     }),
 
     abcNotation: simpleString(),
-
-    hasStaff: flag(V(false)),
 
     description: contentString(),
 
@@ -78,8 +75,6 @@ export class Motif extends Thing {
       },
 
       'ABC Notation': {property: 'abcNotation'},
-
-      'Has Staff': {property: 'hasStaff'},
 
       'Description': {property: 'description'},
 

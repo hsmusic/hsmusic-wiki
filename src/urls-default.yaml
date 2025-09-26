@@ -140,8 +140,6 @@ media:
 
     flashArt: 'flash-art/<>.<>'
 
-    motifStaff: 'motif-staff/<>.png'
-
     vgmAlbumAdditionalFile: 'album-additional/vgm/<>/<>'
     vgmAlbumAdditionalFileInFolder: 'album-additional/vgm/<>/<>/<>'
     vgmAlbumArt: 'album-art/vgm/<>/<>'
