@@ -5,6 +5,12 @@ export default {
 
     motifLink:
       relation('linkMotif', connection.motif),
+
+    textWithTooltip:
+      relation('generateTextWithTooltip'),
+
+    tooltip:
+      relation('generateTooltip'),
   }),
 
   data: (connection, context) => ({
@@ -19,6 +25,9 @@ export default {
 
     endTime:
       connection.endTime,
+
+    abcNotation:
+      connection.motif.abcNotation
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -32,6 +41,24 @@ export default {
         } else {
           workingCapsule += '.motif';
           workingOptions.motif = relations.motifLink;
+        }
+
+        if (data.context !== 'motif' && data.abcNotation) {
+          workingOptions.motif = relations.textWithTooltip.slots({
+            text:
+              workingOptions.motif.slots({
+                attributes: {class: 'text-with-tooltip-interaction-cue'},
+              }),
+
+            tooltip:
+              relations.tooltip.slots({
+                attributes: {class: 'motif-preview-tooltip'},
+
+                content:
+                  html.tag('div', {class: 'abc-tip', 'data-notation': JSON.stringify(data.abcNotation)},
+                    html.tag('div', {class: 'motif-sheet'})),
+              }),
+          })
         }
 
         if (
@@ -49,3 +76,4 @@ export default {
         return language.$(workingCapsule, workingOptions);
       })),
 };
+

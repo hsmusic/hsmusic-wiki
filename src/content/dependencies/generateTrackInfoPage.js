@@ -409,6 +409,10 @@ export default {
             id: 'referencing-sources',
             string: 'misc.referencingSources',
           }),
+
+          // I tried VERY HARD to get js/client/abc-render.js to work properly...
+          html.tag('script', {src: "../../static-5p14/lib/abcjs/dist/abcjs-basic.js"}),
+          html.tag('link', {rel: "stylesheet", href: "../../static-5p14/lib/abcjs/abcjs-audio.css"}),
         ],
 
         navLinkStyle: 'hierarchical',

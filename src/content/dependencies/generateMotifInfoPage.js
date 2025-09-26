@@ -81,14 +81,6 @@ export default {
               ]
             ),
 
-          data.abcNotation &&
-            html.tag('p',
-              html.tag('span', {class: 'motif-notation'},
-                language.sanitize("Compact representation"))),
-          data.abcNotation &&
-            html.tag('div', {class: 'abc-tip', 'data-notation': JSON.stringify(data.abcNotation)},
-              html.tag('div', {class: 'motif-sheet'})),
-
           // I tried VERY HARD to get js/client/abc-render.js to work properly...
           data.abcNotation &&
             html.tag('script', {src: "../../static-5p14/lib/abcjs/dist/abcjs-basic.js"}),
