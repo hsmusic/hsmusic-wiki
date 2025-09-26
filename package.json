@@ -63,6 +63,7 @@
     "dependencies": {
         "@eslint/js": "10.0.1",
         "@js-temporal/polyfill": "0.4.4",
+        "abcjs": "6.5.2",
         "chokidar": "5.0.0",
         "chroma-js": "3.2.0",
         "command-exists": "1.2.9",

@@ -1,3 +1,4 @@
+import * as abcRender from './abc-render.js';
 import * as additionalNamesBoxModule from './additional-names-box.js';
 import * as albumCommentarySidebarModule from './album-commentary-sidebar.js';
 import * as artTagGalleryFilterModule from './art-tag-gallery-filter.js';
@@ -25,6 +26,7 @@ import * as textWithTooltipModule from './text-with-tooltip.js';
 import * as wikiSearchModule from './wiki-search.js';
 
 export const modules = [
+  abcRender,
   additionalNamesBoxModule,
   albumCommentarySidebarModule,
   artTagGalleryFilterModule,

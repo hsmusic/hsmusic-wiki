@@ -82,13 +82,26 @@ export default {
             })),
 
           data.abcNotation &&
-            html.tag('p',
-              html.tag('code', {class: 'abc'},
-                {[html.joinChildren]: html.tag('br')},
+            html.tag('div', {class: 'abc-full', 'data-notation': JSON.stringify(data.abcNotation)},
+              [
+                html.tag('div', {class: 'motif-sheet'}),
+                html.tag('div', {class: 'motif-control'})
+              ]
+            ),
 
-                data.abcNotation
-                  .split('\n')
-                  .map(line => language.sanitize(line)))),
+          data.abcNotation &&
+            html.tag('p',
+              html.tag('span', {class: 'motif-notation'},
+                language.sanitize("Compact representation"))),
+          data.abcNotation &&
+            html.tag('div', {class: 'abc-tip', 'data-notation': JSON.stringify(data.abcNotation)},
+              html.tag('div', {class: 'motif-sheet'})),
+
+          // I tried VERY HARD to get js/client/abc-render.js to work properly...
+          data.abcNotation &&
+            html.tag('script', {src: "../../static-5p14/lib/abcjs/dist/abcjs-basic.js"}),
+          data.abcNotation &&
+            html.tag('link', {rel: "stylesheet", href: "../../static-5p14/lib/abcjs/abcjs-audio.css"}),
 
           html.tags([
             relations.connectionsContentHeading.clone().slots({

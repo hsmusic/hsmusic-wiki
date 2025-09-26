@@ -78,6 +78,10 @@ export const dependencyRoutes = [
   }),
 
   quickNodeDependency({
+    name: 'abcjs',
+  }),
+
+  quickNodeDependency({
     name: 'msgpackr',
     path: 'dist',
   }),
