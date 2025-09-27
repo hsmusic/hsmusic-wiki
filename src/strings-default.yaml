@@ -603,7 +603,7 @@ motifConnectionList:
     track: "{TRACK}"
     motif: "{MOTIF}"
 
-    track.withTimeRange: "({TIME_RANGE}) {TRACK}"
+    track.withTimeRange: "{TRACK} ({TIME_RANGE})"
     motif.withTimeRange: "({TIME_RANGE}) {MOTIF}"
 
 #
@@ -3137,6 +3137,11 @@ motifInfoPage:
 
   nav:
     motif: "Motif: {MOTIF}"
+
+  sticky:
+    _: "Tracks that reference this motif:"
+    fromGroup: "Tracks that reference this motif — from {GROUP}:"
+    fromOther: "Tracks that reference this motif — from somewhere else:"
 
 #
 # newsIndex:

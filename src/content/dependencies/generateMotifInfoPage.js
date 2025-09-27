@@ -26,7 +26,7 @@ export default {
         .map(motif => relation('linkMotif', motif)),
 
     featuringTracksList:
-      relation('generateMotifConnectionList',
+      relation('generateMotifConnectionListGrouped',
         motif.featuredInTracks,
         motif),
   }),
@@ -100,7 +100,10 @@ export default {
               string: 'releaseInfo.tracksThatFeatureMotif',
             }),
 
-            relations.featuringTracksList,
+            relations.featuringTracksList
+              .slots({
+                headingString: pageCapsule,
+              }),
           ]),
         ],
 
