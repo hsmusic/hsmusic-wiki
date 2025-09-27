@@ -1211,10 +1211,18 @@ export function parseFeaturedMotifs(value, {subdoc, FeaturedMotifConnection}) {
             end: groups.time2,
           }));
 
+      const context =
+        accentParts
+          .filter(part => !part.match(timeRangeRegex))
+
       const basicDocument = {
         'Motif':
           match.groups.main,
       };
+
+      if (context.length > 0) {
+        basicDocument['Context'] = context.join(', ')
+      }
 
       if (empty(timeRanges)) {
         documents = [basicDocument];

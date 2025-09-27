@@ -2,7 +2,7 @@ import {input} from '#composite';
 import Thing from '#thing';
 import {parseTimeIntoDuration} from '#yaml';
 
-import {singleReference, soupyFind, thing, timeIntoDuration}
+import {simpleString, singleReference, soupyFind, thing, timeIntoDuration}
   from '#composite/wiki-properties';
 
 export class FeaturedMotifConnection extends Thing {
@@ -21,6 +21,8 @@ export class FeaturedMotifConnection extends Thing {
       class: input.value(Track),
     }),
 
+    context: simpleString(),
+
     startTime: timeIntoDuration(),
     endTime: timeIntoDuration(),
 
@@ -32,6 +34,7 @@ export class FeaturedMotifConnection extends Thing {
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Motif': {property: 'motif'},
+      'Context': {property: 'context'},
 
       'Start Time': {
         property: 'startTime',

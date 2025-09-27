@@ -17,6 +17,9 @@ export default {
     context:
       context.isTrack ? 'track' : 'motif',
 
+    contextText:
+      connection.context,
+
     trackDuration:
       connection.track.duration,
 
@@ -55,8 +58,15 @@ export default {
                 attributes: {class: 'motif-preview-tooltip'},
 
                 content:
-                  html.tag('div', {class: 'abc-tip', 'data-notation': JSON.stringify(data.abcNotation)},
-                    html.tag('div', {class: 'motif-sheet'})),
+                  html.tag('div', [
+                    html.tag('span',
+                      {class: 'motif-context'},
+                      {[html.onlyIfContent]: true},
+                      data.contextText
+                    ),
+                    html.tag('div', {class: 'abc-tip', 'data-notation': JSON.stringify(data.abcNotation)},
+                      html.tag('div', {class: 'motif-sheet'})),
+                  ])
               }),
           })
         }
