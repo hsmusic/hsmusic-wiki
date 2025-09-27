@@ -1,5 +1,6 @@
-import {empty, filterMultipleArrays, stitchArrays} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 import {sortMotifConnectionsChronologically} from '#sort';
+import {divideIntoGroups} from '#wiki-data';
 
 export default {
   contentDependencies: [
@@ -24,37 +25,17 @@ export default {
   query(sprawl, motifConnections) {
     const dividingGroups = sprawl.divideTrackListsByGroups;
 
-    const groupings = new Map();
-    const ungroupedRefs = [];
+    const {groups, groupedItems, ungroupedItems} =
+      divideIntoGroups(motifConnections, dividingGroups, {
+        compareGroup: (connection, group) =>
+          connection.track.album.groups.includes(group),
+      });
 
-    // Entry order matters! Add blank lists for each group
-    // in the order that those groups are provided.
-    for (const group of dividingGroups) {
-      groupings.set(group, []);
-    }
-
-    for (const mc of motifConnections) {
-      const firstMatchingGroup =
-        dividingGroups.find(group => group.albums.includes(mc.track.album));
-
-      if (firstMatchingGroup) {
-        groupings.get(firstMatchingGroup).push(mc);
-      } else {
-        ungroupedRefs.push(mc);
-      }
-    }
-
-    const groups = Array.from(groupings.keys());
-    const groupedRefs = Array.from(groupings.values());
-
-    // Drop the empty lists, so just the groups which
-    // at least a single track matched are left.
-    filterMultipleArrays(
+    return {
       groups,
-      groupedRefs,
-      (_group, tracks) => !empty(tracks));
-
-    return {groups, groupedRefs, ungroupedRefs};
+      groupedRefs: groupedItems,
+      ungroupedRefs: ungroupedItems,
+    };
   },
 
   relations: (relation, query, sprawl, connections, context) => ({

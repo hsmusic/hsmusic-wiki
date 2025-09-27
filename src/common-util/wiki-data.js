@@ -1,13 +1,15 @@
 // Utility functions for interacting with wiki data.
 
-import {accumulateSum, chunkByConditions, empty, re, unique} from './sugar.js';
 import {sortByDate} from './sort.js';
 
-// This is a duplicate binding of filterMultipleArrays that's included purely
-// to leave wiki-data.js compatible with the release build of HSMusic.
-// Sorry! This is really ridiculous!! If the next update after 10/25/2023 has
-// released, this binding is no longer needed!
-export {filterMultipleArrays} from './sugar.js';
+import {
+  accumulateSum,
+  chunkByConditions,
+  empty,
+  filterMultipleArrays,
+  re,
+  unique,
+} from './sugar.js';
 
 // Generic value operations
 
@@ -350,6 +352,43 @@ export function selectRepresentativeArtistContributorContribs(contribs) {
       ...annotatedContributorContribs,
     ];
   }
+}
+
+// Simple function, really a port of the old algorithm that originated
+// in generateDividedTrackList. Not actually used there, since the new
+// approach is hells of more involved, and we haven't abstracted that.
+export function divideIntoGroups(things, dividingGroups, {compareGroup}) {
+  const groupings = new Map();
+  const ungroupedItems = [];
+
+  // Entry order matters! Add blank lists for each group
+  // in the order that those groups are provided.
+  for (const group of dividingGroups) {
+    groupings.set(group, []);
+  }
+
+  for (const item of things) {
+    const firstMatchingGroup =
+      dividingGroups.find(group => compareGroup(item, group));
+
+    if (firstMatchingGroup) {
+      groupings.get(firstMatchingGroup).push(item);
+    } else {
+      ungroupedItems.push(item);
+    }
+  }
+
+  const groups = Array.from(groupings.keys());
+  const groupedItems = Array.from(groupings.values());
+
+  // Drop the empty lists, so just the groups which
+  // at least a single track matched are left.
+  filterMultipleArrays(
+    groups,
+    groupedItems,
+    (_group, tracks) => !empty(tracks));
+
+  return {groups, groupedItems, ungroupedItems};
 }
 
 // Big-ass homepage row functions
