@@ -1,5 +1,15 @@
-import {cp, mkdir, stat, symlink, writeFile, unlink} from 'node:fs/promises';
 import * as path from 'node:path';
+
+import {
+  copyFile,
+  cp,
+  mkdir,
+  readFile,
+  stat,
+  symlink,
+  writeFile,
+  unlink,
+} from 'node:fs/promises';
 
 import {rimraf} from 'rimraf';
 
@@ -86,6 +96,11 @@ export function getCLIOptions() {
       type: 'value',
     },
 
+    'paths': {
+      help: `Skip rest and build only pages matching paths in this text file`,
+      type: 'value',
+    },
+
     // NOT for neatly ena8ling or disa8ling specific features of the site!
     // This is only in charge of what general groups of files to write.
     // They're here to make development quicker when you're only working
@@ -117,6 +132,7 @@ export async function go({
   const outputPath = cliOptions['out-path'] || process.env.HSMUSIC_OUT;
   const appendIndexHTML = cliOptions['append-index-html'] ?? false;
   const writeOneLanguage = cliOptions['lang'] ?? null;
+  const pathsFromFile = cliOptions['paths'] ?? null;
 
   if (!outputPath) {
     logError`Expected ${'--out-path'} option or ${'HSMUSIC_OUT'} to be set`;
@@ -134,6 +150,36 @@ export async function go({
     logInfo`Writing only language ${writeOneLanguage} this run.`;
   } else {
     logInfo`Writing all languages.`;
+  }
+
+  let filterPaths = null;
+  if (pathsFromFile) {
+    let pathsText;
+    try {
+      pathsText = await readFile(pathsFromFile, 'utf8');
+    } catch (error) {
+      logError`Failed to read file specified in ${'--paths'}:`;
+      logError`${error.code}: ${pathsFromFile}`;
+      return false;
+    }
+
+    filterPaths = pathsText.split('\n').filter(Boolean);
+
+    if (empty(filterPaths)) {
+      logWarn`Specified to build only paths in file ${'--paths'}:`;
+      logWarn`${pathsFromFile}`;
+      logWarn`But this file is totally empty...`;
+    }
+
+    if (filterPaths.some(path => !path.startsWith('/'))) {
+      logError`All lines in ${'--paths'} file should start with slash ('${'/'}')`;
+      logError`These lines don't:`;
+      console.error(filterPaths.filter(path => !path.startsWith('/')).join('\n'));
+      logError`Please check file contents, or specified path, and try again.`;
+      return false;
+    }
+
+    logInfo`Writing ${filterPaths.length} paths specified in: ${pathsFromFile} (${'--paths'})`;
   }
 
   const selectedPageFlags = Object.keys(cliOptions)
@@ -207,6 +253,27 @@ export async function go({
 
           paths.push(...targets.flatMap(target => pageSpec.pathsForTarget(target)));
           // TODO: Validate each pathsForTargets entry
+        }
+
+        if (!empty(filterPaths)) {
+          paths =
+            paths.filter(path =>
+              filterPaths.includes(
+                (path.type === 'page'
+                  ? '/' +
+                    getPagePathname({
+                      baseDirectory: '',
+                      pagePath: path.path,
+                      urls,
+                    })
+               : path.type === 'redirect'
+                  ? '/' +
+                    getPagePathname({
+                      baseDirectory: '',
+                      pagePath: path.fromPath,
+                      urls,
+                    })
+                  : null)));
         }
 
         paths =
