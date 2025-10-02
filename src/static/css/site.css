@@ -2559,7 +2559,9 @@ h1 a[href="#additional-names-box"]:hover {
   max-width: min(60vw, 600px);
 
   padding: 15px 20px 10px 20px;
+}
 
+#additional-names-box:not(.always-visible) {
   display: none;
 }
 

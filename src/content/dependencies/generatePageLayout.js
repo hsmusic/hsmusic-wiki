@@ -296,12 +296,17 @@ export default {
     const titleContentsHTML =
       (html.isBlank(slots.title)
         ? null
-     : html.isBlank(slots.additionalNames)
-        ? language.sanitize(slots.title)
-        : html.tag('a', {
+
+     : (!html.isBlank(slots.additionalNames) &&
+        !html.resolve(slots.additionalNames, {slots: ['alwaysVisible']})
+          .getSlotValue('alwaysVisible'))
+
+        ? html.tag('a', {
             href: '#additional-names-box',
             title: language.$('misc.additionalNames.tooltip').toString(),
-          }, language.sanitize(slots.title)));
+          }, language.sanitize(slots.title))
+
+        : language.sanitize(slots.title));
 
     const titleHTML =
       (html.isBlank(slots.title)
