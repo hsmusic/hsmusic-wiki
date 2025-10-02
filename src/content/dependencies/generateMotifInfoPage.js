@@ -60,7 +60,10 @@ export default {
         headingMode: 'sticky',
         color: data.color,
 
-        additionalNames: relations.additionalNamesBox,
+        additionalNames:
+          relations.additionalNamesBox.slots({
+            alwaysVisible: true,
+          }),
 
         mainContent: [
           html.tag('p',
