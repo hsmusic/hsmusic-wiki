@@ -10,7 +10,7 @@ import {input, templateCompositeFrom} from '#composite';
 import {withResultOfAvailabilityCheck} from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
 
-import withMainRelease from './withMainRelease.js';
+import withMainReleaseTrack from './withMainReleaseTrack.js';
 
 export default templateCompositeFrom({
   annotation: `inheritFromMainRelease`,
@@ -32,12 +32,12 @@ export default templateCompositeFrom({
         : ['#mainReleaseValue'])),
 
   steps: () => [
-    withMainRelease({
+    withMainReleaseTrack({
       notFoundValue: input('notFoundValue'),
     }),
 
     withResultOfAvailabilityCheck({
-      from: '#mainRelease',
+      from: '#mainReleaseTrack',
     }),
 
     {
@@ -61,7 +61,7 @@ export default templateCompositeFrom({
     },
 
     withPropertyFromObject({
-      object: '#mainRelease',
+      object: '#mainReleaseTrack',
       property: input('property'),
     }),
 

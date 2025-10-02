@@ -1,14 +1,15 @@
+export {default as alwaysReferenceByDirectory} from './alwaysReferenceByDirectory.js';
 export {default as exitWithoutUniqueCoverArt} from './exitWithoutUniqueCoverArt.js';
 export {default as inheritContributionListFromMainRelease} from './inheritContributionListFromMainRelease.js';
 export {default as inheritFromMainRelease} from './inheritFromMainRelease.js';
 export {default as withAllReleases} from './withAllReleases.js';
-export {default as withAlwaysReferenceByDirectory} from './withAlwaysReferenceByDirectory.js';
 export {default as withContainingTrackSection} from './withContainingTrackSection.js';
 export {default as withCoverArtistContribs} from './withCoverArtistContribs.js';
 export {default as withDate} from './withDate.js';
 export {default as withDirectorySuffix} from './withDirectorySuffix.js';
 export {default as withHasUniqueCoverArt} from './withHasUniqueCoverArt.js';
 export {default as withMainRelease} from './withMainRelease.js';
+export {default as withMainReleaseTrack} from './withMainReleaseTrack.js';
 export {default as withOtherReleases} from './withOtherReleases.js';
 export {default as withPropertyFromAlbum} from './withPropertyFromAlbum.js';
 export {default as withPropertyFromMainRelease} from './withPropertyFromMainRelease.js';

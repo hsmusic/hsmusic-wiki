@@ -1,13 +1,15 @@
-// Just includes the main release of this track as a dependency.
-// If this track isn't a secondary release, then it'll provide null, unless
-// the {selfIfMain} option is set, in which case it'll provide this track
-// itself. This will early exit (with notFoundValue) if the main release
-// is specified by reference and that reference doesn't resolve to anything.
+// Resolves this track's `mainRelease` reference, using weird-ass atypical
+// machinery that operates on soupyFind and does not operate on findMixed,
+// let alone a prim and proper standalone find spec.
+//
+// Raises null only if there is no `mainRelease` reference provided at all.
+// This will early exit (with notFoundValue) if the reference doesn't resolve.
+//
 
 import {input, templateCompositeFrom} from '#composite';
 
-import {exitWithoutDependency, withResultOfAvailabilityCheck}
-  from '#composite/control-flow';
+import {raiseOutputWithoutDependency} from '#composite/control-flow';
+import {withPropertyFromObject} from '#composite/data';
 import {withResolvedReference} from '#composite/wiki-data';
 import {soupyFind} from '#composite/wiki-properties';
 
@@ -15,56 +17,78 @@ export default templateCompositeFrom({
   annotation: `withMainRelease`,
 
   inputs: {
-    selfIfMain: input({type: 'boolean', defaultValue: false}),
+    from: input({
+      defaultDependency: 'mainRelease',
+      acceptsNull: true,
+    }),
+
     notFoundValue: input({defaultValue: null}),
   },
 
   outputs: ['#mainRelease'],
 
   steps: () => [
-    withResultOfAvailabilityCheck({
-      from: 'mainReleaseTrack',
+    raiseOutputWithoutDependency({
+      dependency: input('from'),
+      output: input.value({'#mainRelease': null}),
+    }),
+
+    withResolvedReference({
+      ref: input('from'),
+      find: soupyFind.input('trackMainReleasesOnly'),
+    }).outputs({
+      '#resolvedReference': '#matchingTrack',
+    }),
+
+    withResolvedReference({
+      ref: input('from'),
+      find: soupyFind.input('album'),
+    }).outputs({
+      '#resolvedReference': '#matchingAlbum',
     }),
 
     {
       dependencies: [
-        input.myself(),
-        input('selfIfMain'),
-        '#availability',
+        '#matchingTrack',
+        '#matchingAlbum',
+        input('notFoundValue'),
       ],
 
       compute: (continuation, {
-        [input.myself()]: track,
-        [input('selfIfMain')]: selfIfMain,
-        '#availability': availability,
+        ['#matchingTrack']: matchingTrack,
+        ['#matchingAlbum']: matchingAlbum,
+        [input('notFoundValue')]: notFoundValue,
       }) =>
-        (availability
+        (matchingTrack && matchingAlbum
           ? continuation()
-          : continuation.raiseOutput({
+       : matchingTrack ?? matchingAlbum
+          ? continuation.raiseOutput({
               ['#mainRelease']:
-                (selfIfMain ? track : null),
-            })),
+                matchingTrack ?? matchingAlbum,
+            })
+          : continuation.exit(notFoundValue)),
     },
 
-    withResolvedReference({
-      ref: 'mainReleaseTrack',
-      find: soupyFind.input('track'),
-    }),
-
-    exitWithoutDependency({
-      dependency: '#resolvedReference',
-      value: input('notFoundValue'),
+    withPropertyFromObject({
+      object: '#matchingAlbum',
+      property: input.value('tracks'),
     }),
 
     {
-      dependencies: ['#resolvedReference'],
+      dependencies: [
+        '#matchingAlbum.tracks',
+        '#matchingTrack',
+        input('notFoundValue'),
+      ],
 
       compute: (continuation, {
-        ['#resolvedReference']: resolvedReference,
+        ['#matchingAlbum.tracks']: matchingAlbumTracks,
+        ['#matchingTrack']: matchingTrack,
+        [input('notFoundValue')]: notFoundValue,
       }) =>
-        continuation({
-          ['#mainRelease']: resolvedReference,
-        }),
+        (matchingAlbumTracks.includes(matchingTrack)
+          ? continuation.raiseOutput({'#mainRelease': matchingTrack})
+          : continuation.exit(notFoundValue)),
     },
   ],
 });

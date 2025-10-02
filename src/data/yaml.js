@@ -1695,7 +1695,6 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
 
     ['trackData', [
       'artworkData',
-      'trackData',
       'wikiInfo',
     ]],
 

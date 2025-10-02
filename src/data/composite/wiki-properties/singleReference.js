@@ -8,11 +8,14 @@
 //
 
 import {input, templateCompositeFrom} from '#composite';
-import {isThingClass, validateReference} from '#validators';
+import {validateReference} from '#validators';
 
 import {exposeDependency} from '#composite/control-flow';
 import {inputSoupyFind, inputWikiData, withResolvedReference}
   from '#composite/wiki-data';
+
+import {referenceListInputDescriptions, referenceListUpdateDescription}
+  from './helpers/reference-list-helpers.js';
 
 export default templateCompositeFrom({
   annotation: `singleReference`,
@@ -20,19 +23,16 @@ export default templateCompositeFrom({
   compose: false,
 
   inputs: {
-    class: input.staticValue({validate: isThingClass}),
+    ...referenceListInputDescriptions(),
 
+    data: inputWikiData({allowMixedTypes: true}),
     find: inputSoupyFind(),
-    data: inputWikiData({allowMixedTypes: false}),
   },
 
-  update: ({
-    [input.staticValue('class')]: thingClass,
-  }) => ({
-    validate:
-      validateReference(
-        thingClass[Symbol.for('Thing.referenceType')]),
-  }),
+  update:
+    referenceListUpdateDescription({
+      validateReferenceList: validateReference,
+    }),
 
   steps: () => [
     withResolvedReference({

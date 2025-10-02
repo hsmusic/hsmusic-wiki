@@ -237,7 +237,7 @@ export function filterReferenceErrors(wikiData, {
       sampledTracks: '_trackMainReleasesOnly',
       artTags: '_artTag',
       referencedArtworks: '_artwork',
-      mainReleaseTrack: '_trackMainReleasesOnly',
+      mainRelease: '_mainRelease',
       commentary: '_content',
       creditingSources: '_content',
       referencingSources: '_content',
@@ -346,6 +346,55 @@ export function filterReferenceErrors(wikiData, {
                 };
                 break;
 
+              case '_mainRelease':
+                findFn = ref => {
+                  // Mocking what's going on in `withMainRelease`.
+
+                  let track, trackError;
+                  let album, albumError;
+
+                  try {
+                    track = boundFind.trackMainReleasesOnly(ref);
+                  } catch (caughtError) {
+                    trackError = new Error(
+                      `Didn't match a track`, {cause: caughtError});
+                  }
+
+                  try {
+                    album = boundFind.album(ref);
+                  } catch (caughtError) {
+                    albumError = new Error(
+                      `Didn't match an album`, {cause: caughtError});
+                  }
+
+                  if (track && album) {
+                    if (album.tracks.includes(track)) {
+                      return track;
+                    } else {
+                      throw new Error(
+                        `Unrelated album and track matched for reference "${ref}". Please resolve:\n` +
+                        `- ${inspect(track)}\n` +
+                        `- ${inspect(album)}\n` +
+                        `Returning null for this reference.`);
+                    }
+                  }
+
+                  if (track ?? album) {
+                    return track ?? album;
+                  }
+
+                  const aggregateCause =
+                    new AggregateError([albumError, trackError]);
+
+                  aggregateCause[Symbol.for('hsmusic.aggregate.translucent')] = true;
+
+                  throw new Error(`Trouble matching "${ref}"`, {
+                    cause: aggregateCause,
+                  });
+                }
+
+                break;
+
               case '_trackArtwork':
                 findFn = ref => boundFind.track(ref.reference);
                 break;
@@ -353,7 +402,7 @@ export function filterReferenceErrors(wikiData, {
               case '_trackMainReleasesOnly':
                 findFn = trackRef => {
                   const track = boundFind.track(trackRef);
-                  const mainRef = track && CacheableObject.getUpdateValue(track, 'mainReleaseTrack');
+                  const mainRef = track && CacheableObject.getUpdateValue(track, 'mainRelease');
 
                   if (mainRef) {
                     // It's possible for the main release to not actually exist, in this case.

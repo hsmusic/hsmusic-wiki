@@ -17,7 +17,7 @@ export default templateCompositeFrom({
   inputs: {
     ref: input({type: 'string', acceptsNull: true}),
 
-    data: inputWikiData({allowMixedTypes: false}),
+    data: inputWikiData({allowMixedTypes: true}),
     find: inputSoupyFind(),
   },
 

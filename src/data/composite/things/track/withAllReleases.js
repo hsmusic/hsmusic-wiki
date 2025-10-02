@@ -10,7 +10,7 @@ import {sortByDate} from '#sort';
 
 import {withPropertyFromObject} from '#composite/data';
 
-import withMainRelease from './withMainRelease.js';
+import withMainReleaseTrack from './withMainReleaseTrack.js';
 
 export default templateCompositeFrom({
   annotation: `withAllReleases`,
@@ -18,7 +18,7 @@ export default templateCompositeFrom({
   outputs: ['#allReleases'],
 
   steps: () => [
-    withMainRelease({
+    withMainReleaseTrack({
       selfIfMain: input.value(true),
       notFoundValue: input.value([]),
     }),
@@ -28,18 +28,22 @@ export default templateCompositeFrom({
     // `this.secondaryReleases` from within a data composition.
     // Oooooooooooooooooooooooooooooooooooooooooooooooo
     withPropertyFromObject({
-      object: '#mainRelease',
+      object: '#mainReleaseTrack',
       property: input.value('secondaryReleases'),
     }),
 
     {
-      dependencies: ['#mainRelease', '#mainRelease.secondaryReleases'],
+      dependencies: [
+        '#mainReleaseTrack',
+        '#mainReleaseTrack.secondaryReleases',
+      ],
+
       compute: (continuation, {
-        ['#mainRelease']: mainRelease,
-        ['#mainRelease.secondaryReleases']: secondaryReleases,
+        ['#mainReleaseTrack']: mainReleaseTrack,
+        ['#mainReleaseTrack.secondaryReleases']: secondaryReleases,
       }) => continuation({
         ['#allReleases']:
-          sortByDate([mainRelease, ...secondaryReleases]),
+          sortByDate([mainReleaseTrack, ...secondaryReleases]),
       }),
     },
   ],
