@@ -379,8 +379,24 @@ export function filterReferenceErrors(wikiData, {
                     }
                   }
 
-                  if (track ?? album) {
-                    return track ?? album;
+                  if (track) {
+                    return track;
+                  }
+
+                  if (album) {
+                    // At this point verification depends on the thing itself,
+                    // which is currently in lexical scope, but if this code
+                    // gets refactored, there might be trouble here...
+
+                    if (thing.mainReleaseTrack === null) {
+                      throw new Error(
+                        `Matched album for reference "${ref}":\n` +
+                        `- ` + inspect(album) + `\n` +
+                        `...but none of its tracks automatically match this secondary release.\n` +
+                        `Please resolve by specifying the track here, instead of the album.`);
+                    } else {
+                      return album;
+                    }
                   }
 
                   const aggregateCause =
