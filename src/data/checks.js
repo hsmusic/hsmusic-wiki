@@ -11,6 +11,7 @@ import Thing from '#thing';
 import thingConstructors from '#things';
 
 import {
+  annotateError,
   annotateErrorWithIndex,
   conditionallySuppressError,
   decorateErrorWithIndex,
@@ -163,6 +164,69 @@ function getFieldPropertyMessage(yamlDocumentSpec, property) {
       : ` in property ${colors.green(property)}`);
 
   return fieldPropertyMessage;
+}
+
+function decoAnnotateFindErrors(findFn) {
+  function annotateMultipleNameMatchesIncludingUnfortunatelyUnsecondary(error) {
+    const matches = error[Symbol.for('hsmusic.find.multipleNameMatches')];
+    if (!matches) return;
+
+    const notSoSecondary =
+      matches
+        .map(match => match.thing ?? match)
+        .filter(match =>
+          match.isTrack &&
+          match.isMainRelease &&
+          CacheableObject.getUpdateValue(match, 'mainRelease'));
+
+    if (empty(notSoSecondary)) return;
+
+    let {message} = error;
+    message += (message.includes('\n') ? '\n\n' : '\n');
+    message += colors.bright(colors.yellow('<!>')) + ' ';
+    message += colors.yellow(`Some of these tracks are meant to be secondary releases,`) + '\n';
+    message += ' '.repeat(4);
+    message += colors.yellow(`but another error is keeping that from processing correctly!`) + '\n';
+    message += ' '.repeat(4);
+    message += colors.yellow(`Probably look for an error to do with "Main Release", first.`);
+    Object.assign(error, {message});
+  }
+
+  return (...args) => {
+    try {
+      return findFn(...args);
+    } catch (caughtError) {
+      throw annotateError(caughtError, ...[
+        annotateMultipleNameMatchesIncludingUnfortunatelyUnsecondary,
+      ]);
+    }
+  };
+}
+
+function decoSuppressFindErrors(findFn, {property}) {
+  void property;
+
+  return conditionallySuppressError(_error => {
+    // We're not suppressing any errors at the moment.
+    // An old suppression is kept below for reference.
+
+    /*
+    if (property === 'sampledTracks') {
+      // Suppress "didn't match anything" errors in particular, just for samples.
+      // In hsmusic-data we have a lot of "stub" sample data which don't have
+      // corresponding tracks yet, so it won't be useful to report such reference
+      // errors until we take the time to address that. But other errors, like
+      // malformed reference strings or miscapitalized existing tracks, should
+      // still be reported, as samples of existing tracks *do* display on the
+      // website!
+      if (error.message.includes(`Didn't match anything`)) {
+        return true;
+      }
+    }
+    */
+
+    return false;
+  }, findFn);
 }
 
 // Warn about references across data which don't match anything.  This involves
@@ -482,27 +546,8 @@ export function filterReferenceErrors(wikiData, {
                 break;
             }
 
-            const suppress = fn => conditionallySuppressError(_error => {
-              // We're not suppressing any errors at the moment.
-              // An old suppression is kept below for reference.
-
-              /*
-              if (property === 'sampledTracks') {
-                // Suppress "didn't match anything" errors in particular, just for samples.
-                // In hsmusic-data we have a lot of "stub" sample data which don't have
-                // corresponding tracks yet, so it won't be useful to report such reference
-                // errors until we take the time to address that. But other errors, like
-                // malformed reference strings or miscapitalized existing tracks, should
-                // still be reported, as samples of existing tracks *do* display on the
-                // website!
-                if (error.message.includes(`Didn't match anything`)) {
-                  return true;
-                }
-              }
-              */
-
-              return false;
-            }, fn);
+            findFn = decoSuppressFindErrors(findFn, {property});
+            findFn = decoAnnotateFindErrors(findFn);
 
             const fieldPropertyMessage =
               getFieldPropertyMessage(
@@ -558,10 +603,10 @@ export function filterReferenceErrors(wikiData, {
                   value, {message: errorMessage},
                   decorateErrorWithIndex(refs =>
                     (refs.length === 1
-                      ? suppress(findFn)(refs[0])
+                      ? findFn(refs[0])
                       : filterAggregate(
                           refs, {message: `Errors in entry's artist references`},
-                          decorateErrorWithIndex(suppress(findFn)))
+                          decorateErrorWithIndex(findFn))
                             .aggregate
                             .close())));
 
@@ -573,19 +618,18 @@ export function filterReferenceErrors(wikiData, {
               if (Array.isArray(value)) {
                 newPropertyValue = filter(
                   value, {message: errorMessage},
-                  decorateErrorWithIndex(suppress(findFn)));
+                  decorateErrorWithIndex(findFn));
                 break determineNewPropertyValue;
               }
 
-              nest({message: errorMessage},
-                suppress(({call}) => {
-                  try {
-                    call(findFn, value);
-                  } catch (error) {
-                    newPropertyValue = null;
-                    throw error;
-                  }
-                }));
+              nest({message: errorMessage}, ({call}) => {
+                try {
+                  call(findFn, value);
+                } catch (error) {
+                  newPropertyValue = null;
+                  throw error;
+                }
+              });
             }
 
             if (writeProperty) {

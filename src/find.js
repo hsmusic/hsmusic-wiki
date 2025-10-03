@@ -140,12 +140,19 @@ function oopsMultipleNameMatches(mode, {
   normalizedName,
   multipleNameMatches,
 }) {
-  return warnOrThrow(mode,
-    `Multiple matches for reference "${name}". Please resolve:\n` +
-    multipleNameMatches[normalizedName]
-      .map(match => `- ${inspect(match)}\n`)
-      .join('') +
-    `Returning null for this reference.`);
+  try {
+    return warnOrThrow(mode,
+      `Multiple matches for reference "${name}". Please resolve:\n` +
+      multipleNameMatches[normalizedName]
+        .map(match => `- ${inspect(match)}\n`)
+        .join('') +
+      `Returning null for this reference.`);
+  } catch (caughtError) {
+    throw Object.assign(caughtError, {
+      [Symbol.for('hsmusic.find.multipleNameMatches')]:
+        multipleNameMatches[normalizedName],
+    });
+  }
 }
 
 function oopsNameCapitalizationMismatch(mode, {
