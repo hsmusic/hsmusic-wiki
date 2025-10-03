@@ -398,7 +398,7 @@ export class Track extends Thing {
 
       referenceList({
         class: input.value(Track),
-        find: soupyFind.input('track'),
+        find: soupyFind.input('trackMainReleasesOnly'),
       }),
     ],
 
@@ -409,7 +409,7 @@ export class Track extends Thing {
 
       referenceList({
         class: input.value(Track),
-        find: soupyFind.input('track'),
+        find: soupyFind.input('trackMainReleasesOnly'),
       }),
     ],
 

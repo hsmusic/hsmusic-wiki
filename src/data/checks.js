@@ -442,9 +442,16 @@ export function filterReferenceErrors(wikiData, {
 
               case '_trackMainReleasesOnly':
                 findFn = trackRef => {
-                  const track = boundFind.track(trackRef);
-                  const mainRef = track && CacheableObject.getUpdateValue(track, 'mainRelease');
+                  let track = boundFind.trackMainReleasesOnly(trackRef, {mode: 'quiet'});
+                  if (track) {
+                    return track;
+                  }
 
+                  // Will error normally, if this can't unambiguously resolve
+                  // or doesn't match any track.
+                  track = boundFind.track(trackRef);
+
+                  const mainRef = CacheableObject.getUpdateValue(track, 'mainRelease');
                   if (mainRef) {
                     // It's possible for the main release to not actually exist, in this case.
                     // It should still be reported since the 'Main Release' field was present.
