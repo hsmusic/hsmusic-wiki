@@ -203,5 +203,19 @@ export default templateCompositeFrom({
           null,
       }),
     },
+
+    {
+      dependencies: ['#mainReleaseTrack', input.myself()],
+
+      compute: (continuation, {
+        ['#mainReleaseTrack']: mainReleaseTrack,
+        [input.myself()]: thisTrack,
+      }) => continuation({
+        ['#mainReleaseTrack']:
+          (mainReleaseTrack === thisTrack
+            ? null
+            : mainReleaseTrack),
+      }),
+    },
   ],
 });

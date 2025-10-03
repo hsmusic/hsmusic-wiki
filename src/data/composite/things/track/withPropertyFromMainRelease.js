@@ -13,7 +13,7 @@ import {withPropertyFromObject} from '#composite/data';
 import withMainReleaseTrack from './withMainReleaseTrack.js';
 
 export default templateCompositeFrom({
-  annotation: `inheritFromMainRelease`,
+  annotation: `withPropertyFromMainRelease`,
 
   inputs: {
     property: input({type: 'string'}),

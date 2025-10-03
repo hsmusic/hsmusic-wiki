@@ -405,11 +405,20 @@ export function filterReferenceErrors(wikiData, {
                     // gets refactored, there might be trouble here...
 
                     if (thing.mainReleaseTrack === null) {
-                      throw new Error(
-                        `Matched album for reference "${ref}":\n` +
-                        `- ` + inspect(album) + `\n` +
-                        `...but none of its tracks automatically match this secondary release.\n` +
-                        `Please resolve by specifying the track here, instead of the album.`);
+                      if (album === thing.album) {
+                        throw new Error(
+                          `Matched album for reference "${ref}":\n` +
+                          `- ` + inspect(album) + `\n` +
+                          `...but this is the album that includes this secondary release, itself.\n` +
+                          `Please resolve by pointing to aonther album here, or by removing this\n` +
+                          `Main Release field, if this track is meant to be the main release.`);
+                      } else {
+                        throw new Error(
+                          `Matched album for reference "${ref}":\n` +
+                          `- ` + inspect(album) + `\n` +
+                          `...but none of its tracks automatically match this secondary release.\n` +
+                          `Please resolve by specifying the track here, instead of the album.`);
+                      }
                     } else {
                       return album;
                     }
