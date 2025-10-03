@@ -510,6 +510,20 @@ export class Album extends Thing {
           : [album.name]),
     },
 
+    albumSinglesOnly: {
+      referencing: ['album'],
+
+      bindTo: 'albumData',
+
+      incldue: album =>
+        album.style === 'single',
+
+      getMatchableNames: album =>
+        (album.alwaysReferenceByDirectory
+          ? []
+          : [album.name]),
+    },
+
     albumWithArtwork: {
       referenceTypes: [
         'album',
@@ -523,8 +537,8 @@ export class Album extends Thing {
         album.hasCoverArt,
 
       getMatchableNames: album =>
-        (album.alwaysReferenceByDirectory 
-          ? [] 
+        (album.alwaysReferenceByDirectory
+          ? []
           : [album.name]),
     },
 

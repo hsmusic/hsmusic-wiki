@@ -33,19 +33,56 @@ export default templateCompositeFrom({
       output: input.value({'#mainRelease': null}),
     }),
 
+    {
+      dependencies: [input('from'), 'name'],
+      compute: (continuation, {
+        [input('from')]: ref,
+        ['name']: ownName,
+      }) =>
+        (ref === 'same name single'
+          ? continuation({
+              ['#albumOrTrackReference']: null,
+              ['#sameNameSingleReference']: ownName,
+            })
+          : continuation({
+              ['#albumOrTrackReference']: ref,
+              ['#sameNameSingleReference']: null,
+            })),
+    },
+
     withResolvedReference({
-      ref: input('from'),
+      ref: '#albumOrTrackReference',
       find: soupyFind.input('trackMainReleasesOnly'),
     }).outputs({
       '#resolvedReference': '#matchingTrack',
     }),
 
     withResolvedReference({
-      ref: input('from'),
+      ref: '#albumOrTrackReference',
       find: soupyFind.input('album'),
     }).outputs({
       '#resolvedReference': '#matchingAlbum',
     }),
+
+    withResolvedReference({
+      ref: '#sameNameSingleReference',
+      find: soupyFind.input('albumSinglesOnly'),
+    }).outputs({
+      '#resolvedReference': '#sameNameSingle',
+    }),
+
+    {
+      dependencies: ['#sameNameSingle'],
+      compute: (continuation, {
+        ['#sameNameSingle']: sameNameSingle,
+      }) =>
+        (sameNameSingle
+          ? continuation.raiseOutput({
+              ['#mainRelease']:
+                sameNameSingle,
+            })
+          : continuation()),
+    },
 
     {
       dependencies: [

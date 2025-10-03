@@ -350,6 +350,17 @@ export function filterReferenceErrors(wikiData, {
                 findFn = ref => {
                   // Mocking what's going on in `withMainRelease`.
 
+                  if (ref === 'same name single') {
+                    // Accessing the current thing here.
+                    try {
+                      return boundFind.albumSinglesOnly(thing.name);
+                    } catch (caughtError) {
+                      throw new Error(
+                        `Didn't match a single with the same name`,
+                        {cause: caughtError});
+                    }
+                  }
+
                   let track, trackError;
                   let album, albumError;
 
