@@ -70,6 +70,16 @@ export function pick(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
+// Gets the only item in a single-item array (strictly, length === 1).
+// If the array has more than one item, or is empty, this is null.
+export function onlyItem(array) {
+  if (array.length === 1) {
+    return array[0];
+  } else {
+    return null;
+  }
+}
+
 // Gets the item at an index relative to another index.
 export function atOffset(array, index, offset, {
   wrap = false,
