@@ -299,6 +299,18 @@ releaseInfo:
 
   note: "Context notes:"
 
+  alsoReleased:
+    onAlbums: >-
+      Also released on {ALBUMS}.
+
+    asSingle: >-
+      Also released {SINGLE}.
+
+    onAlbums.asSingle: >-
+      Also released on {ALBUMS}, and {SINGLE}.
+
+    single: "as a single"
+
   alsoReleasedOn: "Also released on {ALBUMS}."
 
   tracksReferenced:
