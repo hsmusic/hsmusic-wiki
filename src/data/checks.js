@@ -653,7 +653,11 @@ export class ContentNodeError extends Error {
     message,
   }) {
     const headingLine =
-      `(${where}) ${message}`;
+      (message.includes('\n\n')
+        ? `(${where})\n\n` + message + '\n'
+     : message.includes('\n')
+        ? `(${where})\n` + message
+        : `(${where}) ${message}`);
 
     const textUpToNode =
       containingLine.slice(0, columnNumber);
@@ -826,6 +830,9 @@ export function reportContentTextErrors(wikiData, {
               findFn = boundFind[spec.find];
               break;
           }
+
+          findFn = decoSuppressFindErrors(findFn, {property: null});
+          findFn = decoAnnotateFindErrors(findFn);
 
           const findRef =
             (replacerKeyImplied
