@@ -8,6 +8,7 @@ import {input, templateCompositeFrom} from '#composite';
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 
 import gobbleSoupyFind from './gobbleSoupyFind.js';
+import inputFindOptions from './inputFindOptions.js';
 import inputSoupyFind from './inputSoupyFind.js';
 import inputWikiData from './inputWikiData.js';
 
@@ -19,6 +20,7 @@ export default templateCompositeFrom({
 
     data: inputWikiData({allowMixedTypes: true}),
     find: inputSoupyFind(),
+    findOptions: inputFindOptions(),
   },
 
   outputs: ['#resolvedReference'],
@@ -36,21 +38,35 @@ export default templateCompositeFrom({
     }),
 
     {
+      dependencies: [input('findOptions')],
+      compute: (continuation, {
+        [input('findOptions')]: findOptions,
+      }) => continuation({
+        ['#findOptions']:
+          (findOptions
+            ? {...findOptions, mode: 'quiet'}
+            : {mode: 'quiet'}),
+      }),
+    },
+
+    {
       dependencies: [
         input('ref'),
         input('data'),
         '#find',
+        '#findOptions',
       ],
 
       compute: (continuation, {
         [input('ref')]: ref,
         [input('data')]: data,
         ['#find']: findFunction,
+        ['#findOptions']: findOptions,
       }) => continuation({
         ['#resolvedReference']:
           (data
-            ? findFunction(ref, data, {mode: 'quiet'}) ?? null
-            : findFunction(ref, {mode: 'quiet'}) ?? null),
+            ? findFunction(ref, data, findOptions) ?? null
+            : findFunction(ref, findOptions) ?? null),
       }),
     },
   ],

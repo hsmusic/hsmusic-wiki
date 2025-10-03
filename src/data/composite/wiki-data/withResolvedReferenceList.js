@@ -11,6 +11,7 @@ import {raiseOutputWithoutDependency, withAvailabilityFilter}
 import {withMappedList} from '#composite/data';
 
 import gobbleSoupyFind from './gobbleSoupyFind.js';
+import inputFindOptions from './inputFindOptions.js';
 import inputNotFoundMode from './inputNotFoundMode.js';
 import inputSoupyFind from './inputSoupyFind.js';
 import inputWikiData from './inputWikiData.js';
@@ -27,6 +28,7 @@ export default templateCompositeFrom({
 
     data: inputWikiData({allowMixedTypes: true}),
     find: inputSoupyFind(),
+    findOptions: inputFindOptions(),
 
     notFoundMode: inputNotFoundMode(),
   },
@@ -47,15 +49,28 @@ export default templateCompositeFrom({
     }),
 
     {
-      dependencies: [input('data'), '#find'],
+      dependencies: [input('findOptions')],
+      compute: (continuation, {
+        [input('findOptions')]: findOptions,
+      }) => continuation({
+        ['#findOptions']:
+          (findOptions
+            ? {...findOptions, mode: 'quiet'}
+            : {mode: 'quiet'}),
+      }),
+    },
+
+    {
+      dependencies: [input('data'), '#find', '#findOptions'],
       compute: (continuation, {
         [input('data')]: data,
         ['#find']: findFunction,
+        ['#findOptions']: findOptions,
       }) => continuation({
         ['#map']:
           (data
-            ? ref => findFunction(ref, data, {mode: 'quiet'})
-            : ref => findFunction(ref, {mode: 'quiet'})),
+            ? ref => findFunction(ref, data, findOptions)
+            : ref => findFunction(ref, findOptions)),
       }),
     },
 

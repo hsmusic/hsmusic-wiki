@@ -8,6 +8,7 @@ export {default as exitWithoutContribs} from './exitWithoutContribs.js';
 export {default as exitWithoutArtwork} from './exitWithoutArtwork.js';
 export {default as gobbleSoupyFind} from './gobbleSoupyFind.js';
 export {default as gobbleSoupyReverse} from './gobbleSoupyReverse.js';
+export {default as inputFindOptions} from './inputFindOptions.js';
 export {default as inputNotFoundMode} from './inputNotFoundMode.js';
 export {default as inputSoupyFind} from './inputSoupyFind.js';
 export {default as inputSoupyReverse} from './inputSoupyReverse.js';

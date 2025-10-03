@@ -7,6 +7,7 @@ import {withPropertyFromList} from '#composite/data';
 import {raiseOutputWithoutDependency, withAvailabilityFilter}
   from '#composite/control-flow';
 
+import inputFindOptions from './inputFindOptions.js';
 import inputSoupyFind from './inputSoupyFind.js';
 import inputNotFoundMode from './inputNotFoundMode.js';
 import inputWikiData from './inputWikiData.js';
@@ -28,6 +29,7 @@ export default templateCompositeFrom({
 
     data: inputWikiData({allowMixedTypes: true}),
     find: inputSoupyFind(),
+    findOptions: inputFindOptions(),
 
     notFoundMode: inputNotFoundMode(),
   },
@@ -61,6 +63,7 @@ export default templateCompositeFrom({
       list: '#references',
       data: input('data'),
       find: input('find'),
+      findOptions: input('findOptions'),
       notFoundMode: input.value('null'),
     }),
 

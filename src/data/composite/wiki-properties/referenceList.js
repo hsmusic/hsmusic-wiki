@@ -11,8 +11,13 @@ import {input, templateCompositeFrom} from '#composite';
 import {validateReferenceList} from '#validators';
 
 import {exposeDependency} from '#composite/control-flow';
-import {inputSoupyFind, inputWikiData, withResolvedReferenceList}
-  from '#composite/wiki-data';
+
+import {
+  inputFindOptions,
+  inputSoupyFind,
+  inputWikiData,
+  withResolvedReferenceList,
+} from '#composite/wiki-data';
 
 import {referenceListInputDescriptions, referenceListUpdateDescription}
   from './helpers/reference-list-helpers.js';
@@ -27,6 +32,7 @@ export default templateCompositeFrom({
 
     data: inputWikiData({allowMixedTypes: true}),
     find: inputSoupyFind(),
+    findOptions: inputFindOptions(),
   },
 
   update:
@@ -39,6 +45,7 @@ export default templateCompositeFrom({
       list: input.updateValue(),
       data: input('data'),
       find: input('find'),
+      findOptions: input('findOptions'),
     }),
 
     exposeDependency({dependency: '#resolvedReferenceList'}),
