@@ -353,7 +353,12 @@ export function filterReferenceErrors(wikiData, {
                   if (ref === 'same name single') {
                     // Accessing the current thing here.
                     try {
-                      return boundFind.albumSinglesOnly(thing.name);
+                      return boundFind.albumSinglesOnly(thing.name, {
+                        fuzz: {
+                          capitalization: true,
+                          kebab: true,
+                        },
+                      });
                     } catch (caughtError) {
                       throw new Error(
                         `Didn't match a single with the same name`,

@@ -67,6 +67,12 @@ export default templateCompositeFrom({
     withResolvedReference({
       ref: '#sameNameSingleReference',
       find: soupyFind.input('albumSinglesOnly'),
+      findOptions: input.value({
+        fuzz: {
+          capitalization: true,
+          kebab: true,
+        },
+      }),
     }).outputs({
       '#resolvedReference': '#sameNameSingle',
     }),
