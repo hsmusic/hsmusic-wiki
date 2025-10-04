@@ -846,11 +846,6 @@ export class Album extends Thing {
         'Crediting Sources',
       ]},
 
-      {message: `Move referencing sources on singles to the track`, fields: [
-        ['Style', 'single'],
-        'Referencing Sources',
-      ]},
-
       {message: `Move additional names on singles to the track`, fields: [
         ['Style', 'single'],
         'Additional Names',
