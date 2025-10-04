@@ -97,16 +97,6 @@ count:
       many: ""
       other: "{CONTRIBUTIONS} contributions"
 
-  coverArts:
-    _: "{COVER_ARTS}"
-    withUnit:
-      zero: ""
-      one: "{COVER_ARTS} cover art"
-      two: ""
-      few: ""
-      many: ""
-      other: "{COVER_ARTS} cover arts"
-
   flashes:
     _: "{FLASHES}"
     withUnit:
