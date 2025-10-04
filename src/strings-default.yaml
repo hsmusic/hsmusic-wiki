@@ -311,8 +311,6 @@ releaseInfo:
 
     single: "as a single"
 
-  alsoReleasedOn: "Also released on {ALBUMS}."
-
   tracksReferenced:
     _: "Tracks that {TRACK} references:"
     sticky: "Tracks that this one references:"
