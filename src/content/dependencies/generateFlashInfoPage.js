@@ -1,11 +1,24 @@
 import {empty} from '#sugar';
 
+function checkInterrupted(which, relations, {html}) {
+  if (
+    !html.isBlank(relations.contributorContributionList) ||
+    !html.isBlank(relations.featuredTracksList)
+  ) return true;
+
+  if (which === 'crediting-sources') {
+    if (!html.isBlank(relations.artistCommentaryEntries)) return true;
+  }
+
+  return false;
+}
+
 export default {
   contentDependencies: [
     'generateAdditionalNamesBox',
+    'generateCollapsedContentEntrySection',
     'generateCommentaryEntry',
     'generateCommentaryContentHeading',
-    'generateContentContentHeading',
     'generateContentHeading',
     'generateContributionList',
     'generateFlashActSidebar',
@@ -56,9 +69,6 @@ export default {
     contentHeading:
       relation('generateContentHeading'),
 
-    contentContentHeading:
-      relation('generateContentContentHeading', flash),
-
     commentaryContentHeading:
       relation('generateCommentaryContentHeading', flash),
 
@@ -81,9 +91,10 @@ export default {
       flash.commentary
         .map(entry => relation('generateCommentaryEntry', entry)),
 
-    creditSourceEntries:
-      flash.creditingSources
-        .map(entry => relation('generateCommentaryEntry', entry)),
+    creditingSourcesSection:
+      relation('generateCollapsedContentEntrySection',
+        flash.creditingSources,
+        flash),
   }),
 
   data: (_query, flash) => ({
@@ -135,11 +146,11 @@ export default {
             {[html.joinChildren]: html.tag('br')},
 
             language.encapsulate('releaseInfo', capsule => [
-              (!html.isBlank(relations.contributorContributionList) ||
-               !html.isBlank(relations.featuredTracksList)) &&
+              checkInterrupted('commentary', relations, {html}) &&
                 relations.readCommentaryLine,
 
-              !html.isBlank(relations.creditSourceEntries) &&
+              checkInterrupted('crediting-sources', relations, {html}) &&
+              !html.isBlank(relations.creditingSourcesSection) &&
                 language.encapsulate(capsule, 'readCreditingSources', capsule =>
                   language.$(capsule, {
                     link:
@@ -179,15 +190,10 @@ export default {
             relations.artistCommentaryEntries,
           ]),
 
-          html.tags([
-            relations.contentContentHeading.clone()
-              .slots({
-                attributes: {id: 'crediting-sources'},
-                string: 'misc.creditingSources',
-              }),
-
-            relations.creditSourceEntries,
-          ]),
+          relations.creditingSourcesSection.slots({
+            id: 'crediting-sources',
+            string: 'misc.creditingSources',
+          }),
         ],
 
         navLinkStyle: 'hierarchical',

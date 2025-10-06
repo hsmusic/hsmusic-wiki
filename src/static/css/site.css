@@ -1860,6 +1860,7 @@ p.image-details.origin-details .filename-line {
 .inherited-commentary-section {
   clear: right;
   margin-top: 1em;
+  margin-bottom: 1.5em;
   margin-right: min(4vw, 60px);
   border: 2px solid var(--deep-color);
   border-radius: 4px;
@@ -2013,6 +2014,11 @@ h1 {
 
 #content li i {
   white-space: nowrap;
+}
+
+#content details {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
 }
 
 #content.top-index h1,
@@ -3596,6 +3602,48 @@ dl dt.content-heading {
 
 h3.content-heading {
   clear: both;
+}
+
+summary.content-heading {
+  list-style-type: none;
+}
+
+summary.content-heading .cue {
+  display: inline-flex;
+  color: var(--primary-color);
+}
+
+summary.content-heading .cue::after {
+  content: "";
+  padding-left: 0.5ch;
+  display: list-item;
+  list-style-type: disclosure-closed;
+  list-style-position: inside;
+}
+
+details[open] > summary.content-heading .cue::after {
+  list-style-type: disclosure-open;
+}
+
+summary.content-heading > span:hover {
+  text-decoration: none !important;
+}
+
+summary.content-heading > span:hover .cue {
+  text-decoration: underline;
+  text-decoration-style: wavy;
+}
+
+summary.content-heading .when-open {
+  display: none;
+}
+
+details[open] > summary.content-heading .when-open {
+  display: unset;
+}
+
+details[open] > summary.content-heading .when-collapsed {
+  display: none;
 }
 
 /* This animation's name is referenced in JavaScript */

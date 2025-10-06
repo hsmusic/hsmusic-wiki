@@ -1,3 +1,24 @@
+function checkInterrupted(which, relations, {html}) {
+  if (
+    !html.isBlank(relations.additionalFilesList) ||
+    !html.isBlank(relations.contributorContributionList) ||
+    !html.isBlank(relations.flashesThatFeatureList) ||
+    !html.isBlank(relations.lyricsSection) ||
+    !html.isBlank(relations.midiProjectFilesList) ||
+    !html.isBlank(relations.referencedByTracksList) ||
+    !html.isBlank(relations.referencedTracksList) ||
+    !html.isBlank(relations.sampledByTracksList) ||
+    !html.isBlank(relations.sampledTracksList) ||
+    !html.isBlank(relations.sheetMusicFilesList)
+  ) return true;
+
+  if (which === 'crediting-sources' || which === 'referencing-sources') {
+    if (!html.isBlank(relations.artistCommentarySection)) return true;
+  }
+
+  return false;
+}
+
 export default {
   contentDependencies: [
     'generateAdditionalFilesList',
@@ -8,7 +29,7 @@ export default {
     'generateAlbumSidebar',
     'generateAlbumStyleTags',
     'generateCommentaryEntry',
-    'generateContentContentHeading',
+    'generateCollapsedContentEntrySection',
     'generateContentHeading',
     'generateContributionList',
     'generateLyricsSection',
@@ -81,9 +102,6 @@ export default {
     contentHeading:
       relation('generateContentHeading'),
 
-    contentContentHeading:
-      relation('generateContentContentHeading', track),
-
     releaseInfo:
       relation('generateTrackReleaseInfo', track),
 
@@ -130,13 +148,15 @@ export default {
     artistCommentarySection:
       relation('generateTrackArtistCommentarySection', track),
 
-    creditingSourceEntries:
-      track.creditingSources
-        .map(entry => relation('generateCommentaryEntry', entry)),
+    creditingSourcesSection:
+      relation('generateCollapsedContentEntrySection',
+        track.creditingSources,
+        track),
 
-    referencingSourceEntries:
-      track.referencingSources
-        .map(entry => relation('generateCommentaryEntry', entry)),
+    referencingSourcesSection:
+      relation('generateCollapsedContentEntrySection',
+        track.referencingSources,
+        track),
   }),
 
   data: (query, track) => ({
@@ -212,21 +232,11 @@ export default {
                         language.$(capsule, 'link')),
                   })),
 
-              (!html.isBlank(relations.additionalFilesList) ||
-               !html.isBlank(relations.contributorContributionList) ||
-               !html.isBlank(relations.creditingSourceEntries) ||
-               !html.isBlank(relations.flashesThatFeatureList) ||
-               !html.isBlank(relations.lyricsSection) ||
-               !html.isBlank(relations.midiProjectFilesList) ||
-               !html.isBlank(relations.referencedByTracksList) ||
-               !html.isBlank(relations.referencedTracksList) ||
-               !html.isBlank(relations.referencingSourceEntries) ||
-               !html.isBlank(relations.sampledByTracksList) ||
-               !html.isBlank(relations.sampledTracksList) ||
-               !html.isBlank(relations.sheetMusicFilesList)) &&
+              checkInterrupted('commentary', relations, {html}) &&
                 relations.readCommentaryLine,
 
-              !html.isBlank(relations.creditingSourceEntries) &&
+              !html.isBlank(relations.creditingSourcesSection) &&
+              checkInterrupted('crediting-sources', relations, {html}) &&
                 language.encapsulate(capsule, 'readCreditingSources', capsule =>
                   language.$(capsule, {
                     link:
@@ -235,7 +245,8 @@ export default {
                         language.$(capsule, 'link')),
                   })),
 
-              !html.isBlank(relations.referencingSourceEntries) &&
+              !html.isBlank(relations.referencingSourcesSection) &&
+              checkInterrupted('referencing-sources', relations, {html}) &&
                 language.encapsulate(capsule, 'readReferencingSources', capsule =>
                   language.$(capsule, {
                     link:
@@ -368,9 +379,7 @@ export default {
 
           data.firstTrackInSingle &&
           (!html.isBlank(relations.lyricsSection) ||
-           !html.isBlank(relations.artistCommentarySection) ||
-           !html.isBlank(relations.creditingSourceEntries) ||
-           !html.isBlank(relations.referencingSourceEntries)) &&
+           !html.isBlank(relations.artistCommentarySection)) &&
             html.tag('hr', {class: 'main-separator'}),
 
           data.needsLyrics &&
@@ -412,25 +421,15 @@ export default {
 
           relations.artistCommentarySection,
 
-          html.tags([
-            relations.contentContentHeading.clone()
-              .slots({
-                attributes: {id: 'crediting-sources'},
-                string: 'misc.creditingSources',
-              }),
+          relations.creditingSourcesSection.slots({
+            id: 'crediting-sources',
+            string: 'misc.creditingSources',
+          }),
 
-            relations.creditingSourceEntries,
-          ]),
-
-          html.tags([
-            relations.contentContentHeading.clone()
-              .slots({
-                attributes: {id: 'referencing-sources'},
-                string: 'misc.referencingSources',
-              }),
-
-            relations.referencingSourceEntries,
-          ]),
+          relations.referencingSourcesSection.slots({
+            id: 'referencing-sources',
+            string: 'misc.referencingSources',
+          }),
         ],
 
         navLinkStyle: 'hierarchical',

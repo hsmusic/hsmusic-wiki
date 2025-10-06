@@ -18,6 +18,7 @@ import * as hoverableTooltipModule from './hoverable-tooltip.js';
 import * as imageOverlayModule from './image-overlay.js';
 import * as intrapageDotSwitcherModule from './intrapage-dot-switcher.js';
 import * as liveMousePositionModule from './live-mouse-position.js';
+import * as memorableDetailsModule from './memorable-details.js';
 import * as quickDescriptionModule from './quick-description.js';
 import * as revealAllGridControlModule from './reveal-all-grid-control.js';
 import * as scriptedLinkModule from './scripted-link.js';
@@ -44,6 +45,7 @@ export const modules = [
   imageOverlayModule,
   intrapageDotSwitcherModule,
   liveMousePositionModule,
+  memorableDetailsModule,
   quickDescriptionModule,
   revealAllGridControlModule,
   scriptedLinkModule,

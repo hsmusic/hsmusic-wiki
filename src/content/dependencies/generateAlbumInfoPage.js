@@ -13,9 +13,9 @@ export default {
     'generateAlbumSocialEmbed',
     'generateAlbumStyleTags',
     'generateAlbumTrackList',
+    'generateCollapsedContentEntrySection',
     'generateCommentaryContentHeading',
     'generateCommentaryEntry',
-    'generateContentContentHeading',
     'generateContentHeading',
     'generatePageLayout',
     'generateReadCommentaryLine',
@@ -58,9 +58,6 @@ export default {
     contentHeading:
       relation('generateContentHeading'),
 
-    contentContentHeading:
-      relation('generateContentContentHeading', album),
-
     releaseInfo:
       relation('generateAlbumReleaseInfo', album),
 
@@ -90,9 +87,10 @@ export default {
       album.commentary
         .map(entry => relation('generateCommentaryEntry', entry)),
 
-    creditSourceEntries:
-      album.creditingSources
-        .map(entry => relation('generateCommentaryEntry', entry)),
+    creditingSourcesSection:
+      relation('generateCollapsedContentEntrySection',
+        album.creditingSources,
+        album),
   }),
 
   data: (album) => ({
@@ -172,7 +170,7 @@ export default {
               !html.isBlank(relations.artistCommentaryEntries) &&
                 relations.readCommentaryLine,
 
-              !html.isBlank(relations.creditSourceEntries) &&
+              !html.isBlank(relations.creditingSourcesSection) &&
                 language.encapsulate(capsule, 'readCreditingSources', capsule =>
                   language.$(capsule, {
                     link:
@@ -192,9 +190,7 @@ export default {
               date: language.formatDate(data.dateAddedToWiki),
             })),
 
-          (!html.isBlank(relations.artistCommentaryEntries) ||
-           !html.isBlank(relations.creditSourceEntries))
-          &&
+          !html.isBlank(relations.artistCommentaryEntries) &&
             html.tag('hr', {class: 'main-separator'}),
 
           language.encapsulate('releaseInfo.additionalFiles', capsule =>
@@ -213,15 +209,10 @@ export default {
             relations.artistCommentaryEntries,
           ]),
 
-          html.tags([
-            relations.contentContentHeading.clone()
-              .slots({
-                attributes: {id: 'crediting-sources'},
-                string: 'misc.creditingSources',
-              }),
-
-            relations.creditSourceEntries,
-          ]),
+          relations.creditingSourcesSection.slots({
+            id: 'crediting-sources',
+            string: 'misc.creditingSources',
+          }),
         ],
 
         navLinkStyle: 'hierarchical',

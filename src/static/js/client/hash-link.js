@@ -1,6 +1,7 @@
 /* eslint-env browser */
 
-import {filterMultipleArrays, stitchArrays} from '../../shared-util/sugar.js';
+import {filterMultipleArrays, stitchArrays, unique}
+  from '../../shared-util/sugar.js';
 
 import {dispatchInternalEvent} from '../client-util.js';
 
@@ -10,6 +11,9 @@ export const info = {
   links: null,
   hrefs: null,
   targets: null,
+
+  details: null,
+  detailsIDs: null,
 
   state: {
     highlightedTarget: null,
@@ -40,6 +44,19 @@ export function getPageReferences() {
     info.hrefs,
     info.targets,
     (_link, _href, target) => target);
+
+  info.details =
+    unique([
+      ...document.querySelectorAll('details[id]'),
+      ...
+        Array.from(document.querySelectorAll('summary[id]'))
+          .map(summary => summary.closest('details')),
+    ]);
+
+  info.detailsIDs =
+    info.details.map(details =>
+      details.id ||
+      details.querySelector('summary').id);
 }
 
 function processScrollingAfterHashLinkClicked() {
@@ -58,6 +75,15 @@ function processScrollingAfterHashLinkClicked() {
       lastScroll = window.scrollY;
     }
   }, 200);
+}
+
+export function mutatePageContent() {
+  if (location.hash.length > 1) {
+    const target = document.getElementById(location.hash.slice(1));
+    if (target) {
+      expandDetails(target);
+    }
+  }
 }
 
 export function addPageListeners() {
@@ -93,6 +119,8 @@ export function addPageListeners() {
       if (listenerResults.includes(false)) {
         return;
       }
+
+      expandDetails(target);
 
       // Hide skipper box right away, so the layout is updated on time for the
       // math operations coming up next.
@@ -142,5 +170,33 @@ export function addPageListeners() {
       if (target !== state.highlightedTarget) return;
       state.highlightedTarget = null;
     });
+  }
+
+  stitchArrays({
+    details: info.details,
+    id: info.detailsIDs,
+  }).forEach(({details, id}) => {
+      details.addEventListener('toggle', () => {
+        if (!details.open) {
+          detractHash(id);
+        }
+      });
+    });
+}
+
+function expandDetails(target) {
+  if (target.nodeName === 'SUMMARY') {
+    const details = target.closest('details');
+    if (details) {
+      details.open = true;
+    }
+  } else if (target.nodeName === 'DETAILS') {
+    details.open = true;
+  }
+}
+
+function detractHash(id) {
+  if (location.hash === '#' + id) {
+    history.pushState({}, undefined, location.href.replace(/#.*$/, ''));
   }
 }

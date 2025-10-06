@@ -256,6 +256,10 @@ function getContentHeadingClosestToStickySubheading(index) {
   // Iterate from bottom to top of the content area.
   const contentHeadings = info.contentHeadings[index];
   for (const heading of contentHeadings.slice().reverse()) {
+    if (heading.nodeName === 'SUMMARY' && !heading.closest('details').open) {
+      continue;
+    }
+
     const headingRect = heading.getBoundingClientRect();
     if (headingRect.y + headingRect.height / 1.5 < stickyBottom + 40) {
       return heading;

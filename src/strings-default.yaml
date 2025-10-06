@@ -609,7 +609,9 @@ misc:
         wallpaperArt: "wallpaper art"
 
   creditingSources:
-    _: "Crediting sources for {THING}:"
+    _: "{CUE} for {THING}:"
+    collapsed: "{CUE} for {THING}…"
+    cue: "Crediting sources"
     sticky: "Crediting sources:"
 
   # external:
@@ -847,7 +849,9 @@ misc:
       track: "Tracks"
 
   referencingSources:
-    _: "Referencing sources for {THING}:"
+    _: "{CUE} for {THING}:"
+    collapsed: "{CUE} for {THING}…"
+    cue: "Referencing sources"
     sticky: "Referencing sources:"
 
   # skippers:
