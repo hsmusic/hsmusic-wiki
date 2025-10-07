@@ -3,11 +3,6 @@ import {sortAlbumsTracksChronologically, sortContributionsChronologically}
 import {chunkByConditions, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateArtistInfoPageChunkedList',
-    'generateArtistInfoPageArtworksChunk',
-  ],
-
   query(artist, filterEditsForWiki) {
     const query = {};
 

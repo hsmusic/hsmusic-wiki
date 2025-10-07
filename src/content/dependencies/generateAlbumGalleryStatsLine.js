@@ -1,8 +1,6 @@
 import {getTotalDuration} from '#wiki-data';
 
 export default {
-  extraDependencies: ['html', 'language'],
-
   data: (album) => ({
     date:
       album.date,

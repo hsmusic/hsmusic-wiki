@@ -2,9 +2,6 @@ import {sortAlphabetically} from '#sort';
 import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkArtTagInfo'],
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl({artTagData}) {
     return {artTagData};
   },

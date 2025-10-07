@@ -1,9 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: ['generateTextWithTooltip'],
-  extraDependencies: ['html', 'language'],
-
   relations: (relation) => ({
     textWithTooltip:
       relation('generateTextWithTooltip'),

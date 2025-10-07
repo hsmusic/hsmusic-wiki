@@ -1,15 +1,6 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'generatePageSidebarBox',
-    'linkFlashAct',
-    'linkFlashIndex',
-  ],
-
-  extraDependencies: ['html', 'wikiData'],
-
   sprawl: ({flashSideData}) => ({flashSideData}),
 
   relations: (relation, sprawl, _act, _flash) => ({

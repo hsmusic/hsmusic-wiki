@@ -6,9 +6,6 @@ import {
 } from '#sugar';
 
 export default {
-  contentDependencies: ['linkArtTagDynamically'],
-  extraDependencies: ['html', 'language'],
-
   // Recursion ain't too pretty!
 
   query(ancestorArtTag, targetArtTag) {

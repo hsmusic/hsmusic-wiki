@@ -2,9 +2,6 @@ import {sortChronologically} from '#sort';
 import {accumulateSum, filterMultipleArrays, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['generatePageLayout', 'linkAlbumCommentary'],
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl({albumData}) {
     return {albumData};
   },

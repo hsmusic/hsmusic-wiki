@@ -1,9 +1,6 @@
 import {sortAlphabetically} from '#sort';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkTrack'],
-  extraDependencies: ['wikiData'],
-
   sprawl({trackData}) {
     return {trackData};
   },

@@ -1,6 +1,4 @@
 export default {
-  contentDependencies: ['linkAlbum'],
-
   data: (album) =>
     ({directory: album.directory}),
 

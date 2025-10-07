@@ -1,15 +1,6 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateContentHeading',
-    'generateIntrapageDotSwitcher',
-    'generateLyricsEntry',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, entries) => ({
     heading:
       relation('generateContentHeading'),

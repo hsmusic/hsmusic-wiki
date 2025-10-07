@@ -1,6 +1,4 @@
 export default {
-  contentDependencies: ['generatePreviousNextLink'],
-
   relations: (relation) => ({
     link:
       relation('generatePreviousNextLink'),

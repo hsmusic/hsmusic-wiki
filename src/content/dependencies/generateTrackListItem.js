@@ -1,13 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateArtistCredit',
-    'generateColorStyleAttribute',
-    'generateTrackListMissingDuration',
-    'linkTrack',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, track, contextContributions) => ({
     trackLink:
       relation('linkTrack', track),

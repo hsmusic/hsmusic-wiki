@@ -1,8 +1,6 @@
 import {unique} from '#sugar';
 
 export default {
-  extraDependencies: ['html', 'language'],
-
   query: (group) => ({
     styles:
       unique(group.albums.map(album => album.style)),

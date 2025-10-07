@@ -1,6 +1,4 @@
 export default {
-  extraDependencies: ['html', 'language'],
-
   slots: {
     showing: {
       validate: v => v.is('all', 'direct', 'indirect'),

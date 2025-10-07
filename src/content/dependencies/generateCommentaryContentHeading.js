@@ -1,9 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: ['generateContentContentHeading'],
-  extraDependencies: ['language'],
-
   query: (thing) => ({
     entries:
       (thing.isTrack

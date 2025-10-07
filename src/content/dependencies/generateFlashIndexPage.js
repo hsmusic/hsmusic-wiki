@@ -1,17 +1,6 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'generateCoverGrid',
-    'generatePageLayout',
-    'image',
-    'linkFlash',
-    'linkFlashAct',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({flashActData}) => ({flashActData}),
 
   query(sprawl) {

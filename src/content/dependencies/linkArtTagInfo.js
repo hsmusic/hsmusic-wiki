@@ -1,6 +1,4 @@
 export default {
-  contentDependencies: ['linkThing'],
-
   relations: (relation, artTag) =>
     ({link: relation('linkThing', 'localized.artTagInfo', artTag)}),
 

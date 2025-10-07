@@ -1,16 +1,6 @@
 import {sortArtworksChronologically} from '#sort';
 
 export default {
-  contentDependencies: [
-    'generateArtistNavLinks',
-    'generateCoverGrid',
-    'generatePageLayout',
-    'image',
-    'linkAnythingMan',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query: (artist) => ({
     artworks:
       sortArtworksChronologically(

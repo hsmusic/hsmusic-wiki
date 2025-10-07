@@ -2,8 +2,6 @@ import {empty, repeat, stitchArrays} from '#sugar';
 import {getCarouselLayoutForNumberOfItems} from '#wiki-data';
 
 export default {
-  extraDependencies: ['html'],
-
   slots: {
     images: {validate: v => v.strictArrayOf(v.isHTML)},
     links: {validate: v => v.strictArrayOf(v.isHTML)},

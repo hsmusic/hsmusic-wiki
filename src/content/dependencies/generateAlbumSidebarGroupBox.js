@@ -2,16 +2,6 @@ import {sortChronologically} from '#sort';
 import {atOffset} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generatePageSidebarBox',
-    'linkAlbum',
-    'linkExternal',
-    'linkGroup',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query(album, group) {
     const query = {};
 

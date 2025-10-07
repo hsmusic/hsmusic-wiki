@@ -1,12 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateGroupSidebarCategoryDetails',
-    'generatePageSidebar',
-    'generatePageSidebarBox',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({groupCategoryData}) => ({groupCategoryData}),
 
   relations: (relation, sprawl, group) => ({

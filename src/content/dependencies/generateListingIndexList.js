@@ -1,9 +1,6 @@
 import {empty, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['linkListing'],
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl({listingTargetSpec, wikiInfo}) {
     return {listingTargetSpec, wikiInfo};
   },

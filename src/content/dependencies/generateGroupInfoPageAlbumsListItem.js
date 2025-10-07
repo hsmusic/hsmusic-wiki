@@ -1,16 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateAbsoluteDatetimestamp',
-    'generateArtistCredit',
-    'generateColorStyleAttribute',
-    'linkAlbum',
-    'linkGroup',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query: (album, group) => {
     const otherCategory =
       album.groups

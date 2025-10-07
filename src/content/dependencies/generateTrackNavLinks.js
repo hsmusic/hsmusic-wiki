@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['linkAlbum', 'linkTrack'],
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, track) => ({
     albumLink:
       relation('linkAlbum', track.album),

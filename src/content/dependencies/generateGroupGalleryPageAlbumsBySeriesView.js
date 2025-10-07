@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateGroupGalleryPageSeriesSection'],
-  extraDependencies: ['html'],
-
   relations: (relation, group) => ({
     seriesSections:
       group.serieses

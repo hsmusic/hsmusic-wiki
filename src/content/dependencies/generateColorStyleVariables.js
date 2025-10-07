@@ -1,6 +1,4 @@
 export default {
-  extraDependencies: ['html', 'getColors'],
-
   slots: {
     color: {
       validate: v => v.isColor,

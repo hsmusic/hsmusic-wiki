@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['linkArtist', 'linkExternal', 'transformContent'],
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, entry) => ({
     content:
       relation('transformContent', entry.body),

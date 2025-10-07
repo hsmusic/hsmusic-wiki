@@ -1,22 +1,6 @@
 import {empty, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateAlbumCommentarySidebar',
-    'generateAlbumNavAccent',
-    'generateAlbumSecondaryNav',
-    'generateAlbumStyleTags',
-    'generateCommentaryEntry',
-    'generateContentHeading',
-    'generateCoverArtwork',
-    'generatePageLayout',
-    'linkAlbum',
-    'linkExternal',
-    'linkTrack',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query(album) {
     const query = {};
 

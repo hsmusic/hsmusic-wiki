@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generatePageLayout', 'transformContent'],
-  extraDependencies: ['html'],
-
   relations(relation, staticPage) {
     return {
       layout: relation('generatePageLayout'),

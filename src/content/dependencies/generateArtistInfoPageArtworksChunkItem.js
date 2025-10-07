@@ -1,15 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateArtistInfoPageChunkItem',
-    'generateArtistInfoPageOtherArtistLinks',
-    'linkTrack',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query: (contrib) => ({
     kind:
       (contrib.thingProperty === 'bannerArtistContribs' ||

@@ -1,11 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateInterpageDotSwitcher',
-    'generateNextLink',
-    'generatePreviousLink',
-    'linkNewsEntry',
-  ],
-
   relations: (relation, previousEntry, nextEntry) => ({
     switcher:
       relation('generateInterpageDotSwitcher'),

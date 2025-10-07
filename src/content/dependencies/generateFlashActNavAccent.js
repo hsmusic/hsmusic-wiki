@@ -1,15 +1,6 @@
 import {atOffset} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateInterpageDotSwitcher',
-    'generateNextLink',
-    'generatePreviousLink',
-    'linkFlashAct',
-  ],
-
-  extraDependencies: ['wikiData'],
-
   sprawl: ({flashActData}) =>
     ({flashActData}),
 

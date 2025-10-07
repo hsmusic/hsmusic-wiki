@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['linkTemplate'],
-  extraDependencies: ['wikiData'],
-
   sprawl({wikiInfo}) {
     return {wikiShortName: wikiInfo.nameShort};
   },

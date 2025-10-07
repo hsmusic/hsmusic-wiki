@@ -1,30 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateAdditionalFilesList',
-    'generateAdditionalNamesBox',
-    'generateAlbumArtworkColumn',
-    'generateAlbumBanner',
-    'generateAlbumNavAccent',
-    'generateAlbumReleaseInfo',
-    'generateAlbumSecondaryNav',
-    'generateAlbumSidebar',
-    'generateAlbumSocialEmbed',
-    'generateAlbumStyleTags',
-    'generateAlbumTrackList',
-    'generateCollapsedContentEntrySection',
-    'generateCommentaryContentHeading',
-    'generateCommentaryEntry',
-    'generateContentHeading',
-    'generatePageLayout',
-    'generateReadCommentaryLine',
-    'linkAlbumCommentary',
-    'linkAlbumGallery',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, album) => ({
     layout:
       relation('generatePageLayout'),

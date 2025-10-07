@@ -1,6 +1,4 @@
 export default {
-  extraDependencies: ['html'],
-
   slots: {
     attributes: {
       type: 'attributes',

@@ -1,15 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'generateInterpageDotSwitcher',
-    'generateNextLink',
-    'generatePreviousLink',
-    'linkAlbumDynamically',
-    'linkGroup',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation) => ({
     switcher:
       relation('generateInterpageDotSwitcher'),

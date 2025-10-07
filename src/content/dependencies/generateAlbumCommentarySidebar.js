@@ -1,15 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateAlbumSidebarTrackSection',
-    'generatePageSidebar',
-    'generatePageSidebarBox',
-    'linkAlbum',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, album) => ({
     sidebar:
       relation('generatePageSidebar'),

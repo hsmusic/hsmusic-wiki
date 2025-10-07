@@ -11,15 +11,6 @@ import {
 const {Album, Flash} = T;
 
 export default {
-  contentDependencies: [
-    'generateListingPage',
-    'linkAlbum',
-    'linkArtist',
-    'linkFlash',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({albumData, artistData, flashData, trackData, wikiInfo}) =>
     ({albumData, artistData, flashData, trackData,
       enableFlashesAndGames: wikiInfo.enableFlashesAndGames}),

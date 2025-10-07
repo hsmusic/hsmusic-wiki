@@ -5,9 +5,6 @@ function linkable(tag) {
 }
 
 export default {
-  contentDependencies: ['linkArtTagGallery'],
-  extraDependencies: ['html', 'language'],
-
   query: (artwork) => ({
     linkableArtTags:
       artwork.artTags.filter(linkable),

@@ -1,6 +1,4 @@
 export default {
-  extraDependencies: ['html', 'to'],
-
   slots: {
     path: {
       validate: v => v.validateArrayItems(v.isString),

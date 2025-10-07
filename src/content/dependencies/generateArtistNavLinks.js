@@ -1,15 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateInterpageDotSwitcher',
-    'linkArtist',
-    'linkArtistGallery',
-    'linkArtistRollingWindow',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({wikiInfo}) => ({
     enableListings:
       wikiInfo.enableListings,

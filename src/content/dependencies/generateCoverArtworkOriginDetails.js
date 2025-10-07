@@ -1,13 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateArtistCredit',
-    'generateAbsoluteDatetimestamp',
-    'linkAlbum',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language', 'pagePath'],
-
   query: (artwork) => ({
     attachedArtistContribs:
       (artwork.attachedArtwork

@@ -1,8 +1,6 @@
 import {unique} from '#sugar';
 
 export default {
-  contentDependencies: ['linkArtist'],
-
   query(contribs) {
     const associatedContributionsByOtherArtists =
       contribs

@@ -1,6 +1,4 @@
 export default {
-  contentDependencies: ['generateCoverCarousel', 'image', 'linkAlbum'],
-
   relations: (relation, row) => ({
     coverCarousel:
       relation('generateCoverCarousel'),

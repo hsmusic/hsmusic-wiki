@@ -2,9 +2,6 @@ import {sortAlphabetically} from '#sort';
 import {chunkByProperties} from '#sugar';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkAlbum'],
-  extraDependencies: ['language', 'wikiData'],
-
   sprawl({albumData}) {
     return {albumData};
   },

@@ -1,15 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'generateCoverArtworkArtTagDetails',
-    'generateCoverArtworkArtistDetails',
-    'generateCoverArtworkOriginDetails',
-    'generateCoverArtworkReferenceDetails',
-    'image',
-  ],
-
-  extraDependencies: ['html'],
-
   relations: (relation, artwork) => ({
     colorStyleAttribute:
       relation('generateColorStyleAttribute'),

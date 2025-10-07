@@ -2,9 +2,6 @@ import {sortByCount, sortChronologically} from '#sort';
 import {filterByCount, filterMultipleArrays, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkAlbum', 'linkTrack'],
-  extraDependencies: ['language', 'wikiData'],
-
   sprawl({albumData}) {
     return {albumData};
   },

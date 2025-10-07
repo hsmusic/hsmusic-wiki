@@ -1,13 +1,6 @@
 import {accumulateSum, empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateReleaseInfoContributionsLine',
-    'generateReleaseInfoListenLine',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations(relation, album) {
     const relations = {};
 

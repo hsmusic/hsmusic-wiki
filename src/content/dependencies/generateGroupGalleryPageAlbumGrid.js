@@ -2,15 +2,6 @@ import {stitchArrays} from '#sugar';
 import {getTotalDuration} from '#wiki-data';
 
 export default {
-  contentDependencies: [
-    'generateCoverGrid',
-    'generateGroupGalleryPageAlbumGridTab',
-    'image',
-    'linkAlbum',
-  ],
-
-  extraDependencies: ['language', 'wikiData'],
-
   query: (albums, _group) => ({
     artworks:
       albums.map(album =>

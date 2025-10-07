@@ -1,6 +1,4 @@
 export default {
-  contentDependencies: ['linkFlashAct'],
-
   relations: (relation, flashSide) => ({
     link:
       relation('linkFlashAct', flashSide.acts[0]),

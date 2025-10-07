@@ -1,9 +1,6 @@
 import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
-  contentDependencies: ['generateGridActionLinks', 'generateGridExpando'],
-  extraDependencies: ['html', 'language'],
-
   relations: (relation) => ({
     actionLinks:
       relation('generateGridActionLinks'),

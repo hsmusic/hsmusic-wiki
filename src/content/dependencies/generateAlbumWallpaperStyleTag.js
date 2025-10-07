@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateWallpaperStyleTag'],
-  extraDependencies: ['html'],
-
   relations: (relation, album) => ({
     wallpaperStyleTag:
       (album.hasWallpaperArt

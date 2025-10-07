@@ -1,20 +1,6 @@
 import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateAdditionalNamesBox',
-    'generateArtTagNavLinks',
-    'generateArtTagSidebar',
-    'generateContentHeading',
-    'generatePageLayout',
-    'linkArtTagGallery',
-    'linkArtTagInfo',
-    'linkExternal',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({wikiInfo}) => ({
     enableListings: wikiInfo.enableListings,
   }),

@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateBanner'],
-  extraDependencies: ['html', 'language'],
-
   relations(relation, album) {
     if (!album.hasBannerArt) {
       return {};

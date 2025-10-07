@@ -1,14 +1,6 @@
 import {getTotalDuration} from '#wiki-data';
 
 export default {
-  contentDependencies: [
-    'generateListingIndexList',
-    'generateListingSidebar',
-    'generatePageLayout',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl({albumData, trackData, wikiInfo}) {
     return {
       wikiName: wikiInfo.name,

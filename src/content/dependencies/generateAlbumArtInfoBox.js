@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateReleaseInfoContributionsLine'],
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, album) => ({
     wallpaperArtistContributionsLine:
       (album.wallpaperArtwork

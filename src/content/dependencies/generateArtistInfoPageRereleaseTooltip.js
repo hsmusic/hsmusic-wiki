@@ -1,14 +1,6 @@
 import {sortAlbumsTracksChronologically} from '#sort';
 
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'generateTooltip',
-    'linkOtherReleaseOnArtistInfoPage'
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query: (track) => ({
     firstRelease:
       sortAlbumsTracksChronologically(track.allReleases)[0],

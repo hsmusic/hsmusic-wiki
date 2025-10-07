@@ -1,14 +1,6 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generatePageSidebarBox',
-    'linkNewsEntry',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({newsData}) => ({
     entries:
       newsData.slice(0, 3),

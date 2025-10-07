@@ -1,6 +1,4 @@
 export default {
-  extraDependencies: ['absoluteTo', 'html', 'language', 'wikiData'],
-
   sprawl({wikiInfo}) {
     return {
       canonicalBase: wikiInfo.canonicalBase,

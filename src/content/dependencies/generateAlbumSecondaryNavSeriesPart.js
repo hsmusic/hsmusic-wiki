@@ -1,15 +1,6 @@
 import {atOffset} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'generateSecondaryNavParentSiblingsPart',
-    'linkAlbumDynamically',
-    'linkGroup',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query(series, album) {
     const query = {};
 

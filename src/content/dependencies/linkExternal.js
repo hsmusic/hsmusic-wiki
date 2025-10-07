@@ -1,8 +1,6 @@
 import {isExternalLinkContext, isExternalLinkStyle} from '#external-links';
 
 export default {
-  extraDependencies: ['html', 'language', 'to', 'wikiData'],
-
   sprawl: ({wikiInfo}) => ({
     canonicalBase:
       wikiInfo.canonicalBase,

@@ -2,14 +2,6 @@ import {sortChronologically} from '#sort';
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generatePageLayout',
-    'linkNewsEntry',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl({newsData}) {
     return {newsData};
   },

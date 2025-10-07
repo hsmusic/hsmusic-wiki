@@ -3,9 +3,6 @@ import {sortAlbumsTracksChronologically, sortContributionsChronologically}
 import {chunkArtistTrackContributions} from '#wiki-data';
 
 export default {
-  contentDependencies: ['generateColorStyleAttribute'],
-  extraDependencies: ['html', 'language'],
-
   query(track, artist) {
     const relevantInfoPageChunkingContributions =
       track.allReleases

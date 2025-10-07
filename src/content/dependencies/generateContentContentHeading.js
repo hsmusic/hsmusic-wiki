@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateContentHeading'],
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, _thing) => ({
     contentHeading:
       relation('generateContentHeading'),

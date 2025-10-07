@@ -1,17 +1,6 @@
 import {bindOpts, empty, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateContentHeading',
-    'generateListingSidebar',
-    'generatePageLayout',
-    'linkListing',
-    'linkListingIndex',
-    'linkTemplate',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   relations(relation, listing) {
     const relations = {};
 

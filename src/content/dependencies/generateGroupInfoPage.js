@@ -1,20 +1,6 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'generateGroupInfoPageAlbumsSection',
-    'generateGroupNavLinks',
-    'generateGroupSecondaryNav',
-    'generateGroupSidebar',
-    'generatePageLayout',
-    'linkArtist',
-    'linkExternal',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({wikiInfo}) => ({
     enableGroupUI:
       wikiInfo.enableGroupUI,

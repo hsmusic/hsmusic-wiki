@@ -2,20 +2,6 @@ import {logWarn} from '#cli';
 import {empty} from '#sugar';
 
 export default {
-  extraDependencies: [
-    'checkIfImagePathHasCachedThumbnails',
-    'getDimensionsOfImagePath',
-    'getSizeOfMediaFile',
-    'getThumbnailEqualOrSmaller',
-    'getThumbnailsAvailableForDimensions',
-    'html',
-    'language',
-    'missingImagePaths',
-    'to',
-  ],
-
-  contentDependencies: ['generateColorStyleAttribute'],
-
   relations: (relation, _artwork) => ({
     colorStyle:
       relation('generateColorStyleAttribute'),

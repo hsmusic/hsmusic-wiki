@@ -14,25 +14,6 @@ function checkInterrupted(which, relations, {html}) {
 }
 
 export default {
-  contentDependencies: [
-    'generateAdditionalNamesBox',
-    'generateCollapsedContentEntrySection',
-    'generateCommentaryEntry',
-    'generateCommentaryContentHeading',
-    'generateContentHeading',
-    'generateContributionList',
-    'generateFlashActSidebar',
-    'generateFlashArtworkColumn',
-    'generateFlashNavAccent',
-    'generatePageLayout',
-    'generateReadCommentaryLine',
-    'generateTrackList',
-    'linkExternal',
-    'linkFlashAct',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query(flash) {
     const query = {};
 

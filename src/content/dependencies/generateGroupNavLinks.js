@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateGroupNavAccent', 'linkGroup'],
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({groupCategoryData, wikiInfo}) => ({
     groupCategoryData,
     enableGroupUI: wikiInfo.enableGroupUI,

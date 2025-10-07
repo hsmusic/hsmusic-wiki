@@ -2,9 +2,6 @@ import {sortAlbumsTracksChronologically} from '#sort';
 import {chunkByProperties, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkAlbum', 'linkTrack'],
-  extraDependencies: ['language', 'wikiData'],
-
   sprawl: ({trackData}) => ({trackData}),
 
   query({trackData}, spec) {

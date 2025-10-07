@@ -1,12 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateArtistInfoPageChunk',
-    'generateArtistInfoPageArtworksChunkItem',
-    'linkAlbum',
-  ],
-
-  extraDependencies: ['html'],
-
   relations: (relation, album, contribs) => ({
     template:
       relation('generateArtistInfoPageChunk'),

@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateStyleTag'],
-  extraDependencies: ['to'],
-
   relations: (relation) => ({
     styleTag:
       relation('generateStyleTag'),

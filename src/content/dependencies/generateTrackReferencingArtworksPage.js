@@ -1,13 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateAlbumStyleTags',
-    'generateBackToTrackLink',
-    'generateReferencingArtworksPage',
-    'generateTrackNavLinks',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, track) => ({
     page:
       relation('generateReferencingArtworksPage', track.trackArtworks[0]),

@@ -1,8 +1,4 @@
 export default {
-  contentDependencies: ['generateArtistInfoPageChunkItem', 'linkFlash'],
-
-  extraDependencies: ['language'],
-
   relations: (relation, contrib) => ({
     // Flashes and games can list multiple contributors as collaborative
     // credits, but we don't display these on the artist page, since they

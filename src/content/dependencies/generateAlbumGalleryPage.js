@@ -2,21 +2,6 @@ import {stitchArrays, unique} from '#sugar';
 import {getKebabCase} from '#wiki-data';
 
 export default {
-  contentDependencies: [
-    'generateAlbumGalleryAlbumGrid',
-    'generateAlbumGalleryNoTrackArtworksLine',
-    'generateAlbumGalleryStatsLine',
-    'generateAlbumGalleryTrackGrid',
-    'generateAlbumNavAccent',
-    'generateAlbumSecondaryNav',
-    'generateAlbumStyleTags',
-    'generateIntrapageDotSwitcher',
-    'generatePageLayout',
-    'linkAlbum',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query(album) {
     const query = {};
 

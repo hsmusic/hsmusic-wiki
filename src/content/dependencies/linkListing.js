@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['linkThing'],
-  extraDependencies: ['language'],
-
   relations: (relation, listing) =>
     ({link: relation('linkThing', 'localized.listing', listing)}),
 

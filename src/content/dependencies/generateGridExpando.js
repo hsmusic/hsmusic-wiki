@@ -1,6 +1,4 @@
 export default {
-  extraDependencies: ['html', 'language'],
-
   slots: {
     caption: {type: 'html', mutable: false},
   },

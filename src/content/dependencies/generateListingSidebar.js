@@ -1,13 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateListingIndexList',
-    'generatePageSidebar',
-    'generatePageSidebarBox',
-    'linkListingIndex',
-  ],
-
-  extraDependencies: ['html'],
-
   relations: (relation, currentListing) => ({
     sidebar:
       relation('generatePageSidebar'),

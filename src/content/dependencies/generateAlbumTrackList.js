@@ -35,14 +35,6 @@ function getDisplayMode(album) {
 }
 
 export default {
-  contentDependencies: [
-    'generateAlbumTrackListItem',
-    'generateContentHeading',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query(album) {
     return {
       displayMode: getDisplayMode(album),

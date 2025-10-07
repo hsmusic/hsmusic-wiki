@@ -1,9 +1,6 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkGroup', 'linkGroupGallery'],
-  extraDependencies: ['language', 'wikiData'],
-
   sprawl({groupCategoryData}) {
     return {groupCategoryData};
   },

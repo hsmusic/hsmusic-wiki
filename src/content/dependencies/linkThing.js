@@ -1,13 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'generateTextWithTooltip',
-    'generateTooltip',
-    'linkTemplate',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, _pathKey, thing) => ({
     linkTemplate:
       relation('linkTemplate'),

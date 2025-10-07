@@ -7,18 +7,6 @@ import {
 } from '#sort';
 
 export default {
-  contentDependencies: [
-    'generateArtistInfoPageChunk',
-    'generateArtistInfoPageChunkItem',
-    'linkAlbum',
-    'linkFlash',
-    'linkFlashAct',
-    'linkTrack',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query(artist, filterWikiEditorCommentary) {
     const processEntry = ({
       thing,

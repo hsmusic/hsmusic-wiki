@@ -1,9 +1,6 @@
 // Not to be confused with "html.Stationery".
 
 export default {
-  contentDependencies: ['linkTemplate'],
-  extraDependencies: ['language'],
-
   relations(relation) {
     return {
       linkTemplate: relation('linkTemplate'),

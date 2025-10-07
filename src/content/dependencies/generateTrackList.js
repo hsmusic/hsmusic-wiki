@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateTrackListItem'],
-  extraDependencies: ['html'],
-
   query: (tracks, contextTrack) => ({
     presentedTracks:
       (contextTrack

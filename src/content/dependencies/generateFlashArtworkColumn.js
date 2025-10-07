@@ -1,6 +1,4 @@
 export default {
-  contentDependencies: ['generateCoverArtwork'],
-
   relations: (relation, flash) => ({
     coverArtwork:
       relation('generateCoverArtwork', flash.coverArtwork),

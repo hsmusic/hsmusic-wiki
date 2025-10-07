@@ -1,15 +1,6 @@
 import {collectTreeLeaves, empty, stitchArrays, unique} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generatePageSidebar',
-    'generatePageSidebarBox',
-    'generateArtTagAncestorDescendantMapList',
-    'linkArtTagDynamically',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({artTagData}) =>
     ({artTagData}),
 

@@ -1,14 +1,6 @@
 import {empty, filterMultipleArrays, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateContentHeading',
-    'generateTrackList',
-    'linkGroup',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({wikiInfo}) => ({
     divideTrackListsByGroups:
       wikiInfo.divideTrackListsByGroups,

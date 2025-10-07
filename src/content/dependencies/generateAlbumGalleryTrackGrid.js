@@ -1,16 +1,6 @@
 import {compareArrays, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateAlbumGalleryCoverArtistsLine',
-    'generateCoverGrid',
-    'image',
-    'linkAlbum',
-    'linkTrack',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query(album, label) {
     const query = {};
 

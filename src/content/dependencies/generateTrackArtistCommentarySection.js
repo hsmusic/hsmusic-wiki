@@ -1,15 +1,6 @@
 import {empty, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateCommentaryContentHeading',
-    'generateCommentaryEntry',
-    'linkAlbum',
-    'linkTrack',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query: (track) => ({
     otherSecondaryReleasesWithCommentary:
       track.otherReleases

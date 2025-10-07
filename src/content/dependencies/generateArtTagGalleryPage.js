@@ -2,22 +2,6 @@ import {sortArtworksChronologically} from '#sort';
 import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateAdditionalNamesBox',
-    'generateArtTagGalleryPageFeaturedLine',
-    'generateArtTagGalleryPageShowingLine',
-    'generateArtTagNavLinks',
-    'generateCoverGrid',
-    'generatePageLayout',
-    'generateQuickDescription',
-    'image',
-    'linkAnythingMan',
-    'linkArtTagGallery',
-    'linkExternal',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl({wikiInfo}) {
     return {
       enableListings: wikiInfo.enableListings,

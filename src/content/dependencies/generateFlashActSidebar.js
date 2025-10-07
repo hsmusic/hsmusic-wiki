@@ -1,10 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateFlashActSidebarCurrentActBox',
-    'generateFlashActSidebarSideMapBox',
-    'generatePageSidebar',
-  ],
-
   relations: (relation, act, flash) => ({
     sidebar:
       relation('generatePageSidebar'),

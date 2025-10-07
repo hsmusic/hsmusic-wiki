@@ -20,37 +20,6 @@ function checkInterrupted(which, relations, {html}) {
 }
 
 export default {
-  contentDependencies: [
-    'generateAdditionalFilesList',
-    'generateAdditionalNamesBox',
-    'generateAlbumArtworkColumn',
-    'generateAlbumNavAccent',
-    'generateAlbumSecondaryNav',
-    'generateAlbumSidebar',
-    'generateAlbumStyleTags',
-    'generateCommentaryEntry',
-    'generateCollapsedContentEntrySection',
-    'generateContentHeading',
-    'generateContributionList',
-    'generateLyricsSection',
-    'generatePageLayout',
-    'generateReadCommentaryLine',
-    'generateTrackArtistCommentarySection',
-    'generateTrackArtworkColumn',
-    'generateTrackInfoPageFeaturedByFlashesList',
-    'generateTrackInfoPageOtherReleasesList',
-    'generateTrackList',
-    'generateTrackListDividedByGroups',
-    'generateTrackNavLinks',
-    'generateTrackReleaseInfo',
-    'generateTrackSocialEmbed',
-    'linkAlbum',
-    'linkTrack',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query: (track) => ({
     mainReleaseTrack:
       (track.isMainRelease

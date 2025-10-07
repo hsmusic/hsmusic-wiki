@@ -1,17 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: ['linkTemplate'],
-
-  extraDependencies: [
-    'checkIfImagePathHasCachedThumbnails',
-    'getDimensionsOfImagePath',
-    'getSizeOfMediaFile',
-    'getThumbnailsAvailableForDimensions',
-    'html',
-    'to',
-  ],
-
   relations: (relation) =>
     ({link: relation('linkTemplate')}),
 

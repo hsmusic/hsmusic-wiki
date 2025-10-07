@@ -2,15 +2,6 @@ import {sortByName} from '#sort';
 import {stitchArrays} from '#sugar';
 
 export default {
-  extraDependencies: [
-    'defaultLanguage',
-    'html',
-    'language',
-    'languages',
-    'pagePath',
-    'to',
-  ],
-
   generate({
     defaultLanguage,
     html,

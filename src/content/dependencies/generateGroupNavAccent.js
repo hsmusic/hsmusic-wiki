@@ -1,14 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateInterpageDotSwitcher',
-    'linkGroup',
-    'linkGroupGallery',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, group) => ({
     switcher:
       relation('generateInterpageDotSwitcher'),

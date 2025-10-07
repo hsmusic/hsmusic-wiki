@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['linkContribution'],
-  extraDependencies: ['html'],
-
   relations: (relation, contributions) => ({
     contributionLinks:
       contributions

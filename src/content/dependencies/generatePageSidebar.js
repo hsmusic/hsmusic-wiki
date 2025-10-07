@@ -1,6 +1,4 @@
 export default {
-  extraDependencies: ['html'],
-
   slots: {
     // Attributes to apply to the whole sidebar. This be added to the
     // containing sidebar-column, arr - specify attributes on each section if

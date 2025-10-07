@@ -4,11 +4,6 @@ import {stitchArrays} from '#sugar';
 import {chunkArtistTrackContributions} from '#wiki-data';
 
 export default {
-  contentDependencies: [
-    'generateArtistInfoPageChunkedList',
-    'generateArtistInfoPageTracksChunk',
-  ],
-
   query(artist) {
     const query = {};
 

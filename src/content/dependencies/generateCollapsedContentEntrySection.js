@@ -1,11 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateCommentaryEntry',
-    'generateContentContentHeading',
-  ],
-
-  extraDependencies: ['html'],
-
   relations: (relation, entries, thing) => ({
     contentContentHeading:
       relation('generateContentContentHeading', thing),

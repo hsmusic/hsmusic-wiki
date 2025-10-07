@@ -1,6 +1,4 @@
 export default {
-  contentDependencies: ['linkTemplate'],
-
   relations: (relation) =>
     ({link: relation('linkTemplate')}),
 

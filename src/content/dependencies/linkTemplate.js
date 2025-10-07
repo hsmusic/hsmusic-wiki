@@ -3,13 +3,6 @@ import {empty} from '#sugar';
 import striptags from 'striptags';
 
 export default {
-  extraDependencies: [
-    'appendIndexHTML',
-    'html',
-    'language',
-    'to',
-  ],
-
   slots: {
     href: {type: 'string'},
     path: {validate: v => v.validateArrayItems(v.isString)},

@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateListingPage', 'linkAlbum', 'linkTrack'],
-  extraDependencies: ['language', 'wikiData'],
-
   sprawl({albumData}) {
     return {albumData};
   },

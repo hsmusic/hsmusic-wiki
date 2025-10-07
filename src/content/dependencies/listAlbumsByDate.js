@@ -2,9 +2,6 @@ import {sortChronologically} from '#sort';
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkAlbum'],
-  extraDependencies: ['language', 'wikiData'],
-
   sprawl({albumData}) {
     return {albumData};
   },

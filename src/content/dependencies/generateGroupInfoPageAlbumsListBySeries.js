@@ -1,13 +1,6 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateContentHeading',
-    'generateGroupInfoPageAlbumsListItem',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query: (group) => ({
     closelyLinkedArtists:
       group.closelyLinkedArtists

@@ -1,6 +1,4 @@
 export default {
-  contentDependencies: ['linkTemplate'],
-
   query: (file, filename) => ({
     index:
       file.filenames.indexOf(filename),

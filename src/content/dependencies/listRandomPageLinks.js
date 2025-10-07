@@ -2,14 +2,6 @@ import {sortChronologically} from '#sort';
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateListingPage',
-    'generateListRandomPageLinksAlbumLink',
-    'linkGroup',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({albumData, wikiInfo}) => ({albumData, wikiInfo}),
 
   query(sprawl, spec) {

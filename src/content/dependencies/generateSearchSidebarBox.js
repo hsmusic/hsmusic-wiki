@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generatePageSidebarBox'],
-  extraDependencies: ['html', 'language'],
-
   relations: (relation) => ({
     sidebarBox:
       relation('generatePageSidebarBox'),

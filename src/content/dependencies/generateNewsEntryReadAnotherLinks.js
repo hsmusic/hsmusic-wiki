@@ -1,12 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateAbsoluteDatetimestamp',
-    'generateRelativeDatetimestamp',
-    'linkNewsEntry',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations(relation, currentEntry, previousEntry, nextEntry) {
     const relations = {};
 

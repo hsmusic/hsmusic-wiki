@@ -1,9 +1,6 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['generateDotSwitcherTemplate'],
-  extraDependencies: ['html', 'language'],
-
   relations: (relation) => ({
     template:
       relation('generateDotSwitcherTemplate'),

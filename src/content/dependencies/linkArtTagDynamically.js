@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['linkArtTagGallery', 'linkArtTagInfo'],
-  extraDependencies: ['pagePath'],
-
   relations: (relation, artTag) => ({
     galleryLink: relation('linkArtTagGallery', artTag),
     infoLink: relation('linkArtTagInfo', artTag),

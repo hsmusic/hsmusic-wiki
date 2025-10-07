@@ -2,15 +2,6 @@ import {sortChronologically} from '#sort';
 import {atOffset} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'generateSecondaryNavParentSiblingsPart',
-    'linkAlbumDynamically',
-    'linkGroup',
-  ],
-
-  extraDependencies: ['html'],
-
   query(group, album) {
     const query = {};
 

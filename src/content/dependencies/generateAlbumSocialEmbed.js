@@ -1,13 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateSocialEmbed',
-    'generateAlbumSocialEmbedDescription',
-  ],
-
-  extraDependencies: ['absoluteTo', 'language'],
-
   relations(relation, album) {
     return {
       socialEmbed:

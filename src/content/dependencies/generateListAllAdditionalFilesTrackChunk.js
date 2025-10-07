@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateListAllAdditionalFilesChunk', 'linkTrack'],
-  extraDependencies: ['html'],
-
   relations: (relation, track, additionalFiles) => ({
     trackLink:
       relation('linkTrack', track),

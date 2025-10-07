@@ -1,12 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateAbsoluteDatetimestamp',
-    'generateDatetimestampTemplate',
-    'generateTooltip',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   data: (currentDate, referenceDate) =>
     (currentDate.getTime() === referenceDate.getTime()
       ? {equal: true, date: currentDate}

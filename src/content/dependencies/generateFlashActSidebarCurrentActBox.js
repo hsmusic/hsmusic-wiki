@@ -1,12 +1,4 @@
 export default {
-  contentDependencies: [
-    'generatePageSidebarBox',
-    'linkFlash',
-    'linkFlashAct',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, act, _flash) => ({
     box:
       relation('generatePageSidebarBox'),

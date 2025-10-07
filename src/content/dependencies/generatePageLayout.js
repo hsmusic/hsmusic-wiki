@@ -2,28 +2,6 @@ import {openAggregate} from '#aggregate';
 import {atOffset, empty, repeat} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateColorStyleTag',
-    'generateFooterLocalizationLinks',
-    'generateImageOverlay',
-    'generatePageSidebar',
-    'generateSearchSidebarBox',
-    'generateStaticURLStyleTag',
-    'generateStickyHeadingContainer',
-    'generateWikiWallpaperStyleTag',
-    'transformContent',
-  ],
-
-  extraDependencies: [
-    'getColors',
-    'html',
-    'language',
-    'pagePath',
-    'pagePathStringFromRoot',
-    'to',
-    'wikiData',
-  ],
-
   sprawl: ({wikiInfo}) => ({
     enableSearch: wikiInfo.enableSearch,
     footerContent: wikiInfo.footerContent,

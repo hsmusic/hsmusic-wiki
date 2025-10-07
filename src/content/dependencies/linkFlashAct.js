@@ -1,6 +1,4 @@
 export default {
-  contentDependencies: ['generateUnsafeMunchy', 'linkThing'],
-
   relations: (relation, flashAct) => ({
     unsafeMunchy:
       relation('generateUnsafeMunchy'),

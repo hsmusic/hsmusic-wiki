@@ -1,9 +1,6 @@
 import {empty, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['generateStyleTag'],
-  extraDependencies: ['html', 'to'],
-
   relations: (relation) => ({
     styleTag:
       relation('generateStyleTag'),

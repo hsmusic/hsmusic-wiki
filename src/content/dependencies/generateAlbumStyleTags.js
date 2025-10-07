@@ -1,9 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: ['generateAlbumWallpaperStyleTag', 'generateStyleTag'],
-  extraDependencies: ['html'],
-
   relations: (relation, album, _track) => ({
     styleTag:
       relation('generateStyleTag'),

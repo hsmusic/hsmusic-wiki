@@ -1,13 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateAlbumStyleTags',
-    'generateBackToAlbumLink',
-    'generateReferencingArtworksPage',
-    'linkAlbum',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, album) => ({
     page:
       relation('generateReferencingArtworksPage', album.coverArtworks[0]),

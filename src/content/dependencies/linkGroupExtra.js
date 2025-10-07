@@ -1,13 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'linkGroup',
-    'linkGroupGallery',
-  ],
-
-  extraDependencies: ['html'],
-
   relations(relation, group) {
     const relations = {};
 

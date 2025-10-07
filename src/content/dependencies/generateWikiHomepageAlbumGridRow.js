@@ -2,9 +2,6 @@ import {empty, stitchArrays} from '#sugar';
 import {getNewAdditions, getNewReleases} from '#wiki-data';
 
 export default {
-  contentDependencies: ['generateCoverGrid', 'image', 'linkAlbum'],
-  extraDependencies: ['language', 'wikiData'],
-
   sprawl({albumData}, row) {
     const sprawl = {};
 

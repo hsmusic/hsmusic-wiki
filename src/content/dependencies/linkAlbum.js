@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['linkThing', 'linkTrack'],
-  extraDependencies: ['language'],
-
   relations: (relation, album) => ({
     link:
       (album.style === 'single'

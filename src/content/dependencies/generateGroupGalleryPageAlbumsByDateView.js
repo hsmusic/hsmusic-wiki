@@ -1,13 +1,6 @@
 import {sortChronologically} from '#sort';
 
 export default {
-  contentDependencies: [
-    'generateGroupGalleryPageAlbumGrid',
-    'generateGroupGalleryPageStyleSelector',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query: (group) => ({
     albums:
       sortChronologically(group.albums.slice(), {latestFirst: true}),

@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateListAllAdditionalFilesChunk'],
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, _album, additionalFiles) => ({
     chunk:
       relation('generateListAllAdditionalFilesChunk', additionalFiles),

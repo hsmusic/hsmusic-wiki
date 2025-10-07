@@ -1,11 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateDatetimestampTemplate',
-    'generateTooltip',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   data: (date) =>
     ({date}),
 

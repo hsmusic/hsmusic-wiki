@@ -1,6 +1,4 @@
 export default {
-  contentDependencies: ['generateCoverArtwork'],
-
   relations: (relation, artist) => ({
     coverArtwork:
       (artist.hasAvatar

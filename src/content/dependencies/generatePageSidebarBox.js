@@ -1,6 +1,4 @@
 export default {
-  extraDependencies: ['html'],
-
   slots: {
     content: {
       type: 'html',

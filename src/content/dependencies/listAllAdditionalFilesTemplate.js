@@ -1,13 +1,6 @@
 import {sortChronologically} from '#sort';
 
 export default {
-  contentDependencies: [
-    'generateListingPage',
-    'generateListAllAdditionalFilesAlbumSection',
-  ],
-
-  extraDependencies: ['html', 'wikiData'],
-
   sprawl: ({albumData}) => ({albumData}),
 
   query: (sprawl, spec, property) => ({

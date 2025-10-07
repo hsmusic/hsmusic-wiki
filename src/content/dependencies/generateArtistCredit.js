@@ -1,14 +1,6 @@
 import {compareArrays, empty, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateArtistCreditWikiEditsPart',
-    'linkContribution',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query: (creditContributions, contextContributions, _formatText) => {
     const query = {};
 

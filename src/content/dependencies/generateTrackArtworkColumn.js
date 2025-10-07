@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateCoverArtwork'],
-  extraDependencies: ['html'],
-
   relations: (relation, track) => ({
     albumCover:
       (!track.hasUniqueCoverArt && track.album.hasCoverArt

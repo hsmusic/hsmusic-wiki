@@ -1,8 +1,6 @@
 import {isExternalLinkContext} from '#external-links';
 
 export default {
-  extraDependencies: ['html', 'language', 'to'],
-
   data: (url) => ({url}),
 
   slots: {

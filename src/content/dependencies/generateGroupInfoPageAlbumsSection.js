@@ -1,14 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateContentHeading',
-    'generateGroupInfoPageAlbumsListByDate',
-    'generateGroupInfoPageAlbumsListBySeries',
-    'generateIntrapageDotSwitcher',
-    'linkGroupGallery',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, group) => ({
     contentHeading:
       relation('generateContentHeading'),

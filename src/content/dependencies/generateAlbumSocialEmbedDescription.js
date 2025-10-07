@@ -1,8 +1,6 @@
 import {accumulateSum} from '#sugar';
 
 export default {
-  extraDependencies: ['language'],
-
   data: (album) => ({
     duration:
       accumulateSum(album.tracks, track => track.duration),

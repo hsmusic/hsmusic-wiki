@@ -1,10 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateArtistInfoPageChunk',
-    'generateArtistInfoPageFlashesChunkItem',
-    'linkFlashAct',
-  ],
-
   relations: (relation, flashAct, contribs) => ({
     template:
       relation('generateArtistInfoPageChunk'),

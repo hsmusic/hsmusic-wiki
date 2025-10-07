@@ -11,16 +11,6 @@ import {
 } from '#sugar';
 
 export default {
-  contentDependencies: [
-    'image',
-    'generateArtistNavLinks',
-    'generateCoverGrid',
-    'generatePageLayout',
-    'linkAnythingMan',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({groupCategoryData}) => ({
     groupCategoryData,
   }),

@@ -1,9 +1,6 @@
 import {accumulateSum, empty, stitchArrays, withEntries} from '#sugar';
 
 export default {
-  contentDependencies: ['linkGroup'],
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({groupCategoryData}) => ({
     groupOrder:
       groupCategoryData.flatMap(category => category.groups),

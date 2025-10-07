@@ -1,6 +1,4 @@
 export default {
-  contentDependencies: ['generateGridActionLinks', 'transformContent'],
-
   relations: (relation, row) => ({
     template:
       relation('generateGridActionLinks'),

@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateAlbumArtInfoBox', 'generateCoverArtwork'],
-  extraDependencies: ['html'],
-
   query: (album) => ({
     nonAttachingArtworkIndex:
       (album.hasCoverArt

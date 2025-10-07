@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['linkArtistGallery'],
-  extraDependencies: ['html', 'language'],
-
   relations(relation, coverArtists) {
     return {
       coverArtistLinks:

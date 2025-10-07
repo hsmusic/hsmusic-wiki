@@ -1,15 +1,6 @@
 import {atOffset} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'generateSecondaryNavParentSiblingsPart',
-    'linkGroupDynamically',
-    'linkListing',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({listingSpec, wikiInfo}) => ({
     groupsByCategoryListing:
       (wikiInfo.enableListings

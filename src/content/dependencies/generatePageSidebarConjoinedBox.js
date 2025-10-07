@@ -4,9 +4,6 @@
 // templates' resolved content), take care when slotting into this.
 
 export default {
-  contentDependencies: ['generatePageSidebarBox'],
-  extraDependencies: ['html'],
-
   relations: (relation) => ({
     box:
       relation('generatePageSidebarBox'),

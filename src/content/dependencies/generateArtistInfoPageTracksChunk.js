@@ -2,12 +2,6 @@ import {unique} from '#sugar';
 import {getTotalDuration} from '#wiki-data';
 
 export default {
-  contentDependencies: [
-    'generateArtistInfoPageChunk',
-    'generateArtistInfoPageTracksChunkItem',
-    'linkAlbum',
-  ],
-
   relations: (relation, artist, album, trackContribLists) => ({
     template:
       relation('generateArtistInfoPageChunk'),

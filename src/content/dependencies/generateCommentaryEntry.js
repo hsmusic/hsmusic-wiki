@@ -1,15 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateCommentaryEntryDate',
-    'generateColorStyleAttribute',
-    'linkArtist',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, entry) => ({
     artistLinks:
       (!empty(entry.artists) && !entry.artistText

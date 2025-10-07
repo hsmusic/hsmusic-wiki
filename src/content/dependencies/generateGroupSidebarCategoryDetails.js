@@ -1,14 +1,6 @@
 import {empty, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'linkGroup',
-    'linkGroupGallery',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations(relation, category) {
     return {
       colorStyle:

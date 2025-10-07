@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateAdditionalFilesListChunk'],
-  extraDependencies: ['html'],
-
   relations: (relation, additionalFiles) => ({
     chunks:
       additionalFiles

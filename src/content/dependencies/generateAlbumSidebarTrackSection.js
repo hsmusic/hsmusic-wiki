@@ -1,9 +1,6 @@
 import {empty, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['linkTrack'],
-  extraDependencies: ['getColors', 'html', 'language'],
-
   relations(relation, album, track, trackSection) {
     const relations = {};
 

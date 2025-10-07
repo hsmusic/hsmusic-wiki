@@ -2,22 +2,6 @@ import {sortChronologically} from '#sort';
 import {filterItemsForCarousel, getTotalDuration} from '#wiki-data';
 
 export default {
-  contentDependencies: [
-    'generateCoverCarousel',
-    'generateGroupGalleryPageAlbumsByDateView',
-    'generateGroupGalleryPageAlbumsBySeriesView',
-    'generateGroupNavLinks',
-    'generateGroupSecondaryNav',
-    'generateIntrapageDotSwitcher',
-    'generatePageLayout',
-    'generateQuickDescription',
-    'image',
-    'linkAlbum',
-    'linkListing',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({wikiInfo}) =>
     ({enableGroupUI: wikiInfo.enableGroupUI}),
 

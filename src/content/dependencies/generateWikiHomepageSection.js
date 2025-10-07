@@ -1,13 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'generateWikiHomepageActionsRow',
-    'generateWikiHomepageAlbumCarouselRow',
-    'generateWikiHomepageAlbumGridRow',
-  ],
-
-  extraDependencies: ['html'],
-
   relations: (relation, homepageSection) => ({
     colorStyle:
       relation('generateColorStyleAttribute', homepageSection.color),

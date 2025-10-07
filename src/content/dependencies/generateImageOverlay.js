@@ -1,6 +1,4 @@
 export default {
-  extraDependencies: ['html', 'language'],
-
   generate: ({html, language}) =>
     html.tag('div', {id: 'image-overlay-container'},
       html.tag('div', {id: 'image-overlay-content-container'}, [

@@ -3,13 +3,6 @@ import {sortContributionsChronologically, sortFlashesChronologically}
 import {chunkByConditions, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateArtistInfoPageChunkedList',
-    'generateArtistInfoPageFlashesChunk',
-  ],
-
-  extraDependencies: ['wikiData'],
-
   sprawl: ({wikiInfo}) => ({
     enableFlashesAndGames:
       wikiInfo.enableFlashesAndGames,

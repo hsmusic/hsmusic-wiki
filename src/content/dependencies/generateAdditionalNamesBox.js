@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateAdditionalNamesBoxItem'],
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, additionalNames) => ({
     items:
       additionalNames

@@ -10,9 +10,6 @@ import {
 } from '#sugar';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkArtist', 'linkGroup'],
-  extraDependencies: ['language', 'wikiData'],
-
   sprawl({artistData, wikiInfo}) {
     return {artistData, wikiInfo};
   },

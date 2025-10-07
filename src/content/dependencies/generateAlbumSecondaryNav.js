@@ -1,15 +1,6 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateAlbumSecondaryNavGroupPart',
-    'generateAlbumSecondaryNavSeriesPart',
-    'generateDotSwitcherTemplate',
-    'generateSecondaryNav',
-  ],
-
-  extraDependencies: ['html', 'wikiData'],
-
   sprawl: ({groupData}) => ({
     // TODO: Series aren't their own things, so we access them weirdly.
     seriesData:

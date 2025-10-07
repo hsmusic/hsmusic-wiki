@@ -24,9 +24,6 @@ function getReleaseContext(urlString, {
 }
 
 export default {
-  contentDependencies: ['linkExternal'],
-  extraDependencies: ['html', 'language'],
-
   query(thing) {
     const query = {};
 

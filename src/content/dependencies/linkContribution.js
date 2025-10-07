@@ -1,12 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateContributionTooltip',
-    'generateTextWithTooltip',
-    'linkArtist',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, contribution) => ({
     artistLink:
       relation('linkArtist', contribution.artist),

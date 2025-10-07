@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateTextWithTooltip'],
-  extraDependencies: ['html'],
-
   relations: (relation) => ({
     textWithTooltip:
       relation('generateTextWithTooltip'),

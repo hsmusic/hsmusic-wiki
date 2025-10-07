@@ -1,8 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  extraDependencies: ['html', 'language'],
-
   query: (thing) => ({
     entries:
       (thing.isTrack

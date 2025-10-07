@@ -1,19 +1,6 @@
 import striptags from 'striptags';
 
 export default {
-  contentDependencies: [
-    'generateCoverGrid',
-    'generateFlashActNavAccent',
-    'generateFlashActSidebar',
-    'generatePageLayout',
-    'image',
-    'linkFlash',
-    'linkFlashAct',
-    'linkFlashIndex',
-  ],
-
-  extraDependencies: ['language'],
-
   relations: (relation, act) => ({
     layout:
       relation('generatePageLayout'),

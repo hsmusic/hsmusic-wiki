@@ -25,9 +25,6 @@ function getSiblings(contribution) {
 }
 
 export default {
-  contentDependencies: ['linkAnythingMan'],
-  extraDependencies: ['html', 'language'],
-
   query: (contribution) => ({
     ...getSiblings(contribution),
   }),

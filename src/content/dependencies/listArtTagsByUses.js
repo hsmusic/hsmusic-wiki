@@ -2,9 +2,6 @@ import {sortAlphabetically, sortByCount} from '#sort';
 import {filterByCount, stitchArrays, unique} from '#sugar';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkArtTagGallery'],
-  extraDependencies: ['language', 'wikiData'],
-
   sprawl: ({artTagData}) =>
     ({artTagData}),
 

@@ -1,10 +1,6 @@
 import {sortChronologically} from '#sort';
 
 export default {
-  contentDependencies: ['generateGroupInfoPageAlbumsListItem'],
-
-  extraDependencies: ['html'],
-
   query: (group) => ({
     // Typically, a latestFirst: false (default) chronological sort would be
     // appropriate here, but navigation between adjacent albums in a group is a

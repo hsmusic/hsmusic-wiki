@@ -1,12 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateAlbumSidebarTrackSection',
-    'generatePageSidebarBox',
-    'linkAlbum',
-  ],
-
-  extraDependencies: ['html'],
-
   relations: (relation, album, track) => ({
     box:
       relation('generatePageSidebarBox'),

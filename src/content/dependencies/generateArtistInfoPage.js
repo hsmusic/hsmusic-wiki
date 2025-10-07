@@ -1,24 +1,6 @@
 import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateArtistArtworkColumn',
-    'generateArtistGroupContributionsInfo',
-    'generateArtistInfoPageArtworksChunkedList',
-    'generateArtistInfoPageCommentaryChunkedList',
-    'generateArtistInfoPageFlashesChunkedList',
-    'generateArtistInfoPageTracksChunkedList',
-    'generateArtistNavLinks',
-    'generateContentHeading',
-    'generatePageLayout',
-    'linkArtistGallery',
-    'linkExternal',
-    'linkGroup',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query: (artist) => ({
     trackContributions: [
       ...artist.trackArtistContributions,

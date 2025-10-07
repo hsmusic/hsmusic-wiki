@@ -3,9 +3,6 @@ import {stitchArrays} from '#sugar';
 import {getArtistNumContributions} from '#wiki-data';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkArtist', 'linkGroup'],
-  extraDependencies: ['language', 'wikiData'],
-
   sprawl: ({artistData, wikiInfo}) =>
     ({artistData, wikiInfo}),
 

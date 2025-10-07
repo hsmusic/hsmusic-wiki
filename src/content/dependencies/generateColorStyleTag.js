@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateColorStyleVariables', 'generateStyleTag'],
-  extraDependencies: ['html'],
-
   relations: (relation) => ({
     styleTag:
       relation('generateStyleTag'),

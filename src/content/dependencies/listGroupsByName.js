@@ -2,9 +2,6 @@ import {sortAlphabetically} from '#sort';
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkGroup', 'linkGroupGallery'],
-  extraDependencies: ['language', 'wikiData'],
-
   sprawl({groupData}) {
     return {groupData};
   },

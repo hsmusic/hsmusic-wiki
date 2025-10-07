@@ -1,8 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  extraDependencies: ['html', 'language'],
-
   slots: {
     mode: {
       validate: v => v.is('flash', 'album'),

@@ -2,16 +2,6 @@ import {sortChronologically} from '#sort';
 import {atOffset} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateNewsEntryNavAccent',
-    'generateNewsEntryReadAnotherLinks',
-    'generatePageLayout',
-    'linkNewsIndex',
-    'transformContent',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl({newsData}) {
     return {newsData};
   },

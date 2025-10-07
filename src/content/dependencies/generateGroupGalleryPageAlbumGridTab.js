@@ -1,9 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: ['generateArtistCredit'],
-  extraDependencies: ['language'],
-
   query(album, group) {
     if (album.groups.length > 1) {
       const contextGroup = group;

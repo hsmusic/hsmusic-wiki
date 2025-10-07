@@ -1,14 +1,6 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateExternalHandle',
-    'generateExternalIcon',
-    'generateExternalPlatform',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, contribution) => ({
     icons:
       contribution.artist.urls

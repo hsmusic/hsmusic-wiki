@@ -1,9 +1,4 @@
 export default {
-  contentDependencies: [
-    'linkAlbumReferencingArtworks',
-    'linkTrackReferencingArtworks',
-  ],
-
   relations: (relation, artwork) => ({
     link:
       (artwork.thing.isAlbum

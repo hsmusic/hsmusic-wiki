@@ -1,15 +1,4 @@
 export default {
-  contentDependencies: [
-    'generatePageLayout',
-    'generatePageSidebar',
-    'generatePageSidebarBox',
-    'generateWikiHomepageNewsBox',
-    'generateWikiHomepageSection',
-    'transformContent',
-  ],
-
-  extraDependencies: ['wikiData'],
-
   sprawl: ({wikiInfo}) => ({
     wikiName:
       wikiInfo.name,

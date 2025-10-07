@@ -1,12 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateInterpageDotSwitcher',
-    'linkArtTagInfo',
-    'linkArtTagGallery',
-  ],
-
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({wikiInfo}) =>
     ({enableListings: wikiInfo.enableListings}),
 

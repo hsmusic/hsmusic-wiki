@@ -1,14 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateCoverArtwork',
-    'generateCoverGrid',
-    'generatePageLayout',
-    'image',
-    'linkAnythingMan',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, artwork) => ({
     layout:
       relation('generatePageLayout'),

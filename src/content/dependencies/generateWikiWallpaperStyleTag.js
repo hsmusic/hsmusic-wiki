@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateWallpaperStyleTag'],
-  extraDependencies: ['wikiData'],
-
   sprawl: ({wikiInfo}) => ({wikiInfo}),
 
   relations: (relation) => ({

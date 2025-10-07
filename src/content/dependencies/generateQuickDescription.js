@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['transformContent'],
-  extraDependencies: ['html', 'language'],
-
   query: (thing) => ({
     hasDescription:
       !!thing.description,

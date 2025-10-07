@@ -1,12 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'generatePageSidebarBox',
-    'linkTrack',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, track) => ({
     box:
       relation('generatePageSidebarBox'),

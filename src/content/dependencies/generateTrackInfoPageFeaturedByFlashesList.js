@@ -2,9 +2,6 @@ import {sortFlashesChronologically} from '#sort';
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['linkFlash', 'linkTrack'],
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl: ({wikiInfo}) => ({
     enableFlashesAndGames:
       wikiInfo.enableFlashesAndGames,

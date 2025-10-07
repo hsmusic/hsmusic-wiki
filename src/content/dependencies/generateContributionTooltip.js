@@ -32,14 +32,6 @@ function getSiblings(contribution) {
 }
 
 export default {
-  contentDependencies: [
-    'generateContributionTooltipChronologySection',
-    'generateContributionTooltipExternalLinkSection',
-    'generateTooltip',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query: (contribution) => ({
     albumArtistContribution:
       (contribution.thing.isTrack

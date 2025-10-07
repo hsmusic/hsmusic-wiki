@@ -2,9 +2,6 @@ import {sortFlashesChronologically} from '#sort';
 import {empty, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkAlbum', 'linkFlash', 'linkTrack'],
-  extraDependencies: ['wikiData'],
-
   sprawl({flashData}) {
     return {flashData};
   },

@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['generateArtistCredit'],
-  extraDependencies: ['html'],
-
   relations: (relation, contributions, formatText) => ({
     credit:
       relation('generateArtistCredit', contributions, [], formatText),

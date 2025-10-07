@@ -3,9 +3,6 @@ import {empty, filterByCount, filterMultipleArrays, stitchArrays}
   from '#sugar';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkArtist'],
-  extraDependencies: ['html', 'language', 'wikiData'],
-
   sprawl({artistData, wikiInfo}) {
     return {
       artistData,

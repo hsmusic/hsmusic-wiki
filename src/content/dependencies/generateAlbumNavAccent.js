@@ -1,17 +1,6 @@
 import {atOffset, empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateInterpageDotSwitcher',
-    'generateNextLink',
-    'generatePreviousLink',
-    'linkTrack',
-    'linkAlbumCommentary',
-    'linkAlbumGallery',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query(album, track) {
     const query = {};
 

@@ -3,9 +3,6 @@ import {filterByCount, stitchArrays} from '#sugar';
 import {getTotalDuration} from '#wiki-data';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkAlbum'],
-  extraDependencies: ['language', 'wikiData'],
-
   sprawl({albumData}) {
     return {albumData};
   },

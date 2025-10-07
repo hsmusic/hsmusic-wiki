@@ -2,15 +2,6 @@ import {compareDates, sortChronologically} from '#sort';
 import {filterMultipleArrays, sortMultipleArrays, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateListingPage',
-    'linkAlbum',
-    'linkGroup',
-    'linkGroupGallery',
-  ],
-
-  extraDependencies: ['language', 'wikiData'],
-
   sprawl({groupData}) {
     return {groupData};
   },

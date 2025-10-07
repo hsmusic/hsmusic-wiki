@@ -1,7 +1,5 @@
 export default {
   extraDependencies: ['html'],
-  contentDependencies: ['generateColorStyleAttribute'],
-
   relations: (relation) => ({
     colorStyle: relation('generateColorStyleAttribute'),
   }),

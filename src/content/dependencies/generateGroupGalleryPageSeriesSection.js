@@ -1,13 +1,6 @@
 import {sortChronologically} from '#sort';
 
 export default {
-  contentDependencies: [
-    'generateContentHeading',
-    'generateGroupGalleryPageAlbumGrid',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query(series) {
     const query = {};
 

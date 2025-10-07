@@ -1,6 +1,4 @@
 export default {
-  contentDependencies: ['linkStationaryIndex'],
-
   relations: (relation) =>
     ({link:
         relation(

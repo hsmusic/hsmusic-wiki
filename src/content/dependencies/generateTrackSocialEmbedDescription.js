@@ -1,8 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  extraDependencies: ['html', 'language'],
-
   data: (track) => ({
     artistNames:
       track.artistContribs

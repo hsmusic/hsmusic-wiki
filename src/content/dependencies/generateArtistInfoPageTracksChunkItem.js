@@ -2,17 +2,7 @@ import {sortAlbumsTracksChronologically} from '#sort';
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateArtistInfoPageChunkItem',
-    'generateArtistInfoPageFirstReleaseTooltip',
-    'generateArtistInfoPageOtherArtistLinks',
-    'generateArtistInfoPageRereleaseTooltip',
-    'linkTrack',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
-  query (_artist, contribs) {
+  query(_artist, contribs) {
     const query = {};
 
     // TODO: Very mysterious what to do if the set of contributions is,

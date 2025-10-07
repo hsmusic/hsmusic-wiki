@@ -1,9 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: ['linkTrack'],
-  extraDependencies: ['pagePath'],
-
   relations: (relation, track) => ({
     infoLink: relation('linkTrack', track),
   }),

@@ -7,8 +7,6 @@ const indent = text =>
     .join('\n');
 
 export default {
-  extraDependencies: ['html'],
-
   slots: {
     attributes: {
       type: 'attributes',

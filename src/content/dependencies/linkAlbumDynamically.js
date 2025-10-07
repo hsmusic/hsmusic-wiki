@@ -1,14 +1,6 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'linkAlbumCommentary',
-    'linkAlbumGallery',
-    'linkAlbum',
-  ],
-
-  extraDependencies: ['html', 'pagePath'],
-
   relations: (relation, album) => ({
     galleryLink:
       relation('linkAlbumGallery', album),

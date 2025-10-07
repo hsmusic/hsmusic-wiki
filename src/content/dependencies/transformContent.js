@@ -58,26 +58,6 @@ function getArg(node, argKey) {
 }
 
 export default {
-  contentDependencies: [
-    ...(
-      Object.values(replacerSpec)
-        .map(description => description.link)
-        .filter(Boolean)),
-
-    'image',
-    'generateTextWithTooltip',
-    'generateTooltip',
-    'linkExternal',
-  ],
-
-  extraDependencies: [
-    'html',
-    'language',
-    'niceShowAggregate',
-    'to',
-    'wikiData',
-  ],
-
   sprawl(wikiData, content) {
     const find =
       bindFind(wikiData, {

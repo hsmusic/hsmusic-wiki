@@ -1,14 +1,6 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateCoverGrid',
-    'image',
-    'linkAlbum',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query: (album) => ({
     artworks:
       (album.hasCoverArt

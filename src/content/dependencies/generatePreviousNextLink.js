@@ -1,6 +1,4 @@
 export default {
-  extraDependencies: ['html', 'language'],
-
   slots: {
     link: {
       type: 'html',

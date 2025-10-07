@@ -2,14 +2,6 @@ import {sortAlbumsTracksChronologically} from '#sort';
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateColorStyleAttribute',
-    'generateTooltip',
-    'linkOtherReleaseOnArtistInfoPage',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   query: (track) => ({
     rereleases:
       sortAlbumsTracksChronologically(track.allReleases).slice(1),

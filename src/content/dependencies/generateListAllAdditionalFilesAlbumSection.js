@@ -1,13 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateContentHeading',
-    'generateListAllAdditionalFilesAlbumChunk',
-    'generateListAllAdditionalFilesTrackChunk',
-    'linkAlbum',
-  ],
-
-  extraDependencies: ['html'],
-
   relations: (relation, album, property) => ({
     heading:
       relation('generateContentHeading'),

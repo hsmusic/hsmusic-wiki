@@ -1,11 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateSocialEmbed',
-    'generateTrackSocialEmbedDescription',
-  ],
-
-  extraDependencies: ['absoluteTo', 'language'],
-
   relations(relation, track) {
     return {
       socialEmbed:

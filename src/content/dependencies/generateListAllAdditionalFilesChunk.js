@@ -1,9 +1,6 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['linkAdditionalFile'],
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, additionalFiles) => ({
     links:
       additionalFiles

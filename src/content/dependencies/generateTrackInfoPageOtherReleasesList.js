@@ -1,9 +1,6 @@
 import {onlyItem, stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['linkTrack'],
-  extraDependencies: ['html', 'language'],
-
   query(track) {
     const query = {};
 

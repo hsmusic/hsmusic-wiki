@@ -1,14 +1,6 @@
 import {compareArrays} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'generateReleaseInfoContributionsLine',
-    'generateReleaseInfoListenLine',
-    'linkAlbum',
-  ],
-
-  extraDependencies: ['html', 'language'],
-
   relations(relation, track) {
     const relations = {};
 

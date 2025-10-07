@@ -1,7 +1,4 @@
 export default {
-  contentDependencies: ['linkReferencedArtworks', 'linkReferencingArtworks'],
-  extraDependencies: ['html', 'language'],
-
   relations: (relation, artwork) => ({
     referencedArtworksLink:
       relation('linkReferencedArtworks', artwork),

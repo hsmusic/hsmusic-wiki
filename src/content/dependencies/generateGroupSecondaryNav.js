@@ -1,9 +1,4 @@
 export default {
-  contentDependencies: [
-    'generateSecondaryNav',
-    'generateGroupSecondaryNavCategoryPart',
-  ],
-
   relations: (relation, group) => ({
     secondaryNav:
       relation('generateSecondaryNav'),
