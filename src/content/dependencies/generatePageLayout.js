@@ -1,3 +1,5 @@
+import striptags from 'striptags';
+
 import {openAggregate} from '#aggregate';
 import {atOffset, empty, repeat} from '#sugar';
 
@@ -654,11 +656,13 @@ export default {
               language.encapsulate('misc.pageTitle', workingCapsule => {
                 const workingOptions = {};
 
-                workingOptions.title = slots.title;
+                workingOptions.title =
+                  striptags(slots.title.toString());
 
                 if (!html.isBlank(slots.subtitle)) {
                   workingCapsule += '.withSubtitle';
-                  workingOptions.subtitle = slots.subtitle;
+                  workingOptions.subtitle =
+                    striptags(slots.subtitle.toString());
                 }
 
                 const showWikiName =

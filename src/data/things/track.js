@@ -50,6 +50,7 @@ import {
 import {
   commentatorArtists,
   constitutibleArtworkList,
+  contentString,
   contributionList,
   dimensions,
   directory,
@@ -113,6 +114,7 @@ export class Track extends Thing {
     // > Update & expose - Identifying metadata
 
     name: name('Unnamed Track'),
+    nameText: contentString(),
 
     directory: [
       withDirectorySuffix(),
@@ -579,6 +581,7 @@ export class Track extends Thing {
       // Identifying metadata
 
       'Track': {property: 'name'},
+      'Track Text': {property: 'nameText'},
       'Directory': {property: 'directory'},
       'Suffix Directory': {property: 'suffixDirectoryFromAlbum'},
       'Always Reference By Directory': {property: 'alwaysReferenceByDirectory'},

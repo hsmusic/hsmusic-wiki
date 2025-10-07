@@ -71,6 +71,9 @@ export default {
     contentHeading:
       relation('generateContentHeading'),
 
+    name:
+      relation('generateName', track),
+
     releaseInfo:
       relation('generateTrackReleaseInfo', track),
 
@@ -153,7 +156,7 @@ export default {
       relations.layout.slots({
         title:
           language.$(pageCapsule, 'title', {
-            track: data.name,
+            track: relations.name,
           }),
 
         headingMode: 'sticky',
