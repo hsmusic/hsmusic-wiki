@@ -3,7 +3,7 @@ import {inspect as nodeInspect} from 'node:util';
 import {decorateError} from '#aggregate';
 import {colors, decorateTime, ENABLE_COLOR} from '#cli';
 import {Template} from '#html';
-import {annotateFunction, empty, setIntersection} from '#sugar';
+import {empty} from '#sugar';
 
 function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
@@ -13,166 +13,78 @@ const DECORATE_TIME = process.env.HSMUSIC_DEBUG_CONTENT_PERF === '1';
 
 export class ContentFunctionSpecError extends Error {}
 
-export default function contentFunction({
-  contentDependencies = [],
-  extraDependencies = [],
-
-  slots,
-  sprawl,
-  query,
-  relations,
-  data,
-  generate,
-}) {
-  const expectedContentDependencyKeys = new Set(contentDependencies);
-  const expectedExtraDependencyKeys = new Set(extraDependencies);
-
-  // Initial checks. These only need to be run once per description of a
-  // content function, and don't depend on any mutable context (e.g. which
-  // dependencies have been fulfilled so far).
-
-  const overlappingContentExtraDependencyKeys =
-    setIntersection(expectedContentDependencyKeys, expectedExtraDependencyKeys);
-
-  if (!empty(overlappingContentExtraDependencyKeys)) {
-    throw new ContentFunctionSpecError(`Overlap in content and extra dependency keys: ${[...overlappingContentExtraDependencyKeys].join(', ')}`);
-  }
-
-  if (!generate) {
+export default function contentFunction(spec) {
+  if (!spec.generate) {
     throw new ContentFunctionSpecError(`Expected generate function`);
   }
 
-  if (sprawl && !expectedExtraDependencyKeys.has('wikiData')) {
-    throw new ContentFunctionSpecError(`Content functions which sprawl must specify wikiData in extraDependencies`);
+  if (spec.slots) {
+    Template.validateSlotsDescription(spec.slots);
   }
 
-  if (slots && !expectedExtraDependencyKeys.has('html')) {
-    throw new ContentFunctionSpecError(`Content functions with slots must specify html in extraDependencies`);
-  }
-
-  if (slots) {
-    Template.validateSlotsDescription(slots);
-  }
-
-  // Pass all the details to expectDependencies, which will recursively build
-  // up a set of fulfilled dependencies and make functions like `relations`
-  // and `generate` callable only with sufficient fulfilled dependencies.
-
-  return expectDependencies({
-    slots,
-    sprawl,
-    query,
-    relations,
-    data,
-    generate,
-
-    expectedContentDependencyKeys,
-    expectedExtraDependencyKeys,
-    missingContentDependencyKeys: new Set(expectedContentDependencyKeys),
-    missingExtraDependencyKeys: new Set(expectedExtraDependencyKeys),
-    invalidatingDependencyKeys: new Set(),
-    fulfilledDependencyKeys: new Set(),
-    fulfilledDependencies: {},
-  });
+  return expectDependencies(spec);
 }
 
 contentFunction.identifyingSymbol = Symbol(`Is a content function?`);
 
-export function expectDependencies({
-  slots,
-  sprawl,
-  query,
-  relations,
-  data,
-  generate,
-
-  expectedContentDependencyKeys,
-  expectedExtraDependencyKeys,
-  missingContentDependencyKeys,
-  missingExtraDependencyKeys,
-  invalidatingDependencyKeys,
-  fulfilledDependencyKeys,
-  fulfilledDependencies,
-}) {
-  const hasSprawlFunction = !!sprawl;
-  const hasQueryFunction = !!query;
-  const hasRelationsFunction = !!relations;
-  const hasDataFunction = !!data;
-  const hasSlotsDescription = !!slots;
-
-  const isInvalidated = !empty(invalidatingDependencyKeys);
-  const isMissingContentDependencies = !empty(missingContentDependencyKeys);
-  const isMissingExtraDependencies = !empty(missingExtraDependencyKeys);
-
-  let wrappedGenerate;
-
+export function expectDependencies(spec, {
+  boundExtraDependencies = null,
+} = {}) {
   const optionalDecorateTime = (prefix, fn) =>
     (DECORATE_TIME
       ? decorateTime(`${prefix}/${generate.name}`, fn)
       : fn);
 
-  if (isInvalidated) {
-    wrappedGenerate = function() {
-      throw new Error(`Generate invalidated because unfulfilled dependencies provided: ${[...invalidatingDependencyKeys].join(', ')}`);
-    };
+  let generate = ([arg1, arg2], ...extraArgs) => {
+    if (spec.data && !arg1) {
+      throw new Error(`Expected data`);
+    }
 
-    annotateFunction(wrappedGenerate, {name: generate, trait: 'invalidated'});
-    wrappedGenerate.fulfilled = false;
-  } else if (isMissingContentDependencies || isMissingExtraDependencies) {
-    wrappedGenerate = function() {
-      throw new Error(`Dependencies still needed: ${[...missingContentDependencyKeys, ...missingExtraDependencyKeys].join(', ')}`);
-    };
+    if (spec.data && spec.relations && !arg2) {
+      throw new Error(`Expected relations`);
+    }
 
-    annotateFunction(wrappedGenerate, {name: generate, trait: 'unfulfilled'});
-    wrappedGenerate.fulfilled = false;
-  } else {
-    let callUnderlyingGenerate = ([arg1, arg2], ...extraArgs) => {
-      if (hasDataFunction && !arg1) {
-        throw new Error(`Expected data`);
+    if (spec.relations && !arg1) {
+      throw new Error(`Expected relations`);
+    }
+
+    try {
+      if (spec.data && spec.relations) {
+        return spec.generate(arg1, arg2, ...extraArgs, boundExtraDependencies);
+      } else if (spec.data || spec.relations) {
+        return spec.generate(arg1, ...extraArgs, boundExtraDependencies);
+      } else {
+        return spec.generate(...extraArgs, boundExtraDependencies);
       }
+    } catch (caughtError) {
+      const error = new Error(
+        `Error generating content for ${spec.generate.name}`,
+        {cause: caughtError});
 
-      if (hasDataFunction && hasRelationsFunction && !arg2) {
-        throw new Error(`Expected relations`);
-      }
+      error[Symbol.for(`hsmusic.aggregate.alwaysTrace`)] = true;
+      error[Symbol.for(`hsmusic.aggregate.traceFrom`)] = caughtError;
 
-      if (hasRelationsFunction && !arg1) {
-        throw new Error(`Expected relations`);
-      }
+      error[Symbol.for(`hsmusic.aggregate.unhelpfulTraceLines`)] = [
+        /content-function\.js/,
+        /util\/html\.js/,
+      ];
 
-      try {
-        if (hasDataFunction && hasRelationsFunction) {
-          return generate(arg1, arg2, ...extraArgs, fulfilledDependencies);
-        } else if (hasDataFunction || hasRelationsFunction) {
-          return generate(arg1, ...extraArgs, fulfilledDependencies);
-        } else {
-          return generate(...extraArgs, fulfilledDependencies);
-        }
-      } catch (caughtError) {
-        const error = new Error(
-          `Error generating content for ${generate.name}`,
-          {cause: caughtError});
+      error[Symbol.for(`hsmusic.aggregate.helpfulTraceLines`)] = [
+        /content\/dependencies\/(.*\.js:.*(?=\)))/,
+      ];
 
-        error[Symbol.for(`hsmusic.aggregate.alwaysTrace`)] = true;
-        error[Symbol.for(`hsmusic.aggregate.traceFrom`)] = caughtError;
+      throw error;
+    }
+  };
 
-        error[Symbol.for(`hsmusic.aggregate.unhelpfulTraceLines`)] = [
-          /content-function\.js/,
-          /util\/html\.js/,
-        ];
+  generate = optionalDecorateTime(`generate`, generate);
 
-        error[Symbol.for(`hsmusic.aggregate.helpfulTraceLines`)] = [
-          /content\/dependencies\/(.*\.js:.*(?=\)))/,
-        ];
+  if (spec.slots) {
+    const normalGenerate = generate;
 
-        throw error;
-      }
-    };
-
-    callUnderlyingGenerate =
-      optionalDecorateTime(`generate`, callUnderlyingGenerate);
-
-    if (hasSlotsDescription) {
-      const stationery = fulfilledDependencies.html.stationery({
+    let stationery = null;
+    generate = function(...args) {
+      stationery ??= boundExtraDependencies.html.stationery({
         annotation: generate.name,
 
         // These extra slots are for the data and relations (positional) args.
@@ -182,170 +94,49 @@ export function expectDependencies({
         slots: {
           _cfArg1: {validate: v => v.isObject},
           _cfArg2: {validate: v => v.isObject},
-          ...slots,
+          ...spec.slots,
         },
 
         content(slots) {
           const args = [slots._cfArg1, slots._cfArg2];
-          return callUnderlyingGenerate(args, slots);
+          return normalGenerate(args, slots);
         },
       });
 
-      wrappedGenerate = function(...args) {
-        return stationery.template().slots({
-          _cfArg1: args[0] ?? null,
-          _cfArg2: args[1] ?? null,
-        });
-      };
-    } else {
-      wrappedGenerate = function(...args) {
-        return callUnderlyingGenerate(args);
-      };
-    }
-
-    wrappedGenerate.fulfill = function() {
-      throw new Error(`All dependencies already fulfilled (${generate.name})`);
-    };
-
-    annotateFunction(wrappedGenerate, {name: generate, trait: 'fulfilled'});
-    wrappedGenerate.fulfilled = true;
-  }
-
-  wrappedGenerate[contentFunction.identifyingSymbol] = true;
-
-  if (hasSprawlFunction) {
-    wrappedGenerate.sprawl = optionalDecorateTime(`sprawl`, sprawl);
-  }
-
-  if (hasQueryFunction) {
-    wrappedGenerate.query = optionalDecorateTime(`query`, query);
-  }
-
-  if (hasRelationsFunction) {
-    wrappedGenerate.relations = optionalDecorateTime(`relations`, relations);
-  }
-
-  if (hasDataFunction) {
-    wrappedGenerate.data = optionalDecorateTime(`data`, data);
-  }
-
-  wrappedGenerate.fulfill ??= function fulfill(dependencies) {
-    // To avoid unneeded destructuring, `fullfillDependencies` is a mutating
-    // function. But `fulfill` itself isn't meant to mutate! We create a copy
-    // of these variables, so their original values are kept for additional
-    // calls to this same `fulfill`.
-    const newlyMissingContentDependencyKeys = new Set(missingContentDependencyKeys);
-    const newlyMissingExtraDependencyKeys = new Set(missingExtraDependencyKeys);
-    const newlyInvalidatingDependencyKeys = new Set(invalidatingDependencyKeys);
-    const newlyFulfilledDependencyKeys = new Set(fulfilledDependencyKeys);
-    const newlyFulfilledDependencies = {...fulfilledDependencies};
-
-    try {
-      fulfillDependencies(dependencies, {
-        missingContentDependencyKeys: newlyMissingContentDependencyKeys,
-        missingExtraDependencyKeys: newlyMissingExtraDependencyKeys,
-        invalidatingDependencyKeys: newlyInvalidatingDependencyKeys,
-        fulfilledDependencyKeys: newlyFulfilledDependencyKeys,
-        fulfilledDependencies: newlyFulfilledDependencies,
+      return stationery.template().slots({
+        _cfArg1: args[0] ?? null,
+        _cfArg2: args[1] ?? null,
       });
-    } catch (error) {
-      error.message += ` (${generate.name})`;
-      throw error;
-    }
+    };
+  } else {
+    const normalGenerate = generate;
+    generate = (...args) => normalGenerate(args);
+  }
 
-    return expectDependencies({
-      slots,
-      sprawl,
-      query,
-      relations,
-      data,
-      generate,
-
-      expectedContentDependencyKeys,
-      expectedExtraDependencyKeys,
-      missingContentDependencyKeys: newlyMissingContentDependencyKeys,
-      missingExtraDependencyKeys: newlyMissingExtraDependencyKeys,
-      invalidatingDependencyKeys: newlyInvalidatingDependencyKeys,
-      fulfilledDependencyKeys: newlyFulfilledDependencyKeys,
-      fulfilledDependencies: newlyFulfilledDependencies,
-    });
-
+  generate.fulfill = function() {
+    throw new Error(`not part of the flow`);
   };
 
-  Object.assign(wrappedGenerate, {
-    contentDependencies: expectedContentDependencyKeys,
-    extraDependencies: expectedExtraDependencyKeys,
+  Object.defineProperty(generate, 'fulfilled', {
+    get() {
+      throw new Error(`unknowable`);
+    }
   });
 
-  return wrappedGenerate;
-}
+  generate[contentFunction.identifyingSymbol] = true;
 
-export function fulfillDependencies(dependencies, {
-  missingContentDependencyKeys,
-  missingExtraDependencyKeys,
-  invalidatingDependencyKeys,
-  fulfilledDependencyKeys,
-  fulfilledDependencies,
-}) {
-  // This is a mutating function. Be aware: it WILL mutate the provided sets
-  // and objects EVEN IF there are errors. This function doesn't exit early,
-  // so all provided dependencies which don't have an associated error should
-  // be treated as fulfilled (this is reflected via fulfilledDependencyKeys).
-
-  const errors = [];
-
-  for (let [key, value] of Object.entries(dependencies)) {
-    if (fulfilledDependencyKeys.has(key)) {
-      errors.push(new Error(`Dependency ${key} is already fulfilled`));
-      continue;
+  for (const key of ['sprawl', 'query', 'relations', 'data']) {
+    if (spec[key]) {
+      generate[key] = optionalDecorateTime(`sprawl`, spec[key]);
     }
-
-    const isContentKey = missingContentDependencyKeys.has(key);
-    const isExtraKey = missingExtraDependencyKeys.has(key);
-
-    if (!isContentKey && !isExtraKey) {
-      errors.push(new Error(`Dependency ${key} is not expected`));
-      continue;
-    }
-
-    if (value === undefined) {
-      errors.push(new Error(`Dependency ${key} was provided undefined`));
-      continue;
-    }
-
-    const isContentFunction =
-      !!value?.[contentFunction.identifyingSymbol];
-
-    const isFulfilledContentFunction =
-      isContentFunction && value.fulfilled;
-
-    if (isContentKey) {
-      if (!isContentFunction) {
-        errors.push(new Error(`Content dependency ${key} is not a content function (got ${value})`));
-        continue;
-      }
-
-      if (!isFulfilledContentFunction) {
-        invalidatingDependencyKeys.add(key);
-      }
-
-      missingContentDependencyKeys.delete(key);
-    } else if (isExtraKey) {
-      if (isContentFunction) {
-        errors.push(new Error(`Extra dependency ${key} is a content function`));
-        continue;
-      }
-
-      missingExtraDependencyKeys.delete(key);
-    }
-
-    fulfilledDependencyKeys.add(key);
-    fulfilledDependencies[key] = value;
   }
 
-  if (!empty(errors)) {
-    throw new AggregateError(errors, `Errors fulfilling dependencies`);
-  }
+  generate.bindExtraDependencies = (extraDependencies) =>
+    expectDependencies(spec, {
+      boundExtraDependencies: extraDependencies,
+    });
+
+  return generate;
 }
 
 export function getArgsForRelationsAndData(contentFunction, wikiData, ...args) {
@@ -393,8 +184,6 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
     };
 
     if (contentFunction.relations) {
-      const listedDependencies = new Set(contentFunction.contentDependencies);
-
       // Note: "slots" here is a completely separate concept from HTML template
       // slots, which are handled completely within the content function. Here,
       // relation slots are just references to a position within the relations
@@ -408,10 +197,6 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
       })();
 
       const relationFunction = (name, ...args) => {
-        if (!listedDependencies.has(name)) {
-          throw new Error(`Called relation('${name}') but ${contentFunctionName} doesn't list that dependency`);
-        }
-
         const relationSymbol = Symbol(relationSymbolMessage(name));
         const traceError = new Error();
 
@@ -502,22 +287,6 @@ export function fillRelationsLayoutFromSlotResults(relationIdentifier, results, 
   return recursive(layout);
 }
 
-export function getNeededContentDependencyNames(contentDependencies, name) {
-  const set = new Set();
-
-  function recursive(name) {
-    const contentFunction = contentDependencies[name];
-    for (const dependencyName of contentFunction?.contentDependencies ?? []) {
-      recursive(dependencyName);
-    }
-    set.add(name);
-  }
-
-  recursive(name);
-
-  return set;
-}
-
 export const decorateErrorWithRelationStack = (fn, traceStack) =>
   decorateError(fn, caughtError => {
     let cause = caughtError;
@@ -579,65 +348,10 @@ export function quickEvaluate({
   const flatTreeInfo = flattenRelationsTree(treeInfo);
   const {root, relationIdentifier, flatRelationSlots} = flatTreeInfo;
 
-  const neededContentDependencyNames =
-    getNeededContentDependencyNames(allContentDependencies, name);
-
-  // Content functions aren't recursive, so by following the set above
-  // sequentually, we will always provide fulfilled content functions as the
-  // dependencies for later content functions.
-  const fulfilledContentDependencies = {};
-  for (const name of neededContentDependencyNames) {
-    const unfulfilledContentFunction = allContentDependencies[name];
-    if (!unfulfilledContentFunction) continue;
-
-    const {contentDependencies, extraDependencies} = unfulfilledContentFunction;
-
-    if (empty(contentDependencies) && empty(extraDependencies)) {
-      fulfilledContentDependencies[name] = unfulfilledContentFunction;
-      continue;
-    }
-
-    const fulfillments = {};
-
-    for (const dependencyName of contentDependencies ?? []) {
-      if (dependencyName in fulfilledContentDependencies) {
-        fulfillments[dependencyName] =
-          fulfilledContentDependencies[dependencyName];
-      }
-    }
-
-    for (const dependencyName of extraDependencies ?? []) {
-      if (dependencyName in allExtraDependencies) {
-        fulfillments[dependencyName] =
-          allExtraDependencies[dependencyName];
-      }
-    }
-
-    fulfilledContentDependencies[name] =
-      unfulfilledContentFunction.fulfill(fulfillments);
-  }
-
-  // There might still be unfulfilled content functions if dependencies weren't
-  // provided as part of allContentDependencies or allExtraDependencies.
-  // Catch and report these early, together in an aggregate error.
-  const unfulfilledErrors = [];
-  const unfulfilledNames = [];
-  for (const name of neededContentDependencyNames) {
-    const contentFunction = fulfilledContentDependencies[name];
-    if (!contentFunction) continue;
-    if (!contentFunction.fulfilled) {
-      try {
-        contentFunction();
-      } catch (error) {
-        error.message = `(${name}) ${error.message}`;
-        unfulfilledErrors.push(error);
-        unfulfilledNames.push(name);
-      }
-    }
-  }
-
-  if (!empty(unfulfilledErrors)) {
-    throw new AggregateError(unfulfilledErrors, `Content functions unfulfilled (${unfulfilledNames.join(', ')})`);
+  allContentDependencies = {...allContentDependencies};
+  for (const [name, contentFunction] of Object.entries(allContentDependencies)) {
+    allContentDependencies[name] =
+      contentFunction.bindExtraDependencies(allExtraDependencies);
   }
 
   const slotResults = {};
@@ -646,10 +360,9 @@ export function quickEvaluate({
     const callDecorated = (fn, ...args) =>
       decorateErrorWithRelationStack(fn, traceStack)(...args);
 
-    const contentFunction = fulfilledContentDependencies[name];
-
+    const contentFunction = allContentDependencies[name];
     if (!contentFunction) {
-      throw new Error(`Content function ${name} unfulfilled or not listed`);
+      throw new Error(`Content function ${name} not listed`);
     }
 
     const generateArgs = [];
