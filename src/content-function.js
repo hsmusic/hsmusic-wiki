@@ -13,6 +13,14 @@ const DECORATE_TIME = process.env.HSMUSIC_DEBUG_CONTENT_PERF === '1';
 
 export class ContentFunctionSpecError extends Error {}
 
+function optionalDecorateTime(prefix, fn) {
+  if (DECORATE_TIME) {
+    return decorateTime(`${prefix}/${generate.name}`, fn);
+  } else {
+    return fn;
+  }
+}
+
 export default function contentFunction(spec) {
   if (!spec.generate) {
     throw new ContentFunctionSpecError(`Expected generate function`);
@@ -22,19 +30,34 @@ export default function contentFunction(spec) {
     Template.validateSlotsDescription(spec.slots);
   }
 
-  return expectDependencies(spec);
+  return expectExtraDependencies(spec, null);
 }
 
 contentFunction.identifyingSymbol = Symbol(`Is a content function?`);
 
-export function expectDependencies(spec, {
-  boundExtraDependencies = null,
-} = {}) {
-  const optionalDecorateTime = (prefix, fn) =>
-    (DECORATE_TIME
-      ? decorateTime(`${prefix}/${generate.name}`, fn)
-      : fn);
+export function expectExtraDependencies(spec, boundExtraDependencies) {
+  const generate =
+    (boundExtraDependencies
+      ? prepareWorkingGenerateFunction(spec, boundExtraDependencies)
+      : () => {
+          throw new Error(`Not bound with extraDependencies yet`);
+        });
 
+  generate[contentFunction.identifyingSymbol] = true;
+
+  for (const key of ['sprawl', 'query', 'relations', 'data']) {
+    if (spec[key]) {
+      generate[key] = optionalDecorateTime(`sprawl`, spec[key]);
+    }
+  }
+
+  generate.bindExtraDependencies = (extraDependencies) =>
+    expectExtraDependencies(spec, extraDependencies);
+
+  return generate;
+}
+
+function prepareWorkingGenerateFunction(spec, boundExtraDependencies) {
   let generate = ([arg1, arg2], ...extraArgs) => {
     if (spec.data && !arg1) {
       throw new Error(`Expected data`);
@@ -80,10 +103,8 @@ export function expectDependencies(spec, {
   generate = optionalDecorateTime(`generate`, generate);
 
   if (spec.slots) {
-    const normalGenerate = generate;
-
     let stationery = null;
-    generate = function(...args) {
+    return (...args) => {
       stationery ??= boundExtraDependencies.html.stationery({
         annotation: generate.name,
 
@@ -99,7 +120,7 @@ export function expectDependencies(spec, {
 
         content(slots) {
           const args = [slots._cfArg1, slots._cfArg2];
-          return normalGenerate(args, slots);
+          return generate(args, slots);
         },
       });
 
@@ -108,35 +129,9 @@ export function expectDependencies(spec, {
         _cfArg2: args[1] ?? null,
       });
     };
-  } else {
-    const normalGenerate = generate;
-    generate = (...args) => normalGenerate(args);
   }
 
-  generate.fulfill = function() {
-    throw new Error(`not part of the flow`);
-  };
-
-  Object.defineProperty(generate, 'fulfilled', {
-    get() {
-      throw new Error(`unknowable`);
-    }
-  });
-
-  generate[contentFunction.identifyingSymbol] = true;
-
-  for (const key of ['sprawl', 'query', 'relations', 'data']) {
-    if (spec[key]) {
-      generate[key] = optionalDecorateTime(`sprawl`, spec[key]);
-    }
-  }
-
-  generate.bindExtraDependencies = (extraDependencies) =>
-    expectDependencies(spec, {
-      boundExtraDependencies: extraDependencies,
-    });
-
-  return generate;
+  return (...args) => generate(args);
 }
 
 export function getArgsForRelationsAndData(contentFunction, wikiData, ...args) {
