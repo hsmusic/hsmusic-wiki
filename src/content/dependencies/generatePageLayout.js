@@ -673,7 +673,7 @@ export default {
                   workingCapsule += '.withSubtitle';
                   workingOptions.subtitle =
                     html.tags([
-                      striptags(slots.subtitle.toString());
+                      striptags(slots.subtitle.toString()),
                     ]);
                 }
 
