@@ -1,8 +1,9 @@
 import {input, templateCompositeFrom} from '#composite';
 
 import {withResultOfAvailabilityCheck} from '#composite/control-flow';
+import {withPropertyFromObject} from '#composite/data';
 
-import withPropertyFromAlbum from './withPropertyFromAlbum.js';
+import withContainingTrackSection from './withContainingTrackSection.js';
 
 export default templateCompositeFrom({
   annotation: `withSuffixDirectoryFromAlbum`,
@@ -36,18 +37,13 @@ export default templateCompositeFrom({
           : continuation()),
     },
 
-    withPropertyFromAlbum({
-      property: input.value('suffixTrackDirectories'),
-    }),
+    withContainingTrackSection(),
 
-    {
-      dependencies: ['#album.suffixTrackDirectories'],
-      compute: (continuation, {
-        ['#album.suffixTrackDirectories']: suffixTrackDirectories,
-      }) => continuation({
-        ['#suffixDirectoryFromAlbum']:
-          suffixTrackDirectories,
-      }),
-    },
+    withPropertyFromObject({
+      object: '#trackSection',
+      property: input.value('suffixTrackDirectories'),
+    }).outputs({
+      '#trackSection.suffixTrackDirectories': '#suffixDirectoryFromAlbum',
+    }),
   ],
 });
