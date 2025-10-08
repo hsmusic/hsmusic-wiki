@@ -8,8 +8,11 @@ import {input, templateCompositeFrom} from '#composite';
 import {onlyItem} from '#sugar';
 import {getKebabCase} from '#wiki-data';
 
-import {exitWithoutDependency, withResultOfAvailabilityCheck}
-  from '#composite/control-flow';
+import {
+  exitWithoutDependency,
+  withAvailabilityFilter,
+  withResultOfAvailabilityCheck,
+} from '#composite/control-flow';
 
 import {
   withFilteredList,
@@ -112,6 +115,30 @@ export default templateCompositeFrom({
     withPropertyFromObject({
       object: '#mainRelease',
       property: input.value('tracks'),
+    }),
+
+    withPropertyFromList({
+      list: '#mainRelease.tracks',
+      property: input.value('mainRelease'),
+      internal: input.value(true),
+    }),
+
+    withAvailabilityFilter({
+      from: '#mainRelease.tracks.mainRelease',
+    }),
+
+    withMappedList({
+      list: '#availabilityFilter',
+      map: input.value(item => !item),
+    }).outputs({
+      '#mappedList': '#availabilityFilter',
+    }),
+
+    withFilteredList({
+      list: '#mainRelease.tracks',
+      filter: '#availabilityFilter',
+    }).outputs({
+      '#filteredList': '#mainRelease.tracks',
     }),
 
     withPropertyFromList({
