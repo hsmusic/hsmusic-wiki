@@ -24,8 +24,6 @@ function bindSearchUtilities({
   thumbsCache,
   urls,
 }) {
-  // TODO: :boom:
-
   const bound = {
     urls,
   };
