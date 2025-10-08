@@ -9,7 +9,8 @@ import FlexSearch from 'flexsearch';
 import {pack} from 'msgpackr';
 
 import {logWarn} from '#cli';
-import {makeSearchIndex, populateSearchIndex, searchSpec} from '#search-spec';
+import {makeSearchIndex, populateSearchIndex} from '#search-shape';
+import searchSpec from '#search-select';
 import {stitchArrays} from '#sugar';
 import {checkIfImagePathHasCachedThumbnails, getThumbnailEqualOrSmaller}
   from '#thumbs';

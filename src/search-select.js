@@ -1,4 +1,8 @@
-// Index structures shared by client and server, and relevant interfaces.
+// Complements the specs in search-shape.js with the functions that actually
+// process live wiki data into records that are appropriate for storage.
+// These files totally go together, so read them side by side, okay?
+
+import baseSearchSpec from '#search-shape';
 
 function prepareArtwork(artwork, thing, {
   checkIfImagePathHasCachedThumbnails,
@@ -65,14 +69,7 @@ function baselineProcess(thing, opts) {
   return fields;
 }
 
-const baselineStore = [
-  'primaryName',
-  'disambiguator',
-  'artwork',
-  'color',
-];
-
-function genericQuery(wikiData) {
+function genericSelect(wikiData) {
   const groupOrder =
     wikiData.wikiInfo.divideTrackListsByGroups;
 
@@ -108,7 +105,7 @@ function genericQuery(wikiData) {
 
     sortByGroupRank(
       wikiData.trackData
-        .filter(track => !track.mainReleaseTrack)),
+        .filter(track => track.isMainRelease)),
   ].flat();
 }
 
@@ -197,96 +194,20 @@ function genericProcess(thing, opts) {
   return fields;
 }
 
-const genericStore = baselineStore;
-
-export const searchSpec = {
+const spiffySearchSpec = {
   generic: {
-    query: genericQuery,
+    ...baseSearchSpec.generic,
+
+    select: genericSelect,
     process: genericProcess,
-
-    index: [
-      'primaryName',
-      'parentName',
-      'artTags',
-      'additionalNames',
-      'contributors',
-      'groups',
-    ].map(field => ({field, tokenize: 'forward'})),
-
-    store: genericStore,
   },
 
   verbatim: {
-    query: genericQuery,
+    ...baseSearchSpec.verbatim,
+
+    select: genericSelect,
     process: genericProcess,
-
-    index: [
-      'primaryName',
-      'parentName',
-      'artTags',
-      'additionalNames',
-      'contributors',
-      'groups',
-    ],
-
-    store: genericStore,
   },
 };
 
-export function makeSearchIndex(descriptor, {FlexSearch}) {
-  return new FlexSearch.Document({
-    id: 'reference',
-    index: descriptor.index,
-    store: descriptor.store,
-
-    // Disable scoring, always return results according to provided order
-    // (specified above in `genericQuery`, etc).
-    resolution: 1,
-  });
-}
-
-// TODO: This function basically mirrors bind-utilities.js, which isn't
-// exactly robust, but... binding might need some more thought across the
-// codebase in *general.*
-function bindSearchUtilities({
-  checkIfImagePathHasCachedThumbnails,
-  getThumbnailEqualOrSmaller,
-  thumbsCache,
-  urls,
-}) {
-  const bound = {
-    urls,
-  };
-
-  bound.checkIfImagePathHasCachedThumbnails =
-    (imagePath) =>
-      checkIfImagePathHasCachedThumbnails(imagePath, thumbsCache);
-
-  bound.getThumbnailEqualOrSmaller =
-    (preferred, imagePath) =>
-      getThumbnailEqualOrSmaller(preferred, imagePath, thumbsCache);
-
-  return bound;
-}
-
-export function populateSearchIndex(index, descriptor, opts) {
-  const {wikiData} = opts;
-  const bound = bindSearchUtilities(opts);
-
-  const collection = descriptor.query(wikiData);
-
-  for (const thing of collection) {
-    const reference = thing.constructor.getReference(thing);
-
-    let processed;
-    try {
-      processed = descriptor.process(thing, bound);
-    } catch (caughtError) {
-      throw new Error(
-        `Failed to process searchable thing ${reference}`,
-        {cause: caughtError});
-    }
-
-    index.add({reference, ...processed});
-  }
-}
+export default spiffySearchSpec;

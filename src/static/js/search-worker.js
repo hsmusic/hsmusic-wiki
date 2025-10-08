@@ -2,7 +2,8 @@
 
 import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
 
-import {makeSearchIndex, searchSpec} from '../shared-util/search-spec.js';
+import {default as searchSpec, makeSearchIndex}
+  from '../shared-util/search-shape.js';
 
 import {
   empty,
