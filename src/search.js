@@ -39,16 +39,13 @@ function bindSearchUtilities({
   return bound;
 }
 
-function populateSearchIndex(index, descriptor, opts) {
-  const {wikiData} = opts;
-  const bound = bindSearchUtilities(opts);
-
+function populateSearchIndex(index, descriptor, wikiData, utilities) {
   for (const thing of descriptor.select(wikiData)) {
     const reference = thing.constructor.getReference(thing);
 
     let processed;
     try {
-      processed = descriptor.process(thing, bound);
+      processed = descriptor.process(thing, utilities);
     } catch (caughtError) {
       throw new Error(
         `Failed to process searchable thing ${reference}`,
@@ -105,17 +102,20 @@ export async function writeSearchData({
       .map(descriptor =>
         makeSearchIndex(descriptor, {FlexSearch}));
 
+  const utilities =
+    bindSearchUtilities({
+      checkIfImagePathHasCachedThumbnails,
+      getThumbnailEqualOrSmaller,
+      thumbsCache,
+      urls,
+      wikiData,
+    });
+
   stitchArrays({
     index: indexes,
     descriptor: descriptors,
   }).forEach(({index, descriptor}) =>
-      populateSearchIndex(index, descriptor, {
-        checkIfImagePathHasCachedThumbnails,
-        getThumbnailEqualOrSmaller,
-        thumbsCache,
-        urls,
-        wikiData,
-      }));
+      populateSearchIndex(index, descriptor, wikiData, utilities));
 
   const serializedIndexes =
     await Promise.all(indexes.map(serializeIndex));
