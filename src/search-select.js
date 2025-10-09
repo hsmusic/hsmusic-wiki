@@ -3,6 +3,7 @@
 // These files totally go together, so read them side by side, okay?
 
 import baseSearchSpec from '#search-shape';
+import {getKebabCase} from '#wiki-data';
 
 function prepareArtwork(artwork, thing, {
   checkIfImagePathHasCachedThumbnails,
@@ -105,7 +106,10 @@ function genericSelect(wikiData) {
 
     sortByGroupRank(
       wikiData.trackData
-        .filter(track => track.isMainRelease)),
+        .filter(track =>
+          track.isMainRelease ||
+          (getKebabCase(track.name) !==
+           getKebabCase(track.mainReleaseTrack.name)))),
   ].flat();
 }
 
