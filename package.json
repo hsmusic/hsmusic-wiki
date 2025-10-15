@@ -84,9 +84,5 @@
         "chokidar": "^3.5.3",
         "tap": "^21.1.1",
         "tcompare": "^6.0.0"
-    },
-    "tap": {
-        "coverage": false,
-        "coverage-report": false
     }
 }
