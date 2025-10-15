@@ -11,16 +11,21 @@ import {quickEvaluate} from '#content-function';
 import * as html from '#html';
 import {internalDefaultStringsFile, processLanguageFile} from '#language';
 import {empty} from '#sugar';
-import {generateURLs, thumb, urlSpec} from '#urls';
+
+import {
+  applyLocalizedWithBaseDirectory,
+  generateURLs,
+  internalDefaultURLSpecFile,
+  processURLSpecFromFileSync,
+  thumb,
+} from '#urls';
 
 import mock from './generic-mock.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-function cleanURLSpec(reference) {
-  const prepared = structuredClone(reference);
-
-  for (const spec of Object.values(prepared)) {
+function cleanURLSpec(urlSpec) {
+  for (const spec of Object.values(urlSpec)) {
     if (spec.prefix) {
       // Strip out STATIC_VERSION. This updates fairly regularly and we
       // don't want it to affect snapshot tests.
@@ -28,12 +33,23 @@ function cleanURLSpec(reference) {
         .replace(/static-\d+[a-z]\d+/i, 'static');
     }
   }
+}
 
-  return prepared;
+function urlsPlease() {
+  const {aggregate: urlsAggregate, result: urlSpec} =
+    processURLSpecFromFileSync(internalDefaultURLSpecFile);
+
+  urlsAggregate.close();
+
+  applyLocalizedWithBaseDirectory(urlSpec);
+
+  cleanURLSpec(urlSpec);
+
+  return generateURLs(urlSpec);
 }
 
 export function testContentFunctions(t, message, fn) {
-  const urls = generateURLs(cleanURLSpec(urlSpec));
+  const urls = urlsPlease();
 
   t.test(message, async t => {
     let loadedContentDependencies;

@@ -1,6 +1,7 @@
 // Exports defined here are re-exported through urls.js,
 // so they're generally imported from '#urls'.
 
+import {readFileSync} from 'node:fs';
 import {readFile} from 'node:fs/promises';
 import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -195,6 +196,24 @@ export async function processURLSpecFromFile(file) {
       error => annotateErrorWithFile(error, file));
   }
 
+  return processURLSpecFromFileContents(file, contents);
+}
+
+export function processURLSpecFromFileSync(file) {
+  let contents;
+
+  try {
+    contents = readFileSync(file, 'utf-8');
+  } catch (caughtError) {
+    throw annotateError(
+      new Error(`Failed to read URL spec file`, {cause: caughtError}),
+      error => annotateErrorWithFile(error, file));
+  }
+
+  return processURLSpecFromFileContents(file, contents);
+}
+
+function processURLSpecFromFileContents(file, contents) {
   let sourceSpec;
   let parseLanguage;
 
