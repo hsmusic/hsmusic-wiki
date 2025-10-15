@@ -545,7 +545,7 @@ t.test(`html.template`, t => {
         slots.slot1,
         slots.slot2,
         slots.slot3,
-        `(length: ${slots.slot4.length})`,
+        `(is null: ${slots.slot4 === null})`,
       ].join(' '));
     },
   });
@@ -557,7 +557,7 @@ t.test(`html.template`, t => {
     slot4: '',
   });
 
-  t.equal(template3.toString(), `<span>123 0 false (length: 0)</span>`);
+  t.equal(template3.toString(), `<span>123 0 false (is null: true)</span>`);
 });
 
 t.test(`Template - description errors`, t => {
