@@ -3,136 +3,153 @@
 export const info = {
   id: 'abcRender',
 
-  status: "unloaded"
+  status: "unloaded",
+
+  settings: {
+    visualParamsFull: {
+      add_classes: true,
+      responsive: 'resize',
+      selectTypes: false,
+    },
+
+    visualParamsTip: {
+      selectTypes: false,
+      staffwidth: 300,
+      scale: 0.8,
+    },
+
+    audioParamsFull: {
+      displayLoop: false,
+      displayRestart: false,
+      displayPlay: true,
+      displayProgress: true,
+      displayWarp: true,
+    },
+
+    audioParamsTip: {
+      displayLoop: false,
+      displayRestart: false,
+      displayPlay: true,
+      displayProgress: true,
+      displayWarp: false,
+    },
+  },
 };
 
 const abcjs = window.ABCJS;
 
-var visualParams = {
-  add_classes: true,
-  responsive: "resize",
-  selectTypes: false
-};
+class CursorControl {
+  #visualTarget;
+  #controlsTarget;
+  #cursor;
 
-var visualParamsTip = {
-  selectTypes: false,
-  staffwidth: 300,
-  scale: 0.8
-};
+  beatSubdivisions = 2;
 
-var audioParams = {
-  displayLoop: false,
-  displayRestart: false,
-  displayPlay: true,
-  displayProgress: true,
-  displayWarp: true
-};
+  constructor(visualTarget, controlsTarget) {
+    this.#visualTarget = visualTarget;
+    this.#controlsTarget = controlsTarget;
+  }
 
-var audioParamsTip = {
-  displayLoop: false,
-  displayRestart: false,
-  displayPlay: true,
-  displayProgress: true,
-  displayWarp: false
-};
+  onReady() {}
 
-function CursorControl(el_visual, el_control) {
-  var self = this;
+  onStart() {
+    const svg = this.#visualTarget.querySelector("svg");
+    this.#cursor = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    this.#cursor.setAttribute("class", "abcjs-cursor");
+    this.#cursor.setAttributeNS(null, 'x1', 0);
+    this.#cursor.setAttributeNS(null, 'y1', 0);
+    this.#cursor.setAttributeNS(null, 'x2', 0);
+    this.#cursor.setAttributeNS(null, 'y2', 0);
+    svg.appendChild(this.#cursor);
+  }
 
-  self.onReady = function() { };
-  self.onStart = function() {
-    var svg = el_visual.querySelector("svg");
-    var cursor = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    cursor.setAttribute("class", "abcjs-cursor");
-    cursor.setAttributeNS(null, 'x1', 0);
-    cursor.setAttributeNS(null, 'y1', 0);
-    cursor.setAttributeNS(null, 'x2', 0);
-    cursor.setAttributeNS(null, 'y2', 0);
-    svg.appendChild(cursor);
+  onBeat(_beatNumber, _totalBeats, _totalTime) {}
 
-  };
-  self.beatSubdivisions = 2;
-  self.onBeat = function(beatNumber, totalBeats, totalTime) { };
-  self.onEvent = function(ev) {
-    if (ev.measureStart && ev.left === null)
-      return; // this was the second part of a tie across a measure line. Just ignore it.
-
-    var lastSelection = document.querySelectorAll("#paper svg .highlight");
-    for (var k = 0; k < lastSelection.length; k++)
-      lastSelection[k].classList.remove("highlight");
-
-    for (var i = 0; i < ev.elements.length; i++ ) {
-      var note = ev.elements[i];
-      for (var j = 0; j < note.length; j++) {
-        note[j].classList.add("highlight");
-      }
+  onEvent(event) {
+    if (event.measureStart && event.left === null) {
+      // this was the second part of a tie across a measure line. Just ignore it.
+      return;
     }
 
-    var cursor = el_visual.querySelector("svg .abcjs-cursor");
-    if (cursor) {
-      cursor.setAttribute("x1", ev.left - 2);
-      cursor.setAttribute("x2", ev.left - 2);
-      cursor.setAttribute("y1", ev.top);
-      cursor.setAttribute("y2", ev.top + ev.height);
+    for (const g of document.querySelectorAll('#paper svg g.highlight')) {
+      g.classList.remove('highlight');
     }
-  };
-  self.onFinished = function() {
-    var els = el_visual.querySelectorAll("svg .highlight");
-    for (var i = 0; i < els.length; i++ ) {
-      els[i].classList.remove("highlight");
+
+    for (const g of event.elements.flat()) {
+      g.classList.add('highlight');
     }
-    var cursor = el_visual.querySelector("svg .abcjs-cursor");
-    if (cursor) {
-      cursor.setAttribute("x1", 0);
-      cursor.setAttribute("x2", 0);
-      cursor.setAttribute("y1", 0);
-      cursor.setAttribute("y2", 0);
+
+    if (this.#cursor) {
+      this.#cursor.setAttribute('x1', event.left - 2);
+      this.#cursor.setAttribute('x2', event.left - 2);
+      this.#cursor.setAttribute('y1', event.top);
+      this.#cursor.setAttribute('y2', event.top + event.height);
     }
-  };
+  }
+
+  onFinished() {
+    for (const g of this.#visualTarget.querySelectorAll("svg g.highlight")) {
+      g.classList.remove('highlight');
+    }
+
+    if (this.#cursor) {
+      this.#cursor.setAttribute('x1', 0);
+      this.#cursor.setAttribute('x2', 0);
+      this.#cursor.setAttribute('y1', 0);
+      this.#cursor.setAttribute('y2', 0);
+    }
+  }
 }
 
-function buildPlayer(tune, el_visual, el_control, params, audioParams) {
-  // Render sheet music
-  var [visualObj] = abcjs.renderAbc(el_visual, tune, params);
+async function buildPlayer(tune, {
+  visualTarget,
+  controlsTarget,
+  visualParams,
+  audioParams,
+}) {
+  const [visualObj] = abcjs.renderAbc(visualTarget, tune, visualParams);
 
-  if (el_control && abcjs.synth.supportsAudio()) {
-    var cursorControl = new CursorControl(el_visual, el_control);
-    var synthControl = new abcjs.synth.SynthController();
+  if (controlsTarget && abcjs.synth.supportsAudio()) {
+    const cursorControl = new CursorControl(visualTarget, controlsTarget);
+    const synthControl = new abcjs.synth.SynthController();
 
-    synthControl.load(el_control, cursorControl, audioParams);
+    synthControl.load(controlsTarget, cursorControl, audioParams);
     synthControl.disable(true);
 
-    var midiBuffer = new abcjs.synth.CreateSynth();
-    midiBuffer.init({
-      visualObj: visualObj,
-    }).then(function (response) {
-      if (synthControl) {
-        synthControl.setTune(visualObj).then(function (response) {
-          console.log("Audio successfully loaded.")
-        }).catch(function (error) {
-          console.warn("Audio problem:", error);
-        });
-      }
-    }).catch(function (error) {
+    const midiBuffer = new abcjs.synth.CreateSynth();
+
+    try {
+      await midiBuffer.init({visualObj});
+      await synthControl.setTune(visualObj);
+    } catch {
       console.warn("Audio problem:", error);
-    });
+      console.warn("...for tune:\n" + tune);
+    }
   }
 }
 
 export function mutatePageContent() {
   if (!abcjs) return;
 
+  const {settings} = info;
+
   for (const abcwrapper of document.querySelectorAll(".abc-full[data-notation]")) {
-    let tune = JSON.parse(abcwrapper.dataset.notation);
-    let el_visual = abcwrapper.querySelector(".motif-sheet");
-    let el_control = abcwrapper.querySelector(".motif-control");
-    buildPlayer(tune, el_visual, el_control, visualParams, audioParams);
+    const tune = JSON.parse(abcwrapper.dataset.notation);
+    buildPlayer(tune, {
+      visualTarget: abcwrapper.querySelector(".motif-sheet"),
+      controlsTarget: abcwrapper.querySelector(".motif-control"),
+      visualParams: settings.visualParamsFull,
+      audioParams: settings.audioParamsFull,
+    });
   }
 
   for (const abcwrapper of document.querySelectorAll(".abc-tip[data-notation]")) {
-    let tune = JSON.parse(abcwrapper.dataset.notation);
-    let el_visual = abcwrapper.querySelector(".motif-sheet");
-    let el_control = abcwrapper.querySelector(".motif-control");
-    buildPlayer(tune, el_visual, el_control, visualParamsTip);
+    const tune = JSON.parse(abcwrapper.dataset.notation);
+    buildPlayer(tune, {
+      visualTarget: abcwrapper.querySelector(".motif-sheet"),
+      controlsTarget: abcwrapper.querySelector(".motif-control"),
+      visualParams: settings.visualParamsTip,
+      audioParams: null, // settings.audioParamsTip
+    });
   }
 }
