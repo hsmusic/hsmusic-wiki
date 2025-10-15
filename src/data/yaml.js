@@ -463,7 +463,7 @@ export class FieldCombinationError extends Error {
 
     const causeMessage =
       (typeof message === 'function'
-        ? message(filteredFields)
+        ? message(filteredDocument)
      : typeof message === 'string'
         ? message
         : null);
