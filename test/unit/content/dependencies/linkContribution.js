@@ -1,7 +1,7 @@
 import t from 'tap';
 import {testContentFunctions} from '#test-lib';
 
-t.test('generateContributionLinks (unit)', async t => {
+t.test('linkContribution (unit)', async t => {
   const artist1 = {
     name: 'Clark Powell',
     directory: 'clark-powell',
@@ -24,7 +24,15 @@ t.test('generateContributionLinks (unit)', async t => {
   const annotation2 = 'Snooping';
   const annotation3 = 'Arrangement';
 
-  await testContentFunctions(t, 'generateContributionLinks (unit 1)', async (t, evaluate) => {
+  const thing1 = {};
+  const thing2 = {};
+  const thing3 = {};
+
+  const contribution1 = {artist: artist1, annotation: annotation1, thing: thing1};
+  const contribution2 = {artist: artist2, annotation: annotation2, thing: thing2};
+  const contribution3 = {artist: artist3, annotation: annotation3, thing: thing3};
+
+  await testContentFunctions(t, 'linkContribution (unit 1)', async (t, evaluate) => {
     const slots = {
       showAnnotation: true,
       showExternalLinks: true,
@@ -71,15 +79,15 @@ t.test('generateContributionLinks (unit)', async t => {
     evaluate({
       name: 'linkContribution',
       multiple: [
-        {args: [{artist: artist1, annotation: annotation1}]},
-        {args: [{artist: artist2, annotation: annotation2}]},
-        {args: [{artist: artist3, annotation: annotation3}]},
+        {args: [contribution1]},
+        {args: [contribution2]},
+        {args: [contribution3]},
       ],
       slots,
     });
   });
 
-  await testContentFunctions(t, 'generateContributionLinks (unit 2)', async (t, evaluate) => {
+  await testContentFunctions(t, 'linkContribution (unit 2)', async (t, evaluate) => {
     const slots = {
       showAnnotation: false,
       showExternalLinks: false,
@@ -127,9 +135,9 @@ t.test('generateContributionLinks (unit)', async t => {
     evaluate({
       name: 'linkContribution',
       multiple: [
-        {args: [{artist: artist1, annotation: annotation1}]},
-        {args: [{artist: artist2, annotation: annotation2}]},
-        {args: [{artist: artist3, annotation: annotation3}]},
+        {args: [contribution1]},
+        {args: [contribution2]},
+        {args: [contribution3]},
       ],
       slots,
     });
