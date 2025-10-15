@@ -82,7 +82,7 @@
     "license": "MIT",
     "devDependencies": {
         "chokidar": "^3.5.3",
-        "tap": "^19.0.2",
+        "tap": "^21.1.1",
         "tcompare": "^6.0.0"
     },
     "tap": {
