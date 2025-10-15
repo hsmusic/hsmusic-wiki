@@ -842,9 +842,11 @@ export function validateReference(type) {
             type.map(type => `"${type}:"`).join(', ') +
             `, got "${typePart}:"`);
         }
-      } else if (typePart !== type) {
-        throw new TypeError(
-          `Expected ref to begin with "${type}:", got "${typePart}:"`);
+      } else if (type) {
+        if (typePart !== type) {
+          throw new TypeError(
+            `Expected ref to begin with "${type}:", got "${typePart}:"`);
+        }
       }
 
       isDirectory(directoryPart);

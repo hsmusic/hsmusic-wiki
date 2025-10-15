@@ -374,8 +374,8 @@ test(t, 'validateReference', t => {
 
   t.ok(typeless('Hopes and Dreams'));
   t.ok(typeless('track:snowdin-town'));
+  t.ok(typeless('album:undertale-soundtrack'));
   t.throws(() => typeless(''), TypeError);
-  t.throws(() => typeless('album:undertale-soundtrack'));
 });
 
 test(t, 'validateReferenceList', t => {
