@@ -61,7 +61,7 @@ t.test(`withPropertyFromObject: "internal" input`, t => {
     ],
   });
 
-  const thing = new (class extends CacheableObject {
+  const constructor = class extends CacheableObject {
     static [CacheableObject.propertyDescriptors] = {
       foo: {
         flags: {update: true, expose: false},
@@ -78,7 +78,11 @@ t.test(`withPropertyFromObject: "internal" input`, t => {
         },
       },
     };
-  });
+  };
+
+  constructor.finalizeCacheableObjectPrototype();
+
+  const thing = Reflect.construct(constructor, []);
 
   thing.foo = 100;
   thing.bar = 200;

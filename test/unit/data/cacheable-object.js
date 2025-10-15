@@ -2,10 +2,14 @@ import t from 'tap';
 
 import CacheableObject from '#cacheable-object';
 
-function newCacheableObject(PD) {
-  return new (class extends CacheableObject {
-    static [CacheableObject.propertyDescriptors] = PD;
-  });
+function newCacheableObject(propertyDescriptors) {
+  const constructor = class extends CacheableObject {
+    static [CacheableObject.propertyDescriptors] = propertyDescriptors;
+  };
+
+  constructor.finalizeCacheableObjectPrototype();
+
+  return Reflect.construct(constructor, []);
 }
 
 t.test(`CacheableObject simple separate update & expose`, t => {
