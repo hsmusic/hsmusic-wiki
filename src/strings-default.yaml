@@ -607,8 +607,14 @@ motifConnectionList:
     track: "{TRACK}"
     motif: "{MOTIF}"
 
+    track.withContext: "{TRACK} ({CONTEXT})"
+    motif.withContext: "{MOTIF} ({CONTEXT})"
+
     track.withTimeRange: "{TRACK} ({TIME_RANGE})"
     motif.withTimeRange: "({TIME_RANGE}) {MOTIF}"
+
+    track.withTimeRange.withContext: "{TRACK} ({TIME_RANGE}) ({CONTEXT})"
+    motif.withTimeRange.withContext: "({TIME_RANGE}) {MOTIF} ({CONTEXT})"
 
 #
 # misc:

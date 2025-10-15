@@ -59,11 +59,6 @@ export default {
 
                 content:
                   html.tag('div', [
-                    html.tag('span',
-                      {class: 'motif-context'},
-                      {[html.onlyIfContent]: true},
-                      data.contextText
-                    ),
                     html.tag('div', {class: 'abc-tip', 'data-notation': JSON.stringify(data.abcNotation)},
                       html.tag('div', {class: 'motif-sheet'})),
                   ])
@@ -81,6 +76,11 @@ export default {
               data.startTime,
               data.endTime,
               data.trackDuration);
+        }
+
+        if (data.contextText) {
+          workingCapsule += '.withContext';
+          workingOptions.context = data.contextText
         }
 
         return language.$(workingCapsule, workingOptions);
