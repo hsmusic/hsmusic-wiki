@@ -13,9 +13,9 @@ const DECORATE_TIME = process.env.HSMUSIC_DEBUG_CONTENT_PERF === '1';
 
 export class ContentFunctionSpecError extends Error {}
 
-function optionalDecorateTime(prefix, fn) {
+function optionalDecorateTime(prefix, dependency, fn) {
   if (DECORATE_TIME) {
-    return decorateTime(`${prefix}/${generate.name}`, fn);
+    return decorateTime(`${prefix}/${dependency}`, fn);
   } else {
     return fn;
   }
@@ -45,9 +45,10 @@ export function expectExtraDependencies(spec, boundExtraDependencies) {
 
   generate[contentFunction.identifyingSymbol] = true;
 
+  const dependency = spec.generate.name;
   for (const key of ['sprawl', 'query', 'relations', 'data']) {
     if (spec[key]) {
-      generate[key] = optionalDecorateTime(`sprawl`, spec[key]);
+      generate[key] = optionalDecorateTime(key, dependency, spec[key]);
     }
   }
 
@@ -58,6 +59,8 @@ export function expectExtraDependencies(spec, boundExtraDependencies) {
 }
 
 function prepareWorkingGenerateFunction(spec, boundExtraDependencies) {
+  const dependency = spec.generate.name;
+
   let generate = ([arg1, arg2], ...extraArgs) => {
     if (spec.data && !arg1) {
       throw new Error(`Expected data`);
@@ -81,7 +84,7 @@ function prepareWorkingGenerateFunction(spec, boundExtraDependencies) {
       }
     } catch (caughtError) {
       const error = new Error(
-        `Error generating content for ${spec.generate.name}`,
+        `Error generating content for ${dependency}`,
         {cause: caughtError});
 
       error[Symbol.for(`hsmusic.aggregate.alwaysTrace`)] = true;
@@ -100,13 +103,13 @@ function prepareWorkingGenerateFunction(spec, boundExtraDependencies) {
     }
   };
 
-  generate = optionalDecorateTime(`generate`, generate);
+  generate = optionalDecorateTime(`generate`, dependency, generate);
 
   if (spec.slots) {
     let stationery = null;
     return (...args) => {
       stationery ??= boundExtraDependencies.html.stationery({
-        annotation: generate.name,
+        annotation: dependency,
 
         // These extra slots are for the data and relations (positional) args.
         // No hacks to store them temporarily or otherwise "invisibly" alter
