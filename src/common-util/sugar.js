@@ -423,15 +423,23 @@ export function splitKeys(key) {
 
 // Follows a key path like 'foo.bar.baz' to get an item nested deeply inside
 // an object. If a value partway through the chain is an array, the values
-// down the rest of the chain are gotten for each item in the array.
+// down the rest of the chain are gotten for each item in the array. If a value
+// partway through the chain is missing the next key, the chain stops and is
+// undefined (or null) at that point.
 //
 // obj: {x: [{y: ['a']}, {y: ['b', 'c']}]}
 // key: 'x.y'
 //   -> [['a'], ['b', 'c']]
 //
+// obj: {x: [{y: ['a']}, {y: ['b', 'c']}, {z: ['d', 'e']}]}
+// key: 'x.z'
+//   -> [undefined, undefined, ['d', 'e']]
+//
 export function getNestedProp(obj, key) {
   const recursive = (o, k) =>
-    (k.length === 1
+    (o === undefined || o === null
+      ? o
+   : k.length === 1
       ? o[k[0]]
    : Array.isArray(o[k[0]])
       ? o[k[0]].map(v => recursive(v, k.slice(1)))
