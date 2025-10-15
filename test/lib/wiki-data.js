@@ -1,5 +1,6 @@
 import CacheableObject from '#cacheable-object';
-import find from '#find';
+import find, {bindFind} from '#find';
+import {bindReverse} from '#reverse';
 import {withEntries} from '#sugar';
 import Thing from '#thing';
 import thingConstructors from '#things';
@@ -9,11 +10,13 @@ export function linkAndBindWikiData(wikiData, {
   inferAlbumsOwnTrackData = true,
 } = {}) {
   function customLinkWikiDataArrays(wikiData, options = {}) {
-    linkWikiDataArrays(
-      (options.XXX_decacheWikiData
-        ? withEntries(wikiData, entries => entries
-            .map(([key, value]) => [key, value.slice()]))
-        : wikiData));
+    if (options.XXX_decacheWikiData) {
+      wikiData =
+        withEntries(wikiData, entries => entries
+          .map(([key, value]) => [key, value.slice()]));
+    }
+
+    linkWikiDataArrays(wikiData, {bindFind, bindReverse});
   }
 
   customLinkWikiDataArrays(wikiData);
