@@ -1,9 +1,7 @@
 /* eslint-env browser */
 
 export const info = {
-  id: 'abcRender',
-
-  status: "unloaded",
+  id: 'abcRenderModule',
 
   settings: {
     visualParamsFull: {
@@ -53,9 +51,9 @@ class CursorControl {
   onReady() {}
 
   onStart() {
-    const svg = this.#visualTarget.querySelector("svg");
-    this.#cursor = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    this.#cursor.setAttribute("class", "abcjs-cursor");
+    const svg = this.#visualTarget.querySelector('svg');
+    this.#cursor = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    this.#cursor.classList.add('abcjs-cursor');
     this.#cursor.setAttributeNS(null, 'x1', 0);
     this.#cursor.setAttributeNS(null, 'y1', 0);
     this.#cursor.setAttributeNS(null, 'x2', 0);
@@ -88,7 +86,7 @@ class CursorControl {
   }
 
   onFinished() {
-    for (const g of this.#visualTarget.querySelectorAll("svg g.highlight")) {
+    for (const g of this.#visualTarget.querySelectorAll('svg g.highlight')) {
       g.classList.remove('highlight');
     }
 
@@ -122,8 +120,8 @@ async function buildPlayer(tune, {
       await midiBuffer.init({visualObj});
       await synthControl.setTune(visualObj);
     } catch {
-      console.warn("Audio problem:", error);
-      console.warn("...for tune:\n" + tune);
+      console.warn('Audio problem:', error);
+      console.warn('...for tune:\n' + tune);
     }
   }
 }
@@ -133,21 +131,21 @@ export function mutatePageContent() {
 
   const {settings} = info;
 
-  for (const abcwrapper of document.querySelectorAll(".abc-full[data-notation]")) {
+  for (const abcwrapper of document.querySelectorAll('.abc-full[data-notation]')) {
     const tune = JSON.parse(abcwrapper.dataset.notation);
     buildPlayer(tune, {
-      visualTarget: abcwrapper.querySelector(".motif-sheet"),
-      controlsTarget: abcwrapper.querySelector(".motif-control"),
+      visualTarget: abcwrapper.querySelector('.motif-sheet'),
+      controlsTarget: abcwrapper.querySelector('.motif-control'),
       visualParams: settings.visualParamsFull,
       audioParams: settings.audioParamsFull,
     });
   }
 
-  for (const abcwrapper of document.querySelectorAll(".abc-tip[data-notation]")) {
+  for (const abcwrapper of document.querySelectorAll('.abc-tip[data-notation]')) {
     const tune = JSON.parse(abcwrapper.dataset.notation);
     buildPlayer(tune, {
-      visualTarget: abcwrapper.querySelector(".motif-sheet"),
-      controlsTarget: abcwrapper.querySelector(".motif-control"),
+      visualTarget: abcwrapper.querySelector('.motif-sheet'),
+      controlsTarget: abcwrapper.querySelector('.motif-control'),
       visualParams: settings.visualParamsTip,
       audioParams: null, // settings.audioParamsTip
     });
