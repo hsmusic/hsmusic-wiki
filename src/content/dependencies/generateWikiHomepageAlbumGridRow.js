@@ -18,8 +18,7 @@ export default {
         sprawl.albums =
           (row.sourceGroup
             ? row.sourceGroup.albums
-                .slice()
-                .reverse()
+                .toReversed()
                 .filter(album => album.isListedOnHomepage)
                 .slice(0, row.countAlbumsFromGroup)
             : []);

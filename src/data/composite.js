@@ -1416,7 +1416,7 @@ export function compositeFrom(description) {
 
 export function displayCompositeCacheAnalysis() {
   const showTimes = (cache, key) => {
-    const times = cache.times[key].slice().sort();
+    const times = cache.times[key].toSorted();
 
     const all = times;
     const worst10pc = times.slice(-times.length / 10);

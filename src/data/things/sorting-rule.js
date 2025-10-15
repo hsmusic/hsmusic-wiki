@@ -146,7 +146,7 @@ export class ThingSortingRule extends SortingRule {
 
   sort(sortable) {
     if (this.properties) {
-      for (const property of this.properties.slice().reverse()) {
+      for (const property of this.properties.toReversed()) {
         const get = thing => thing[property];
         const lc = property.toLowerCase();
 
@@ -286,10 +286,8 @@ export class DocumentSortingRule extends ThingSortingRule {
   }
 
   static async* applyAll(rules, {wikiData, dataPath, dry}) {
-    rules =
-      rules
-        .slice()
-        .sort((a, b) => a.filename.localeCompare(b.filename, 'en'));
+    rules = rules
+      .toSorted((a, b) => a.filename.localeCompare(b.filename, 'en'));
 
     for (const {chunk, filename} of chunkByProperties(rules, ['filename'])) {
       const initialLayout = getThingLayoutForFilename(filename, wikiData);

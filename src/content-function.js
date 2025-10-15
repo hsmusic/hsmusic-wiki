@@ -286,7 +286,7 @@ export const decorateErrorWithRelationStack = (fn, traceStack) =>
   decorateError(fn, caughtError => {
     let cause = caughtError;
 
-    for (const {name, args, traceError} of traceStack.slice().reverse()) {
+    for (const {name, args, traceError} of traceStack.toReversed()) {
       const nameText = colors.green(`"${name}"`);
       const namePart = `Error in relation(${nameText})`;
 
