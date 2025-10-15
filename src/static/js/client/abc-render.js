@@ -28,6 +28,14 @@ var audioParams = {
   displayWarp: true
 };
 
+var audioParamsTip = {
+  displayLoop: false,
+  displayRestart: false,
+  displayPlay: true,
+  displayProgress: true,
+  displayWarp: false
+};
+
 function CursorControl(el_visual, el_control) {
   var self = this;
 
@@ -83,13 +91,14 @@ function CursorControl(el_visual, el_control) {
   };
 }
 
-function buildPlayer(tune, el_visual, el_control) {
+function buildPlayer(tune, el_visual, el_control, params, audioParams) {
   // Render sheet music
-  var [visualObj] = abcjs.renderAbc(el_visual, tune, visualParams);
+  var [visualObj] = abcjs.renderAbc(el_visual, tune, params);
 
   if (el_control && abcjs.synth.supportsAudio()) {
     var cursorControl = new CursorControl(el_visual, el_control);
     var synthControl = new abcjs.synth.SynthController();
+
     synthControl.load(el_control, cursorControl, audioParams);
     synthControl.disable(true);
 
@@ -114,15 +123,16 @@ export function mutatePageContent() {
   if (!abcjs) return;
 
   for (const abcwrapper of document.querySelectorAll(".abc-full[data-notation]")) {
-    var tune = JSON.parse(abcwrapper.dataset.notation);
+    let tune = JSON.parse(abcwrapper.dataset.notation);
     let el_visual = abcwrapper.querySelector(".motif-sheet");
     let el_control = abcwrapper.querySelector(".motif-control");
-    buildPlayer(tune, el_visual, el_control);
+    buildPlayer(tune, el_visual, el_control, visualParams, audioParams);
   }
 
   for (const abcwrapper of document.querySelectorAll(".abc-tip[data-notation]")) {
-    var tune = JSON.parse(abcwrapper.dataset.notation);
+    let tune = JSON.parse(abcwrapper.dataset.notation);
     let el_visual = abcwrapper.querySelector(".motif-sheet");
-    abcjs.renderAbc(el_visual, tune, visualParamsTip);
+    let el_control = abcwrapper.querySelector(".motif-control");
+    buildPlayer(tune, el_visual, el_control, visualParamsTip);
   }
 }

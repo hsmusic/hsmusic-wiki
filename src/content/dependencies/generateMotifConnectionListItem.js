@@ -60,7 +60,10 @@ export default {
                 content:
                   html.tag('div', [
                     html.tag('div', {class: 'abc-tip', 'data-notation': JSON.stringify(data.abcNotation)},
-                      html.tag('div', {class: 'motif-sheet'})),
+                      [
+                        html.tag('div', {class: 'motif-sheet'}),
+                        html.tag('div', {class: 'motif-control'})
+                      ]),
                   ])
               }),
           })
