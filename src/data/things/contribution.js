@@ -8,7 +8,7 @@ import Thing from '#thing';
 import {isBoolean, isStringNonEmpty, isThing, validateReference}
   from '#validators';
 
-import {flag, simpleDate, soupyFind} from '#composite/wiki-properties';
+import {simpleDate, soupyFind} from '#composite/wiki-properties';
 
 import {
   exitWithoutDependency,

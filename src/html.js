@@ -2009,7 +2009,7 @@ export class Template {
 
     throw new Error(
       `Didn't find slots ${inspect(slots, {compact: true})} ` +
-      `resolving ${inspect(tagOrTemplate, {compact: true})}`);
+      `resolving ${inspect(content, {compact: true})}`);
   }
 
   [inspect.custom]() {

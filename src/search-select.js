@@ -52,7 +52,7 @@ function prepareArtwork(artwork, thing, {
   return serializeSrc;
 }
 
-function baselineProcess(thing, opts) {
+function baselineProcess(thing, _opts) {
   const fields = {};
 
   fields.primaryName =

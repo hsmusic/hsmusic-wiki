@@ -165,6 +165,8 @@ import dimensionsOf from 'image-size';
 import {stringifyCache} from '#cli';
 import {commandExists, isMain, promisifyProcess, traverse} from '#node-utils';
 import {sortByName} from '#sort';
+import {delay, empty, filterMultipleArrays, queue, stitchArrays, unique}
+  from '#sugar';
 
 import {
   colors,
@@ -176,16 +178,6 @@ import {
   parseOptions,
   progressPromiseAll,
 } from '#cli';
-
-import {
-  delay,
-  empty,
-  chunkMultipleArrays,
-  filterMultipleArrays,
-  queue,
-  stitchArrays,
-  unique,
-} from '#sugar';
 
 export const defaultMagickThreads = 8;
 

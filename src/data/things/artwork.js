@@ -39,7 +39,6 @@ import {
   withRecontextualizedContributionList,
   withResolvedAnnotatedReferenceList,
   withResolvedContribs,
-  withResolvedReferenceList,
 } from '#composite/wiki-data';
 
 import {
@@ -60,7 +59,6 @@ import {
   withContainingArtworkList,
   withContentWarningArtTags,
   withContribsFromAttachedArtwork,
-  withPropertyFromAttachedArtwork,
   withDate,
 } from '#composite/things/artwork';
 

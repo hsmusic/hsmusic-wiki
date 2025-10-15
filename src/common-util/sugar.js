@@ -271,7 +271,7 @@ export const withEntries = (obj, fn) => {
   if (obj instanceof Map) {
     const result = fn(Array.from(obj.entries()));
     if (result instanceof Promise) {
-      return result.then(entries => new map(entries));
+      return result.then(entries => new Map(entries));
     } else {
       return new Map(result);
     }

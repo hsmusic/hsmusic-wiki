@@ -191,7 +191,7 @@ function expandDetails(target) {
       details.open = true;
     }
   } else if (target.nodeName === 'DETAILS') {
-    details.open = true;
+    target.open = true;
   }
 }
 

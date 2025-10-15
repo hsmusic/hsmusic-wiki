@@ -588,7 +588,7 @@ export const externalLinkSpec = [
 
     detail: {
       substring: 'subreddit',
-      subreddit: {pathname: /^r\/[^\/]+(?=\/)?/},
+      subreddit: {pathname: /^r\/[^/]+(?=\/)?/},
     },
   },
 

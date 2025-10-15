@@ -1,15 +1,7 @@
 import * as path from 'node:path';
 
-import {
-  copyFile,
-  cp,
-  mkdir,
-  readFile,
-  stat,
-  symlink,
-  writeFile,
-  unlink,
-} from 'node:fs/promises';
+import {cp, mkdir, readFile, stat, symlink, writeFile, unlink}
+  from 'node:fs/promises';
 
 import {rimraf} from 'rimraf';
 
