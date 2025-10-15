@@ -12,6 +12,7 @@ export default class CacheableObject {
   static propertyDependants = Symbol.for('CacheableObject.propertyDependants');
 
   static cacheValid = Symbol.for('CacheableObject.cacheValid');
+  static cachedValue = Symbol.for('CacheableObject.cachedValue');
   static updateValue = Symbol.for('CacheableObject.updateValues');
 
   constructor({seal = true} = {}) {
