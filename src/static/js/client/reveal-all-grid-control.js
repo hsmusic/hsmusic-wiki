@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {cssProp} from '../client-util.js';
 
 export const info = {

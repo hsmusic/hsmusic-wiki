@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {cssProp} from '../client-util.js';
 
 import {info as hashLinkInfo} from './hash-link.js';

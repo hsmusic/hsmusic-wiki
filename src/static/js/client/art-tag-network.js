@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {cssProp} from '../client-util.js';
 
 import {atOffset, stitchArrays} from '../../shared-util/sugar.js';

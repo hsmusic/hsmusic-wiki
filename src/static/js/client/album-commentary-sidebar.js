@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {empty} from '../../shared-util/sugar.js';
 
 import {info as hashLinkInfo} from './hash-link.js';

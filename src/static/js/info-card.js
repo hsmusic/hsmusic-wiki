@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 // Note: This is a super ancient chunk of code which isn't actually in use,
 // so it's just commented out here.
 

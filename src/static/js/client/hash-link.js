@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {filterMultipleArrays, stitchArrays, unique}
   from '../../shared-util/sugar.js';
 

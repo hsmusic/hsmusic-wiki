@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 export const info = {
   id: `draggedLinkInfo`,
 

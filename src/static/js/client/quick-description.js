@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {stitchArrays} from '../../shared-util/sugar.js';
 
 export const info = {

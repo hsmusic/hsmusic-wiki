@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {pick, stitchArrays} from '../../shared-util/sugar.js';
 
 import {

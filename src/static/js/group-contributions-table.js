@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 // TODO: Update to clientSteps style.
 
 const groupContributionsTableInfo =

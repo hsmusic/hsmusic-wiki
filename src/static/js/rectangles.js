@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {info as liveMousePositionInfo} from './client/live-mouse-position.js';
 
 export class WikiRect extends DOMRect {

@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 export function rebase(href, rebaseKey = 'rebaseLocalized') {
   let result = document.documentElement.dataset[rebaseKey] || './';
 

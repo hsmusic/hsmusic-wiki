@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {getColors} from '../../shared-util/colors.js';
 
 import {cssProp} from '../client-util.js';

@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {promiseWithResolvers} from '../../shared-util/sugar.js';
 
 import {dispatchInternalEvent} from '../client-util.js';

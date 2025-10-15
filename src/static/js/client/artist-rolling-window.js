@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {cssProp, formatDate} from '../client-util.js';
 
 import {sortByDate} from '../../shared-util/sort.js';

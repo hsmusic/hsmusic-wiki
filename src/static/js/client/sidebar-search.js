@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {getColors} from '../../shared-util/colors.js';
 import {accumulateSum, empty, unique} from '../../shared-util/sugar.js';
 

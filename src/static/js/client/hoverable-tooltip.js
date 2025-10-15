@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {empty, filterMultipleArrays} from '../../shared-util/sugar.js';
 
 import {WikiRect} from '../rectangles.js';

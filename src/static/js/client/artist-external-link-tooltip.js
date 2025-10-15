@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {accumulateSum, empty} from '../../shared-util/sugar.js';
 
 import {info as hoverableTooltipInfo, repositionCurrentTooltip}

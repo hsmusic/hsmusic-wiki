@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 /**
  * This fetch function is adapted from a `loadImage` function
  * credited to Parziphal, Feb 13, 2017.

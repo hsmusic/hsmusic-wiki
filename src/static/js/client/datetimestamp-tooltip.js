@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 // TODO: Maybe datetimestamps can just be incorporated into text-with-tooltip?
 
 import {stitchArrays} from '../../shared-util/sugar.js';

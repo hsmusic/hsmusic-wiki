@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import {filterMultipleArrays, stitchArrays} from '../../shared-util/sugar.js';
 import {cssProp, dispatchInternalEvent, templateContent}
   from '../client-util.js';

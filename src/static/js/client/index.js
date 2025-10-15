@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import '../group-contributions-table.js';
 
 import * as additionalNamesBoxModule from './additional-names-box.js';
