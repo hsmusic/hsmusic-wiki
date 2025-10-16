@@ -231,6 +231,12 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  directory: 'motif/by-name',
+  stringsKey: 'listMotifs.byName',
+  contentFunction: 'listMotifsByName',
+});
+
+listingSpec.push({
   directory: 'all-sheet-music-files',
   stringsKey: 'other.allSheetMusic',
   contentFunction: 'listAllSheetMusicFiles',
@@ -339,6 +345,10 @@ const listingTargetSpec = [
   {
     stringsKey: 'tag',
     listings: filterListings('tag'),
+  },
+  {
+    stringsKey: 'motif',
+    listings: filterListings('motif'),
   },
   {
     stringsKey: 'other',

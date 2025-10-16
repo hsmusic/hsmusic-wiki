@@ -2455,6 +2455,7 @@ listingPage:
     group: "Groups"
     track: "Tracks"
     tag: "Tags"
+    motif: "Motifs"
     other: "Other"
 
   # misc:
@@ -2971,6 +2972,12 @@ listingPage:
         title: "{ALBUM}"
         title.withDate: "{ALBUM} ({DATE})"
         item: "{TRACK}"
+
+  listMotifs:
+    byName:
+      title: "Motifs - by name"
+      title.short: "...by name"
+      item: "{MOTIF}"
 
   other:
 
