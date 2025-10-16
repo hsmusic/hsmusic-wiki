@@ -299,7 +299,7 @@ for (const [index, listing] of listingSpec.entries()) {
         errors.push(new AggregateError(suberrors, `Errors matching "see also" listings for ${listing.directory}`));
       }
     } else {
-      listing.seeAlso = null;
+      listing.seeAlso = [];
     }
   }
 

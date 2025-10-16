@@ -1,56 +1,36 @@
-import {bindOpts, empty, stitchArrays} from '#sugar';
+import {bindOpts, stitchArrays} from '#sugar';
 
 export default {
-  relations(relation, listing) {
-    const relations = {};
+  relations: (relation, listing) => ({
+    layout:
+      relation('generatePageLayout'),
 
-    relations.layout =
-      relation('generatePageLayout');
+    sidebar:
+      relation('generateListingSidebar', listing),
 
-    relations.sidebar =
-      relation('generateListingSidebar', listing);
+    listingsIndexLink:
+      relation('linkListingIndex'),
 
-    relations.listingsIndexLink =
-      relation('linkListingIndex');
+    chunkHeading:
+      relation('generateContentHeading'),
 
-    relations.chunkHeading =
-      relation('generateContentHeading');
+    showSkipToSectionLinkTemplate:
+      relation('linkTemplate'),
 
-    relations.showSkipToSectionLinkTemplate =
-      relation('linkTemplate');
+    sameTargetListingsLine:
+      (listing.target.listings.length > 1
+        ? relation('generateListingPageSameTargetListingsLine', listing)
+        : null),
 
-    if (listing.target.listings.length > 1) {
-      relations.sameTargetListingLinks =
-        listing.target.listings
-          .map(listing => relation('linkListing', listing));
-    } else {
-      relations.sameTargetListingLinks = [];
-    }
+    seeAlsoLinks:
+      listing.seeAlso
+        .map(listing => relation('linkListing', listing)),
+  }),
 
-    relations.seeAlsoLinks =
-      (!empty(listing.seeAlso)
-        ? listing.seeAlso
-            .map(listing => relation('linkListing', listing))
-        : []);
-
-    return relations;
-  },
-
-  data(listing) {
-    return {
-      stringsKey: listing.stringsKey,
-
-      targetStringsKey: listing.target.stringsKey,
-
-      sameTargetListingStringsKeys:
-        listing.target.listings
-          .map(listing => listing.stringsKey),
-
-      sameTargetListingsCurrentIndex:
-        listing.target.listings
-          .indexOf(listing),
-    };
-  },
+  data: (listing) => ({
+    stringsKey:
+      listing.stringsKey,
+  }),
 
   slots: {
     type: {
@@ -158,29 +138,7 @@ export default {
       headingMode: 'sticky',
 
       mainContent: [
-        html.tag('p',
-          {[html.onlyIfContent]: true},
-          language.$('listingPage.listingsFor', {
-            [language.onlyIfOptions]: ['listings'],
-
-            target:
-              language.$('listingPage.target', data.targetStringsKey),
-
-            listings:
-              language.formatUnitList(
-                stitchArrays({
-                  link: relations.sameTargetListingLinks,
-                  stringsKey: data.sameTargetListingStringsKeys,
-                }).map(({link, stringsKey}, index) =>
-                    html.tag('span',
-                      index === data.sameTargetListingsCurrentIndex &&
-                        {class: 'current'},
-
-                      link.slots({
-                        attributes: {class: 'nowrap'},
-                        content: language.$('listingPage', stringsKey, 'title.short'),
-                      })))),
-          })),
+        relations.sameTargetListingsLine,
 
         html.tag('p',
           {[html.onlyIfContent]: true},
