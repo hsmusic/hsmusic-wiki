@@ -64,6 +64,7 @@
         "node": ">= 22.13.0"
     },
     "dependencies": {
+        "@eslint/js": "^9.38.0",
         "@js-temporal/polyfill": "^0.4.4",
         "chroma-js": "^2.4.2",
         "command-exists": "^1.2.9",
