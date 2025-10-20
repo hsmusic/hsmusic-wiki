@@ -71,7 +71,6 @@
         "compress-json": "3.4.0",
         "eslint": "9.37.0",
         "flexsearch": "0.7.43",
-        "he": "1.2.0",
         "image-size": "2.0.2",
         "js-yaml": "4.1.0",
         "marked": "16.4.1",

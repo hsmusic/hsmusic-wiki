@@ -4,7 +4,6 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 import chokidar from 'chokidar';
-import he from 'he'; // It stands for "HTML Entities", apparently. Cursed.
 import yaml from 'js-yaml';
 
 import {annotateError, annotateErrorWithFile, showAggregate, withAggregate}
@@ -250,9 +249,6 @@ async function processLanguageSpecFromFile(file, processLanguageSpecOpts) {
 
 export function initializeLanguageObject() {
   const language = new Language();
-
-  language.escapeHTML = string =>
-    he.encode(string, {useNamedReferences: true});
 
   language.externalLinkSpec = externalLinkSpec;
 

@@ -123,10 +123,6 @@ export class Language extends Thing {
       update: {validate: isExternalLinkSpec},
     },
 
-    // Update only
-
-    escapeHTML: externalFunction(),
-
     // Expose only
 
     isLanguage: [
@@ -170,12 +166,12 @@ export class Language extends Thing {
     strings_htmlEscaped: {
       flags: {expose: true},
       expose: {
-        dependencies: ['strings', 'inheritedStrings', 'escapeHTML'],
-        compute({strings, inheritedStrings, escapeHTML}) {
-          if (!(strings || inheritedStrings) || !escapeHTML) return null;
+        dependencies: ['strings', 'inheritedStrings'],
+        compute({strings, inheritedStrings}) {
+          if (!(strings || inheritedStrings)) return null;
           const allStrings = {...inheritedStrings, ...strings};
           return Object.fromEntries(
-            Object.entries(allStrings).map(([k, v]) => [k, escapeHTML(v)])
+            Object.entries(allStrings).map(([k, v]) => [k, this.escapeHTML(v)])
           );
         },
       },
@@ -204,6 +200,18 @@ export class Language extends Thing {
     if (!this[property]) {
       throw new Error(`Intl API ${property} unavailable`);
     }
+  }
+
+  escapeHTML(string) {
+    // https://html.spec.whatwg.org/multipage/parsing.html#escapingString
+
+    string = string
+      .replaceAll('&', '&amp;')
+      .replaceAll('\u00a0', '&nbsp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;');
+
+    return string;
   }
 
   getUnitForm(value) {
@@ -428,14 +436,9 @@ export class Language extends Thing {
   // html.Tag objects - gets left as-is, preserving the value exactly as it's
   // provided.
   #sanitizeValueForInsertion(value) {
-    const escapeHTML = CacheableObject.getUpdateValue(this, 'escapeHTML');
-    if (!escapeHTML) {
-      throw new Error(`escapeHTML unavailable`);
-    }
-
     switch (typeof value) {
       case 'string':
-        return escapeHTML(value);
+        return this.escapeHTML(value);
 
       case 'number':
       case 'boolean':
