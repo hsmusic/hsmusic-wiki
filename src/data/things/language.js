@@ -2,12 +2,12 @@ import {Temporal, toTemporalInstant} from '@js-temporal/polyfill';
 
 import {withAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
-import {logWarn} from '#cli';
 import {input} from '#composite';
 import * as html from '#html';
-import {empty} from '#sugar';
+import {empty, withEntries} from '#sugar';
 import {isLanguageCode} from '#validators';
 import Thing from '#thing';
+import {languageOptionRegex} from '#wiki-data';
 
 import {
   getExternalLinkStringOfStyleFromDescriptors,
@@ -17,10 +17,11 @@ import {
   isExternalLinkStyle,
 } from '#external-links';
 
-import {exposeConstant} from '#composite/control-flow';
+import {exitWithoutDependency, exposeConstant, exposeDependency}
+  from '#composite/control-flow';
 import {externalFunction, flag, name} from '#composite/wiki-properties';
 
-export const languageOptionRegex = /{(?<name>[A-Z0-9_]+)}/g;
+import {withStrings} from '#composite/things/language';
 
 export class Language extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({
@@ -62,52 +63,17 @@ export class Language extends Thing {
 
     // Mapping of translation keys to values (strings). Generally, don't
     // access this object directly - use methods instead.
-    strings: {
-      flags: {update: true, expose: true},
-      update: {validate: (t) => typeof t === 'object'},
+    strings: [
+      withStrings({
+        from: input.updateValue({
+          validate: t => typeof t === 'object',
+        }),
+      }),
 
-      expose: {
-        dependencies: ['inheritedStrings', 'code'],
-        transform(strings, {inheritedStrings, code}) {
-          if (!strings && !inheritedStrings) return null;
-          if (!inheritedStrings) return strings;
-
-          const validStrings = {
-            ...inheritedStrings,
-            ...strings,
-          };
-
-          const optionsFromTemplate = template =>
-            Array.from(template.matchAll(languageOptionRegex))
-              .map(({groups}) => groups.name);
-
-          for (const [key, providedTemplate] of Object.entries(strings)) {
-            const inheritedTemplate = inheritedStrings[key];
-            if (!inheritedTemplate) continue;
-
-            const providedOptions = optionsFromTemplate(providedTemplate);
-            const inheritedOptions = optionsFromTemplate(inheritedTemplate);
-
-            const missingOptionNames =
-              inheritedOptions.filter(name => !providedOptions.includes(name));
-
-            const misplacedOptionNames =
-              providedOptions.filter(name => !inheritedOptions.includes(name));
-
-            if (!empty(missingOptionNames) || !empty(misplacedOptionNames)) {
-              logWarn`Not using ${code ?? '(no code)'} string ${key}:`;
-              if (!empty(missingOptionNames))
-                logWarn`- Missing options: ${missingOptionNames.join(', ')}`;
-              if (!empty(misplacedOptionNames))
-                logWarn`- Unexpected options: ${misplacedOptionNames.join(', ')}`;
-              validStrings[key] = inheritedStrings[key];
-            }
-          }
-
-          return validStrings;
-        },
-      },
-    },
+      exposeDependency({
+        dependency: '#strings',
+      }),
+    ],
 
     // May be provided to specify "default" strings, generally (but not
     // necessarily) inherited from another Language object.
@@ -163,19 +129,20 @@ export class Language extends Thing {
     },
 
     // TODO: This currently isn't used. Is it still needed?
-    strings_htmlEscaped: {
-      flags: {expose: true},
-      expose: {
-        dependencies: ['strings', 'inheritedStrings'],
-        compute({strings, inheritedStrings}) {
-          if (!(strings || inheritedStrings)) return null;
-          const allStrings = {...inheritedStrings, ...strings};
-          return Object.fromEntries(
-            Object.entries(allStrings).map(([k, v]) => [k, html.escape(v)])
-          );
-        },
+    strings_htmlEscaped: [
+      withStrings(),
+
+      exitWithoutDependency({
+        dependency: '#strings',
+      }),
+
+      {
+        dependencies: ['#strings'],
+        compute: ({'#strings': strings}) =>
+          withEntries(strings, entries => entries
+            .map(([key, value]) => [key, html.escape(value)])),
       },
-    },
+    ],
   });
 
   static #intlHelper (constructor, opts) {

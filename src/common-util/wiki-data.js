@@ -106,6 +106,8 @@ export const commentaryRegexCaseSensitive =
 export const commentaryRegexCaseSensitiveOneShot =
   new RegExp(commentaryRegexRaw);
 
+export const languageOptionRegex = /{(?<name>[A-Z0-9_]+)}/g;
+
 // The #validators function isOldStyleLyrics() describes
 // what this regular expression detects against.
 export const multipleLyricsDetectionRegex =

@@ -28,6 +28,7 @@
         "#composite/things/contribution": "./src/data/composite/things/contribution/index.js",
         "#composite/things/flash": "./src/data/composite/things/flash/index.js",
         "#composite/things/flash-act": "./src/data/composite/things/flash-act/index.js",
+        "#composite/things/language": "./src/data/composite/things/language/index.js",
         "#composite/things/track": "./src/data/composite/things/track/index.js",
         "#composite/things/track-section": "./src/data/composite/things/track-section/index.js",
         "#content-dependencies": "./src/content/dependencies/index.js",
