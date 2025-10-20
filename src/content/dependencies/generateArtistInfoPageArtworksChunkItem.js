@@ -11,7 +11,9 @@ export default {
        (contrib.thing.isArtwork &&
         contrib.thing.thingProperty === 'wallpaperArtwork')
         ? 'wallpaper'
-     : contrib.thing.isAlbum
+     : contrib.thing.isAlbum ||
+       (contrib.thing.isArtwork &&
+        contrib.thing.thingProperty === 'coverArtworks')
         ? 'album-cover'
         : 'track-cover'),
   }),
