@@ -3,17 +3,11 @@ import {empty} from '#sugar';
 export default {
   query: (contrib) => ({
     kind:
-      (contrib.thingProperty === 'bannerArtistContribs' ||
-       (contrib.thing.isArtwork &&
-        contrib.thing.thingProperty === 'bannerArtwork')
+      (contrib.thing.thingProperty === 'bannerArtwork'
         ? 'banner'
-     : contrib.thingProperty === 'wallpaperArtistContribs' ||
-       (contrib.thing.isArtwork &&
-        contrib.thing.thingProperty === 'wallpaperArtwork')
+     : contrib.thing.thingProperty === 'wallpaperArtwork'
         ? 'wallpaper'
-     : contrib.thing.isAlbum ||
-       (contrib.thing.isArtwork &&
-        contrib.thing.thingProperty === 'coverArtworks')
+     : contrib.thing.thingProperty === 'coverArtworks'
         ? 'album-cover'
         : 'track-cover'),
   }),
