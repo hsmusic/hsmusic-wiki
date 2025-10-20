@@ -171,7 +171,7 @@ export class Language extends Thing {
           if (!(strings || inheritedStrings)) return null;
           const allStrings = {...inheritedStrings, ...strings};
           return Object.fromEntries(
-            Object.entries(allStrings).map(([k, v]) => [k, this.escapeHTML(v)])
+            Object.entries(allStrings).map(([k, v]) => [k, html.escape(v)])
           );
         },
       },
@@ -200,18 +200,6 @@ export class Language extends Thing {
     if (!this[property]) {
       throw new Error(`Intl API ${property} unavailable`);
     }
-  }
-
-  escapeHTML(string) {
-    // https://html.spec.whatwg.org/multipage/parsing.html#escapingString
-
-    string = string
-      .replaceAll('&', '&amp;')
-      .replaceAll('\u00a0', '&nbsp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;');
-
-    return string;
   }
 
   getUnitForm(value) {
@@ -438,7 +426,7 @@ export class Language extends Thing {
   #sanitizeValueForInsertion(value) {
     switch (typeof value) {
       case 'string':
-        return this.escapeHTML(value);
+        return html.escape(value);
 
       case 'number':
       case 'boolean':

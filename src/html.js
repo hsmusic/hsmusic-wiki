@@ -359,6 +359,22 @@ export function normalize(content) {
   return Tag.normalize(content);
 }
 
+export function escape(string, {attribute = false} = {}) {
+  // https://html.spec.whatwg.org/multipage/parsing.html#escapingString
+
+  string = string
+    .replaceAll('&', '&amp;')
+    .replaceAll('\u00a0', '&nbsp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+
+  if (attribute) {
+    string = string.replaceAll('"', '&quot;');
+  }
+
+  return string;
+}
+
 export class Tag {
   #tagName = '';
   #content = null;
@@ -1343,7 +1359,7 @@ export class Attributes {
       attributeKeyValues
         .map(([key, value]) => {
           const keyPart = key;
-          const escapedValue = this.#escapeAttributeValue(value);
+          const escapedValue = escape(value.toString(), {attribute: true});
           const valuePart =
             (color
               ? colors.green(`"${escapedValue}"`)
@@ -1417,23 +1433,6 @@ export class Attributes {
       default:
         return value;
     }
-  }
-
-  #escapeAttributeValue(value) {
-    // https://html.spec.whatwg.org/multipage/parsing.html#escapingString
-
-    // assumes the containing attribute value token is written
-    // with double quotes
-
-    value = value
-      .toString()
-      .replaceAll('&', '&amp;')
-      .replaceAll('\u00a0', '&nbsp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;');
-
-    return value;
   }
 
   static parse(string) {
