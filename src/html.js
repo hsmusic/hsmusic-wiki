@@ -1420,10 +1420,20 @@ export class Attributes {
   }
 
   #escapeAttributeValue(value) {
-    return value
+    // https://html.spec.whatwg.org/multipage/parsing.html#escapingString
+
+    // assumes the containing attribute value token is written
+    // with double quotes
+
+    value = value
       .toString()
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&apos;');
+      .replaceAll('&', '&amp;')
+      .replaceAll('\u00a0', '&nbsp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;');
+
+    return value;
   }
 
   static parse(string) {
