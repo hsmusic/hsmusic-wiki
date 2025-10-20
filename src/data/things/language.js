@@ -10,10 +10,10 @@ import Thing from '#thing';
 import {languageOptionRegex} from '#wiki-data';
 
 import {
+  externalLinkSpec,
   getExternalLinkStringOfStyleFromDescriptors,
   getExternalLinkStringsFromDescriptors,
   isExternalLinkContext,
-  isExternalLinkSpec,
   isExternalLinkStyle,
 } from '#external-links';
 
@@ -80,13 +80,6 @@ export class Language extends Thing {
     inheritedStrings: {
       flags: {update: true, expose: true},
       update: {validate: (t) => typeof t === 'object'},
-    },
-
-    // List of descriptors for providing to external link utilities when using
-    // language.formatExternalLink - refer to #external-links for info.
-    externalLinkSpec: {
-      flags: {update: true, expose: true},
-      update: {validate: isExternalLinkSpec},
     },
 
     // Expose only
@@ -648,10 +641,6 @@ export class Language extends Thing {
     style = 'platform',
     context = 'generic',
   } = {}) {
-    if (!this.externalLinkSpec) {
-      throw new TypeError(`externalLinkSpec unavailable`);
-    }
-
     // Null or undefined url is blank content.
     if (url === null || url === undefined) {
       return html.blank();
@@ -660,7 +649,7 @@ export class Language extends Thing {
     isExternalLinkContext(context);
 
     if (style === 'all') {
-      return getExternalLinkStringsFromDescriptors(url, this.externalLinkSpec, {
+      return getExternalLinkStringsFromDescriptors(url, externalLinkSpec, {
         language: this,
         context,
       });
@@ -669,7 +658,7 @@ export class Language extends Thing {
     isExternalLinkStyle(style);
 
     const result =
-      getExternalLinkStringOfStyleFromDescriptors(url, style, this.externalLinkSpec, {
+      getExternalLinkStringOfStyleFromDescriptors(url, style, externalLinkSpec, {
         language: this,
         context,
       });

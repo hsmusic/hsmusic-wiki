@@ -8,7 +8,6 @@ import yaml from 'js-yaml';
 
 import {annotateError, annotateErrorWithFile, showAggregate, withAggregate}
   from '#aggregate';
-import {externalLinkSpec} from '#external-links';
 import {colors, logWarn} from '#cli';
 import {empty, splitKeys, withEntries} from '#sugar';
 import T from '#things';
@@ -247,16 +246,8 @@ async function processLanguageSpecFromFile(file, processLanguageSpecOpts) {
   }
 }
 
-export function initializeLanguageObject() {
-  const language = new Language();
-
-  language.externalLinkSpec = externalLinkSpec;
-
-  return language;
-}
-
 export async function processLanguageFile(file) {
-  const language = initializeLanguageObject();
+  const language = new Language()
   const properties = await processLanguageSpecFromFile(file);
   return Object.assign(language, properties);
 }
@@ -267,7 +258,7 @@ export function watchLanguageFile(file, {
   const basename = path.basename(file);
 
   const events = new EventEmitter();
-  const language = initializeLanguageObject();
+  const language = new Language();
 
   let emittedReady = false;
   let successfullyAppliedLanguage = false;
