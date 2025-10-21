@@ -35,8 +35,8 @@ const inlineMarked = new Marked({
   ...commonMarkedOptions,
 
   renderer: {
-    paragraph(text) {
-      return text;
+    paragraph({tokens}) {
+      return this.parser.parseInline(tokens);
     },
   },
 });
