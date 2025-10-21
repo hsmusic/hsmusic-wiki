@@ -99,6 +99,7 @@ export class Language extends Thing {
 
     intl_date: this.#intlHelper(Intl.DateTimeFormat, {full: true}),
     intl_dateYear: this.#intlHelper(Intl.DateTimeFormat, {year: 'numeric'}),
+    intl_dateMonthDay: this.#intlHelper(Intl.DateTimeFormat, {month: 'numeric', day: 'numeric'}),
     intl_number: this.#intlHelper(Intl.NumberFormat),
     intl_listConjunction: this.#intlHelper(Intl.ListFormat, {type: 'conjunction'}),
     intl_listDisjunction: this.#intlHelper(Intl.ListFormat, {type: 'disjunction'}),
@@ -461,6 +462,15 @@ export class Language extends Thing {
 
     this.assertIntlAvailable('intl_dateYear');
     return this.intl_dateYear.format(date);
+  }
+
+  formatMonthDay(date) {
+    if (date === null || date === undefined) {
+      return html.blank();
+    }
+
+    this.assertIntlAvailable('intl_dateMonthDay');
+    return this.intl_dateMonthDay.format(date);
   }
 
   formatYearRange(startDate, endDate) {
