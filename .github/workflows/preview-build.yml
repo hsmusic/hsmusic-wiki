@@ -1,0 +1,50 @@
+name: Manual Preview Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Which GitHub Environment to use
+        type: environment
+        default: preview
+      fast_build:
+        description: Prune data and media for a faster build
+        type: boolean
+        default: false
+      languages:
+        description: JSON array of language codes
+        type: string
+        default: '["en"]'
+      code_branch:
+        description: Branch for hsmusic-wiki
+        type: string
+        default: preview
+      data_branch:
+        description: Branch for hsmusic-data
+        type: string
+        default: preview
+      media_branch:
+        description: Branch for hsmusic-media
+        type: string
+        default: preview
+      lang_branch:
+        description: Branch for hsmusic-lang
+        type: string
+        default: preview
+
+concurrency:
+  group: hsmusic-${{ github.workflow }}-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  run-reusable:
+    uses: hsmusic/hsmusic-wiki/.github/workflows/deploy-wiki.yml@makin/worker
+    secrets: inherit
+    with:
+      environment: ${{ inputs.environment }}
+      fast_build: ${{ inputs.fast_build }}
+      languages: ${{ inputs.languages }}
+      code_branch: ${{ inputs.code_branch }}
+      data_branch: ${{ inputs.data_branch }}
+      media_branch: ${{ inputs.media_branch }}
+      lang_branch: ${{ inputs.lang_branch }}
