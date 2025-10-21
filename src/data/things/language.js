@@ -4,7 +4,7 @@ import {withAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
 import {input} from '#composite';
 import * as html from '#html';
-import {empty, withEntries} from '#sugar';
+import {accumulateSum, empty, withEntries} from '#sugar';
 import {isLanguageCode} from '#validators';
 import Thing from '#thing';
 import {languageOptionRegex} from '#wiki-data';
@@ -106,6 +106,7 @@ export class Language extends Thing {
     intl_listUnit: this.#intlHelper(Intl.ListFormat, {type: 'unit'}),
     intl_pluralCardinal: this.#intlHelper(Intl.PluralRules, {type: 'cardinal'}),
     intl_pluralOrdinal: this.#intlHelper(Intl.PluralRules, {type: 'ordinal'}),
+    intl_wordSegmenter: this.#intlHelper(Intl.Segmenter, {granularity: 'word'}),
 
     validKeys: {
       flags: {expose: true},
@@ -161,6 +162,15 @@ export class Language extends Thing {
     if (!this[property]) {
       throw new Error(`Intl API ${property} unavailable`);
     }
+  }
+
+  countWords(text) {
+    this.assertIntlAvailable('intl_wordSegmenter');
+
+    const string = html.resolve(text, {normalize: 'plain'});
+    const segments = this.intl_wordSegmenter.segment(string);
+
+    return accumulateSum(segments, segment => segment.isWordLike ? 1 : 0);
   }
 
   getUnitForm(value) {
