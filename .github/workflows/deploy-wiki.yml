@@ -1,36 +1,79 @@
-name: Manual Preview Build
+name: Build Preview (reusable)
 
 on:
+  workflow_call:
+    inputs:
+      environment:
+        description: GitHub Environment name
+        required: true
+        type: string
+      fast_build:
+        description: Prune data and media for a faster build
+        required: false
+        default: false
+        type: boolean
+      languages:
+        description: JSON array of language codes
+        required: false
+        default: '["en"]'
+        type: string
+      code_branch:
+        description: Branch for hsmusic-wiki
+        required: false
+        default: preview
+        type: string
+      data_branch:
+        description: Branch for hsmusic-data
+        required: false
+        default: preview
+        type: string
+      media_branch:
+        description: Branch for hsmusic-media
+        required: false
+        default: preview
+        type: string
+      lang_branch:
+        description: Branch for hsmusic-lang
+        required: false
+        default: preview
+        type: string
   workflow_dispatch:
     inputs:
       environment:
-        description: Which GitHub Environment to use
-        type: environment
+        description: GitHub Environment name
+        required: true
+        type: string
         default: preview
       fast_build:
         description: Prune data and media for a faster build
-        type: boolean
+        required: false
         default: false
+        type: boolean
       languages:
         description: JSON array of language codes
-        type: string
+        required: false
         default: '["en"]'
+        type: string
       code_branch:
         description: Branch for hsmusic-wiki
-        type: string
+        required: false
         default: preview
+        type: string
       data_branch:
         description: Branch for hsmusic-data
-        type: string
+        required: false
         default: preview
+        type: string
       media_branch:
         description: Branch for hsmusic-media
-        type: string
+        required: false
         default: preview
+        type: string
       lang_branch:
         description: Branch for hsmusic-lang
-        type: string
+        required: false
         default: preview
+        type: string
 
 concurrency:
   group: hsmusic-${{ github.workflow }}-${{ inputs.environment }}
@@ -84,7 +127,6 @@ jobs:
       - name: Ensure AWS CLI present
         run: |
           if ! command -v aws >/dev/null 2>&1; then
-            echo "Installing AWS CLI"
             sudo apt-get update
             sudo apt-get install -y awscli
           fi
@@ -102,6 +144,21 @@ jobs:
           cd code
           scripts/prune-fast-build.sh
 
+      - name: Wire environment variables with fallbacks
+        run: |
+          echo "AWS_REGION=${AWS_REGION:-${{ vars.AWS_REGION }}}" >> "$GITHUB_ENV"
+          echo "AWS_MEDIA_BUCKET=${AWS_MEDIA_BUCKET:-${{ vars.AWS_MEDIA_BUCKET }}}" >> "$GITHUB_ENV"
+          echo "AWS_SITE_BUCKET=${AWS_SITE_BUCKET:-${{ vars.AWS_SITE_BUCKET }}}" >> "$GITHUB_ENV"
+
+      - name: Show effective config
+        run: |
+          echo "Environment: ${{ inputs.environment }}"
+          echo "AWS_REGION=$AWS_REGION"
+          echo "AWS_MEDIA_BUCKET=$AWS_MEDIA_BUCKET"
+          echo "AWS_SITE_BUCKET=$AWS_SITE_BUCKET"
+          node --version
+          magick -version
+
       - name: Generate thumbnails and size cache
         run: |
           cd code
@@ -109,33 +166,20 @@ jobs:
           hsmusic --skip-thumbs --live-dev-server --skip-serving --data-path ../data --media-path ../media --cache-path ../cache --lang-path ../lang
 
       - name: Upload media caches and thumbnails
-        env:
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          AWS_MEDIA_BUCKET: ${{ vars.AWS_MEDIA_BUCKET }}
         run: |
-          aws s3 cp \
-            cache/media-cache/thumbnail-cache.json "$AWS_MEDIA_BUCKET"/ \
-            --acl public-read --quiet
-          aws s3 cp \
-            media/file-size-cache.json "$AWS_MEDIA_BUCKET"/ \
-            --acl public-read --quiet
-          aws s3 sync \
-            media "$AWS_MEDIA_BUCKET" --acl public-read --exclude '.git/*' --quiet
-          aws s3 sync \
-            cache/media-cache "$AWS_MEDIA_BUCKET" --acl public-read --quiet
+          aws s3 cp cache/media-cache/thumbnail-cache.json "$AWS_MEDIA_BUCKET"/ --acl public-read --quiet
+          aws s3 cp media/file-size-cache.json "$AWS_MEDIA_BUCKET"/ --acl public-read --quiet
+          aws s3 sync media "$AWS_MEDIA_BUCKET" --acl public-read --exclude '.git/*' --quiet
+          aws s3 sync cache/media-cache "$AWS_MEDIA_BUCKET" --acl public-read --quiet
 
       - name: Build and deploy for each language
-        env:
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          AWS_SITE_BUCKET: ${{ vars.AWS_SITE_BUCKET }}
-          LANGUAGES_JSON: ${{ inputs.languages }}
         run: |
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y jq
           cd code
           rm -rf ../out && mkdir ../out
-          for lang in $(echo "$LANGUAGES_JSON" | jq -r '.[]'); do
+          for lang in $(echo '${{ inputs.languages }}' | jq -r '.[]'); do
             echo "Building language: $lang"
             hsmusic \
               --lang "$lang" \
