@@ -1,8 +1,12 @@
 export default {
-  data: (date) =>
-    ({date}),
+  data: (date, contextDate) => ({
+    date,
 
-  relations: (relation) => ({
+    contextDate:
+      contextDate ?? null,
+  }),
+
+  relations: (relation, _date, _contextDate) => ({
     template:
       relation('generateDatetimestampTemplate'),
 
@@ -12,35 +16,79 @@ export default {
 
   slots: {
     style: {
-      validate: v => v.is('full', 'year'),
+      validate: v => v.is(...[
+        'full',
+        'year',
+        'minimal-difference',
+        'year-difference',
+      ]),
       default: 'full',
     },
 
-    // Only has an effect for 'year' style.
     tooltip: {
       type: 'boolean',
       default: false,
     },
   },
 
-  generate: (data, relations, slots, {language}) =>
-    relations.template.slots({
-      mainContent:
-        (slots.style === 'full'
-          ? language.formatDate(data.date)
-       : slots.style === 'year'
-          ? data.date.getFullYear().toString()
-          : null),
+  generate(data, relations, slots, {html, language}) {
+    if (!data.date) {
+      return html.blank();
+    }
 
-      tooltip:
-        slots.tooltip &&
-        slots.style === 'year' &&
-          relations.tooltip.slots({
-            content:
-              language.formatDate(data.date),
-          }),
+    relations.template.setSlots({
+      tooltip: slots.tooltip ? relations.tooltip : null,
+      datetime: data.date.toISOString(),
+    });
 
-      datetime:
-        data.date.toISOString(),
-    }),
+    let label = null;
+    let tooltip = null;
+
+    switch (slots.style) {
+      case 'full': {
+        label = language.formatDate(data.date);
+        break;
+      }
+
+      case 'year': {
+        label = language.formatYear(data.date);
+        tooltip = language.formatDate(data.date);
+        break;
+      }
+
+      case 'minimal-difference': {
+        if (data.date.toDateString() === data.contextDate?.toDateString()) {
+          return html.blank();
+        }
+
+        if (data.date.getFullYear() === data.contextDate?.getFullYear()) {
+          label = language.formatMonthDay(data.date);
+          tooltip = language.formatDate(data.date);
+        } else {
+          label = language.formatYear(data.date);
+          tooltip = language.formatDate(data.date);
+        }
+
+        break;
+      }
+
+      case 'year-difference': {
+        if (data.date.toDateString() === data.contextDate?.toDateString()) {
+          return html.blank();
+        }
+
+        if (data.date.getFullYear() === data.contextDate?.getFullYear()) {
+          label = language.formatDate(data.date);
+        } else {
+          label = language.formatYear(data.date);
+          tooltip = language.formatDate(data.date);
+        }
+      }
+    }
+
+    relations.template.setSlot('mainContent', label);
+    relations.tooltip.setSlot('content', tooltip);
+
+    return relations.template;
+  },
 };

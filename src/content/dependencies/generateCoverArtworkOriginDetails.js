@@ -24,9 +24,9 @@ export default {
         : null),
 
     datetimestamp:
-      (artwork.date && artwork.date !== artwork.thing.date
-        ? relation('generateAbsoluteDatetimestamp', artwork.date)
-        : null),
+      relation('generateAbsoluteDatetimestamp',
+        artwork.date,
+        artwork.thing.date),
   }),
 
 
@@ -53,8 +53,8 @@ export default {
         {class: 'origin-details'},
 
         (() => {
-          relations.datetimestamp?.setSlots({
-            style: 'year',
+          relations.datetimestamp.setSlots({
+            style: 'year-difference',
             tooltip: true,
           });
 
@@ -67,7 +67,7 @@ export default {
                 workingOptions.label = data.label;
               }
 
-              if (relations.datetimestamp) {
+              if (!html.isBlank(relations.datetimestamp)) {
                 workingCapsule += '.withYear';
                 workingOptions.year = relations.datetimestamp;
               }
@@ -108,7 +108,7 @@ export default {
                 workingOptions.label = data.label;
               }
 
-              if (html.isBlank(artworkBy) && relations.datetimestamp) {
+              if (html.isBlank(artworkBy) && !html.isBlank(relations.datetimestamp)) {
                 workingCapsule += '.withYear';
                 workingOptions.year = relations.datetimestamp;
               }
@@ -125,7 +125,7 @@ export default {
                 label: data.label,
               };
 
-              if (relations.datetimestamp) {
+              if (!html.isBlank(relations.datetimestamp)) {
                 workingCapsule += '.withYear';
                 workingOptions.year = relations.datetimestamp;
               }
