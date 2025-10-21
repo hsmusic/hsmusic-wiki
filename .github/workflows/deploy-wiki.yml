@@ -85,6 +85,9 @@ jobs:
     environment: ${{ inputs.environment }}
     timeout-minutes: 360
 
+    env:
+      CHECKOUT_TOKEN: ${{ secrets.CI_PAT || github.token }}
+
     steps:
       - name: Checkout wiki
         uses: actions/checkout@v4
@@ -92,6 +95,7 @@ jobs:
           repository: hsmusic/hsmusic-wiki
           ref: ${{ inputs.code_branch }}
           path: code
+          token: ${{ env.CHECKOUT_TOKEN }}
 
       - name: Checkout data
         uses: actions/checkout@v4
@@ -99,6 +103,7 @@ jobs:
           repository: hsmusic/hsmusic-data
           ref: ${{ inputs.data_branch }}
           path: data
+          token: ${{ env.CHECKOUT_TOKEN }}
 
       - name: Checkout media
         uses: actions/checkout@v4
@@ -106,6 +111,7 @@ jobs:
           repository: hsmusic/hsmusic-media
           ref: ${{ inputs.media_branch }}
           path: media
+          token: ${{ env.CHECKOUT_TOKEN }}
 
       - name: Checkout lang
         uses: actions/checkout@v4
@@ -113,6 +119,7 @@ jobs:
           repository: hsmusic/hsmusic-lang
           ref: ${{ inputs.lang_branch }}
           path: lang
+          token: ${{ env.CHECKOUT_TOKEN }}
 
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
@@ -121,8 +128,20 @@ jobs:
           cache: 'npm'
           cache-dependency-path: code/package-lock.json
 
-      - name: Install ImageMagick
+      - name: Install fuse userspace library
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          if apt-cache show libfuse2t64 >/dev/null 2>&1; then
+            sudo apt-get install -y libfuse2t64
+          else
+            sudo apt-get install -y libfuse2 || sudo apt-get install -y fuse
+          fi
+
+      - name: Install ImageMagick 7
         uses: mfinelli/setup-imagemagick@v7
+        with:
+          install-libfuse2: false
 
       - name: Ensure AWS CLI present
         run: |
@@ -144,7 +163,7 @@ jobs:
           cd code
           scripts/prune-fast-build.sh
 
-      - name: Wire environment variables with fallbacks
+      - name: Resolve AWS config with local fallbacks
         run: |
           echo "AWS_REGION=${AWS_REGION:-${{ vars.AWS_REGION }}}" >> "$GITHUB_ENV"
           echo "AWS_MEDIA_BUCKET=${AWS_MEDIA_BUCKET:-${{ vars.AWS_MEDIA_BUCKET }}}" >> "$GITHUB_ENV"
