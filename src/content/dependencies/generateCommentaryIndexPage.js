@@ -18,11 +18,8 @@ export default {
           .filter(({commentary}) => commentary)
           .flatMap(({commentary}) => commentary));
 
-    query.wordCounts =
-      entries.map(entries =>
-        accumulateSum(
-          entries,
-          entry => entry.body.split(' ').length));
+    query.bodies =
+      entries.map(entries => entries.map(entry => entry.body));
 
     query.entryCounts =
       entries.map(entries => entries.length);
@@ -41,6 +38,11 @@ export default {
       albumLinks:
         query.albums
           .map(album => relation('linkAlbumCommentary', album)),
+
+      albumBodies:
+        query.bodies
+          .map(bodies => bodies
+            .map(body => relation('transformContent', body))),
     };
   },
 

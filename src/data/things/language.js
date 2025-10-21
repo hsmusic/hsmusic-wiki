@@ -106,6 +106,7 @@ export class Language extends Thing {
     intl_listUnit: this.#intlHelper(Intl.ListFormat, {type: 'unit'}),
     intl_pluralCardinal: this.#intlHelper(Intl.PluralRules, {type: 'cardinal'}),
     intl_pluralOrdinal: this.#intlHelper(Intl.PluralRules, {type: 'ordinal'}),
+    intl_wordSegmenter: this.#intlHelper(Intl.Segmenter, {granularity: 'word'}),
 
     validKeys: {
       flags: {expose: true},
@@ -161,6 +162,13 @@ export class Language extends Thing {
     if (!this[property]) {
       throw new Error(`Intl API ${property} unavailable`);
     }
+  }
+
+  countWords(text) {
+    this.assertIntlAvailable('intl_wordSegmenter');
+
+    const string = html.resolve(text, {normalize: 'plain'});
+    return Array.from(this.intl_wordSegmenter.segment(string)).length;
   }
 
   getUnitForm(value) {
