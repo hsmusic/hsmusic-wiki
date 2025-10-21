@@ -2,9 +2,8 @@ import {sortChronologically} from '#sort';
 import {accumulateSum, filterMultipleArrays, stitchArrays} from '#sugar';
 
 export default {
-  sprawl({albumData}) {
-    return {albumData};
-  },
+  sprawl: ({albumData}) =>
+    ({albumData}),
 
   query(sprawl) {
     const query = {};
@@ -18,44 +17,49 @@ export default {
           .filter(({commentary}) => commentary)
           .flatMap(({commentary}) => commentary));
 
-    query.wordCounts =
-      entries.map(entries =>
-        accumulateSum(
-          entries,
-          entry => entry.body.split(' ').length));
+    query.bodies =
+      entries.map(entries => entries.map(entry => entry.body));
 
     query.entryCounts =
       entries.map(entries => entries.length);
 
-    filterMultipleArrays(query.albums, query.wordCounts, query.entryCounts,
-      (album, wordCount, entryCount) => entryCount >= 1);
+    filterMultipleArrays(query.albums, query.bodies, query.entryCounts,
+      (album, bodies, entryCount) => entryCount >= 1);
 
     return query;
   },
 
-  relations(relation, query) {
-    return {
-      layout:
-        relation('generatePageLayout'),
+  relations: (relation, query) => ({
+    layout:
+      relation('generatePageLayout'),
 
-      albumLinks:
-        query.albums
-          .map(album => relation('linkAlbumCommentary', album)),
-    };
-  },
+    albumLinks:
+      query.albums
+        .map(album => relation('linkAlbumCommentary', album)),
 
-  data(query) {
-    return {
-      wordCounts: query.wordCounts,
-      entryCounts: query.entryCounts,
+    albumBodies:
+      query.bodies
+        .map(bodies => bodies
+          .map(body => relation('transformContent', body))),
+  }),
 
-      totalWordCount: accumulateSum(query.wordCounts),
-      totalEntryCount: accumulateSum(query.entryCounts),
-    };
-  },
+  data: (query) => ({
+    entryCounts: query.entryCounts,
+    totalEntryCount: accumulateSum(query.entryCounts),
+  }),
 
-  generate: (data, relations, {html, language}) =>
-    language.encapsulate('commentaryIndex', pageCapsule =>
+  generate(data, relations, {html, defaultLanguage, language}) {
+    const wordCounts =
+      relations.albumBodies.map(bodies =>
+        accumulateSum(bodies, body =>
+          defaultLanguage.countWords(body.slot('mode', 'multiline'))));
+
+    const totalWordCount =
+      accumulateSum(wordCounts);
+
+    const {entryCounts, totalEntryCount} = data;
+
+    return language.encapsulate('commentaryIndex', pageCapsule =>
       relations.layout.slots({
         title: language.$(pageCapsule, 'title'),
 
@@ -66,11 +70,11 @@ export default {
           html.tag('p', language.$(pageCapsule, 'infoLine', {
             words:
               html.tag('b',
-                language.formatWordCount(data.totalWordCount, {unit: true})),
+                language.formatWordCount(totalWordCount, {unit: true})),
 
             entries:
               html.tag('b',
-                  language.countCommentaryEntries(data.totalEntryCount, {unit: true})),
+                language.countCommentaryEntries(totalEntryCount, {unit: true})),
           })),
 
           language.encapsulate(pageCapsule, 'albumList', listCapsule => [
@@ -80,8 +84,8 @@ export default {
             html.tag('ul',
               stitchArrays({
                 albumLink: relations.albumLinks,
-                wordCount: data.wordCounts,
-                entryCount: data.entryCounts,
+                wordCount: wordCounts,
+                entryCount: entryCounts,
               }).map(({albumLink, wordCount, entryCount}) =>
                 html.tag('li',
                   language.$(listCapsule, 'item', {
@@ -97,5 +101,6 @@ export default {
           {auto: 'home'},
           {auto: 'current'},
         ],
-      })),
+      }));
+  },
 };
