@@ -20,19 +20,11 @@ export default {
       validate: v => v.is('full', 'year'),
       default: 'full',
     },
-
-    tooltip: {
-      type: 'boolean',
-      default: false,
-    },
   },
 
   generate(data, relations, slots, {language}) {
     if (data.equal) {
-      return relations.fallback.slots({
-        style: slots.style,
-        tooltip: slots.tooltip,
-      });
+      return relations.fallback.slot('style', slots.style);
     }
 
     return relations.template.slots({
@@ -44,15 +36,14 @@ export default {
           : null),
 
       tooltip:
-        slots.tooltip &&
-          relations.tooltip.slots({
-            content:
-              language.formatRelativeDate(data.currentDate, data.referenceDate, {
-                considerRoundingDays: true,
-                approximate: true,
-                absolute: slots.style === 'year',
-              }),
-          }),
+        relations.tooltip.slots({
+          content:
+            language.formatRelativeDate(data.currentDate, data.referenceDate, {
+              considerRoundingDays: true,
+              approximate: true,
+              absolute: slots.style === 'year',
+            }),
+        }),
 
       datetime:
         data.currentDate.toISOString(),

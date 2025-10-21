@@ -66,7 +66,7 @@ export default {
             workingOptions.yearAccent =
               language.$(yearCapsule, 'accent', {
                 year:
-                  relations.datetimestamp.slots({style: 'year', tooltip: true}),
+                  relations.datetimestamp.slot('style', 'year'),
               });
           }
 

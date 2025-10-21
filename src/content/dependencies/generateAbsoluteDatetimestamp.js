@@ -24,11 +24,6 @@ export default {
       ]),
       default: 'full',
     },
-
-    tooltip: {
-      type: 'boolean',
-      default: false,
-    },
   },
 
   generate(data, relations, slots, {html, language}) {
@@ -37,7 +32,7 @@ export default {
     }
 
     relations.template.setSlots({
-      tooltip: slots.tooltip ? relations.tooltip : null,
+      tooltip: relations.tooltip,
       datetime: data.date.toISOString(),
     });
 

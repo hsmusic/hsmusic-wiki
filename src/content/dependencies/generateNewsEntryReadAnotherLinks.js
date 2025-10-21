@@ -49,10 +49,7 @@ export default {
       if (relations.previousEntryDatetimestamp) {
         parts.push('withDate');
         options.date =
-          relations.previousEntryDatetimestamp.slots({
-            style: 'full',
-            tooltip: true,
-          });
+          relations.previousEntryDatetimestamp.slot('style', 'full');
       }
 
       entryLines.push(language.$(...parts, options));
@@ -67,10 +64,7 @@ export default {
       if (relations.nextEntryDatetimestamp) {
         parts.push('withDate');
         options.date =
-          relations.nextEntryDatetimestamp.slots({
-            style: 'full',
-            tooltip: true,
-          });
+          relations.nextEntryDatetimestamp.slot('style', 'full');
       }
 
       entryLines.push(language.$(...parts, options));

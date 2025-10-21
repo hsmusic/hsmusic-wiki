@@ -53,10 +53,7 @@ export default {
         {class: 'origin-details'},
 
         (() => {
-          relations.datetimestamp.setSlots({
-            style: 'year-difference',
-            tooltip: true,
-          });
+          relations.datetimestamp.setSlot('style', 'year-difference');
 
           const artworkBy =
             language.encapsulate(capsule, 'artworkBy', workingCapsule => {
