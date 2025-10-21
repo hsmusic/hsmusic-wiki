@@ -1,3 +1,5 @@
+import multilingualWordCount from 'word-count';
+
 import {sortChronologically} from '#sort';
 import {accumulateSum, filterMultipleArrays, stitchArrays} from '#sugar';
 
@@ -48,11 +50,14 @@ export default {
     totalEntryCount: accumulateSum(query.entryCounts),
   }),
 
-  generate(data, relations, {html, defaultLanguage, language}) {
+  generate(data, relations, {html, language}) {
     const wordCounts =
       relations.albumBodies.map(bodies =>
         accumulateSum(bodies, body =>
-          defaultLanguage.countWords(body.slot('mode', 'multiline'))));
+          multilingualWordCount(
+            html.resolve(
+              body.slot('mode', 'multiline'),
+              {normalize: 'plain'}))));
 
     const totalWordCount =
       accumulateSum(wordCounts);

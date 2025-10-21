@@ -78,6 +78,7 @@
         "msgpackr": "1.11.1",
         "rimraf": "5.0.7",
         "striptags": "4.0.0-alpha.4",
+        "word-count": "0.3.1",
         "word-wrap": "1.2.5"
     },
     "license": "MIT",
