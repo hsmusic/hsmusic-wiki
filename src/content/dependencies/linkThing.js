@@ -77,13 +77,14 @@ export default {
     const linkAttributes = slots.attributes;
     const wrapperAttributes = html.attributes();
 
+    const name =
+      relations.name.slot('preferShortName', slots.preferShortName);
+
     const showShortName =
       slots.preferShortName &&
      !data.nameText &&
       data.nameShort &&
       data.nameShort !== data.name;
-
-    const name = relations.name;
 
     const showWikiTooltip =
       (slots.tooltipStyle === 'auto'
