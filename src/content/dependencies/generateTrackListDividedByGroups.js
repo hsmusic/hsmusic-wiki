@@ -45,7 +45,7 @@ export default {
   relations: (relation, query, sprawl, tracks, contextTrack) => ({
     flatList:
       (empty(sprawl.divideTrackListsByGroups)
-        ? relation('generateTrackList', tracks, contextTrack)
+        ? relation('generateNearbyTrackList', tracks, contextTrack)
         : null),
 
     contentHeading:
@@ -57,12 +57,12 @@ export default {
 
     groupedTrackLists:
       query.groupedTracks
-        .map(tracks => relation('generateTrackList', tracks, contextTrack)),
+        .map(tracks => relation('generateNearbyTrackList', tracks, contextTrack)),
 
     ungroupedTrackList:
       (empty(query.ungroupedTracks)
         ? null
-        : relation('generateTrackList', query.ungroupedTracks, contextTrack)),
+        : relation('generateNearbyTrackList', query.ungroupedTracks, contextTrack)),
   }),
 
   data: (query, _sprawl, _tracks) => ({

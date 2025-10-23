@@ -1,20 +1,21 @@
 export default {
-  query: (tracks, contextTrack) => ({
-    presentedTracks:
-      (contextTrack
-        ? tracks.map(track =>
-            track.otherReleases.find(({album}) => album === contextTrack.album) ??
-            track)
-        : tracks),
-  }),
-
-  relations: (relation, query, _tracks, _contextTrack) => ({
+  relations: (relation, tracks, contextContributions) => ({
     items:
-      query.presentedTracks
-        .map(track => relation('generateTrackListItem', track, [])),
+      tracks.map(track =>
+        relation('generateTrackListItem', track, contextContributions)),
   }),
 
   slots: {
+    showArtists: {
+      validate: v => v.is(true, false, 'auto'),
+      default: 'auto',
+    },
+
+    showDuration: {
+      type: 'boolean',
+      default: false,
+    },
+
     colorMode: {
       validate: v => v.is('none', 'track', 'line'),
       default: 'track',
@@ -27,8 +28,8 @@ export default {
 
       relations.items.map(item =>
         item.slots({
-          showArtists: 'auto',
-          showDuration: false,
+          showArtists: slots.showArtists,
+          showDuration: slots.showDuration,
           colorMode: slots.colorMode,
         }))),
 };

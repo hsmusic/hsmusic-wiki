@@ -87,10 +87,10 @@ export default {
       relation('generateContributionList', track.contributorContribs),
 
     referencedTracksList:
-      relation('generateTrackList', track.referencedTracks, track),
+      relation('generateNearbyTrackList', track.referencedTracks, track),
 
     sampledTracksList:
-      relation('generateTrackList', track.sampledTracks, track),
+      relation('generateNearbyTrackList', track.sampledTracks, track),
 
     referencedByTracksList:
       relation('generateTrackListDividedByGroups',

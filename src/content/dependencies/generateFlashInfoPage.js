@@ -63,7 +63,7 @@ export default {
       relation('generateFlashNavAccent', flash),
 
     featuredTracksList:
-      relation('generateTrackList', flash.featuredTracks),
+      relation('generateTrackList', flash.featuredTracks, []),
 
     contributorContributionList:
       relation('generateContributionList', flash.contributorContribs),
