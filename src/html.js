@@ -1698,6 +1698,61 @@ export function smooth(smoothie) {
   return tags(helper(smoothie));
 }
 
+export function inside(insidee) {
+  if (insidee instanceof Template) {
+    return inside(Template.resolve(insidee));
+  }
+
+  if (insidee instanceof Tag) {
+    return Array.from(smooth(tags(insidee.content)).content);
+  }
+
+  return [];
+}
+
+export function findInside(insidee, query) {
+  if (typeof query === 'object' && query.slots) {
+    return findInside(insidee, item =>
+      Template.resolveForSlots(item, query.slots, 'null'));
+  }
+
+  if (typeof query === 'object' && query.annotation) {
+    return findInside(insidee, item =>
+      Template.resolveForAnnotation(item, query.annotation, 'null'));
+  }
+
+  if (typeof query === 'object' && query.tag) {
+    return findInside(insidee, item => {
+      const tag = normalize(item);
+      if (tag.tagName === query) {
+        return tag;
+      } else {
+        return null;
+      }
+    });
+  }
+
+  if (typeof query === 'string') {
+    return findInside(insidee, item =>
+      Template.resolveForContentFunction(item, query, 'null'));
+  }
+
+  if (typeof query !== 'function') {
+    throw new Error(`Expected {slots}, {annotation}, or query function`);
+  }
+
+  for (const item of inside(insidee)) {
+    const result = query(item);
+    if (result && result === true) {
+      return item;
+    } else if (result) {
+      return result;
+    }
+  }
+
+  return null;
+}
+
 export function template(description) {
   return new Template(description);
 }
@@ -2109,7 +2164,7 @@ export class Template {
     return content;
   }
 
-  static resolveForSlots(content, slots) {
+  static resolveForSlots(content, slots, without = 'throw') {
     if (!slots || typeof slots !== 'object') {
       throw new Error(
         `Expected slots to be an object or array, ` +
@@ -2132,9 +2187,72 @@ export class Template {
       }
     }
 
-    throw new Error(
-      `Didn't find slots ${inspect(slots, {compact: true})} ` +
-      `resolving ${inspect(content, {compact: true})}`);
+    if (without === 'throw') {
+      throw new Error(
+        `Didn't find slots ${inspect(slots, {compact: true})} ` +
+        `resolving ${inspect(content, {compact: true})}`);
+    } else {
+      return null;
+    }
+  }
+
+  static resolveForAnnotation(content, annotation, without = 'throw') {
+    if (!annotation || typeof annotation !== 'string') {
+      throw new Error(
+        `Expected annotation to be a string, ` +
+        `got ${typeAppearance(annotation)}`);
+    }
+
+    while (content instanceof Template) {
+      if (content.description.annotation === annotation) {
+        return content;
+      } else {
+        content = content.content;
+      }
+    }
+
+    if (without === 'throw') {
+      throw new Error(
+        `Didn't find annotation ${inspect(annotation, {compact: true})} ` +
+        `resolving ${inspect(content, {compact: true})}`);
+    } else {
+      return null;
+    }
+  }
+
+  static resolveForContentFunction(content, dependency, without = 'throw') {
+    if (!dependency || typeof dependency !== 'string') {
+      throw new Error(
+        `Expected dependency to be a string, ` +
+        `got ${typeAppearance(dependency)}`);
+    }
+
+    const considerContentFunction = () =>
+      (content instanceof Tag || content instanceof Template) &&
+      Object.hasOwn(content, Symbol.for('hsmusic.contentFunction.via')) &&
+      content[Symbol.for('hsmusic.contentFunction.via')].includes(dependency);
+
+    while (content instanceof Template) {
+      if (considerContentFunction()) {
+        return content;
+      } else if (content.description.annotation === dependency) {
+        return content;
+      } else {
+        content = content.content;
+      }
+    }
+
+    if (considerContentFunction()) {
+      return content;
+    }
+
+    if (without === 'throw') {
+      throw new Error(
+        `Didn't find dependency ${inspect(dependency, {compact: true})} ` +
+        `resolving ${inspect(content, {compact: true})}`);
+    } else {
+      return null;
+    }
   }
 
   [inspect.custom]() {

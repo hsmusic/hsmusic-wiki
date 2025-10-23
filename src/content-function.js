@@ -2,7 +2,7 @@ import {inspect as nodeInspect} from 'node:util';
 
 import {decorateError} from '#aggregate';
 import {colors, decorateTime, ENABLE_COLOR} from '#cli';
-import {Template} from '#html';
+import {Tag, Template} from '#html';
 import {empty} from '#sugar';
 
 function inspect(value, opts = {}) {
@@ -102,6 +102,20 @@ function prepareWorkingGenerateFunction(spec, boundExtraDependencies) {
       throw error;
     }
   };
+
+  generate = (baseGenerate => (...args) => {
+    const result = baseGenerate(...args);
+
+    if (result instanceof Template || result instanceof Tag) {
+      if (Object.hasOwn(result, Symbol.for('hsmusic.content.via'))) {
+        result[Symbol.for('hsmusic.contentFunction.via')].push(dependency);
+      } else {
+        result[Symbol.for('hsmusic.contentFunction.via')] = [dependency];
+      }
+    }
+
+    return result;
+  })(generate);
 
   generate = optionalDecorateTime(`generate`, dependency, generate);
 
