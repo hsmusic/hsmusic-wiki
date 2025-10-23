@@ -354,13 +354,19 @@ export class Language extends Thing {
 
       partInProgress += template.slice(lastIndex, match.index);
 
-      for (const insertionItem of html.smush(insertion).content) {
+      const insertionItems = html.smush(insertion).content;
+      if (insertionItems.length === 1 && typeof insertionItems[0] !== 'string') {
+        // Push the insertion exactly as it is, rather than manipulating.
+        if (partInProgress) outputParts.push(partInProgress);
+        outputParts.push(insertion);
+        partInProgress = '';
+      } else for (const insertionItem of insertionItems) {
         if (typeof insertionItem === 'string') {
           // Join consecutive strings together.
           partInProgress += insertionItem;
         } else {
           // Push the string part in progress, then the insertion as-is.
-          outputParts.push(partInProgress);
+          if (partInProgress) outputParts.push(partInProgress);
           outputParts.push(insertionItem);
           partInProgress = '';
         }
