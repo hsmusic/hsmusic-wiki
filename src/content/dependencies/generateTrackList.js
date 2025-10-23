@@ -27,7 +27,7 @@ export default {
 
       relations.items.map(item =>
         item.slots({
-          showArtists: true,
+          showArtists: 'auto',
           showDuration: false,
           colorMode: slots.colorMode,
         }))),

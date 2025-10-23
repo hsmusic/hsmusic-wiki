@@ -3,10 +3,16 @@ export default {
     trackLink:
       relation('linkTrack', track),
 
-    credit:
+    contextualCredit:
       relation('generateArtistCredit',
         track.artistContribs,
         contextContributions,
+        track.artistText),
+
+    acontextualCredit:
+      relation('generateArtistCredit',
+        track.artistContribs,
+        [],
         track.artistText),
 
     colorStyle:
@@ -27,12 +33,11 @@ export default {
   }),
 
   slots: {
-    // showArtists enables showing artists *at all.* It doesn't take precedence
-    // over behavior which automatically collapses (certain) artists because of
-    // provided context contributions.
+    // true always shows artists, false never does; 'auto' shows only if
+    // the track's artists differ from the given context contributions.
     showArtists: {
-      type: 'boolean',
-      default: true,
+      validate: v => v.is(true, false, 'auto'),
+      default: 'auto',
     },
 
     // If true and the track doesn't have a duration, a missing-duration cue
@@ -72,24 +77,33 @@ export default {
                 : relations.missingDuration);
           }
 
-          const artistCapsule = language.encapsulate(itemCapsule, 'withArtists');
+          const chosenCredit =
+            (slots.showArtists === true
+              ? relations.acontextualCredit
+           : slots.showArtists === 'auto'
+              ? relations.contextualCredit
+              : null);
 
-          relations.credit.setSlots({
-            normalStringKey:
-              artistCapsule + '.by',
+          if (chosenCredit) {
+            const artistCapsule = language.encapsulate(itemCapsule, 'withArtists');
 
-            featuringStringKey:
-              artistCapsule + '.featuring',
+            chosenCredit.setSlots({
+              normalStringKey:
+                artistCapsule + '.by',
 
-            normalFeaturingStringKey:
-              artistCapsule + '.by.featuring',
-          });
+              featuringStringKey:
+                artistCapsule + '.featuring',
 
-          if (!html.isBlank(relations.credit)) {
-            workingCapsule += '.withArtists';
-            workingOptions.by =
-              html.tag('span', {class: 'by'},
-                relations.credit);
+              normalFeaturingStringKey:
+                artistCapsule + '.by.featuring',
+            });
+
+            if (!html.isBlank(chosenCredit)) {
+              workingCapsule += '.withArtists';
+              workingOptions.by =
+                html.tag('span', {class: 'by'},
+                  chosenCredit);
+            }
           }
 
           return language.$(workingCapsule, workingOptions);
