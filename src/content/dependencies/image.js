@@ -28,6 +28,8 @@ export default {
 
   slots: {
     thumb: {type: 'string'},
+    responsiveThumb: {type: 'boolean', default: false},
+    responsiveSizes: {type: 'string'},
 
     reveal: {type: 'boolean', default: true},
     lazy: {type: 'boolean', default: false},
@@ -199,31 +201,29 @@ export default {
     // so it won't be set if thumbnails aren't available.
     let revealSrc = null;
 
+    let originalDimensions;
+    let availableThumbs;
+    let selectedThumbtack;
+
+    const getThumbSrc = (thumbtack) =>
+      to('thumb.path', mediaSrc.replace(/\.(png|jpg)$/, `.${thumbtack}.jpg`));
+
     // If thumbnails are available *and* being used, calculate thumbSrc,
     // and provide some attributes relevant to the large image overlay.
     if (hasThumbnails && slots.thumb) {
-      const selectedSize =
+      selectedThumbtack =
         getThumbnailEqualOrSmaller(slots.thumb, mediaSrc);
 
-      const mediaSrcJpeg =
-        mediaSrc.replace(/\.(png|jpg)$/, `.${selectedSize}.jpg`);
-
       displaySrc =
-        to('thumb.path', mediaSrcJpeg);
+        getThumbSrc(selectedThumbtack);
 
       if (willReveal) {
-        const miniSize =
-          getThumbnailEqualOrSmaller('mini', mediaSrc);
-
-        const mediaSrcJpeg =
-          mediaSrc.replace(/\.(png|jpg)$/, `.${miniSize}.jpg`);
-
         revealSrc =
-          to('thumb.path', mediaSrcJpeg);
+          getThumbSrc(getThumbnailEqualOrSmaller('mini', mediaSrc));
       }
 
-      const originalDimensions = getDimensionsOfImagePath(mediaSrc);
-      const availableThumbs = getThumbnailsAvailableForDimensions(originalDimensions);
+      originalDimensions = getDimensionsOfImagePath(mediaSrc);
+      availableThumbs = getThumbnailsAvailableForDimensions(originalDimensions);
 
       const fileSize =
         (willLink && mediaSrc
@@ -239,9 +239,52 @@ export default {
         !empty(availableThumbs) &&
           {'data-thumbs':
               availableThumbs
-                .map(([name, size]) => `${name}:${size}`)
+                .map(([tack, size]) => `${tack}:${size}`)
                 .join(' ')},
       ]);
+    }
+
+    let displayStaticImg =
+      html.tag('img',
+        imgAttributes,
+        {src: displaySrc});
+
+    if (hasThumbnails && slots.responsiveThumb) responsive: {
+      if (slots.lazy) {
+        logWarn`${'responsiveThumb'} and ${'lazy'} are used together, but not compatible`;
+        break responsive;
+      }
+
+      if (!slots.thumb) {
+        logWarn`${'responsiveThumb'} must be used alongside a default ${'thumb'}`;
+        break responsive;
+      }
+
+      const srcset = [
+        // Never load the original source, which might be a very large
+        // uncompressed file. Bah!
+        /* [originalSrc, `${Math.min(...originalDimensions)}w`], */
+
+        ...availableThumbs.map(([tack, size]) =>
+          [getThumbSrc(tack), `${size}w`]),
+
+        // fallback
+        [displaySrc],
+      ].map(line => line.join(' ')).join(',\n');
+
+      displayStaticImg =
+        html.tag('img',
+          imgAttributes,
+
+          {sizes:
+            (slots.responsiveSizes.match(/(?=(?:,|^))\s*\S/)
+                // slot provided fallback size
+              ? slots.responsiveSizes
+                // default fallback size
+              : slots.responsiveSizes + ',\n' +
+                new Map(availableThumbs).get(selectedThumbtack) + 'px')},
+
+          {srcset});
     }
 
     if (!displaySrc) {
@@ -252,10 +295,7 @@ export default {
     }
 
     const images = {
-      displayStatic:
-        html.tag('img',
-          imgAttributes,
-          {src: displaySrc}),
+      displayStatic: displayStaticImg,
 
       displayLazy:
         slots.lazy &&

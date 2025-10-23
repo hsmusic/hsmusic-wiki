@@ -147,7 +147,8 @@ function getImageLinkDetails(imageLink) {
       a.href,
 
     embeddedSrc:
-      img?.src ??
+      img?.src ||
+      img?.currentSrc ||
       a.dataset.embedSrc,
 
     originalFileSize:

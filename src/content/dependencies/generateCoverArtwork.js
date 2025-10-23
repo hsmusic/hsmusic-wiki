@@ -122,6 +122,30 @@ export default {
                 thumb: 'medium',
                 reveal: true,
                 link: true,
+
+                responsiveThumb: true,
+                responsiveSizes:
+                  // No clamp(), min(), or max() here because Safari.
+                  // The boundaries here are mostly experimental, apart from
+                  // the ones which flat-out switch layouts.
+
+                  // Layout - Thin (phones)
+                  // Most of viewport width
+                  '(max-width: 600px) 90vw,\n' +
+
+                  // Layout - Medium
+                  // Sidebar is hidden; content area is by definition
+                  // most of the viewport
+                  '(max-width: 640px) 220px,\n' +
+                  '(max-width: 800px) 36vw,\n' +
+                  '(max-width: 850px) 280px,\n' +
+
+                  // Layout - Wide
+                  // Sidebar is visible; content area has its own maximum
+                  // Assume the sidebar is at minimum width
+                  '(max-width: 880px) 220px,\n' +
+                  '(max-width: 1050pz) calc(0.40 * (90vw - 150px - 10px)),\n' +
+                  '280px',
               }),
 
               slots.showOriginDetails &&
