@@ -266,7 +266,7 @@ export default {
         /* [originalSrc, `${Math.min(...originalDimensions)}w`], */
 
         ...availableThumbs.map(([tack, size]) =>
-          [getThumbSrc(tack), `${size}w`]),
+          [getThumbSrc(tack), `${Math.floor(0.95 * size)}w`]),
 
         // fallback
         [displaySrc],
