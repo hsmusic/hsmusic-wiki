@@ -301,6 +301,11 @@ releaseInfo:
 
     single: "as a single"
 
+  previousProduction:
+    _: "This track is a previous version or production of {TRACKS}."
+
+    trackOnAlbum: "{TRACK} (on {ALBUM})"
+
   tracksReferenced:
     _: "Tracks that {TRACK} references:"
     sticky: "Tracks that this one references:"
@@ -461,6 +466,9 @@ trackList:
 
     rerelease: >-
       {TRACK} (rerelease)
+
+    previousProduction: >-
+      {TRACK} (previous version or production)
 
 #
 # misc:

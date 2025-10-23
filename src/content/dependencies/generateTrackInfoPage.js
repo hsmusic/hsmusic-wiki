@@ -80,17 +80,20 @@ export default {
     readCommentaryLine:
       relation('generateReadCommentaryLine', track),
 
-    otherReleasesList:
-      relation('generateTrackInfoPageOtherReleasesList', track),
+    otherReleasesLine:
+      relation('generateTrackInfoPageOtherReleasesLine', track),
+
+    previousProductionLine:
+      relation('generateTrackInfoPagePreviousProductionLine', track),
 
     contributorContributionList:
       relation('generateContributionList', track.contributorContribs),
 
     referencedTracksList:
-      relation('generateNearbyTrackList', track.referencedTracks, track),
+      relation('generateReferencedTracksList', track),
 
     sampledTracksList:
-      relation('generateNearbyTrackList', track.sampledTracks, track),
+      relation('generateNearbyTrackList', track.sampledTracks, track, []),
 
     referencedByTracksList:
       relation('generateTrackListDividedByGroups',
@@ -228,7 +231,11 @@ export default {
                   })),
             ])),
 
-          relations.otherReleasesList,
+          html.tag('p', {[html.onlyIfContent]: true},
+            relations.otherReleasesLine),
+
+          html.tag('p', {[html.onlyIfContent]: true},
+            relations.previousProductionLine),
 
           html.tags([
             relations.contentHeading.clone()

@@ -297,6 +297,7 @@ export function filterReferenceErrors(wikiData, {
       artistContribs: '_contrib',
       contributorContribs: '_contrib',
       coverArtistContribs: '_contrib',
+      previousProductionTracks: '_trackMainReleasesOnly',
       referencedTracks: '_trackMainReleasesOnly',
       sampledTracks: '_trackMainReleasesOnly',
       artTags: '_artTag',

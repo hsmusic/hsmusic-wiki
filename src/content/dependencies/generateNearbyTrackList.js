@@ -1,5 +1,5 @@
 export default {
-  query: (tracks, contextTrack) => ({
+  query: (tracks, contextTrack, _contextContributions) => ({
     presentedTracks:
       (contextTrack
         ? tracks.map(track =>
@@ -8,13 +8,23 @@ export default {
         : tracks),
   }),
 
-  relations: (relation, query, _tracks, _contextTrack) => ({
+  relations: (relation, query, _tracks, _contextTrack, contextContributions) => ({
     items:
       query.presentedTracks
-        .map(track => relation('generateTrackListItem', track, [])),
+        .map(track => relation('generateTrackListItem', track, contextContributions)),
   }),
 
   slots: {
+    showArtists: {
+      validate: v => v.is(true, false, 'auto'),
+      default: 'auto',
+    },
+
+    showDuration: {
+      type: 'boolean',
+      default: false,
+    },
+
     colorMode: {
       validate: v => v.is('none', 'track', 'line'),
       default: 'track',
@@ -27,8 +37,8 @@ export default {
 
       relations.items.map(item =>
         item.slots({
-          showArtists: 'auto',
-          showDuration: false,
+          showArtists: slots.showArtists,
+          showDuration: slots.showDuration,
           colorMode: slots.colorMode,
         }))),
 };
