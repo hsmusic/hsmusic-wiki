@@ -60,7 +60,7 @@ export function reportDirectoryErrors(wikiData, {
           : [thing.directory]);
 
       for (const directory of directories) {
-        if (directory === null || directory === undefined) {
+        if (directory === '' || directory === null || directory === undefined) {
           missingDirectoryThings.add(thing);
           continue;
         }
