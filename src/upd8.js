@@ -1798,10 +1798,17 @@ async function main() {
       if (!paragraph) console.log('');
       niceShowAggregate(aggregate);
 
-      logWarn`The above duplicate directories were detected while reviewing data files.`;
-      logWarn`Since it's impossible to automatically determine which one's directory is`;
-      logWarn`correct, the build can't continue. Specify unique 'Directory' fields in`;
-      logWarn`some or all of these data entries to resolve the errors.`;
+      if (aggregate.errors.find(err => err.message.toLowerCase().includes('duplicate'))) {
+        logWarn`The above duplicate directories were detected while reviewing data files.`;
+        logWarn`Since it's impossible to automatically determine which one's directory is`;
+        logWarn`correct, the build can't continue. Specify unique 'Directory' fields in`;
+        logWarn`some or all of these data entries to resolve the errors.`;
+      } else {
+        logWarn`The above directory errors were detected while reviewing data files.`;
+        logWarn`Since it's impossible to automatically fill in working directories,`;
+        logWarn`the build can't continue. Manually specify 'Directory' fields in`;
+        logWarn`some or all of these data entries to resolve the errors.`;
+      }
 
       console.log('');
       paragraph = true;
