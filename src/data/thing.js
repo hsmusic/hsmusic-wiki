@@ -84,7 +84,13 @@ export default class Thing extends CacheableObject {
     }
 
     if (!thing.directory) {
-      throw TypeError(`Passed ${thing.constructor.name} is missing its directory`);
+      if (thing.name) {
+        throw TypeError(
+          `Passed ${thing.constructor.name} (named ${inspect(thing.name)}) ` +
+          `is missing its directory`);
+      } else {
+        throw TypeError(`Passed ${thing.constructor.name} is missing its directory`);
+      }
     }
 
     return `${thing.constructor[Thing.referenceType]}:${thing.directory}`;
