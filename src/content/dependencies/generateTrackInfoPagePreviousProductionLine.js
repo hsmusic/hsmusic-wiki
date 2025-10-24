@@ -23,15 +23,16 @@ export default {
         [language.onlyIfOptions]: ['tracks'],
 
         tracks:
-          stitchArrays({
-            trackLink: relations.trackLinks,
-            albumLink: relations.albumLinks,
-          }).map(({trackLink, albumLink}) =>
-              (albumLink
-                ? language.$(capsule, 'trackOnAlbum', {
-                    track: trackLink,
-                    album: albumLink,
-                  })
-                : trackLink)),
+          language.formatConjunctionList(
+            stitchArrays({
+              trackLink: relations.trackLinks,
+              albumLink: relations.albumLinks,
+            }).map(({trackLink, albumLink}) =>
+                (albumLink
+                  ? language.$(capsule, 'trackOnAlbum', {
+                      track: trackLink,
+                      album: albumLink,
+                    })
+                  : trackLink))),
       })),
 };
