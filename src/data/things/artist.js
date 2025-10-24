@@ -7,9 +7,9 @@ import {colors} from '#cli';
 import {input} from '#composite';
 import {stitchArrays} from '#sugar';
 import Thing from '#thing';
-import {isName, validateArrayItems} from '#validators';
+import {validateArrayItems} from '#validators';
 import {getKebabCase} from '#wiki-data';
-import {parseArtwork} from '#yaml';
+import {parseArtistAliases, parseArtwork} from '#yaml';
 
 import {
   sortAlbumsTracksChronologically,
@@ -32,6 +32,8 @@ import {
   singleReference,
   soupyFind,
   soupyReverse,
+  thing,
+  thingList,
   urls,
 } from '#composite/wiki-properties';
 
@@ -63,17 +65,14 @@ export class Artist extends Thing {
         .call(this, 'Avatar Artwork'),
     ],
 
-    aliasNames: {
-      flags: {update: true, expose: true},
-      update: {validate: validateArrayItems(isName)},
-      expose: {transform: (names) => names ?? []},
-    },
-
     isAlias: flag(),
 
-    aliasedArtist: singleReference({
+    artistAliases: thingList({
       class: input.value(Artist),
-      find: soupyFind.input('artist'),
+    }),
+
+    aliasedArtist: thing({
+      class: input.value(Artist),
     }),
 
     // Update only
@@ -251,8 +250,6 @@ export class Artist extends Thing {
     hasAvatar: S.id,
     avatarFileExtension: S.id,
 
-    aliasNames: S.id,
-
     tracksAsCommentator: S.toRefs,
     albumsAsCommentator: S.toRefs,
   });
@@ -283,17 +280,9 @@ export class Artist extends Thing {
         // in the original's alias list. This is honestly a bit awkward, but it
         // avoids artist aliases conflicting with each other when checking for
         // duplicate directories.
-        for (const aliasName of originalArtist.aliasNames) {
-          // These are trouble. We should be accessing aliases' directories
-          // directly, but artists currently don't expose a reverse reference
-          // list for aliases. (This is pending a cleanup of "reverse reference"
-          // behavior in general.) It doesn't actually cause problems *here*
-          // because alias directories are computed from their names 100% of the
-          // time, but that *is* an assumption this code makes.
-          if (aliasName === artist.name) continue;
-          if (artist.directory === getKebabCase(aliasName)) {
-            return [];
-          }
+        for (const alias of originalArtist.artistAliases) {
+          if (alias === artist) break;
+          if (alias.directory === artist.directory) return [];
         }
 
         // And, aliases never return just a blank string. This part is pretty
@@ -333,7 +322,10 @@ export class Artist extends Thing {
       'Has Avatar': {property: 'hasAvatar'},
       'Avatar File Extension': {property: 'avatarFileExtension'},
 
-      'Aliases': {property: 'aliasNames'},
+      'Aliases': {
+        property: 'artistAliases',
+        transform: parseArtistAliases,
+      },
 
       'Dead URLs': {ignore: true},
 
@@ -353,26 +345,7 @@ export class Artist extends Thing {
 
     save(results) {
       const artists = results;
-
-      const artistRefs =
-        artists.map(artist => Thing.getReference(artist));
-
-      const artistAliasNames =
-        artists.map(artist => artist.aliasNames);
-
-      const artistAliases =
-        stitchArrays({
-          originalArtistRef: artistRefs,
-          aliasNames: artistAliasNames,
-        }).flatMap(({originalArtistRef, aliasNames}) =>
-            aliasNames.map(name => {
-              const alias = new Artist();
-              alias.name = name;
-              alias.isAlias = true;
-              alias.aliasedArtist = originalArtistRef;
-              return alias;
-            }));
-
+      const artistAliases = artists.flatMap(artist => artist.artistAliases);
       const artistData = [...artists, ...artistAliases];
 
       const artworkData =
