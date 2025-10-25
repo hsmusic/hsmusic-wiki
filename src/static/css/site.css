@@ -1555,19 +1555,25 @@ li:not(:first-child:last-child) .tooltip:where(:not(.cover-artwork .tooltip)),
 }
 
 pre.content-code {
-  white-space: normal;
   background: black;
   color: white;
+
+  white-space: nowrap;
+
   padding: 5px;
   max-width: calc(100vw - 180px);
+
+  /* Welcome to heck. */
+  font-family: inherit;
+
   overflow-x: scroll;
   border: 1px dashed var(--primary-color);
 }
 
 pre.content-code code {
+  font-family: "courier new", monospace;
+  font-weight: 800;
   font-size: 0.8em;
-  line-height: 1;
-  white-space: nowrap;
 }
 
 s.spoiler {
