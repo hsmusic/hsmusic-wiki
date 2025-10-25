@@ -2,7 +2,7 @@ import {sortAlbumsTracksChronologically} from '#sort';
 import {empty} from '#sugar';
 
 export default {
-  query(_artist, contribs) {
+  query(artist, contribs) {
     const query = {};
 
     // TODO: Very mysterious what to do if the set of contributions is,
@@ -68,11 +68,18 @@ export default {
     query.isFirstRelease =
       allReleasesChronologically[0] === query.track;
 
-    query.isRerelease =
+    query.isLaterRelease =
       allReleasesChronologically[0] !== query.track;
 
-    query.hasOtherReleases =
-      !empty(query.track.otherReleases);
+    query.hasOtherCreditedReleases =
+      query.track.otherReleases.some(track => {
+        const contribs = [
+          ...track.artistContribs,
+          ...track.contributorContribs,
+        ];
+
+        return contribs.some(contrib => contrib.artist === artist);
+      });
 
     return query;
   },
@@ -88,12 +95,12 @@ export default {
       relation('generateArtistInfoPageOtherArtistLinks', contribs),
 
     rereleaseTooltip:
-      (query.isRerelease
+      (query.isLaterRelease
         ? relation('generateArtistInfoPageRereleaseTooltip', query.track, artist)
         : null),
 
     firstReleaseTooltip:
-      (query.isFirstRelease && query.hasOtherReleases
+      (query.isFirstRelease && query.hasOtherCreditedReleases
         ? relation('generateArtistInfoPageFirstReleaseTooltip', query.track, artist)
         : null),
   }),

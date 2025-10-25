@@ -1488,6 +1488,10 @@ li:not(:first-child:last-child) .tooltip:where(:not(.cover-artwork .tooltip)),
   font-size: 0.9em;
 }
 
+.rerelease-tooltip .not-credited-on-first-release {
+  opacity: 0.9;
+}
+
 .content-tooltip-guy .hoverable a {
   text-decoration-color: transparent;
   text-decoration-style: dotted;

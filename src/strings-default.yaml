@@ -1332,6 +1332,9 @@ artistPage:
         firstRelease: >-
           First released on {ALBUM}
 
+        notCreditedOnFirstRelease: >-
+          Note that {ARTIST} is not credited on this track's first release.
+
       firstRelease:
         _: "{ENTRY} ({FIRST_RELEASE})"
         term: "first release"

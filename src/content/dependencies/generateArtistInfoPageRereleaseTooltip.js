@@ -1,10 +1,22 @@
 import {sortAlbumsTracksChronologically} from '#sort';
 
 export default {
-  query: (track) => ({
-    firstRelease:
-      sortAlbumsTracksChronologically(track.allReleases)[0],
-  }),
+  query(track, artist) {
+    const query = {};
+
+    query.firstRelease =
+      sortAlbumsTracksChronologically(track.allReleases)[0];
+
+    const contribs = [
+      ...query.firstRelease.artistContribs,
+      ...query.firstRelease.contributorContribs,
+    ];
+
+    query.creditedOnFirstRelease =
+      contribs.some(contrib => contrib.artist === artist);
+
+    return query;
+  },
 
   relations: (relation, query, track, artist) => ({
     tooltip:
@@ -14,10 +26,15 @@ export default {
       relation('generateColorStyleAttribute', track.color),
 
     firstReleaseLink:
-      relation('linkOtherReleaseOnArtistInfoPage', query.firstRelease, artist),
+      (query.creditedOnFirstRelease
+        ? relation('linkOtherReleaseOnArtistInfoPage', query.firstRelease, artist)
+        : relation('linkTrackAsRelease', query.firstRelease)),
   }),
 
-  data: (query, track) => ({
+  data: (query, track, artist) => ({
+    artistName:
+      artist.name,
+
     rereleaseDate:
       track.dateFirstReleased ??
       track.album.date,
@@ -25,6 +42,9 @@ export default {
     firstReleaseDate:
       query.firstRelease.dateFirstReleased ??
       query.firstRelease.album.date,
+
+    creditedOnFirstRelease:
+      query.creditedOnFirstRelease,
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -48,6 +68,15 @@ export default {
             approximate: true,
             absolute: true,
           }),
+
+          !data.creditedOnFirstRelease && [
+            html.tag('hr', {class: 'cute'}),
+
+            html.tag('span', {class: 'not-credited-on-first-release'},
+              language.$(capsule, 'notCreditedOnFirstRelease', {
+                artist: data.artistName,
+              })),
+          ],
         ],
       })),
 };

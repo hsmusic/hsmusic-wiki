@@ -2,10 +2,18 @@ import {sortAlbumsTracksChronologically} from '#sort';
 import {stitchArrays} from '#sugar';
 
 export default {
-  query: (track) => ({
-    rereleases:
-      sortAlbumsTracksChronologically(track.allReleases).slice(1),
-  }),
+query: (track, artist) => ({
+  rereleases:
+    sortAlbumsTracksChronologically(
+      track.otherReleases.filter(track => {
+        const contribs = [
+          ...track.artistContribs,
+          ...track.contributorContribs,
+        ];
+
+        return contribs.some(contrib => contrib.artist === artist);
+      })),
+}),
 
   relations: (relation, query, track, artist) => ({
     tooltip:
