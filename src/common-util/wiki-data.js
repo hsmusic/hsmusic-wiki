@@ -541,26 +541,29 @@ export function combineWikiDataArrays(arrays) {
 export function* matchMarkdownLinks(markdownSource, {marked}) {
   const plausibleLinkRegexp = /\[(?=.*?\))/g;
 
-  // Pedantic rules use more particular parentheses detection in link
-  // destinations - they allow one level of balanced parentheses, and
-  // otherwise, parentheses must be escaped. This allows for entire links
-  // to be wrapped in parentheses, e.g below:
-  //
-  //   This is so cool. ([You know??](https://example.com))
-  //
-  const definiteLinkRegexp = marked.Lexer.rules.inline.pedantic.link;
+  const lexer = new marked.Lexer();
+
+  // This is just an optimization. Don't let Marked try to process tokens
+  // recursively, i.e. within the text/label of the link. We only care about
+  // the text itself, as a string.
+  lexer.inlineTokens = x => [];
+
+  // This is cheating, because the lexer's tokenizer is a private property,
+  // but we can apparently access it anyway.
+  const {tokenizer} = lexer;
 
   let plausibleMatch = null;
   while (plausibleMatch = plausibleLinkRegexp.exec(markdownSource)) {
+    const {index} = plausibleMatch;
+
     const definiteMatch =
-      definiteLinkRegexp.exec(markdownSource.slice(plausibleMatch.index));
+      tokenizer.link(markdownSource.slice(index));
 
     if (!definiteMatch) {
       continue;
     }
 
-    const [{length}, label, href] = definiteMatch;
-    const index = plausibleMatch.index + definiteMatch.index;
+    const {raw: {length}, text: label, href} = definiteMatch;
 
     yield {label, href, index, length};
   }
