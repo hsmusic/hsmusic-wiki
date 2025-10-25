@@ -29,6 +29,28 @@ const commonMarkedOptions = {
 
 const multilineMarked = new Marked({
   ...commonMarkedOptions,
+
+  renderer: {
+    code({text}) {
+      let lines = text
+        .replace(/^\n+/, '')
+        .replace(/\n+$/, '')
+        .split('\n');
+
+      lines = lines
+        .map(line => line
+          .replace(/^ +/, spaces => '&nbsp'.repeat(spaces.length))
+          .replaceAll(/ {2,}/g, spaces => '&nbsp'.repeat(spaces.length)));
+
+      return (
+        `<pre class="content-code"><code>` +
+        (lines.length > 1 ? '\n' : '') +
+        lines.join('<br>\n') +
+        (lines.length > 1 ? '\n' : '') +
+        `</pre></code>`
+      );
+    },
+  },
 });
 
 const inlineMarked = new Marked({
@@ -867,20 +889,37 @@ export default {
     // This is separated into its own function just since we're gonna reuse
     // it in a minute if everything goes to heck in lyrics mode.
     const transformMultiline = () => {
-      const markedInput =
-        extractNonTextNodes()
-          // Compress multiple line breaks into single line breaks,
-          // except when they're preceding or following indented
-          // text (by at least two spaces) or blockquotes.
-          .replace(/(?<!^  .*|^>.*)\n{2,}(?!^  |^>)/gm, '\n') /* eslint-disable-line no-regex-spaces */
-          // Expand line breaks which don't follow a list, quote,
-          // or <br> / "  ", and which don't precede or follow
-          // indented text (by at least two spaces).
-          .replace(/(?<!^ *(?:-|\d+\.).*|^>.*|^  .*\n*|  $|<br>$)\n+(?!  |\n)/gm, '\n\n') /* eslint-disable-line no-regex-spaces */
-          // Expand line breaks which are at the end of a list.
-          .replace(/(?<=^ *(?:-|\d+\.).*)\n+(?!^ *(?:-|\d+\.))/gm, '\n\n')
-          // Expand line breaks which are at the end of a quote.
-          .replace(/(?<=^>.*)\n+(?!^>)/gm, '\n\n');
+      let fencedCode = [];
+
+      const fencedCodePlaceholder =
+        `<span class="INSERT-FENCED-CODE"></span>`;
+
+      let markedInput = extractNonTextNodes();
+
+      markedInput = markedInput
+        .replaceAll(/```(?:[\s\S](?!```))*\n```/g, (match) => {
+          fencedCode.push(match);
+          return fencedCodePlaceholder;
+        });
+
+      markedInput = markedInput
+        // Compress multiple line breaks into single line breaks,
+        // except when they're preceding or following indented
+        // text (by at least two spaces) or blockquotes.
+        .replace(/(?<!^  .*|^>.*)\n{2,}(?!^  |^>)/gm, '\n') /* eslint-disable-line no-regex-spaces */
+        // Expand line breaks which don't follow a list, quote,
+        // or <br> / "  ", and which don't precede or follow
+        // indented text (by at least two spaces).
+        .replace(/(?<!^ *(?:-|\d+\.).*|^>.*|^  .*\n*|  $|<br>$)\n+(?!  |\n)/gm, '\n\n') /* eslint-disable-line no-regex-spaces */
+        // Expand line breaks which are at the end of a list.
+        .replace(/(?<=^ *(?:-|\d+\.).*)\n+(?!^ *(?:-|\d+\.))/gm, '\n\n')
+        // Expand line breaks which are at the end of a quote.
+        .replace(/(?<=^>.*)\n+(?!^>)/gm, '\n\n');
+
+      fencedCode = fencedCode.reverse();
+
+      markedInput = markedInput
+        .replaceAll(fencedCodePlaceholder, () => fencedCode.pop());
 
       const markedOutput =
         multilineMarked.parse(markedInput);

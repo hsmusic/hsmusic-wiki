@@ -1554,6 +1554,22 @@ li:not(:first-child:last-child) .tooltip:where(:not(.cover-artwork .tooltip)),
   color: #fffb;
 }
 
+pre.content-code {
+  white-space: normal;
+  background: black;
+  color: white;
+  padding: 5px;
+  max-width: calc(100vw - 180px);
+  overflow-x: scroll;
+  border: 1px dashed var(--primary-color);
+}
+
+pre.content-code code {
+  font-size: 0.8em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 s.spoiler {
   display: inline-block;
   color: transparent;
