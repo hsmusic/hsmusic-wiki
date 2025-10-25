@@ -7,13 +7,13 @@ export default {
       relation('generateArtistCredit',
         track.artistContribs,
         contextContributions,
-        track.artistText),
+        track.artistTextInLists),
 
     acontextualCredit:
       relation('generateArtistCredit',
         track.artistContribs,
         [],
-        track.artistText),
+        track.artistTextInLists),
 
     colorStyle:
       relation('generateColorStyleAttribute', track.color),

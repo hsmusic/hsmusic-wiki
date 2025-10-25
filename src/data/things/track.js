@@ -189,9 +189,25 @@ export class Track extends Thing {
       }),
     ],
 
-    artistContribs: [
-      inheritContributionListFromMainRelease(),
+    artistTextInLists: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isContentString),
+      }),
 
+      exposeDependencyOrContinue({
+        dependency: 'artistText',
+      }),
+
+      withPropertyFromAlbum({
+        property: input.value('trackArtistText'),
+      }),
+
+      exposeDependency({
+        dependency: '#album.trackArtistText',
+      }),
+    ],
+
+    artistContribs: [
       withDate(),
 
       withResolvedContribs({
@@ -624,9 +640,8 @@ export class Track extends Thing {
 
       // Credits and contributors
 
-      'Artist Text': {
-        property: 'artistText',
-      },
+      'Artist Text': {property: 'artistText'},
+      'Artist Text In Lists': {property: 'artistTextInLists'},
 
       'Artists': {
         property: 'artistContribs',
