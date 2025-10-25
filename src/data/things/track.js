@@ -224,6 +224,10 @@ export class Track extends Thing {
         mode: input.value('empty'),
       }),
 
+      // Specifically inherit artist contributions later than artist contribs.
+      // Secondary releases' artists may differ from the main release.
+      inheritContributionListFromMainRelease(),
+
       withPropertyFromAlbum({
         property: input.value('trackArtistContribs'),
       }),
@@ -795,11 +799,6 @@ export class Track extends Thing {
       {message: `Secondary releases inherit samples from the main one`, fields: [
         'Main Release',
         'Sampled Tracks',
-      ]},
-
-      {message: `Secondary releases inherit artists from the main one`, fields: [
-        'Main Release',
-        'Artists',
       ]},
 
       {message: `Secondary releases inherit contributors from the main one`, fields: [
