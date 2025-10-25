@@ -43,11 +43,11 @@ const multilineMarked = new Marked({
           .replaceAll(/ {2,}/g, spaces => '&nbsp'.repeat(spaces.length)));
 
       return (
-        `<pre class="content-code"><code>` +
+        `<pre class="content-code"><span><code>` +
         (lines.length > 1 ? '\n' : '') +
         lines.join('<br>\n') +
         (lines.length > 1 ? '\n' : '') +
-        `</pre></code>`
+        `</pre></span></code>`
       );
     },
   },
