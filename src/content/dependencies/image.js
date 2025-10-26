@@ -108,12 +108,11 @@ export default {
     // src string directly when a parts-formed path *is* available seems wrong.
     // It should be possible to do urls.from(slots.path[0]).to(...slots.path),
     // for example, but will require reworking the control flow here a little.
-    let mediaSrc = null;
+    let mediaSrc = decodeURIComponent(originalSrc);
     if (originalSrc.startsWith(to('media.root'))) {
-      mediaSrc =
-        originalSrc
-          .slice(to('media.root').length)
-          .replace(/^\//, '');
+      mediaSrc = mediaSrc
+        .slice(to('media.root').length)
+        .replace(/^\//, '');
     }
 
     const isMissingImageFile =
