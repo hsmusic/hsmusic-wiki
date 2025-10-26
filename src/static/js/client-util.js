@@ -97,12 +97,12 @@ export function getVisuallyContainingElement(child) {
 const getLinkHref = (type, directory) => rebase(`${type}/${directory}`);
 */
 
-export const openAlbum = d => rebase(`album/${d}`);
-export const openArtTag = d => rebase(`tag/${d}`);
-export const openArtist = d => rebase(`artist/${d}`);
-export const openFlash = d => rebase(`flash/${d}`);
-export const openGroup = d => rebase(`group/${d}`);
-export const openTrack = d => rebase(`track/${d}`);
+export const openAlbum = d => rebase(`album/${d}/`);
+export const openArtTag = d => rebase(`tag/${d}/`);
+export const openArtist = d => rebase(`artist/${d}/`);
+export const openFlash = d => rebase(`flash/${d}/`);
+export const openGroup = d => rebase(`group/${d}/`);
+export const openTrack = d => rebase(`track/${d}/`);
 
 // TODO: This should also use urlSpec.
 
