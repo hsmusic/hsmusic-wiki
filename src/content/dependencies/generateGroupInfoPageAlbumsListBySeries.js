@@ -12,6 +12,10 @@ export default {
       group.serieses
         .map(() => relation('generateContentHeading')),
 
+    seriesDescriptions:
+      group.serieses
+        .map(series => relation('transformContent', series.description)),
+
     seriesItems:
       group.serieses
         .map(series => series.albums
@@ -50,11 +54,13 @@ export default {
           name: data.seriesNames,
           itemsShowArtists: data.seriesItemsShowArtists,
           heading: relations.seriesHeadings,
+          description: relations.seriesDescriptions,
           items: relations.seriesItems,
         }).map(({
             name,
             itemsShowArtists,
             heading,
+            description,
             items,
           }) =>
             html.tags([
@@ -66,7 +72,11 @@ export default {
                   }),
               }),
 
-              html.tag('dd',
+              html.tag('dd', [
+                html.tag('blockquote',
+                  {[html.onlyIfContent]: true},
+                  description),
+
                 html.tag('ul',
                   stitchArrays({
                     item: items,
@@ -75,6 +85,7 @@ export default {
                       item.slots({
                         accentMode:
                           (showArtists ? 'artists' : null),
-                      })))),
+                      }))),
+              ]),
             ])))),
 };

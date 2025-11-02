@@ -2353,17 +2353,23 @@ li .origin-details {
   text-indent: 0;
 }
 
-.album-group-list blockquote {
+blockquote:is(
+  .album-group-list *, .group-series-list *
+) {
   max-width: 540px;
   margin-bottom: 9px;
   margin-top: 3px;
 }
 
-.album-group-list blockquote p:first-child {
+blockquote p:first-child:is(
+  .album-group-list *, .group-series-list *
+) {
   margin-top: 0;
 }
 
-.album-group-list blockquote p:last-child {
+blockquote p:last-child:is(
+  .album-group-list *, .group-series-list *
+) {
   margin-bottom: 0;
 }
 
