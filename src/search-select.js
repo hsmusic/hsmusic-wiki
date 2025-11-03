@@ -169,22 +169,19 @@ function genericProcess(thing, opts) {
 
   const contributions =
     contribKeys
-      .filter(key => Object.hasOwn(thing, key))
-      .flatMap(key => thing[key]);
+      .flatMap(key => thing[key] ?? []);
 
   fields.contributors =
     contributions
       .flatMap(({artist}) => [
         artist.name,
-        ...artist.aliasNames,
+        ...artist.artistAliases.map(alias => alias.name),
       ]);
 
   const groups =
-     (Object.hasOwn(thing, 'groups')
-       ? thing.groups
-    : Object.hasOwn(thing, 'album')
-       ? thing.album.groups
-       : []);
+     thing.groups ??
+     thing.album?.groups ??
+     [];
 
   const mainContributorNames =
     contributions
