@@ -55,9 +55,10 @@ function prepareArtwork(artwork, thing, {
 
 function determineArtistGroups(artist, opts) {
   const contributions = [
-    ...artist.musicContributions,
-    ...artist.artworkContributions,
-  ];
+    artist.musicContributions,
+    artist.artworkContributions
+      .filter(contrib => !contrib.annotation?.includes('edits for wiki')),
+  ].flat();
 
   const contributionGroups =
     contributions.flatMap(contrib => contrib.groups);
