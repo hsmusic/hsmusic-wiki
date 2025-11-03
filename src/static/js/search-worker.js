@@ -391,12 +391,14 @@ function performSearchAction({query, options}) {
 
 const interestingFieldCombinations = [
   ['primaryName'],
+  ['additionalNames'],
 
   ['primaryName', 'parentName', 'groups'],
   ['primaryName', 'parentName'],
   ['primaryName', 'groups', 'contributors'],
   ['primaryName', 'groups', 'artTags'],
   ['primaryName', 'groups'],
+  ['additionalNames', 'groups'],
   ['primaryName', 'contributors'],
   ['primaryName', 'artTags'],
   ['parentName', 'groups', 'artTags'],
