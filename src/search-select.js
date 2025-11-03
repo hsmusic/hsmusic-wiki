@@ -62,32 +62,41 @@ function determineArtistGroups(artist, opts) {
   const contributionGroups =
     contributions.flatMap(contrib => contrib.groups);
 
+  const scores =
+    new Map(
+      unique(contributionGroups).map(group => [group, 0]));
+
   const artistNamesish =
     unique(
       [artist.name, ...artist.artistAliases.map(alias => alias.name)]
         .map(name => getKebabCase(name)));
 
-  const interestingGroups =
-    unique(contributionGroups)
-      .filter(group => !artistNamesish.includes(getKebabCase(group.name)));
-
-  if (contributions.length < 50) {
-    return interestingGroups;
+  for (const group of scores.keys()) {
+    if (artistNamesish.includes(getKebabCase(group.name))) {
+      scores.delete(group);
+    }
   }
-
-  const dividingGroups =
-    opts.wikiInfo.divideTrackListsByGroups;
-
-  const scores =
-    new Map(interestingGroups.map(group => [group, 0]));
 
   for (const group of contributionGroups) {
     scores.set(group, scores.get(group) + 1 / contributions.length);
   }
 
-  for (const group of interestingGroups) {
-    if (dividingGroups.includes(group)) continue;
-    if (scores.get(group) < 0.12) {
+  const dividingGroups =
+    opts.wikiInfo.divideTrackListsByGroups;
+
+  const dividingGroupThreshold =
+    (contributions.length < 50 ? 0.08 : 0.16);
+
+  const generalGroupThreshold =
+    (contributions.length < 50 ? 0.00 : 0.12);
+
+  for (const group of scores.keys()) {
+    const threshold =
+      (dividingGroups.includes(group)
+        ? dividingGroupThreshold
+        : generalGroupThreshold);
+
+    if (scores.get(group) < threshold) {
       scores.delete(group);
     }
   }
