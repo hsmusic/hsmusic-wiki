@@ -116,30 +116,24 @@ function genericSelect(wikiData) {
 function genericProcess(thing, opts) {
   const fields = baselineProcess(thing, opts);
 
-  const kind =
-    thing.constructor[Symbol.for('Thing.referenceType')];
-
   const boundPrepareArtwork = artwork =>
     prepareArtwork(artwork, thing, opts);
 
   fields.artwork =
-    (kind === 'track' && thing.hasUniqueCoverArt
+    (thing.isTrack && thing.hasUniqueCoverArt
       ? boundPrepareArtwork(thing.trackArtworks[0])
-   : kind === 'track'
+   : thing.isTrack
       ? boundPrepareArtwork(thing.album.coverArtworks[0])
-   : kind === 'album'
+   : thing.isAlbum
       ? boundPrepareArtwork(thing.coverArtworks[0])
-   : kind === 'flash'
+   : thing.isFlash
       ? boundPrepareArtwork(thing.coverArtwork)
       : null);
 
   fields.parentName =
-    (kind === 'track'
-      ? thing.album.name
-   : kind === 'group'
-      ? thing.category.name
-   : kind === 'flash'
-      ? thing.act.name
+    (thing.isTrack ? thing.album.name
+   : thing.isGroup ? thing.category.name
+   : thing.isFlash ? thing.act.name
       : null);
 
   fields.disambiguator =
@@ -147,9 +141,9 @@ function genericProcess(thing, opts) {
 
   fields.artTags =
     (Array.from(new Set(
-      (kind === 'track'
+      (thing.isTrack
         ? thing.trackArtworks.flatMap(artwork => artwork.artTags)
-     : kind === 'album'
+     : thing.isAlbum
         ? thing.coverArtworks.flatMap(artwork => artwork.artTags)
         : []))))
 
