@@ -3,6 +3,7 @@
 // These files totally go together, so read them side by side, okay?
 
 import baseSearchSpec from '#search-shape';
+import {unique} from '#sugar';
 import {getKebabCase} from '#wiki-data';
 
 function prepareArtwork(artwork, thing, {
@@ -50,6 +51,48 @@ function prepareArtwork(artwork, thing, {
     displaySrc.replace(thing.directory, '<>');
 
   return serializeSrc;
+}
+
+function determineArtistGroups(artist, opts) {
+  const contributions = [
+    ...artist.musicContributions,
+    ...artist.artworkContributions,
+  ];
+
+  const contributionGroups =
+    contributions.flatMap(contrib => contrib.groups);
+
+  const artistNamesish =
+    unique(
+      [artist.name, ...artist.artistAliases.map(alias => alias.name)]
+        .map(name => getKebabCase(name)));
+
+  const interestingGroups =
+    unique(contributionGroups)
+      .filter(group => !artistNamesish.includes(getKebabCase(group.name)));
+
+  if (contributions.length < 50) {
+    return interestingGroups;
+  }
+
+  const dividingGroups =
+    opts.wikiInfo.divideTrackListsByGroups;
+
+  const scores =
+    new Map(interestingGroups.map(group => [group, 0]));
+
+  for (const group of contributionGroups) {
+    scores.set(group, scores.get(group) + 1 / contributions.length);
+  }
+
+  for (const group of interestingGroups) {
+    if (dividingGroups.includes(group)) continue;
+    if (scores.get(group) < 0.12) {
+      scores.delete(group);
+    }
+  }
+
+  return Array.from(scores.keys());
 }
 
 function baselineProcess(thing, _opts) {
@@ -173,9 +216,10 @@ function genericProcess(thing, opts) {
       ]);
 
   const groups =
-     thing.groups ??
-     thing.album?.groups ??
-     [];
+    (thing.isAlbum ? thing.groups
+   : thing.isTrack ? thing.album.groups
+   : thing.isArtist ? determineArtistGroups(thing, opts)
+   : []);
 
   const mainContributorNames =
     contributions

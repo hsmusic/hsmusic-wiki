@@ -23,9 +23,12 @@ function bindSearchUtilities({
   getThumbnailEqualOrSmaller,
   thumbsCache,
   urls,
+  wikiData,
 }) {
   const bound = {
     urls,
+    wikiData,
+    wikiInfo: wikiData.wikiInfo,
   };
 
   bound.checkIfImagePathHasCachedThumbnails =
