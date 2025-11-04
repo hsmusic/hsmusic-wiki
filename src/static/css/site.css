@@ -1261,8 +1261,7 @@ label > input[type=checkbox]:not(:checked) + span {
   font-size: 0.9rem;
 }
 
-li:not(:first-child:last-child) .tooltip:where(:not(.cover-artwork .tooltip)),
-.offset-tooltips > :not(:first-child:last-child) .tooltip {
+.offset-tooltips .tooltip {
   left: 14px;
 }
 

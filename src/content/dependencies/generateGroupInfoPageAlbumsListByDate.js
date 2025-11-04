@@ -35,6 +35,9 @@ export default {
 
       slots.hidden && {style: 'display: none'},
 
+      relations.items.length > 1&&
+        {class: 'offset-tooltips'},
+
       {[html.onlyIfContent]: true},
 
       relations.items

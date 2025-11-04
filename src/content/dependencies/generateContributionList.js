@@ -13,6 +13,9 @@ export default {
     html.tag('ul',
       {[html.onlyIfContent]: true},
 
+      relations.contributionLinks.length > 1 &&
+        {class: 'offset-tooltips'},
+
       relations.contributionLinks
         .map(contributionLink =>
           html.tag('li',

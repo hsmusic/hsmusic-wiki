@@ -1,4 +1,5 @@
-import {unique} from '#sugar';
+import {sortAlbumsTracksChronologically} from '#sort';
+import {empty, unique} from '#sugar';
 import {getTotalDuration} from '#wiki-data';
 
 export default {
@@ -18,7 +19,7 @@ export default {
           trackContribs)),
   }),
 
-  data(_artist, album, trackContribLists) {
+  data(artist, album, trackContribLists) {
     const data = {};
 
     const contribs =
@@ -43,6 +44,30 @@ export default {
     data.durationApproximate =
       durationTerms.length > 1;
 
+    const tracks =
+      trackContribLists.map(contribs => contribs[0].thing);
+
+    data.numLinkingOtherReleases =
+      tracks.filter(track => {
+        if (empty(track.otherReleases)) return false;
+
+        const releases =
+          sortAlbumsTracksChronologically(track.allReleases.slice());
+
+        // later releases always link to first release
+        if (track !== releases[0]) return true;
+
+        // first releases only link to later credited releases
+        return tracks.slice(1).some(track => {
+          const contribs = [
+            ...track.artistContribs,
+            ...track.contributorContribs,
+          ];
+
+          return contribs.some(contrib => contrib.artist === artist);
+        });
+      }).length;
+
     return data;
   },
 
@@ -56,6 +81,10 @@ export default {
       durationApproximate: data.durationApproximate,
 
       list:
-        html.tag('ul', relations.items),
+        html.tag('ul',
+          data.numLinkingOtherReleases > 1 &&
+            {class: 'offset-tooltips'},
+
+          relations.items),
     }),
 };

@@ -48,6 +48,9 @@ export default {
         {id: 'group-album-list-by-series'},
         {class: 'group-series-list'},
 
+        relations.seriesItems.flat().length > 1 &&
+          {class: 'offset-tooltips'},
+
         {[html.onlyIfContent]: true},
 
         stitchArrays({
