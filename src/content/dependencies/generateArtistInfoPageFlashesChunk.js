@@ -21,7 +21,7 @@ export default {
   generate: (data, relations, {html}) =>
     relations.template.slots({
       mode: 'flash',
-      flashActLink: relations.flashActLink,
+      link: relations.flashActLink,
       dates: data.dates,
 
       list:

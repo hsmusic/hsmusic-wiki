@@ -8,12 +8,7 @@ export default {
 
     id: {type: 'string'},
 
-    albumLink: {
-      type: 'html',
-      mutable: false,
-    },
-
-    flashActLink: {
+    link: {
       type: 'html',
       mutable: false,
     },
@@ -51,50 +46,43 @@ export default {
     }
 
     let accentedLink;
+    switch (slots.mode) {
+      case 'album': {
+        const options = {album: slots.link};
+        const parts = ['artistPage.creditList.album'];
 
-    accent: {
-      switch (slots.mode) {
-        case 'album': {
-          accentedLink = slots.albumLink;
-
-          const options = {album: accentedLink};
-          const parts = ['artistPage.creditList.album'];
-
-          if (onlyDate) {
-            parts.push('withDate');
-            options.date = language.formatDate(onlyDate);
-          }
-
-          if (slots.duration) {
-            parts.push('withDuration');
-            options.duration =
-              language.formatDuration(slots.duration, {
-                approximate: slots.durationApproximate,
-              });
-          }
-
-          accentedLink = language.formatString(...parts, options);
-          break;
+        if (onlyDate) {
+          parts.push('withDate');
+          options.date = language.formatDate(onlyDate);
         }
 
-        case 'flash': {
-          accentedLink = slots.flashActLink;
-
-          const options = {act: accentedLink};
-          const parts = ['artistPage.creditList.flashAct'];
-
-          if (onlyDate) {
-            parts.push('withDate');
-            options.date = language.formatDate(onlyDate);
-          } else if (earliestDate && latestDate) {
-            parts.push('withDateRange');
-            options.dateRange =
-              language.formatDateRange(earliestDate, latestDate);
-          }
-
-          accentedLink = language.formatString(...parts, options);
-          break;
+        if (slots.duration) {
+          parts.push('withDuration');
+          options.duration =
+            language.formatDuration(slots.duration, {
+              approximate: slots.durationApproximate,
+            });
         }
+
+        accentedLink = language.formatString(...parts, options);
+        break;
+      }
+
+      case 'flash': {
+        const options = {act: slots.link};
+        const parts = ['artistPage.creditList.flashAct'];
+
+        if (onlyDate) {
+          parts.push('withDate');
+          options.date = language.formatDate(onlyDate);
+        } else if (earliestDate && latestDate) {
+          parts.push('withDateRange');
+          options.dateRange =
+            language.formatDateRange(earliestDate, latestDate);
+        }
+
+        accentedLink = language.formatString(...parts, options);
+        break;
       }
     }
 

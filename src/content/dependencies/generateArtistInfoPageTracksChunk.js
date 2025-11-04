@@ -49,8 +49,7 @@ export default {
   generate: (data, relations, {html}) =>
     relations.template.slots({
       mode: 'album',
-
-      albumLink: relations.albumLink,
+      link: relations.albumLink,
 
       dates: data.dates,
       duration: data.duration,

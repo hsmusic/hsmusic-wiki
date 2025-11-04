@@ -220,7 +220,7 @@ export default {
             (chunkType === 'album'
               ? chunk.slots({
                   mode: 'album',
-                  albumLink: chunkLink,
+                  link: chunkLink,
 
                   list:
                     html.tag('ul',
@@ -248,7 +248,7 @@ export default {
              : chunkType === 'flash-act'
               ? chunk.slots({
                   mode: 'flash',
-                  flashActLink: chunkLink,
+                  link: chunkLink,
 
                   list:
                     html.tag('ul',
