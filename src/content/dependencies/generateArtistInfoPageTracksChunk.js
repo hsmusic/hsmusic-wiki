@@ -46,7 +46,7 @@ export default {
     return data;
   },
 
-  generate: (data, relations) =>
+  generate: (data, relations, {html}) =>
     relations.template.slots({
       mode: 'album',
 
@@ -56,6 +56,7 @@ export default {
       duration: data.duration,
       durationApproximate: data.durationApproximate,
 
-      items: relations.items,
+      list:
+        html.tag('ul', relations.items),
     }),
 };

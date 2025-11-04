@@ -18,11 +18,13 @@ export default {
         .map(contrib => contrib.date),
   }),
 
-  generate: (data, relations) =>
+  generate: (data, relations, {html}) =>
     relations.template.slots({
       mode: 'flash',
       flashActLink: relations.flashActLink,
       dates: data.dates,
-      items: relations.items,
+
+      list:
+        html.tag('ul', relations.items),
     }),
 };

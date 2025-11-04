@@ -25,7 +25,7 @@ export default {
     },
   },
 
-  generate: (data, relations, slots) =>
+  generate: (data, relations, slots, {html}) =>
     relations.template.slots({
       mode: 'album',
       albumLink: relations.albumLink,
@@ -35,8 +35,9 @@ export default {
           ? Array.from({length: data.dates}, () => null)
           : data.dates),
 
-      items:
-        relations.items.map(item =>
-          item.slot('filterEditsForWiki', slots.filterEditsForWiki)),
+      list:
+        html.tag('ul',
+          relations.items.map(item =>
+            item.slot('filterEditsForWiki', slots.filterEditsForWiki))),
     }),
 };

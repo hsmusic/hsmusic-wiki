@@ -221,51 +221,56 @@ export default {
               ? chunk.slots({
                   mode: 'album',
                   albumLink: chunkLink,
-                  items:
-                    stitchArrays({
-                      item: items,
-                      link: itemLinks,
-                      annotation: itemAnnotations,
-                      type: itemTypes,
-                    }).map(({item, link, annotation, type}) =>
-                      item.slots({
-                        annotation:
-                          annotation.slots({
-                            mode: 'inline',
-                            absorbPunctuationFollowingExternalLinks: false,
-                          }),
 
-                        content:
-                          (type === 'album'
-                            ? html.tag('i',
-                                language.$(capsule, 'album.commentary'))
-                            : language.$(capsule, 'track', {track: link})),
-                      })),
+                  list:
+                    html.tag('ul',
+                      stitchArrays({
+                        item: items,
+                        link: itemLinks,
+                        annotation: itemAnnotations,
+                        type: itemTypes,
+                      }).map(({item, link, annotation, type}) =>
+                        item.slots({
+                          annotation:
+                            annotation.slots({
+                              mode: 'inline',
+                              absorbPunctuationFollowingExternalLinks: false,
+                            }),
+
+                          content:
+                            (type === 'album'
+                              ? html.tag('i',
+                                  language.$(capsule, 'album.commentary'))
+                              : language.$(capsule, 'track', {track: link})),
+                        }))),
                 })
-           : chunkType === 'flash-act'
+
+             : chunkType === 'flash-act'
               ? chunk.slots({
                   mode: 'flash',
                   flashActLink: chunkLink,
-                  items:
-                    stitchArrays({
-                      item: items,
-                      link: itemLinks,
-                      annotation: itemAnnotations,
-                    }).map(({item, link, annotation}) =>
-                      item.slots({
-                        annotation:
-                          (annotation
-                            ? annotation.slots({
-                                mode: 'inline',
-                                absorbPunctuationFollowingExternalLinks: false,
-                              })
-                            : null),
 
-                        content:
-                          language.$(capsule, 'flash', {
-                            flash: link,
-                          }),
-                      })),
+                  list:
+                    html.tag('ul',
+                      stitchArrays({
+                        item: items,
+                        link: itemLinks,
+                        annotation: itemAnnotations,
+                      }).map(({item, link, annotation}) =>
+                        item.slots({
+                          annotation:
+                            (annotation
+                              ? annotation.slots({
+                                  mode: 'inline',
+                                  absorbPunctuationFollowingExternalLinks: false,
+                                })
+                              : null),
+
+                          content:
+                            language.$(capsule, 'flash', {
+                              flash: link,
+                            }),
+                        }))),
                 })
               : null)))),
 };

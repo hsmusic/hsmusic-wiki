@@ -18,7 +18,7 @@ export default {
       mutable: false,
     },
 
-    items: {
+    list: {
       type: 'html',
       mutable: false,
     },
@@ -103,10 +103,7 @@ export default {
         slots.id && {id: slots.id},
         accentedLink),
 
-      html.tag('dd',
-        html.tag('ul',
-          {class: 'offset-tooltips'},
-          slots.items)),
+      html.tag('dd', slots.list),
     ]);
   },
 };
