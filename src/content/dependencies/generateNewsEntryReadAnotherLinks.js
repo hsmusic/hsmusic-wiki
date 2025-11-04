@@ -70,12 +70,16 @@ export default {
       entryLines.push(language.$(...parts, options));
     }
 
+    console.log(language.$order(prefix, 'previous.withDate', 0));
+
     return (
       html.tag('p', {class: 'read-another-links'},
         {[html.onlyIfContent]: true},
         {[html.joinChildren]: html.tag('br')},
 
         entryLines.length > 1 &&
+        language.$order(prefix, 'previous.withDate', 0) === 'DATE' &&
+        language.$order(prefix, 'next.withDate', 0) === 'DATE' &&
           {class: 'offset-tooltips'},
 
         entryLines));

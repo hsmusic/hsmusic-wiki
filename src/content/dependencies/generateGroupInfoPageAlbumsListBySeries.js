@@ -49,6 +49,7 @@ export default {
         {class: 'group-series-list'},
 
         relations.seriesItems.flat().length > 1 &&
+        language.$order(listCapsule, 'item.withYear', 0) === 'YEAR_ACCENT' &&
           {class: 'offset-tooltips'},
 
         {[html.onlyIfContent]: true},

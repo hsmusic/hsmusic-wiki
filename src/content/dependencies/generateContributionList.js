@@ -9,11 +9,12 @@ export default {
     chronologyKind: {type: 'string'},
   },
 
-  generate: (relations, slots, {html}) =>
+  generate: (relations, slots, {html, language}) =>
     html.tag('ul',
       {[html.onlyIfContent]: true},
 
       relations.contributionLinks.length > 1 &&
+      language.$order('misc.artistLink.withContribution', 0) === 'ARTIST' &&
         {class: 'offset-tooltips'},
 
       relations.contributionLinks

@@ -29,13 +29,14 @@ export default {
     },
   },
 
-  generate: (relations, slots, {html}) =>
+  generate: (relations, slots, {html, language}) =>
     html.tag('ul',
       {id: 'group-album-list-by-date'},
 
       slots.hidden && {style: 'display: none'},
 
       relations.items.length > 1&&
+      language.$order('groupInfoPage.albumList.item.withYear', 0) === 'YEAR_ACCENT' &&
         {class: 'offset-tooltips'},
 
       {[html.onlyIfContent]: true},
