@@ -158,6 +158,10 @@ export class Language extends Thing {
     return this.formatString(...args);
   }
 
+  $order(...args) {
+    return this.orderStringOptions(...args);
+  }
+
   assertIntlAvailable(property) {
     if (!this[property]) {
       throw new Error(`Intl API ${property} unavailable`);
@@ -190,18 +194,13 @@ export class Language extends Thing {
     const key =
       this.#joinKeyParts(hasOptions ? args.slice(0, -1) : args);
 
+    const template =
+      this.#getStringTemplateFromFormedKey(key);
+
     const options =
       (hasOptions
         ? args.at(-1)
         : {});
-
-    if (!this.strings) {
-      throw new Error(`Strings unavailable`);
-    }
-
-    if (!this.validKeys.includes(key)) {
-      throw new Error(`Invalid key ${key} accessed`);
-    }
 
     const constantCasify = name =>
       name
@@ -243,8 +242,7 @@ export class Language extends Thing {
         ]));
 
     const output = this.#iterateOverTemplate({
-      template: this.strings[key],
-
+      template,
       match: languageOptionRegex,
 
       insert: ({name: optionName}, canceledForming) => {
@@ -322,6 +320,46 @@ export class Language extends Thing {
     }
 
     return output;
+  }
+
+  orderStringOptions(...args) {
+    let slice = null, at = null, parts = null;
+    if (args.length >= 2 && typeof args.at(-1) === 'number') {
+      if (args.length >= 3 && typeof args.at(-2) === 'number') {
+        slice = [args.at(-2), args.at(-1)];
+        parts = args.slice(0, -2);
+      } else {
+        at = args.at(-1);
+        parts = args.slice(0, -1);
+      }
+    } else {
+      parts = args;
+    }
+
+    const template = this.getStringTemplate(...parts);
+    const matches = Array.from(template.matchAll(languageOptionRegex));
+    const options = matches.map(({groups}) => groups.name);
+
+    if (slice !== null) return options.slice(...slice);
+    if (at !== null) return options.at(at);
+    return options;
+  }
+
+  getStringTemplate(...args) {
+    const key = this.#joinKeyParts(args);
+    return this.#getStringTemplateFromFormedKey(key);
+  }
+
+  #getStringTemplateFromFormedKey(key) {
+    if (!this.strings) {
+      throw new Error(`Strings unavailable`);
+    }
+
+    if (!this.validKeys.includes(key)) {
+      throw new Error(`Invalid key ${key} accessed`);
+    }
+
+    return this.strings[key];
   }
 
   #iterateOverTemplate({
