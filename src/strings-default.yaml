@@ -2984,6 +2984,14 @@ listingPage:
       title.short: "...by Uses"
       item: "{MOTIF} ({TIMES_USED})"
 
+    byGroup:
+      title: "Motifs - by Group"
+      title.short: "...by Group"
+
+      chunk:
+        title: "{GROUP}"
+        item: "{MOTIF}"
+
   other:
 
     # other.allSheetMusic:

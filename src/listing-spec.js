@@ -243,6 +243,12 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  directory: 'motif/by-group',
+  stringsKey: 'listMotifs.byGroup',
+  contentFunction: 'listMotifsByGroup',
+});
+
+listingSpec.push({
   directory: 'all-sheet-music-files',
   stringsKey: 'other.allSheetMusic',
   contentFunction: 'listAllSheetMusicFiles',
