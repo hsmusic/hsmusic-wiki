@@ -2975,8 +2975,8 @@ listingPage:
 
   listMotifs:
     byName:
-      title: "Motifs - by name"
-      title.short: "...by name"
+      title: "Motifs - by Name"
+      title.short: "...by Name"
       item: "{MOTIF}"
 
   other:
