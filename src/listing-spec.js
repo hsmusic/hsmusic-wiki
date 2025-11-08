@@ -237,6 +237,12 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  directory: 'motif/by-uses',
+  stringsKey: 'listMotifs.byUses',
+  contentFunction: 'listMotifsByUses',
+});
+
+listingSpec.push({
   directory: 'all-sheet-music-files',
   stringsKey: 'other.allSheetMusic',
   contentFunction: 'listAllSheetMusicFiles',

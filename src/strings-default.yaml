@@ -2979,6 +2979,11 @@ listingPage:
       title.short: "...by Name"
       item: "{MOTIF}"
 
+    byUses:
+      title: "Motifs - by Uses"
+      title.short: "...by Uses"
+      item: "{MOTIF} ({TIMES_USED})"
+
   other:
 
     # other.allSheetMusic:
