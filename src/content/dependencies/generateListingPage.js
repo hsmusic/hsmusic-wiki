@@ -33,6 +33,10 @@ export default {
   }),
 
   slots: {
+    loadLibraries: {
+      validate: v => v.isObject,
+    },
+
     type: {
       validate: v => v.is('rows', 'chunks', 'custom'),
     },
@@ -134,6 +138,8 @@ export default {
 
     return relations.layout.slots({
       title: formatListingString({context: 'title'}),
+
+      loadLibraries: slots.loadLibraries,
 
       headingMode: 'sticky',
 
