@@ -41,6 +41,15 @@ export default {
       validate: v => v.is('rows', 'chunks', 'custom'),
     },
 
+    listStyle: {
+      validate: v => v.is('ordered', 'unordered'),
+      default: 'unordered',
+    },
+
+    listAttributes: {
+      validate: v => v.isObject,
+    },
+
     rows: {
       validate: v => v.strictArrayOf(v.isObject),
     },
@@ -72,11 +81,6 @@ export default {
 
     chunkIDs: {
       validate: v => v.strictArrayOf(v.optional(v.isString)),
-    },
-
-    listStyle: {
-      validate: v => v.is('ordered', 'unordered'),
-      default: 'unordered',
     },
 
     content: {
@@ -127,6 +131,8 @@ export default {
     const formatRowList = ({context, rows, rowAttributes}) =>
       html.tag(
         (slots.listStyle === 'ordered' ? 'ol' : 'ul'),
+        slots.listAttributes,
+
         stitchArrays({
           row: rows,
           attributes: rowAttributes ?? rows.map(() => null),
@@ -165,6 +171,8 @@ export default {
 
         slots.type === 'chunks' &&
           html.tag('dl',
+            slots.listAttributes,
+
             slots.showSkipToSection && [
               html.tag('dt',
                 language.$('listingPage.skipToSection')),
