@@ -1,5 +1,7 @@
 /* eslint-env browser */
 
+import {readyPreparedTextWithTooltip} from './text-with-tooltip.js';
+
 export const info = {
   id: 'abcRenderModule',
 
@@ -158,5 +160,7 @@ export function mutatePageContent() {
       visualParams: settings.visualParamsTip,
       audioParams: null, // settings.audioParamsTip
     });
+
+    readyPreparedTextWithTooltip(abcwrapper);
   }
 }
