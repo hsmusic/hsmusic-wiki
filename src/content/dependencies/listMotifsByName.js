@@ -27,8 +27,10 @@ export default {
   },
 
   generate(relations) {
-    // console.log(arguments)
     return relations.page.slots({
+      loadLibraries: ['abcjs'],
+      listAttributes: {class: 'offset-tooltips'},
+
       type: 'rows',
       rows:
         relations.motifLinks

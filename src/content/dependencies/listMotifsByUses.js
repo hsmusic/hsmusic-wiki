@@ -37,6 +37,9 @@ export default {
 
   generate: (data, relations, {language}) =>
     relations.page.slots({
+      loadLibraries: ['abcjs'],
+      listAttributes: {class: 'offset-tooltips'},
+
       type: 'rows',
       rows:
         stitchArrays({

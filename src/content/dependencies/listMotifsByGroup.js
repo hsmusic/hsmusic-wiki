@@ -80,6 +80,9 @@ export default {
 
   generate: (relations) =>
     relations.page.slots({
+      loadLibraries: ['abcjs'],
+      listAttributes: {class: 'offset-tooltips'},
+
       type: 'chunks',
 
       chunkTitles:
