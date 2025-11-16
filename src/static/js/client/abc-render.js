@@ -192,11 +192,20 @@ export function mutatePageContent() {
     });
   }
 
-  for (const abcwrapper of document.querySelectorAll(settings.selectorTip)) {
-    if (session.renderAllTooltipsImmediately) {
+  if (session.renderAllTooltipsImmediately) {
+    const wrappers = document.querySelectorAll(settings.selectorTip)
+    const start = Date.now();
+    for (const abcwrapper of wrappers) {
       prepareMotifTooltip(abcwrapper);
       readyPreparedTextWithTooltip(abcwrapper);
-    } else {
+    }
+    if (wrappers.length) {
+      console.info(
+        `rendered all ${wrappers.length} motif tooltips ` +
+        `in ${((Date.now() - start) / 1000).toFixed(3)}s`);
+    }
+  } else {
+    for (const abcwrapper of document.querySelectorAll(settings.selectorTip)) {
       // lie and announce the text-with-tooltip as "prepared" already
       // it'll be filled in before a tooltip is actually requested for it...
       // HOPEFULLY...
