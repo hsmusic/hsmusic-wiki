@@ -127,7 +127,16 @@ async function buildPlayer(tune, {
 }
 
 export function mutatePageContent() {
-  if (!abcjs) return;
+  if (!abcjs) {
+    const abcs = document.querySelectorAll('.abc-full, .abc-tip');
+    if (abcs.length) {
+      console.warn(
+        `page has abcjs elements but the library isn't loaded, ` +
+        `so these are left not visible or interactive`);
+    }
+
+    return;
+  }
 
   const {settings} = info;
 
