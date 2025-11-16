@@ -76,12 +76,12 @@
     display: none;
   }
 
-  .text-with-tooltip .text-with-tooltip-interaction-cue {
+  .text-with-tooltip:not(.unready) .text-with-tooltip-interaction-cue {
     text-decoration-line: underline;
     text-decoration-style: dotted;
   }
 
-  .text-with-tooltip > .hoverable:hover .text-with-tooltip-interaction-cue,
+  .text-with-tooltip:not(.unready) > .hoverable:hover .text-with-tooltip-interaction-cue,
   .text-with-tooltip > .hoverable.has-visible-tooltip .text-with-tooltip-interaction-cue {
     text-decoration-style: wavy !important;
   }

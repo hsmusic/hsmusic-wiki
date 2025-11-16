@@ -10,6 +10,11 @@ export default {
       default: false,
     },
 
+    requiresTooltipContentFromClient: {
+      type: 'boolean',
+      default: false,
+    },
+
     text: {
       type: 'html',
       mutable: false,
@@ -39,6 +44,10 @@ export default {
         [html.noEdgeWhitespace]: true,
         class: 'text-with-tooltip',
       });
+    }
+
+    if (slots.requiresTooltipContentFromClient) {
+      attributes.add({class: 'unready'});
     }
 
     const textPart =
