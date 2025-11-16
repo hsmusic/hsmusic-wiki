@@ -1,11 +1,22 @@
 /* eslint-env browser */
 
 import {readyPreparedTextWithTooltip} from './text-with-tooltip.js';
+import {info as hoverableTooltipInfo} from './hoverable-tooltip.js';
 
 export const info = {
   id: 'abcRenderModule',
 
+  state: {
+    preparedWrappers: new WeakSet(),
+
+    prepareTooltipsNearWrapper: null,
+    prepareTooltipsWhenTooltipShows: null,
+  },
+
   settings: {
+    selectorFull: '.abc-full[data-notation]',
+    selectorTip: '.abc-tip[data-notation]',
+
     visualParamsFull: {
       add_classes: true,
       responsive: 'resize',
@@ -32,6 +43,23 @@ export const info = {
       displayPlay: true,
       displayProgress: true,
       displayWarp: false,
+    },
+
+    // Earlier strings are of greater precedence.
+    // Selectors in each string are of equal precedence.
+    nearbyTooltipSelectors: [
+      'ul, ol, dl',
+      'p, blockquote',
+      '#content, .sidebar',
+      '#page-container > *',
+      ':root',
+    ],
+  },
+
+  session: {
+    renderAllTooltipsImmediately: {
+      type: 'boolean',
+      default: false,
     },
   },
 };
@@ -128,6 +156,18 @@ async function buildPlayer(tune, {
   }
 }
 
+export function addInternalListeners() {
+  hoverableTooltipInfo.event.whenTooltipShows.push(({tooltip}) => {
+    const {state} = info;
+
+    if (tooltip === state.prepareTooltipsWhenTooltipShows) {
+      setTimeout(() => {
+        prepareNearbyMotifTooltips(state.prepareTooltipsNearWrapper);
+      });
+    }
+  });
+}
+
 export function mutatePageContent() {
   if (!abcjs) {
     const abcs = document.querySelectorAll('.abc-full, .abc-tip');
@@ -140,9 +180,9 @@ export function mutatePageContent() {
     return;
   }
 
-  const {settings} = info;
+  const {session, settings} = info;
 
-  for (const abcwrapper of document.querySelectorAll('.abc-full[data-notation]')) {
+  for (const abcwrapper of document.querySelectorAll(settings.selectorFull)) {
     const tune = JSON.parse(abcwrapper.dataset.notation);
     buildPlayer(tune, {
       visualTarget: abcwrapper.querySelector('.motif-sheet'),
@@ -152,15 +192,82 @@ export function mutatePageContent() {
     });
   }
 
-  for (const abcwrapper of document.querySelectorAll('.abc-tip[data-notation]')) {
-    const tune = JSON.parse(abcwrapper.dataset.notation);
-    buildPlayer(tune, {
-      visualTarget: abcwrapper.querySelector('.motif-sheet'),
-      controlsTarget: abcwrapper.querySelector('.motif-control'),
-      visualParams: settings.visualParamsTip,
-      audioParams: null, // settings.audioParamsTip
-    });
+  for (const abcwrapper of document.querySelectorAll(settings.selectorTip)) {
+    if (session.renderAllTooltipsImmediately) {
+      prepareMotifTooltip(abcwrapper);
+      readyPreparedTextWithTooltip(abcwrapper);
+    } else {
+      // lie and announce the text-with-tooltip as "prepared" already
+      // it'll be filled in before a tooltip is actually requested for it...
+      // HOPEFULLY...
+      readyPreparedTextWithTooltip(abcwrapper);
+    }
+  }
+}
 
-    readyPreparedTextWithTooltip(abcwrapper);
+export function addPageListeners() {
+  if (!abcjs) return;
+
+  const {settings, state} = info;
+
+  for (const abcwrapper of document.querySelectorAll(settings.selectorTip)) {
+    const twt = abcwrapper.closest('.text-with-tooltip');
+    const hoverable = twt.querySelector('.hoverable');
+    const tooltip = twt.querySelector('.tooltip');
+
+    const handle = () => {
+      prepareMotifTooltip(abcwrapper, true);
+      state.prepareTooltipsNearWrapper = abcwrapper;
+      state.prepareTooltipsWhenTooltipShows = tooltip;
+    };
+
+    hoverable.addEventListener('mouseover', handle);
+    hoverable.addEventListener('focusin', handle);
+  }
+}
+
+function prepareMotifTooltip(abcwrapper) {
+  const {settings, state} = info;
+
+  if (state.preparedWrappers.has(abcwrapper)) {
+    return;
+  } else {
+    state.preparedWrappers.add(abcwrapper);
+  }
+
+  const tune = JSON.parse(abcwrapper.dataset.notation);
+  buildPlayer(tune, {
+    visualTarget: abcwrapper.querySelector('.motif-sheet'),
+    controlsTarget: abcwrapper.querySelector('.motif-control'),
+    visualParams: settings.visualParamsTip,
+    audioParams: null, // settings.audioParamsTip
+  });
+}
+
+function prepareNearbyMotifTooltips(abcwrapper) {
+  const {settings} = info;
+
+  const timeout = Date.now() + 200;
+
+  let parent, rest = settings.nearbyTooltipSelectors;
+  do parent = abcwrapper.closest(rest.shift());
+  while (rest.length && !parent);
+  if (!parent) return;
+
+  const nearby = Array.from(parent.querySelectorAll(settings.selectorTip));
+  if (nearby.includes(abcwrapper)) {
+    const index = nearby.indexOf(abcwrapper);
+    for (let i = 1; i <= 5; i++) {
+      if (nearby[index + i]) prepareMotifTooltip(nearby[index + i]);
+      if (nearby[index - i]) prepareMotifTooltip(nearby[index - i]);
+      if (Date.now() > timeout) return;
+    }
+  } else if (nearby.length < 24) {
+    while (nearby.length) {
+      const pluck = Math.floor(Math.random() * nearby.length);
+      const [abcwrapper] = nearby.splice(pluck, 1);
+      prepareMotifTooltip(abcwrapper);
+      if (Date.now() > timeout) return;
+    }
   }
 }

@@ -26,7 +26,10 @@ import * as textWithTooltipModule from './text-with-tooltip.js';
 import * as wikiSearchModule from './wiki-search.js';
 
 export const modules = [
+  // must be earlier than hoverableTooltipModule
   abcRenderModule,
+
+  // order agnostic, as far as we know or are fortunate
   additionalNamesBoxModule,
   albumCommentarySidebarModule,
   artTagGalleryFilterModule,
