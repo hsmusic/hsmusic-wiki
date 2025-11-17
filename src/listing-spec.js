@@ -125,6 +125,24 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  directory: 'motif/by-name',
+  stringsKey: 'listMotifs.byName',
+  contentFunction: 'listMotifsByName',
+});
+
+listingSpec.push({
+  directory: 'motif/by-uses',
+  stringsKey: 'listMotifs.byUses',
+  contentFunction: 'listMotifsByUses',
+});
+
+listingSpec.push({
+  directory: 'motif/by-group',
+  stringsKey: 'listMotifs.byGroup',
+  contentFunction: 'listMotifsByGroup',
+});
+
+listingSpec.push({
   directory: 'tracks/by-name',
   stringsKey: 'listTracks.byName',
   contentFunction: 'listTracksByName',
@@ -231,24 +249,6 @@ listingSpec.push({
 });
 
 listingSpec.push({
-  directory: 'motif/by-name',
-  stringsKey: 'listMotifs.byName',
-  contentFunction: 'listMotifsByName',
-});
-
-listingSpec.push({
-  directory: 'motif/by-uses',
-  stringsKey: 'listMotifs.byUses',
-  contentFunction: 'listMotifsByUses',
-});
-
-listingSpec.push({
-  directory: 'motif/by-group',
-  stringsKey: 'listMotifs.byGroup',
-  contentFunction: 'listMotifsByGroup',
-});
-
-listingSpec.push({
   directory: 'all-sheet-music-files',
   stringsKey: 'other.allSheetMusic',
   contentFunction: 'listAllSheetMusicFiles',
@@ -351,16 +351,16 @@ const listingTargetSpec = [
     listings: filterListings('group'),
   },
   {
+    stringsKey: 'motif',
+    listings: filterListings('motif'),
+  },
+  {
     stringsKey: 'track',
     listings: filterListings('track'),
   },
   {
     stringsKey: 'tag',
     listings: filterListings('tag'),
-  },
-  {
-    stringsKey: 'motif',
-    listings: filterListings('motif'),
   },
   {
     stringsKey: 'other',
