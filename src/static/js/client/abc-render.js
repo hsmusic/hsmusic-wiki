@@ -153,12 +153,9 @@ async function buildPlayer(abcwrapper, tune, {
     synthControl.load(controlsTarget, cursorControl, audioParams);
     synthControl.disable(true);
 
-    const midiBuffer = new abcjs.synth.CreateSynth();
-
     try {
-      await midiBuffer.init({visualObj});
       await synthControl.setTune(visualObj);
-    } catch {
+    } catch (error) {
       console.warn('Audio problem:', error);
       console.warn('...for tune:\n' + tune);
     }
