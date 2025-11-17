@@ -129,12 +129,21 @@ class CursorControl {
   }
 }
 
-async function buildPlayer(tune, {
-  visualTarget,
-  controlsTarget,
+async function buildPlayer(abcwrapper, tune, {
   visualParams,
   audioParams,
 }) {
+  const {state} = info;
+
+  if (state.preparedWrappers.has(abcwrapper)) {
+    return;
+  } else {
+    state.preparedWrappers.add(abcwrapper);
+  }
+
+  const visualTarget = abcwrapper.querySelector('.motif-sheet');
+  const controlsTarget = abcwrapper.querySelector('.motif-control');
+
   const [visualObj] = abcjs.renderAbc(visualTarget, tune, visualParams);
 
   if (controlsTarget && abcjs.synth.supportsAudio()) {
@@ -184,9 +193,7 @@ export function mutatePageContent() {
 
   for (const abcwrapper of document.querySelectorAll(settings.selectorFull)) {
     const tune = JSON.parse(abcwrapper.dataset.notation);
-    buildPlayer(tune, {
-      visualTarget: abcwrapper.querySelector('.motif-sheet'),
-      controlsTarget: abcwrapper.querySelector('.motif-control'),
+    buildPlayer(abcwrapper, tune, {
       visualParams: settings.visualParamsFull,
       audioParams: settings.audioParamsFull,
     });
@@ -236,18 +243,10 @@ export function addPageListeners() {
 }
 
 function prepareMotifTooltip(abcwrapper) {
-  const {settings, state} = info;
-
-  if (state.preparedWrappers.has(abcwrapper)) {
-    return;
-  } else {
-    state.preparedWrappers.add(abcwrapper);
-  }
+  const {settings} = info;
 
   const tune = JSON.parse(abcwrapper.dataset.notation);
-  buildPlayer(tune, {
-    visualTarget: abcwrapper.querySelector('.motif-sheet'),
-    controlsTarget: abcwrapper.querySelector('.motif-control'),
+  buildPlayer(abcwrapper, tune, {
     visualParams: settings.visualParamsTip,
     audioParams: settings.audioParamsTip,
   });
