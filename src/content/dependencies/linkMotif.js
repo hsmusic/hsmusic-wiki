@@ -27,6 +27,7 @@ export default {
   generate: (data, relations, slots, {html}) =>
     relations.textWithTooltip.slots({
       requiresTooltipContentFromClient: true,
+      customInteractionCue: true,
 
       text:
         relations.link.slots({
