@@ -2100,7 +2100,16 @@
 /* Motifs */
 
 @layer layout {
-  span.motif-notation {
+  .motif-tooltip {
+    margin-top: 3px;
+  }
+
+  .motif-tooltip .motif-sheet,
+  .motif-tooltip .motif-control {
+    display: block;
+  }
+
+  .motif-notation {
     font-family: monospace;
     font-size: 2em;
   }

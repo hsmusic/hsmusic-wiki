@@ -36,20 +36,16 @@ export default {
 
       tooltip:
         relations.tooltip.slots({
-          attributes: {class: 'motif-preview-tooltip'},
+          attributes: {class: 'motif-tooltip'},
 
           content:
             data.abcNotation &&
             slots.proferTooltip &&
-            html.tag('div', [
-              html.tag('div', {class: 'abc-tip'},
-                {'data-notation': JSON.stringify(data.abcNotation)},
+            html.tag('span', {class: 'abc-tip'},
+              {'data-notation': JSON.stringify(data.abcNotation)},
 
-                [
-                  html.tag('div', {class: 'motif-sheet'}),
-                  html.tag('div', {class: 'motif-control'}),
-                ]),
-            ]),
+              html.tag('span', {class: 'motif-sheet'}),
+              html.tag('span', {class: 'motif-control'})),
         }),
     }),
 };
