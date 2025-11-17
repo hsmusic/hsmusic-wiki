@@ -69,7 +69,8 @@ const abcjs = window.ABCJS;
 class CursorControl {
   #visualTarget;
   #controlsTarget;
-  #cursor;
+
+  #cursor = null;
 
   beatSubdivisions = 2;
 
@@ -81,6 +82,10 @@ class CursorControl {
   onReady() {}
 
   onStart() {
+    if (!this.#cursor) this.#initializeCursor();
+  }
+
+  #initializeCursor() {
     const svg = this.#visualTarget.querySelector('svg');
     this.#cursor = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     this.#cursor.classList.add('abcjs-cursor');
