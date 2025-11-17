@@ -120,6 +120,11 @@ export const replacerSpec = {
     link: 'linkPathFromMedia',
   },
 
+  'motif': {
+    find: 'motif',
+    link: 'linkMotifWithoutTooltip',
+  },
+
   'news-index': {
     find: null,
     link: 'linkNewsIndex',

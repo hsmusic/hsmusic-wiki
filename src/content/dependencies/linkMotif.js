@@ -22,6 +22,10 @@ export default {
       type: 'boolean',
       default: true,
     },
+
+    // PRETEND TO BE A NORMAL INTERNAL LINK. (Evil)
+    content: {type: 'string'},
+    hash: {type: 'string'},
   },
 
   generate: (data, relations, slots, {html}) =>
@@ -32,6 +36,10 @@ export default {
       text:
         relations.link.slots({
           attributes: {class: 'text-with-tooltip-interaction-cue'},
+
+          // see no evil
+          content: slots.content,
+          hash: slots.content,
         }),
 
       tooltip:
