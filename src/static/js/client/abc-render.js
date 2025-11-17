@@ -249,7 +249,7 @@ function prepareMotifTooltip(abcwrapper) {
     visualTarget: abcwrapper.querySelector('.motif-sheet'),
     controlsTarget: abcwrapper.querySelector('.motif-control'),
     visualParams: settings.visualParamsTip,
-    audioParams: null, // settings.audioParamsTip
+    audioParams: settings.audioParamsTip,
   });
 }
 
