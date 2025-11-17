@@ -7,7 +7,10 @@ export const info = {
   id: 'abcRenderModule',
 
   state: {
-    preparedWrappers: new WeakSet(),
+    preparedWrappers: new Set(),
+    wrapperToSynthControl: new Map(),
+
+    tooltipToWrapper: new Map(),
 
     prepareTooltipsNearWrapper: null,
     prepareTooltipsWhenTooltipShows: null,
@@ -155,6 +158,8 @@ async function buildPlayer(abcwrapper, tune, {
     const cursorControl = new CursorControl(visualTarget, controlsTarget);
     const synthControl = new abcjs.synth.SynthController();
 
+    state.wrapperToSynthControl.set(abcwrapper, synthControl);
+
     synthControl.load(controlsTarget, cursorControl, audioParams);
     synthControl.disable(true);
 
@@ -175,6 +180,14 @@ export function addInternalListeners() {
       setTimeout(() => {
         prepareNearbyMotifTooltips(state.prepareTooltipsNearWrapper);
       });
+    }
+  });
+
+  hoverableTooltipInfo.event.whenTooltipHides.push(({tooltip}) => {
+    const {state} = info;
+
+    if (state.tooltipToWrapper.has(tooltip)) {
+      stopMotifPlayback(state.tooltipToWrapper.get(tooltip));
     }
   });
 }
@@ -245,13 +258,16 @@ export function addPageListeners() {
 }
 
 function prepareMotifTooltip(abcwrapper) {
-  const {settings} = info;
+  const {settings, state} = info;
 
   const tune = JSON.parse(abcwrapper.dataset.notation);
   buildPlayer(abcwrapper, tune, {
     visualParams: settings.visualParamsTip,
     audioParams: settings.audioParamsTip,
   });
+
+  const tooltip = abcwrapper.closest('.tooltip');
+  state.tooltipToWrapper.set(tooltip, abcwrapper);
 }
 
 function prepareNearbyMotifTooltips(abcwrapper) {
@@ -280,4 +296,15 @@ function prepareNearbyMotifTooltips(abcwrapper) {
       if (Date.now() > timeout) return;
     }
   }
+}
+
+function stopMotifPlayback(abcwrapper) {
+  const {state} = info;
+
+  const synthControl = state.wrapperToSynthControl.get(abcwrapper);
+  if (!synthControl.midiBuffer) return;
+  if (!synthControl.timer) return;
+
+  synthControl.midiBuffer.stop();
+  synthControl.finished();
 }
