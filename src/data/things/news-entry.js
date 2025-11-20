@@ -12,6 +12,7 @@ import {contentString, directory, name, simpleDate}
 export class NewsEntry extends Thing {
   static [Thing.referenceType] = 'news-entry';
   static [Thing.friendlyName] = `News Entry`;
+  static [Thing.wikiData] = 'newsData';
 
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
@@ -71,8 +72,6 @@ export class NewsEntry extends Thing {
 
     documentMode: allInOne,
     documentThing: NewsEntry,
-
-    save: (results) => ({newsData: results}),
 
     sort({newsData}) {
       sortChronologically(newsData, {latestFirst: true});

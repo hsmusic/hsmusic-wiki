@@ -40,6 +40,7 @@ import {withAllDescendantArtTags, withAncestorArtTagBaobabTree}
 export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
   static [Thing.friendlyName] = `Art Tag`;
+  static [Thing.wikiData] = 'artTagData';
 
   static [Thing.getPropertyDescriptors] = ({AdditionalName}) => ({
     // Update & expose
@@ -209,8 +210,6 @@ export class ArtTag extends Thing {
 
     documentMode: allTogether,
     documentThing: ArtTag,
-
-    save: (results) => ({artTagData: results}),
 
     sort({artTagData}) {
       sortAlphabetically(artTagData);

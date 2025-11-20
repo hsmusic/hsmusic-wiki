@@ -3,25 +3,21 @@ import {input, templateCompositeFrom} from '#composite';
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 import {withIndexInList, withPropertiesFromObject} from '#composite/data';
 
-import withContainingTrackSection from './withContainingTrackSection.js';
-
 export default templateCompositeFrom({
   annotation: `withTrackNumber`,
 
   outputs: ['#trackNumber'],
 
   steps: () => [
-    withContainingTrackSection(),
-
     // Zero is the fallback, not one, but in most albums the first track
     // (and its intended output by this composition) will be one.
     raiseOutputWithoutDependency({
-      dependency: '#trackSection',
+      dependency: 'trackSection',
       output: input.value({'#trackNumber': 0}),
     }),
 
     withPropertiesFromObject({
-      object: '#trackSection',
+      object: 'trackSection',
       properties: input.value(['tracks', 'startCountingFrom']),
     }),
 

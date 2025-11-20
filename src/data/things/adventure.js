@@ -16,6 +16,7 @@ import {Flash, FlashAct} from './flash.js';
 
 export class Adventure extends Thing {
   static [Thing.referenceType] = 'adventure';
+  static [Thing.wikiData] = 'adventureData';
 
   static [Thing.getPropertyDescriptors] = ({FlashAct}) => ({
     // > Internal relationships
@@ -63,56 +64,41 @@ export class Adventure extends Thing {
         ? AdventureFlashAct
         : AdventureFlash),
 
-    save(results) {
-      const adventureData = [];
-      const flashActData = [];
-      const flashData = [];
+    connect({header: adventure, entries}) {
+      const acts = [];
 
-      for (const {header: adventure, entries} of results) {
-        const acts = [];
+      let thing, i;
+      for (i = 0; thing = entries[i]; i++) {
+        if (thing.isFlashAct) {
+          const act = thing;
+          const flashes = [];
 
-        let thing, i;
-        for (i = 0; thing = entries[i]; i++) {
-          if (thing.isFlashAct) {
-            const act = thing;
-            const flashes = [];
+          for (i++; thing = entries[i]; i++) {
+            if (thing.isFlash) {
+              const flash = thing;
 
-            for (i++; thing = entries[i]; i++) {
-              if (thing.isFlash) {
-                const flash = thing;
+              flash.act = act;
+              flashes.push(flash);
 
-                flash.act = act;
-                flashes.push(flash);
-                flashData.push(flash);
-
-                continue;
-              }
-
-              i--;
-              break;
+              continue;
             }
 
-            act.flashes = flashes;
-            acts.push(act);
-            flashActData.push(act);
-
-            continue;
+            i--;
+            break;
           }
 
-          if (thing.isFlash) {
-            throw new Error(`Flashes must be under a flash act`);
-          }
+          act.flashes = flashes;
+          acts.push(act);
+
+          continue;
         }
 
-        adventure.acts = acts;
-        adventureData.push(adventure);
+        if (thing.isFlash) {
+          throw new Error(`Flashes must be under a flash act`);
+        }
       }
 
-      return {
-        adventureData,
-        flashActData,
-        flashData,
-      };
+      adventure.acts = acts;
     },
   });
 }

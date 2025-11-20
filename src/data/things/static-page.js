@@ -15,6 +15,7 @@ import {contentString, directory, flag, name, simpleString}
 export class StaticPage extends Thing {
   static [Thing.referenceType] = 'static';
   static [Thing.friendlyName] = `Static Page`;
+  static [Thing.wikiData] = 'staticPageData';
 
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
@@ -85,8 +86,6 @@ export class StaticPage extends Thing {
 
     documentMode: onePerFile,
     documentThing: StaticPage,
-
-    save: (results) => ({staticPageData: results}),
 
     sort({staticPageData}) {
       sortAlphabetically(staticPageData);

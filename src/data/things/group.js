@@ -34,6 +34,7 @@ import {
 
 export class Group extends Thing {
   static [Thing.referenceType] = 'group';
+  static [Thing.wikiData] = 'groupData';
 
   static [Thing.getPropertyDescriptors] = ({Album, Artist, Series}) => ({
     // Update & expose
@@ -217,7 +218,7 @@ export class Group extends Thing {
         ? GroupCategory
         : Group),
 
-    save(results) {
+    connect(results) {
       let groupCategory;
       let groupRefs = [];
 
@@ -241,12 +242,6 @@ export class Group extends Thing {
       if (groupCategory) {
         Object.assign(groupCategory, {groups: groupRefs});
       }
-
-      const groupData = results.filter(x => x instanceof Group);
-      const groupCategoryData = results.filter(x => x instanceof GroupCategory);
-      const seriesData = groupData.flatMap(group => group.serieses);
-
-      return {groupData, groupCategoryData, seriesData};
     },
 
     // Groups aren't sorted at all, always preserving the order in the data
@@ -258,6 +253,7 @@ export class Group extends Thing {
 export class GroupCategory extends Thing {
   static [Thing.referenceType] = 'group-category';
   static [Thing.friendlyName] = `Group Category`;
+  static [Thing.wikiData] = 'groupCategoryData';
 
   static [Thing.getPropertyDescriptors] = ({Group}) => ({
     // Update & expose
@@ -310,6 +306,8 @@ export class GroupCategory extends Thing {
 }
 
 export class Series extends Thing {
+  static [Thing.wikiData] = 'seriesData';
+
   static [Thing.getPropertyDescriptors] = ({Album, Group}) => ({
     // Update & expose
 

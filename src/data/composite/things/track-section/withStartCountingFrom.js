@@ -3,8 +3,6 @@ import {input, templateCompositeFrom} from '#composite';
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 import {withNearbyItemFromList, withPropertyFromObject} from '#composite/data';
 
-import withAlbum from './withAlbum.js';
-
 export default templateCompositeFrom({
   annotation: `withStartCountingFrom`,
 
@@ -29,15 +27,13 @@ export default templateCompositeFrom({
           : continuation.raiseOutput({'#startCountingFrom': from})),
     },
 
-    withAlbum(),
-
     raiseOutputWithoutDependency({
-      dependency: '#album',
+      dependency: 'album',
       output: input.value({'#startCountingFrom': 1}),
     }),
 
     withPropertyFromObject({
-      object: '#album',
+      object: 'album',
       property: input.value('trackSections'),
     }),
 

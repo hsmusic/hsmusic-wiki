@@ -10,6 +10,10 @@ export default class Thing extends CacheableObject {
   static referenceType = Symbol.for('Thing.referenceType');
   static friendlyName = Symbol.for('Thing.friendlyName');
 
+  static wikiData = Symbol.for('Thing.wikiData');
+  static oneInstancePerWiki = Symbol.for('Thing.oneThingPerWiki');
+  static constitutibleProperties = Symbol.for('Thing.constitutibleProperties');
+
   static getPropertyDescriptors = Symbol.for('Thing.getPropertyDescriptors');
   static getSerializeDescriptors = Symbol.for('Thing.getSerializeDescriptors');
 

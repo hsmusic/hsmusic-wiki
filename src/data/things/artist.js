@@ -41,7 +41,11 @@ import {artistTotalDuration} from '#composite/things/artist';
 
 export class Artist extends Thing {
   static [Thing.referenceType] = 'artist';
-  static [Thing.wikiDataArray] = 'artistData';
+  static [Thing.wikiData] = 'artistData';
+
+  static [Thing.constitutibleProperties] = [
+    'avatarArtwork', // from inline fields
+  ];
 
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
@@ -342,19 +346,6 @@ export class Artist extends Thing {
 
     documentMode: allInOne,
     documentThing: Artist,
-
-    save(results) {
-      const artists = results;
-      const artistAliases = artists.flatMap(artist => artist.artistAliases);
-      const artistData = [...artists, ...artistAliases];
-
-      const artworkData =
-        artistData
-          .filter(artist => artist.hasAvatar)
-          .map(artist => artist.avatarArtwork);
-
-      return {artistData, artworkData};
-    },
 
     sort({artistData}) {
       sortAlphabetically(artistData);

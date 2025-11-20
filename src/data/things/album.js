@@ -78,11 +78,18 @@ import {
 } from '#composite/wiki-properties';
 
 import {withCoverArtDate, withTracks} from '#composite/things/album';
-import {withAlbum, withContinueCountingFrom, withStartCountingFrom}
+import {withContinueCountingFrom, withStartCountingFrom}
   from '#composite/things/track-section';
 
 export class Album extends Thing {
   static [Thing.referenceType] = 'album';
+  static [Thing.wikiData] = 'albumData';
+
+  static [Thing.constitutibleProperties] = [
+    'coverArtworks',
+    'wallpaperArtwork',
+    'bannerArtwork',
+  ];
 
   static [Thing.getPropertyDescriptors] = ({
     AdditionalFile,
@@ -569,20 +576,6 @@ export class Album extends Thing {
   };
 
   static [Thing.reverseSpecs] = {
-    albumsWhoseTracksInclude: {
-      bindTo: 'albumData',
-
-      referencing: album => [album],
-      referenced: album => album.tracks,
-    },
-
-    albumsWhoseTrackSectionsInclude: {
-      bindTo: 'albumData',
-
-      referencing: album => [album],
-      referenced: album => album.trackSections,
-    },
-
     albumsWhoseArtworksFeature: {
       bindTo: 'albumData',
 
@@ -882,101 +875,48 @@ export class Album extends Thing {
         ? TrackSection
         : Track),
 
-    save(results) {
-      const albumData = [];
-      const trackSectionData = [];
-      const trackData = [];
+    connect({header: album, entries}) {
+      const trackSections = [];
 
-      const artworkData = [];
-      const commentaryData = [];
-      const creditingSourceData = [];
-      const referencingSourceData = [];
-      const lyricsData = [];
+      let currentTrackSection = new TrackSection();
+      let currentTrackSectionTracks = [];
 
-      for (const {header: album, entries} of results) {
-        const trackSections = [];
+      Object.assign(currentTrackSection, {
+        name: `Default Track Section`,
+        isDefaultTrackSection: true,
+      });
 
-        let currentTrackSection = new TrackSection();
-        let currentTrackSectionTracks = [];
-
-        Object.assign(currentTrackSection, {
-          name: `Default Track Section`,
-          isDefaultTrackSection: true,
-        });
-
-        const closeCurrentTrackSection = () => {
-          if (
-            currentTrackSection.isDefaultTrackSection &&
-            empty(currentTrackSectionTracks)
-          ) {
-            return;
-          }
-
-          currentTrackSection.tracks =
-            currentTrackSectionTracks;
-
-          trackSections.push(currentTrackSection);
-          trackSectionData.push(currentTrackSection);
-        };
-
-        for (const entry of entries) {
-          if (entry instanceof TrackSection) {
-            closeCurrentTrackSection();
-            currentTrackSection = entry;
-            currentTrackSectionTracks = [];
-            continue;
-          }
-
-          currentTrackSectionTracks.push(entry);
-          trackData.push(entry);
-
-          // Set the track's album before accessing its list of artworks.
-          // The existence of its artwork objects may depend on access to
-          // its album's 'Default Track Cover Artists'.
-          entry.album = album;
-
-          artworkData.push(...entry.trackArtworks);
-          commentaryData.push(...entry.commentary);
-          creditingSourceData.push(...entry.creditingSources);
-          referencingSourceData.push(...entry.referencingSources);
-
-          // TODO: As exposed, Track.lyrics tries to inherit from the main
-          // release, which is impossible before the data's been linked.
-          // We just use the update value here. But it's icky!
-          lyricsData.push(...CacheableObject.getUpdateValue(entry, 'lyrics') ?? []);
+      const closeCurrentTrackSection = () => {
+        if (
+          currentTrackSection.isDefaultTrackSection &&
+          empty(currentTrackSectionTracks)
+        ) {
+          return;
         }
 
-        closeCurrentTrackSection();
+        currentTrackSection.tracks = currentTrackSectionTracks;
+        currentTrackSection.album = album;
 
-        albumData.push(album);
+        trackSections.push(currentTrackSection);
+      };
 
-        artworkData.push(...album.coverArtworks);
-
-        if (album.bannerArtwork) {
-          artworkData.push(album.bannerArtwork);
+      for (const entry of entries) {
+        if (entry instanceof TrackSection) {
+          closeCurrentTrackSection();
+          currentTrackSection = entry;
+          currentTrackSectionTracks = [];
+          continue;
         }
 
-        if (album.wallpaperArtwork) {
-          artworkData.push(album.wallpaperArtwork);
-        }
+        entry.album = album;
+        entry.trackSection = currentTrackSection;
 
-        commentaryData.push(...album.commentary);
-        creditingSourceData.push(...album.creditingSources);
-
-        album.trackSections = trackSections;
+        currentTrackSectionTracks.push(entry);
       }
 
-      return {
-        albumData,
-        trackSectionData,
-        trackData,
+      closeCurrentTrackSection();
 
-        artworkData,
-        commentaryData,
-        creditingSourceData,
-        referencingSourceData,
-        lyricsData,
-      };
+      album.trackSections = trackSections;
     },
 
     sort({albumData, trackData}) {
@@ -1041,9 +981,14 @@ export class Album extends Thing {
 export class TrackSection extends Thing {
   static [Thing.friendlyName] = `Track Section`;
   static [Thing.referenceType] = `track-section`;
+  static [Thing.wikiData] = 'trackSectionData';
 
   static [Thing.getPropertyDescriptors] = ({Track}) => ({
     // Update & expose
+
+    album: thing({
+      class: input.value(Album),
+    }),
 
     name: name('Unnamed Track Section'),
 
@@ -1054,10 +999,8 @@ export class TrackSection extends Thing {
         validate: input.value(isDirectory),
       }),
 
-      withAlbum(),
-
       withPropertyFromObject({
-        object: '#album',
+        object: 'album',
         property: input.value('directorySuffix'),
       }),
 
@@ -1069,10 +1012,8 @@ export class TrackSection extends Thing {
         validate: input.value(isBoolean),
       }),
 
-      withAlbum(),
-
       withPropertyFromObject({
-        object: '#album',
+        object: 'album',
         property: input.value('suffixTrackDirectories'),
       }),
 
@@ -1084,10 +1025,8 @@ export class TrackSection extends Thing {
         validate: input.value(isColor),
       }),
 
-      withAlbum(),
-
       withPropertyFromObject({
-        object: '#album',
+        object: 'album',
         property: input.value('color'),
       }),
 
@@ -1109,10 +1048,8 @@ export class TrackSection extends Thing {
         validate: input.value(isBoolean),
       }),
 
-      withAlbum(),
-
       withPropertyFromObject({
-        object: '#album',
+        object: 'album',
         property: input.value('countTracksInArtistTotals'),
       }),
 
@@ -1122,11 +1059,6 @@ export class TrackSection extends Thing {
     isDefaultTrackSection: flag(false),
 
     description: contentString(),
-
-    album: [
-      withAlbum(),
-      exposeDependency({dependency: '#album'}),
-    ],
 
     tracks: thingList({
       class: input.value(Track),
@@ -1145,14 +1077,12 @@ export class TrackSection extends Thing {
     ],
 
     directory: [
-      withAlbum(),
-
       exitWithoutDependency({
-        dependency: '#album',
+        dependency: 'album',
       }),
 
       withPropertyFromObject({
-        object: '#album',
+        object: 'album',
         property: input.value('directory'),
       }),
 
@@ -1190,15 +1120,6 @@ export class TrackSection extends Thing {
 
       getMatchableDirectories: trackSection =>
         [trackSection.unqualifiedDirectory],
-    },
-  };
-
-  static [Thing.reverseSpecs] = {
-    trackSectionsWhichInclude: {
-      bindTo: 'trackSectionData',
-
-      referencing: trackSection => [trackSection],
-      referenced: trackSection => trackSection.tracks,
     },
   };
 

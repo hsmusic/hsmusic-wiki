@@ -3,7 +3,6 @@ export {default as exitWithoutUniqueCoverArt} from './exitWithoutUniqueCoverArt.
 export {default as inheritContributionListFromMainRelease} from './inheritContributionListFromMainRelease.js';
 export {default as inheritFromMainRelease} from './inheritFromMainRelease.js';
 export {default as withAllReleases} from './withAllReleases.js';
-export {default as withContainingTrackSection} from './withContainingTrackSection.js';
 export {default as withCoverArtistContribs} from './withCoverArtistContribs.js';
 export {default as withDate} from './withDate.js';
 export {default as withDirectorySuffix} from './withDirectorySuffix.js';

@@ -46,6 +46,11 @@ import {
 
 export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';
+  static [Thing.wikiData] = 'flashData';
+
+  static [Thing.constitutibleProperties] = [
+    'coverArtwork', // from inline fields
+  ];
 
   static [Thing.getPropertyDescriptors] = ({
     AdditionalName,
@@ -274,6 +279,7 @@ export class Flash extends Thing {
 export class FlashAct extends Thing {
   static [Thing.referenceType] = 'flash-act';
   static [Thing.friendlyName] = `Flash Act`;
+  static [Thing.wikiData] = 'flashActData';
 
   static [Thing.getPropertyDescriptors] = ({Flash, FlashSide}) => ({
     // Update & expose
@@ -355,6 +361,7 @@ export class FlashAct extends Thing {
 export class FlashSide extends Thing {
   static [Thing.referenceType] = 'flash-side';
   static [Thing.friendlyName] = `Flash Side`;
+  static [Thing.wikiData] = 'flashSideData';
 
   static [Thing.getPropertyDescriptors] = ({FlashAct}) => ({
     // Update & expose
@@ -421,15 +428,7 @@ export class FlashSide extends Thing {
         ? FlashAct
         : Flash),
 
-    save(results) {
-      const flashSideData = [];
-      const flashActData = [];
-      const flashData = [];
-
-      const artworkData = [];
-      const commentaryData = [];
-      const creditingSourceData = [];
-
+    connect(results) {
       let thing, i;
 
       for (i = 0; thing = results[i]; i++) {
@@ -449,11 +448,6 @@ export class FlashSide extends Thing {
                   flash.act = act;
                   flashes.push(flash);
 
-                  flashData.push(flash);
-                  artworkData.push(flash.coverArtwork);
-                  commentaryData.push(...flash.commentary);
-                  creditingSourceData.push(...flash.creditingSources);
-
                   continue;
                 }
 
@@ -464,8 +458,6 @@ export class FlashSide extends Thing {
               act.side = side;
               act.flashes = flashes;
               acts.push(act);
-
-              flashActData.push(act);
 
               continue;
             }
@@ -480,8 +472,6 @@ export class FlashSide extends Thing {
 
           side.acts = acts;
 
-          flashSideData.push(side);
-
           continue;
         }
 
@@ -493,16 +483,6 @@ export class FlashSide extends Thing {
           throw new Error(`Flashes must be under a side and act`);
         }
       }
-
-      return {
-        flashSideData,
-        flashActData,
-        flashData,
-
-        artworkData,
-        commentaryData,
-        creditingSourceData,
-      };
     },
 
     sort({flashData}) {

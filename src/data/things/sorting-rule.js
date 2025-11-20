@@ -38,6 +38,7 @@ function isSelectFollowingEntry(value) {
 
 export class SortingRule extends Thing {
   static [Thing.friendlyName] = `Sorting Rule`;
+  static [Thing.wikiData] = 'sortingRules';
 
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
@@ -77,8 +78,6 @@ export class SortingRule extends Thing {
       (document['Sort Documents']
         ? DocumentSortingRule
         : null),
-
-    save: (results) => ({sortingRules: results}),
   });
 
   check(opts) {

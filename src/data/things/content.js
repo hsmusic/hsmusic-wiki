@@ -154,6 +154,8 @@ export class ContentEntry extends Thing {
 }
 
 export class CommentaryEntry extends ContentEntry {
+  static [Thing.wikiData] = 'commentaryData';
+
   static [Thing.getPropertyDescriptors] = () => ({
     // Expose only
 
@@ -170,6 +172,8 @@ export class CommentaryEntry extends ContentEntry {
 }
 
 export class LyricsEntry extends ContentEntry {
+  static [Thing.wikiData] = 'lyricsData';
+
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
@@ -223,6 +227,8 @@ export class LyricsEntry extends ContentEntry {
 }
 
 export class CreditingSourcesEntry extends ContentEntry {
+  static [Thing.wikiData] = 'creditingSourceData';
+
   static [Thing.getPropertyDescriptors] = () => ({
     // Expose only
 
@@ -235,6 +241,8 @@ export class CreditingSourcesEntry extends ContentEntry {
 }
 
 export class ReferencingSourcesEntry extends ContentEntry {
+  static [Thing.wikiData] = 'referencingSourceData';
+
   static [Thing.getPropertyDescriptors] = () => ({
     // Expose only
 

@@ -3,8 +3,6 @@ import {input, templateCompositeFrom} from '#composite';
 import {withResultOfAvailabilityCheck} from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
 
-import withContainingTrackSection from './withContainingTrackSection.js';
-
 export default templateCompositeFrom({
   annotation: `withSuffixDirectoryFromAlbum`,
 
@@ -37,10 +35,8 @@ export default templateCompositeFrom({
           : continuation()),
     },
 
-    withContainingTrackSection(),
-
     withPropertyFromObject({
-      object: '#trackSection',
+      object: 'trackSection',
       property: input.value('suffixTrackDirectories'),
     }).outputs({
       '#trackSection.suffixTrackDirectories': '#suffixDirectoryFromAlbum',

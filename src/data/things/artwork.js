@@ -64,6 +64,12 @@ import {
 
 export class Artwork extends Thing {
   static [Thing.referenceType] = 'artwork';
+  static [Thing.wikiData] = 'artworkData';
+
+  static [Thing.constitutibleProperties] = [
+    // Contributions currently aren't being observed for constitution.
+    // 'artistContribs', // from attached artwork or thing
+  ];
 
   static [Thing.getPropertyDescriptors] = ({ArtTag}) => ({
     // Update & expose

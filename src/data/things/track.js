@@ -76,7 +76,6 @@ import {
   inheritContributionListFromMainRelease,
   inheritFromMainRelease,
   withAllReleases,
-  withContainingTrackSection,
   withCoverArtistContribs,
   withDate,
   withDirectorySuffix,
@@ -92,6 +91,16 @@ import {
 
 export class Track extends Thing {
   static [Thing.referenceType] = 'track';
+  static [Thing.wikiData] = 'trackData';
+
+  static [Thing.constitutibleProperties] = [
+    // Contributions currently aren't being observed for constitution.
+    // 'artistContribs', // from main release or album
+    // 'contributorContribs', // from main release
+    // 'coverArtistContribs', // from main release
+
+    'trackArtworks', // from inline fields
+  ];
 
   static [Thing.getPropertyDescriptors] = ({
     AdditionalFile,
@@ -103,12 +112,17 @@ export class Track extends Thing {
     CreditingSourcesEntry,
     LyricsEntry,
     ReferencingSourcesEntry,
+    TrackSection,
     WikiInfo,
   }) => ({
     // > Update & expose - Internal relationships
 
     album: thing({
       class: input.value(Album),
+    }),
+
+    trackSection: thing({
+      class: input.value(TrackSection),
     }),
 
     // > Update & expose - Identifying metadata
@@ -263,10 +277,8 @@ export class Track extends Thing {
         validate: input.value(isBoolean),
       }),
 
-      withContainingTrackSection(),
-
       withPropertyFromObject({
-        object: '#trackSection',
+        object: 'trackSection',
         property: input.value('countTracksInArtistTotals'),
       }),
 
@@ -285,10 +297,8 @@ export class Track extends Thing {
         validate: input.value(isColor),
       }),
 
-      withContainingTrackSection(),
-
       withPropertyFromObject({
-        object: '#trackSection',
+        object: 'trackSection',
         property: input.value('color'),
       }),
 
@@ -509,6 +519,11 @@ export class Track extends Thing {
     ],
 
     commentatorArtists: commentatorArtists(),
+
+    directorySuffix: [
+      withDirectorySuffix(),
+      exposeDependency({dependency: '#directorySuffix'}),
+    ],
 
     date: [
       withDate(),

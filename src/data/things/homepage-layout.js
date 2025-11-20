@@ -32,6 +32,8 @@ import {
 
 export class HomepageLayout extends Thing {
   static [Thing.friendlyName] = `Homepage Layout`;
+  static [Thing.wikiData] = 'homepageLayout';
+  static [Thing.oneInstancePerWiki] = true;
 
   static [Thing.getPropertyDescriptors] = ({HomepageLayoutSection}) => ({
     // Update & expose
@@ -102,7 +104,7 @@ export class HomepageLayout extends Thing {
       return null;
     },
 
-    save(results) {
+    connect(results) {
       if (!empty(results) && !(results[0] instanceof HomepageLayout)) {
         throw new Error(`Expected 'Homepage' document at top of homepage layout file`);
       }
@@ -145,8 +147,6 @@ export class HomepageLayout extends Thing {
       closeCurrentSection();
 
       homepageLayout.sections = sections;
-
-      return {homepageLayout};
     },
   });
 }

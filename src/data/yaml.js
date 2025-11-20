@@ -44,6 +44,32 @@ function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
 }
 
+function pushWikiData(a, b) {
+  for (const key of Object.keys(b)) {
+    if (Object.hasOwn(a, key)) {
+      if (Array.isArray(a[key])) {
+        if (Array.isArray(b[key])) {
+          a[key].push(...b[key]);
+        } else {
+          throw new Error(`${key} already present, expected array of items to push`);
+        }
+      } else {
+        if (Array.isArray(a[key])) {
+          throw new Error(`${key} already present and not an array, refusing to overwrite`);
+        } else {
+          throw new Error(`${key} already present, refusing to overwrite`);
+        }
+      }
+    } else {
+      if (Array.isArray(b[key])) {
+        a[key] = [...b[key]];
+      } else {
+        a[key] = b[key];
+      }
+    }
+  }
+}
+
 // General function for inputting a single document (usually loaded from YAML)
 // and outputting an instance of a provided Thing subclass.
 //
@@ -160,6 +186,16 @@ function makeProcessDocument(thingConstructor, {
     });
 
     const thing = Reflect.construct(thingConstructor, []);
+
+    const wikiData = {};
+    const flat = [thing];
+    if (thingConstructor[Thing.wikiData]) {
+      if (thingConstructor[Thing.oneInstancePerWiki]) {
+        wikiData[thingConstructor[Thing.wikiData]] = thing;
+      } else {
+        wikiData[thingConstructor[Thing.wikiData]] = [thing];
+      }
+    }
 
     const documentEntries = Object.entries(document)
       .filter(([field]) => !ignoredFields.includes(field));
@@ -312,26 +348,29 @@ function makeProcessDocument(thingConstructor, {
     const followSubdocSetup = setup => {
       let error = null;
 
-      let subthing;
+      let result;
       try {
-        const result = bouncer(setup.data, setup.documentType);
-        subthing = result.thing;
-        result.aggregate.close();
+        let aggregate;
+        ({result, aggregate} = bouncer(setup.data, setup.documentType));
+        aggregate.close();
       } catch (caughtError) {
         error = caughtError;
       }
 
-      if (subthing) {
+      if (result.thing) {
         if (setup.bindInto) {
-          subthing[setup.bindInto] = thing;
+          result.thing[setup.bindInto] = thing;
         }
 
         if (setup.provide) {
-          Object.assign(subthing, setup.provide);
+          Object.assign(result.thing, setup.provide);
         }
       }
 
-      return {error, subthing};
+      pushWikiData(wikiData, result.wikiData);
+      flat.push(...result.flat);
+
+      return {error, subthing: result.thing};
     };
 
     for (const [field, layout] of Object.entries(subdocLayouts)) {
@@ -414,7 +453,14 @@ function makeProcessDocument(thingConstructor, {
             {preserveOriginalOrder: true})));
     }
 
-    return {thing, aggregate};
+    return {
+      aggregate,
+      result: {
+        thing,
+        flat,
+        wikiData,
+      },
+    };
   });
 }
 
@@ -1309,26 +1355,35 @@ export function processThingsFromDataStep(documents, dataStep) {
   switch (documentMode) {
     case documentModes.allInOne:
     case documentModes.allTogether: {
-      const result = [];
+      const things = [];
+      const flat = [];
+      const wikiData = {};
       const aggregate = openAggregate({message: `Errors processing documents`});
 
       documents.forEach(
         decorateErrorWithIndex((document, index) => {
-          const {thing, aggregate: subAggregate} =
+          const {result, aggregate: subAggregate} =
             processDocument(document, dataStep.documentThing);
 
-          thing[Thing.yamlSourceDocument] = document;
-          thing[Thing.yamlSourceDocumentPlacement] =
+          result.thing[Thing.yamlSourceDocument] = document;
+          result.thing[Thing.yamlSourceDocumentPlacement] =
             [documentModes.allInOne, index];
 
-          result.push(thing);
+          things.push(result.thing);
+          flat.push(...result.flat);
+          pushWikiData(wikiData, result.wikiData);
+
           aggregate.call(subAggregate.close);
         }));
 
       return {
         aggregate,
-        result,
-        things: result,
+        result: {
+          network: things,
+          flat: things,
+          file: things,
+          wikiData,
+        },
       };
     }
 
@@ -1336,17 +1391,21 @@ export function processThingsFromDataStep(documents, dataStep) {
       if (documents.length > 1)
         throw new Error(`Only expected one document to be present, got ${documents.length}`);
 
-      const {thing, aggregate} =
+      const {result, aggregate} =
         processDocument(documents[0], dataStep.documentThing);
 
-      thing[Thing.yamlSourceDocument] = documents[0];
-      thing[Thing.yamlSourceDocumentPlacement] =
+      result.thing[Thing.yamlSourceDocument] = documents[0];
+      result.thing[Thing.yamlSourceDocumentPlacement] =
         [documentModes.oneDocumentTotal];
 
       return {
         aggregate,
-        result: thing,
-        things: [thing],
+        result: {
+          network: result.thing,
+          flat: result.flat,
+          file: [result.thing],
+          wikiData: result.wikiData,
+        },
       };
     }
 
@@ -1358,13 +1417,16 @@ export function processThingsFromDataStep(documents, dataStep) {
         throw new Error(`Missing header document (empty file or erroneously starting with "---"?)`);
 
       const aggregate = openAggregate({message: `Errors processing documents`});
+      const wikiData = {};
 
-      const {thing: headerThing, aggregate: headerAggregate} =
+      const {result: headerResult, aggregate: headerAggregate} =
         processDocument(headerDocument, dataStep.headerDocumentThing);
 
-      headerThing[Thing.yamlSourceDocument] = headerDocument;
-      headerThing[Thing.yamlSourceDocumentPlacement] =
+      headerResult.thing[Thing.yamlSourceDocument] = headerDocument;
+      headerResult.thing[Thing.yamlSourceDocumentPlacement] =
         [documentModes.headerAndEntries, 'header'];
+
+      pushWikiData(wikiData, headerResult.wikiData);
 
       try {
         headerAggregate.close();
@@ -1373,17 +1435,18 @@ export function processThingsFromDataStep(documents, dataStep) {
         aggregate.push(caughtError);
       }
 
-      const entryThings = [];
+      const entryResults = [];
 
       for (const [index, entryDocument] of entryDocuments.entries()) {
-        const {thing: entryThing, aggregate: entryAggregate} =
+        const {result: entryResult, aggregate: entryAggregate} =
           processDocument(entryDocument, dataStep.entryDocumentThing);
 
-        entryThing[Thing.yamlSourceDocument] = entryDocument;
-        entryThing[Thing.yamlSourceDocumentPlacement] =
+        entryResult.thing[Thing.yamlSourceDocument] = entryDocument;
+        entryResult.thing[Thing.yamlSourceDocumentPlacement] =
           [documentModes.headerAndEntries, 'entry', index];
 
-        entryThings.push(entryThing);
+        entryResults.push(entryResult);
+        pushWikiData(wikiData, entryResult.wikiData);
 
         try {
           entryAggregate.close();
@@ -1396,10 +1459,16 @@ export function processThingsFromDataStep(documents, dataStep) {
       return {
         aggregate,
         result: {
-          header: headerThing,
-          entries: entryThings,
+          network: {
+            header: headerResult.thing,
+            entries: entryResults.map(result => result.thing),
+          },
+
+          flat: headerResult.flat.concat(entryResults.flatMap(result => result.flat)),
+          file: [headerResult.thing, ...entryResults.map(result => result.thing)],
+
+          wikiData,
         },
-        things: [headerThing, ...entryThings],
       };
     }
 
@@ -1410,17 +1479,21 @@ export function processThingsFromDataStep(documents, dataStep) {
       if (empty(documents) || !documents[0])
         throw new Error(`Expected a document, this file is empty`);
 
-      const {thing, aggregate} =
+      const {result, aggregate} =
         processDocument(documents[0], dataStep.documentThing);
 
-      thing[Thing.yamlSourceDocument] = documents[0];
-      thing[Thing.yamlSourceDocumentPlacement] =
+      result.thing[Thing.yamlSourceDocument] = documents[0];
+      result.thing[Thing.yamlSourceDocumentPlacement] =
         [documentModes.onePerFile];
 
       return {
         aggregate,
-        result: thing,
-        things: [thing],
+        result: {
+          network: result.thing,
+          flat: result.flat,
+          file: [result.thing],
+          wikiData: result.wikiData,
+        },
       };
     }
 
@@ -1521,10 +1594,10 @@ export async function processThingsFromDataSteps(documentLists, fileLists, dataS
           file: files,
           documents: documentLists,
         }).map(({file, documents}) => {
-            const {result, aggregate, things} =
+            const {result, aggregate} =
               processThingsFromDataStep(documents, dataStep);
 
-            for (const thing of things) {
+            for (const thing of result.file) {
               thing[Thing.yamlSourceFilename] =
                 path.relative(dataPath, file)
                   .split(path.sep)
@@ -1551,45 +1624,35 @@ export async function processThingsFromDataSteps(documentLists, fileLists, dataS
           translucent: true,
         }).contain(await fileListPromise));
 
-  const thingLists =
+  const results =
     aggregate
       .receive(await Promise.all(dataStepPromises));
 
-  return {aggregate, result: thingLists};
+  return {aggregate, result: results};
 }
 
-// Flattens a list of *lists* of things for a given data step (each list
-// corresponding to one YAML file) into results to be saved on the final
-// wikiData object, routing thing lists into the step's save() function.
-export function saveThingsFromDataStep(thingLists, dataStep) {
+// Runs a data step's connect() function, if present, with representations
+// of the results from the YAML files, called "networks" - one network and
+// one call to .connect() per YAML file - in order to form data connections
+// (direct links) between related objects within a file.
+export function connectThingsFromDataStep(results, dataStep) {
   const {documentMode} = dataStep;
 
   switch (documentMode) {
-    case documentModes.allInOne: {
-      const things =
-        (empty(thingLists)
-          ? []
-          : thingLists[0]);
-
-      return dataStep.save(things);
-    }
-
-    case documentModes.oneDocumentTotal: {
-      const thing =
-        (empty(thingLists)
-          ? {}
-          : thingLists[0]);
-
-      return dataStep.save(thing);
-    }
-
-    case documentModes.allTogether: {
-      return dataStep.save(thingLists.flat());
-    }
-
-    case documentModes.headerAndEntries:
+    case documentModes.oneDocumentTotal:
     case documentModes.onePerFile: {
-      return dataStep.save(thingLists);
+      // These results are never connected.
+      return;
+    }
+
+    case documentModes.allInOne:
+    case documentModes.allTogether:
+    case documentModes.headerAndEntries: {
+      for (const result of results) {
+        dataStep.connect?.(result.network);
+      }
+
+      break;
     }
 
     default:
@@ -1597,60 +1660,71 @@ export function saveThingsFromDataStep(thingLists, dataStep) {
   }
 }
 
-// Flattens a list of *lists* of things for each data step (each list
-// corresponding to one YAML file) into the final wikiData object,
-// routing thing lists into each step's save() function.
-export function saveThingsFromDataSteps(thingLists, dataSteps) {
+export function connectThingsFromDataSteps(processThingResultLists, dataSteps) {
   const aggregate =
     openAggregate({
-      message: `Errors finalizing things from data files`,
+      message: `Errors connecting things from data files`,
       translucent: true,
     });
 
-  const wikiData = {};
-
   stitchArrays({
     dataStep: dataSteps,
-    thingLists: thingLists,
-  }).map(({dataStep, thingLists}) => {
+    processThingResults: processThingResultLists,
+  }).forEach(({dataStep, processThingResults}) => {
       try {
-        return saveThingsFromDataStep(thingLists, dataStep);
+        connectThingsFromDataStep(processThingResults, dataStep);
       } catch (caughtError) {
         const error = new Error(
-          `Error finalizing things for data step: ${colors.bright(dataStep.title)}`,
+          `Error connecting things for data step: ${colors.bright(dataStep.title)}`,
           {cause: caughtError});
 
         error[Symbol.for('hsmusic.aggregate.translucent')] = true;
 
         aggregate.push(error);
-
-        return null;
-      }
-    })
-    .filter(Boolean)
-    .forEach(saveResult => {
-      for (const [saveKey, saveValue] of Object.entries(saveResult)) {
-        if (Object.hasOwn(wikiData, saveKey)) {
-          if (Array.isArray(wikiData[saveKey])) {
-            if (Array.isArray(saveValue)) {
-              wikiData[saveKey].push(...saveValue);
-            } else {
-              throw new Error(`${saveKey} already present, expected array of items to push`);
-            }
-          } else {
-            if (Array.isArray(saveValue)) {
-              throw new Error(`${saveKey} already present and not an array, refusing to overwrite`);
-            } else {
-              throw new Error(`${saveKey} already present, refusing to overwrite`);
-            }
-          }
-        } else {
-          wikiData[saveKey] = saveValue;
-        }
       }
     });
 
-  return {aggregate, result: wikiData};
+  return {result: null, aggregate};
+}
+
+export function makeWikiDataFromDataSteps(processThingResultLists, _dataSteps) {
+  const wikiData = {};
+
+  let found = false;
+  for (const result of processThingResultLists.flat(2)) {
+    pushWikiData(wikiData, result.wikiData);
+  }
+
+  const scanForConstituted =
+    processThingResultLists.flat(2).flatMap(result => result.flat);
+
+  const exists = new Set(scanForConstituted);
+
+  while (scanForConstituted.length) {
+    const scanningThing = scanForConstituted.pop();
+
+    for (const key of scanningThing.constructor[Thing.constitutibleProperties] ?? []) {
+      const maybeConstitutedThings =
+        (Array.isArray(scanningThing[key])
+          ? scanningThing[key]
+       : scanningThing[key]
+          ? [scanningThing[key]]
+          : []);
+
+      for (const thing of maybeConstitutedThings) {
+        if (exists.has(thing)) continue;
+        exists.add(thing);
+
+        if (thing.constructor[Thing.wikiData]) {
+          pushWikiData(wikiData, {[thing.constructor[Thing.wikiData]]: [thing]});
+        }
+
+        scanForConstituted.push(thing);
+      }
+    }
+  }
+
+  return wikiData;
 }
 
 export async function loadAndProcessDataDocuments(dataSteps, {dataPath}) {
@@ -1663,13 +1737,15 @@ export async function loadAndProcessDataDocuments(dataSteps, {dataPath}) {
     aggregate.receive(
       await loadYAMLDocumentsFromDataSteps(dataSteps, {dataPath}));
 
-  const thingLists =
+  const processThingResultLists =
     aggregate.receive(
       await processThingsFromDataSteps(documentLists, fileLists, dataSteps, {dataPath}));
 
+  aggregate.receive(
+    connectThingsFromDataSteps(processThingResultLists, dataSteps));
+
   const wikiData =
-    aggregate.receive(
-      saveThingsFromDataSteps(thingLists, dataSteps));
+    makeWikiDataFromDataSteps(processThingResultLists, dataSteps);
 
   return {aggregate, result: wikiData};
 }

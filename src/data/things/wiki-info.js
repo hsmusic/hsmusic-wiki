@@ -28,6 +28,8 @@ import {
 
 export class WikiInfo extends Thing {
   static [Thing.friendlyName] = `Wiki Info`;
+  static [Thing.wikiData] = 'wikiInfo';
+  static [Thing.oneInstancePerWiki] = true;
 
   static [Thing.getPropertyDescriptors] = ({Group}) => ({
     // Update & expose
@@ -168,13 +170,5 @@ export class WikiInfo extends Thing {
 
     documentMode: oneDocumentTotal,
     documentThing: WikiInfo,
-
-    save(wikiInfo) {
-      if (!wikiInfo) {
-        return;
-      }
-
-      return {wikiInfo};
-    },
   });
 }
