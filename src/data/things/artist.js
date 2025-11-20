@@ -63,6 +63,7 @@ export class Artist extends Thing {
       exitWithoutDependency({
         dependency: 'hasAvatar',
         value: input.value(null),
+        mode: input.value('falsy'),
       }),
 
       constitutibleArtwork.fromYAMLFieldSpec
