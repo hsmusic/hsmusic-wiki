@@ -265,11 +265,11 @@ export class HomepageLayoutActionsRow extends HomepageLayoutRow {
     },
   });
 
-  static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(HomepageLayoutRow, {
+  static [Thing.yamlDocumentSpec] = {
     fields: {
       'Actions': {property: 'actionLinks'},
     },
-  });
+  };
 }
 
 export class HomepageLayoutAlbumCarouselRow extends HomepageLayoutRow {
@@ -297,11 +297,11 @@ export class HomepageLayoutAlbumCarouselRow extends HomepageLayoutRow {
     },
   });
 
-  static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(HomepageLayoutRow, {
+  static [Thing.yamlDocumentSpec] = {
     fields: {
       'Albums': {property: 'albums'},
     },
-  });
+  };
 }
 
 export class HomepageLayoutAlbumGridRow extends HomepageLayoutRow {
@@ -361,11 +361,11 @@ export class HomepageLayoutAlbumGridRow extends HomepageLayoutRow {
     },
   });
 
-  static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(HomepageLayoutRow, {
+  static [Thing.yamlDocumentSpec] = {
     fields: {
       'Group': {property: 'sourceGroup'},
       'Count': {property: 'countAlbumsFromGroup'},
       'Albums': {property: 'sourceAlbums'},
     },
-  });
+  };
 }

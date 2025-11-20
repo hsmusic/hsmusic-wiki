@@ -216,6 +216,27 @@ function evaluateSerializeDescriptors() {
   });
 }
 
+function finalizeYamlDocumentSpecs() {
+  return descriptorAggregateHelper({
+    message: `Errors finalizing Thing YAML document specs`,
+
+    op(constructor) {
+      const superclass = Object.getPrototypeOf(constructor);
+      if (
+        constructor[Thing.yamlDocumentSpec] &&
+        superclass[Thing.yamlDocumentSpec]
+      ) {
+        constructor[Thing.yamlDocumentSpec] =
+          Thing.extendDocumentSpec(superclass, constructor[Thing.yamlDocumentSpec]);
+      }
+    },
+
+    showFailedClasses(failedClasses) {
+      logError`Failed to finalize YAML document specs for classes: ${failedClasses.join(', ')}`;
+    },
+  });
+}
+
 function finalizeCacheableObjectPrototypes() {
   return descriptorAggregateHelper({
     message: `Errors finalizing Thing class prototypes`,
@@ -230,19 +251,14 @@ function finalizeCacheableObjectPrototypes() {
   });
 }
 
-if (!errorDuplicateClassNames())
-  process.exit(1);
+if (!errorDuplicateClassNames()) process.exit(1);
 
 flattenClassLists();
 
-if (!evaluatePropertyDescriptors())
-  process.exit(1);
-
-if (!evaluateSerializeDescriptors())
-  process.exit(1);
-
-if (!finalizeCacheableObjectPrototypes())
-  process.exit(1);
+if (!evaluatePropertyDescriptors()) process.exit(1);
+if (!evaluateSerializeDescriptors()) process.exit(1);
+if (!finalizeYamlDocumentSpecs()) process.exit(1);
+if (!finalizeCacheableObjectPrototypes()) process.exit(1);
 
 Object.assign(allClasses, {Thing});
 
