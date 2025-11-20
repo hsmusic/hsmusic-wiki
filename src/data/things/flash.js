@@ -1,7 +1,6 @@
 export const FLASH_DATA_FILE = 'flashes.yaml';
 
 import {input} from '#composite';
-import {empty} from '#sugar';
 import {sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
 import {anyOf, isColor, isContentString, isDirectory, isNumber, isString}
@@ -45,9 +44,6 @@ import {
   urls,
 } from '#composite/wiki-properties';
 
-import {withFlashAct} from '#composite/things/flash';
-import {withFlashSide} from '#composite/things/flash-act';
-
 export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';
 
@@ -55,10 +51,15 @@ export class Flash extends Thing {
     AdditionalName,
     CommentaryEntry,
     CreditingSourcesEntry,
+    FlashAct,
     Track,
     WikiInfo,
   }) => ({
     // Update & expose
+
+    act: thing({
+      class: input.value(FlashAct),
+    }),
 
     name: name('Unnamed Flash'),
 
@@ -93,14 +94,12 @@ export class Flash extends Thing {
         validate: input.value(isColor),
       }),
 
-      withFlashAct(),
-
       withPropertyFromObject({
-        object: '#flashAct',
+        object: 'act',
         property: input.value('color'),
       }),
 
-      exposeDependency({dependency: '#flashAct.color'}),
+      exposeDependency({dependency: '#act.color'}),
     ],
 
     date: simpleDate(),
@@ -157,16 +156,9 @@ export class Flash extends Thing {
 
     commentatorArtists: commentatorArtists(),
 
-    act: [
-      withFlashAct(),
-      exposeDependency({dependency: '#flashAct'}),
-    ],
-
     side: [
-      withFlashAct(),
-
       withPropertyFromObject({
-        object: '#flashAct',
+        object: 'act',
         property: input.value('side'),
       }),
 
@@ -283,8 +275,12 @@ export class FlashAct extends Thing {
   static [Thing.referenceType] = 'flash-act';
   static [Thing.friendlyName] = `Flash Act`;
 
-  static [Thing.getPropertyDescriptors] = () => ({
+  static [Thing.getPropertyDescriptors] = ({Flash, FlashSide}) => ({
     // Update & expose
+
+    side: thing({
+      class: input.value(FlashSide),
+    }),
 
     name: name('Unnamed Flash Act'),
     directory: directory(),
@@ -295,15 +291,13 @@ export class FlashAct extends Thing {
         validate: input.value(isContentString),
       }),
 
-      withFlashSide(),
-
       withPropertyFromObject({
-        object: '#flashSide',
+        object: 'side',
         property: input.value('listTerminology'),
       }),
 
       exposeDependencyOrContinue({
-        dependency: '#flashSide.listTerminology',
+        dependency: '#side.listTerminology',
       }),
 
       exposeConstant({
@@ -311,9 +305,8 @@ export class FlashAct extends Thing {
       }),
     ],
 
-    flashes: referenceList({
+    flashes: thingList({
       class: input.value(Flash),
-      find: soupyFind.input('flash'),
     }),
 
     // Update only
@@ -327,11 +320,6 @@ export class FlashAct extends Thing {
       exposeConstant({
         value: input.value(true),
       }),
-    ],
-
-    side: [
-      withFlashSide(),
-      exposeDependency({dependency: '#flashSide'}),
     ],
   });
 
@@ -368,7 +356,7 @@ export class FlashSide extends Thing {
   static [Thing.referenceType] = 'flash-side';
   static [Thing.friendlyName] = `Flash Side`;
 
-  static [Thing.getPropertyDescriptors] = () => ({
+  static [Thing.getPropertyDescriptors] = ({FlashAct}) => ({
     // Update & expose
 
     name: name('Unnamed Flash Side'),
@@ -376,9 +364,8 @@ export class FlashSide extends Thing {
     color: color(),
     listTerminology: contentString(),
 
-    acts: referenceList({
+    acts: thingList({
       class: input.value(FlashAct),
-      find: soupyFind.input('flashAct'),
     }),
 
     // Update only
@@ -435,56 +422,82 @@ export class FlashSide extends Thing {
         : Flash),
 
     save(results) {
-      // JavaScript likes you.
+      const flashSideData = [];
+      const flashActData = [];
+      const flashData = [];
 
-      if (!empty(results) && !(results[0] instanceof FlashSide)) {
-        throw new Error(`Expected a side at top of flash data file`);
-      }
+      const artworkData = [];
+      const commentaryData = [];
+      const creditingSourceData = [];
 
-      let index = 0;
-      let thing;
-      for (; thing = results[index]; index++) {
-        const flashSide = thing;
-        const flashActRefs = [];
+      let thing, i;
 
-        if (results[index + 1] instanceof Flash) {
-          throw new Error(`Expected an act to immediately follow a side`);
-        }
+      for (i = 0; thing = results[i]; i++) {
+        if (thing.isFlashSide) {
+          const side = thing;
+          const acts = [];
 
-        for (
-          index++;
-          (thing = results[index]) && thing instanceof FlashAct;
-          index++
-        ) {
-          const flashAct = thing;
-          const flashRefs = [];
-          for (
-            index++;
-            (thing = results[index]) && thing instanceof Flash;
-            index++
-          ) {
-            flashRefs.push(Thing.getReference(thing));
+          for (i++; thing = results[i]; i++) {
+            if (thing.isFlashAct) {
+              const act = thing;
+              const flashes = [];
+
+              for (i++; thing = results[i]; i++) {
+                if (thing.isFlash) {
+                  const flash = thing;
+
+                  flash.act = act;
+                  flashes.push(flash);
+
+                  flashData.push(flash);
+                  artworkData.push(flash.coverArtwork);
+                  commentaryData.push(...flash.commentary);
+                  creditingSourceData.push(...flash.creditingSources);
+
+                  continue;
+                }
+
+                i--;
+                break;
+              }
+
+              act.side = side;
+              act.flashes = flashes;
+              acts.push(act);
+
+              flashActData.push(act);
+
+              continue;
+            }
+
+            if (thing.isFlash) {
+              throw new Error(`Flashes must be under an act`);
+            }
+
+            i--;
+            break;
           }
-          index--;
-          flashAct.flashes = flashRefs;
-          flashActRefs.push(Thing.getReference(flashAct));
+
+          side.acts = acts;
+
+          flashSideData.push(side);
+
+          continue;
         }
-        index--;
-        flashSide.acts = flashActRefs;
+
+        if (thing.isFlashAct) {
+          throw new Error(`Acts must be under a side`);
+        }
+
+        if (thing.isFlash) {
+          throw new Error(`Flashes must be under a side and act`);
+        }
       }
-
-      const flashData = results.filter(x => x instanceof Flash);
-      const flashActData = results.filter(x => x instanceof FlashAct);
-      const flashSideData = results.filter(x => x instanceof FlashSide);
-
-      const artworkData = flashData.map(flash => flash.coverArtwork);
-      const commentaryData = flashData.flatMap(flash => flash.commentary);
-      const creditingSourceData = flashData.flatMap(flash => flash.creditingSources);
 
       return {
-        flashData,
-        flashActData,
         flashSideData,
+        flashActData,
+        flashData,
 
         artworkData,
         commentaryData,

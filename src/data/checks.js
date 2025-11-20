@@ -285,10 +285,6 @@ export function filterReferenceErrors(wikiData, {
       featuredTracks: 'track',
     }],
 
-    ['flashActData', {
-      flashes: 'flash',
-    }],
-
     ['seriesData', {
       albums: 'album',
     }],
