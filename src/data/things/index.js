@@ -6,7 +6,7 @@ import CacheableObject from '#cacheable-object';
 import {logError} from '#cli';
 import {compositeFrom} from '#composite';
 import * as serialize from '#serialize';
-import {withEntries} from '#sugar';
+import {empty} from '#sugar';
 import Thing from '#thing';
 
 import * as additionalFileClasses from './additional-file.js';
@@ -90,25 +90,39 @@ function errorDuplicateClassNames() {
 }
 
 function flattenClassLists() {
-  let allClassesUnsorted = Object.create(null);
-
+  let remaining = [];
   for (const classes of Object.values(allClassLists)) {
-    for (const [name, constructor] of Object.entries(classes)) {
+    for (const constructor of Object.values(classes)) {
       if (typeof constructor !== 'function') continue;
       if (!(constructor.prototype instanceof Thing)) continue;
-      allClassesUnsorted[name] = constructor;
+      remaining.push(constructor);
     }
   }
 
-  // Sort subclasses after their superclasses.
-  Object.assign(allClasses,
-    withEntries(allClassesUnsorted, entries =>
-      entries.sort(({[1]: A}, {[1]: B}) =>
-        (A.prototype instanceof B
-          ? +1
-       : B.prototype instanceof A
-          ? -1
-          :  0))));
+  let sorted = [];
+  while (true) {
+    if (sorted[0]) {
+      const superclass = Object.getPrototypeOf(sorted[0]);
+      if (superclass !== Thing) {
+        if (sorted.includes(superclass)) {
+          sorted.unshift(...sorted.splice(sorted.indexOf(superclass), 1));
+        } else {
+          sorted.unshift(superclass);
+        }
+        continue;
+      }
+    }
+
+    if (!empty(remaining)) {
+      sorted.unshift(remaining.shift());
+    } else {
+      break;
+    }
+  }
+
+  for (const constructor of sorted) {
+    allClasses[constructor.name] = constructor;
+  }
 }
 
 function descriptorAggregateHelper({
