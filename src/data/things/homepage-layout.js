@@ -244,8 +244,6 @@ export class HomepageLayoutActionsRow extends HomepageLayoutRow {
   static [Thing.friendlyName] = `Homepage Actions Row`;
 
   static [Thing.getPropertyDescriptors] = (opts) => ({
-    ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
-
     // Update & expose
 
     actionLinks: {
@@ -278,8 +276,6 @@ export class HomepageLayoutAlbumCarouselRow extends HomepageLayoutRow {
   static [Thing.friendlyName] = `Homepage Album Carousel Row`;
 
   static [Thing.getPropertyDescriptors] = (opts, {Album} = opts) => ({
-    ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
-
     // Update & expose
 
     albums: referenceList({
@@ -312,8 +308,6 @@ export class HomepageLayoutAlbumGridRow extends HomepageLayoutRow {
   static [Thing.friendlyName] = `Homepage Album Grid Row`;
 
   static [Thing.getPropertyDescriptors] = (opts, {Album, Group} = opts) => ({
-    ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
-
     // Update & expose
 
     sourceGroup: [

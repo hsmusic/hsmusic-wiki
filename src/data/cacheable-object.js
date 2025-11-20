@@ -16,25 +16,11 @@ export default class CacheableObject {
   static updateValue = Symbol.for('CacheableObject.updateValues');
 
   constructor({seal = true} = {}) {
-    this[CacheableObject.updateValue] = Object.create(null);
     this[CacheableObject.cachedValue] = Object.create(null);
     this[CacheableObject.cacheValid] = Object.create(null);
 
-    const propertyDescriptors = this.constructor[CacheableObject.propertyDescriptors];
-    for (const property of Reflect.ownKeys(propertyDescriptors)) {
-      const {flags, update} = propertyDescriptors[property];
-      if (!flags.update) continue;
-
-      if (
-        typeof update === 'object' &&
-        update !== null &&
-        'default' in update
-      ) {
-        this[property] = update?.default;
-      } else {
-        this[property] = null;
-      }
-    }
+    this[CacheableObject.updateValue] =
+      Object.create(this[CacheableObject.updateValue]);
 
     if (seal) {
       Object.seal(this);
@@ -50,9 +36,31 @@ export default class CacheableObject {
       throw new Error(`Expected constructor ${this.name} to provide CacheableObject.propertyDescriptors`);
     }
 
+    const propertyDescriptors = this[CacheableObject.propertyDescriptors];
+
+    // Finalize prototype update value
+
+    this.prototype[CacheableObject.updateValue] =
+      Object.create(
+        Object.getPrototypeOf(this.prototype)[CacheableObject.updateValue] ??
+        null);
+
+    for (const property of Reflect.ownKeys(propertyDescriptors)) {
+      const {flags, update} = propertyDescriptors[property];
+      if (!flags.update) continue;
+
+      if (typeof update === 'object' && update !== null && 'default' in update) {
+        validatePropertyValue(property, null, update.default, update);
+        this.prototype[CacheableObject.updateValue][property] = update.default;
+      } else {
+        this.prototype[CacheableObject.updateValue][property] = null;
+      }
+    }
+
+    // Finalize prototype property descriptors
+
     this[CacheableObject.propertyDependants] = Object.create(null);
 
-    const propertyDescriptors = this[CacheableObject.propertyDescriptors];
     for (const property of Reflect.ownKeys(propertyDescriptors)) {
       const {flags, update, expose} = propertyDescriptors[property];
 
@@ -74,17 +82,7 @@ export default class CacheableObject {
           }
 
           if (newValue !== null && update?.validate) {
-            try {
-              const result = update.validate(newValue);
-              if (result === undefined) {
-                throw new TypeError(`Validate function returned undefined`);
-              } else if (result !== true) {
-                throw new TypeError(`Validation failed for value ${newValue}`);
-              }
-            } catch (caughtError) {
-              throw new CacheableObjectPropertyValueError(
-                property, oldValue, newValue, {cause: caughtError});
-            }
+            validatePropertyValue(property, oldValue, newValue, update);
           }
 
           this[CacheableObject.updateValue][property] = newValue;
@@ -259,5 +257,20 @@ export class CacheableObjectPropertyValueError extends Error {
       options);
 
     this.property = property;
+  }
+}
+
+// good ol' module-scope utility functions
+function validatePropertyValue(property, oldValue, newValue, update) {
+  try {
+    const result = update.validate(newValue);
+    if (result === undefined) {
+      throw new TypeError(`Validate function returned undefined`);
+    } else if (result !== true) {
+      throw new TypeError(`Validation failed for value ${newValue}`);
+    }
+  } catch (caughtError) {
+    throw new CacheableObjectPropertyValueError(
+      property, oldValue, newValue, {cause: caughtError});
   }
 }

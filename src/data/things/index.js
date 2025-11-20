@@ -181,10 +181,10 @@ function evaluatePropertyDescriptors() {
         }
       }
 
-      constructor[CacheableObject.propertyDescriptors] = {
-        ...constructor[CacheableObject.propertyDescriptors] ?? {},
-        ...results,
-      };
+      constructor[CacheableObject.propertyDescriptors] =
+        Object.create(constructor[CacheableObject.propertyDescriptors] ?? null);
+
+      Object.assign(constructor[CacheableObject.propertyDescriptors], results);
     },
 
     showFailedClasses(failedClasses) {
