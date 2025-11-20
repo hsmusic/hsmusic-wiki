@@ -186,7 +186,7 @@ export default class CacheableObject {
   }
 
   static hasPropertyDescriptor(property) {
-    return Object.hasOwn(this[CacheableObject.propertyDescriptors], property);
+    return property in this[CacheableObject.propertyDescriptors];
   }
 
   static cacheAllExposedProperties(obj) {
