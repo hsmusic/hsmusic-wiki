@@ -505,8 +505,8 @@ export class Album extends Thing {
       bindTo: 'albumData',
 
       getMatchableNames: album =>
-        (album.alwaysReferenceByDirectory 
-          ? [] 
+        (album.alwaysReferenceByDirectory
+          ? []
           : [album.name]),
     },
 
