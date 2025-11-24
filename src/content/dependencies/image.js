@@ -184,16 +184,6 @@ export default {
       mediaSrc &&
       checkIfImagePathHasCachedThumbnails(mediaSrc);
 
-    // Warn for images that *should* have cached thumbnail information but are
-    // missing from the thumbs cache.
-    if (
-      slots.thumb &&
-      !hasThumbnails &&
-      !mediaSrc.endsWith('.gif')
-    ) {
-      logWarn`No thumbnail info cached: ${mediaSrc} - displaying original image here (instead of ${slots.thumb})`;
-    }
-
     let displaySrc = originalSrc;
 
     // This is only distinguished from displaySrc by being a thumbnail,
