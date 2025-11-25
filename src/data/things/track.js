@@ -87,7 +87,6 @@ import {
 } from '#composite/wiki-properties';
 
 import {
-  exitWithoutUniqueCoverArt,
   inheritContributionListFromMainRelease,
   inheritFromMainRelease,
   withPropertyFromAlbum,
@@ -451,7 +450,9 @@ export class Track extends Thing {
     // > Update & expose - Artworks
 
     trackArtworks: [
-      exitWithoutUniqueCoverArt({
+      exitWithoutDependency({
+        dependency: 'hasUniqueCoverArt',
+        mode: input.value('falsy'),
         value: input.value([]),
       }),
 
@@ -460,7 +461,9 @@ export class Track extends Thing {
     ],
 
     coverArtistContribs: [
-      exitWithoutUniqueCoverArt({
+      exitWithoutDependency({
+        dependency: 'hasUniqueCoverArt',
+        mode: input.value('falsy'),
         value: input.value([]),
       }),
 
@@ -519,7 +522,10 @@ export class Track extends Thing {
     ],
 
     coverArtFileExtension: [
-      exitWithoutUniqueCoverArt(),
+      exitWithoutDependency({
+        dependency: 'hasUniqueCoverArt',
+        mode: input.value('falsy'),
+      }),
 
       exposeUpdateValueOrContinue({
         validate: input.value(isFileExtension),
@@ -537,7 +543,10 @@ export class Track extends Thing {
     ],
 
     coverArtDimensions: [
-      exitWithoutUniqueCoverArt(),
+      exitWithoutDependency({
+        dependency: 'hasUniqueCoverArt',
+        mode: input.value('falsy'),
+      }),
 
       exposeUpdateValueOrContinue(),
 
@@ -551,7 +560,9 @@ export class Track extends Thing {
     ],
 
     artTags: [
-      exitWithoutUniqueCoverArt({
+      exitWithoutDependency({
+        dependency: 'hasUniqueCoverArt',
+        mode: input.value('falsy'),
         value: input.value([]),
       }),
 
@@ -562,7 +573,9 @@ export class Track extends Thing {
     ],
 
     referencedArtworks: [
-      exitWithoutUniqueCoverArt({
+      exitWithoutDependency({
+        dependency: 'hasUniqueCoverArt',
+        mode: input.value('falsy'),
         value: input.value([]),
       }),
 
