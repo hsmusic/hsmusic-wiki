@@ -4,6 +4,7 @@ import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input} from '#composite';
 import {onlyItem} from '#sugar';
+import {sortByDate} from '#sort';
 import Thing from '#thing';
 import {getKebabCase} from '#wiki-data';
 
@@ -88,7 +89,6 @@ import {
   exitWithoutUniqueCoverArt,
   inheritContributionListFromMainRelease,
   inheritFromMainRelease,
-  withAllReleases,
   withDirectorySuffix,
   withOtherReleases,
   withPropertyFromAlbum,
@@ -953,8 +953,41 @@ export class Track extends Thing {
     }),
 
     allReleases: [
-      withAllReleases(),
-      exposeDependency({dependency: '#allReleases'}),
+      {
+        dependencies: [
+          'mainReleaseTrack',
+          'secondaryReleases',
+          input.myself(),
+        ],
+
+        compute: (continuation, {
+          mainReleaseTrack,
+          secondaryReleases,
+          [input.myself()]: thisTrack,
+        }) =>
+          (mainReleaseTrack
+            ? continuation({
+                ['#mainReleaseTrack']: mainReleaseTrack,
+                ['#secondaryReleaseTracks']: mainReleaseTrack.secondaryReleases,
+              })
+            : continuation({
+                ['#mainReleaseTrack']: thisTrack,
+                ['#secondaryReleaseTracks']: secondaryReleases,
+              })),
+      },
+
+      {
+        dependencies: [
+          '#mainReleaseTrack',
+          '#secondaryReleaseTracks',
+        ],
+
+        compute: ({
+          ['#mainReleaseTrack']: mainReleaseTrack,
+          ['#secondaryReleaseTracks']: secondaryReleaseTracks,
+        }) =>
+          sortByDate([mainReleaseTrack, ...secondaryReleaseTracks]),
+      },
     ],
 
     otherReleases: [

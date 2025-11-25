@@ -3,21 +3,17 @@
 
 import {input, templateCompositeFrom} from '#composite';
 
-import withAllReleases from './withAllReleases.js';
-
 export default templateCompositeFrom({
   annotation: `withOtherReleases`,
 
   outputs: ['#otherReleases'],
 
   steps: () => [
-    withAllReleases(),
-
     {
-      dependencies: [input.myself(), '#allReleases'],
+      dependencies: [input.myself(), 'allReleases'],
       compute: (continuation, {
         [input.myself()]: thisTrack,
-        ['#allReleases']: allReleases,
+        ['allReleases']: allReleases,
       }) => continuation({
         ['#otherReleases']:
           allReleases.filter(track => track !== thisTrack),

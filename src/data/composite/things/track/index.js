@@ -2,7 +2,6 @@ export {default as alwaysReferenceByDirectory} from './alwaysReferenceByDirector
 export {default as exitWithoutUniqueCoverArt} from './exitWithoutUniqueCoverArt.js';
 export {default as inheritContributionListFromMainRelease} from './inheritContributionListFromMainRelease.js';
 export {default as inheritFromMainRelease} from './inheritFromMainRelease.js';
-export {default as withAllReleases} from './withAllReleases.js';
 export {default as withDirectorySuffix} from './withDirectorySuffix.js';
 export {default as withOtherReleases} from './withOtherReleases.js';
 export {default as withPropertyFromAlbum} from './withPropertyFromAlbum.js';
