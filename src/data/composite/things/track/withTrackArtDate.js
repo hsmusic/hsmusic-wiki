@@ -3,7 +3,6 @@ import {isDate} from '#validators';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 
-import withDate from './withDate.js';
 import withPropertyFromAlbum from './withPropertyFromAlbum.js';
 
 export default templateCompositeFrom({
@@ -50,8 +49,10 @@ export default templateCompositeFrom({
           : continuation()),
     },
 
-    withDate().outputs({
-      '#date': '#trackArtDate',
-    }),
+    {
+      dependencies: ['date'],
+      compute: (continuation, {date}) =>
+        continuation({'#trackArtDate': date}),
+    },
   ],
 });

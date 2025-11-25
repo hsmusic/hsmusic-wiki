@@ -83,7 +83,6 @@ import {
   inheritFromMainRelease,
   withAllReleases,
   withCoverArtistContribs,
-  withDate,
   withDirectorySuffix,
   withMainRelease,
   withMainReleaseTrack,
@@ -227,13 +226,11 @@ export class Track extends Thing {
     ],
 
     artistContribs: [
-      withDate(),
-
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
         thingProperty: input.thisProperty(),
         artistProperty: input.value('trackArtistContributions'),
-        date: '#date',
+        date: 'date',
       }).outputs({
         '#resolvedContribs': '#artistContribs',
       }),
@@ -258,7 +255,7 @@ export class Track extends Thing {
 
       withRedatedContributionList({
         list: '#album.trackArtistContribs',
-        date: '#date',
+        date: 'date',
       }),
 
       exposeDependency({dependency: '#album.trackArtistContribs'}),
@@ -267,10 +264,8 @@ export class Track extends Thing {
     contributorContribs: [
       inheritContributionListFromMainRelease(),
 
-      withDate(),
-
       contributionList({
-        date: '#date',
+        date: 'date',
         artistProperty: input.value('trackContributorContributions'),
       }),
     ],
@@ -531,8 +526,25 @@ export class Track extends Thing {
     ],
 
     date: [
-      withDate(),
-      exposeDependency({dependency: '#date'}),
+      {
+        dependencies: ['disableDate'],
+        compute: (continuation, {disableDate}) =>
+          (disableDate
+            ? null
+            : continuation()),
+      },
+
+      exposeDependencyOrContinue({
+        dependency: 'dateFirstReleased',
+      }),
+
+      withPropertyFromAlbum({
+        property: input.value('date'),
+      }),
+
+      exposeDependency({
+        dependency: '#album.date',
+      }),
     ],
 
     trackNumber: [

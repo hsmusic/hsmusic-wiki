@@ -8,7 +8,6 @@ import {exposeDependency, raiseOutputWithoutDependency}
 import {withRecontextualizedContributionList, withRedatedContributionList}
   from '#composite/wiki-data';
 
-import withDate from './withDate.js';
 import withPropertyFromMainRelease
   from './withPropertyFromMainRelease.js';
 
@@ -30,11 +29,9 @@ export default templateCompositeFrom({
       list: '#mainReleaseValue',
     }),
 
-    withDate(),
-
     withRedatedContributionList({
       list: '#mainReleaseValue',
-      date: '#date',
+      date: 'date',
     }),
 
     exposeDependency({
