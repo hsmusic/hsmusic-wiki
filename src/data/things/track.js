@@ -89,7 +89,6 @@ import {
 import {
   inheritContributionListFromMainRelease,
   inheritFromMainRelease,
-  withPropertyFromAlbum,
 } from '#composite/things/track';
 
 export class Track extends Thing {
@@ -161,7 +160,8 @@ export class Track extends Thing {
         validate: input.value(isBoolean),
       }),
 
-      withPropertyFromAlbum({
+      withPropertyFromObject({
+        object: 'album',
         property: input.value('alwaysReferenceTracksByDirectory'),
       }),
 
@@ -306,7 +306,8 @@ export class Track extends Thing {
         validate: input.value(isContentString),
       }),
 
-      withPropertyFromAlbum({
+      withPropertyFromObject({
+        object: 'album',
         property: input.value('trackArtistText'),
       }),
 
@@ -324,7 +325,8 @@ export class Track extends Thing {
         dependency: '_artistText',
       }),
 
-      withPropertyFromAlbum({
+      withPropertyFromObject({
+        object: 'album',
         property: input.value('trackArtistText'),
       }),
 
@@ -352,7 +354,8 @@ export class Track extends Thing {
       // Secondary releases' artists may differ from the main release.
       inheritContributionListFromMainRelease(),
 
-      withPropertyFromAlbum({
+      withPropertyFromObject({
+        object: 'album',
         property: input.value('trackArtistContribs'),
       }),
 
@@ -412,7 +415,8 @@ export class Track extends Thing {
 
       exposeDependencyOrContinue({dependency: '#trackSection.color'}),
 
-      withPropertyFromAlbum({
+      withPropertyFromObject({
+        object: 'album',
         property: input.value('color'),
       }),
 
@@ -479,7 +483,8 @@ export class Track extends Thing {
         mode: input.value('empty'),
       }),
 
-      withPropertyFromAlbum({
+      withPropertyFromObject({
+        object: 'album',
         property: input.value('trackCoverArtistContribs'),
       }),
 
@@ -508,7 +513,8 @@ export class Track extends Thing {
         validate: input.value(isDate),
       }),
 
-      withPropertyFromAlbum({
+      withPropertyFromObject({
+        object: 'album',
         property: input.value('trackArtDate'),
       }),
 
@@ -531,7 +537,8 @@ export class Track extends Thing {
         validate: input.value(isFileExtension),
       }),
 
-      withPropertyFromAlbum({
+      withPropertyFromObject({
+        object: 'album',
         property: input.value('trackCoverArtFileExtension'),
       }),
 
@@ -550,7 +557,8 @@ export class Track extends Thing {
 
       exposeUpdateValueOrContinue(),
 
-      withPropertyFromAlbum({
+      withPropertyFromObject({
+        object: 'album',
         property: input.value('trackDimensions'),
       }),
 
@@ -704,7 +712,8 @@ export class Track extends Thing {
         dependency: 'dateFirstReleased',
       }),
 
-      withPropertyFromAlbum({
+      withPropertyFromObject({
+        object: 'album',
         property: input.value('date'),
       }),
 
@@ -782,7 +791,8 @@ export class Track extends Thing {
             : continuation()),
       },
 
-      withPropertyFromAlbum({
+      withPropertyFromObject({
+        object: 'album',
         property: input.value('trackCoverArtistContribs'),
         internal: input.value(true),
       }),
@@ -1100,7 +1110,8 @@ export class Track extends Thing {
     ],
 
     groups: [
-      withPropertyFromAlbum({
+      withPropertyFromObject({
+        object: 'album',
         property: input.value('groups'),
       }),
 
