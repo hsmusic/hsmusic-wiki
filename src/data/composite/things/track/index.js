@@ -4,4 +4,3 @@ export {default as inheritContributionListFromMainRelease} from './inheritContri
 export {default as inheritFromMainRelease} from './inheritFromMainRelease.js';
 export {default as withPropertyFromAlbum} from './withPropertyFromAlbum.js';
 export {default as withPropertyFromMainRelease} from './withPropertyFromMainRelease.js';
-export {default as withTrackNumber} from './withTrackNumber.js';

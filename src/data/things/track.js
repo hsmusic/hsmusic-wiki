@@ -49,7 +49,9 @@ import {
   fillMissingListItems,
   withFilteredList,
   withFlattenedList,
+  withIndexInList,
   withMappedList,
+  withPropertiesFromObject,
   withPropertyFromList,
   withPropertyFromObject,
 } from '#composite/data';
@@ -90,7 +92,6 @@ import {
   inheritContributionListFromMainRelease,
   inheritFromMainRelease,
   withPropertyFromAlbum,
-  withTrackNumber,
 } from '#composite/things/track';
 
 export class Track extends Thing {
@@ -657,8 +658,36 @@ export class Track extends Thing {
     ],
 
     trackNumber: [
-      withTrackNumber(),
-      exposeDependency({dependency: '#trackNumber'}),
+      // Zero is the fallback, not one, but in most albums the first track
+      // (and its intended output by this composition) will be one.
+      exitWithoutDependency({
+        dependency: 'trackSection',
+        value: input.value(0),
+      }),
+
+      withPropertiesFromObject({
+        object: 'trackSection',
+        properties: input.value(['tracks', 'startCountingFrom']),
+      }),
+
+      withIndexInList({
+        list: '#trackSection.tracks',
+        item: input.myself(),
+      }),
+
+      exitWithoutDependency({
+        dependency: '#index',
+        value: input.value(0),
+        mode: input.value('index'),
+      }),
+
+      {
+        dependencies: ['#trackSection.startCountingFrom', '#index'],
+        compute: ({
+          ['#trackSection.startCountingFrom']: startCountingFrom,
+          ['#index']: index,
+        }) => startCountingFrom + index,
+      },
     ],
 
     // Whether or not the track has "unique" cover artwork - a cover which is
