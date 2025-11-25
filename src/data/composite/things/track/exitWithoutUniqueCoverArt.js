@@ -5,8 +5,6 @@ import {input, templateCompositeFrom} from '#composite';
 
 import {exitWithoutDependency} from '#composite/control-flow';
 
-import withHasUniqueCoverArt from './withHasUniqueCoverArt.js';
-
 export default templateCompositeFrom({
   annotation: `exitWithoutUniqueCoverArt`,
 
@@ -15,10 +13,8 @@ export default templateCompositeFrom({
   },
 
   steps: () => [
-    withHasUniqueCoverArt(),
-
     exitWithoutDependency({
-      dependency: '#hasUniqueCoverArt',
+      dependency: 'hasUniqueCoverArt',
       mode: input.value('falsy'),
       value: input('value'),
     }),

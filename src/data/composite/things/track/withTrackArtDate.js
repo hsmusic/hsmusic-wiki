@@ -4,7 +4,6 @@ import {isDate} from '#validators';
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 
 import withDate from './withDate.js';
-import withHasUniqueCoverArt from './withHasUniqueCoverArt.js';
 import withPropertyFromAlbum from './withPropertyFromAlbum.js';
 
 export default templateCompositeFrom({
@@ -21,10 +20,8 @@ export default templateCompositeFrom({
   outputs: ['#trackArtDate'],
 
   steps: () => [
-    withHasUniqueCoverArt(),
-
     raiseOutputWithoutDependency({
-      dependency: '#hasUniqueCoverArt',
+      dependency: 'hasUniqueCoverArt',
       mode: input.value('falsy'),
       output: input.value({'#trackArtDate': null}),
     }),

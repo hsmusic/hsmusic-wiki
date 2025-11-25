@@ -6,7 +6,6 @@ export {default as withAllReleases} from './withAllReleases.js';
 export {default as withCoverArtistContribs} from './withCoverArtistContribs.js';
 export {default as withDate} from './withDate.js';
 export {default as withDirectorySuffix} from './withDirectorySuffix.js';
-export {default as withHasUniqueCoverArt} from './withHasUniqueCoverArt.js';
 export {default as withMainRelease} from './withMainRelease.js';
 export {default as withMainReleaseTrack} from './withMainReleaseTrack.js';
 export {default as withOtherReleases} from './withOtherReleases.js';

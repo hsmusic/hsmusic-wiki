@@ -30,8 +30,6 @@ import {
   parseLyrics,
 } from '#yaml';
 
-import {withPropertyFromList, withPropertyFromObject} from '#composite/data';
-
 import {
   exitWithoutDependency,
   exposeConstant,
@@ -39,7 +37,15 @@ import {
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
   exposeWhetherDependencyAvailable,
+  withResultOfAvailabilityCheck,
 } from '#composite/control-flow';
+
+import {
+  fillMissingListItems,
+  withFlattenedList,
+  withPropertyFromList,
+  withPropertyFromObject,
+} from '#composite/data';
 
 import {
   withRecontextualizedContributionList,
@@ -79,7 +85,6 @@ import {
   withCoverArtistContribs,
   withDate,
   withDirectorySuffix,
-  withHasUniqueCoverArt,
   withMainRelease,
   withMainReleaseTrack,
   withOtherReleases,
@@ -535,9 +540,93 @@ export class Track extends Thing {
       exposeDependency({dependency: '#trackNumber'}),
     ],
 
+    // Whether or not the track has "unique" cover artwork - a cover which is
+    // specifically associated with this track in particular, rather than with
+    // the track's album as a whole. This is typically used to select between
+    // displaying the track artwork and a fallback, such as the album artwork
+    // or a placeholder. (This property is named hasUniqueCoverArt instead of
+    // the usual hasCoverArt to emphasize that it does not inherit from the
+    // album.)
+    //
+    // hasUniqueCoverArt is based only around the presence of *specified*
+    // cover artist contributions, not whether the references to artists on those
+    // contributions actually resolve to anything. It completely evades interacting
+    // with find/replace.
     hasUniqueCoverArt: [
-      withHasUniqueCoverArt(),
-      exposeDependency({dependency: '#hasUniqueCoverArt'}),
+      {
+        dependencies: ['disableUniqueCoverArt'],
+        compute: (continuation, {disableUniqueCoverArt}) =>
+          (disableUniqueCoverArt
+            ? false
+            : continuation()),
+      },
+
+      withResultOfAvailabilityCheck({
+        from: '_coverArtistContribs',
+        mode: input.value('empty'),
+      }),
+
+      {
+        dependencies: ['#availability'],
+        compute: (continuation, {
+          ['#availability']: availability,
+        }) =>
+          (availability
+            ? true
+            : continuation()),
+      },
+
+      withPropertyFromAlbum({
+        property: input.value('trackCoverArtistContribs'),
+        internal: input.value(true),
+      }),
+
+      withResultOfAvailabilityCheck({
+        from: '#album.trackCoverArtistContribs',
+        mode: input.value('empty'),
+      }),
+
+      {
+        dependencies: ['#availability'],
+        compute: (continuation, {
+          ['#availability']: availability,
+        }) =>
+          (availability
+            ? true
+            : continuation()),
+      },
+
+      exitWithoutDependency({
+        dependency: '_trackArtworks',
+        mode: input.value('empty'),
+        value: input.value(false),
+      }),
+
+      withPropertyFromList({
+        list: '_trackArtworks',
+        property: input.value('artistContribs'),
+        internal: input.value(true),
+      }),
+
+      // Since we're getting the update value for each artwork's artistContribs,
+      // it may not be set at all, and in that case won't be exposing as [].
+      fillMissingListItems({
+        list: '#trackArtworks.artistContribs',
+        fill: input.value([]),
+      }),
+
+      withFlattenedList({
+        list: '#trackArtworks.artistContribs',
+      }),
+
+      withResultOfAvailabilityCheck({
+        from: '#flattenedList',
+        mode: input.value('empty'),
+      }),
+
+      exposeDependency({
+        dependency: '#availability',
+      }),
     ],
 
     isMainRelease: [
