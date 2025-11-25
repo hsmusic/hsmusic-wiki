@@ -257,7 +257,7 @@ export class Artwork extends Thing {
               })),
         }),
 
-        data: 'artworkData',
+        data: '_artworkData',
         find: '#find',
 
         thing: input.value('artwork'),

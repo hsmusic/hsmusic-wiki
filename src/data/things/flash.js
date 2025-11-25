@@ -167,7 +167,7 @@ export class Flash extends Thing {
         property: input.value('side'),
       }),
 
-      exposeDependency({dependency: '#flashAct.side'}),
+      exposeDependency({dependency: '#act.side'}),
     ],
   });
 

@@ -9,7 +9,7 @@ export default templateCompositeFrom({
   inputs: {
     ref: input({
       type: 'string',
-      defaultDependency: 'artist',
+      defaultDependency: '_artist',
     }),
   },
 
