@@ -12,7 +12,19 @@ export default templateCompositeFrom({
   inputs: {
     mode: inputAvailabilityCheckMode(),
     value: input({defaultValue: null}),
+
+    validate: input({
+      type: 'function',
+      defaultValue: null,
+    }),
   },
+
+  update: ({
+    [input.staticValue('validate')]: validate,
+  }) =>
+    (validate
+      ? {validate}
+      : {}),
 
   steps: () => [
     exitWithoutDependency({
