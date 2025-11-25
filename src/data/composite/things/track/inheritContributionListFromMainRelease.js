@@ -15,14 +15,13 @@ export default templateCompositeFrom({
   annotation: `inheritContributionListFromMainRelease`,
 
   steps: () => [
-    withPropertyFromMainRelease({
-      property: input.thisProperty(),
-      notFoundValue: input.value([]),
+    raiseOutputWithoutDependency({
+      dependency: 'isSecondaryRelease',
+      mode: input.value('falsy'),
     }),
 
-    raiseOutputWithoutDependency({
-      dependency: '#isSecondaryRelease',
-      mode: input.value('falsy'),
+    withPropertyFromMainRelease({
+      property: input.thisProperty(),
     }),
 
     withRecontextualizedContributionList({

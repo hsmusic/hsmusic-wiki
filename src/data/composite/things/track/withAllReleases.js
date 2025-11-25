@@ -10,40 +10,47 @@ import {sortByDate} from '#sort';
 
 import {withPropertyFromObject} from '#composite/data';
 
-import withMainReleaseTrack from './withMainReleaseTrack.js';
-
 export default templateCompositeFrom({
   annotation: `withAllReleases`,
 
   outputs: ['#allReleases'],
 
   steps: () => [
-    withMainReleaseTrack({
-      selfIfMain: input.value(true),
-      notFoundValue: input.value([]),
-    }),
+    {
+      dependencies: [
+        'mainReleaseTrack',
+        'secondaryReleases',
+        input.myself(),
+      ],
 
-    // We don't talk about bruno no no
-    // Yes, this can perform a normal access equivalent to
-    // `this.secondaryReleases` from within a data composition.
-    // Oooooooooooooooooooooooooooooooooooooooooooooooo
-    withPropertyFromObject({
-      object: '#mainReleaseTrack',
-      property: input.value('secondaryReleases'),
-    }),
+      compute: (continuation, {
+        mainReleaseTrack,
+        secondaryReleases,
+        [input.myself()]: thisTrack,
+      }) =>
+        (mainReleaseTrack
+          ? continuation({
+              ['#mainReleaseTrack']: mainReleaseTrack,
+              ['#secondaryReleaseTracks']: mainReleaseTrack.secondaryReleases,
+            })
+          : continuation({
+              ['#mainReleaseTrack']: thisTrack,
+              ['#secondaryReleaseTracks']: secondaryReleases,
+            })),
+    },
 
     {
       dependencies: [
         '#mainReleaseTrack',
-        '#mainReleaseTrack.secondaryReleases',
+        '#secondaryReleaseTracks',
       ],
 
       compute: (continuation, {
         ['#mainReleaseTrack']: mainReleaseTrack,
-        ['#mainReleaseTrack.secondaryReleases']: secondaryReleases,
+        ['#secondaryReleaseTracks']: secondaryReleaseTracks,
       }) => continuation({
         ['#allReleases']:
-          sortByDate([mainReleaseTrack, ...secondaryReleases]),
+          sortByDate([mainReleaseTrack, ...secondaryReleaseTracks]),
       }),
     },
   ],

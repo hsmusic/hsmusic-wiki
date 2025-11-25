@@ -1,86 +1,54 @@
-// Provides a value inherited from the main release, if applicable, and a
-// flag indicating if this track is a secondary release or not.
-//
-// Like withMainRelease, this will early exit (with notFoundValue) if the
-// main release is specified by reference and that reference doesn't
-// resolve to anything.
+// Provides a value inherited from the main release, or null,
+// if this track is not a secondary release.
 
 import {input, templateCompositeFrom} from '#composite';
 
 import {withResultOfAvailabilityCheck} from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
 
-import withMainReleaseTrack from './withMainReleaseTrack.js';
-
 export default templateCompositeFrom({
   annotation: `withPropertyFromMainRelease`,
 
   inputs: {
     property: input({type: 'string'}),
-
-    notFoundValue: input({
-      defaultValue: null,
-    }),
   },
 
   outputs: ({
     [input.staticValue('property')]: property,
-  }) =>
-    ['#isSecondaryRelease'].concat(
-      (property
-        ? ['#mainRelease.' + property]
-        : ['#mainReleaseValue'])),
+  }) => [
+    (property
+        ? '#mainRelease.' + property
+        : '#mainReleaseValue'),
+  ],
 
   steps: () => [
-    withMainReleaseTrack({
-      notFoundValue: input('notFoundValue'),
-    }),
-
-    withResultOfAvailabilityCheck({
-      from: '#mainReleaseTrack',
-    }),
-
     {
-      dependencies: [
-        '#availability',
-        input.staticValue('property'),
-      ],
-
+      dependencies: ['isSecondaryRelease', input.staticValue('property')],
       compute: (continuation, {
-        ['#availability']: availability,
+        ['isSecondaryRelease']: isSecondaryRelease,
         [input.staticValue('property')]: property,
       }) =>
-        (availability
+        (isSecondaryRelease
           ? continuation()
-          : continuation.raiseOutput(
-              Object.assign(
-                {'#isSecondaryRelease': false},
-                (property
-                  ? {['#mainRelease.' + property]: null}
-                  : {'#mainReleaseValue': null})))),
+       : property
+          ? continuation.raiseOutput({['#mainRelease.' + property]: null})
+          : continuation.raiseOutput({'#mainReleaseValue': null})),
     },
 
     withPropertyFromObject({
-      object: '#mainReleaseTrack',
+      object: 'mainReleaseTrack',
       property: input('property'),
     }),
 
     {
-      dependencies: [
-        '#value',
-        input.staticValue('property'),
-      ],
-
+      dependencies: ['#value', input.staticValue('property')],
       compute: (continuation, {
         ['#value']: value,
         [input.staticValue('property')]: property,
       }) =>
-        continuation.raiseOutput(
-          Object.assign(
-            {'#isSecondaryRelease': true},
-            (property
-              ? {['#mainRelease.' + property]: value}
-              : {'#mainReleaseValue': value}))),
+        (property
+          ? continuation.raiseOutput({['#mainRelease.' + property]: value})
+          : continuation.raiseOutput({'#mainReleaseValue': value})),
     },
   ],
 });

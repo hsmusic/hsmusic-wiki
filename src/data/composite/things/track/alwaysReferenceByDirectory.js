@@ -15,7 +15,6 @@ import {
   exposeUpdateValueOrContinue,
 } from '#composite/control-flow';
 
-import withMainReleaseTrack from './withMainReleaseTrack.js';
 import withPropertyFromAlbum from './withPropertyFromAlbum.js';
 
 export default templateCompositeFrom({
@@ -44,15 +43,13 @@ export default templateCompositeFrom({
       value: input.value(false),
     }),
 
-    withMainReleaseTrack(),
-
     exitWithoutDependency({
-      dependency: '#mainReleaseTrack',
+      dependency: 'mainReleaseTrack',
       value: input.value(false),
     }),
 
     withPropertyFromObject({
-      object: '#mainReleaseTrack',
+      object: 'mainReleaseTrack',
       property: input.value('name'),
     }),
 

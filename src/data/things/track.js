@@ -3,7 +3,9 @@ import {inspect} from 'node:util';
 import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input} from '#composite';
+import {onlyItem} from '#sugar';
 import Thing from '#thing';
+import {getKebabCase} from '#wiki-data';
 
 import {
   isBoolean,
@@ -38,12 +40,15 @@ import {
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
   exposeWhetherDependencyAvailable,
+  withAvailabilityFilter,
   withResultOfAvailabilityCheck,
 } from '#composite/control-flow';
 
 import {
   fillMissingListItems,
+  withFilteredList,
   withFlattenedList,
+  withMappedList,
   withPropertyFromList,
   withPropertyFromObject,
 } from '#composite/data';
@@ -85,7 +90,6 @@ import {
   inheritFromMainRelease,
   withAllReleases,
   withDirectorySuffix,
-  withMainReleaseTrack,
   withOtherReleases,
   withPropertyFromAlbum,
   withSuffixDirectoryFromAlbum,
@@ -538,9 +542,7 @@ export class Track extends Thing {
     // > Update & expose - Referenced tracks
 
     previousProductionTracks: [
-      inheritFromMainRelease({
-        notFoundValue: input.value([]),
-      }),
+      inheritFromMainRelease(),
 
       referenceList({
         class: input.value(Track),
@@ -549,9 +551,7 @@ export class Track extends Thing {
     ],
 
     referencedTracks: [
-      inheritFromMainRelease({
-        notFoundValue: input.value([]),
-      }),
+      inheritFromMainRelease(),
 
       referenceList({
         class: input.value(Track),
@@ -560,9 +560,7 @@ export class Track extends Thing {
     ],
 
     sampledTracks: [
-      inheritFromMainRelease({
-        notFoundValue: input.value([]),
-      }),
+      inheritFromMainRelease(),
 
       referenceList({
         class: input.value(Track),
@@ -756,28 +754,196 @@ export class Track extends Thing {
     ],
 
     isMainRelease: [
-      withMainReleaseTrack(),
-
       exposeWhetherDependencyAvailable({
-        dependency: '#mainReleaseTrack',
+        dependency: 'mainReleaseTrack',
         negate: input.value(true),
       }),
     ],
 
     isSecondaryRelease: [
-      withMainReleaseTrack(),
-
       exposeWhetherDependencyAvailable({
-        dependency: '#mainReleaseTrack',
+        dependency: 'mainReleaseTrack',
       }),
     ],
 
     mainReleaseTrack: [
-      withMainReleaseTrack(),
-
-      exposeDependency({
-        dependency: '#mainReleaseTrack',
+      exitWithoutDependency({
+        dependency: 'mainRelease',
       }),
+
+      withPropertyFromObject({
+        object: 'mainRelease',
+        property: input.value('isTrack'),
+      }),
+
+      {
+        dependencies: ['mainRelease', '#mainRelease.isTrack'],
+        compute: (continuation, {
+          ['mainRelease']: mainRelease,
+          ['#mainRelease.isTrack']: mainReleaseIsTrack,
+        }) =>
+          (mainReleaseIsTrack
+            ? mainRelease
+            : continuation()),
+      },
+
+      {
+        dependencies: ['name', '_directory'],
+        compute: (continuation, {
+          ['name']: ownName,
+          ['_directory']: ownDirectory,
+        }) => {
+          const ownNameKebabed = getKebabCase(ownName);
+
+          return continuation({
+            ['#mapItsNameLikeName']:
+              name => getKebabCase(name) === ownNameKebabed,
+
+            ['#mapItsDirectoryLikeDirectory']:
+              (ownDirectory
+                ? directory => directory === ownDirectory
+                : () => false),
+
+            ['#mapItsNameLikeDirectory']:
+              (ownDirectory
+                ? name => getKebabCase(name) === ownDirectory
+                : () => false),
+
+            ['#mapItsDirectoryLikeName']:
+              directory => directory === ownNameKebabed,
+          });
+        },
+      },
+
+      withPropertyFromObject({
+        object: 'mainRelease',
+        property: input.value('tracks'),
+      }),
+
+      withPropertyFromList({
+        list: '#mainRelease.tracks',
+        property: input.value('mainRelease'),
+        internal: input.value(true),
+      }),
+
+      withAvailabilityFilter({
+        from: '#mainRelease.tracks.mainRelease',
+      }),
+
+      withMappedList({
+        list: '#availabilityFilter',
+        map: input.value(item => !item),
+      }).outputs({
+        '#mappedList': '#availabilityFilter',
+      }),
+
+      withFilteredList({
+        list: '#mainRelease.tracks',
+        filter: '#availabilityFilter',
+      }).outputs({
+        '#filteredList': '#mainRelease.tracks',
+      }),
+
+      withPropertyFromList({
+        list: '#mainRelease.tracks',
+        property: input.value('name'),
+      }),
+
+      withPropertyFromList({
+        list: '#mainRelease.tracks',
+        property: input.value('directory'),
+        internal: input.value(true),
+      }),
+
+      withMappedList({
+        list: '#mainRelease.tracks.name',
+        map: '#mapItsNameLikeName',
+      }).outputs({
+        '#mappedList': '#filterItsNameLikeName',
+      }),
+
+      withMappedList({
+        list: '#mainRelease.tracks.directory',
+        map: '#mapItsDirectoryLikeDirectory',
+      }).outputs({
+        '#mappedList': '#filterItsDirectoryLikeDirectory',
+      }),
+
+      withMappedList({
+        list: '#mainRelease.tracks.name',
+        map: '#mapItsNameLikeDirectory',
+      }).outputs({
+        '#mappedList': '#filterItsNameLikeDirectory',
+      }),
+
+      withMappedList({
+        list: '#mainRelease.tracks.directory',
+        map: '#mapItsDirectoryLikeName',
+      }).outputs({
+        '#mappedList': '#filterItsDirectoryLikeName',
+      }),
+
+      withFilteredList({
+        list: '#mainRelease.tracks',
+        filter: '#filterItsNameLikeName',
+      }).outputs({
+        '#filteredList': '#matchingItsNameLikeName',
+      }),
+
+      withFilteredList({
+        list: '#mainRelease.tracks',
+        filter: '#filterItsDirectoryLikeDirectory',
+      }).outputs({
+        '#filteredList': '#matchingItsDirectoryLikeDirectory',
+      }),
+
+      withFilteredList({
+        list: '#mainRelease.tracks',
+        filter: '#filterItsNameLikeDirectory',
+      }).outputs({
+        '#filteredList': '#matchingItsNameLikeDirectory',
+      }),
+
+      withFilteredList({
+        list: '#mainRelease.tracks',
+        filter: '#filterItsDirectoryLikeName',
+      }).outputs({
+        '#filteredList': '#matchingItsDirectoryLikeName',
+      }),
+
+      {
+        dependencies: [
+          '#matchingItsNameLikeName',
+          '#matchingItsDirectoryLikeDirectory',
+          '#matchingItsNameLikeDirectory',
+          '#matchingItsDirectoryLikeName',
+        ],
+
+        compute: (continuation, {
+          ['#matchingItsNameLikeName']:           NLN,
+          ['#matchingItsDirectoryLikeDirectory']: DLD,
+          ['#matchingItsNameLikeDirectory']:      NLD,
+          ['#matchingItsDirectoryLikeName']:      DLN,
+        }) => continuation({
+          ['#mainReleaseTrack']:
+            onlyItem(DLD) ??
+            onlyItem(NLN) ??
+            onlyItem(DLN) ??
+            onlyItem(NLD) ??
+            null,
+        }),
+      },
+
+      {
+        dependencies: ['#mainReleaseTrack', input.myself()],
+        compute: ({
+          ['#mainReleaseTrack']: mainReleaseTrack,
+          [input.myself()]: thisTrack,
+        }) =>
+          (mainReleaseTrack === thisTrack
+            ? null
+            : mainReleaseTrack),
+      },
     ],
 
     // Only has any value for main releases, because secondary releases
@@ -797,15 +963,13 @@ export class Track extends Thing {
     ],
 
     commentaryFromMainRelease: [
-      withMainReleaseTrack(),
-
       exitWithoutDependency({
-        dependency: '#mainReleaseTrack',
+        dependency: 'mainReleaseTrack',
         value: input.value([]),
       }),
 
       withPropertyFromObject({
-        object: '#mainReleaseTrack',
+        object: 'mainReleaseTrack',
         property: input.value('commentary'),
       }),
 
