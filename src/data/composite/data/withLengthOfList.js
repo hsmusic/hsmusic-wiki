@@ -1,16 +1,6 @@
 import {input, templateCompositeFrom} from '#composite';
 
-function getOutputName({
-  [input.staticDependency('list')]: list,
-}) {
-  if (list && list.startsWith('#')) {
-    return `${list}.length`;
-  } else if (list) {
-    return `#${list}.length`;
-  } else {
-    return '#length';
-  }
-}
+import {getOutputName} from './helpers/property-from-helpers.js';
 
 export default templateCompositeFrom({
   annotation: `withMappedList`,
@@ -19,13 +9,25 @@ export default templateCompositeFrom({
     list: input({type: 'array'}),
   },
 
-  outputs: inputs => [getOutputName(inputs)],
+  outputs: ({
+    [input.staticDependency('list')]: list,
+  }) => [
+    (list
+      ? getOutputName({property: 'length', from: list})
+      : '#length'),
+  ],
 
   steps: () => [
     {
       dependencies: [input.staticDependency('list')],
-      compute: (continuation, inputs) =>
-        continuation({'#output': getOutputName(inputs)}),
+      compute: (continuation, {
+        [input.staticDependency('list')]: list,
+      }) => continuation({
+        '#output':
+          (list
+            ? getOutputName({property: 'length', from: list})
+            : '#length'),
+      }),
     },
 
     {

@@ -13,20 +13,7 @@
 import CacheableObject from '#cacheable-object';
 import {input, templateCompositeFrom} from '#composite';
 
-function getOutputName({
-  [input.staticDependency('object')]: object,
-  [input.staticValue('property')]: property,
-}) {
-  if (object && property) {
-    if (object.startsWith('#')) {
-      return `${object}.${property}`;
-    } else {
-      return `#${object}.${property}`;
-    }
-  } else {
-    return '#value';
-  }
-}
+import {getOutputName} from './helpers/property-from-helpers.js';
 
 export default templateCompositeFrom({
   annotation: `withPropertyFromObject`,
@@ -37,7 +24,14 @@ export default templateCompositeFrom({
     internal: input({type: 'boolean', defaultValue: false}),
   },
 
-  outputs: inputs => [getOutputName(inputs)],
+  outputs: ({
+    [input.staticDependency('object')]: object,
+    [input.staticValue('property')]: property,
+  }) => [
+    (property
+      ? getOutputName({property, from: object || '#object'})
+      : '#value'),
+  ],
 
   steps: () => [
     {
@@ -46,8 +40,15 @@ export default templateCompositeFrom({
         input.staticValue('property'),
       ],
 
-      compute: (continuation, inputs) =>
-        continuation({'#output': getOutputName(inputs)}),
+      compute: (continuation, {
+        [input.staticDependency('object')]: object,
+        [input.staticValue('property')]: property,
+      }) => continuation({
+        '#output':
+          (property
+            ? getOutputName({property, from: object || '#object'})
+            : '#value'),
+      }),
     },
 
     {

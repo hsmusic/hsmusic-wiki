@@ -16,12 +16,7 @@
 import CacheableObject from '#cacheable-object';
 import {input, templateCompositeFrom} from '#composite';
 
-function getOutputName({list, property, prefix}) {
-  if (!property) return `#values`;
-  if (prefix) return `${prefix}.${property}`;
-  if (list) return `${list}.${property}`;
-  return `#list.${property}`;
-}
+import {getOutputName} from './helpers/property-from-helpers.js';
 
 export default templateCompositeFrom({
   annotation: `withPropertyFromList`,
@@ -37,8 +32,11 @@ export default templateCompositeFrom({
     [input.staticDependency('list')]: list,
     [input.staticValue('property')]: property,
     [input.staticValue('prefix')]: prefix,
-  }) =>
-    [getOutputName({list, property, prefix})],
+  }) => [
+    (property
+      ? getOutputName({property, from: list || '#list', prefix})
+      : '#values'),
+  ],
 
   steps: () => [
     {
@@ -78,7 +76,9 @@ export default templateCompositeFrom({
         [input.staticValue('prefix')]: prefix,
       }) => continuation({
         ['#outputName']:
-          getOutputName({list, property, prefix}),
+          (property
+            ? getOutputName({property, from: list || '#list', prefix})
+            : '#values'),
       }),
     },
 

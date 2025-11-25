@@ -11,6 +11,8 @@
 import {input, templateCompositeFrom} from '#composite';
 import {isString, validateArrayItems} from '#validators';
 
+import {getOutputName} from './helpers/property-from-helpers.js';
+
 export default templateCompositeFrom({
   annotation: `withPropertiesFromObject`,
 
@@ -32,11 +34,7 @@ export default templateCompositeFrom({
   }) =>
     (properties
       ? properties.map(property =>
-          (prefix
-            ? `${prefix}.${property}`
-         : object
-            ? `${object}.${property}`
-            : `#object.${property}`))
+          getOutputName({property, from: object || '#object', prefix}))
       : ['#object']),
 
   steps: () => [
@@ -71,11 +69,7 @@ export default templateCompositeFrom({
           ? continuation(
               Object.fromEntries(
                 entries.map(([property, value]) => [
-                  (prefix
-                    ? `${prefix}.${property}`
-                 : object
-                    ? `${object}.${property}`
-                    : `#object.${property}`),
+                  getOutputName({property, from: object || '#object', prefix}),
                   value ?? null,
                 ])))
           : continuation({
