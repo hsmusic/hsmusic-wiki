@@ -21,8 +21,6 @@ import {
   withPropertyFromObject,
 } from '#composite/data';
 
-import withMainRelease from './withMainRelease.js';
-
 export default templateCompositeFrom({
   annotation: `withMainReleaseTrack`,
 
@@ -58,23 +56,21 @@ export default templateCompositeFrom({
             })),
     },
 
-    withMainRelease(),
-
     exitWithoutDependency({
-      dependency: '#mainRelease',
+      dependency: 'mainRelease',
       value: input('notFoundValue'),
     }),
 
     withPropertyFromObject({
-      object: '#mainRelease',
+      object: 'mainRelease',
       property: input.value('isTrack'),
     }),
 
     {
-      dependencies: ['#mainRelease', '#mainRelease.isTrack'],
+      dependencies: ['mainRelease', '#mainRelease.isTrack'],
 
       compute: (continuation, {
-        ['#mainRelease']: mainRelease,
+        ['mainRelease']: mainRelease,
         ['#mainRelease.isTrack']: mainReleaseIsTrack,
       }) =>
         (mainReleaseIsTrack
@@ -113,7 +109,7 @@ export default templateCompositeFrom({
     },
 
     withPropertyFromObject({
-      object: '#mainRelease',
+      object: 'mainRelease',
       property: input.value('tracks'),
     }),
 

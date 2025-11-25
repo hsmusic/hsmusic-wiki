@@ -32,6 +32,7 @@ import {
 
 import {
   exitWithoutDependency,
+  exitWithoutUpdateValue,
   exposeConstant,
   exposeDependency,
   exposeDependencyOrContinue,
@@ -51,6 +52,7 @@ import {
   withRecontextualizedContributionList,
   withRedatedContributionList,
   withResolvedContribs,
+  withResolvedReference,
 } from '#composite/wiki-data';
 
 import {
@@ -83,7 +85,6 @@ import {
   inheritFromMainRelease,
   withAllReleases,
   withDirectorySuffix,
-  withMainRelease,
   withMainReleaseTrack,
   withOtherReleases,
   withPropertyFromAlbum,
@@ -168,16 +169,92 @@ export class Track extends Thing {
     // whether or not a matching track is found on a provided album, for
     // example. When presenting or processing, read `mainReleaseTrack`.
     mainRelease: [
-      withMainRelease({
-        from: input.updateValue({
-          validate:
-            validateReference(['album', 'track']),
-        }),
+      exitWithoutUpdateValue({
+        validate: input.value(
+          validateReference(['album', 'track'])),
       }),
 
-      exposeDependency({
-        dependency: '#mainRelease',
+      {
+        dependencies: ['name'],
+        transform: (ref, continuation, {name: ownName}) =>
+          (ref === 'same name single'
+            ? continuation(ref, {
+                ['#albumOrTrackReference']: null,
+                ['#sameNameSingleReference']: ownName,
+              })
+            : continuation(ref, {
+                ['#albumOrTrackReference']: ref,
+                ['#sameNameSingleReference']: null,
+              })),
+      },
+
+      withResolvedReference({
+        ref: '#albumOrTrackReference',
+        find: soupyFind.input('trackMainReleasesOnly'),
+      }).outputs({
+        '#resolvedReference': '#matchingTrack',
       }),
+
+      withResolvedReference({
+        ref: '#albumOrTrackReference',
+        find: soupyFind.input('album'),
+      }).outputs({
+        '#resolvedReference': '#matchingAlbum',
+      }),
+
+      withResolvedReference({
+        ref: '#sameNameSingleReference',
+        find: soupyFind.input('albumSinglesOnly'),
+        findOptions: input.value({
+          fuzz: {
+            capitalization: true,
+            kebab: true,
+          },
+        }),
+      }).outputs({
+        '#resolvedReference': '#sameNameSingle',
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#sameNameSingle',
+      }),
+
+      {
+        dependencies: [
+          '#matchingTrack',
+          '#matchingAlbum',
+        ],
+
+        compute: (continuation, {
+          ['#matchingTrack']: matchingTrack,
+          ['#matchingAlbum']: matchingAlbum,
+        }) =>
+          (matchingTrack && matchingAlbum
+            ? continuation()
+         : matchingTrack ?? matchingAlbum
+            ? matchingTrack ?? matchingAlbum
+            : null),
+      },
+
+      withPropertyFromObject({
+        object: '#matchingAlbum',
+        property: input.value('tracks'),
+      }),
+
+      {
+        dependencies: [
+          '#matchingAlbum.tracks',
+          '#matchingTrack',
+        ],
+
+        compute: ({
+          ['#matchingAlbum.tracks']: matchingAlbumTracks,
+          ['#matchingTrack']: matchingTrack,
+        }) =>
+          (matchingAlbumTracks.includes(matchingTrack)
+            ? matchingTrack
+            : null),
+      },
     ],
 
     bandcampTrackIdentifier: simpleString(),
