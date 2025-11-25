@@ -9,7 +9,7 @@ export default templateCompositeFrom({
   annotation: `withStrings`,
 
   inputs: {
-    from: input({defaultDependency: 'strings'}),
+    from: input({defaultDependency: '_strings'}),
   },
 
   outputs: ['#strings'],

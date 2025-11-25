@@ -40,7 +40,7 @@ export default templateCompositeFrom({
     }),
 
     exitWithoutDependency({
-      dependency: 'mainRelease',
+      dependency: '_mainRelease',
       value: input.value(false),
     }),
 

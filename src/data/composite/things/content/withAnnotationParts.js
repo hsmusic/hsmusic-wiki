@@ -19,12 +19,12 @@ export default templateCompositeFrom({
 
   steps: () => [
     raiseOutputWithoutDependency({
-      dependency: 'annotation',
+      dependency: '_annotation',
       output: input.value({'#annotationParts': []}),
     }),
 
     withContentNodes({
-      from: 'annotation',
+      from: '_annotation',
     }),
 
     splitContentNodesAround({

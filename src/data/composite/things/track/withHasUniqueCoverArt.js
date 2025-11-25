@@ -37,7 +37,7 @@ export default templateCompositeFrom({
     },
 
     withResultOfAvailabilityCheck({
-      from: 'coverArtistContribs',
+      from: '_coverArtistContribs',
       mode: input.value('empty'),
     }),
 
@@ -76,13 +76,13 @@ export default templateCompositeFrom({
     },
 
     raiseOutputWithoutDependency({
-      dependency: 'trackArtworks',
+      dependency: '_trackArtworks',
       mode: input.value('empty'),
       output: input.value({'#hasUniqueCoverArt': false}),
     }),
 
     withPropertyFromList({
-      list: 'trackArtworks',
+      list: '_trackArtworks',
       property: input.value('artistContribs'),
       internal: input.value(true),
     }),

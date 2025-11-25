@@ -18,7 +18,7 @@ export default templateCompositeFrom({
 
   inputs: {
     from: input({
-      defaultDependency: 'mainRelease',
+      defaultDependency: '_mainRelease',
       acceptsNull: true,
     }),
 

@@ -18,13 +18,13 @@ export default templateCompositeFrom({
 
   steps: () => [
     raiseOutputWithoutDependency({
-      dependency: 'directDescendantArtTags',
+      dependency: '_directDescendantArtTags',
       mode: input.value('empty'),
       output: input.value({'#allDescendantArtTags': []})
     }),
 
     withResolvedReferenceList({
-      list: 'directDescendantArtTags',
+      list: '_directDescendantArtTags',
       find: soupyFind.input('artTag'),
     }),
 

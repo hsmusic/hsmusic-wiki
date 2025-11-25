@@ -120,18 +120,14 @@ export default class CacheableObject {
 
           const dependencies = Object.create(null);
           for (const key of expose.dependencies ?? []) {
-            switch (key) {
-              case 'this':
-                dependencies.this = this;
-                break;
-
-              case 'thisProperty':
-                dependencies.thisProperty = property;
-                break;
-
-              default:
-                dependencies[key] = this[CacheableObject.updateValue][key];
-                break;
+            if (key === 'this') {
+              dependencies.this = this;
+            } else if (key === 'thisProperty') {
+              dependencies.thisProperty = property;
+            } else if (key.startsWith('_')) {
+              dependencies[key] = this[CacheableObject.updateValue][key.slice(1)];
+            } else {
+              dependencies[key] = this[key];
             }
           }
 
@@ -150,27 +146,11 @@ export default class CacheableObject {
       if (flags.expose) recordAsDependant: {
         const dependantsMap = this[CacheableObject.propertyDependants];
 
-        if (flags.update && expose?.transform) {
-          if (dependantsMap[property]) {
-            dependantsMap[property].push(property);
+        for (const dependency of dependenciesOf(property, propertyDescriptors)) {
+          if (dependantsMap[dependency]) {
+            dependantsMap[dependency].push(dependency);
           } else {
-            dependantsMap[property] = [property];
-          }
-        }
-
-        for (const dependency of expose?.dependencies ?? []) {
-          switch (dependency) {
-            case 'this':
-            case 'thisProperty':
-              continue;
-
-            default: {
-              if (dependantsMap[dependency]) {
-                dependantsMap[dependency].push(property);
-              } else {
-                dependantsMap[dependency] = [property];
-              }
-            }
+            dependantsMap[dependency] = [dependency];
           }
         }
       }
@@ -261,6 +241,7 @@ export class CacheableObjectPropertyValueError extends Error {
 }
 
 // good ol' module-scope utility functions
+
 function validatePropertyValue(property, oldValue, newValue, update) {
   try {
     const result = update.validate(newValue);
@@ -272,5 +253,46 @@ function validatePropertyValue(property, oldValue, newValue, update) {
   } catch (caughtError) {
     throw new CacheableObjectPropertyValueError(
       property, oldValue, newValue, {cause: caughtError});
+  }
+}
+
+function* dependenciesOf(property, propertyDescriptors, cycle = []) {
+  const descriptor = propertyDescriptors[property];
+
+  if (descriptor?.flags?.update && descriptor?.expose?.transform) {
+    yield property;
+  }
+
+  const dependencies = descriptor?.expose?.dependencies;
+  if (!dependencies) return;
+
+  for (const dependency of dependencies) {
+    if (dependency === 'this') continue;
+    if (dependency === 'thisProperty') continue;
+
+    if (dependency.startsWith('_')) {
+      yield dependency.slice(1);
+      continue;
+    }
+
+    if (dependency === property) {
+      throw new Error(
+        `property ${dependency} directly depends on its own computed value`);
+    }
+
+    if (cycle.includes(dependency)) {
+      const subcycle = cycle.slice(cycle.indexOf(dependency));
+      const supercycle = cycle.slice(0, cycle.indexOf(dependency));
+      throw new Error(
+        `property ${dependency} indirectly depends on its own computed value\n` +
+        `  via: ` + subcycle.map(p => p + ' -> ').join('') + property + ' -> ' + dependency +
+        (supercycle.length
+          ? '\n   in: ' + supercycle.join(' -> ')
+          : ''));
+    }
+
+    cycle.push(property);
+    yield* dependenciesOf(dependency, propertyDescriptors, cycle);
+    cycle.pop();
   }
 }

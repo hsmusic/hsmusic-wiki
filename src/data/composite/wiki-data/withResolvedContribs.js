@@ -110,7 +110,7 @@ export default templateCompositeFrom({
         '#thingProperty',
         input('artistProperty'),
         input.myself(),
-        'find',
+        '_find',
       ],
 
       compute: (continuation, {
@@ -118,7 +118,7 @@ export default templateCompositeFrom({
         ['#thingProperty']: thingProperty,
         [input('artistProperty')]: artistProperty,
         [input.myself()]: myself,
-        ['find']: find,
+        ['_find']: find,
       }) => continuation({
         ['#contributions']:
           details.map(details => {

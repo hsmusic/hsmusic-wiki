@@ -51,7 +51,7 @@ export class ContentEntry extends Thing {
 
     accessKind: [
       exitWithoutDependency({
-        dependency: 'accessDate',
+        dependency: '_accessDate',
       }),
 
       exposeUpdateValueOrContinue({

@@ -119,8 +119,8 @@ export class Group extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['this', 'reverse'],
-        compute: ({this: group, reverse}) =>
+        dependencies: ['this', '_reverse'],
+        compute: ({this: group, _reverse: reverse}) =>
           reverse.albumsWhoseGroupsInclude(group),
       },
     },
@@ -129,8 +129,8 @@ export class Group extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['this', 'reverse'],
-        compute: ({this: group, reverse}) =>
+        dependencies: ['this', '_reverse'],
+        compute: ({this: group, _reverse: reverse}) =>
           reverse.groupCategoriesWhichInclude(group, {unique: true})
             ?.color,
       },
@@ -140,8 +140,8 @@ export class Group extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['this', 'reverse'],
-        compute: ({this: group, reverse}) =>
+        dependencies: ['this', '_reverse'],
+        compute: ({this: group, _reverse: reverse}) =>
           reverse.groupCategoriesWhichInclude(group, {unique: true}) ??
           null,
       },

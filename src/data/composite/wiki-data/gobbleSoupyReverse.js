@@ -30,7 +30,7 @@ export default templateCompositeFrom({
     },
 
     withPropertyFromObject({
-      object: 'reverse',
+      object: '_reverse',
       property: '#key',
     }).outputs({
       '#value': '#reverse',

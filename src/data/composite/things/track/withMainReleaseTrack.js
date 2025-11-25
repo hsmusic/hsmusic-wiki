@@ -35,7 +35,7 @@ export default templateCompositeFrom({
 
   steps: () => [
     withResultOfAvailabilityCheck({
-      from: 'mainRelease',
+      from: '_mainRelease',
     }),
 
     {
@@ -85,10 +85,10 @@ export default templateCompositeFrom({
     },
 
     {
-      dependencies: ['name', 'directory'],
+      dependencies: ['name', '_directory'],
       compute: (continuation, {
         ['name']: ownName,
-        ['directory']: ownDirectory,
+        ['_directory']: ownDirectory,
       }) => {
         const ownNameKebabed = getKebabCase(ownName);
 

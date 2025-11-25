@@ -30,7 +30,7 @@ export default templateCompositeFrom({
     },
 
     withPropertyFromObject({
-      object: 'find',
+      object: '_find',
       property: '#key',
     }).outputs({
       '#value': '#find',

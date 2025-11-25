@@ -13,7 +13,7 @@ export default templateCompositeFrom({
   inputs: {
     from: input({
       validate: isDate,
-      defaultDependency: 'coverArtDate',
+      defaultDependency: '_coverArtDate',
       acceptsNull: true,
     }),
   },

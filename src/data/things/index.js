@@ -58,6 +58,7 @@ const __dirname = path.dirname(
 function niceShowAggregate(error, ...opts) {
   showAggregate(error, {
     pathToFileURL: (f) => path.relative(__dirname, fileURLToPath(f)),
+    showClasses: false,
     ...opts,
   });
 }
@@ -152,6 +153,15 @@ function descriptorAggregateHelper({
   } catch (error) {
     niceShowAggregate(error);
     showFailedClasses(failedClasses);
+
+    /*
+    if (error.errors) {
+      for (const sub of error.errors) {
+        console.error(sub);
+      }
+    }
+    */
+
     return false;
   }
 }

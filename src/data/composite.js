@@ -713,8 +713,9 @@ export function compositeFrom(description) {
       stepExposeDescriptions
         .flatMap(expose => expose?.dependencies ?? [])
         .map(dependency => {
-          if (typeof dependency === 'string')
+          if (typeof dependency === 'string') {
             return (dependency.startsWith('#') ? null : dependency);
+          }
 
           const tokenShape = getInputTokenShape(dependency);
           const tokenValue = getInputTokenValue(dependency);

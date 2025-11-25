@@ -8,7 +8,7 @@ export default templateCompositeFrom({
 
   inputs: {
     flagValue: input({
-      defaultDependency: 'suffixDirectoryFromAlbum',
+      defaultDependency: '_suffixDirectoryFromAlbum',
       acceptsNull: true,
     }),
   },
@@ -17,18 +17,18 @@ export default templateCompositeFrom({
 
   steps: () => [
     withResultOfAvailabilityCheck({
-      from: 'suffixDirectoryFromAlbum',
+      from: input('flagValue'),
     }),
 
     {
       dependencies: [
         '#availability',
-        'suffixDirectoryFromAlbum'
+        input('flagValue'),
       ],
 
       compute: (continuation, {
         ['#availability']: availability,
-        ['suffixDirectoryFromAlbum']: flagValue,
+        [input('flagValue')]: flagValue,
       }) =>
         (availability
           ? continuation.raiseOutput({['#suffixDirectoryFromAlbum']: flagValue})

@@ -9,7 +9,7 @@ export default templateCompositeFrom({
   inputs: {
     from: input({
       type: 'number',
-      defaultDependency: 'startCountingFrom',
+      defaultDependency: '_startCountingFrom',
       acceptsNull: true,
     }),
   },

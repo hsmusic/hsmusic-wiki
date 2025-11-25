@@ -92,7 +92,7 @@ export class WikiInfo extends Thing {
 
     enableSearch: [
       exitWithoutDependency({
-        dependency: 'searchDataAvailable',
+        dependency: '_searchDataAvailable',
         mode: input.value('falsy'),
         value: input.value(false),
       }),

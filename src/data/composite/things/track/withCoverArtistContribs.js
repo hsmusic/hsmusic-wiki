@@ -18,7 +18,7 @@ export default templateCompositeFrom({
 
   inputs: {
     from: input({
-      defaultDependency: 'coverArtistContribs',
+      defaultDependency: '_coverArtistContribs',
       validate: isContributionList,
       acceptsNull: true,
     }),

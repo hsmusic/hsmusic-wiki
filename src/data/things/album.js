@@ -155,7 +155,7 @@ export class Album extends Thing {
     // > Update & expose - Credits and contributors
 
     artistContribs: contributionList({
-      date: 'date',
+      date: '_date',
       artistProperty: input.value('albumArtistContributions'),
     }),
 
@@ -166,7 +166,7 @@ export class Album extends Thing {
         from: input.updateValue({validate: isContributionList}),
         thingProperty: input.thisProperty(),
         artistProperty: input.value('albumTrackArtistContributions'),
-        date: 'date',
+        date: '_date',
       }).outputs({
         '#resolvedContribs': '#trackArtistContribs',
       }),
@@ -177,7 +177,7 @@ export class Album extends Thing {
       }),
 
       withResolvedContribs({
-        from: 'artistContribs',
+        from: '_artistContribs',
         thingProperty: input.thisProperty(),
         artistProperty: input.value('albumTrackArtistContributions'),
         date: 'date',
@@ -209,13 +209,9 @@ export class Album extends Thing {
     // > Update & expose - Artworks
 
     coverArtworks: [
-      // This works, lol, because this array describes `expose.transform` for
-      // the coverArtworks property, and compositions generally access the
-      // update value, not what's exposed by property access out in the open.
-      // There's no recursion going on here.
       exitWithoutArtwork({
-        contribs: 'coverArtistContribs',
-        artworks: 'coverArtworks',
+        contribs: '_coverArtistContribs',
+        artworks: '_coverArtworks',
         value: input.value([]),
       }),
 
@@ -244,8 +240,8 @@ export class Album extends Thing {
 
     coverArtFileExtension: [
       exitWithoutArtwork({
-        contribs: 'coverArtistContribs',
-        artworks: 'coverArtworks',
+        contribs: '_coverArtistContribs',
+        artworks: '_coverArtworks',
       }),
 
       fileExtension('jpg'),
@@ -253,8 +249,8 @@ export class Album extends Thing {
 
     coverArtDimensions: [
       exitWithoutArtwork({
-        contribs: 'coverArtistContribs',
-        artworks: 'coverArtworks',
+        contribs: '_coverArtistContribs',
+        artworks: '_coverArtworks',
       }),
 
       dimensions(),
@@ -262,8 +258,8 @@ export class Album extends Thing {
 
     artTags: [
       exitWithoutArtwork({
-        contribs: 'coverArtistContribs',
-        artworks: 'coverArtworks',
+        contribs: '_coverArtistContribs',
+        artworks: '_coverArtworks',
         value: input.value([]),
       }),
 
@@ -275,8 +271,8 @@ export class Album extends Thing {
 
     referencedArtworks: [
       exitWithoutArtwork({
-        contribs: 'coverArtistContribs',
-        artworks: 'coverArtworks',
+        contribs: '_coverArtistContribs',
+        artworks: '_coverArtworks',
         value: input.value([]),
       }),
 
@@ -286,7 +282,7 @@ export class Album extends Thing {
     trackCoverArtistContribs: contributionList({
       // May be null, indicating cover art was added for tracks on the date
       // each track specifies, or else the track's own release date.
-      date: 'trackArtDate',
+      date: '_trackArtDate',
 
       // This is the "correct" value, but it gets overwritten - with the same
       // value - regardless.
@@ -301,7 +297,7 @@ export class Album extends Thing {
 
     wallpaperArtwork: [
       exitWithoutDependency({
-        dependency: 'wallpaperArtistContribs',
+        dependency: '_wallpaperArtistContribs',
         mode: input.value('empty'),
         value: input.value(null),
       }),
@@ -321,8 +317,8 @@ export class Album extends Thing {
 
     wallpaperFileExtension: [
       exitWithoutArtwork({
-        contribs: 'wallpaperArtistContribs',
-        artwork: 'wallpaperArtwork',
+        contribs: '_wallpaperArtistContribs',
+        artwork: '_wallpaperArtwork',
       }),
 
       fileExtension('jpg'),
@@ -330,8 +326,8 @@ export class Album extends Thing {
 
     wallpaperStyle: [
       exitWithoutArtwork({
-        contribs: 'wallpaperArtistContribs',
-        artwork: 'wallpaperArtwork',
+        contribs: '_wallpaperArtistContribs',
+        artwork: '_wallpaperArtwork',
       }),
 
       simpleString(),
@@ -340,8 +336,8 @@ export class Album extends Thing {
     wallpaperParts: [
       // kinda nonsensical or at least unlikely lol, but y'know
       exitWithoutArtwork({
-        contribs: 'wallpaperArtistContribs',
-        artwork: 'wallpaperArtwork',
+        contribs: '_wallpaperArtistContribs',
+        artwork: '_wallpaperArtwork',
         value: input.value([]),
       }),
 
@@ -350,7 +346,7 @@ export class Album extends Thing {
 
     bannerArtwork: [
       exitWithoutDependency({
-        dependency: 'bannerArtistContribs',
+        dependency: '_bannerArtistContribs',
         mode: input.value('empty'),
         value: input.value(null),
       }),
@@ -370,8 +366,8 @@ export class Album extends Thing {
 
     bannerFileExtension: [
       exitWithoutArtwork({
-        contribs: 'bannerArtistContribs',
-        artwork: 'bannerArtwork',
+        contribs: '_bannerArtistContribs',
+        artwork: '_bannerArtwork',
       }),
 
       fileExtension('jpg'),
@@ -379,8 +375,8 @@ export class Album extends Thing {
 
     bannerDimensions: [
       exitWithoutArtwork({
-        contribs: 'bannerArtistContribs',
-        artwork: 'bannerArtwork',
+        contribs: '_bannerArtistContribs',
+        artwork: '_bannerArtwork',
       }),
 
       dimensions(),
@@ -388,8 +384,8 @@ export class Album extends Thing {
 
     bannerStyle: [
       exitWithoutArtwork({
-        contribs: 'bannerArtistContribs',
-        artwork: 'bannerArtwork',
+        contribs: '_bannerArtistContribs',
+        artwork: '_bannerArtwork',
       }),
 
       simpleString(),
@@ -445,15 +441,15 @@ export class Album extends Thing {
 
     hasCoverArt: [
       withHasArtwork({
-        contribs: 'coverArtistContribs',
-        artworks: 'coverArtworks',
+        contribs: '_coverArtistContribs',
+        artworks: '_coverArtworks',
       }),
 
       exposeDependency({dependency: '#hasArtwork'}),
     ],
 
-    hasWallpaperArt: contribsPresent({contribs: 'wallpaperArtistContribs'}),
-    hasBannerArt: contribsPresent({contribs: 'bannerArtistContribs'}),
+    hasWallpaperArt: contribsPresent({contribs: '_wallpaperArtistContribs'}),
+    hasBannerArt: contribsPresent({contribs: '_bannerArtistContribs'}),
 
     tracks: [
       withTracks(),
@@ -1087,7 +1083,7 @@ export class TrackSection extends Thing {
       }),
 
       withDirectory({
-        directory: 'unqualifiedDirectory',
+        directory: '_unqualifiedDirectory',
       }).outputs({
         '#directory': '#unqualifiedDirectory',
       }),

@@ -17,13 +17,13 @@ export default templateCompositeFrom({
   inputs: {
     directory: input({
       validate: isDirectory,
-      defaultDependency: 'directory',
+      defaultDependency: '_directory',
       acceptsNull: true,
     }),
 
     name: input({
       validate: isName,
-      defaultDependency: 'name',
+      defaultDependency: '_name',
       acceptsNull: true,
     }),
 

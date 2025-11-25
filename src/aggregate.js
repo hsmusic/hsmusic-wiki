@@ -417,6 +417,7 @@ export function showAggregate(topError, {
   pathToFileURL = f => f,
   showTraces = true,
   showTranslucent = showTraces,
+  showClasses = showTraces,
   print = true,
 } = {}) {
   const getTranslucency = error =>
@@ -569,10 +570,10 @@ export function showAggregate(topError, {
       message || `(no message)`;
 
     const kindPart =
-      kind || `unnamed kind`;
+      kind || `unnamed class`;
 
     let headerPart =
-      (showTraces
+      (showClasses
         ? `[${kindPart}] ${messagePart}`
      : errors
         ? `[${messagePart}]`

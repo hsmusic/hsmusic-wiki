@@ -10,7 +10,7 @@ export default templateCompositeFrom({
   inputs: {
     from: input({
       validate: isDate,
-      defaultDependency: 'coverArtDate',
+      defaultDependency: '_coverArtDate',
       acceptsNull: true,
     }),
   },
@@ -19,8 +19,8 @@ export default templateCompositeFrom({
 
   steps: () => [
     withHasArtwork({
-      contribs: 'coverArtistContribs',
-      artworks: 'coverArtworks',
+      contribs: '_coverArtistContribs',
+      artworks: '_coverArtworks',
     }),
 
     raiseOutputWithoutDependency({

@@ -209,7 +209,7 @@ export class Track extends Thing {
       }),
 
       exposeDependencyOrContinue({
-        dependency: 'artistText',
+        dependency: '_artistText',
       }),
 
       withPropertyFromAlbum({
@@ -318,13 +318,13 @@ export class Track extends Thing {
       }),
 
       exitWithoutDependency({
-        dependency: 'lyrics',
+        dependency: '_lyrics',
         mode: input.value('empty'),
         value: input.value(false),
       }),
 
       withPropertyFromList({
-        list: 'lyrics',
+        list: '_lyrics',
         property: input.value('helpNeeded'),
       }),
 

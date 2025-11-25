@@ -16,7 +16,7 @@ export default templateCompositeFrom({
     from: input({
       type: 'array',
       acceptsNull: true,
-      defaultDependency: 'artTags',
+      defaultDependency: '_artTags',
     }),
   },
 

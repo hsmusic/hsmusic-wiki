@@ -8,7 +8,7 @@ export default templateCompositeFrom({
 
   inputs: {
     from: input({
-      defaultDependency: 'date',
+      defaultDependency: '_date',
       acceptsNull: true,
     }),
   },

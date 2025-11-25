@@ -16,7 +16,7 @@ export default templateCompositeFrom({
 
   inputs: {
     artistProperty: input({
-      defaultDependency: 'artistProperty',
+      defaultDependency: '_artistProperty',
       acceptsNull: true,
     }),
   },
