@@ -886,7 +886,7 @@ export function compositeFrom(description) {
           }
         });
 
-    withAggregate({message: `Errors in input values provided to ${compositionName}`}, ({push}) => {
+    withAggregate({message: `Errors validating input values provided to ${compositionName}`}, ({push}) => {
       for (const {dynamic, name, value, description} of stitchArrays({
         dynamic: inputsMayBeDynamicValue,
         name: inputNames,
@@ -896,9 +896,10 @@ export function compositeFrom(description) {
         if (!dynamic) continue;
         try {
           validateInputValue(value, description);
-        } catch (error) {
-          error.message = `${name}: ${error.message}`;
-          push(error);
+        } catch (caughtError) {
+          push(new Error(
+            `Error validating input ${name}: ` + inspect(value, {compact: true}),
+            {cause: caughtError}));
         }
       }
     });
