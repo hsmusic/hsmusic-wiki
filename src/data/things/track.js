@@ -89,9 +89,7 @@ import {
   exitWithoutUniqueCoverArt,
   inheritContributionListFromMainRelease,
   inheritFromMainRelease,
-  withDirectorySuffix,
   withPropertyFromAlbum,
-  withSuffixDirectoryFromAlbum,
   withTrackNumber,
 } from '#composite/things/track';
 
@@ -136,34 +134,23 @@ export class Track extends Thing {
     name: name('Unnamed Track'),
     nameText: contentString(),
 
-    directory: [
-      withDirectorySuffix(),
-
-      directory({
-        suffix: '#directorySuffix',
-      }),
-    ],
+    directory: directory({
+      suffix: 'directorySuffix',
+    }),
 
     suffixDirectoryFromAlbum: [
-      {
-        dependencies: [
-          input.updateValue({validate: isBoolean}),
-        ],
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
 
-        compute: (continuation, {
-          [input.updateValue()]: value,
-        }) => continuation({
-          ['#flagValue']: value ?? false,
-        }),
-      },
-
-      withSuffixDirectoryFromAlbum({
-        flagValue: '#flagValue',
+      withPropertyFromObject({
+        object: 'trackSection',
+        property: input.value('suffixTrackDirectories'),
       }),
 
       exposeDependency({
-        dependency: '#suffixDirectoryFromAlbum',
-      })
+        dependency: '#trackSection.suffixTrackDirectories',
+      }),
     ],
 
     alwaysReferenceByDirectory: alwaysReferenceByDirectory(),
@@ -632,8 +619,19 @@ export class Track extends Thing {
     commentatorArtists: commentatorArtists(),
 
     directorySuffix: [
-      withDirectorySuffix(),
-      exposeDependency({dependency: '#directorySuffix'}),
+      exitWithoutDependency({
+        dependency: 'suffixDirectoryFromAlbum',
+        mode: input.value('falsy'),
+      }),
+
+      withPropertyFromObject({
+        object: 'trackSection',
+        property: input.value('directorySuffix'),
+      }),
+
+      exposeDependency({
+        dependency: '#trackSection.directorySuffix',
+      }),
     ],
 
     date: [

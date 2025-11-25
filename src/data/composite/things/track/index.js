@@ -2,8 +2,6 @@ export {default as alwaysReferenceByDirectory} from './alwaysReferenceByDirector
 export {default as exitWithoutUniqueCoverArt} from './exitWithoutUniqueCoverArt.js';
 export {default as inheritContributionListFromMainRelease} from './inheritContributionListFromMainRelease.js';
 export {default as inheritFromMainRelease} from './inheritFromMainRelease.js';
-export {default as withDirectorySuffix} from './withDirectorySuffix.js';
 export {default as withPropertyFromAlbum} from './withPropertyFromAlbum.js';
 export {default as withPropertyFromMainRelease} from './withPropertyFromMainRelease.js';
-export {default as withSuffixDirectoryFromAlbum} from './withSuffixDirectoryFromAlbum.js';
 export {default as withTrackNumber} from './withTrackNumber.js';
