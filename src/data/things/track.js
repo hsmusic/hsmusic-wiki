@@ -89,7 +89,6 @@ import {
   withOtherReleases,
   withPropertyFromAlbum,
   withSuffixDirectoryFromAlbum,
-  withTrackArtDate,
   withTrackNumber,
 } from '#composite/things/track';
 
@@ -361,13 +360,26 @@ export class Track extends Thing {
     ],
 
     coverArtDate: [
-      withTrackArtDate({
-        from: input.updateValue({
-          validate: isDate,
-        }),
+      exitWithoutDependency({
+        dependency: 'hasUniqueCoverArt',
+        mode: input.value('falsy'),
       }),
 
-      exposeDependency({dependency: '#trackArtDate'}),
+      exposeUpdateValueOrContinue({
+        validate: input.value(isDate),
+      }),
+
+      withPropertyFromAlbum({
+        property: input.value('trackArtDate'),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#album.trackArtDate',
+      }),
+
+      exposeDependency({
+        dependency: 'date',
+      }),
     ],
 
     coverArtFileExtension: [

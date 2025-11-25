@@ -11,7 +11,6 @@ import {
 
 import exitWithoutUniqueCoverArt from './exitWithoutUniqueCoverArt.js';
 import withPropertyFromAlbum from './withPropertyFromAlbum.js';
-import withTrackArtDate from './withTrackArtDate.js';
 
 export default templateCompositeFrom({
   annotation: `withCoverArtistContribs`,
@@ -31,13 +30,11 @@ export default templateCompositeFrom({
       value: input.value([]),
     }),
 
-    withTrackArtDate(),
-
     withResolvedContribs({
       from: input('from'),
       thingProperty: input.value('coverArtistContribs'),
       artistProperty: input.value('trackCoverArtistContributions'),
-      date: '#trackArtDate',
+      date: 'coverArtDate',
     }).outputs({
       '#resolvedContribs': '#coverArtistContribs',
     }),
@@ -58,7 +55,7 @@ export default templateCompositeFrom({
 
     withRedatedContributionList({
       list: '#album.trackCoverArtistContribs',
-      date: '#trackArtDate',
+      date: 'coverArtDate',
     }),
 
     {
