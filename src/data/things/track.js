@@ -82,7 +82,6 @@ import {
   inheritContributionListFromMainRelease,
   inheritFromMainRelease,
   withAllReleases,
-  withCoverArtistContribs,
   withDirectorySuffix,
   withMainRelease,
   withMainReleaseTrack,
@@ -350,13 +349,39 @@ export class Track extends Thing {
     ],
 
     coverArtistContribs: [
-      withCoverArtistContribs({
-        from: input.updateValue({
-          validate: isContributionList,
-        }),
+      exitWithoutUniqueCoverArt({
+        value: input.value([]),
       }),
 
-      exposeDependency({dependency: '#coverArtistContribs'}),
+      withResolvedContribs({
+        from: input.updateValue({validate: isContributionList}),
+        thingProperty: input.value('coverArtistContribs'),
+        artistProperty: input.value('trackCoverArtistContributions'),
+        date: 'coverArtDate',
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#resolvedContribs',
+        mode: input.value('empty'),
+      }),
+
+      withPropertyFromAlbum({
+        property: input.value('trackCoverArtistContribs'),
+      }),
+
+      withRecontextualizedContributionList({
+        list: '#album.trackCoverArtistContribs',
+        artistProperty: input.value('trackCoverArtistContributions'),
+      }),
+
+      withRedatedContributionList({
+        list: '#album.trackCoverArtistContribs',
+        date: 'coverArtDate',
+      }),
+
+      exposeDependency({
+        dependency: '#album.trackCoverArtistContribs',
+      }),
     ],
 
     coverArtDate: [
