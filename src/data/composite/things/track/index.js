@@ -1,4 +1,3 @@
-export {default as alwaysReferenceByDirectory} from './alwaysReferenceByDirectory.js';
 export {default as exitWithoutUniqueCoverArt} from './exitWithoutUniqueCoverArt.js';
 export {default as inheritContributionListFromMainRelease} from './inheritContributionListFromMainRelease.js';
 export {default as inheritFromMainRelease} from './inheritFromMainRelease.js';

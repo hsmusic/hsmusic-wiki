@@ -87,7 +87,6 @@ import {
 } from '#composite/wiki-properties';
 
 import {
-  alwaysReferenceByDirectory,
   exitWithoutUniqueCoverArt,
   inheritContributionListFromMainRelease,
   inheritFromMainRelease,
@@ -154,7 +153,51 @@ export class Track extends Thing {
       }),
     ],
 
-    alwaysReferenceByDirectory: alwaysReferenceByDirectory(),
+    // Controls how find.track works - it'll never be matched by
+    // a reference just to the track's name, which means you don't
+    // have to always reference some *other* (much more commonly
+    // referenced) track by directory instead of more naturally by name.
+    alwaysReferenceByDirectory: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      withPropertyFromAlbum({
+        property: input.value('alwaysReferenceTracksByDirectory'),
+      }),
+
+      // Falsy mode means this exposes true if the album's property is true,
+      // but continues if the property is false (which is also the default).
+      exposeDependencyOrContinue({
+        dependency: '#album.alwaysReferenceTracksByDirectory',
+        mode: input.value('falsy'),
+      }),
+
+      exitWithoutDependency({
+        dependency: '_mainRelease',
+        value: input.value(false),
+      }),
+
+      exitWithoutDependency({
+        dependency: 'mainReleaseTrack',
+        value: input.value(false),
+      }),
+
+      withPropertyFromObject({
+        object: 'mainReleaseTrack',
+        property: input.value('name'),
+      }),
+
+      {
+        dependencies: ['name', '#mainReleaseTrack.name'],
+        compute: ({
+          ['name']: name,
+          ['#mainReleaseTrack.name']: mainReleaseName,
+        }) =>
+          getKebabCase(name) ===
+          getKebabCase(mainReleaseName),
+      },
+    ],
 
     // Album or track. The exposed value is really just what's provided here,
     // whether or not a matching track is found on a provided album, for
