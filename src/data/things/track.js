@@ -90,7 +90,6 @@ import {
   inheritContributionListFromMainRelease,
   inheritFromMainRelease,
   withDirectorySuffix,
-  withOtherReleases,
   withPropertyFromAlbum,
   withSuffixDirectoryFromAlbum,
   withTrackNumber,
@@ -991,8 +990,14 @@ export class Track extends Thing {
     ],
 
     otherReleases: [
-      withOtherReleases(),
-      exposeDependency({dependency: '#otherReleases'}),
+      {
+        dependencies: [input.myself(), 'allReleases'],
+        compute: ({
+          [input.myself()]: thisTrack,
+          ['allReleases']: allReleases,
+        }) =>
+          allReleases.filter(track => track !== thisTrack),
+      },
     ],
 
     commentaryFromMainRelease: [
