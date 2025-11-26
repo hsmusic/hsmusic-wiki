@@ -34,9 +34,6 @@ import {
   urls,
 } from '#composite/wiki-properties';
 
-import {withAllDescendantArtTags, withAncestorArtTagBaobabTree}
-  from '#composite/things/art-tag';
-
 export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
   static [Thing.friendlyName] = `Art Tag`;
@@ -113,29 +110,51 @@ export class ArtTag extends Thing {
     }),
 
     indirectlyFeaturedInArtworks: [
-      withAllDescendantArtTags(),
-
       {
-        dependencies: ['#allDescendantArtTags'],
-        compute: ({'#allDescendantArtTags': allDescendantArtTags}) =>
+        dependencies: ['allDescendantArtTags'],
+        compute: ({allDescendantArtTags}) =>
           unique(
             allDescendantArtTags
               .flatMap(artTag => artTag.directlyFeaturedInArtworks)),
       },
     ],
 
+    // All the art tags which descend from this one - that means its own direct
+    // descendants, plus all the direct and indirect descendants of each of those!
+    // The results aren't specially sorted, but they won't contain any duplicates
+    // (for example if two descendant tags both route deeper to end up including
+    // some of the same tags).
     allDescendantArtTags: [
-      withAllDescendantArtTags(),
-      exposeDependency({dependency: '#allDescendantArtTags'}),
+      {
+        dependencies: ['directDescendantArtTags'],
+        compute: ({directDescendantArtTags}) =>
+          unique([
+            ...directDescendantArtTags,
+            ...directDescendantArtTags.flatMap(artTag => artTag.allDescendantArtTags),
+          ]),
+      },
     ],
 
     directAncestorArtTags: reverseReferenceList({
       reverse: soupyReverse.input('artTagsWhichDirectlyAncestor'),
     }),
 
+    // All the art tags which are ancestors of this one as a "baobab tree" -
+    // what you'd typically think of as roots are all up in the air! Since this
+    // really is backwards from the way that the art tag tree is written in data,
+    // chances are pretty good that there will be many of the exact same "leaf"
+    // nodes - art tags which don't themselves have any ancestors. In the actual
+    // data structure, each node is a Map, with keys for each ancestor and values
+    // for each ancestor's own baobab (thus a branching structure, just like normal
+    // trees in this regard).
     ancestorArtTagBaobabTree: [
-      withAncestorArtTagBaobabTree(),
-      exposeDependency({dependency: '#ancestorArtTagBaobabTree'}),
+      {
+        dependencies: ['directAncestorArtTags'],
+        compute: ({directAncestorArtTags}) =>
+          new Map(
+            directAncestorArtTags
+              .map(artTag => [artTag, artTag.ancestorArtTagBaobabTree])),
+      },
     ],
   });
 
