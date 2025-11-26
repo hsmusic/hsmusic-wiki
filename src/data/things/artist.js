@@ -18,8 +18,10 @@ import {
   sortContributionsChronologically,
 } from '#sort';
 
-import {exitWithoutDependency, exposeConstant} from '#composite/control-flow';
-import {withReverseReferenceList} from '#composite/wiki-data';
+import {exitWithoutDependency, exposeConstant, exposeDependency}
+  from '#composite/control-flow';
+import {withFilteredList, withPropertyFromList} from '#composite/data';
+import {withContributionListSums} from '#composite/wiki-data';
 
 import {
   constitutibleArtwork,
@@ -36,8 +38,6 @@ import {
   thingList,
   urls,
 } from '#composite/wiki-properties';
-
-import {artistTotalDuration} from '#composite/things/artist';
 
 export class Artist extends Thing {
   static [Thing.referenceType] = 'artist';
@@ -146,31 +146,19 @@ export class Artist extends Thing {
     }),
 
     musicContributions: [
-      withReverseReferenceList({
-        reverse: soupyReverse.input('trackArtistContributionsBy'),
-      }).outputs({
-        '#reverseReferenceList': '#trackArtistContribs',
-      }),
-
-      withReverseReferenceList({
-        reverse: soupyReverse.input('trackContributorContributionsBy'),
-      }).outputs({
-        '#reverseReferenceList': '#trackContributorContribs',
-      }),
-
       {
         dependencies: [
-          '#trackArtistContribs',
-          '#trackContributorContribs',
+          'trackArtistContributions',
+          'trackContributorContributions',
         ],
 
         compute: (continuation, {
-          ['#trackArtistContribs']: trackArtistContribs,
-          ['#trackContributorContribs']: trackContributorContribs,
+          trackArtistContributions,
+          trackContributorContributions,
         }) => continuation({
           ['#contributions']: [
-            ...trackArtistContribs,
-            ...trackContributorContribs,
+            ...trackArtistContributions,
+            ...trackContributorContributions,
           ],
         }),
       },
@@ -185,49 +173,25 @@ export class Artist extends Thing {
     ],
 
     artworkContributions: [
-      withReverseReferenceList({
-        reverse: soupyReverse.input('trackCoverArtistContributionsBy'),
-      }).outputs({
-        '#reverseReferenceList': '#trackCoverArtistContribs',
-      }),
-
-      withReverseReferenceList({
-        reverse: soupyReverse.input('albumCoverArtistContributionsBy'),
-      }).outputs({
-        '#reverseReferenceList': '#albumCoverArtistContribs',
-      }),
-
-      withReverseReferenceList({
-        reverse: soupyReverse.input('albumWallpaperArtistContributionsBy'),
-      }).outputs({
-        '#reverseReferenceList': '#albumWallpaperArtistContribs',
-      }),
-
-      withReverseReferenceList({
-        reverse: soupyReverse.input('albumBannerArtistContributionsBy'),
-      }).outputs({
-        '#reverseReferenceList': '#albumBannerArtistContribs',
-      }),
-
       {
         dependencies: [
-          '#trackCoverArtistContribs',
-          '#albumCoverArtistContribs',
-          '#albumWallpaperArtistContribs',
-          '#albumBannerArtistContribs',
+          'trackCoverArtistContributions',
+          'albumCoverArtistContributions',
+          'albumWallpaperArtistContributions',
+          'albumBannerArtistContributions',
         ],
 
         compute: (continuation, {
-          ['#trackCoverArtistContribs']: trackCoverArtistContribs,
-          ['#albumCoverArtistContribs']: albumCoverArtistContribs,
-          ['#albumWallpaperArtistContribs']: albumWallpaperArtistContribs,
-          ['#albumBannerArtistContribs']: albumBannerArtistContribs,
+          trackCoverArtistContributions,
+          albumCoverArtistContributions,
+          albumWallpaperArtistContributions,
+          albumBannerArtistContributions,
         }) => continuation({
           ['#contributions']: [
-            ...trackCoverArtistContribs,
-            ...albumCoverArtistContribs,
-            ...albumWallpaperArtistContribs,
-            ...albumBannerArtistContribs,
+            ...trackCoverArtistContributions,
+            ...albumCoverArtistContributions,
+            ...albumWallpaperArtistContributions,
+            ...albumBannerArtistContributions,
           ],
         }),
       },
@@ -241,7 +205,32 @@ export class Artist extends Thing {
       },
     ],
 
-    totalDuration: artistTotalDuration(),
+    totalDuration: [
+      withPropertyFromList({
+        list: 'musicContributions',
+        property: input.value('thing'),
+      }),
+
+      withPropertyFromList({
+        list: '#musicContributions.thing',
+        property: input.value('isMainRelease'),
+      }),
+
+      withFilteredList({
+        list: 'musicContributions',
+        filter: '#musicContributions.thing.isMainRelease',
+      }).outputs({
+        '#filteredList': '#mainReleaseContributions',
+      }),
+
+      withContributionListSums({
+        list: '#mainReleaseContributions',
+      }),
+
+      exposeDependency({
+        dependency: '#contributionListDuration',
+      }),
+    ],
   });
 
   static [Thing.getSerializeDescriptors] = ({
