@@ -34,8 +34,6 @@ import {
   parseWallpaperParts,
 } from '#yaml';
 
-import {withPropertyFromObject} from '#composite/data';
-
 import {
   exitWithoutDependency,
   exposeConstant,
@@ -43,6 +41,12 @@ import {
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
 } from '#composite/control-flow';
+
+import {
+  withFlattenedList,
+  withPropertyFromList,
+  withPropertyFromObject,
+} from '#composite/data';
 
 import {
   exitWithoutArtwork,
@@ -77,7 +81,6 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {withCoverArtDate, withTracks} from '#composite/things/album';
 import {withContinueCountingFrom, withStartCountingFrom}
   from '#composite/things/track-section';
 
@@ -219,23 +222,29 @@ export class Album extends Thing {
         .call(this, 'Cover Artwork'),
     ],
 
-    coverArtistContribs: [
-      withCoverArtDate(),
-
-      contributionList({
-        date: '#coverArtDate',
-        artistProperty: input.value('albumCoverArtistContributions'),
-      }),
-    ],
+    coverArtistContribs: contributionList({
+      date: 'coverArtDate',
+      artistProperty: input.value('albumCoverArtistContributions'),
+    }),
 
     coverArtDate: [
-      withCoverArtDate({
-        from: input.updateValue({
-          validate: isDate,
-        }),
+      withHasArtwork({
+        contribs: '_coverArtistContribs',
+        artworks: '_coverArtworks',
       }),
 
-      exposeDependency({dependency: '#coverArtDate'}),
+      exitWithoutDependency({
+        dependency: '#hasArtwork',
+        mode: input.value('falsy'),
+      }),
+
+      exposeUpdateValueOrContinue({
+        validate: input.value(isDate),
+      }),
+
+      exposeDependency({
+        dependency: 'date',
+      }),
     ],
 
     coverArtFileExtension: [
@@ -306,14 +315,10 @@ export class Album extends Thing {
         .call(this, 'Wallpaper Artwork'),
     ],
 
-    wallpaperArtistContribs: [
-      withCoverArtDate(),
-
-      contributionList({
-        date: '#coverArtDate',
-        artistProperty: input.value('albumWallpaperArtistContributions'),
-      }),
-    ],
+    wallpaperArtistContribs: contributionList({
+      date: 'coverArtDate',
+      artistProperty: input.value('albumWallpaperArtistContributions'),
+    }),
 
     wallpaperFileExtension: [
       exitWithoutArtwork({
@@ -355,14 +360,10 @@ export class Album extends Thing {
         .call(this, 'Banner Artwork'),
     ],
 
-    bannerArtistContribs: [
-      withCoverArtDate(),
-
-      contributionList({
-        date: '#coverArtDate',
-        artistProperty: input.value('albumBannerArtistContributions'),
-      }),
-    ],
+    bannerArtistContribs: contributionList({
+      date: 'coverArtDate',
+      artistProperty: input.value('albumBannerArtistContributions'),
+    }),
 
     bannerFileExtension: [
       exitWithoutArtwork({
@@ -452,8 +453,23 @@ export class Album extends Thing {
     hasBannerArt: contribsPresent({contribs: '_bannerArtistContribs'}),
 
     tracks: [
-      withTracks(),
-      exposeDependency({dependency: '#tracks'}),
+      exitWithoutDependency({
+        dependency: 'trackSections',
+        value: input.value([]),
+      }),
+
+      withPropertyFromList({
+        list: 'trackSections',
+        property: input.value('tracks'),
+      }),
+
+      withFlattenedList({
+        list: '#trackSections.tracks',
+      }),
+
+      exposeDependency({
+        dependency: '#flattenedList',
+      }),
     ],
   });
 
