@@ -44,6 +44,8 @@ import {
 
 import {
   withFlattenedList,
+  withLengthOfList,
+  withNearbyItemFromList,
   withPropertyFromList,
   withPropertyFromObject,
 } from '#composite/data';
@@ -80,9 +82,6 @@ import {
   wallpaperParts,
   wikiData,
 } from '#composite/wiki-properties';
-
-import {withContinueCountingFrom, withStartCountingFrom}
-  from '#composite/things/track-section';
 
 export class Album extends Thing {
   static [Thing.referenceType] = 'album';
@@ -1046,11 +1045,41 @@ export class TrackSection extends Thing {
     ],
 
     startCountingFrom: [
-      withStartCountingFrom({
-        from: input.updateValue({validate: isNumber}),
+      exposeUpdateValueOrContinue({
+        validate: input.value(isNumber),
       }),
 
-      exposeDependency({dependency: '#startCountingFrom'}),
+      exitWithoutDependency({
+        dependency: 'album',
+        value: input.value(1),
+      }),
+
+      withPropertyFromObject({
+        object: 'album',
+        property: input.value('trackSections'),
+      }),
+
+      withNearbyItemFromList({
+        list: '#album.trackSections',
+        item: input.myself(),
+        offset: input.value(-1),
+      }).outputs({
+        '#nearbyItem': '#previousTrackSection',
+      }),
+
+      exitWithoutDependency({
+        dependency: '#previousTrackSection',
+        value: input.value(1),
+      }),
+
+      withPropertyFromObject({
+        object: '#previousTrackSection',
+        property: input.value('continueCountingFrom'),
+      }),
+
+      exposeDependency({
+        dependency: '#previousTrackSection.continueCountingFrom',
+      }),
     ],
 
     dateOriginallyReleased: simpleDate(),
@@ -1115,9 +1144,15 @@ export class TrackSection extends Thing {
     ],
 
     continueCountingFrom: [
-      withContinueCountingFrom(),
+      withLengthOfList({
+        list: 'tracks',
+      }),
 
-      exposeDependency({dependency: '#continueCountingFrom'}),
+      {
+        dependencies: ['startCountingFrom', '#tracks.length'],
+        compute: ({startCountingFrom, '#tracks.length': tracks}) =>
+          startCountingFrom + tracks,
+      },
     ],
   });
 
