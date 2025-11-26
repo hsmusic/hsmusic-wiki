@@ -25,8 +25,6 @@ import {
   parseDimensions,
 } from '#yaml';
 
-import {withPropertyFromList, withPropertyFromObject} from '#composite/data';
-
 import {
   exitWithoutDependency,
   exposeConstant,
@@ -36,9 +34,16 @@ import {
 } from '#composite/control-flow';
 
 import {
+  withFilteredList,
+  withPropertyFromList,
+  withPropertyFromObject,
+} from '#composite/data';
+
+import {
   withRecontextualizedContributionList,
   withResolvedAnnotatedReferenceList,
   withResolvedContribs,
+  withResolvedReferenceList,
 } from '#composite/wiki-data';
 
 import {
@@ -54,12 +59,11 @@ import {
 } from '#composite/wiki-properties';
 
 import {
-  withArtTags,
   withAttachedArtwork,
   withContainingArtworkList,
-  withContentWarningArtTags,
   withContribsFromAttachedArtwork,
   withDate,
+  withPropertyFromAttachedArtwork,
 } from '#composite/things/artwork';
 
 export class Artwork extends Thing {
@@ -218,15 +222,42 @@ export class Artwork extends Thing {
     artTagsFromThingProperty: simpleString(),
 
     artTags: [
-      withArtTags({
-        from: input.updateValue({
+      withResolvedReferenceList({
+        list: input.updateValue({
           validate:
             validateReferenceList(ArtTag[Thing.referenceType]),
         }),
+        find: soupyFind.input('artTag'),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#resolvedReferenceList',
+        mode: input.value('empty'),
+      }),
+
+      withPropertyFromAttachedArtwork({
+        property: input.value('artTags'),
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#attachedArtwork.artTags',
+        mode: input.value('empty'),
+      }),
+
+      exitWithoutDependency({
+        dependency: 'artTagsFromThingProperty',
+        value: input.value([]),
+      }),
+
+      withPropertyFromObject({
+        object: 'thing',
+        property: 'artTagsFromThingProperty',
+      }).outputs({
+        ['#value']: '#thing.artTags',
       }),
 
       exposeDependency({
-        dependency: '#artTags',
+        dependency: '#thing.artTags'
       }),
     ],
 
@@ -372,18 +403,24 @@ export class Artwork extends Thing {
     ],
 
     contentWarningArtTags: [
-      withContentWarningArtTags(),
+      withPropertyFromList({
+        list: 'artTags',
+        property: input.value('isContentWarning'),
+      }),
+
+      withFilteredList({
+        list: 'artTags',
+        filter: '#artTags.isContentWarning',
+      }),
 
       exposeDependency({
-        dependency: '#contentWarningArtTags',
+        dependency: '#filteredList',
       }),
     ],
 
     contentWarnings: [
-      withContentWarningArtTags(),
-
       withPropertyFromList({
-        list: '#contentWarningArtTags',
+        list: 'contentWarningArtTags',
         property: input.value('name'),
       }),
 
