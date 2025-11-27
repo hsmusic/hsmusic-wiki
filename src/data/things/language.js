@@ -4,7 +4,7 @@ import {withAggregate} from '#aggregate';
 import {input} from '#composite';
 import * as html from '#html';
 import {accumulateSum, empty, withEntries} from '#sugar';
-import {isLanguageCode} from '#validators';
+import {isLanguageCode, isObject} from '#validators';
 import Thing from '#thing';
 import {languageOptionRegex} from '#wiki-data';
 
@@ -19,8 +19,6 @@ import {
 import {exitWithoutDependency, exposeConstant, exposeDependency}
   from '#composite/control-flow';
 import {flag, name} from '#composite/wiki-properties';
-
-import {withStrings} from '#composite/things/language';
 
 export class Language extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({
@@ -63,15 +61,60 @@ export class Language extends Thing {
     // Mapping of translation keys to values (strings). Generally, don't
     // access this object directly - use methods instead.
     strings: [
-      withStrings({
-        from: input.updateValue({
-          validate: t => typeof t === 'object',
-        }),
-      }),
+      {
+        dependencies: [
+          input.updateValue({validate: isObject}),
+          'inheritedStrings',
+        ],
 
-      exposeDependency({
-        dependency: '#strings',
-      }),
+        compute: (continuation, {
+          [input.updateValue()]: strings,
+          ['inheritedStrings']: inheritedStrings,
+        }) =>
+          (strings && inheritedStrings
+            ? continuation()
+            : strings ?? inheritedStrings),
+      },
+
+      {
+        dependencies: ['inheritedStrings', 'code'],
+        transform(strings, {inheritedStrings, code}) {
+          const validStrings = {
+            ...inheritedStrings,
+            ...strings,
+          };
+
+          const optionsFromTemplate = template =>
+            Array.from(template.matchAll(languageOptionRegex))
+              .map(({groups}) => groups.name);
+
+          for (const [key, providedTemplate] of Object.entries(strings)) {
+            const inheritedTemplate = inheritedStrings[key];
+            if (!inheritedTemplate) continue;
+
+            const providedOptions = optionsFromTemplate(providedTemplate);
+            const inheritedOptions = optionsFromTemplate(inheritedTemplate);
+
+            const missingOptionNames =
+              inheritedOptions.filter(name => !providedOptions.includes(name));
+
+            const misplacedOptionNames =
+              providedOptions.filter(name => !inheritedOptions.includes(name));
+
+            if (!empty(missingOptionNames) || !empty(misplacedOptionNames)) {
+              logWarn`Not using ${code ?? '(no code)'} string ${key}:`;
+              if (!empty(missingOptionNames))
+                logWarn`- Missing options: ${missingOptionNames.join(', ')}`;
+              if (!empty(misplacedOptionNames))
+                logWarn`- Unexpected options: ${misplacedOptionNames.join(', ')}`;
+
+              validStrings[key] = inheritedStrings[key];
+            }
+          }
+
+          return validStrings;
+        },
+      },
     ],
 
     // May be provided to specify "default" strings, generally (but not
@@ -124,15 +167,13 @@ export class Language extends Thing {
 
     // TODO: This currently isn't used. Is it still needed?
     strings_htmlEscaped: [
-      withStrings(),
-
       exitWithoutDependency({
-        dependency: '#strings',
+        dependency: 'strings',
       }),
 
       {
-        dependencies: ['#strings'],
-        compute: ({'#strings': strings}) =>
+        dependencies: ['strings'],
+        compute: ({strings}) =>
           withEntries(strings, entries => entries
             .map(([key, value]) => [key, html.escape(value)])),
       },
