@@ -31,10 +31,12 @@ import {
   exposeDependency,
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
+  flipFilter,
 } from '#composite/control-flow';
 
 import {
   withFilteredList,
+  withNearbyItemFromList,
   withPropertyFromList,
   withPropertyFromObject,
 } from '#composite/data';
@@ -58,13 +60,8 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {
-  withAttachedArtwork,
-  withContainingArtworkList,
-  withContribsFromAttachedArtwork,
-  withDate,
-  withPropertyFromAttachedArtwork,
-} from '#composite/things/artwork';
+import {withContainingArtworkList, withDate}
+  from '#composite/things/artwork';
 
 export class Artwork extends Thing {
   static [Thing.referenceType] = 'artwork';
@@ -190,7 +187,14 @@ export class Artwork extends Thing {
         mode: input.value('empty'),
       }),
 
-      withContribsFromAttachedArtwork(),
+      withPropertyFromObject({
+        object: 'attachedArtwork',
+        property: input.value('artistContribs'),
+      }),
+
+      withRecontextualizedContributionList({
+        list: '#attachedArtwork.artistContribs',
+      }),
 
       exposeDependencyOrContinue({
         dependency: '#attachedArtwork.artistContribs',
@@ -235,7 +239,8 @@ export class Artwork extends Thing {
         mode: input.value('empty'),
       }),
 
-      withPropertyFromAttachedArtwork({
+      withPropertyFromObject({
+        object: 'attachedArtwork',
         property: input.value('artTags'),
       }),
 
@@ -376,10 +381,33 @@ export class Artwork extends Thing {
     ],
 
     attachedArtwork: [
-      withAttachedArtwork(),
+      exitWithoutDependency({
+        dependency: 'attachAbove',
+        mode: input.value('falsy'),
+      }),
+
+      withContainingArtworkList(),
+
+      withPropertyFromList({
+        list: '#containingArtworkList',
+        property: input.value('attachAbove'),
+      }),
+
+      flipFilter({
+        filter: '#containingArtworkList.attachAbove',
+      }).outputs({
+        '#containingArtworkList.attachAbove': '#filterNotAttached',
+      }),
+
+      withNearbyItemFromList({
+        list: '#containingArtworkList',
+        item: input.myself(),
+        offset: input.value(-1),
+        filter: '#filterNotAttached',
+      }),
 
       exposeDependency({
-        dependency: '#attachedArtwork',
+        dependency: '#nearbyItem',
       }),
     ],
 
