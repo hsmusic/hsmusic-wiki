@@ -42,6 +42,8 @@ import {
 } from '#composite/data';
 
 import {
+  constituteFrom,
+  constituteOrContinue,
   withRecontextualizedContributionList,
   withResolvedAnnotatedReferenceList,
   withResolvedContribs,
@@ -90,47 +92,27 @@ export class Artwork extends Thing {
     dateFromThingProperty: simpleString(),
 
     date: [
-      withDate({
-        from: input.updateValue({validate: isDate}),
+      exposeUpdateValueOrContinue({
+        validate: input.value(isDate),
       }),
 
-      exposeDependency({dependency: '#date'}),
+      constituteFrom({
+        property: 'dateFromThingProperty',
+        from: 'thing',
+      }),
     ],
 
     fileExtensionFromThingProperty: simpleString(),
 
     fileExtension: [
-      {
-        compute: (continuation) => continuation({
-          ['#default']: 'jpg',
-        }),
-      },
-
       exposeUpdateValueOrContinue({
         validate: input.value(isFileExtension),
       }),
 
-      exitWithoutDependency({
-        dependency: 'thing',
-        value: '#default',
-      }),
-
-      exitWithoutDependency({
-        dependency: 'fileExtensionFromThingProperty',
-        value: '#default',
-      }),
-
-      withPropertyFromObject({
-        object: 'thing',
+      constituteFrom({
         property: 'fileExtensionFromThingProperty',
-      }),
-
-      exposeDependencyOrContinue({
-        dependency: '#value',
-      }),
-
-      exposeDependency({
-        dependency: '#default',
+        from: 'thing',
+        else: input.value('jpg'),
       }),
     ],
 
@@ -141,29 +123,9 @@ export class Artwork extends Thing {
         validate: input.value(isDimensions),
       }),
 
-      exitWithoutDependency({
-        dependency: 'dimensionsFromThingProperty',
-        value: input.value(null),
-      }),
-
-      withPropertyFromObject({
-        object: 'thing',
+      constituteFrom({
         property: 'dimensionsFromThingProperty',
-      }).outputs({
-        ['#value']: '#dimensionsFromThing',
-      }),
-
-      exitWithoutDependency({
-        dependency: 'dimensionsFromThingProperty',
-        value: input.value(null),
-      }),
-
-      exposeDependencyOrContinue({
-        dependency: '#dimensionsFromThing',
-      }),
-
-      exposeConstant({
-        value: input.value(null),
+        from: 'thing',
       }),
     ],
 
@@ -200,24 +162,9 @@ export class Artwork extends Thing {
         dependency: '#attachedArtwork.artistContribs',
       }),
 
-      exitWithoutDependency({
-        dependency: 'artistContribsFromThingProperty',
-        value: input.value([]),
-      }),
-
-      withPropertyFromObject({
-        object: 'thing',
+      constituteFrom({
         property: 'artistContribsFromThingProperty',
-      }).outputs({
-        ['#value']: '#artistContribs',
-      }),
-
-      withRecontextualizedContributionList({
-        list: '#artistContribs',
-      }),
-
-      exposeDependency({
-        dependency: '#artistContribs',
+        from: 'thing',
       }),
     ],
 
@@ -239,30 +186,16 @@ export class Artwork extends Thing {
         mode: input.value('empty'),
       }),
 
-      withPropertyFromObject({
-        object: 'attachedArtwork',
+      constituteOrContinue({
         property: input.value('artTags'),
-      }),
-
-      exposeDependencyOrContinue({
-        dependency: '#attachedArtwork.artTags',
+        from: 'attachedArtwork',
         mode: input.value('empty'),
       }),
 
-      exitWithoutDependency({
-        dependency: 'artTagsFromThingProperty',
-        value: input.value([]),
-      }),
-
-      withPropertyFromObject({
-        object: 'thing',
+      constituteFrom({
         property: 'artTagsFromThingProperty',
-      }).outputs({
-        ['#value']: '#thing.artTags',
-      }),
-
-      exposeDependency({
-        dependency: '#thing.artTags'
+        from: 'thing',
+        else: input.value([]),
       }),
     ],
 
@@ -304,24 +237,10 @@ export class Artwork extends Thing {
         mode: input.value('empty'),
       }),
 
-      exitWithoutDependency({
-        dependency: 'referencedArtworksFromThingProperty',
-        value: input.value([]),
-      }),
-
-      withPropertyFromObject({
-        object: 'thing',
+      constituteFrom({
         property: 'referencedArtworksFromThingProperty',
-      }).outputs({
-        ['#value']: '#referencedArtworks',
-      }),
-
-      exposeDependencyOrContinue({
-        dependency: '#referencedArtworks',
-      }),
-
-      exposeConstant({
-        value: input.value([]),
+        from: 'thing',
+        else: input.value([]),
       }),
     ],
 

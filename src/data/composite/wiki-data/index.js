@@ -4,6 +4,8 @@
 // #composite/data.
 //
 
+export {default as constituteFrom} from './constituteFrom.js';
+export {default as constituteOrContinue} from './constituteOrContinue.js';
 export {default as exitWithoutContribs} from './exitWithoutContribs.js';
 export {default as exitWithoutArtwork} from './exitWithoutArtwork.js';
 export {default as gobbleSoupyFind} from './gobbleSoupyFind.js';
