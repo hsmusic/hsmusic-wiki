@@ -1690,7 +1690,6 @@ export function connectThingsFromDataSteps(processThingResultLists, dataSteps) {
 export function makeWikiDataFromDataSteps(processThingResultLists, _dataSteps) {
   const wikiData = {};
 
-  let found = false;
   for (const result of processThingResultLists.flat(2)) {
     pushWikiData(wikiData, result.wikiData);
   }

@@ -3,7 +3,6 @@ export const DATA_ALBUM_DIRECTORY = 'album';
 import * as path from 'node:path';
 import {inspect} from 'node:util';
 
-import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input} from '#composite';
 import {traverse} from '#node-utils';

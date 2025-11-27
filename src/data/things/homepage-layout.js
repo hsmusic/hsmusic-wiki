@@ -243,7 +243,7 @@ export class HomepageLayoutRow extends Thing {
 export class HomepageLayoutActionsRow extends HomepageLayoutRow {
   static [Thing.friendlyName] = `Homepage Actions Row`;
 
-  static [Thing.getPropertyDescriptors] = (opts) => ({
+  static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
     actionLinks: {

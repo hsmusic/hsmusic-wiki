@@ -1,6 +1,6 @@
 import {logWarn} from '#cli';
 import {input, templateCompositeFrom} from '#composite';
-import {empty, withEntries} from '#sugar';
+import {empty} from '#sugar';
 import {languageOptionRegex} from '#wiki-data';
 
 import {withResultOfAvailabilityCheck} from '#composite/control-flow';

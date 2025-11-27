@@ -3,7 +3,6 @@
 
 import {input, templateCompositeFrom} from '#composite';
 
-import {withResultOfAvailabilityCheck} from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
 
 export default templateCompositeFrom({

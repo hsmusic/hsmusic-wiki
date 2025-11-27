@@ -1,7 +1,6 @@
 import {Temporal, toTemporalInstant} from '@js-temporal/polyfill';
 
 import {withAggregate} from '#aggregate';
-import CacheableObject from '#cacheable-object';
 import {input} from '#composite';
 import * as html from '#html';
 import {accumulateSum, empty, withEntries} from '#sugar';
@@ -19,7 +18,7 @@ import {
 
 import {exitWithoutDependency, exposeConstant, exposeDependency}
   from '#composite/control-flow';
-import {externalFunction, flag, name} from '#composite/wiki-properties';
+import {flag, name} from '#composite/wiki-properties';
 
 import {withStrings} from '#composite/things/language';
 

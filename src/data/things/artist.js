@@ -5,10 +5,7 @@ import {inspect} from 'node:util';
 import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input} from '#composite';
-import {stitchArrays} from '#sugar';
 import Thing from '#thing';
-import {validateArrayItems} from '#validators';
-import {getKebabCase} from '#wiki-data';
 import {parseArtistAliases, parseArtwork} from '#yaml';
 
 import {
@@ -31,7 +28,6 @@ import {
   flag,
   name,
   reverseReferenceList,
-  singleReference,
   soupyFind,
   soupyReverse,
   thing,

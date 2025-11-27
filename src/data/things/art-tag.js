@@ -15,7 +15,6 @@ import {parseAdditionalNames, parseAnnotatedReferences} from '#yaml';
 import {
   exitWithoutDependency,
   exposeConstant,
-  exposeDependency,
   exposeUpdateValueOrContinue,
 } from '#composite/control-flow';
 
