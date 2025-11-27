@@ -62,8 +62,7 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {withContainingArtworkList, withDate}
-  from '#composite/things/artwork';
+import {withContainingArtworkList} from '#composite/things/artwork';
 
 export class Artwork extends Thing {
   static [Thing.referenceType] = 'artwork';
@@ -135,11 +134,9 @@ export class Artwork extends Thing {
     artistContribsArtistProperty: simpleString(),
 
     artistContribs: [
-      withDate(),
-
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
-        date: '#date',
+        date: 'date',
         thingProperty: input.thisProperty(),
         artistProperty: 'artistContribsArtistProperty',
       }),
