@@ -1,11 +1,12 @@
 import {input} from '#composite';
 import {transposeArrays} from '#sugar';
 import Thing from '#thing';
-import {is, isDate} from '#validators';
+import {is, isDate, validateReferenceList} from '#validators';
 import {parseDate} from '#yaml';
 
 import {withFilteredList, withMappedList, withPropertyFromList}
   from '#composite/data';
+import {withResolvedReferenceList} from '#composite/wiki-data';
 import {contentString, simpleDate, soupyFind, thing}
   from '#composite/wiki-properties';
 
@@ -19,9 +20,9 @@ import {
 } from '#composite/control-flow';
 
 import {
-  contentArtists,
   hasAnnotationPart,
   withAnnotationPartNodeLists,
+  withExpressedOrImplicitArtistReferences,
   withWebArchiveDate,
 } from '#composite/things/content';
 
@@ -31,7 +32,27 @@ export class ContentEntry extends Thing {
 
     thing: thing(),
 
-    artists: contentArtists(),
+    artists: [
+      withExpressedOrImplicitArtistReferences({
+        from: input.updateValue({
+          validate: validateReferenceList('artist'),
+        }),
+      }),
+
+      exitWithoutDependency({
+        dependency: '#artistReferences',
+        value: input.value([]),
+      }),
+
+      withResolvedReferenceList({
+        list: '#artistReferences',
+        find: soupyFind.input('artist'),
+      }),
+
+      exposeDependency({
+        dependency: '#resolvedReferenceList',
+      }),
+    ],
 
     artistText: contentString(),
 
