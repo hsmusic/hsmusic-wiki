@@ -159,9 +159,19 @@ export class Artwork extends Thing {
         dependency: '#attachedArtwork.artistContribs',
       }),
 
-      constituteFrom({
+      withPropertyFromObject({
+        object: 'thing',
         property: 'artistContribsFromThingProperty',
-        from: 'thing',
+      }).outputs({
+        '#value': '#artistContribsFromThing',
+      }),
+
+      withRecontextualizedContributionList({
+        list: '#artistContribsFromThing',
+      }),
+
+      exposeDependency({
+        dependency: '#artistContribsFromThing',
       }),
     ],
 
