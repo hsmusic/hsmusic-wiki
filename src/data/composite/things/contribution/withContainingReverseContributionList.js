@@ -9,8 +9,6 @@ import {raiseOutputWithoutDependency, withResultOfAvailabilityCheck}
   from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
 
-import withContributionArtist from './withContributionArtist.js';
-
 export default templateCompositeFrom({
   annotation: `withContainingReverseContributionList`,
 
@@ -32,10 +30,8 @@ export default templateCompositeFrom({
       }),
     }),
 
-    withContributionArtist(),
-
     withPropertyFromObject({
-      object: '#artist',
+      object: 'artist',
       property: input('artistProperty'),
     }).outputs({
       ['#value']: '#list',

@@ -8,7 +8,8 @@ import Thing from '#thing';
 import {isBoolean, isStringNonEmpty, isThing, validateReference}
   from '#validators';
 
-import {simpleDate, soupyFind} from '#composite/wiki-properties';
+import {simpleDate, singleReference, soupyFind}
+  from '#composite/wiki-properties';
 
 import {
   exitWithoutDependency,
@@ -28,7 +29,6 @@ import {
 import {
   inheritFromContributionPresets,
   withContainingReverseContributionList,
-  withContributionArtist,
   withContributionContext,
   withMatchingContributionPresets,
 } from '#composite/things/contribution';
@@ -54,17 +54,9 @@ export class Contribution extends Thing {
 
     date: simpleDate(),
 
-    artist: [
-      withContributionArtist({
-        ref: input.updateValue({
-          validate: validateReference('artist'),
-        }),
-      }),
-
-      exposeDependency({
-        dependency: '#artist',
-      }),
-    ],
+    artist: singleReference({
+      find: soupyFind.input('artist'),
+    }),
 
     annotation: {
       flags: {update: true, expose: true},
