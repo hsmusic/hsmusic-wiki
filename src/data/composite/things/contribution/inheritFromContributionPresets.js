@@ -3,29 +3,18 @@ import {input, templateCompositeFrom} from '#composite';
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 import {withPropertyFromList} from '#composite/data';
 
-import withMatchingContributionPresets
-  from './withMatchingContributionPresets.js';
-
 export default templateCompositeFrom({
   annotation: `inheritFromContributionPresets`,
 
-  inputs: {
-    property: input({type: 'string'}),
-  },
-
   steps: () => [
-    withMatchingContributionPresets().outputs({
-      '#matchingContributionPresets': '#presets',
-    }),
-
     raiseOutputWithoutDependency({
-      dependency: '#presets',
+      dependency: 'matchingContributionPresets',
       mode: input.value('empty'),
     }),
 
     withPropertyFromList({
-      list: '#presets',
-      property: input('property'),
+      list: 'matchingContributionPresets',
+      property: input.thisProperty(),
     }),
 
     {

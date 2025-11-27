@@ -30,7 +30,6 @@ import {
   inheritFromContributionPresets,
   withContainingReverseContributionList,
   withContributionContext,
-  withMatchingContributionPresets,
 } from '#composite/things/contribution';
 
 export class Contribution extends Thing {
@@ -64,9 +63,7 @@ export class Contribution extends Thing {
     },
 
     countInContributionTotals: [
-      inheritFromContributionPresets({
-        property: input.thisProperty(),
-      }),
+      inheritFromContributionPresets(),
 
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
@@ -91,9 +88,7 @@ export class Contribution extends Thing {
     ],
 
     countInDurationTotals: [
-      inheritFromContributionPresets({
-        property: input.thisProperty(),
-      }),
+      inheritFromContributionPresets(),
 
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
@@ -160,11 +155,58 @@ export class Contribution extends Thing {
     ],
 
     matchingPresets: [
-      withMatchingContributionPresets(),
-
-      exposeDependency({
-        dependency: '#matchingContributionPresets',
+      withPropertyFromObject({
+        object: 'thing',
+        property: input.value('wikiInfo'),
+        internal: input.value(true),
       }),
+
+      exitWithoutDependency({
+        dependency: '#thing.wikiInfo',
+        value: input.value([]),
+      }),
+
+      withPropertyFromObject({
+        object: '#thing.wikiInfo',
+        property: input.value('contributionPresets'),
+      }).outputs({
+        '#thing.wikiInfo.contributionPresets': '#contributionPresets',
+      }),
+
+      exitWithoutDependency({
+        dependency: '#contributionPresets',
+        mode: input.value('empty'),
+        value: input.value([]),
+      }),
+
+      withContributionContext(),
+
+      {
+        dependencies: [
+          '#contributionPresets',
+          '#contributionTarget',
+          '#contributionProperty',
+          'annotation',
+        ],
+
+        compute: (continuation, {
+          ['#contributionPresets']: presets,
+          ['#contributionTarget']: target,
+          ['#contributionProperty']: property,
+          ['annotation']: annotation,
+        }) => continuation({
+          ['#matchingContributionPresets']:
+            presets
+              .filter(preset =>
+                preset.context[0] === target &&
+                preset.context.slice(1).includes(property) &&
+                // For now, only match if the annotation is a complete match.
+                // Partial matches (e.g. because the contribution includes "two"
+                // annotations, separated by commas) don't count.
+                preset.annotation === annotation),
+        })
+      },
+
     ],
 
     // All the contributions from the list which includes this contribution.
