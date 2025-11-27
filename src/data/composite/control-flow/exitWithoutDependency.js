@@ -11,8 +11,8 @@ export default templateCompositeFrom({
 
   inputs: {
     dependency: input({acceptsNull: true}),
-    mode: inputAvailabilityCheckMode(),
     value: input({defaultValue: null}),
+    mode: inputAvailabilityCheckMode(),
   },
 
   steps: () => [

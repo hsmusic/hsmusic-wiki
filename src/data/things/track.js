@@ -2,7 +2,7 @@ import {inspect} from 'node:util';
 
 import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
-import {input} from '#composite';
+import {input, V} from '#composite';
 import {onlyItem} from '#sugar';
 import {sortByDate} from '#sort';
 import Thing from '#thing';
@@ -141,14 +141,8 @@ export class Track extends Thing {
         validate: input.value(isBoolean),
       }),
 
-      withPropertyFromObject({
-        object: 'trackSection',
-        property: input.value('suffixTrackDirectories'),
-      }),
-
-      exposeDependency({
-        dependency: '#trackSection.suffixTrackDirectories',
-      }),
+      withPropertyFromObject('trackSection', V('suffixTrackDirectories')),
+      exposeDependency('#trackSection.suffixTrackDirectories'),
     ],
 
     // Controls how find.track works - it'll never be matched by
@@ -160,10 +154,7 @@ export class Track extends Thing {
         validate: input.value(isBoolean),
       }),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('alwaysReferenceTracksByDirectory'),
-      }),
+      withPropertyFromObject('album', V('alwaysReferenceTracksByDirectory')),
 
       // Falsy mode means this exposes true if the album's property is true,
       // but continues if the property is false (which is also the default).
@@ -172,20 +163,10 @@ export class Track extends Thing {
         mode: input.value('falsy'),
       }),
 
-      exitWithoutDependency({
-        dependency: '_mainRelease',
-        value: input.value(false),
-      }),
+      exitWithoutDependency('_mainRelease', V(false)),
+      exitWithoutDependency('mainReleaseTrack', V(false)),
 
-      exitWithoutDependency({
-        dependency: 'mainReleaseTrack',
-        value: input.value(false),
-      }),
-
-      withPropertyFromObject({
-        object: 'mainReleaseTrack',
-        property: input.value('name'),
-      }),
+      withPropertyFromObject('mainReleaseTrack', V('name')),
 
       {
         dependencies: ['name', '#mainReleaseTrack.name'],
@@ -248,9 +229,7 @@ export class Track extends Thing {
         '#resolvedReference': '#sameNameSingle',
       }),
 
-      exposeDependencyOrContinue({
-        dependency: '#sameNameSingle',
-      }),
+      exposeDependencyOrContinue('#sameNameSingle'),
 
       {
         dependencies: [
@@ -321,18 +300,10 @@ export class Track extends Thing {
         validate: input.value(isContentString),
       }),
 
-      exposeDependencyOrContinue({
-        dependency: '_artistText',
-      }),
+      exposeDependencyOrContinue('_artistText'),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('trackArtistText'),
-      }),
-
-      exposeDependency({
-        dependency: '#album.trackArtistText',
-      }),
+      withPropertyFromObject('album', V('trackArtistText')),
+      exposeDependency('#album.trackArtistText'),
     ],
 
     artistContribs: [

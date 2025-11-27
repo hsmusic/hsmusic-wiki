@@ -10,8 +10,8 @@ export default templateCompositeFrom({
   annotation: `exitWithoutUpdateValue`,
 
   inputs: {
-    mode: inputAvailabilityCheckMode(),
     value: input({defaultValue: null}),
+    mode: inputAvailabilityCheckMode(),
 
     validate: input({
       type: 'function',

@@ -17,7 +17,7 @@ const _valueIntoToken = shape =>
    : typeof value === 'string'
       ? Symbol.for(`hsmusic.composite.${shape}:${value}`)
       : {
-          symbol: Symbol.for(`hsmusic.composite.input`),
+          symbol: Symbol.for(`hsmusic.composite.${shape.split('.')[0]}`),
           shape,
           value,
         });
@@ -36,6 +36,10 @@ input.updateValue = _valueIntoToken('input.updateValue');
 input.staticDependency = _valueIntoToken('input.staticDependency');
 input.staticValue = _valueIntoToken('input.staticValue');
 
+// Only valid in positional inputs. This is replaced with
+// equivalent input.value() token in prepared inputs.
+export const V = _valueIntoToken('V');
+
 function isInputToken(token) {
   if (token === null) {
     return false;
@@ -48,27 +52,39 @@ function isInputToken(token) {
   }
 }
 
+function isConciseInputToken(token) {
+  if (token === null) {
+    return false;
+  } else if (typeof token === 'object') {
+    return token.symbol === Symbol.for('hsmusic.composite.V');
+  } else if (typeof token === 'symbol') {
+    return token.description.startsWith('hsmusic.composite.V');
+  } else {
+    return false;
+  }
+}
+
 function getInputTokenShape(token) {
-  if (!isInputToken(token)) {
+  if (!isInputToken(token) && !isConciseInputToken(token)) {
     throw new TypeError(`Expected an input token, got ${typeAppearance(token)}`);
   }
 
   if (typeof token === 'object') {
     return token.shape;
   } else {
-    return token.description.match(/hsmusic\.composite\.(input.*?)(:|$)/)[1];
+    return token.description.match(/hsmusic\.composite\.(input.*?|V)(:|$)/)[1];
   }
 }
 
 function getInputTokenValue(token) {
-  if (!isInputToken(token)) {
+  if (!isInputToken(token) && !isConciseInputToken(token)) {
     throw new TypeError(`Expected an input token, got ${typeAppearance(token)}`);
   }
 
   if (typeof token === 'object') {
     return token.value;
   } else {
-    return token.description.match(/hsmusic\.composite\.input.*?:(.*)/)?.[1] ?? null;
+    return token.description.match(/hsmusic\.composite\.(?:input.*?|V):(.*)/)?.[1] ?? null;
   }
 }
 
@@ -214,17 +230,90 @@ export function templateCompositeFrom(description) {
       ? Object.keys(description.inputs)
       : []);
 
-  const instantiate = (inputOptions = {}) => {
+  const positionalInputNames = expectedInputNames;
+
+  const instantiate = (...args) => {
+    const preparedInputs = {};
+
     withAggregate({message: `Errors in input options passed to ${compositionName}`}, ({push}) => {
-      const providedInputNames = Object.keys(inputOptions);
+      const [positionalInputs, namedInputs] =
+        (typeof args.at(-1) === 'object' &&
+         !isInputToken(args.at(-1)) &&
+         !isConciseInputToken(args.at(-1))
+          ? [args.slice(0, -1), args.at(-1)]
+          : [args, {}]);
+
+      const expresslyProvidedInputNames = Object.keys(namedInputs);
+      const positionallyProvidedInputNames = [];
+
+      const apparentInputRoutes = {};
+
+      const wrongTypeInputPositions = [];
+      const namedAndPositionalConflictInputPositions = [];
+
+      const maximumPositionalInputs = positionalInputNames.length;
+      const lastPossiblePositionalIndex = maximumPositionalInputs - 1;
+
+      for (const [index, value] of positionalInputs.entries()) {
+        if (!isInputToken(value) && !isConciseInputToken(value)) {
+          if (typeof value === 'object' && value !== null) {
+            wrongTypeInputPositions.push(index);
+            continue;
+          } else if (typeof value !== 'string') {
+            wrongTypeInputPositions.push(index);
+            continue;
+          }
+        }
+
+        if (index > lastPossiblePositionalIndex) {
+          continue;
+        }
+
+        const correspondingName = expectedInputNames[index];
+        if (expresslyProvidedInputNames.includes(correspondingName)) {
+          namedAndPositionalConflictInputPositions.push(index);
+          continue;
+        }
+
+        preparedInputs[correspondingName] =
+          (isConciseInputToken(value)
+            ? input.value(getInputTokenValue(value))
+            : value);
+
+        apparentInputRoutes[correspondingName] = `${correspondingName} (i = ${index})`;
+        positionallyProvidedInputNames.push(correspondingName);
+      }
 
       const misplacedInputNames =
-        providedInputNames
+        expresslyProvidedInputNames
           .filter(name => !expectedInputNames.includes(name));
+
+      const wrongTypeInputNames = [];
+
+      for (const [name, value] of Object.entries(namedInputs)) {
+        if (misplacedInputNames.includes(name)) {
+          continue;
+        }
+
+        // Concise input tokens, V(...), end up here too.
+        if (typeof value !== 'string' && !isInputToken(value)) {
+          wrongTypeInputNames.push(name);
+          continue;
+        }
+
+        preparedInputs[name] = value;
+        apparentInputRoutes[name] = name;
+      }
+
+      const totalProvidedInputNames =
+        unique([
+          ...expresslyProvidedInputNames,
+          ...positionallyProvidedInputNames,
+        ]);
 
       const missingInputNames =
         expectedInputNames
-          .filter(name => !providedInputNames.includes(name))
+          .filter(name => !totalProvidedInputNames.includes(name))
           .filter(name => {
             const inputDescription = getInputTokenValue(description.inputs[name]);
             if (!inputDescription) return true;
@@ -233,57 +322,39 @@ export function templateCompositeFrom(description) {
             return true;
           });
 
-      const wrongTypeInputNames = [];
-
       const expectedStaticValueInputNames = [];
       const expectedStaticDependencyInputNames = [];
       const expectedValueProvidingTokenInputNames = [];
-
       const validateFailedErrors = [];
 
-      for (const [name, value] of Object.entries(inputOptions)) {
-        if (misplacedInputNames.includes(name)) {
-          continue;
-        }
-
-        if (typeof value !== 'string' && !isInputToken(value)) {
-          wrongTypeInputNames.push(name);
-          continue;
-        }
-
+      for (const [name, value] of Object.entries(preparedInputs)) {
         const descriptionShape = getInputTokenShape(description.inputs[name]);
 
         const tokenShape = (isInputToken(value) ? getInputTokenShape(value) : null);
         const tokenValue = (isInputToken(value) ? getInputTokenValue(value) : null);
 
-        switch (descriptionShape) {
-          case'input.staticValue':
-            if (tokenShape !== 'input.value') {
-              expectedStaticValueInputNames.push(name);
-              continue;
-            }
-            break;
-
-          case 'input.staticDependency':
-            if (typeof value !== 'string' && tokenShape !== 'input.dependency') {
-              expectedStaticDependencyInputNames.push(name);
-              continue;
-            }
-            break;
-
-          case 'input':
-            if (typeof value !== 'string' && ![
-              'input',
-              'input.value',
-              'input.dependency',
-              'input.myself',
-              'input.thisProperty',
-              'input.updateValue',
-            ].includes(tokenShape)) {
-              expectedValueProvidingTokenInputNames.push(name);
-              continue;
-            }
-            break;
+        if (descriptionShape === 'input.staticValue') {
+          if (tokenShape !== 'input.value') {
+            expectedStaticValueInputNames.push(name);
+            continue;
+          }
+        } else if (descriptionShape === 'input.staticDependency') {
+          if (typeof value !== 'string' && tokenShape !== 'input.dependency') {
+            expectedStaticDependencyInputNames.push(name);
+            continue;
+          }
+        } else {
+          if (typeof value !== 'string' && ![
+            'input',
+            'input.value',
+            'input.dependency',
+            'input.myself',
+            'input.thisProperty',
+            'input.updateValue',
+          ].includes(tokenShape)) {
+            expectedValueProvidingTokenInputNames.push(name);
+            continue;
+          }
         }
 
         if (tokenShape === 'input.value') {
@@ -296,6 +367,11 @@ export function templateCompositeFrom(description) {
         }
       }
 
+      const inputAppearance = name =>
+        (isInputToken(preparedInputs[name])
+          ? `${getInputTokenShape(preparedInputs[name])}() call`
+          : `dependency name`);
+
       if (!empty(misplacedInputNames)) {
         push(new Error(`Unexpected input names: ${misplacedInputNames.join(', ')}`));
       }
@@ -304,29 +380,49 @@ export function templateCompositeFrom(description) {
         push(new Error(`Required these inputs: ${missingInputNames.join(', ')}`));
       }
 
-      const inputAppearance = name =>
-        (isInputToken(inputOptions[name])
-          ? `${getInputTokenShape(inputOptions[name])}() call`
-          : `dependency name`);
+      if (positionalInputs.length > maximumPositionalInputs) {
+        push(new Error(`Too many positional inputs provided (${positionalInputs.length} > ${maximumPositionalInputs}`));
+      }
+
+      for (const index of namedAndPositionalConflictInputPositions) {
+        const conflictingName = positionalInputNames[index];
+        push(new Error(`${name}: Provided as both named and positional (i = ${index}) input`));
+      }
 
       for (const name of expectedStaticDependencyInputNames) {
-        const appearance = inputAppearance(name);
-        push(new Error(`${name}: Expected dependency name, got ${appearance}`));
+        const appearance = inputAppearance(preparedInputs[name]);
+        const route = apparentInputRoutes[name];
+        push(new Error(`${route}: Expected dependency name, got ${appearance}`));
       }
 
       for (const name of expectedStaticValueInputNames) {
-        const appearance = inputAppearance(name)
-        push(new Error(`${name}: Expected input.value() call, got ${appearance}`));
+        const appearance = inputAppearance(preparedInputs[name]);
+        const route = apparentInputRoutes[name];
+        push(new Error(`${route}: Expected input.value() call, got ${appearance}`));
       }
 
       for (const name of expectedValueProvidingTokenInputNames) {
-        const appearance = getInputTokenShape(inputOptions[name]);
-        push(new Error(`${name}: Expected dependency name or value-providing input() call, got ${appearance}`));
+        const appearance = getInputTokenShape(preparedInputs[name]);
+        const route = apparentInputRoutes[name];
+        push(new Error(`${route}: Expected dependency name or value-providing input() call, got ${appearance}`));
       }
 
       for (const name of wrongTypeInputNames) {
-        const type = typeAppearance(inputOptions[name]);
-        push(new Error(`${name}: Expected dependency name or input() call, got ${type}`));
+        if (isConciseInputToken(namedInputs[name])) {
+          push(new Error(`${name}: Use input.value() instead of V() for named inputs`));
+        } else {
+          const type = typeAppearance(namedInputs[name]);
+          push(new Error(`${name}: Expected dependency name or input() call, got ${type}`));
+        }
+      }
+
+      for (const index of wrongTypeInputPositions) {
+        const type = typeAppearance(positionalInputs[index]);
+        if (type === 'object') {
+          push(new Error(`i = ${index}: Got object - all named dependencies must be passed together, in last argument`));
+        } else {
+          push(new Error(`i = ${index}: Expected dependency name or input() call, got ${type}`));
+        }
       }
 
       for (const error of validateFailedErrors) {
@@ -338,13 +434,13 @@ export function templateCompositeFrom(description) {
     if ('inputs' in description) {
       for (const [name, token] of Object.entries(description.inputs)) {
         const tokenValue = getInputTokenValue(token);
-        if (name in inputOptions) {
-          if (typeof inputOptions[name] === 'string') {
-            inputMapping[name] = input.dependency(inputOptions[name]);
+        if (name in preparedInputs) {
+          if (typeof preparedInputs[name] === 'string') {
+            inputMapping[name] = input.dependency(preparedInputs[name]);
           } else {
             // This is always an input token, since only a string or
             // an input token is a valid input option (asserted above).
-            inputMapping[name] = inputOptions[name];
+            inputMapping[name] = preparedInputs[name];
           }
         } else if (tokenValue.defaultValue) {
           inputMapping[name] = input.value(tokenValue.defaultValue);
