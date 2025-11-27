@@ -6,9 +6,7 @@ import {input, templateCompositeFrom} from '#composite';
 
 import {exposeDependency, raiseOutputWithoutDependency}
   from '#composite/control-flow';
-
-import withPropertyFromMainRelease
-  from './withPropertyFromMainRelease.js';
+import {withPropertyFromObject} from '#composite/data';
 
 export default templateCompositeFrom({
   annotation: `inheritFromMainRelease`,
@@ -19,12 +17,13 @@ export default templateCompositeFrom({
       mode: input.value('falsy'),
     }),
 
-    withPropertyFromMainRelease({
+    withPropertyFromObject({
+      object: 'mainReleaseTrack',
       property: input.thisProperty(),
     }),
 
     exposeDependency({
-      dependency: '#mainReleaseValue',
+      dependency: '#value',
     }),
   ],
 });
