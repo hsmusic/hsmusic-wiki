@@ -1,8 +1,11 @@
 import {input} from '#composite';
+import {transposeArrays} from '#sugar';
 import Thing from '#thing';
 import {is, isDate} from '#validators';
 import {parseDate} from '#yaml';
 
+import {withFilteredList, withMappedList, withPropertyFromList}
+  from '#composite/data';
 import {contentString, simpleDate, soupyFind, thing}
   from '#composite/wiki-properties';
 
@@ -18,10 +21,7 @@ import {
 import {
   contentArtists,
   hasAnnotationPart,
-  withAnnotationParts,
-  withHasAnnotationPart,
-  withSourceText,
-  withSourceURLs,
+  withAnnotationPartNodeLists,
   withWebArchiveDate,
 } from '#composite/things/content';
 
@@ -116,21 +116,126 @@ export class ContentEntry extends Thing {
     ],
 
     annotationParts: [
-      withAnnotationParts({
-        mode: input.value('strings'),
+      withAnnotationPartNodeLists(),
+
+      {
+        dependencies: ['#annotationPartNodeLists'],
+        compute: (continuation, {
+          ['#annotationPartNodeLists']: nodeLists,
+        }) => continuation({
+          ['#firstNodes']:
+            nodeLists.map(list => list.at(0)),
+
+          ['#lastNodes']:
+            nodeLists.map(list => list.at(-1)),
+        }),
+      },
+
+      withPropertyFromList({
+        list: '#firstNodes',
+        property: input.value('i'),
+      }).outputs({
+        '#firstNodes.i': '#startIndices',
       }),
 
-      exposeDependency({dependency: '#annotationParts'}),
+      withPropertyFromList({
+        list: '#lastNodes',
+        property: input.value('iEnd'),
+      }).outputs({
+        '#lastNodes.iEnd': '#endIndices',
+      }),
+
+      {
+        dependencies: [
+          'annotation',
+          '#startIndices',
+          '#endIndices',
+        ],
+
+        compute: ({
+          ['annotation']: annotation,
+          ['#startIndices']: startIndices,
+          ['#endIndices']: endIndices,
+        }) =>
+          transposeArrays([startIndices, endIndices])
+            .map(([start, end]) =>
+              annotation.slice(start, end)),
+      },
     ],
 
     sourceText: [
-      withSourceText(),
-      exposeDependency({dependency: '#sourceText'}),
+      withAnnotationPartNodeLists(),
+
+      {
+        dependencies: ['#annotationPartNodeLists'],
+        compute: (continuation, {
+          ['#annotationPartNodeLists']: nodeLists,
+        }) => continuation({
+          ['#firstPartWithExternalLink']:
+            nodeLists
+              .find(nodes => nodes
+                .some(node => node.type === 'external-link')) ??
+            null,
+        }),
+      },
+
+      exitWithoutDependency({
+        dependency: '#firstPartWithExternalLink',
+      }),
+
+      {
+        dependencies: ['annotation', '#firstPartWithExternalLink'],
+        compute: ({
+          ['annotation']: annotation,
+          ['#firstPartWithExternalLink']: nodes,
+        }) =>
+          annotation.slice(
+            nodes.at(0).i,
+            nodes.at(-1).iEnd),
+      },
     ],
 
     sourceURLs: [
-      withSourceURLs(),
-      exposeDependency({dependency: '#sourceURLs'}),
+      withAnnotationPartNodeLists(),
+
+      {
+        dependencies: ['#annotationPartNodeLists'],
+        compute: (continuation, {
+          ['#annotationPartNodeLists']: nodeLists,
+        }) => continuation({
+          ['#firstPartWithExternalLink']:
+            nodeLists
+              .find(nodes => nodes
+                .some(node => node.type === 'external-link')) ??
+            null,
+        }),
+      },
+
+      exitWithoutDependency({
+        dependency: '#firstPartWithExternalLink',
+        value: input.value([]),
+      }),
+
+      withMappedList({
+        list: '#firstPartWithExternalLink',
+        map: input.value(node => node.type === 'external-link'),
+      }).outputs({
+        '#mappedList': '#externalLinkFilter',
+      }),
+
+      withFilteredList({
+        list: '#firstPartWithExternalLink',
+        filter: '#externalLinkFilter',
+      }),
+
+      withMappedList({
+        list: '#filteredList',
+        map: input.value(node => node.data.href),
+      }),
+
+      exposeDependency({
+        dependency: '#mappedList',
+      }),
     ],
   });
 
@@ -196,12 +301,8 @@ export class LyricsEntry extends ContentEntry {
     }),
 
     hasSquareBracketAnnotations: [
-      withHasAnnotationPart({
-        part: input.value('wiki lyrics'),
-      }),
-
       exitWithoutDependency({
-        dependency: '#hasAnnotationPart',
+        dependency: 'isWikiLyrics',
         mode: input.value('falsy'),
         value: input.value(false),
       }),

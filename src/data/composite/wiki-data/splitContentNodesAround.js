@@ -2,6 +2,7 @@ import {input, templateCompositeFrom} from '#composite';
 import {splitContentNodesAround} from '#replacer';
 import {anyOf, isFunction, validateInstanceOf} from '#validators';
 
+import {withAvailabilityFilter} from '#composite/control-flow';
 import {withFilteredList, withMappedList, withUnflattenedList}
   from '#composite/data';
 
@@ -82,6 +83,18 @@ export default templateCompositeFrom({
       indices: '#unflattenIndices',
     }).outputs({
       '#unflattenedList': '#contentNodeLists',
+    }),
+
+    withAvailabilityFilter({
+      from: '#contentNodeLists',
+      mode: input.value('empty'),
+    }),
+
+    withFilteredList({
+      list: '#contentNodeLists',
+      filter: '#availabilityFilter',
+    }).outputs({
+      '#filteredList': '#contentNodeLists',
     }),
   ],
 });

@@ -1,9 +1,5 @@
 import {input, templateCompositeFrom} from '#composite';
 
-import {exposeDependency} from '#composite/control-flow';
-
-import withHasAnnotationPart from './withHasAnnotationPart.js';
-
 export default templateCompositeFrom({
   annotation: `hasAnnotationPart`,
 
@@ -14,12 +10,16 @@ export default templateCompositeFrom({
   },
 
   steps: () => [
-    withHasAnnotationPart({
-      part: input('part'),
-    }),
+    {
+      dependencies: [input('part'), 'annotationParts'],
 
-    exposeDependency({
-      dependency: '#hasAnnotationPart',
-    }),
+      compute: ({
+        [input('part')]: search,
+        ['annotationParts']: parts,
+      }) =>
+          parts.some(part =>
+            part.toLowerCase() ===
+            search.toLowerCase()),
+    },
   ],
 });
