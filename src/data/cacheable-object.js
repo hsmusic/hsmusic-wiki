@@ -148,9 +148,9 @@ export default class CacheableObject {
 
         for (const dependency of dependenciesOf(property, propertyDescriptors)) {
           if (dependantsMap[dependency]) {
-            dependantsMap[dependency].push(dependency);
+            dependantsMap[dependency].push(property);
           } else {
-            dependantsMap[dependency] = [dependency];
+            dependantsMap[dependency] = [property];
           }
         }
       }
