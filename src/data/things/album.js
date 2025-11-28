@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import {inspect} from 'node:util';
 
 import {colors} from '#cli';
-import {input} from '#composite';
+import {input, V} from '#composite';
 import {traverse} from '#node-utils';
 import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {empty} from '#sugar';
@@ -33,6 +33,8 @@ import {
   parseWallpaperParts,
 } from '#yaml';
 
+import {withResolvedContribs} from '#composite/wiki-data';
+
 import {
   exitWithoutDependency,
   exposeConstant,
@@ -50,24 +52,17 @@ import {
 } from '#composite/data';
 
 import {
-  exitWithoutArtwork,
-  withDirectory,
-  withHasArtwork,
-  withResolvedContribs,
-} from '#composite/wiki-data';
-
-import {
   color,
   commentatorArtists,
   constitutibleArtwork,
   constitutibleArtworkList,
   contentString,
-  contribsPresent,
   contributionList,
   dimensions,
   directory,
   fileExtension,
   flag,
+  hasArtwork,
   name,
   referencedArtworkList,
   referenceList,
@@ -119,11 +114,7 @@ export class Album extends Thing {
         validate: input.value(isDirectory),
       }),
 
-      withDirectory(),
-
-      exposeDependency({
-        dependency: '#directory',
-      }),
+      exposeDependency('directory'),
     ],
 
     alwaysReferenceByDirectory: flag(false),
@@ -138,9 +129,7 @@ export class Album extends Thing {
         ])),
       }),
 
-      exposeConstant({
-        value: input.value('album'),
-      }),
+      exposeConstant(V('album')),
     ],
 
     bandcampAlbumIdentifier: simpleString(),
@@ -172,10 +161,7 @@ export class Album extends Thing {
         '#resolvedContribs': '#trackArtistContribs',
       }),
 
-      exposeDependencyOrContinue({
-        dependency: '#trackArtistContribs',
-        mode: input.value('empty'),
-      }),
+      exposeDependencyOrContinue('#trackArtistContribs', V('empty')),
 
       withResolvedContribs({
         from: '_artistContribs',
@@ -186,7 +172,7 @@ export class Album extends Thing {
         '#resolvedContribs': '#trackArtistContribs',
       }),
 
-      exposeDependency({dependency: '#trackArtistContribs'}),
+      exposeDependency('#trackArtistContribs'),
     ],
 
     // > Update & expose - General configuration
@@ -210,10 +196,9 @@ export class Album extends Thing {
     // > Update & expose - Artworks
 
     coverArtworks: [
-      exitWithoutArtwork({
-        contribs: '_coverArtistContribs',
-        artworks: '_coverArtworks',
+      exitWithoutDependency('hasCoverArt', {
         value: input.value([]),
+        mode: input.value('falsy'),
       }),
 
       constitutibleArtworkList.fromYAMLFieldSpec
@@ -226,13 +211,8 @@ export class Album extends Thing {
     }),
 
     coverArtDate: [
-      withHasArtwork({
-        contribs: '_coverArtistContribs',
-        artworks: '_coverArtworks',
-      }),
-
-      exitWithoutDependency({
-        dependency: '#hasArtwork',
+      exitWithoutDependency('hasCoverArt', {
+        value: input.value(null),
         mode: input.value('falsy'),
       }),
 
@@ -240,34 +220,31 @@ export class Album extends Thing {
         validate: input.value(isDate),
       }),
 
-      exposeDependency({
-        dependency: 'date',
-      }),
+      exposeDependency('date'),
     ],
 
     coverArtFileExtension: [
-      exitWithoutArtwork({
-        contribs: '_coverArtistContribs',
-        artworks: '_coverArtworks',
+      exitWithoutDependency('hasCoverArt', {
+        value: input.value(null),
+        mode: input.value('falsy'),
       }),
 
       fileExtension('jpg'),
     ],
 
     coverArtDimensions: [
-      exitWithoutArtwork({
-        contribs: '_coverArtistContribs',
-        artworks: '_coverArtworks',
+      exitWithoutDependency('hasCoverArt', {
+        value: input.value(null),
+        mode: input.value('falsy'),
       }),
 
       dimensions(),
     ],
 
     artTags: [
-      exitWithoutArtwork({
-        contribs: '_coverArtistContribs',
-        artworks: '_coverArtworks',
+      exitWithoutDependency('hasCoverArt', {
         value: input.value([]),
+        mode: input.value('falsy'),
       }),
 
       referenceList({
@@ -277,10 +254,9 @@ export class Album extends Thing {
     ],
 
     referencedArtworks: [
-      exitWithoutArtwork({
-        contribs: '_coverArtistContribs',
-        artworks: '_coverArtworks',
+      exitWithoutDependency('hasCoverArt', {
         value: input.value([]),
+        mode: input.value('falsy'),
       }),
 
       referencedArtworkList(),
@@ -289,7 +265,7 @@ export class Album extends Thing {
     trackCoverArtistContribs: contributionList({
       // May be null, indicating cover art was added for tracks on the date
       // each track specifies, or else the track's own release date.
-      date: '_trackArtDate',
+      date: 'trackArtDate',
 
       // This is the "correct" value, but it gets overwritten - with the same
       // value - regardless.
@@ -303,10 +279,9 @@ export class Album extends Thing {
     trackDimensions: dimensions(),
 
     wallpaperArtwork: [
-      exitWithoutDependency({
-        dependency: '_wallpaperArtistContribs',
-        mode: input.value('empty'),
+      exitWithoutDependency('hasWallpaperArt', {
         value: input.value(null),
+        mode: input.value('falsy'),
       }),
 
       constitutibleArtwork.fromYAMLFieldSpec
@@ -319,39 +294,36 @@ export class Album extends Thing {
     }),
 
     wallpaperFileExtension: [
-      exitWithoutArtwork({
-        contribs: '_wallpaperArtistContribs',
-        artwork: '_wallpaperArtwork',
+      exitWithoutDependency('hasWallpaperArt', {
+        value: input.value(null),
+        mode: input.value('falsy'),
       }),
 
       fileExtension('jpg'),
     ],
 
     wallpaperStyle: [
-      exitWithoutArtwork({
-        contribs: '_wallpaperArtistContribs',
-        artwork: '_wallpaperArtwork',
+      exitWithoutDependency('hasWallpaperArt', {
+        value: input.value(null),
+        mode: input.value('falsy'),
       }),
 
       simpleString(),
     ],
 
     wallpaperParts: [
-      // kinda nonsensical or at least unlikely lol, but y'know
-      exitWithoutArtwork({
-        contribs: '_wallpaperArtistContribs',
-        artwork: '_wallpaperArtwork',
+      exitWithoutDependency('hasWallpaperArt', {
         value: input.value([]),
+        mode: input.value('falsy'),
       }),
 
       wallpaperParts(),
     ],
 
     bannerArtwork: [
-      exitWithoutDependency({
-        dependency: '_bannerArtistContribs',
-        mode: input.value('empty'),
+      exitWithoutDependency('hasBannerArt', {
         value: input.value(null),
+        mode: input.value('falsy'),
       }),
 
       constitutibleArtwork.fromYAMLFieldSpec
@@ -364,27 +336,27 @@ export class Album extends Thing {
     }),
 
     bannerFileExtension: [
-      exitWithoutArtwork({
-        contribs: '_bannerArtistContribs',
-        artwork: '_bannerArtwork',
+      exitWithoutDependency('hasBannerArt', {
+        value: input.value(null),
+        mode: input.value('falsy'),
       }),
 
       fileExtension('jpg'),
     ],
 
     bannerDimensions: [
-      exitWithoutArtwork({
-        contribs: '_bannerArtistContribs',
-        artwork: '_bannerArtwork',
+      exitWithoutDependency('hasBannerArt', {
+        value: input.value(null),
+        mode: input.value('falsy'),
       }),
 
       dimensions(),
     ],
 
     bannerStyle: [
-      exitWithoutArtwork({
-        contribs: '_bannerArtistContribs',
-        artwork: '_bannerArtwork',
+      exitWithoutDependency('hasBannerArt', {
+        value: input.value(null),
+        mode: input.value('falsy'),
       }),
 
       simpleString(),
@@ -430,44 +402,31 @@ export class Album extends Thing {
 
     // > Expose only
 
-    isAlbum: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isAlbum: exposeConstant(V(true)),
 
     commentatorArtists: commentatorArtists(),
 
-    hasCoverArt: [
-      withHasArtwork({
-        contribs: '_coverArtistContribs',
-        artworks: '_coverArtworks',
-      }),
+    hasCoverArt: hasArtwork({
+      contribs: '_coverArtistContribs',
+      artworks: '_coverArtworks',
+    }),
 
-      exposeDependency({dependency: '#hasArtwork'}),
-    ],
+    hasWallpaperArt: hasArtwork({
+      contribs: '_wallpaperArtistContribs',
+      artwork: '_wallpaperArtwork',
+    }),
 
-    hasWallpaperArt: contribsPresent({contribs: '_wallpaperArtistContribs'}),
-    hasBannerArt: contribsPresent({contribs: '_bannerArtistContribs'}),
+    hasBannerArt: hasArtwork({
+      contribs: '_bannerArtistContribs',
+      artwork: '_bannerArtwork',
+    }),
 
     tracks: [
-      exitWithoutDependency({
-        dependency: 'trackSections',
-        value: input.value([]),
-      }),
+      exitWithoutDependency('trackSections', V([])),
 
-      withPropertyFromList({
-        list: 'trackSections',
-        property: input.value('tracks'),
-      }),
-
-      withFlattenedList({
-        list: '#trackSections.tracks',
-      }),
-
-      exposeDependency({
-        dependency: '#flattenedList',
-      }),
+      withPropertyFromList('trackSections', V('tracks')),
+      withFlattenedList('#trackSections.tracks'),
+      exposeDependency('#flattenedList'),
     ],
   });
 
@@ -1126,17 +1085,11 @@ export class TrackSection extends Thing {
         property: input.value('directory'),
       }),
 
-      withDirectory({
-        directory: '_unqualifiedDirectory',
-      }).outputs({
-        '#directory': '#unqualifiedDirectory',
-      }),
-
       {
-        dependencies: ['#album.directory', '#unqualifiedDirectory'],
+        dependencies: ['#album.directory', 'unqualifiedDirectory'],
         compute: ({
           ['#album.directory']: albumDirectory,
-          ['#unqualifiedDirectory']: unqualifiedDirectory,
+          ['unqualifiedDirectory']: unqualifiedDirectory,
         }) =>
           albumDirectory + '/' + unqualifiedDirectory,
       },

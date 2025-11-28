@@ -248,10 +248,7 @@ export class Track extends Thing {
             : null),
       },
 
-      withPropertyFromObject({
-        object: '#matchingAlbum',
-        property: input.value('tracks'),
-      }),
+      withPropertyFromObject( '#matchingAlbum', V('tracks')),
 
       {
         dependencies: [
@@ -285,14 +282,8 @@ export class Track extends Thing {
         validate: input.value(isContentString),
       }),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('trackArtistText'),
-      }),
-
-      exposeDependency({
-        dependency: '#album.trackArtistText',
-      }),
+      withPropertyFromObject('album', V('trackArtistText')),
+      exposeDependency('#album.trackArtistText'),
     ],
 
     artistTextInLists: [
@@ -316,19 +307,13 @@ export class Track extends Thing {
         '#resolvedContribs': '#artistContribs',
       }),
 
-      exposeDependencyOrContinue({
-        dependency: '#artistContribs',
-        mode: input.value('empty'),
-      }),
+      exposeDependencyOrContinue('#artistContribs', V('empty')),
 
       // Specifically inherit artist contributions later than artist contribs.
       // Secondary releases' artists may differ from the main release.
       inheritContributionListFromMainRelease(),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('trackArtistContribs'),
-      }),
+      withPropertyFromObject('album', V('trackArtistContribs')),
 
       withRecontextualizedContributionList({
         list: '#album.trackArtistContribs',
@@ -340,7 +325,7 @@ export class Track extends Thing {
         date: 'date',
       }),
 
-      exposeDependency({dependency: '#album.trackArtistContribs'}),
+      exposeDependency('#album.trackArtistContribs'),
     ],
 
     contributorContribs: [
@@ -359,12 +344,8 @@ export class Track extends Thing {
         validate: input.value(isBoolean),
       }),
 
-      withPropertyFromObject({
-        object: 'trackSection',
-        property: input.value('countTracksInArtistTotals'),
-      }),
-
-      exposeDependency({dependency: '#trackSection.countTracksInArtistTotals'}),
+      withPropertyFromObject('trackSection', V('countTracksInArtistTotals')),
+      exposeDependency('#trackSection.countTracksInArtistTotals'),
     ],
 
     disableUniqueCoverArt: flag(),
@@ -379,19 +360,11 @@ export class Track extends Thing {
         validate: input.value(isColor),
       }),
 
-      withPropertyFromObject({
-        object: 'trackSection',
-        property: input.value('color'),
-      }),
+      withPropertyFromObject('trackSection', V('color')),
+      exposeDependencyOrContinue('#trackSection.color'),
 
-      exposeDependencyOrContinue({dependency: '#trackSection.color'}),
-
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('color'),
-      }),
-
-      exposeDependency({dependency: '#album.color'}),
+      withPropertyFromObject('album', V('color')),
+      exposeDependency('#album.color'),
     ],
 
     needsLyrics: [
@@ -400,16 +373,12 @@ export class Track extends Thing {
         validate: input.value(isBoolean),
       }),
 
-      exitWithoutDependency({
-        dependency: '_lyrics',
-        mode: input.value('empty'),
+      exitWithoutDependency('_lyrics', {
         value: input.value(false),
+        mode: input.value('empty'),
       }),
 
-      withPropertyFromList({
-        list: '_lyrics',
-        property: input.value('helpNeeded'),
-      }),
+      withPropertyFromList('_lyrics', V('helpNeeded')),
 
       {
         dependencies: ['#lyrics.helpNeeded'],
@@ -425,10 +394,9 @@ export class Track extends Thing {
     // > Update & expose - Artworks
 
     trackArtworks: [
-      exitWithoutDependency({
-        dependency: 'hasUniqueCoverArt',
-        mode: input.value('falsy'),
+      exitWithoutDependency('hasUniqueCoverArt', {
         value: input.value([]),
+        mode: input.value('falsy'),
       }),
 
       constitutibleArtworkList.fromYAMLFieldSpec
@@ -436,10 +404,9 @@ export class Track extends Thing {
     ],
 
     coverArtistContribs: [
-      exitWithoutDependency({
-        dependency: 'hasUniqueCoverArt',
-        mode: input.value('falsy'),
+      exitWithoutDependency('hasUniqueCoverArt', {
         value: input.value([]),
+        mode: input.value('falsy'),
       }),
 
       withResolvedContribs({
@@ -449,15 +416,9 @@ export class Track extends Thing {
         date: 'coverArtDate',
       }),
 
-      exposeDependencyOrContinue({
-        dependency: '#resolvedContribs',
-        mode: input.value('empty'),
-      }),
+      exposeDependencyOrContinue('#resolvedContribs', V('empty')),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('trackCoverArtistContribs'),
-      }),
+      withPropertyFromObject('album', V('trackCoverArtistContribs')),
 
       withRecontextualizedContributionList({
         list: '#album.trackCoverArtistContribs',
@@ -469,14 +430,12 @@ export class Track extends Thing {
         date: 'coverArtDate',
       }),
 
-      exposeDependency({
-        dependency: '#album.trackCoverArtistContribs',
-      }),
+      exposeDependency('#album.trackCoverArtistContribs'),
     ],
 
     coverArtDate: [
-      exitWithoutDependency({
-        dependency: 'hasUniqueCoverArt',
+      exitWithoutDependency('hasUniqueCoverArt', {
+        value: input.value(null),
         mode: input.value('falsy'),
       }),
 
@@ -484,23 +443,15 @@ export class Track extends Thing {
         validate: input.value(isDate),
       }),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('trackArtDate'),
-      }),
+      withPropertyFromObject('album', V('trackArtDate')),
+      exposeDependencyOrContinue('#album.trackArtDate'),
 
-      exposeDependencyOrContinue({
-        dependency: '#album.trackArtDate',
-      }),
-
-      exposeDependency({
-        dependency: 'date',
-      }),
+      exposeDependency('date'),
     ],
 
     coverArtFileExtension: [
-      exitWithoutDependency({
-        dependency: 'hasUniqueCoverArt',
+      exitWithoutDependency('hasUniqueCoverArt', {
+        value: input.value(null),
         mode: input.value('falsy'),
       }),
 
@@ -508,41 +459,30 @@ export class Track extends Thing {
         validate: input.value(isFileExtension),
       }),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('trackCoverArtFileExtension'),
-      }),
+      withPropertyFromObject('album', V('trackCoverArtFileExtension')),
+      exposeDependencyOrContinue('#album.trackCoverArtFileExtension'),
 
-      exposeDependencyOrContinue({dependency: '#album.trackCoverArtFileExtension'}),
-
-      exposeConstant({
-        value: input.value('jpg'),
-      }),
+      exposeConstant(V('jpg')),
     ],
 
     coverArtDimensions: [
-      exitWithoutDependency({
-        dependency: 'hasUniqueCoverArt',
+      exitWithoutDependency('hasUniqueCoverArt', {
+        value: input.value(null),
         mode: input.value('falsy'),
       }),
 
       exposeUpdateValueOrContinue(),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('trackDimensions'),
-      }),
-
-      exposeDependencyOrContinue({dependency: '#album.trackDimensions'}),
+      withPropertyFromObject('album', V('trackDimensions')),
+      exposeDependencyOrContinue('#album.trackDimensions'),
 
       dimensions(),
     ],
 
     artTags: [
-      exitWithoutDependency({
-        dependency: 'hasUniqueCoverArt',
-        mode: input.value('falsy'),
+      exitWithoutDependency('hasUniqueCoverArt', {
         value: input.value([]),
+        mode: input.value('falsy'),
       }),
 
       referenceList({
@@ -552,10 +492,9 @@ export class Track extends Thing {
     ],
 
     referencedArtworks: [
-      exitWithoutDependency({
-        dependency: 'hasUniqueCoverArt',
-        mode: input.value('falsy'),
+      exitWithoutDependency('hasUniqueCoverArt', {
         value: input.value([]),
+        mode: input.value('falsy'),
       }),
 
       referencedArtworkList(),
@@ -646,28 +585,18 @@ export class Track extends Thing {
 
     // > Expose only
 
-    isTrack: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isTrack: exposeConstant(V(true)),
 
     commentatorArtists: commentatorArtists(),
 
     directorySuffix: [
-      exitWithoutDependency({
-        dependency: 'suffixDirectoryFromAlbum',
+      exitWithoutDependency('suffixDirectoryFromAlbum', {
+        value: input.value(null),
         mode: input.value('falsy'),
       }),
 
-      withPropertyFromObject({
-        object: 'trackSection',
-        property: input.value('directorySuffix'),
-      }),
-
-      exposeDependency({
-        dependency: '#trackSection.directorySuffix',
-      }),
+      withPropertyFromObject('trackSection', V('directorySuffix')),
+      exposeDependency('#trackSection.directorySuffix'),
     ],
 
     date: [
@@ -679,43 +608,21 @@ export class Track extends Thing {
             : continuation()),
       },
 
-      exposeDependencyOrContinue({
-        dependency: 'dateFirstReleased',
-      }),
+      exposeDependencyOrContinue('dateFirstReleased'),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('date'),
-      }),
-
-      exposeDependency({
-        dependency: '#album.date',
-      }),
+      withPropertyFromObject('album', V('date')),
+      exposeDependency('#album.date'),
     ],
 
     trackNumber: [
       // Zero is the fallback, not one, but in most albums the first track
       // (and its intended output by this composition) will be one.
-      exitWithoutDependency({
-        dependency: 'trackSection',
-        value: input.value(0),
-      }),
 
-      withPropertiesFromObject({
-        object: 'trackSection',
-        properties: input.value(['tracks', 'startCountingFrom']),
-      }),
+      exitWithoutDependency('trackSection', V(0)),
+      withPropertiesFromObject('trackSection', V(['tracks', 'startCountingFrom'])),
 
-      withIndexInList({
-        list: '#trackSection.tracks',
-        item: input.myself(),
-      }),
-
-      exitWithoutDependency({
-        dependency: '#index',
-        value: input.value(0),
-        mode: input.value('index'),
-      }),
+      withIndexInList('#trackSection.tracks', input.myself()),
+      exitWithoutDependency('#index', V(0), V('index')),
 
       {
         dependencies: ['#trackSection.startCountingFrom', '#index'],
@@ -762,8 +669,7 @@ export class Track extends Thing {
             : continuation()),
       },
 
-      withPropertyFromObject({
-        object: 'album',
+      withPropertyFromObject('album', {
         property: input.value('trackCoverArtistContribs'),
         internal: input.value(true),
       }),
@@ -783,61 +689,43 @@ export class Track extends Thing {
             : continuation()),
       },
 
-      exitWithoutDependency({
-        dependency: '_trackArtworks',
-        mode: input.value('empty'),
+      exitWithoutDependency('_trackArtworks', {
         value: input.value(false),
+        mode: input.value('empty'),
       }),
 
-      withPropertyFromList({
-        list: '_trackArtworks',
+      withPropertyFromList('_trackArtworks', {
         property: input.value('artistContribs'),
         internal: input.value(true),
       }),
 
       // Since we're getting the update value for each artwork's artistContribs,
       // it may not be set at all, and in that case won't be exposing as [].
-      fillMissingListItems({
-        list: '#trackArtworks.artistContribs',
-        fill: input.value([]),
-      }),
+      fillMissingListItems('#trackArtworks.artistContribs', V([])),
 
-      withFlattenedList({
-        list: '#trackArtworks.artistContribs',
-      }),
+      withFlattenedList('#trackArtworks.artistContribs'),
 
-      withResultOfAvailabilityCheck({
-        from: '#flattenedList',
+      exposeWhetherDependencyAvailable({
+        dependency: '#flattenedList',
         mode: input.value('empty'),
-      }),
-
-      exposeDependency({
-        dependency: '#availability',
       }),
     ],
 
-    isMainRelease: [
+    isMainRelease:
       exposeWhetherDependencyAvailable({
         dependency: 'mainReleaseTrack',
         negate: input.value(true),
       }),
-    ],
 
-    isSecondaryRelease: [
+    isSecondaryRelease:
       exposeWhetherDependencyAvailable({
         dependency: 'mainReleaseTrack',
       }),
-    ],
 
     mainReleaseTrack: [
-      exitWithoutDependency({
-        dependency: 'mainRelease',
-      }),
+      exitWithoutDependency('mainRelease'),
 
-      withPropertyFromObject({
-        object: 'mainRelease',
-        property: input.value('isTrack'),
-      }),
+      withPropertyFromObject('mainRelease', V('isTrack')),
 
       {
         dependencies: ['mainRelease', '#mainRelease.isTrack'],
@@ -878,20 +766,14 @@ export class Track extends Thing {
         },
       },
 
-      withPropertyFromObject({
-        object: 'mainRelease',
-        property: input.value('tracks'),
-      }),
+      withPropertyFromObject('mainRelease', V('tracks')),
 
-      withPropertyFromList({
-        list: '#mainRelease.tracks',
+      withPropertyFromList('#mainRelease.tracks', {
         property: input.value('mainRelease'),
         internal: input.value(true),
       }),
 
-      withAvailabilityFilter({
-        from: '#mainRelease.tracks.mainRelease',
-      }),
+      withAvailabilityFilter({from: '#mainRelease.tracks.mainRelease'}),
 
       withMappedList({
         list: '#availabilityFilter',
@@ -900,79 +782,39 @@ export class Track extends Thing {
         '#mappedList': '#availabilityFilter',
       }),
 
-      withFilteredList({
-        list: '#mainRelease.tracks',
-        filter: '#availabilityFilter',
-      }).outputs({
-        '#filteredList': '#mainRelease.tracks',
-      }),
+      withFilteredList('#mainRelease.tracks', '#availabilityFilter')
+        .outputs({'#filteredList': '#mainRelease.tracks'}),
 
-      withPropertyFromList({
-        list: '#mainRelease.tracks',
-        property: input.value('name'),
-      }),
+      withPropertyFromList('#mainRelease.tracks', V('name')),
 
-      withPropertyFromList({
-        list: '#mainRelease.tracks',
+      withPropertyFromList('#mainRelease.tracks', {
         property: input.value('directory'),
         internal: input.value(true),
       }),
 
-      withMappedList({
-        list: '#mainRelease.tracks.name',
-        map: '#mapItsNameLikeName',
-      }).outputs({
-        '#mappedList': '#filterItsNameLikeName',
-      }),
+      withMappedList('#mainRelease.tracks.name', '#mapItsNameLikeName')
+        .outputs({'#mappedList': '#filterItsNameLikeName'}),
 
-      withMappedList({
-        list: '#mainRelease.tracks.directory',
-        map: '#mapItsDirectoryLikeDirectory',
-      }).outputs({
-        '#mappedList': '#filterItsDirectoryLikeDirectory',
-      }),
+      withMappedList('#mainRelease.tracks.directory', '#mapItsDirectoryLikeDirectory')
+        .outputs({'#mappedList': '#filterItsDirectoryLikeDirectory'}),
 
-      withMappedList({
-        list: '#mainRelease.tracks.name',
-        map: '#mapItsNameLikeDirectory',
-      }).outputs({
-        '#mappedList': '#filterItsNameLikeDirectory',
-      }),
+      withMappedList('#mainRelease.tracks.name', '#mapItsNameLikeDirectory')
+        .outputs({'#mappedList': '#filterItsNameLikeDirectory'}),
 
-      withMappedList({
-        list: '#mainRelease.tracks.directory',
-        map: '#mapItsDirectoryLikeName',
-      }).outputs({
-        '#mappedList': '#filterItsDirectoryLikeName',
-      }),
+      withMappedList('#mainRelease.tracks.directory', '#mapItsDirectoryLikeName')
+        .outputs({'#mappedList': '#filterItsDirectoryLikeName'}),
 
-      withFilteredList({
-        list: '#mainRelease.tracks',
-        filter: '#filterItsNameLikeName',
-      }).outputs({
-        '#filteredList': '#matchingItsNameLikeName',
-      }),
+      withFilteredList('#mainRelease.tracks', '#filterItsNameLikeName')
+        .outputs({'#filteredList': '#matchingItsNameLikeName'}),
 
-      withFilteredList({
-        list: '#mainRelease.tracks',
-        filter: '#filterItsDirectoryLikeDirectory',
-      }).outputs({
-        '#filteredList': '#matchingItsDirectoryLikeDirectory',
-      }),
+      withFilteredList('#mainRelease.tracks', '#filterItsDirectoryLikeDirectory')
+        .outputs({'#filteredList': '#matchingItsDirectoryLikeDirectory'}),
 
-      withFilteredList({
-        list: '#mainRelease.tracks',
-        filter: '#filterItsNameLikeDirectory',
-      }).outputs({
-        '#filteredList': '#matchingItsNameLikeDirectory',
-      }),
+      withFilteredList('#mainRelease.tracks', '#filterItsNameLikeDirectory')
+        .outputs({'#filteredList': '#matchingItsNameLikeDirectory'}),
 
-      withFilteredList({
-        list: '#mainRelease.tracks',
-        filter: '#filterItsDirectoryLikeName',
-      }).outputs({
-        '#filteredList': '#matchingItsDirectoryLikeName',
-      }),
+      withFilteredList('#mainRelease.tracks', '#filterItsDirectoryLikeName')
+        .outputs({'#filteredList': '#matchingItsDirectoryLikeName'}),
 
       {
         dependencies: [
@@ -1065,30 +907,15 @@ export class Track extends Thing {
     ],
 
     commentaryFromMainRelease: [
-      exitWithoutDependency({
-        dependency: 'mainReleaseTrack',
-        value: input.value([]),
-      }),
+      exitWithoutDependency('mainReleaseTrack', V([])),
 
-      withPropertyFromObject({
-        object: 'mainReleaseTrack',
-        property: input.value('commentary'),
-      }),
-
-      exposeDependency({
-        dependency: '#mainReleaseTrack.commentary',
-      }),
+      withPropertyFromObject('mainReleaseTrack', V('commentary')),
+      exposeDependency('#mainReleaseTrack.commentary'),
     ],
 
     groups: [
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('groups'),
-      }),
-
-      exposeDependency({
-        dependency: '#album.groups',
-      }),
+      withPropertyFromObject('album', V('groups')),
+      exposeDependency('#album.groups'),
     ],
 
     followingProductionTracks: reverseReferenceList({

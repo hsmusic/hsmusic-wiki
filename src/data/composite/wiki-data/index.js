@@ -7,7 +7,6 @@
 export {default as constituteFrom} from './constituteFrom.js';
 export {default as constituteOrContinue} from './constituteOrContinue.js';
 export {default as exitWithoutContribs} from './exitWithoutContribs.js';
-export {default as exitWithoutArtwork} from './exitWithoutArtwork.js';
 export {default as gobbleSoupyFind} from './gobbleSoupyFind.js';
 export {default as gobbleSoupyReverse} from './gobbleSoupyReverse.js';
 export {default as inputFindOptions} from './inputFindOptions.js';
@@ -21,7 +20,6 @@ export {default as withConstitutedArtwork} from './withConstitutedArtwork.js';
 export {default as withContentNodes} from './withContentNodes.js';
 export {default as withContributionListSums} from './withContributionListSums.js';
 export {default as withDirectory} from './withDirectory.js';
-export {default as withHasArtwork} from './withHasArtwork.js';
 export {default as withRecontextualizedContributionList} from './withRecontextualizedContributionList.js';
 export {default as withRedatedContributionList} from './withRedatedContributionList.js';
 export {default as withResolvedAnnotatedReferenceList} from './withResolvedAnnotatedReferenceList.js';

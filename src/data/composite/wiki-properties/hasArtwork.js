@@ -1,13 +1,17 @@
-import {input, templateCompositeFrom} from '#composite';
+import {input, templateCompositeFrom, V} from '#composite';
 import {isContributionList, isThing, strictArrayOf} from '#validators';
 
-import {raiseOutputWithoutDependency, withResultOfAvailabilityCheck}
-  from '#composite/control-flow';
 import {fillMissingListItems, withFlattenedList, withPropertyFromList}
   from '#composite/data';
 
+import {
+  exitWithoutDependency,
+  exposeWhetherDependencyAvailable,
+  withResultOfAvailabilityCheck,
+} from '#composite/control-flow';
+
 export default templateCompositeFrom({
-  annotation: 'withHasArtwork',
+  annotation: 'hasArtwork',
 
   inputs: {
     contribs: input({
@@ -26,7 +30,7 @@ export default templateCompositeFrom({
     }),
   },
 
-  outputs: ['#hasArtwork'],
+  compose: false,
 
   steps: () => [
     withResultOfAvailabilityCheck({
@@ -40,9 +44,7 @@ export default templateCompositeFrom({
         ['#availability']: availability,
       }) =>
         (availability
-          ? continuation.raiseOutput({
-              ['#hasArtwork']: true,
-            })
+          ? true
           : continuation()),
     },
 
@@ -64,34 +66,25 @@ export default templateCompositeFrom({
         }),
     },
 
-    raiseOutputWithoutDependency({
-      dependency: '#artworks',
+    exitWithoutDependency('#artworks', {
+      value: input.value(false),
       mode: input.value('empty'),
-      output: input.value({'#hasArtwork': false}),
     }),
 
-    withPropertyFromList({
-      list: '#artworks',
+    withPropertyFromList('#artworks', {
       property: input.value('artistContribs'),
       internal: input.value(true),
     }),
 
     // Since we're getting the update value for each artwork's artistContribs,
     // it may not be set at all, and in that case won't be exposing as [].
-    fillMissingListItems({
-      list: '#artworks.artistContribs',
-      fill: input.value([]),
-    }),
+    fillMissingListItems('#artworks.artistContribs', V([])),
 
-    withFlattenedList({
-      list: '#artworks.artistContribs',
-    }),
+    withFlattenedList('#artworks.artistContribs'),
 
-    withResultOfAvailabilityCheck({
-      from: '#flattenedList',
+    exposeWhetherDependencyAvailable({
+      dependency: '#flattenedList',
       mode: input.value('empty'),
-    }).outputs({
-      '#availability': '#hasArtwork',
     }),
   ],
 });
