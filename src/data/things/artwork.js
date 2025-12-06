@@ -213,9 +213,7 @@ export class Artwork extends Thing {
     reverse: soupyReverse(),
 
     // used for referencedArtworks (mixedFind)
-    artworkData: wikiData({
-      class: input.value(Artwork),
-    }),
+    artworkData: wikiData(V(Artwork)),
 
     // Expose only
 

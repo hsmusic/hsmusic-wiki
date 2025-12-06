@@ -78,9 +78,7 @@ export class Group extends Thing {
       find: soupyFind.input('album'),
     }),
 
-    serieses: thingList({
-      class: input.value(Series),
-    }),
+    serieses: thingList(V(Series)),
 
     // Update only
 
@@ -307,9 +305,7 @@ export class Series extends Thing {
 
     description: contentString(),
 
-    group: thing({
-      class: input.value(Group),
-    }),
+    group: thing(V(Group)),
 
     albums: referenceList({
       class: input.value(Album),

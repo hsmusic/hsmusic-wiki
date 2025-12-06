@@ -66,14 +66,8 @@ export class Artist extends Thing {
     ],
 
     isAlias: flag(V(false)),
-
-    artistAliases: thingList({
-      class: input.value(Artist),
-    }),
-
-    aliasedArtist: thing({
-      class: input.value(Artist),
-    }),
+    artistAliases: thingList(V(Artist)),
+    aliasedArtist: thing(V(Artist)),
 
     // Update only
 

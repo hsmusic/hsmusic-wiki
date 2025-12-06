@@ -59,9 +59,7 @@ export class ArtTag extends Thing {
       },
     ],
 
-    additionalNames: thingList({
-      class: input.value(AdditionalName),
-    }),
+    additionalNames: thingList(V(AdditionalName)),
 
     description: contentString(),
 

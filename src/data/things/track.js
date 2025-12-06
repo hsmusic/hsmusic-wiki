@@ -119,13 +119,8 @@ export class Track extends Thing {
   }) => ({
     // > Update & expose - Internal relationships
 
-    album: thing({
-      class: input.value(Album),
-    }),
-
-    trackSection: thing({
-      class: input.value(TrackSection),
-    }),
+    album: thing(V(Album)),
+    trackSection: thing(V(TrackSection)),
 
     // > Update & expose - Identifying metadata
 
@@ -269,9 +264,7 @@ export class Track extends Thing {
     bandcampTrackIdentifier: simpleString(),
     bandcampArtworkIdentifier: simpleString(),
 
-    additionalNames: thingList({
-      class: input.value(AdditionalName),
-    }),
+    additionalNames: thingList(V(AdditionalName)),
 
     dateFirstReleased: simpleDate(),
 
@@ -531,17 +524,9 @@ export class Track extends Thing {
 
     // > Update & expose - Additional files
 
-    additionalFiles: thingList({
-      class: input.value(AdditionalFile),
-    }),
-
-    sheetMusicFiles: thingList({
-      class: input.value(AdditionalFile),
-    }),
-
-    midiProjectFiles: thingList({
-      class: input.value(AdditionalFile),
-    }),
+    additionalFiles: thingList(V(AdditionalFile)),
+    sheetMusicFiles: thingList(V(AdditionalFile)),
+    midiProjectFiles: thingList(V(AdditionalFile)),
 
     // > Update & expose - Content entries
 
@@ -551,22 +536,12 @@ export class Track extends Thing {
       // certainly couldn't be recontextualized...
       inheritFromMainRelease(),
 
-      thingList({
-        class: input.value(LyricsEntry),
-      }),
+      thingList(V(LyricsEntry)),
     ],
 
-    commentary: thingList({
-      class: input.value(CommentaryEntry),
-    }),
-
-    creditingSources: thingList({
-      class: input.value(CreditingSourcesEntry),
-    }),
-
-    referencingSources: thingList({
-      class: input.value(ReferencingSourcesEntry),
-    }),
+    commentary: thingList(V(CommentaryEntry)),
+    creditingSources: thingList(V(CreditingSourcesEntry)),
+    referencingSources: thingList(V(ReferencingSourcesEntry)),
 
     // > Update only
 
@@ -574,14 +549,10 @@ export class Track extends Thing {
     reverse: soupyReverse(),
 
     // used for referencedArtworkList (mixedFind)
-    artworkData: wikiData({
-      class: input.value(Artwork),
-    }),
+    artworkData: wikiData(V(Artwork)),
 
     // used for withMatchingContributionPresets (indirectly by Contribution)
-    wikiInfo: thing({
-      class: input.value(WikiInfo),
-    }),
+    wikiInfo: thing(V(WikiInfo)),
 
     // > Expose only
 

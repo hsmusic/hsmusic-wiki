@@ -46,9 +46,7 @@ export class HomepageLayout extends Thing {
       expose: {transform: value => value ?? []},
     },
 
-    sections: thingList({
-      class: input.value(HomepageLayoutSection),
-    }),
+    sections: thingList(V(HomepageLayoutSection)),
 
     // Expose only
 
@@ -157,9 +155,7 @@ export class HomepageLayoutSection extends Thing {
 
     color: color(),
 
-    rows: thingList({
-      class: input.value(HomepageLayoutRow),
-    }),
+    rows: thingList(V(HomepageLayoutRow)),
 
     // Expose only
 
@@ -180,9 +176,7 @@ export class HomepageLayoutRow extends Thing {
   static [Thing.getPropertyDescriptors] = ({HomepageLayoutSection}) => ({
     // Update & expose
 
-    section: thing({
-      class: input.value(HomepageLayoutSection),
-    }),
+    section: thing(V(HomepageLayoutSection)),
 
     // Update only
 

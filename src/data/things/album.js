@@ -100,9 +100,7 @@ export class Album extends Thing {
   }) => ({
     // > Update & expose - Internal relationships
 
-    trackSections: thingList({
-      class: input.value(TrackSection),
-    }),
+    trackSections: thingList(V(TrackSection)),
 
     // > Update & expose - Identifying metadata
 
@@ -135,9 +133,7 @@ export class Album extends Thing {
     bandcampAlbumIdentifier: simpleString(),
     bandcampArtworkIdentifier: simpleString(),
 
-    additionalNames: thingList({
-      class: input.value(AdditionalName),
-    }),
+    additionalNames: thingList(V(AdditionalName)),
 
     date: simpleDate(),
     dateAddedToWiki: simpleDate(),
@@ -371,19 +367,12 @@ export class Album extends Thing {
 
     // > Update & expose - Content entries
 
-    commentary: thingList({
-      class: input.value(CommentaryEntry),
-    }),
-
-    creditingSources: thingList({
-      class: input.value(CreditingSourcesEntry),
-    }),
+    commentary: thingList(V(CommentaryEntry)),
+    creditingSources: thingList(V(CreditingSourcesEntry)),
 
     // > Update & expose - Additional files
 
-    additionalFiles: thingList({
-      class: input.value(AdditionalFile),
-    }),
+    additionalFiles: thingList(V(AdditionalFile)),
 
     // > Update only
 
@@ -391,14 +380,10 @@ export class Album extends Thing {
     reverse: soupyReverse(),
 
     // used for referencedArtworkList (mixedFind)
-    artworkData: wikiData({
-      class: input.value(Artwork),
-    }),
+    artworkData: wikiData(V(Artwork)),
 
     // used for withMatchingContributionPresets (indirectly by Contribution)
-    wikiInfo: thing({
-      class: input.value(WikiInfo),
-    }),
+    wikiInfo: thing(V(WikiInfo)),
 
     // > Expose only
 
@@ -955,9 +940,7 @@ export class TrackSection extends Thing {
   static [Thing.getPropertyDescriptors] = ({Track}) => ({
     // Update & expose
 
-    album: thing({
-      class: input.value(Album),
-    }),
+    album: thing(V(Album)),
 
     name: name(V('Unnamed Track Section')),
 
@@ -1059,9 +1042,7 @@ export class TrackSection extends Thing {
 
     description: contentString(),
 
-    tracks: thingList({
-      class: input.value(Track),
-    }),
+    tracks: thingList(V(Track)),
 
     // Update only
 

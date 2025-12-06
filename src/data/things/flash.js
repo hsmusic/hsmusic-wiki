@@ -61,9 +61,7 @@ export class Flash extends Thing {
   }) => ({
     // Update & expose
 
-    act: thing({
-      class: input.value(FlashAct),
-    }),
+    act: thing(V(FlashAct)),
 
     name: name(V('Unnamed Flash')),
 
@@ -124,17 +122,10 @@ export class Flash extends Thing {
 
     urls: urls(),
 
-    additionalNames: thingList({
-      class: input.value(AdditionalName),
-    }),
+    additionalNames: thingList(V(AdditionalName)),
 
-    commentary: thingList({
-      class: input.value(CommentaryEntry),
-    }),
-
-    creditingSources: thingList({
-      class: input.value(CreditingSourcesEntry),
-    }),
+    commentary: thingList(V(CommentaryEntry)),
+    creditingSources: thingList(V(CreditingSourcesEntry)),
 
     // Update only
 
@@ -142,9 +133,7 @@ export class Flash extends Thing {
     reverse: soupyReverse(),
 
     // used for withMatchingContributionPresets (indirectly by Contribution)
-    wikiInfo: thing({
-      class: input.value(WikiInfo),
-    }),
+    wikiInfo: thing(V(WikiInfo)),
 
     // Expose only
 
@@ -271,9 +260,7 @@ export class FlashAct extends Thing {
   static [Thing.getPropertyDescriptors] = ({Flash, FlashSide}) => ({
     // Update & expose
 
-    side: thing({
-      class: input.value(FlashSide),
-    }),
+    side: thing(V(FlashSide)),
 
     name: name(V('Unnamed Flash Act')),
     directory: directory(),
@@ -288,9 +275,7 @@ export class FlashAct extends Thing {
       exposeDependency('#side.listTerminology'),
     ],
 
-    flashes: thingList({
-      class: input.value(Flash),
-    }),
+    flashes: thingList(V(Flash)),
 
     // Update only
 
@@ -344,9 +329,7 @@ export class FlashSide extends Thing {
     color: color(),
     listTerminology: contentString(),
 
-    acts: thingList({
-      class: input.value(FlashAct),
-    }),
+    acts: thingList(V(FlashAct)),
 
     // Update only
 
