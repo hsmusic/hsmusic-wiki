@@ -1,12 +1,26 @@
 // A color! This'll be some CSS-ready value.
 
+import {input, templateCompositeFrom} from '#composite';
 import {isColor} from '#validators';
 
-// TODO: Not templateCompositeFrom.
+export default templateCompositeFrom({
+  annotation: 'color',
 
-export default function() {
-  return {
-    flags: {update: true, expose: true},
-    update: {validate: isColor},
-  };
-}
+  compose: false,
+
+  inputs: {
+    default: input({validate: isColor, defaultValue: null}),
+  },
+
+  update: {
+    validate: isColor,
+  },
+
+  steps: () => [
+    {
+      dependencies: [input('default')],
+      transform: (value, {[input('default')]: defaultValue}) =>
+        value ?? defaultValue,
+    },
+  ],
+});

@@ -43,7 +43,7 @@ export class SortingRule extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
-    active: flag(true),
+    active: flag(V(true)),
 
     message: {
       flags: {update: true, expose: true},

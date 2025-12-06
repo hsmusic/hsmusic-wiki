@@ -106,7 +106,7 @@ export class Album extends Thing {
 
     // > Update & expose - Identifying metadata
 
-    name: name('Unnamed Album'),
+    name: name(V('Unnamed Album')),
     directory: directory(),
 
     directorySuffix: [
@@ -117,9 +117,9 @@ export class Album extends Thing {
       exposeDependency('directory'),
     ],
 
-    alwaysReferenceByDirectory: flag(false),
-    alwaysReferenceTracksByDirectory: flag(false),
-    suffixTrackDirectories: flag(false),
+    alwaysReferenceByDirectory: flag(V(false)),
+    alwaysReferenceTracksByDirectory: flag(V(false)),
+    suffixTrackDirectories: flag(V(false)),
 
     style: [
       exposeUpdateValueOrContinue({
@@ -177,15 +177,15 @@ export class Album extends Thing {
 
     // > Update & expose - General configuration
 
-    countTracksInArtistTotals: flag(true),
+    countTracksInArtistTotals: flag(V(true)),
 
-    showAlbumInTracksWithoutArtists: flag(false),
+    showAlbumInTracksWithoutArtists: flag(V(false)),
 
-    hasTrackNumbers: flag(true),
-    isListedOnHomepage: flag(true),
-    isListedInGalleries: flag(true),
+    hasTrackNumbers: flag(V(true)),
+    isListedOnHomepage: flag(V(true)),
+    isListedInGalleries: flag(V(true)),
 
-    hideDuration: flag(false),
+    hideDuration: flag(V(false)),
 
     // > Update & expose - General metadata
 
@@ -229,7 +229,7 @@ export class Album extends Thing {
         mode: input.value('falsy'),
       }),
 
-      fileExtension('jpg'),
+      fileExtension(V('jpg')),
     ],
 
     coverArtDimensions: [
@@ -274,7 +274,7 @@ export class Album extends Thing {
 
     trackArtDate: simpleDate(),
 
-    trackCoverArtFileExtension: fileExtension('jpg'),
+    trackCoverArtFileExtension: fileExtension(V('jpg')),
 
     trackDimensions: dimensions(),
 
@@ -299,7 +299,7 @@ export class Album extends Thing {
         mode: input.value('falsy'),
       }),
 
-      fileExtension('jpg'),
+      fileExtension(V('jpg')),
     ],
 
     wallpaperStyle: [
@@ -341,7 +341,7 @@ export class Album extends Thing {
         mode: input.value('falsy'),
       }),
 
-      fileExtension('jpg'),
+      fileExtension(V('jpg')),
     ],
 
     bannerDimensions: [
@@ -959,7 +959,7 @@ export class TrackSection extends Thing {
       class: input.value(Album),
     }),
 
-    name: name('Unnamed Track Section'),
+    name: name(V('Unnamed Track Section')),
 
     unqualifiedDirectory: directory(),
 
@@ -1055,7 +1055,7 @@ export class TrackSection extends Thing {
       exposeDependency({dependency: '#album.countTracksInArtistTotals'}),
     ],
 
-    isDefaultTrackSection: flag(false),
+    isDefaultTrackSection: flag(V(false)),
 
     description: contentString(),
 

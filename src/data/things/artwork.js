@@ -120,7 +120,7 @@ export class Artwork extends Thing {
       constituteFrom('thing', 'dimensionsFromThingProperty'),
     ],
 
-    attachAbove: flag(false),
+    attachAbove: flag(V(false)),
 
     artistContribsFromThingProperty: simpleString(),
     artistContribsArtistProperty: simpleString(),

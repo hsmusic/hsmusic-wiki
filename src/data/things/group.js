@@ -39,7 +39,7 @@ export class Group extends Thing {
   static [Thing.getPropertyDescriptors] = ({Album, Artist, Series}) => ({
     // Update & expose
 
-    name: name('Unnamed Group'),
+    name: name(V('Unnamed Group')),
     directory: directory(),
 
     excludeFromGalleryTabs: [
@@ -59,7 +59,7 @@ export class Group extends Thing {
       exposeConstant(V(false)),
     ],
 
-    divideAlbumsByStyle: flag(false),
+    divideAlbumsByStyle: flag(V(false)),
 
     description: contentString(),
 
@@ -246,10 +246,10 @@ export class GroupCategory extends Thing {
   static [Thing.getPropertyDescriptors] = ({Group}) => ({
     // Update & expose
 
-    name: name('Unnamed Group Category'),
+    name: name(V('Unnamed Group Category')),
     directory: directory(),
 
-    excludeGroupsFromGalleryTabs: flag(false),
+    excludeGroupsFromGalleryTabs: flag(V(false)),
 
     color: color(),
 
@@ -295,7 +295,7 @@ export class Series extends Thing {
   static [Thing.getPropertyDescriptors] = ({Album, Group}) => ({
     // Update & expose
 
-    name: name('Unnamed Series'),
+    name: name(V('Unnamed Series')),
 
     showAlbumArtists: {
       flags: {update: true, expose: true},

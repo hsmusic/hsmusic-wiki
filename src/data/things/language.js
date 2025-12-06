@@ -35,7 +35,7 @@ export class Language extends Thing {
 
     // Human-readable name. This should be the language's own native name, not
     // localized to any other language.
-    name: name(`Unnamed Language`),
+    name: name(V(`Unnamed Language`)),
 
     // Language code specific to JavaScript's Internationalization (Intl) API.
     // Usually this will be the same as the language's general code, but it
@@ -57,7 +57,7 @@ export class Language extends Thing {
     // with languages that are currently in development and not ready for
     // formal release, or which are just kept hidden as "experimental zones"
     // for wiki development or content testing.
-    hidden: flag(false),
+    hidden: flag(V(false)),
 
     // Mapping of translation keys to values (strings). Generally, don't
     // access this object directly - use methods instead.

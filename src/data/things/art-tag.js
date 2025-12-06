@@ -41,10 +41,10 @@ export class ArtTag extends Thing {
   static [Thing.getPropertyDescriptors] = ({AdditionalName}) => ({
     // Update & expose
 
-    name: name('Unnamed Art Tag'),
+    name: name(V('Unnamed Art Tag')),
     directory: directory(),
     color: color(),
-    isContentWarning: flag(false),
+    isContentWarning: flag(V(false)),
     extraReadingURLs: urls(),
 
     nameShort: [

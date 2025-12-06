@@ -20,7 +20,7 @@ export class StaticPage extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
-    name: name('Unnamed Static Page'),
+    name: name(V('Unnamed Static Page')),
 
     nameShort: {
       flags: {update: true, expose: true},
@@ -38,7 +38,7 @@ export class StaticPage extends Thing {
     script: simpleString(),
     content: contentString(),
 
-    absoluteLinks: flag(),
+    absoluteLinks: flag(V(false)),
 
     // Expose only
 

@@ -129,7 +129,7 @@ export class Track extends Thing {
 
     // > Update & expose - Identifying metadata
 
-    name: name('Unnamed Track'),
+    name: name(V('Unnamed Track')),
     nameText: contentString(),
 
     directory: directory({
@@ -348,8 +348,8 @@ export class Track extends Thing {
       exposeDependency('#trackSection.countTracksInArtistTotals'),
     ],
 
-    disableUniqueCoverArt: flag(),
-    disableDate: flag(),
+    disableUniqueCoverArt: flag(V(false)),
+    disableDate: flag(V(false)),
 
     // > Update & expose - General metadata
 

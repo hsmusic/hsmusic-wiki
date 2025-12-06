@@ -153,7 +153,7 @@ export class HomepageLayoutSection extends Thing {
   static [Thing.getPropertyDescriptors] = ({HomepageLayoutRow}) => ({
     // Update & expose
 
-    name: name(`Unnamed Homepage Section`),
+    name: name(V(`Unnamed Homepage Section`)),
 
     color: color(),
 

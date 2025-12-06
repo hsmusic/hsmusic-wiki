@@ -65,7 +65,7 @@ export class Flash extends Thing {
       class: input.value(FlashAct),
     }),
 
-    name: name('Unnamed Flash'),
+    name: name(V('Unnamed Flash')),
 
     directory: {
       flags: {update: true, expose: true},
@@ -104,7 +104,7 @@ export class Flash extends Thing {
 
     date: simpleDate(),
 
-    coverArtFileExtension: fileExtension('jpg'),
+    coverArtFileExtension: fileExtension(V('jpg')),
 
     coverArtDimensions: dimensions(),
 
@@ -275,7 +275,7 @@ export class FlashAct extends Thing {
       class: input.value(FlashSide),
     }),
 
-    name: name('Unnamed Flash Act'),
+    name: name(V('Unnamed Flash Act')),
     directory: directory(),
     color: color(),
 
@@ -339,7 +339,7 @@ export class FlashSide extends Thing {
   static [Thing.getPropertyDescriptors] = ({FlashAct}) => ({
     // Update & expose
 
-    name: name('Unnamed Flash Side'),
+    name: name(V('Unnamed Flash Side')),
     directory: directory(),
     color: color(),
     listTerminology: contentString(),

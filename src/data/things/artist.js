@@ -46,14 +46,14 @@ export class Artist extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
-    name: name('Unnamed Artist'),
+    name: name(V('Unnamed Artist')),
     directory: directory(),
     urls: urls(),
 
     contextNotes: contentString(),
 
-    hasAvatar: flag(false),
-    avatarFileExtension: fileExtension('jpg'),
+    hasAvatar: flag(V(false)),
+    avatarFileExtension: fileExtension(V('jpg')),
 
     avatarArtwork: [
       exitWithoutDependency('hasAvatar', {
@@ -65,7 +65,7 @@ export class Artist extends Thing {
         .call(this, 'Avatar Artwork'),
     ],
 
-    isAlias: flag(),
+    isAlias: flag(V(false)),
 
     artistAliases: thingList({
       class: input.value(Artist),

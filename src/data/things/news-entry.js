@@ -17,7 +17,7 @@ export class NewsEntry extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
-    name: name('Unnamed News Entry'),
+    name: name(V('Unnamed News Entry')),
     directory: directory(),
     date: simpleDate(),
 

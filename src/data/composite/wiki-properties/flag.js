@@ -1,19 +1,27 @@
 // Straightforward flag descriptor for a variety of property purposes.
 // Provide a default value, true or false!
 
+import {input, templateCompositeFrom} from '#composite';
 import {isBoolean} from '#validators';
 
-// TODO: Not templateCompositeFrom.
+export default templateCompositeFrom({
+  annotation: 'flag',
 
-// TODO: The description is a lie. This defaults to false. Bad.
+  compose: false,
 
-export default function(defaultValue = false) {
-  if (typeof defaultValue !== 'boolean') {
-    throw new TypeError(`Always set explicit defaults for flags!`);
-  }
+  inputs: {
+    default: input({type: 'boolean'}),
+  },
 
-  return {
-    flags: {update: true, expose: true},
-    update: {validate: isBoolean, default: defaultValue},
-  };
-}
+  update: {
+    validate: isBoolean,
+  },
+
+  steps: () => [
+    {
+      dependencies: [input('default')],
+      transform: (value, {[input('default')]: defaultValue}) =>
+        value ?? defaultValue,
+    },
+  ],
+});

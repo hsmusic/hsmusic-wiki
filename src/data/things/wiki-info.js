@@ -2,20 +2,15 @@ export const WIKI_INFO_FILE = 'wiki-info.yaml';
 
 import {input, V} from '#composite';
 import Thing from '#thing';
+import {isBoolean, isContributionPresetList, isLanguageCode, isName}
+  from '#validators';
 import {parseContributionPresets, parseWallpaperParts} from '#yaml';
-
-import {
-  isBoolean,
-  isColor,
-  isContributionPresetList,
-  isLanguageCode,
-  isName,
-} from '#validators';
 
 import {exitWithoutDependency, exposeConstant} from '#composite/control-flow';
 
 import {
   canonicalBase,
+  color,
   contentString,
   fileExtension,
   flag,
@@ -34,7 +29,7 @@ export class WikiInfo extends Thing {
   static [Thing.getPropertyDescriptors] = ({Group}) => ({
     // Update & expose
 
-    name: name('Unnamed Wiki'),
+    name: name(V('Unnamed Wiki')),
 
     // Displayed in nav bar.
     nameShort: {
@@ -47,14 +42,7 @@ export class WikiInfo extends Thing {
       },
     },
 
-    color: {
-      flags: {update: true, expose: true},
-      update: {validate: isColor},
-
-      expose: {
-        transform: color => color ?? '#0088ff',
-      },
-    },
+    color: color(V('#0088ff')),
 
     // One-line description used for <meta rel="description"> tag.
     description: contentString(),
@@ -69,7 +57,7 @@ export class WikiInfo extends Thing {
     canonicalBase: canonicalBase(),
     canonicalMediaBase: canonicalBase(),
 
-    wikiWallpaperFileExtension: fileExtension('jpg'),
+    wikiWallpaperFileExtension: fileExtension(V('jpg')),
     wikiWallpaperStyle: simpleString(),
     wikiWallpaperParts: wallpaperParts(),
 
@@ -84,11 +72,11 @@ export class WikiInfo extends Thing {
     },
 
     // Feature toggles
-    enableFlashesAndGames: flag(false),
-    enableListings: flag(false),
-    enableNews: flag(false),
-    enableArtTagUI: flag(false),
-    enableGroupUI: flag(false),
+    enableFlashesAndGames: flag(V(false)),
+    enableListings: flag(V(false)),
+    enableNews: flag(V(false)),
+    enableArtTagUI: flag(V(false)),
+    enableGroupUI: flag(V(false)),
 
     enableSearch: [
       exitWithoutDependency({
@@ -97,7 +85,7 @@ export class WikiInfo extends Thing {
         value: input.value(false),
       }),
 
-      flag(true),
+      flag(V(true)),
     ],
 
     // Update only
