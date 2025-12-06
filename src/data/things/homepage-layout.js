@@ -3,7 +3,7 @@ export const HOMEPAGE_LAYOUT_DATA_FILE = 'homepage.yaml';
 import {inspect} from 'node:util';
 
 import {colors} from '#cli';
-import {input} from '#composite';
+import {input, V} from '#composite';
 import Thing from '#thing';
 import {empty} from '#sugar';
 
@@ -52,11 +52,7 @@ export class HomepageLayout extends Thing {
 
     // Expose only
 
-    isHomepageLayout: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isHomepageLayout: exposeConstant(V(true)),
   });
 
   static [Thing.yamlDocumentSpec] = {
@@ -167,11 +163,7 @@ export class HomepageLayoutSection extends Thing {
 
     // Expose only
 
-    isHomepageLayoutSection: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isHomepageLayoutSection: exposeConstant(V(true)),
   });
 
   static [Thing.yamlDocumentSpec] = {
@@ -198,11 +190,7 @@ export class HomepageLayoutRow extends Thing {
 
     // Expose only
 
-    isHomepageLayoutRow: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isHomepageLayoutRow: exposeConstant(V(true)),
 
     type: {
       flags: {expose: true},
@@ -253,16 +241,8 @@ export class HomepageLayoutActionsRow extends HomepageLayoutRow {
 
     // Expose only
 
-    isHomepageLayoutActionsRow: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
-
-    type: {
-      flags: {expose: true},
-      expose: {compute: () => 'actions'},
-    },
+    isHomepageLayoutActionsRow: exposeConstant(V(true)),
+    type: exposeConstant(V('actions')),
   });
 
   static [Thing.yamlDocumentSpec] = {
@@ -285,16 +265,8 @@ export class HomepageLayoutAlbumCarouselRow extends HomepageLayoutRow {
 
     // Expose only
 
-    isHomepageLayoutAlbumCarouselRow: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
-
-    type: {
-      flags: {expose: true},
-      expose: {compute: () => 'album carousel'},
-    },
+    isHomepageLayoutAlbumCarouselRow: exposeConstant(V(true)),
+    type: exposeConstant(V('album carousel')),
   });
 
   static [Thing.yamlDocumentSpec] = {
@@ -334,7 +306,7 @@ export class HomepageLayoutAlbumGridRow extends HomepageLayoutRow {
         find: soupyFind.input('group'),
       }),
 
-      exposeDependency({dependency: '#resolvedReference'}),
+      exposeDependency('#resolvedReference'),
     ],
 
     sourceAlbums: referenceList({
@@ -349,16 +321,8 @@ export class HomepageLayoutAlbumGridRow extends HomepageLayoutRow {
 
     // Expose only
 
-    isHomepageLayoutAlbumGridRow: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
-
-    type: {
-      flags: {expose: true},
-      expose: {compute: () => 'album grid'},
-    },
+    isHomepageLayoutAlbumGridRow: exposeConstant(V(true)),
+    type: exposeConstant(V('album grid')),
   });
 
   static [Thing.yamlDocumentSpec] = {

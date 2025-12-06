@@ -1,4 +1,4 @@
-import {input} from '#composite';
+import {input, V} from '#composite';
 import {transposeArrays} from '#sugar';
 import Thing from '#thing';
 import {is, isDate, validateReferenceList} from '#validators';
@@ -39,19 +39,14 @@ export class ContentEntry extends Thing {
         }),
       }),
 
-      exitWithoutDependency({
-        dependency: '#artistReferences',
-        value: input.value([]),
-      }),
+      exitWithoutDependency('#artistReferences', V([])),
 
       withResolvedReferenceList({
         list: '#artistReferences',
         find: soupyFind.input('artist'),
       }),
 
-      exposeDependency({
-        dependency: '#resolvedReferenceList',
-      }),
+      exposeDependency('#resolvedReferenceList'),
     ],
 
     artistText: contentString(),
@@ -71,9 +66,7 @@ export class ContentEntry extends Thing {
     },
 
     accessKind: [
-      exitWithoutDependency({
-        dependency: '_accessDate',
-      }),
+      exitWithoutDependency('_accessDate'),
 
       exposeUpdateValueOrContinue({
         validate: input.value(
@@ -85,9 +78,7 @@ export class ContentEntry extends Thing {
 
       withWebArchiveDate(),
 
-      withResultOfAvailabilityCheck({
-        from: '#webArchiveDate',
-      }),
+      withResultOfAvailabilityCheck({from: '#webArchiveDate'}),
 
       {
         dependencies: ['#availability'],
@@ -97,13 +88,10 @@ export class ContentEntry extends Thing {
             : continuation()),
       },
 
-      exposeConstant({
-        value: input.value('accessed'),
-      }),
+      exposeConstant(V('accessed')),
     ],
 
     date: simpleDate(),
-
     secondDate: simpleDate(),
 
     accessDate: [
@@ -117,9 +105,7 @@ export class ContentEntry extends Thing {
         dependency: '#webArchiveDate',
       }),
 
-      exposeConstant({
-        value: input.value(null),
-      }),
+      exposeConstant(V(null)),
     ],
 
     body: contentString(),
@@ -130,11 +116,7 @@ export class ContentEntry extends Thing {
 
     // Expose only
 
-    isContentEntry: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isContentEntry: exposeConstant(V(true)),
 
     annotationParts: [
       withAnnotationPartNodeLists(),
@@ -152,19 +134,11 @@ export class ContentEntry extends Thing {
         }),
       },
 
-      withPropertyFromList({
-        list: '#firstNodes',
-        property: input.value('i'),
-      }).outputs({
-        '#firstNodes.i': '#startIndices',
-      }),
+      withPropertyFromList('#firstNodes', V('i'))
+        .outputs({'#firstNodes.i': '#startIndices'}),
 
-      withPropertyFromList({
-        list: '#lastNodes',
-        property: input.value('iEnd'),
-      }).outputs({
-        '#lastNodes.iEnd': '#endIndices',
-      }),
+      withPropertyFromList('#lastNodes', V('iEnd'))
+        .outputs({'#lastNodes.iEnd': '#endIndices'}),
 
       {
         dependencies: [
@@ -200,9 +174,7 @@ export class ContentEntry extends Thing {
         }),
       },
 
-      exitWithoutDependency({
-        dependency: '#firstPartWithExternalLink',
-      }),
+      exitWithoutDependency('#firstPartWithExternalLink'),
 
       {
         dependencies: ['annotation', '#firstPartWithExternalLink'],
@@ -232,10 +204,7 @@ export class ContentEntry extends Thing {
         }),
       },
 
-      exitWithoutDependency({
-        dependency: '#firstPartWithExternalLink',
-        value: input.value([]),
-      }),
+      exitWithoutDependency('#firstPartWithExternalLink', V([])),
 
       withMappedList({
         list: '#firstPartWithExternalLink',
@@ -254,9 +223,7 @@ export class ContentEntry extends Thing {
         map: input.value(node => node.data.href),
       }),
 
-      exposeDependency({
-        dependency: '#mappedList',
-      }),
+      exposeDependency('#mappedList'),
     ],
   });
 
@@ -307,31 +274,14 @@ export class LyricsEntry extends ContentEntry {
 
     // Expose only
 
-    isLyricsEntry: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isLyricsEntry: exposeConstant(V(true)),
 
-    isWikiLyrics: hasAnnotationPart({
-      part: input.value('wiki lyrics'),
-    }),
-
-    helpNeeded: hasAnnotationPart({
-      part: input.value('help needed'),
-    }),
+    isWikiLyrics: hasAnnotationPart(V('wiki lyrics')),
+    helpNeeded: hasAnnotationPart(V('help needed')),
 
     hasSquareBracketAnnotations: [
-      exitWithoutDependency({
-        dependency: 'isWikiLyrics',
-        mode: input.value('falsy'),
-        value: input.value(false),
-      }),
-
-      exitWithoutDependency({
-        dependency: 'body',
-        value: input.value(false),
-      }),
+      exitWithoutDependency('isWikiLyrics', V(false), V('falsy')),
+      exitWithoutDependency('body', V(false)),
 
       {
         dependencies: ['body'],
@@ -354,11 +304,7 @@ export class CreditingSourcesEntry extends ContentEntry {
   static [Thing.getPropertyDescriptors] = () => ({
     // Expose only
 
-    isCreditingSourcesEntry: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isCreditingSourcesEntry: exposeConstant(V(true)),
   });
 }
 
@@ -368,10 +314,6 @@ export class ReferencingSourcesEntry extends ContentEntry {
   static [Thing.getPropertyDescriptors] = () => ({
     // Expose only
 
-    isReferencingSourceEntry: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isReferencingSourceEntry: exposeConstant(V(true)),
   });
 }

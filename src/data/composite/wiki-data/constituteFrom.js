@@ -8,8 +8,8 @@ export default templateCompositeFrom({
   annotation: `constituteFrom`,
 
   inputs: {
+    object: input({type: 'object', acceptsNull: true}),
     property: input({type: 'string', acceptsNull: true}),
-    from: input({type: 'object', acceptsNull: true}),
     else: input({defaultValue: null}),
     mode: inputAvailabilityCheckMode(),
   },
@@ -18,8 +18,8 @@ export default templateCompositeFrom({
 
   steps: () => [
     constituteOrContinue({
+      object: input('object'),
       property: input('property'),
-      from: input('from'),
       mode: input('mode'),
     }),
 

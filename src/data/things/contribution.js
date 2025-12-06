@@ -2,11 +2,10 @@ import {inspect} from 'node:util';
 
 import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
-import {input} from '#composite';
+import {input, V} from '#composite';
 import {empty} from '#sugar';
 import Thing from '#thing';
-import {isBoolean, isStringNonEmpty, isThing, validateReference}
-  from '#validators';
+import {isBoolean, isStringNonEmpty, isThing} from '#validators';
 
 import {simpleDate, singleReference, soupyFind}
   from '#composite/wiki-properties';
@@ -82,9 +81,7 @@ export class Contribution extends Thing {
             : continuation()),
       },
 
-      exposeConstant({
-        value: input.value(true),
-      }),
+      exposeConstant(V(true)),
     ],
 
     countInDurationTotals: [
@@ -94,15 +91,10 @@ export class Contribution extends Thing {
         validate: input.value(isBoolean),
       }),
 
-      withPropertyFromObject({
-        object: 'thing',
-        property: input.value('duration'),
-      }),
-
-      exitWithoutDependency({
-        dependency: '#thing.duration',
-        mode: input.value('falsy'),
+      withPropertyFromObject('thing', V('duration')),
+      exitWithoutDependency('#thing.duration', {
         value: input.value(false),
+        mode: input.value('falsy'),
       }),
 
       {
@@ -118,9 +110,7 @@ export class Contribution extends Thing {
             : continuation()),
       },
 
-      exposeConstant({
-        value: input.value(true),
-      }),
+      exposeConstant(V(true)),
     ],
 
     // Update only
@@ -129,11 +119,7 @@ export class Contribution extends Thing {
 
     // Expose only
 
-    isContribution: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isContribution: exposeConstant(V(true)),
 
     context: [
       withContributionContext(),
@@ -155,32 +141,24 @@ export class Contribution extends Thing {
     ],
 
     matchingPresets: [
-      withPropertyFromObject({
-        object: 'thing',
+      withPropertyFromObject('thing', {
         property: input.value('wikiInfo'),
         internal: input.value(true),
       }),
 
-      exitWithoutDependency({
-        dependency: '#thing.wikiInfo',
+      exitWithoutDependency('#thing.wikiInfo', V([])),
+
+      withPropertyFromObject('#thing.wikiInfo', V('contributionPresets'))
+        .outputs({'#thing.wikiInfo.contributionPresets': '#contributionPresets'}),
+
+      exitWithoutDependency('#contributionPresets', {
         value: input.value([]),
-      }),
-
-      withPropertyFromObject({
-        object: '#thing.wikiInfo',
-        property: input.value('contributionPresets'),
-      }).outputs({
-        '#thing.wikiInfo.contributionPresets': '#contributionPresets',
-      }),
-
-      exitWithoutDependency({
-        dependency: '#contributionPresets',
         mode: input.value('empty'),
-        value: input.value([]),
       }),
 
       withContributionContext(),
 
+      // TODO: implementing this with compositional filters would be fun
       {
         dependencies: [
           '#contributionPresets',
@@ -206,7 +184,6 @@ export class Contribution extends Thing {
                 preset.annotation === annotation),
         })
       },
-
     ],
 
     // All the contributions from the list which includes this contribution.
@@ -214,27 +191,13 @@ export class Contribution extends Thing {
     // artist, but also this very contribution. It doesn't mix contributions
     // exposed on different properties.
     associatedContributions: [
-      exitWithoutDependency({
-        dependency: 'thing',
-        value: input.value([]),
-      }),
+      exitWithoutDependency('thing', V([])),
+      exitWithoutDependency('thingProperty', V([])),
 
-      exitWithoutDependency({
-        dependency: 'thingProperty',
-        value: input.value([]),
-      }),
+      withPropertyFromObject('thing', 'thingProperty')
+        .outputs({'#value': '#contributions'}),
 
-      withPropertyFromObject({
-        object: 'thing',
-        property: 'thingProperty',
-      }).outputs({
-        '#value': '#contributions',
-      }),
-
-      withPropertyFromList({
-        list: '#contributions',
-        property: input.value('annotation'),
-      }),
+      withPropertyFromList('#contributions', V('annotation')),
 
       {
         dependencies: ['#contributions.annotation', 'annotation'],
@@ -250,71 +213,37 @@ export class Contribution extends Thing {
         }),
       },
 
-      withFilteredList({
-        list: '#contributions',
-        filter: '#likeContributionsFilter',
-      }).outputs({
-        '#filteredList': '#contributions',
-      }),
+      withFilteredList('#contributions', '#likeContributionsFilter')
+        .outputs({'#filteredList': '#contributions'}),
 
-      exposeDependency({
-        dependency: '#contributions',
-      }),
+      exposeDependency('#contributions'),
     ],
 
     previousBySameArtist: [
-      withContainingReverseContributionList().outputs({
-        '#containingReverseContributionList': '#list',
-      }),
+      withContainingReverseContributionList()
+        .outputs({'#containingReverseContributionList': '#list'}),
 
-      exitWithoutDependency({
-        dependency: '#list',
-      }),
+      exitWithoutDependency('#list'),
 
-      withNearbyItemFromList({
-        list: '#list',
-        item: input.myself(),
-        offset: input.value(-1),
-      }),
-
-      exposeDependency({
-        dependency: '#nearbyItem',
-      }),
+      withNearbyItemFromList('#list', input.myself(), V(-1)),
+      exposeDependency('#nearbyItem'),
     ],
 
     nextBySameArtist: [
-      withContainingReverseContributionList().outputs({
-        '#containingReverseContributionList': '#list',
-      }),
+      withContainingReverseContributionList()
+        .outputs({'#containingReverseContributionList': '#list'}),
 
-      exitWithoutDependency({
-        dependency: '#list',
-      }),
+      exitWithoutDependency('#list'),
 
-      withNearbyItemFromList({
-        list: '#list',
-        item: input.myself(),
-        offset: input.value(+1),
-      }),
-
-      exposeDependency({
-        dependency: '#nearbyItem',
-      }),
+      withNearbyItemFromList('#list', input.myself(), V(+1)),
+      exposeDependency('#nearbyItem'),
     ],
 
     groups: [
-      withPropertyFromObject({
-        object: 'thing',
-        property: input.value('groups'),
-      }),
+      withPropertyFromObject('thing', V('groups')),
+      exposeDependencyOrContinue('#thing.groups'),
 
-      exposeDependencyOrContinue({
-        dependency: '#thing.groups',
-      }),
-
-      exposeConstant({
-        value: input.value([]),
-      }),
+      exposeConstant(V([])),
     ],
   });
 

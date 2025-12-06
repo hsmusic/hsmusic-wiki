@@ -2,7 +2,7 @@ export const DATA_STATIC_PAGE_DIRECTORY = 'static-page';
 
 import * as path from 'node:path';
 
-import {input} from '#composite';
+import {V} from '#composite';
 import {traverse} from '#node-utils';
 import {sortAlphabetically} from '#sort';
 import Thing from '#thing';
@@ -42,11 +42,7 @@ export class StaticPage extends Thing {
 
     // Expose only
 
-    isStaticPage: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isStaticPage: exposeConstant(V(true)),
   });
 
   static [Thing.findSpecs] = {

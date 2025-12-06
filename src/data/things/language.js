@@ -1,7 +1,8 @@
 import {Temporal, toTemporalInstant} from '@js-temporal/polyfill';
 
 import {withAggregate} from '#aggregate';
-import {input} from '#composite';
+import {logWarn} from '#cli';
+import {input, V} from '#composite';
 import * as html from '#html';
 import {accumulateSum, empty, withEntries} from '#sugar';
 import {isLanguageCode, isObject} from '#validators';
@@ -16,7 +17,7 @@ import {
   isExternalLinkStyle,
 } from '#external-links';
 
-import {exitWithoutDependency, exposeConstant, exposeDependency}
+import {exitWithoutDependency, exposeConstant}
   from '#composite/control-flow';
 import {flag, name} from '#composite/wiki-properties';
 
@@ -126,18 +127,9 @@ export class Language extends Thing {
 
     // Expose only
 
-    isLanguage: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isLanguage: exposeConstant(V(true)),
 
-    onlyIfOptions: {
-      flags: {expose: true},
-      expose: {
-        compute: () => Symbol.for(`language.onlyIfOptions`),
-      },
-    },
+    onlyIfOptions: exposeConstant(V(Symbol.for(`language.onlyIfOptions`))),
 
     intl_date: this.#intlHelper(Intl.DateTimeFormat, {full: true}),
     intl_dateYear: this.#intlHelper(Intl.DateTimeFormat, {year: 'numeric'}),
@@ -167,9 +159,7 @@ export class Language extends Thing {
 
     // TODO: This currently isn't used. Is it still needed?
     strings_htmlEscaped: [
-      exitWithoutDependency({
-        dependency: 'strings',
-      }),
+      exitWithoutDependency('strings'),
 
       {
         dependencies: ['strings'],

@@ -1,6 +1,6 @@
 export const WIKI_INFO_FILE = 'wiki-info.yaml';
 
-import {input} from '#composite';
+import {input, V} from '#composite';
 import Thing from '#thing';
 import {parseContributionPresets, parseWallpaperParts} from '#yaml';
 
@@ -114,11 +114,7 @@ export class WikiInfo extends Thing {
 
     // Expose only
 
-    isWikiInfo: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isWikiInfo: exposeConstant(V(true)),
   });
 
   static [Thing.yamlDocumentSpec] = {

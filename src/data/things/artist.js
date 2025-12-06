@@ -4,7 +4,7 @@ import {inspect} from 'node:util';
 
 import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
-import {input} from '#composite';
+import {input, V} from '#composite';
 import Thing from '#thing';
 import {parseArtistAliases, parseArtwork} from '#yaml';
 
@@ -56,8 +56,7 @@ export class Artist extends Thing {
     avatarFileExtension: fileExtension('jpg'),
 
     avatarArtwork: [
-      exitWithoutDependency({
-        dependency: 'hasAvatar',
+      exitWithoutDependency('hasAvatar', {
         value: input.value(null),
         mode: input.value('falsy'),
       }),
@@ -83,11 +82,7 @@ export class Artist extends Thing {
 
     // Expose only
 
-    isArtist: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isArtist: exposeConstant(V(true)),
 
     trackArtistContributions: reverseReferenceList({
       reverse: soupyReverse.input('trackArtistContributionsBy'),
@@ -202,30 +197,14 @@ export class Artist extends Thing {
     ],
 
     totalDuration: [
-      withPropertyFromList({
-        list: 'musicContributions',
-        property: input.value('thing'),
-      }),
+      withPropertyFromList('musicContributions', V('thing')),
+      withPropertyFromList('#musicContributions.thing', V('isMainRelease')),
 
-      withPropertyFromList({
-        list: '#musicContributions.thing',
-        property: input.value('isMainRelease'),
-      }),
+      withFilteredList('musicContributions', '#musicContributions.thing.isMainRelease')
+        .outputs({'#filteredList': '#mainReleaseContributions'}),
 
-      withFilteredList({
-        list: 'musicContributions',
-        filter: '#musicContributions.thing.isMainRelease',
-      }).outputs({
-        '#filteredList': '#mainReleaseContributions',
-      }),
-
-      withContributionListSums({
-        list: '#mainReleaseContributions',
-      }),
-
-      exposeDependency({
-        dependency: '#contributionListDuration',
-      }),
+      withContributionListSums('#mainReleaseContributions'),
+      exposeDependency('#contributionListDuration'),
     ],
   });
 

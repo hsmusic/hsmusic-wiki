@@ -3,7 +3,7 @@ export const GROUP_DATA_FILE = 'groups.yaml';
 import {inspect} from 'node:util';
 
 import {colors} from '#cli';
-import {input} from '#composite';
+import {input, V} from '#composite';
 import Thing from '#thing';
 import {is, isBoolean} from '#validators';
 import {parseAnnotatedReferences, parseSerieses} from '#yaml';
@@ -53,18 +53,10 @@ export class Group extends Thing {
         '#uniqueReferencingThing': '#category',
       }),
 
-      withPropertyFromObject({
-        object: '#category',
-        property: input.value('excludeGroupsFromGalleryTabs'),
-      }),
+      withPropertyFromObject('#category', V('excludeGroupsFromGalleryTabs')),
+      exposeDependencyOrContinue('#category.excludeGroupsFromGalleryTabs'),
 
-      exposeDependencyOrContinue({
-        dependency: '#category.excludeGroupsFromGalleryTabs',
-      }),
-
-      exposeConstant({
-        value: input.value(false),
-      }),
+      exposeConstant(V(false)),
     ],
 
     divideAlbumsByStyle: flag(false),
@@ -97,11 +89,7 @@ export class Group extends Thing {
 
     // Expose only
 
-    isGroup: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isGroup: exposeConstant(V(true)),
 
     descriptionShort: {
       flags: {expose: true},
@@ -276,11 +264,7 @@ export class GroupCategory extends Thing {
 
     // Expose only
 
-    isGroupCategory: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isGroupCategory: exposeConstant(V(true)),
   });
 
   static [Thing.reverseSpecs] = {

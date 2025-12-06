@@ -1,6 +1,6 @@
 export const FLASH_DATA_FILE = 'flashes.yaml';
 
-import {input} from '#composite';
+import {input, V} from '#composite';
 import {sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
 import {anyOf, isColor, isContentString, isDirectory, isNumber, isString}
@@ -21,7 +21,6 @@ import {withPropertyFromObject} from '#composite/data';
 import {
   exposeConstant,
   exposeDependency,
-  exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
 } from '#composite/control-flow';
 
@@ -99,12 +98,8 @@ export class Flash extends Thing {
         validate: input.value(isColor),
       }),
 
-      withPropertyFromObject({
-        object: 'act',
-        property: input.value('color'),
-      }),
-
-      exposeDependency({dependency: '#act.color'}),
+      withPropertyFromObject('act', V('color')),
+      exposeDependency('#act.color'),
     ],
 
     date: simpleDate(),
@@ -153,21 +148,13 @@ export class Flash extends Thing {
 
     // Expose only
 
-    isFlash: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isFlash: exposeConstant(V(true)),
 
     commentatorArtists: commentatorArtists(),
 
     side: [
-      withPropertyFromObject({
-        object: 'act',
-        property: input.value('side'),
-      }),
-
-      exposeDependency({dependency: '#act.side'}),
+      withPropertyFromObject('act', V('side')),
+      exposeDependency('#act.side'),
     ],
   });
 
@@ -297,18 +284,8 @@ export class FlashAct extends Thing {
         validate: input.value(isContentString),
       }),
 
-      withPropertyFromObject({
-        object: 'side',
-        property: input.value('listTerminology'),
-      }),
-
-      exposeDependencyOrContinue({
-        dependency: '#side.listTerminology',
-      }),
-
-      exposeConstant({
-        value: input.value(null),
-      }),
+      withPropertyFromObject('side', V('listTerminology')),
+      exposeDependency('#side.listTerminology'),
     ],
 
     flashes: thingList({
@@ -322,11 +299,7 @@ export class FlashAct extends Thing {
 
     // Expose only
 
-    isFlashAct: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isFlashAct: exposeConstant(V(true)),
   });
 
   static [Thing.findSpecs] = {
@@ -381,11 +354,7 @@ export class FlashSide extends Thing {
 
     // Expose only
 
-    isFlashSide: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isFlashSide: exposeConstant(V(true)),
   });
 
   static [Thing.yamlDocumentSpec] = {

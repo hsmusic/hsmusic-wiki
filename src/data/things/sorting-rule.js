@@ -3,7 +3,7 @@ export const SORTING_RULE_DATA_FILE = 'sorting-rules.yaml';
 import {readFile, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
-import {input} from '#composite';
+import {V} from '#composite';
 import {chunkByProperties, compareArrays, unique} from '#sugar';
 import Thing from '#thing';
 import {isObject, isStringNonEmpty, anyOf, strictArrayOf} from '#validators';
@@ -52,11 +52,7 @@ export class SortingRule extends Thing {
 
     // Expose only
 
-    isSortingRule: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isSortingRule: exposeConstant(V(true)),
   });
 
   static [Thing.yamlDocumentSpec] = {
@@ -130,18 +126,14 @@ export class ThingSortingRule extends SortingRule {
 
     // Expose only
 
-    isThingSortingRule: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isThingSortingRule: exposeConstant(V(true)),
   });
 
-  static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(SortingRule, {
+  static [Thing.yamlDocumentSpec] = {
     fields: {
       'By Properties': {property: 'properties'},
     },
-  });
+  };
 
   sort(sortable) {
     if (this.properties) {
@@ -237,14 +229,10 @@ export class DocumentSortingRule extends ThingSortingRule {
 
     // Expose only
 
-    isDocumentSortingRule: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isDocumentSortingRule: exposeConstant(V(true)),
   });
 
-  static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(ThingSortingRule, {
+  static [Thing.yamlDocumentSpec] = {
     fields: {
       'Sort Documents': {property: 'filename'},
       'Select Documents Following': {property: 'selectDocumentsFollowing'},
@@ -257,7 +245,7 @@ export class DocumentSortingRule extends ThingSortingRule {
         'Select Documents Under',
       ]},
     ],
-  });
+  };
 
   static async apply(rule, {wikiData, dataPath, dry}) {
     const oldLayout = getThingLayoutForFilename(rule.filename, wikiData);

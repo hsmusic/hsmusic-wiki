@@ -4,7 +4,7 @@ export const ART_TAG_DATA_FILE = 'tags.yaml';
 import {readFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
-import {input} from '#composite';
+import {input, V} from '#composite';
 import {traverse} from '#node-utils';
 import {sortAlphabetically} from '#sort';
 import Thing from '#thing';
@@ -85,15 +85,11 @@ export class ArtTag extends Thing {
 
     // Expose only
 
-    isArtTag: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isArtTag: exposeConstant(V(true)),
 
     descriptionShort: [
-      exitWithoutDependency({
-        dependency: 'description',
+      exitWithoutDependency('description', {
+        value: input.value(null),
         mode: input.value('falsy'),
       }),
 

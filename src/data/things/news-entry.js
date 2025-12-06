@@ -1,6 +1,6 @@
 export const NEWS_DATA_FILE = 'news.yaml';
 
-import {input} from '#composite';
+import {V} from '#composite';
 import {sortChronologically} from '#sort';
 import Thing from '#thing';
 import {parseDate} from '#yaml';
@@ -25,11 +25,7 @@ export class NewsEntry extends Thing {
 
     // Expose only
 
-    isNewsEntry: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isNewsEntry: exposeConstant(V(true)),
 
     contentShort: {
       flags: {expose: true},

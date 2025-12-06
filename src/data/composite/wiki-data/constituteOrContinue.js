@@ -12,8 +12,8 @@ export default templateCompositeFrom({
   annotation: `constituteFrom`,
 
   inputs: {
+    object: input({type: 'object', acceptsNull: true}),
     property: input({type: 'string', acceptsNull: true}),
-    from: input({type: 'object', acceptsNull: true}),
     mode: inputAvailabilityCheckMode(),
   },
 
@@ -23,8 +23,8 @@ export default templateCompositeFrom({
     }),
 
     withPropertyFromObject({
+      object: input('object'),
       property: input('property'),
-      object: input('from'),
     }),
 
     exposeDependencyOrContinue({

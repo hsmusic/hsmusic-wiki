@@ -1,7 +1,7 @@
 import {inspect} from 'node:util';
 
 import {colors} from '#cli';
-import {input} from '#composite';
+import {input, V} from '#composite';
 import find from '#find';
 import Thing from '#thing';
 
@@ -95,10 +95,7 @@ export class Artwork extends Thing {
         validate: input.value(isDate),
       }),
 
-      constituteFrom({
-        property: 'dateFromThingProperty',
-        from: 'thing',
-      }),
+      constituteFrom('thing', 'dateFromThingProperty'),
     ],
 
     fileExtensionFromThingProperty: simpleString(),
@@ -108,9 +105,7 @@ export class Artwork extends Thing {
         validate: input.value(isFileExtension),
       }),
 
-      constituteFrom({
-        property: 'fileExtensionFromThingProperty',
-        from: 'thing',
+      constituteFrom('thing', 'fileExtensionFromThingProperty', {
         else: input.value('jpg'),
       }),
     ],
@@ -122,10 +117,7 @@ export class Artwork extends Thing {
         validate: input.value(isDimensions),
       }),
 
-      constituteFrom({
-        property: 'dimensionsFromThingProperty',
-        from: 'thing',
-      }),
+      constituteFrom('thing', 'dimensionsFromThingProperty'),
     ],
 
     attachAbove: flag(false),
@@ -141,38 +133,18 @@ export class Artwork extends Thing {
         artistProperty: 'artistContribsArtistProperty',
       }),
 
-      exposeDependencyOrContinue({
-        dependency: '#resolvedContribs',
-        mode: input.value('empty'),
-      }),
+      exposeDependencyOrContinue('#resolvedContribs', V('empty')),
 
-      withPropertyFromObject({
-        object: 'attachedArtwork',
-        property: input.value('artistContribs'),
-      }),
+      withPropertyFromObject('attachedArtwork', V('artistContribs')),
 
-      withRecontextualizedContributionList({
-        list: '#attachedArtwork.artistContribs',
-      }),
+      withRecontextualizedContributionList('#attachedArtwork.artistContribs'),
+      exposeDependencyOrContinue('#attachedArtwork.artistContribs'),
 
-      exposeDependencyOrContinue({
-        dependency: '#attachedArtwork.artistContribs',
-      }),
+      withPropertyFromObject('thing', 'artistContribsFromThingProperty')
+        .outputs({'#value': '#artistContribsFromThing'}),
 
-      withPropertyFromObject({
-        object: 'thing',
-        property: 'artistContribsFromThingProperty',
-      }).outputs({
-        '#value': '#artistContribsFromThing',
-      }),
-
-      withRecontextualizedContributionList({
-        list: '#artistContribsFromThing',
-      }),
-
-      exposeDependency({
-        dependency: '#artistContribsFromThing',
-      }),
+      withRecontextualizedContributionList('#artistContribsFromThing'),
+      exposeDependency('#artistContribsFromThing'),
     ],
 
     style: simpleString(),
@@ -188,22 +160,11 @@ export class Artwork extends Thing {
         find: soupyFind.input('artTag'),
       }),
 
-      exposeDependencyOrContinue({
-        dependency: '#resolvedReferenceList',
-        mode: input.value('empty'),
-      }),
+      exposeDependencyOrContinue('#resolvedReferenceList', V('empty')),
 
-      constituteOrContinue({
-        property: input.value('artTags'),
-        from: 'attachedArtwork',
-        mode: input.value('empty'),
-      }),
+      constituteOrContinue('attachedArtwork', V('artTags'), V('empty')),
 
-      constituteFrom({
-        property: 'artTagsFromThingProperty',
-        from: 'thing',
-        else: input.value([]),
-      }),
+      constituteFrom('thing', 'artTagsFromThingProperty', V([])),
     ],
 
     referencedArtworksFromThingProperty: simpleString(),
@@ -239,14 +200,9 @@ export class Artwork extends Thing {
         thing: input.value('artwork'),
       }),
 
-      exposeDependencyOrContinue({
-        dependency: '#resolvedAnnotatedReferenceList',
-        mode: input.value('empty'),
-      }),
+      exposeDependencyOrContinue('#resolvedAnnotatedReferenceList', V('empty')),
 
-      constituteFrom({
-        property: 'referencedArtworksFromThingProperty',
-        from: 'thing',
+      constituteFrom('thing', 'referencedArtworksFromThingProperty', {
         else: input.value([]),
       }),
     ],
@@ -263,11 +219,7 @@ export class Artwork extends Thing {
 
     // Expose only
 
-    isArtwork: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
+    isArtwork: exposeConstant(V(true)),
 
     referencedByArtworks: reverseReferenceList({
       reverse: soupyReverse.input('artworksWhichReference'),
@@ -275,11 +227,7 @@ export class Artwork extends Thing {
 
     isMainArtwork: [
       withContainingArtworkList(),
-
-      exitWithoutDependency({
-        dependency: '#containingArtworkList',
-        value: input.value(null),
-      }),
+      exitWithoutDependency('#containingArtworkList'),
 
       {
         dependencies: [input.myself(), '#containingArtworkList'],
@@ -293,11 +241,7 @@ export class Artwork extends Thing {
 
     mainArtwork: [
       withContainingArtworkList(),
-
-      exitWithoutDependency({
-        dependency: '#containingArtworkList',
-        value: input.value(null),
-      }),
+      exitWithoutDependency('#containingArtworkList'),
 
       {
         dependencies: ['#containingArtworkList'],
@@ -307,23 +251,17 @@ export class Artwork extends Thing {
     ],
 
     attachedArtwork: [
-      exitWithoutDependency({
-        dependency: 'attachAbove',
+      exitWithoutDependency('attachAbove', {
+        value: input.value(null),
         mode: input.value('falsy'),
       }),
 
       withContainingArtworkList(),
 
-      withPropertyFromList({
-        list: '#containingArtworkList',
-        property: input.value('attachAbove'),
-      }),
+      withPropertyFromList('#containingArtworkList', V('attachAbove')),
 
-      flipFilter({
-        filter: '#containingArtworkList.attachAbove',
-      }).outputs({
-        '#containingArtworkList.attachAbove': '#filterNotAttached',
-      }),
+      flipFilter('#containingArtworkList.attachAbove')
+        .outputs({'#containingArtworkList.attachAbove': '#filterNotAttached'}),
 
       withNearbyItemFromList({
         list: '#containingArtworkList',
@@ -332,9 +270,7 @@ export class Artwork extends Thing {
         filter: '#filterNotAttached',
       }),
 
-      exposeDependency({
-        dependency: '#nearbyItem',
-      }),
+      exposeDependency('#nearbyItem'),
     ],
 
     attachingArtworks: reverseReferenceList({
@@ -342,46 +278,23 @@ export class Artwork extends Thing {
     }),
 
     groups: [
-      withPropertyFromObject({
-        object: 'thing',
-        property: input.value('groups'),
-      }),
+      withPropertyFromObject('thing', V('groups')),
+      exposeDependencyOrContinue('#thing.groups'),
 
-      exposeDependencyOrContinue({
-        dependency: '#thing.groups',
-      }),
-
-      exposeConstant({
-        value: input.value([]),
-      }),
+      exposeConstant(V([])),
     ],
 
     contentWarningArtTags: [
-      withPropertyFromList({
-        list: 'artTags',
-        property: input.value('isContentWarning'),
-      }),
-
-      withFilteredList({
-        list: 'artTags',
-        filter: '#artTags.isContentWarning',
-      }),
-
-      exposeDependency({
-        dependency: '#filteredList',
-      }),
+      withPropertyFromList('artTags', V('isContentWarning')),
+      withFilteredList('artTags', '#artTags.isContentWarning'),
+      exposeDependency('#filteredList'),
     ],
 
     contentWarnings: [
-      withPropertyFromList({
-        list: 'contentWarningArtTags',
-        property: input.value('name'),
-      }),
-
-      exposeDependency({
-        dependency: '#contentWarningArtTags.name',
-      }),
+      withPropertyFromList('contentWarningArtTags', V('name')),
+      exposeDependency('#contentWarningArtTags.name'),
     ],
+
   });
 
   static [Thing.yamlDocumentSpec] = {
