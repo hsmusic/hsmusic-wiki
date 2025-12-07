@@ -33,7 +33,8 @@ import {
   parseWallpaperParts,
 } from '#yaml';
 
-import {withResolvedContribs} from '#composite/wiki-data';
+import {withRecontextualizedContributionList, withResolvedContribs}
+  from '#composite/wiki-data';
 
 import {
   exitWithoutDependency,
@@ -157,15 +158,11 @@ export class Album extends Thing {
 
       exposeDependencyOrContinue('#trackArtistContribs', V('empty')),
 
-      withResolvedContribs({
-        from: '_artistContribs',
-        thingProperty: input.thisProperty(),
+      withRecontextualizedContributionList('artistContribs', {
         artistProperty: input.value('albumTrackArtistContributions'),
-      }).outputs({
-        '#resolvedContribs': '#trackArtistContribs',
       }),
 
-      exposeDependency('#trackArtistContribs'),
+      exposeDependency('#artistContribs'),
     ],
 
     // > Update & expose - General configuration
