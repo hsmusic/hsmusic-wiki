@@ -29,8 +29,8 @@ export default templateCompositeFrom({
   steps: () => [
     exitWithoutDependency({
       dependency: input.updateValue(),
-      mode: input('mode'),
       value: input('value'),
+      mode: input('mode'),
     }),
   ],
 });

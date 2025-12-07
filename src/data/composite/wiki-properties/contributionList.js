@@ -29,6 +29,7 @@ export default templateCompositeFrom({
     date: input({
       validate: isDate,
       acceptsNull: true,
+      defaultDependency: 'date',
     }),
 
     artistProperty: input({
@@ -42,9 +43,9 @@ export default templateCompositeFrom({
   steps: () => [
     withResolvedContribs({
       from: input.updateValue(),
+      date: input('date'),
       thingProperty: input.thisProperty(),
       artistProperty: input('artistProperty'),
-      date: input('date'),
     }),
 
     exposeDependencyOrContinue({

@@ -141,7 +141,6 @@ export class Album extends Thing {
     // > Update & expose - Credits and contributors
 
     artistContribs: contributionList({
-      date: '_date',
       artistProperty: input.value('albumArtistContributions'),
     }),
 
@@ -152,7 +151,6 @@ export class Album extends Thing {
         from: input.updateValue({validate: isContributionList}),
         thingProperty: input.thisProperty(),
         artistProperty: input.value('albumTrackArtistContributions'),
-        date: '_date',
       }).outputs({
         '#resolvedContribs': '#trackArtistContribs',
       }),
@@ -163,7 +161,6 @@ export class Album extends Thing {
         from: '_artistContribs',
         thingProperty: input.thisProperty(),
         artistProperty: input.value('albumTrackArtistContributions'),
-        date: 'date',
       }).outputs({
         '#resolvedContribs': '#trackArtistContribs',
       }),

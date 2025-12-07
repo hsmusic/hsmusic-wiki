@@ -28,6 +28,7 @@ export default templateCompositeFrom({
     date: input({
       validate: isDate,
       acceptsNull: true,
+      defaultDependency: 'date',
     }),
 
     notFoundMode: inputNotFoundMode(),

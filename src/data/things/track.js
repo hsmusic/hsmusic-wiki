@@ -293,9 +293,9 @@ export class Track extends Thing {
     artistContribs: [
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
+        date: 'date',
         thingProperty: input.thisProperty(),
         artistProperty: input.value('trackArtistContributions'),
-        date: 'date',
       }).outputs({
         '#resolvedContribs': '#artistContribs',
       }),
@@ -404,9 +404,9 @@ export class Track extends Thing {
 
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
+        date: 'coverArtDate',
         thingProperty: input.value('coverArtistContribs'),
         artistProperty: input.value('trackCoverArtistContributions'),
-        date: 'coverArtDate',
       }),
 
       exposeDependencyOrContinue('#resolvedContribs', V('empty')),

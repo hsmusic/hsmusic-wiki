@@ -79,10 +79,9 @@ export class WikiInfo extends Thing {
     enableGroupUI: flag(V(false)),
 
     enableSearch: [
-      exitWithoutDependency({
-        dependency: '_searchDataAvailable',
-        mode: input.value('falsy'),
+      exitWithoutDependency('_searchDataAvailable', {
         value: input.value(false),
+        mode: input.value('falsy'),
       }),
 
       flag(V(true)),

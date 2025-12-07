@@ -23,13 +23,13 @@ export default templateCompositeFrom({
       acceptsNull: true,
     }),
 
-    reference: input({type: 'string', defaultValue: 'reference'}),
-    annotation: input({type: 'string', defaultValue: 'annotation'}),
-    thing: input({type: 'string', defaultValue: 'thing'}),
-
     data: inputWikiData({allowMixedTypes: true}),
     find: inputSoupyFind(),
     findOptions: inputFindOptions(),
+
+    reference: input({type: 'string', defaultValue: 'reference'}),
+    annotation: input({type: 'string', defaultValue: 'annotation'}),
+    thing: input({type: 'string', defaultValue: 'thing'}),
 
     notFoundMode: inputNotFoundMode(),
   },

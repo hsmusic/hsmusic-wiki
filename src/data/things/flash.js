@@ -111,7 +111,6 @@ export class Flash extends Thing {
         .call(this, 'Cover Artwork'),
 
     contributorContribs: contributionList({
-      date: 'date',
       artistProperty: input.value('flashContributorContributions'),
     }),
 

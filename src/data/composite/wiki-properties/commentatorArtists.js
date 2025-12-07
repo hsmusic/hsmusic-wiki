@@ -14,10 +14,9 @@ export default templateCompositeFrom({
   compose: false,
 
   steps: () => [
-    exitWithoutDependency({
-      dependency: 'commentary',
-      mode: input.value('falsy'),
+    exitWithoutDependency('commentary', {
       value: input.value([]),
+      mode: input.value('falsy'),
     }),
 
     withPropertyFromList({

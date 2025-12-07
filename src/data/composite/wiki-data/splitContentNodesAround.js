@@ -42,8 +42,8 @@ export default templateCompositeFrom({
 
     withMappedList({
       list: '#separatorFilter',
-      filter: '#separatorFilter',
       map: input.value((_node, index) => index),
+      filter: '#separatorFilter',
     }),
 
     withFilteredList({

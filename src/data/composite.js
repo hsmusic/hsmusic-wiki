@@ -230,7 +230,14 @@ export function templateCompositeFrom(description) {
       ? Object.keys(description.inputs)
       : []);
 
-  const positionalInputNames = expectedInputNames;
+  const optionalInputNames =
+    expectedInputNames.filter(name => {
+      const inputDescription = getInputTokenValue(description.inputs[name]);
+      if (!inputDescription) return false;
+      if ('defaultValue' in inputDescription) return true;
+      if ('defaultDependency' in inputDescription) return true;
+      return false;
+    });
 
   const instantiate = (...args) => {
     const preparedInputs = {};
@@ -245,13 +252,14 @@ export function templateCompositeFrom(description) {
 
       const expresslyProvidedInputNames = Object.keys(namedInputs);
       const positionallyProvidedInputNames = [];
+      const remainingInputNames = expectedInputNames.slice();
 
       const apparentInputRoutes = {};
 
       const wrongTypeInputPositions = [];
       const namedAndPositionalConflictInputPositions = [];
 
-      const maximumPositionalInputs = positionalInputNames.length;
+      const maximumPositionalInputs = expectedInputNames.length;
       const lastPossiblePositionalIndex = maximumPositionalInputs - 1;
 
       for (const [index, value] of positionalInputs.entries()) {
@@ -269,7 +277,7 @@ export function templateCompositeFrom(description) {
           continue;
         }
 
-        const correspondingName = expectedInputNames[index];
+        const correspondingName = remainingInputNames.shift();
         if (expresslyProvidedInputNames.includes(correspondingName)) {
           namedAndPositionalConflictInputPositions.push(index);
           continue;
@@ -289,6 +297,9 @@ export function templateCompositeFrom(description) {
           .filter(name => !expectedInputNames.includes(name));
 
       const wrongTypeInputNames = [];
+      const skippedInputNames = [];
+      const passedInputNames = [];
+      const nameProvidedInputNames = [];
 
       for (const [name, value] of Object.entries(namedInputs)) {
         if (misplacedInputNames.includes(name)) {
@@ -301,8 +312,33 @@ export function templateCompositeFrom(description) {
           continue;
         }
 
+        const index = remainingInputNames.indexOf(name);
+        if (index === 0) {
+          passedInputNames.push(remainingInputNames.shift());
+        } else if (index === -1) {
+          // This input isn't misplaced, so it's an expected name,
+          // and SHOULD be in the list of remaining input names.
+          // But it isn't if it itself has already been skipped!
+          // And if so, that's already been tracked.
+        } else {
+          const til = remainingInputNames.splice(0, index);
+          passedInputNames.push(...til);
+
+          const skipped =
+            til.filter(name =>
+              !optionalInputNames.includes(name) ||
+              expresslyProvidedInputNames.includes(name));
+
+          if (!empty(skipped)) {
+            skippedInputNames.push({skipped, before: name});
+          }
+
+          passedInputNames.push(remainingInputNames.shift());
+        }
+
         preparedInputs[name] = value;
         apparentInputRoutes[name] = name;
+        nameProvidedInputNames.push(name);
       }
 
       const totalProvidedInputNames =
@@ -314,13 +350,7 @@ export function templateCompositeFrom(description) {
       const missingInputNames =
         expectedInputNames
           .filter(name => !totalProvidedInputNames.includes(name))
-          .filter(name => {
-            const inputDescription = getInputTokenValue(description.inputs[name]);
-            if (!inputDescription) return true;
-            if ('defaultValue' in inputDescription) return false;
-            if ('defaultDependency' in inputDescription) return false;
-            return true;
-          });
+          .filter(name => !optionalInputNames.includes(name));
 
       const expectedStaticValueInputNames = [];
       const expectedStaticDependencyInputNames = [];
@@ -387,6 +417,10 @@ export function templateCompositeFrom(description) {
       for (const index of namedAndPositionalConflictInputPositions) {
         const conflictingName = positionalInputNames[index];
         push(new Error(`${name}: Provided as both named and positional (i = ${index}) input`));
+      }
+
+      for (const {skipped, before} of skippedInputNames) {
+        push(new Error(`Expected ${skipped.join(', ')} before ${before}`));
       }
 
       for (const name of expectedStaticDependencyInputNames) {

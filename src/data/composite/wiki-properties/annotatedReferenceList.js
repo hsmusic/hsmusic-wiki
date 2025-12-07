@@ -57,13 +57,13 @@ export default templateCompositeFrom({
     withResolvedAnnotatedReferenceList({
       list: input.updateValue(),
 
-      reference: input('reference'),
-      annotation: input('annotation'),
-      thing: input('thing'),
-
       data: input('data'),
       find: input('find'),
       findOptions: input('findOptions'),
+
+      reference: input('reference'),
+      annotation: input('annotation'),
+      thing: input('thing'),
     }),
 
     exposeDependency({dependency: '#resolvedAnnotatedReferenceList'}),
