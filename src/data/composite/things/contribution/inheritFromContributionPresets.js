@@ -8,12 +8,12 @@ export default templateCompositeFrom({
 
   steps: () => [
     raiseOutputWithoutDependency({
-      dependency: 'matchingContributionPresets',
+      dependency: 'matchingPresets',
       mode: input.value('empty'),
     }),
 
     withPropertyFromList({
-      list: 'matchingContributionPresets',
+      list: 'matchingPresets',
       property: input.thisProperty(),
     }),
 

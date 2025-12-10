@@ -151,10 +151,7 @@ export class Contribution extends Thing {
       withPropertyFromObject('#thing.wikiInfo', V('contributionPresets'))
         .outputs({'#thing.wikiInfo.contributionPresets': '#contributionPresets'}),
 
-      exitWithoutDependency('#contributionPresets', {
-        value: input.value([]),
-        mode: input.value('empty'),
-      }),
+      exitWithoutDependency('#contributionPresets', V([]), V('empty')),
 
       withContributionContext(),
 
@@ -167,22 +164,19 @@ export class Contribution extends Thing {
           'annotation',
         ],
 
-        compute: (continuation, {
+        compute: ({
           ['#contributionPresets']: presets,
           ['#contributionTarget']: target,
           ['#contributionProperty']: property,
           ['annotation']: annotation,
-        }) => continuation({
-          ['#matchingContributionPresets']:
-            presets
-              .filter(preset =>
-                preset.context[0] === target &&
-                preset.context.slice(1).includes(property) &&
-                // For now, only match if the annotation is a complete match.
-                // Partial matches (e.g. because the contribution includes "two"
-                // annotations, separated by commas) don't count.
-                preset.annotation === annotation),
-        })
+        }) =>
+          presets.filter(preset =>
+            preset.context[0] === target &&
+            preset.context.slice(1).includes(property) &&
+            // For now, only match if the annotation is a complete match.
+            // Partial matches (e.g. because the contribution includes "two"
+            // annotations, separated by commas) don't count.
+            preset.annotation === annotation),
       },
     ],
 
