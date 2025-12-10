@@ -15,7 +15,7 @@ export default {
     const data = {};
 
     data.hasTrackNumbers =
-      album.hasTrackNumbers &&
+      trackSection.hasTrackNumbers &&
       !empty(trackSection.tracks);
 
     data.isTrackPage = !!track;

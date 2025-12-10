@@ -979,20 +979,24 @@ export class TrackSection extends Thing {
       exposeDependency({dependency: '#album.color'}),
     ],
 
+    hasTrackNumbers: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      withPropertyFromObject('album', V('hasTrackNumbers')),
+      exposeDependency('#album.hasTrackNumbers'),
+    ],
+
     startCountingFrom: [
       exposeUpdateValueOrContinue({
         validate: input.value(isNumber),
       }),
 
-      exitWithoutDependency({
-        dependency: 'album',
-        value: input.value(1),
-      }),
+      withPropertyFromObject('album', V('hasTrackNumbers')),
+      exitWithoutDependency('#album.hasTrackNumbers', V(1), V('falsy')),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('trackSections'),
-      }),
+      withPropertyFromObject('album', V('trackSections')),
 
       withNearbyItemFromList({
         list: '#album.trackSections',
@@ -1002,19 +1006,10 @@ export class TrackSection extends Thing {
         '#nearbyItem': '#previousTrackSection',
       }),
 
-      exitWithoutDependency({
-        dependency: '#previousTrackSection',
-        value: input.value(1),
-      }),
+      exitWithoutDependency('#previousTrackSection', V(1)),
 
-      withPropertyFromObject({
-        object: '#previousTrackSection',
-        property: input.value('continueCountingFrom'),
-      }),
-
-      exposeDependency({
-        dependency: '#previousTrackSection.continueCountingFrom',
-      }),
+      withPropertyFromObject('#previousTrackSection', V('continueCountingFrom')),
+      exposeDependency('#previousTrackSection.continueCountingFrom'),
     ],
 
     dateOriginallyReleased: simpleDate(),
@@ -1071,9 +1066,18 @@ export class TrackSection extends Thing {
     ],
 
     continueCountingFrom: [
-      withLengthOfList({
-        list: 'tracks',
-      }),
+      withPropertyFromObject('album', V('hasTrackNumbers')),
+      exitWithoutDependency('#album.hasTrackNumbers', V(null), V('falsy')),
+
+      {
+        dependencies: ['hasTrackNumbers', 'startCountingFrom'],
+        compute: (continuation, {hasTrackNumbers, startCountingFrom}) =>
+          (hasTrackNumbers
+            ? continuation()
+            : continuation.exit(startCountingFrom)),
+      },
+
+      withLengthOfList('tracks'),
 
       {
         dependencies: ['startCountingFrom', '#tracks.length'],
@@ -1104,6 +1108,7 @@ export class TrackSection extends Thing {
       'Suffix Track Directories': {property: 'suffixTrackDirectories'},
 
       'Color': {property: 'color'},
+      'Has Track Numbers': {property: 'hasTrackNumbers'},
       'Start Counting From': {property: 'startCountingFrom'},
 
       'Date Originally Released': {

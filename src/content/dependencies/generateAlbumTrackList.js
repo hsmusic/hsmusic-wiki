@@ -76,7 +76,7 @@ export default {
     const data = {};
 
     data.displayMode = query.displayMode;
-    data.hasTrackNumbers = album.hasTrackNumbers;
+    data.albumHasTrackNumbers = album.hasTrackNumbers;
 
     switch (query.displayMode) {
       case 'trackSections':
@@ -93,15 +93,16 @@ export default {
           album.trackSections
             .map(section => section.tracks.length > 1);
 
-        if (album.hasTrackNumbers) {
-          data.trackSectionsStartCountingFrom =
-            album.trackSections
-              .map(section => section.startCountingFrom);
-        } else {
-          data.trackSectionsStartCountingFrom =
-            album.trackSections
-              .map(() => null);
-        }
+        data.trackSectionsHaveTrackNumbers =
+          album.trackSections
+            .map(section => section.hasTrackNumbers);
+
+        data.trackSectionsStartCountingFrom =
+          album.trackSections
+            .map(section =>
+              (section.hasTrackNumbers
+                ? section.startCountingFrom
+                : null));
 
         break;
     }
@@ -119,8 +120,6 @@ export default {
   },
 
   generate(data, relations, slots, {html, language}) {
-    const listTag = (data.hasTrackNumbers ? 'ol' : 'ul');
-
     const slotItems = items =>
       items.map(item =>
         item.slots({
@@ -139,6 +138,7 @@ export default {
             name: data.trackSectionNames,
             duration: data.trackSectionDurations,
             durationApproximate: data.trackSectionDurationsApproximate,
+            hasTrackNumbers: data.trackSectionsHaveTrackNumbers,
             startCountingFrom: data.trackSectionsStartCountingFrom,
           }).map(({
               heading,
@@ -148,6 +148,7 @@ export default {
               name,
               duration,
               durationApproximate,
+              hasTrackNumbers,
               startCountingFrom,
             }) => [
               language.encapsulate('trackList.section', capsule =>
@@ -180,16 +181,19 @@ export default {
                   {[html.onlyIfContent]: true},
                   description),
 
-                html.tag(listTag,
-                  data.hasTrackNumbers &&
-                    {start: startCountingFrom},
-
-                  slotItems(items)),
+                (hasTrackNumbers
+                  ? html.tag('ol', {start: startCountingFrom},
+                      slotItems(items))
+                  : html.tag('ul', slotItems(items))),
               ]),
             ]));
 
       case 'tracks':
-        return html.tag(listTag, slotItems(relations.items));
+        if (data.albumHasTrackNumbers) {
+          return html.tag('ol', slotItems(relations.items));
+        } else {
+          return html.tag('ul', slotItems(relations.items));
+        }
 
       default:
         return html.blank();
