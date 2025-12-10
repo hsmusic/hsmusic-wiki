@@ -140,6 +140,8 @@ export class Artwork extends Thing {
       withRecontextualizedContributionList('#attachedArtwork.artistContribs'),
       exposeDependencyOrContinue('#attachedArtwork.artistContribs'),
 
+      exitWithoutDependency('artistContribsFromThingProperty', V([])),
+
       withPropertyFromObject('thing', 'artistContribsFromThingProperty')
         .outputs({'#value': '#artistContribsFromThing'}),
 
