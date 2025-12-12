@@ -1241,7 +1241,7 @@ export class Track extends Thing {
     tracksWhichAreFollowingProductionsOf: {
       bindTo: 'trackData',
 
-      referencing: track => track,
+      referencing: track => track.isMainRelease ? [track] : [],
       referenced: track => track.previousProductionTracks,
     },
   };
