@@ -44,28 +44,38 @@ function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
 }
 
+function makeEmptyWikiData() {
+  const wikiData = {};
+
+  for (const thingConstructor of Object.values(thingConstructors)) {
+    if (thingConstructor[Thing.wikiData]) {
+      if (thingConstructor[Thing.oneInstancePerWiki]) {
+        wikiData[thingConstructor[Thing.wikiData]] = null;
+      } else {
+        wikiData[thingConstructor[Thing.wikiData]] = [];
+      }
+    }
+  }
+
+  return wikiData;
+}
+
 function pushWikiData(a, b) {
   for (const key of Object.keys(b)) {
-    if (Object.hasOwn(a, key)) {
-      if (Array.isArray(a[key])) {
-        if (Array.isArray(b[key])) {
-          a[key].push(...b[key]);
-        } else {
-          throw new Error(`${key} already present, expected array of items to push`);
-        }
-      } else {
-        if (Array.isArray(a[key])) {
-          throw new Error(`${key} already present and not an array, refusing to overwrite`);
-        } else {
-          throw new Error(`${key} already present, refusing to overwrite`);
-        }
-      }
-    } else {
+    if (!Object.hasOwn(a, key)) {
+      throw new Error(`${key} not present`);
+    }
+
+    if (Array.isArray(a[key])) {
       if (Array.isArray(b[key])) {
-        a[key] = [...b[key]];
+        a[key].push(...b[key]);
       } else {
-        a[key] = b[key];
+        throw new Error(`${key} is an array, expected array of items to push`);
       }
+    } else if (a[key] === null) {
+      a[key] = b[key];
+    } else if (b[key] !== null) {
+      throw new Error(`${key} already has a value: ${inspect(a[key])}`);
     }
   }
 }
@@ -187,7 +197,7 @@ function makeProcessDocument(thingConstructor, {
 
     const thing = Reflect.construct(thingConstructor, []);
 
-    const wikiData = {};
+    const wikiData = makeEmptyWikiData();
     const flat = [thing];
     if (thingConstructor[Thing.wikiData]) {
       if (thingConstructor[Thing.oneInstancePerWiki]) {
@@ -1357,7 +1367,7 @@ export function processThingsFromDataStep(documents, dataStep) {
     case documentModes.allTogether: {
       const things = [];
       const flat = [];
-      const wikiData = {};
+      const wikiData = makeEmptyWikiData();
       const aggregate = openAggregate({message: `Errors processing documents`});
 
       documents.forEach(
@@ -1417,7 +1427,7 @@ export function processThingsFromDataStep(documents, dataStep) {
         throw new Error(`Missing header document (empty file or erroneously starting with "---"?)`);
 
       const aggregate = openAggregate({message: `Errors processing documents`});
-      const wikiData = {};
+      const wikiData = makeEmptyWikiData();
 
       const {result: headerResult, aggregate: headerAggregate} =
         processDocument(headerDocument, dataStep.headerDocumentThing);
@@ -1688,7 +1698,7 @@ export function connectThingsFromDataSteps(processThingResultLists, dataSteps) {
 }
 
 export function makeWikiDataFromDataSteps(processThingResultLists, _dataSteps) {
-  const wikiData = {};
+  const wikiData = makeEmptyWikiData();
 
   for (const result of processThingResultLists.flat(2)) {
     pushWikiData(wikiData, result.wikiData);
