@@ -35,7 +35,9 @@ export default {
       relation('generatePageLayout'),
 
     sidebar:
-      relation('generateFlashActSidebar', flash.act, flash),
+      (flash.isAdventureFlash
+        ? relation('generateAdventureSidebar', flash.adventure, flash)
+        : relation('generateFlashActSidebar', flash.act, flash)),
 
     additionalNamesBox:
       relation('generateAdditionalNamesBox', flash.additionalNames),

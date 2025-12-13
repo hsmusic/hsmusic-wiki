@@ -30,6 +30,10 @@ localized:
 
     home: ''
 
+    adventureInfo: 'adventure/<>/'
+    adventureFlashes: 'adventure/<>/flash/'
+    adventureFlash: 'adventure/<>/flash/<>/'
+
     album: 'album/<>/'
     albumCommentary: 'commentary/album/<>/'
     albumGallery: 'album/<>/gallery/'

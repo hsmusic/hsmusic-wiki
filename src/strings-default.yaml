@@ -1055,6 +1055,13 @@ homepage:
     entry:
       viewRest: "(View rest of entry!)"
 
+adventureSidebar:
+  flashList:
+    act: "{ACT}"
+    act.fallback: "Flash list"
+
+    flash: "{FLASH}"
+
 #
 # albumSidebar:
 #   This sidebar is displayed on both the album and track info pages!
