@@ -6,7 +6,8 @@ import {input, V} from '#composite';
 import {traverse} from '#node-utils';
 import Thing from '#thing';
 
-import {exposeDependency} from '#composite/control-flow';
+import {exposeConstant, exposeDependency}
+  from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
 import {directory, name, thing, thingList}
   from '#composite/wiki-properties';
@@ -19,6 +20,8 @@ export class Adventure extends Thing {
   static [Thing.wikiData] = 'adventureData';
 
   static [Thing.getPropertyDescriptors] = ({FlashAct}) => ({
+    isAdventure: exposeConstant(V(true)),
+
     // > Internal relationships
 
     acts: thingList(V(FlashAct)),
@@ -85,6 +88,7 @@ export class Adventure extends Thing {
             break;
           }
 
+          act.adventure = adventure;
           act.flashes = flashes;
           acts.push(act);
 
@@ -103,6 +107,8 @@ export class Adventure extends Thing {
 
 export class AdventureFlash extends Flash {
   static [Thing.getPropertyDescriptors] = ({Adventure}) => ({
+    isAdventureFlash: exposeConstant(V(true)),
+
     // > Implicit relationships
 
     adventure: [
@@ -114,6 +120,8 @@ export class AdventureFlash extends Flash {
 
 export class AdventureFlashAct extends FlashAct {
   static [Thing.getPropertyDescriptors] = ({Adventure}) => ({
+    isAdventureFlashAct: exposeConstant(V(true)),
+
     // > Internal relationships
 
     adventure: thing(V(Adventure)),
