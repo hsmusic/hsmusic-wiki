@@ -39,6 +39,9 @@ export const info = {
   failedRule: null,
   failedContainer: null,
 
+  contextContainer: null,
+  contextBackLink: null,
+
   filterContainer: null,
   albumFilterLink: null,
   artistFilterLink: null,
@@ -65,6 +68,8 @@ export const info = {
   noResultsString: null,
   currentResultString: null,
   endSearchString: null,
+
+  backString: null,
 
   albumResultKindString: null,
   artistResultKindString: null,
@@ -108,6 +113,10 @@ export const info = {
     activeQuery: {
       type: 'string',
     },
+
+    activeQueryContextPageName: {type: 'string'},
+    activeQueryContextPagePathname: {type: 'string'},
+    activeQueryContextPageColor: {type: 'string'},
 
     activeQueryResults: {
       type: 'json',
@@ -179,6 +188,9 @@ export function getPageReferences() {
 
   info.noResultsString =
     findString('no-results');
+
+  info.backString =
+    findString('back');
 
   info.currentResultString =
     findString('current-result');
@@ -312,6 +324,25 @@ export function mutatePageContent() {
 
   info.searchBox.appendChild(info.failedRule);
   info.searchBox.appendChild(info.failedContainer);
+
+  // Context section
+
+  info.contextContainer =
+    document.createElement('div');
+
+  info.contextContainer.classList.add('wiki-search-context-container');
+
+  info.contextBackLink =
+    document.createElement('a');
+
+  info.contextContainer.appendChild(
+    templateContent(info.backString, {
+      page: info.contextBackLink,
+    }));
+
+  cssProp(info.contextContainer, 'display', 'none');
+
+  info.searchBox.appendChild(info.contextContainer);
 
   // Filter section
 
@@ -652,6 +683,17 @@ async function activateSidebarSearch(query) {
   state.searchStage = 'complete';
   updateSidebarSearchStatus();
 
+  session.activeQueryContextPageName =
+    document.querySelector('title').dataset.withoutWikiName ??
+    document.title;
+
+  session.activeQueryContextPagePathname =
+    location.pathname;
+
+  session.activeQueryContextPageColor =
+    document.querySelector('.color-style')?.dataset.color ??
+    null;
+
   session.activeQuery = query;
   session.activeQueryResults = results;
   session.resultsScrollOffset = 0;
@@ -804,6 +846,8 @@ function showSidebarSearchResults(results) {
   }
 
   if (shownAnyResults) {
+    showContextControls();
+
     cssProp(info.endSearchRule, 'display', 'block');
     cssProp(info.endSearchLine, 'display', 'block');
 
@@ -898,6 +942,35 @@ function showFilterElements(results) {
     cssProp(info.filterContainer, 'display', null);
   } else {
     cssProp(info.filterContainer, 'display', 'none');
+  }
+}
+
+function showContextControls() {
+  const {session} = info;
+
+  const shouldShow =
+    session.activeQueryContextPagePathname &&
+    location.pathname !== session.activeQueryContextPagePathname;
+
+  if (shouldShow) {
+    info.contextBackLink.href =
+      session.activeQueryContextPagePathname;
+
+    cssProp(info.contextBackLink,
+      '--primary-color',
+      session.activeQueryContextPageColor);
+
+    while (info.contextBackLink.firstChild) {
+      info.contextBackLink.firstChild.remove();
+    }
+
+    info.contextBackLink.appendChild(
+      document.createTextNode(
+        session.activeQueryContextPageName));
+
+    cssProp(info.contextContainer, 'display', 'block');
+  } else {
+    cssProp(info.contextContainer, 'display', 'none');
   }
 }
 
@@ -1126,6 +1199,7 @@ function generateSidebarSearchResultTemplate(slots) {
 }
 
 function hideSidebarSearchResults() {
+  cssProp(info.contextContainer, 'display', 'none');
   cssProp(info.filterContainer, 'display', 'none');
 
   cssProp(info.resultsRule, 'display', 'none');

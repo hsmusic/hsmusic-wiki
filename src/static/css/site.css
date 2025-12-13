@@ -750,6 +750,12 @@ summary.underline-white > span:hover a:not(:hover) {
   margin: 0;
 }
 
+.wiki-search-context-container {
+  padding: 2px 12px 4px;
+  font-size: 0.9em;
+  border-bottom: 1px solid var(--dim-color);
+}
+
 .wiki-search-results-container {
   margin-bottom: 0;
   padding: 2px;

@@ -35,6 +35,11 @@ export default {
           html.tag('template', {class: 'wiki-search-no-results-string'},
             language.$(capsule, 'noResults')),
 
+          html.tag('template', {class: 'wiki-search-back-string'},
+            language.$(capsule, 'back', {
+              page: html.tag('slot', {name: 'page'}),
+            })),
+
           html.tag('template', {class: 'wiki-search-current-result-string'},
             language.$(capsule, 'currentResult')),
 
