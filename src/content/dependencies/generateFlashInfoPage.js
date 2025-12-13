@@ -39,6 +39,11 @@ export default {
         ? relation('generateAdventureSidebar', flash.adventure, flash)
         : relation('generateFlashActSidebar', flash.act, flash)),
 
+    navLinks:
+      (flash.isAdventureFlash
+        ? relation('generateAdventureFlashNavLinks', flash)
+        : relation('generateFlashNavLinks', flash)),
+
     additionalNamesBox:
       relation('generateAdditionalNamesBox', flash.additionalNames),
 
@@ -57,9 +62,6 @@ export default {
 
     readCommentaryLine:
       relation('generateReadCommentaryLine', flash),
-
-    flashActLink:
-      relation('linkFlashAct', flash.act),
 
     flashNavAccent:
       relation('generateFlashNavAccent', flash),
@@ -180,11 +182,7 @@ export default {
         ],
 
         navLinkStyle: 'hierarchical',
-        navLinks: [
-          {auto: 'home'},
-          {html: relations.flashActLink.slot('color', false)},
-          {auto: 'current'},
-        ],
+        navLinks: relations.navLinks,
 
         navBottomRowContent: relations.flashNavAccent,
 
