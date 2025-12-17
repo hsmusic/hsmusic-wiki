@@ -1019,8 +1019,12 @@ misc:
 
       accent: "({DETAILS})"
 
-      albumLength: "{TRACKS}, {TIME}"
-      albumLength.single: "single, {TIME}"
+      albumLength: >-
+        {TRACKS}, {TIME}
+      albumLength.single: >-
+        single, {TIME}
+      albumLength.single.withMultipleTracks: >-
+        single, {TRACKS}, {TIME}+
 
       coverArtists: "Artwork by {ARTISTS}"
       coverArtists.customLabel: "{LABEL} by {ARTISTS}"

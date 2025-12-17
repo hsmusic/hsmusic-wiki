@@ -45,6 +45,8 @@ export default {
       albums.map(album =>
         (album.hideDuration
           ? null
+       : album.style === 'single'
+          ? album.tracks[0]?.duration ?? null
           : getTotalDuration(album.tracks))),
 
     notFromThisGroup:
@@ -81,16 +83,21 @@ export default {
             tracks: data.tracks,
             duration: data.durations,
           }).map(({style, tracks, duration}) =>
-              (style === 'single' && duration
+              (!duration
+                ? null
+             : style === 'single' && tracks > 1
+               ? language.$(capsule, 'details.albumLength.single.withMultipleTracks', {
+                   time: language.formatDuration(duration),
+                   tracks: language.countTracks(tracks, {unit: true}),
+                 })
+             : style === 'single'
                 ? language.$(capsule, 'details.albumLength.single', {
                     time: language.formatDuration(duration),
                   })
-             : duration
-                ? language.$(capsule, 'details.albumLength', {
+                : language.$(capsule, 'details.albumLength', {
                     tracks: language.countTracks(tracks, {unit: true}),
                     time: language.formatDuration(duration),
-                  })
-                : null)),
+                  }))),
 
         revealAllWarnings: data.allWarnings,
       })),
