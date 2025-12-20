@@ -1275,13 +1275,8 @@ export function checkMissingMisplacedMediaFiles(expectedImagePaths, extantImageP
 }
 
 export async function verifyImagePaths(mediaPath, {urls, wikiData}) {
-  console.time('getExpectedImagePaths');
   const expectedPaths = getExpectedImagePaths(mediaPath, {urls, wikiData});
-  console.timeEnd('getExpectedImagePaths');
-  console.time('traverseSourceImagePaths');
   const extantPaths = await traverseSourceImagePaths(mediaPath, {target: 'verify'});
-  console.timeEnd('traverseSourceImagePaths');
-  console.time('set arithmetic');
 
   const {missing: missingPaths, misplaced: misplacedPaths} =
     checkMissingMisplacedMediaFiles(expectedPaths, extantPaths);
@@ -1317,7 +1312,6 @@ export async function verifyImagePaths(mediaPath, {urls, wikiData}) {
   const individuallyMissingPaths =
     missingPaths
       .filter(file => !completelyMissingDirnames.includes(path.dirname(file)));
-  console.timeEnd('set arithmetic');
 
   const wrongExtensionPaths =
     misplacedPaths
