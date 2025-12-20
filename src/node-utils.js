@@ -6,6 +6,8 @@ import {fileURLToPath} from 'node:url';
 
 import _commandExists from 'command-exists';
 
+import {wrapQueue} from '#sugar';
+
 // This package throws an error instead of returning false when the command
 // doesn't exist, for some reason. Yay for making logic more difficult!
 // Here's a straightforward workaround.
@@ -68,6 +70,7 @@ export async function traverse(rootPath, {
   filterFile = () => true,
   filterDir = () => true,
   prefixPath = rootPath,
+  queueSize = 8,
 } = {}) {
   const pathJoinDevice = path.join;
   const pathJoinStyle = {
@@ -80,6 +83,8 @@ export async function traverse(rootPath, {
     throw new Error(`Expected pathStyle to be device, posix, or win32`);
   }
 
+  const q_readdir = wrapQueue(readdir, queueSize);
+
   const recursive = (names, ...subdirectories) =>
     Promise.all(names.map(async name => {
       const devicePath = pathJoinDevice(rootPath, ...subdirectories, name);
@@ -90,7 +95,7 @@ export async function traverse(rootPath, {
       else if (!stats.isDirectory() && !stats.isFile()) return [];
 
       if (stats.isDirectory()) {
-        return recursive(await readdir(devicePath), ...subdirectories, name);
+        return recursive(await q_readdir(devicePath), ...subdirectories, name);
       } else {
         return pathJoinStyle(prefixPath, ...subdirectories, name);
       }

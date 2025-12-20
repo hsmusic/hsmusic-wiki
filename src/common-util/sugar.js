@@ -395,6 +395,35 @@ export function queue(functionList, queueSize = 50) {
   return promiseList;
 }
 
+export function wrapQueue(fn, queueSize = 50) {
+  if (queueSize === 0) return fn;
+
+  let running = 0;
+  let resume = [];
+
+  let proceed = (...args) => {
+    running++;
+    return Promise.try(fn, ...args).finally(() => {
+      running--;
+      if (resume.length) {
+        resume.shift()();
+      }
+    });
+  };
+
+  return (...args) => {
+    if (running === queueSize) {
+      return new Promise(resolve => {
+        resume.push(resolve);
+      }).then(() => {
+        return proceed(...args);
+      });
+    } else {
+      return proceed(...args);
+    }
+  };
+}
+
 export function delay(ms) {
   return new Promise((res) => setTimeout(res, ms));
 }
