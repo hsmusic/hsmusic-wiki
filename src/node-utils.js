@@ -83,13 +83,12 @@ export async function traverse(rootPath, {
     throw new Error(`Expected pathStyle to be device, posix, or win32`);
   }
 
-  const q_readdir = wrapQueue(readdir, Math.ceil(queueSize / 2));
-  const q_stat = wrapQueue(stat, Math.ceil(queueSize / 2));
+  const q_readdir = wrapQueue(readdir, queueSize);
 
   const recursive = (names, ...subdirectories) =>
     Promise.all(names.map(async name => {
       const devicePath = pathJoinDevice(rootPath, ...subdirectories, name);
-      const stats = await q_stat(devicePath);
+      const stats = await stat(devicePath);
 
       if (stats.isDirectory() && !filterDir(name)) return [];
       else if (stats.isFile() && !filterFile(name)) return [];
