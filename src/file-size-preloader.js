@@ -17,10 +17,10 @@
 // This only processes files one at a time because I'm lazy and stat calls
 // are very, very fast.
 
-import {stat} from 'node:fs/promises';
 import {relative, resolve, sep} from 'node:path';
 
 import {logWarn} from '#cli';
+import {stat} from '#quickstat';
 import {filterMultipleArrays, transposeArrays} from '#sugar';
 
 export default class FileSizePreloader {

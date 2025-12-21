@@ -49,6 +49,7 @@ import find, {bindFind, getAllFindSpecs} from '#find';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
 import {isMain, traverse} from '#node-utils';
+import * as quickstat from '#quickstat';
 import {bindReverse} from '#reverse';
 import {writeSearchData} from '#search';
 import {sortByName} from '#sort';
@@ -1175,6 +1176,8 @@ async function main() {
   if (!showTraces) {
     html.disableTagTracing();
   }
+
+  await quickstat.track(mediaPath, {readdir: true, stat: true});
 
   Object.assign(stepStatusSummary.determineMediaCachePath, {
     status: STATUS_STARTED_NOT_DONE,
@@ -3191,6 +3194,8 @@ async function main() {
       ? webRouteSources
           .some(({to}) => to[0].startsWith('searchData'))
       : null);
+
+  quickstat.reset();
 
   if (stepStatusSummary.performBuild.status === STATUS_NOT_APPLICABLE) {
     return true;

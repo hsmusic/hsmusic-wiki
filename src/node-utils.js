@@ -1,10 +1,11 @@
 // Utility functions which are only relevant to particular Node.js constructs.
 
-import {readdir, stat} from 'node:fs/promises';
 import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 import _commandExists from 'command-exists';
+
+import {readdir, stat} from '#quickstat';
 
 // This package throws an error instead of returning false when the command
 // doesn't exist, for some reason. Yay for making logic more difficult!

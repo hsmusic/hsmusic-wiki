@@ -34,6 +34,7 @@
         "#import-heck": "./src/import-heck.js",
         "#language": "./src/data/language.js",
         "#page-specs": "./src/page/index.js",
+        "#quickstat": "./src/quickstat.js",
         "#node-utils": "./src/node-utils.js",
         "#repl": "./src/write/build-modes/repl.js",
         "#replacer": "./src/replacer.js",
