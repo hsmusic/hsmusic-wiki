@@ -149,21 +149,15 @@ const thumbnailSpec = {
 import {spawn} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {createReadStream} from 'node:fs';
+import {mkdir, readFile, rename, writeFile}
+  from 'node:fs/promises';
 import * as path from 'node:path';
-
-import {
-  mkdir,
-  readdir,
-  readFile,
-  rename,
-  stat,
-  writeFile,
-} from 'node:fs/promises';
 
 import dimensionsOf from 'image-size';
 
 import {stringifyCache} from '#cli';
 import {commandExists, isMain, promisifyProcess, traverse} from '#node-utils';
+import {readdir, stat} from '#quickstat';
 import {sortByName} from '#sort';
 import {delay, empty, filterMultipleArrays, queue, stitchArrays, unique}
   from '#sugar';
