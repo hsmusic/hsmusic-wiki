@@ -1,5 +1,12 @@
 import {empty, stitchArrays} from '#sugar';
 
+function findCSSProperty(property, properties) {
+  if (!properties) return null;
+  const regexp = new RegExp(String.raw`(?<=(?:^|;)\s*${property}: ).*?(?=;)`, 'ms' /* mad scrath */);
+  const match = properties.match(regexp);
+  return match?.[0] ?? null;
+}
+
 export default {
   relations: (relation) => ({
     styleTag:
@@ -7,6 +14,10 @@ export default {
   }),
 
   slots: {
+    wallpaperBrightness: {
+      validate: v => v.isNumber,
+    },
+
     singleWallpaperPath: {
       validate: v => v.strictArrayOf(v.isString),
     },
@@ -32,8 +43,16 @@ export default {
 
     attributes.add('class', 'wallpaper-style');
 
+    let brightness = slots.wallpaperBrightness;
+
+    const brightnessFrom = properties => {
+      const opacity = findCSSProperty('opacity', properties);
+      return Number(opacity) || null;
+    };
+
     if (empty(slots.wallpaperPartPaths)) {
       attributes.set('data-wallpaper-mode', 'one');
+      brightness ||= brightnessFrom(slots.singleWallpaperStyle);
 
       rules.push({
         select: 'body::before',
@@ -45,6 +64,7 @@ export default {
     } else {
       attributes.set('data-wallpaper-mode', 'parts');
       attributes.set('data-num-wallpaper-parts', slots.wallpaperPartPaths.length);
+      brightness ||= brightnessFrom(slots.wallpaperPartStyles[0]);
 
       stitchArrays({
         path: slots.wallpaperPartPaths,
@@ -63,6 +83,15 @@ export default {
         select: 'body::before',
         declare: [
           'display: none;',
+        ],
+      });
+    }
+
+    if (brightness) {
+      rules.push({
+        select: ':root',
+        declare: [
+          `--wallpaper-brightness: ${brightness};`,
         ],
       });
     }

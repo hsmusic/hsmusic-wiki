@@ -254,6 +254,10 @@ body::before, .wallpaper-part {
 
 :root {
   color-scheme: dark;
+
+  --initial-wallpaper-opacity: 0.5;
+  --wallpaper-brightness: var(--initial-wallpaper-opacity);
+  --box-opacity: calc(0.6 + 0.3 * (clamp(0.75, var(--wallpaper-brightness), 0.95) - 0.75) / (0.95 - 0.75));
 }
 
 body {
@@ -270,11 +274,22 @@ body::before {
 body::before, .wallpaper-part {
   background-position: center;
   background-size: cover;
-  opacity: 0.5;
+  opacity: var(--initial-wallpaper-opacity);
 }
 
 #page-container {
   background-color: var(--bg-color, rgba(35, 35, 35, 0.8));
+
+  --adjust-page-opacity: calc(alpha * (1.0 + 0.6 * (var(--box-opacity, 0.6) - 0.6)));
+
+  background-color:
+    color-mix(in hsl,
+      rgb(from var(--bg-color, rgba(35, 35, 35, 0.8))
+        r g b / var(--adjust-page-opacity)),
+      rgb(from var(--bg-color, rgba(35, 35, 35, 0.8))
+        0 0 0 / var(--adjust-page-opacity))
+      calc((var(--box-opacity, 0.6) - 0.6) * 40%));
+
   color: #ffffff;
   border-bottom: 2px solid #fff1;
   box-shadow:
@@ -334,7 +349,7 @@ body::before, .wallpaper-part {
 #secondary-nav,
 #skippers,
 #footer {
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, var(--box-opacity, 0.6));
   border: 1px dotted var(--primary-color);
   border-radius: 3px;
   transition: background-color 0.2s;
