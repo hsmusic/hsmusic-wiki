@@ -268,6 +268,11 @@ export class Album extends Thing {
 
     trackDimensions: dimensions(),
 
+    wallpaperBrightness: {
+      flags: {update: true, expose: true},
+      update: {validate: isNumber},
+    },
+
     wallpaperArtwork: [
       exitWithoutDependency('hasWallpaperArt', {
         value: input.value(null),
@@ -666,6 +671,8 @@ export class Album extends Thing {
             artistContribsArtistProperty: 'albumBannerArtistContributions',
           }),
       },
+
+      'Wallpaper Brightness': {property: 'wallpaperBrightness'},
 
       'Wallpaper Artwork': {
         property: 'wallpaperArtwork',

@@ -7,6 +7,9 @@ export default {
   }),
 
   data: ({wikiInfo}) => ({
+    wallpaperBrightness:
+      wikiInfo.wikiWallpaperBrightness,
+
     singleWallpaperPath: [
       'media.path',
       'bg.' + wikiInfo.wikiWallpaperFileExtension,
@@ -27,6 +30,7 @@ export default {
 
   generate: (data, relations) =>
     relations.wallpaperStyleTag.slots({
+      wallpaperBrightness: data.wallpaperBrightness,
       singleWallpaperPath: data.singleWallpaperPath,
       singleWallpaperStyle: data.singleWallpaperStyle,
       wallpaperPartPaths: data.wallpaperPartPaths,

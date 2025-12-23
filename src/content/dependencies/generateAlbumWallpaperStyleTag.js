@@ -7,6 +7,9 @@ export default {
   }),
 
   data: (album) => ({
+    wallpaperBrightness:
+      album.wallpaperBrightness,
+
     singleWallpaperPath:
       ['media.albumWallpaper', album.directory, album.wallpaperFileExtension],
 
@@ -26,6 +29,7 @@ export default {
   generate: (data, relations, {html}) =>
     (relations.wallpaperStyleTag
       ? relations.wallpaperStyleTag.slots({
+          wallpaperBrightness: data.wallpaperBrightness,
           singleWallpaperPath: data.singleWallpaperPath,
           singleWallpaperStyle: data.singleWallpaperStyle,
           wallpaperPartPaths: data.wallpaperPartPaths,

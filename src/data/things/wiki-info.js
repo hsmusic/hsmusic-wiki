@@ -2,9 +2,15 @@ export const WIKI_INFO_FILE = 'wiki-info.yaml';
 
 import {input, V} from '#composite';
 import Thing from '#thing';
-import {isBoolean, isContributionPresetList, isLanguageCode, isName}
-  from '#validators';
 import {parseContributionPresets, parseWallpaperParts} from '#yaml';
+
+import {
+  isBoolean,
+  isContributionPresetList,
+  isLanguageCode,
+  isName,
+  isNumber,
+} from '#validators';
 
 import {exitWithoutDependency, exposeConstant} from '#composite/control-flow';
 
@@ -56,6 +62,11 @@ export class WikiInfo extends Thing {
 
     canonicalBase: canonicalBase(),
     canonicalMediaBase: canonicalBase(),
+
+    wikiWallpaperBrightness: {
+      flags: {update: true, expose: true},
+      update: {validate: isNumber},
+    },
 
     wikiWallpaperFileExtension: fileExtension(V('jpg')),
     wikiWallpaperStyle: simpleString(),
@@ -120,6 +131,7 @@ export class WikiInfo extends Thing {
       'Canonical Base': {property: 'canonicalBase'},
       'Canonical Media Base': {property: 'canonicalMediaBase'},
 
+      'Wiki Wallpaper Brightness': {property: 'wikiWallpaperBrightness'},
       'Wiki Wallpaper File Extension': {property: 'wikiWallpaperFileExtension'},
 
       'Wiki Wallpaper Style': {property: 'wikiWallpaperStyle'},
