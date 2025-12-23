@@ -280,10 +280,10 @@ body::before, .wallpaper-part {
 #page-container {
   background-color: var(--bg-color, rgba(35, 35, 35, 0.8));
 
-  --adjust-page-opacity: calc(alpha * (1.0 + 0.6 * (var(--box-opacity, 0.6) - 0.6)));
+  --adjust-page-opacity: calc(alpha * (1.0 + 0.55 * (var(--box-opacity, 0.6) - 0.6)));
 
   background-color:
-    color-mix(in hsl,
+    color-mix(in oklab,
       rgb(from var(--bg-color, rgba(35, 35, 35, 0.8))
         r g b / var(--adjust-page-opacity)),
       rgb(from var(--bg-color, rgba(35, 35, 35, 0.8))
