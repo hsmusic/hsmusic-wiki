@@ -356,6 +356,10 @@ export async function go({
         if (error.code === 'ERR_STREAM_PREMATURE_CLOSE') {
           // Connection was dropped, this is OK.
           return;
+        } else if (error.code === 'ERR_STREAM_UNABLE_TO_PIPE') {
+          // "Cannot pipe to a closed or destroyed stream"
+          // Sus-amongus networking error. Give up, it's probably OK.
+          return;
         } else {
           throw error;
         }
