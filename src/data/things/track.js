@@ -531,6 +531,8 @@ export class Track extends Thing {
     // > Update & expose - Content entries
 
     lyrics: [
+      exposeUpdateValueOrContinue(),
+
       // TODO: Inherited lyrics are literally the same objects, so of course
       // their .thing properties aren't going to point back to this one, and
       // certainly couldn't be recontextualized...
@@ -1099,11 +1101,6 @@ export class Track extends Thing {
       {message: `Secondary releases inherit contributors from the main one`, fields: [
         'Main Release',
         'Contributors',
-      ]},
-
-      {message: `Secondary releases inherit lyrics from the main one`, fields: [
-        'Main Release',
-        'Lyrics',
       ]},
 
       {
