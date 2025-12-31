@@ -1,29 +1,25 @@
 export default {
   relations: (relation, track) => ({
-    previousProductionTrackList:
-      relation('generateNearbyTrackList',
-        track.previousProductionTracks,
-        track,
-        track.artistContribs),
-
-    referencedTrackList:
+   trackList:
       relation('generateNearbyTrackList',
         track.referencedTracks,
         track,
         []),
   }),
 
-  generate: (relations, {html, language}) =>
+  generate: (relations, {html}) =>
     html.tag('ul', {[html.onlyIfContent]: true}, [
+      // This code is kept here because it's probably the only
+      // detailed example of html.inside() lol
+      /*
       html.inside(relations.previousProductionTrackList)
         .map(li => html.inside(li))
         .map(label =>
           html.tag('li',
             language.$('trackList.item.previousProduction',
               {track: label}))),
+      */
 
-      html.inside(relations.referencedTrackList),
+      html.inside(relations.trackList),
     ]),
 };
-
-

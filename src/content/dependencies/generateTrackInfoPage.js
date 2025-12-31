@@ -83,9 +83,6 @@ export default {
     otherReleasesLine:
       relation('generateTrackInfoPageOtherReleasesLine', track),
 
-    previousProductionLine:
-      relation('generateTrackInfoPagePreviousProductionLine', track),
-
     contributorContributionList:
       relation('generateContributionList', track.contributorContribs),
 
@@ -233,9 +230,6 @@ export default {
 
           html.tag('p', {[html.onlyIfContent]: true},
             relations.otherReleasesLine),
-
-          html.tag('p', {[html.onlyIfContent]: true},
-            relations.previousProductionLine),
 
           html.tags([
             relations.contentHeading.clone()

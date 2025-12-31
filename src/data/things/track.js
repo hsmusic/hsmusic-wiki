@@ -495,15 +495,6 @@ export class Track extends Thing {
 
     // > Update & expose - Referenced tracks
 
-    previousProductionTracks: [
-      inheritFromMainRelease(),
-
-      referenceList({
-        class: input.value(Track),
-        find: soupyFind.input('trackMainReleasesOnly'),
-      }),
-    ],
-
     referencedTracks: [
       inheritFromMainRelease(),
 
@@ -891,10 +882,6 @@ export class Track extends Thing {
       exposeDependency('#album.groups'),
     ],
 
-    followingProductionTracks: reverseReferenceList({
-      reverse: soupyReverse.input('tracksWhichAreFollowingProductionsOf'),
-    }),
-
     referencedByTracks: reverseReferenceList({
       reverse: soupyReverse.input('tracksWhichReference'),
     }),
@@ -1032,7 +1019,6 @@ export class Track extends Thing {
 
       // Referenced tracks
 
-      'Previous Productions': {property: 'previousProductionTracks'},
       'Referenced Tracks': {property: 'referencedTracks'},
       'Sampled Tracks': {property: 'sampledTracks'},
 
@@ -1233,13 +1219,6 @@ export class Track extends Thing {
 
       referencing: track => track.isSecondaryRelease ? [track] : [],
       referenced: track => [track.mainReleaseTrack],
-    },
-
-    tracksWhichAreFollowingProductionsOf: {
-      bindTo: 'trackData',
-
-      referencing: track => track.isMainRelease ? [track] : [],
-      referenced: track => track.previousProductionTracks,
     },
   };
 
