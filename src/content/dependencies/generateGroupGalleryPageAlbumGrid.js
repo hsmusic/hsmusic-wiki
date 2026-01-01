@@ -35,17 +35,18 @@ export default {
     styles:
       albums.map(album => album.style),
 
-    tracks:
-      albums.map(album => album.tracks.length),
-
     allWarnings:
       query.artworks.flatMap(artwork => artwork?.contentWarnings),
 
+    hideDuration:
+      albums.map(album => album.hideDuration),
+
+    tracks:
+      albums.map(album => album.tracks.length),
+
     durations:
       albums.map(album =>
-        (album.hideDuration
-          ? null
-       : album.style === 'single'
+        (album.style === 'single'
           ? album.tracks[0]?.duration ?? null
           : getTotalDuration(album.tracks))),
 
@@ -80,24 +81,32 @@ export default {
         info:
           stitchArrays({
             style: data.styles,
+            hideDuration: data.hideDuration,
             tracks: data.tracks,
             duration: data.durations,
-          }).map(({style, tracks, duration}) =>
-              (!duration
-                ? null
-             : style === 'single' && tracks > 1
-               ? language.$(capsule, 'details.albumLength.single.withMultipleTracks', {
-                   time: language.formatDuration(duration),
-                   tracks: language.countTracks(tracks, {unit: true}),
-                 })
-             : style === 'single'
-                ? language.$(capsule, 'details.albumLength.single', {
-                    time: language.formatDuration(duration),
-                  })
-                : language.$(capsule, 'details.albumLength', {
-                    tracks: language.countTracks(tracks, {unit: true}),
-                    time: language.formatDuration(duration),
-                  }))),
+          }).map(({style, hideDuration, tracks, duration}) =>
+              language.encapsulate(capsule, 'details.albumLength', capsule =>
+                (hideDuration
+                  ? null
+               : !duration && !tracks
+                  ? null
+               : style === 'single' && tracks > 1 && duration
+                  ? language.$(capsule, 'single.withMultipleTracks', {
+                      time: language.formatDuration(duration),
+                      tracks: language.countTracks(tracks, {unit: true}),
+                    })
+               : style === 'single' && duration
+                  ? language.$(capsule, 'single', {
+                      time: language.formatDuration(duration),
+                    })
+               : duration && tracks
+                  ? language.$(capsule, {
+                      time: language.formatDuration(duration),
+                      tracks: language.countTracks(tracks, {unit: true}),
+                    })
+                  : language.$(capsule, 'tracksOnly', {
+                      tracks: language.countTracks(tracks, {unit: true}),
+                    })))),
 
         revealAllWarnings: data.allWarnings,
       })),

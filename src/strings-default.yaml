@@ -1017,6 +1017,8 @@ misc:
         single, {TIME}
       albumLength.single.withMultipleTracks: >-
         single, {TRACKS}, {TIME}+
+      albumLength.tracksOnly: >-
+        {TRACKS}
 
       coverArtists: "Artwork by {ARTISTS}"
       coverArtists.customLabel: "{LABEL} by {ARTISTS}"
