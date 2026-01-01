@@ -1,6 +1,4 @@
-import multilingualWordCount from 'word-count';
-
-import {accumulateSum, empty, stitchArrays} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 export default {
   query(album) {
@@ -39,10 +37,11 @@ export default {
     relations.albumNavAccent =
       relation('generateAlbumNavAccent', album, null);
 
-    relations.bodiesForWordCount =
-      [album.commentary, ...album.tracks.map(t => t.commentary)]
-        .flat()
-        .map(entry => relation('transformContent', entry.body));
+    relations.totals =
+      relation('getContentEntryTotals',
+        ([album.commentary,
+          ...album.tracks.map(t => t.commentary)])
+          .flat());
 
     if (!empty(album.commentary)) {
       relations.albumCommentaryHeading =
@@ -100,19 +99,6 @@ export default {
     data.color = album.color;
     data.date = album.date;
 
-    data.entryCount =
-      query.thingsWithCommentary
-        .flatMap(({commentary}) => commentary)
-        .length;
-
-    data.wordCount =
-      query.thingsWithCommentary
-        .flatMap(({commentary}) => commentary)
-        .map(({body}) => body)
-        .join(' ')
-        .split(' ')
-        .length;
-
     data.trackCommentaryTrackDates =
       query.tracksWithCommentary
         .map(track => track.dateFirstReleased);
@@ -151,7 +137,7 @@ export default {
 
             [
               data.date &&
-              data.entryCount >= 1 &&
+              relations.totals.entryCount >= 1 &&
                 language.$('releaseInfo.albumReleased', {
                   date:
                     html.tag('b',
@@ -161,27 +147,19 @@ export default {
               language.encapsulate(pageCapsule, 'infoLine', workingCapsule => {
                 const workingOptions = {};
 
-                if (data.entryCount >= 1) {
-                  const wordCount =
-                    accumulateSum(
-                      relations.bodiesForWordCount.flatMap(body =>
-                        multilingualWordCount(
-                          html.resolve(
-                            body.slot('mode', 'multiline'),
-                            {normalize: 'plain'}))));
-
-                  const {entryCount} = data;
-
+                if (relations.totals.entryCount >= 1) {
                   workingOptions.words =
                     html.tag('b',
-                      language.formatWordCount(wordCount, {unit: true}));
+                      language.formatWordCount(
+                        relations.totals.wordCount,
+                        {unit: true}));
 
                   workingOptions.entries =
                     html.tag('b',
-                      language.countCommentaryEntries(entryCount, {unit: true}));
-                }
-
-                if (data.entryCount === 0) {
+                      language.countCommentaryEntries(
+                        relations.totals.entryCount,
+                        {unit: true}));
+                } else {
                   workingCapsule += '.withoutCommentary';
                 }
 

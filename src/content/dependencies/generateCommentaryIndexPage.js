@@ -1,7 +1,12 @@
-import multilingualWordCount from 'word-count';
-
 import {sortChronologically} from '#sort';
-import {accumulateSum, filterMultipleArrays, stitchArrays} from '#sugar';
+
+import {
+  accumulateSum,
+  empty,
+  filterMultipleArrays,
+  stitchArrays,
+  transposeArrays,
+} from '#sugar';
 
 export default {
   sprawl: ({albumData}) =>
@@ -13,20 +18,13 @@ export default {
     query.albums =
       sortChronologically(sprawl.albumData.slice());
 
-    const entries =
+    query.entries =
       query.albums.map(album =>
         [album, ...album.tracks]
-          .filter(({commentary}) => commentary)
           .flatMap(({commentary}) => commentary));
 
-    query.bodies =
-      entries.map(entries => entries.map(entry => entry.body));
-
-    query.entryCounts =
-      entries.map(entries => entries.length);
-
-    filterMultipleArrays(query.albums, query.bodies, query.entryCounts,
-      (album, bodies, entryCount) => entryCount >= 1);
+    filterMultipleArrays(query.albums, query.entries,
+      (_album, entries) => !empty(entries));
 
     return query;
   },
@@ -39,30 +37,24 @@ export default {
       query.albums
         .map(album => relation('linkAlbumCommentary', album)),
 
-    albumBodies:
-      query.bodies
-        .map(bodies => bodies
-          .map(body => relation('transformContent', body))),
+    albumTotals:
+      query.entries
+        .map(entries => relation('getContentEntryTotals', entries)),
   }),
 
-  data: (query) => ({
-    entryCounts: query.entryCounts,
-    totalEntryCount: accumulateSum(query.entryCounts),
-  }),
-
-  generate(data, relations, {html, language}) {
-    const wordCounts =
-      relations.albumBodies.map(bodies =>
-        accumulateSum(bodies, body =>
-          multilingualWordCount(
-            html.resolve(
-              body.slot('mode', 'multiline'),
-              {normalize: 'plain'}))));
+  generate(relations, {html, language}) {
+    const [wordCounts, entryCounts] =
+      transposeArrays(
+        relations.albumTotals.map(totals => [
+          totals.wordCount,
+          totals.entryCount,
+        ]));
 
     const totalWordCount =
       accumulateSum(wordCounts);
 
-    const {entryCounts, totalEntryCount} = data;
+    const totalEntryCount =
+      accumulateSum(entryCounts);
 
     return language.encapsulate('commentaryIndex', pageCapsule =>
       relations.layout.slots({
