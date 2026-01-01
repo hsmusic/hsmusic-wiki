@@ -59,6 +59,11 @@ export function getKebabCase(name) {
   return getCaseSensitiveKebabCase(name).toLowerCase();
 }
 
+export function compareKebabCase(name1, name2) {
+  if (!name1 || !name2) return false;
+  return getKebabCase(name1) === getKebabCase(name2);
+}
+
 // Specific data utilities
 
 // Matches heading details from commentary data in roughly the format:

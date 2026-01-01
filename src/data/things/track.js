@@ -6,7 +6,7 @@ import {input, V} from '#composite';
 import {onlyItem} from '#sugar';
 import {sortByDate} from '#sort';
 import Thing from '#thing';
-import {getKebabCase} from '#wiki-data';
+import {compareKebabCase} from '#wiki-data';
 
 import {
   isBoolean,
@@ -169,8 +169,7 @@ export class Track extends Thing {
           ['name']: name,
           ['#mainReleaseTrack.name']: mainReleaseName,
         }) =>
-          getKebabCase(name) ===
-          getKebabCase(mainReleaseName),
+          compareKebabCase(name, mainReleaseName),
       },
     ],
 
@@ -675,27 +674,23 @@ export class Track extends Thing {
         compute: (continuation, {
           ['name']: ownName,
           ['_directory']: ownDirectory,
-        }) => {
-          const ownNameKebabed = getKebabCase(ownName);
+        }) => continuation({
+          ['#mapItsNameLikeName']:
+            itsName => compareKebabCase(itsName, ownName),
 
-          return continuation({
-            ['#mapItsNameLikeName']:
-              name => getKebabCase(name) === ownNameKebabed,
+          ['#mapItsDirectoryLikeDirectory']:
+            (ownDirectory
+              ? itsDirectory => itsDirectory === ownDirectory
+              : () => false),
 
-            ['#mapItsDirectoryLikeDirectory']:
-              (ownDirectory
-                ? directory => directory === ownDirectory
-                : () => false),
+          ['#mapItsNameLikeDirectory']:
+            (ownDirectory
+              ? itsName => compareKebabCase(itsName, ownDirectory)
+              : () => false),
 
-            ['#mapItsNameLikeDirectory']:
-              (ownDirectory
-                ? name => getKebabCase(name) === ownDirectory
-                : () => false),
-
-            ['#mapItsDirectoryLikeName']:
-              directory => directory === ownNameKebabed,
-          });
-        },
+          ['#mapItsDirectoryLikeName']:
+            itsDirectory => compareKebabCase(itsDirectory, ownName),
+        }),
       },
 
       withPropertyFromObject('mainRelease', V('tracks')),

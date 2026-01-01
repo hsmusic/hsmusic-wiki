@@ -4,7 +4,7 @@
 
 import baseSearchSpec from '#search-shape';
 import {unique} from '#sugar';
-import {getKebabCase} from '#wiki-data';
+import {compareKebabCase} from '#wiki-data';
 
 function prepareArtwork(artwork, thing, {
   checkIfImagePathHasCachedThumbnails,
@@ -67,14 +67,17 @@ function determineArtistGroups(artist, opts) {
     new Map(
       unique(contributionGroups).map(group => [group, 0]));
 
-  const artistNamesish =
-    unique(
-      [artist.name, ...artist.artistAliases.map(alias => alias.name)]
-        .map(name => getKebabCase(name)));
+  const artistNames =
+    [artist, ...artist.artistAliases]
+      .map(({name}) => name);
 
+  group:
   for (const group of scores.keys()) {
-    if (artistNamesish.includes(getKebabCase(group.name))) {
-      scores.delete(group);
+    for (const artistName of artistNames) {
+      if (compareKebabCase(group.name, artistName)) {
+        scores.delete(group);
+        continue group;
+      }
     }
   }
 
@@ -161,8 +164,9 @@ function genericSelect(wikiData) {
       wikiData.trackData
         .filter(track =>
           track.isMainRelease ||
-          (getKebabCase(track.name) !==
-           getKebabCase(track.mainReleaseTrack.name)))),
+          !compareKebabCase(
+            track.name,
+            track.mainReleaseTrack.name))),
   ].flat();
 }
 
