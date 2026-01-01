@@ -259,7 +259,7 @@ function validatePropertyValue(property, oldValue, newValue, update) {
 function* dependenciesOf(property, propertyDescriptors, cycle = []) {
   const descriptor = propertyDescriptors[property];
 
-  if (descriptor?.flags?.update && descriptor?.expose?.transform) {
+  if (descriptor?.flags?.update) {
     yield property;
   }
 
