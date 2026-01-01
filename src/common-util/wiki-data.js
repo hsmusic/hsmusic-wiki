@@ -35,7 +35,7 @@ export function getCaseSensitiveKebabCase(name) {
     .replace(/[/@#$%*()_=,[\]{}|\\;:<>?`~]/g, '-')
 
     // More punctuation which always separates surrounding words
-    .replace(/[\u{2013}-\u{2014}]/u, '-') // En Dash, Em Dash
+    .replace(/[\u{2013}-\u{2014}]/gu, '-') // En Dash, Em Dash
 
     // Accented characters
     .replace(/[áâäàå]/gi, 'a')
