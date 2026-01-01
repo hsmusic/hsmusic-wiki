@@ -16,15 +16,30 @@ export default {
     return query;
   },
 
-  relations: (relation, query, _track) => ({
+  relations: (relation, query, track) => ({
+    textWithTooltip:
+      relation('generateTextWithTooltip'),
+
     singleLink:
       (query.singleSingle
         ? relation('linkTrack', query.singleSingle)
         : null),
 
+    singleTooltip:
+      (query.singleSingle
+        ? relation('generateTrackInfoPageOtherReleaseTooltip',
+            query.singleSingle, track)
+        : null),
+
     trackLinks:
       query.regularReleases
         .map(track => relation('linkTrack', track)),
+
+    trackTooltips:
+      query.regularReleases
+        .map(otherTrack =>
+          relation('generateTrackInfoPageOtherReleaseTooltip',
+            otherTrack, track)),
   }),
 
   data: (query, _track) => ({
@@ -48,12 +63,27 @@ export default {
           language.formatConjunctionList(
             stitchArrays({
               trackLink: relations.trackLinks,
+              trackTooltip: relations.trackTooltips,
               albumName: data.albumNames,
               albumColor: data.albumColors,
-            }).map(({trackLink, albumName, albumColor}) =>
-                trackLink.slots({
-                  content: language.sanitize(albumName),
-                  color: albumColor,
+            }).map(({
+                trackLink,
+                trackTooltip,
+                albumName,
+                albumColor,
+              }) =>
+                relations.textWithTooltip.clone().slots({
+                  customInteractionCue: true,
+
+                  text:
+                    trackLink.slots({
+                      attributes: {class: 'text-with-tooltip-interaction-cue'},
+                      content: language.sanitize(albumName),
+                      color: albumColor,
+                    }),
+
+                  tooltip:
+                    trackTooltip,
                 })));
 
         if (!html.isBlank(albumList)) {
@@ -66,8 +96,17 @@ export default {
           any = true;
           workingCapsule += '.asSingle';
           workingOptions.single =
-            relations.singleLink.slots({
-              content: language.$(capsule, 'single'),
+            relations.textWithTooltip.clone().slots({
+              customInteractionCue: true,
+
+              text:
+                relations.singleLink.slots({
+                  attributes: {class: 'text-with-tooltip-interaction-cue'},
+                  content: language.$(capsule, 'single'),
+                }),
+
+              tooltip:
+                relations.singleTooltip,
             });
         }
 

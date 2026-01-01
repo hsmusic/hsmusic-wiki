@@ -301,6 +301,9 @@ releaseInfo:
 
     single: "as a single"
 
+    tooltip:
+      differentName: "as {NAME}"
+
   tracksReferenced:
     _: "Tracks that {TRACK} references:"
     sticky: "Tracks that this one references:"

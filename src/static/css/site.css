@@ -1316,6 +1316,7 @@ label > input[type=checkbox]:not(:checked) + span {
 .commentary-date-tooltip,
 .rerelease-tooltip,
 .first-release-tooltip,
+.other-release-tooltip,
 .content-tooltip {
   padding: 3px 4px 2px 2px;
   left: -10px;
@@ -1427,7 +1428,9 @@ label > input[type=checkbox]:not(:checked) + span {
 }
 
 .contribution-tooltip .tooltip-divider,
-.tooltip-content hr.cute {
+.tooltip-content hr.cute,
+.tooltip-content span.cute-break {
+  display: block;
   grid-column-start: icon-start;
   grid-column-end: platform-end;
   border-top: 1px dotted var(--primary-color);
@@ -1505,6 +1508,13 @@ label > input[type=checkbox]:not(:checked) + span {
 .first-release-tooltip .tooltip-content {
   padding: 3px 4.5px;
   width: 260px;
+  font-size: 0.9em;
+}
+
+.other-release-tooltip .tooltip-content {
+  padding: 3px 4.5px;
+  width: max-content;
+  max-width: 250px;
   font-size: 0.9em;
 }
 
