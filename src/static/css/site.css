@@ -3154,6 +3154,7 @@ video.pixelate, .pixelate video {
   align-items: flex-start;
   padding: 5px 15px;
   box-sizing: border-box;
+  margin-top: 1em;
 }
 
 .grid-listing:not(:has(.grid-item:not([class*="hidden-by-"]))) {
