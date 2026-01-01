@@ -1,4 +1,6 @@
-import {empty, stitchArrays} from '#sugar';
+import multilingualWordCount from 'word-count';
+
+import {accumulateSum, empty, stitchArrays} from '#sugar';
 
 export default {
   query(album) {
@@ -36,6 +38,11 @@ export default {
 
     relations.albumNavAccent =
       relation('generateAlbumNavAccent', album, null);
+
+    relations.bodiesForWordCount =
+      [album.commentary, ...album.tracks.map(t => t.commentary)]
+        .flat()
+        .map(entry => relation('transformContent', entry.body));
 
     if (!empty(album.commentary)) {
       relations.albumCommentaryHeading =
@@ -155,13 +162,23 @@ export default {
                 const workingOptions = {};
 
                 if (data.entryCount >= 1) {
+                  const wordCount =
+                    accumulateSum(
+                      relations.bodiesForWordCount.flatMap(body =>
+                        multilingualWordCount(
+                          html.resolve(
+                            body.slot('mode', 'multiline'),
+                            {normalize: 'plain'}))));
+
+                  const {entryCount} = data;
+
                   workingOptions.words =
                     html.tag('b',
-                      language.formatWordCount(data.wordCount, {unit: true}));
+                      language.formatWordCount(wordCount, {unit: true}));
 
                   workingOptions.entries =
                     html.tag('b',
-                      language.countCommentaryEntries(data.entryCount, {unit: true}));
+                      language.countCommentaryEntries(entryCount, {unit: true}));
                 }
 
                 if (data.entryCount === 0) {
