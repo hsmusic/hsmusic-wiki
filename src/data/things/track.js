@@ -225,40 +225,8 @@ export class Track extends Thing {
       }),
 
       exposeDependencyOrContinue('#sameNameSingle'),
-
-      {
-        dependencies: [
-          '#matchingTrack',
-          '#matchingAlbum',
-        ],
-
-        compute: (continuation, {
-          ['#matchingTrack']: matchingTrack,
-          ['#matchingAlbum']: matchingAlbum,
-        }) =>
-          (matchingTrack && matchingAlbum
-            ? continuation()
-         : matchingTrack ?? matchingAlbum
-            ? matchingTrack ?? matchingAlbum
-            : null),
-      },
-
-      withPropertyFromObject( '#matchingAlbum', V('tracks')),
-
-      {
-        dependencies: [
-          '#matchingAlbum.tracks',
-          '#matchingTrack',
-        ],
-
-        compute: ({
-          ['#matchingAlbum.tracks']: matchingAlbumTracks,
-          ['#matchingTrack']: matchingTrack,
-        }) =>
-          (matchingAlbumTracks.includes(matchingTrack)
-            ? matchingTrack
-            : null),
-      },
+      exposeDependencyOrContinue('#matchingAlbum'),
+      exposeDependency('#matchingTrack'),
     ],
 
     bandcampTrackIdentifier: simpleString(),
