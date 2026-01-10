@@ -45,11 +45,14 @@ export function normalizeName(s) {
     )
     .trim();
 
-  // Discard anything that isn't a letter, number, or space.
-  s = s.replace(/[^\p{Letter}\p{Number} ]/gu, '').trim();
+  // Discard anything that isn't a letter, number, space, or apostrophe.
+  s = s.replace(/[^\p{Letter}\p{Number} ']/gu, '').trim();
 
-  // Remove common English (only, for now) prefixes.
-  s = s.replace(/^(?:an?|the) /i, '');
+  // Remove common articles.
+  s = s.replace(/^(?:an?|the|le|la|l') /i, '');
+
+  // Discard apostrophes.
+  s = s.replace(/'/g, '').trim();
 
   return s;
 }
