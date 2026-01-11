@@ -113,7 +113,8 @@ export default {
               html.tag('li', {class: 'divider'},
                 html.tag('hr')),
 
-            relations.itemsNotCountingTowardTotals,
+            relations.itemsNotCountingTowardTotals
+              .map(item => item.slot('showDuration', false)),
           ]),
     }),
 };

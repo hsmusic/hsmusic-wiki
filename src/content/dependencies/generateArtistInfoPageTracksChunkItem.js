@@ -116,7 +116,14 @@ export default {
         : null),
   }),
 
-  generate: (data, relations, {html, language}) =>
+  slots: {
+    showDuration: {
+      type: 'boolean',
+      default: true,
+    },
+  },
+
+  generate: (data, relations, slots, {html, language}) =>
     relations.template.slots({
       otherArtistLinks: relations.otherArtistLinks,
       rereleaseTooltip: relations.rereleaseTooltip,
@@ -131,7 +138,7 @@ export default {
         language.encapsulate('artistPage.creditList.entry.track', workingCapsule => {
           const workingOptions = {track: relations.trackLink};
 
-          if (data.duration) {
+          if (slots.showDuration && data.duration) {
             workingCapsule += '.withDuration';
             workingOptions.duration =
               language.formatDuration(data.duration);
