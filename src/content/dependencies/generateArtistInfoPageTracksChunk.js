@@ -26,6 +26,9 @@ export default {
     albumLink:
       relation('linkAlbum', album),
 
+    albumArtistCredit:
+      relation('generateArtistCredit', album.artistContribs, []),
+
     itemsCountingTowardTotals:
       query.contribListsCountingTowardTotals.map(trackContribs =>
         relation('generateArtistInfoPageTracksChunkItem',
@@ -91,10 +94,28 @@ export default {
     return data;
   },
 
-  generate: (data, relations, {html}) =>
+  generate: (data, relations, {html, language}) =>
     relations.template.slots({
       mode: 'album',
-      link: relations.albumLink,
+
+      link:
+        language.encapsulate('artistPage.creditList.album', workingCapsule => {
+          const creditCapsule = workingCapsule + '.credit';
+          const workingOptions = {album: relations.albumLink};
+
+          relations.albumArtistCredit.setSlots({
+            normalStringKey: creditCapsule + '.by',
+          });
+
+          if (!html.isBlank(relations.albumArtistCredit)) {
+            workingCapsule += '.withCredit';
+            workingOptions.credit =
+              html.tag('span', {class: 'by'},
+                relations.albumArtistCredit);
+          }
+
+          return language.$(workingCapsule, workingOptions);
+        }),
 
       dates: data.dates,
       duration: data.duration,

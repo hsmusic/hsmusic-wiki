@@ -2284,11 +2284,11 @@ ul.quick-info li:not(:last-child)::after {
   margin: 0 6px;
 }
 
-li .by {
+dt .by, li .by {
   font-style: oblique;
 }
 
-li .by a {
+dt .by a, li .by a {
   display: inline-block;
 }
 

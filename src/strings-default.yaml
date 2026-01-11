@@ -1285,6 +1285,11 @@ artistPage:
 
     album:
       _: "{ALBUM}"
+
+      withCredit: "{ALBUM} {CREDIT}"
+      credit:
+        by: "by {ARTISTS}"
+
       withDate: "{ALBUM} ({DATE})"
       withDuration: "{ALBUM} ({DURATION})"
       withDate.withDuration: "{ALBUM} ({DATE}; {DURATION})"
@@ -1347,13 +1352,7 @@ artistPage:
         rerelease: >-
           Also released on {ALBUM}
 
-      # track:
-      #   The string without duration is used in both the artist's
-      #   track credits list as well as their commentary list.
-
-      track:
-        _: "{TRACK}"
-        withDuration: "({DURATION}) {TRACK}"
+      track: "{TRACK}"
 
       # album:
       #   The artist info page doesn't display if the artist is
@@ -1368,8 +1367,7 @@ artistPage:
         bannerArt: "(banner art)"
         commentary: "(album commentary)"
 
-      flash:
-        _: "{FLASH}"
+      flash: "{FLASH}"
 
       artwork.accent:
         withLabel: >-

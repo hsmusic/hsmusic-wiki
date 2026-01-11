@@ -91,6 +91,11 @@ export default {
     trackLink:
       relation('linkTrack', query.track),
 
+    trackListItem:
+      relation('generateTrackListItem',
+        query.track,
+        query.track.album.artistContribs),
+
     rereleaseTooltip:
       (query.isLaterRelease
         ? relation('generateArtistInfoPageRereleaseTooltip', query.track, artist)
@@ -131,16 +136,13 @@ export default {
           : html.blank()),
 
       content:
-        language.encapsulate('artistPage.creditList.entry.track', workingCapsule => {
-          const workingOptions = {track: relations.trackLink};
-
-          if (slots.showDuration && data.duration) {
-            workingCapsule += '.withDuration';
-            workingOptions.duration =
-              language.formatDuration(data.duration);
-          }
-
-          return language.$(workingCapsule, workingOptions);
+        language.$('artistPage.creditList.entry.track', {
+          track:
+            html.inside(
+              relations.trackListItem.slots({
+                showArtists: 'auto',
+                showDuration: slots.showDuration,
+              })),
         }),
     }),
 };
