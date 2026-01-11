@@ -43,11 +43,12 @@ export default {
           }),
 
           data.otherDate && data.currentDate &&
-            language.formatRelativeDate(data.otherDate, data.currentDate, {
-              considerRoundingDays: true,
-              approximate: true,
-              absolute: false,
-            }),
+            html.tag('span', {class: 'when'},
+              language.formatRelativeDate(data.otherDate, data.currentDate, {
+                considerRoundingDays: true,
+                approximate: true,
+                absolute: false,
+              })),
         ],
       })),
 };

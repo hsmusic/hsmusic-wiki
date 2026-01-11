@@ -1518,6 +1518,14 @@ label > input[type=checkbox]:not(:checked) + span {
   font-size: 0.9em;
 }
 
+.other-release-tooltip .tooltip-content .when {
+  /* technically just putting this in a <span> was enough
+   * to keep it from wrapping all tight-like, for some
+   * reason, but im not taking any chances...
+   */
+  white-space: nowrap;
+}
+
 .rerelease-tooltip .not-credited-on-first-release {
   opacity: 0.9;
 }
