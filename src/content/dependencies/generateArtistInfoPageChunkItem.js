@@ -54,11 +54,7 @@ export default {
                   text: language.$(entryCapsule, 'rerelease.term'),
                   tooltip: slots.rereleaseTooltip,
                 });
-
-              return language.$(workingCapsule, workingOptions);
-            }
-
-            if (!html.isBlank(slots.firstReleaseTooltip)) {
+            } else if (!html.isBlank(slots.firstReleaseTooltip)) {
               workingCapsule += '.firstRelease';
               workingOptions.firstRelease =
                 relations.textWithTooltip.slots({
@@ -66,29 +62,21 @@ export default {
                   text: language.$(entryCapsule, 'firstRelease.term'),
                   tooltip: slots.firstReleaseTooltip,
                 });
-
-              return language.$(workingCapsule, workingOptions);
-            }
-
-            let anyAccent = false;
-
-            if (!empty(slots.otherArtistLinks)) {
-              anyAccent = true;
+            } else if (!empty(slots.otherArtistLinks)) {
               workingCapsule += '.withArtists';
               workingOptions.artists =
                 language.formatConjunctionList(slots.otherArtistLinks);
             }
 
             if (!html.isBlank(slots.annotation)) {
-              anyAccent = true;
               workingCapsule += '.withAnnotation';
               workingOptions.annotation = slots.annotation;
             }
 
-            if (anyAccent) {
-              return language.$(workingCapsule, workingOptions);
-            } else {
+            if (workingCapsule === entryCapsule) {
               return slots.content;
+            } else {
+              return language.$(workingCapsule, workingOptions);
             }
           }),
 

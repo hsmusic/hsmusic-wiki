@@ -1330,6 +1330,7 @@ artistPage:
 
       rerelease:
         _: "{ENTRY} ({RERELEASE})"
+        withAnnotation: "{ENTRY} ({ANNOTATION}; {RERELEASE})"
         term: "rerelease"
 
         firstRelease: >-
@@ -1340,6 +1341,7 @@ artistPage:
 
       firstRelease:
         _: "{ENTRY} ({FIRST_RELEASE})"
+        withAnnotation: "{ENTRY} ({ANNOTATION}; {FIRST_RELEASE})"
         term: "first release"
 
         rerelease: >-
