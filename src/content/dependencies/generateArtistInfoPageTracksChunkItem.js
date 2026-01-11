@@ -94,7 +94,9 @@ export default {
     trackListItem:
       relation('generateTrackListItem',
         query.track,
-        query.track.album.artistContribs),
+        (empty(query.track.album.artistContribs)
+          ? [artist.mockSimpleContribution]
+          : query.track.album.artistContribs)),
 
     rereleaseTooltip:
       (query.isLaterRelease

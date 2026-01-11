@@ -43,7 +43,7 @@ export class Artist extends Thing {
     'avatarArtwork', // from inline fields
   ];
 
-  static [Thing.getPropertyDescriptors] = () => ({
+  static [Thing.getPropertyDescriptors] = ({Contribution}) => ({
     // Update & expose
 
     name: name(V('Unnamed Artist')),
@@ -77,6 +77,27 @@ export class Artist extends Thing {
     // Expose only
 
     isArtist: exposeConstant(V(true)),
+
+    mockSimpleContribution: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['directory', '_find'],
+        compute: ({directory, _find: find}) =>
+          Object.assign(new Contribution, {
+            artist: 'artist:' + directory,
+
+            // These nulls have no effect, they're only included
+            // here for clarity.
+            date: null,
+            thing: null,
+            annotation: null,
+            artistProperty: null,
+            thingProperty: null,
+
+            find,
+          }),
+      },
+    },
 
     trackArtistContributions: reverseReferenceList({
       reverse: soupyReverse.input('trackArtistContributionsBy'),
