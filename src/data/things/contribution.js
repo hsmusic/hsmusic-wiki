@@ -62,11 +62,11 @@ export class Contribution extends Thing {
     },
 
     countInContributionTotals: [
-      inheritFromContributionPresets(),
-
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
       }),
+
+      inheritFromContributionPresets(),
 
       {
         dependencies: ['thing', input.myself()],
@@ -85,11 +85,11 @@ export class Contribution extends Thing {
     ],
 
     countInDurationTotals: [
-      inheritFromContributionPresets(),
-
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
       }),
+
+      inheritFromContributionPresets(),
 
       withPropertyFromObject('thing', V('duration')),
       exitWithoutDependency('#thing.duration', {
