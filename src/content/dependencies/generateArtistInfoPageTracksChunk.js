@@ -3,23 +3,43 @@ import {empty, unique} from '#sugar';
 import {getTotalDuration} from '#wiki-data';
 
 export default {
-  relations: (relation, artist, album, trackContribLists) => ({
+  query: (_artist, _album, trackContribLists) => ({
+    contribListsCountingTowardTotals:
+      trackContribLists
+        .filter(trackContribs => trackContribs
+          .some(contrib =>
+            contrib.countInContributionTotals ||
+            contrib.countInDurationTotals)),
+
+    contribListsNotCountingTowardTotals:
+      trackContribLists
+        .filter(trackContribs => trackContribs
+          .every(contrib =>
+            !contrib.countInContributionTotals &&
+            !contrib.countInDurationTotals)),
+  }),
+
+  relations: (relation, query, artist, album, _trackContribLists) => ({
     template:
       relation('generateArtistInfoPageChunk'),
 
     albumLink:
       relation('linkAlbum', album),
 
-    // Intentional mapping here: each item may be associated with
-    // more than one contribution.
-    items:
-      trackContribLists.map(trackContribs =>
+    itemsCountingTowardTotals:
+      query.contribListsCountingTowardTotals.map(trackContribs =>
+        relation('generateArtistInfoPageTracksChunkItem',
+          artist,
+          trackContribs)),
+
+    itemsNotCountingTowardTotals:
+      query.contribListsNotCountingTowardTotals.map(trackContribs =>
         relation('generateArtistInfoPageTracksChunkItem',
           artist,
           trackContribs)),
   }),
 
-  data(artist, album, trackContribLists) {
+  data(artist, _query, album, trackContribLists) {
     const data = {};
 
     const contribs =
@@ -85,6 +105,15 @@ export default {
           data.numLinkingOtherReleases > 1 &&
             {class: 'offset-tooltips'},
 
-          relations.items),
+          [
+            relations.itemsCountingTowardTotals,
+
+            !empty(relations.itemsCountingTowardTotals) &&
+            !empty(relations.itemsNotCountingTowardTotals) &&
+              html.tag('li', {class: 'divider'},
+                html.tag('hr')),
+
+            relations.itemsNotCountingTowardTotals,
+          ]),
     }),
 };

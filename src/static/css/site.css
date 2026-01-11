@@ -2096,6 +2096,19 @@ h1 {
   white-space: nowrap;
 }
 
+#content li.divider {
+  list-style-type: none;
+  max-width: 220px;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+#content li.divider hr {
+  color: #888;
+  border: none;
+  border-bottom: 1px solid;
+}
+
 #content details {
   margin-top: 0.25em;
   margin-bottom: 0.25em;
