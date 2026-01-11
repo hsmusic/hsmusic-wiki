@@ -1,5 +1,3 @@
-import {empty} from '#sugar';
-
 export default {
   relations: (relation) => ({
     textWithTooltip:
