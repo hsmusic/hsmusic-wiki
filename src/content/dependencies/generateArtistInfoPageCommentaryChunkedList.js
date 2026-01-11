@@ -231,7 +231,9 @@ export default {
                         type: itemTypes,
                       }).map(({item, link, annotation, type}) =>
                         item.slots({
-                          annotation:
+                          // The citation slot, instead of annotation, gives commentary
+                          // a specially custom look.
+                          citation:
                             annotation.slots({
                               mode: 'inline',
                               absorbPunctuationFollowingExternalLinks: false,

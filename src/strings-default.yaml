@@ -1318,7 +1318,13 @@ artistPage:
       #   thing may be described with a word or two, and that's shown
       #   in the list.
 
-      withAnnotation: "{ENTRY} ({ANNOTATION})"
+      withAnnotation: "{ENTRY} — {ANNOTATION}"
+
+      # withCitation:
+      #   For commentary entries and the like. These are usually longer
+      #   than typical annotations.
+
+      withCitation: "{ENTRY} ({CITATION})"
 
       # withArtists:
       #   This lists co-artists or co-contributors, depending on how
@@ -1326,7 +1332,7 @@ artistPage:
 
       withArtists: "{ENTRY} (with {ARTISTS})"
 
-      withArtists.withAnnotation: "{ENTRY} ({ANNOTATION}; with {ARTISTS})"
+      withArtists.withAnnotation: "{ENTRY} — {ANNOTATION} (with {ARTISTS})"
 
       # rerelease:
       #   Tracks which aren't the original release don't display co-
@@ -1335,7 +1341,7 @@ artistPage:
 
       rerelease:
         _: "{ENTRY} ({RERELEASE})"
-        withAnnotation: "{ENTRY} ({ANNOTATION}; {RERELEASE})"
+        withAnnotation: "{ENTRY} ({RERELEASE}) — {ANNOTATION}"
         term: "rerelease"
 
         firstRelease: >-
@@ -1346,7 +1352,7 @@ artistPage:
 
       firstRelease:
         _: "{ENTRY} ({FIRST_RELEASE})"
-        withAnnotation: "{ENTRY} ({ANNOTATION}; {FIRST_RELEASE})"
+        withAnnotation: "{ENTRY} ({FIRST_RELEASE}) — {ANNOTATION}"
         term: "first release"
 
         rerelease: >-

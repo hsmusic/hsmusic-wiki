@@ -17,6 +17,11 @@ export default {
       mutable: false,
     },
 
+    citation: {
+      type: 'html',
+      mutable: false,
+    },
+
     otherArtistLinks: {
       validate: v => v.strictArrayOf(v.isHTML),
     },
@@ -71,6 +76,9 @@ export default {
             if (!html.isBlank(slots.annotation)) {
               workingCapsule += '.withAnnotation';
               workingOptions.annotation = slots.annotation;
+            } else if (!html.isBlank(slots.citation)) {
+              workingCapsule += '.withCitation';
+              workingOptions.citation = slots.citation;
             }
 
             if (workingCapsule === entryCapsule) {
