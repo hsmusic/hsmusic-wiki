@@ -21,9 +21,6 @@ export default {
         ? relation('linkTrack', contrib.thing.thing)
         : null),
 
-    otherArtistLinks:
-      relation('generateArtistInfoPageOtherArtistLinks', [contrib]),
-
     originDetails:
       relation('transformContent', contrib.thing.originDetails),
   }),
@@ -48,8 +45,6 @@ export default {
 
   generate: (data, relations, slots, {html, language}) =>
     relations.template.slots({
-      otherArtistLinks: relations.otherArtistLinks,
-
       annotation:
         language.encapsulate('artistPage.creditList.entry.artwork.accent', workingCapsule => {
           const workingOptions = {};

@@ -1326,14 +1326,6 @@ artistPage:
 
       withCitation: "{ENTRY} ({CITATION})"
 
-      # withArtists:
-      #   This lists co-artists or co-contributors, depending on how
-      #   the artist themselves was credited.
-
-      withArtists: "{ENTRY} (with {ARTISTS})"
-
-      withArtists.withAnnotation: "{ENTRY} — {ANNOTATION} (with {ARTISTS})"
-
       # rerelease:
       #   Tracks which aren't the original release don't display co-
       #   artists or contributors, and get dimmed a little compared

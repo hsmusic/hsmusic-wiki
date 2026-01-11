@@ -22,10 +22,6 @@ export default {
       mutable: false,
     },
 
-    otherArtistLinks: {
-      validate: v => v.strictArrayOf(v.isHTML),
-    },
-
     rereleaseTooltip: {
       type: 'html',
       mutable: false,
@@ -67,10 +63,6 @@ export default {
                   text: language.$(entryCapsule, 'firstRelease.term'),
                   tooltip: slots.firstReleaseTooltip,
                 });
-            } else if (!empty(slots.otherArtistLinks)) {
-              workingCapsule += '.withArtists';
-              workingOptions.artists =
-                language.formatConjunctionList(slots.otherArtistLinks);
             }
 
             if (!html.isBlank(slots.annotation)) {
