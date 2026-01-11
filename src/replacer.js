@@ -934,7 +934,7 @@ export function postprocessExternalLinks(inputNodes) {
 
     let parseFrom = 0;
     for (const match of matchInlineLinks(node.data)) {
-      const {href, index, length} = match;
+      let {href, index, length} = match;
 
       textNode.data += node.data.slice(parseFrom, index);
 
@@ -949,6 +949,13 @@ export function postprocessExternalLinks(inputNodes) {
           data: '',
         };
       }
+
+      try {
+        const url = new URL(href);
+        if (url.pathname === '/' && !url.search && !url.hash) {
+          href = href.replace(/\/$/, '');
+        }
+      } catch {}
 
       outputNodes.push({
         i: node.i + index,
