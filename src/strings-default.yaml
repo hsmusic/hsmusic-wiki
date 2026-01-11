@@ -1337,7 +1337,7 @@ artistPage:
           First released on {ALBUM}
 
         notCreditedOnFirstRelease: >-
-          Note that {ARTIST} is not credited on this track's first release.
+          {ARTIST} isn't credited on this track's first release.
 
       firstRelease:
         _: "{ENTRY} ({FIRST_RELEASE})"
