@@ -41,10 +41,8 @@ export default templateCompositeFrom({
       compute: (continuation, {
         ['#values']: values,
         ['#index']: index,
-      }) => continuation({
-        ['#value']:
-          values[index],
-      }),
+      }) =>
+        continuation.exit(values[index]),
     },
   ],
 });
