@@ -84,15 +84,12 @@ export default {
     return query;
   },
 
-  relations: (relation, query, artist, contribs) => ({
+  relations: (relation, query, artist, _contribs) => ({
     template:
       relation('generateArtistInfoPageChunkItem'),
 
     trackLink:
       relation('linkTrack', query.track),
-
-    otherArtistLinks:
-      relation('generateArtistInfoPageOtherArtistLinks', contribs),
 
     rereleaseTooltip:
       (query.isLaterRelease
@@ -125,7 +122,6 @@ export default {
 
   generate: (data, relations, slots, {html, language}) =>
     relations.template.slots({
-      otherArtistLinks: relations.otherArtistLinks,
       rereleaseTooltip: relations.rereleaseTooltip,
       firstReleaseTooltip: relations.firstReleaseTooltip,
 
