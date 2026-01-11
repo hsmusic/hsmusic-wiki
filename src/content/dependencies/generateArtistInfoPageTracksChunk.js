@@ -2,21 +2,44 @@ import {sortAlbumsTracksChronologically} from '#sort';
 import {empty, unique} from '#sugar';
 import {getTotalDuration} from '#wiki-data';
 
+function countTowardTotals(contribs) {
+  const track = contribs[0].thing;
+
+  if (track.isSecondaryRelease) {
+    const all =
+      Object.fromEntries(
+        unique(contribs.map(contrib => contrib.thingProperty))
+          .map(prop => [
+            prop,
+            track.mainReleaseTrack[prop].slice(),
+          ]));
+
+    contribs = contribs.flatMap(a => {
+      const array = all[a.thingProperty];
+      const index =
+        array.findIndex(b =>
+          b.artist === a.artist &&
+          b.annotation === a.annotation);
+
+      if (index === -1) return [];
+      return array.splice(index, 1);
+    }).filter(Boolean);
+  }
+
+  return contribs.some(contrib =>
+    contrib.countInContributionTotals ||
+    contrib.countInDurationTotals);
+}
+
 export default {
   query: (_artist, _album, trackContribLists) => ({
     contribListsCountingTowardTotals:
       trackContribLists
-        .filter(trackContribs => trackContribs
-          .some(contrib =>
-            contrib.countInContributionTotals ||
-            contrib.countInDurationTotals)),
+        .filter(contribs => countTowardTotals(contribs)),
 
     contribListsNotCountingTowardTotals:
       trackContribLists
-        .filter(trackContribs => trackContribs
-          .every(contrib =>
-            !contrib.countInContributionTotals &&
-            !contrib.countInDurationTotals)),
+        .filter(contribs => !countTowardTotals(contribs)),
   }),
 
   relations: (relation, query, artist, album, _trackContribLists) => ({
