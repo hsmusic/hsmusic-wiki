@@ -289,12 +289,20 @@ export class Track extends Thing {
     ],
 
     contributorContribs: [
+      withResolvedContribs({
+        from: input.updateValue({validate: isContributionList}),
+        date: 'date',
+        thingProperty: input.thisProperty(),
+        artistProperty: input.value('trackArtistContributions'),
+      }).outputs({
+        '#resolvedContribs': '#contributorContribs',
+      }),
+
+      exposeDependencyOrContinue('#contributorContribs', V('empty')),
+
       inheritContributionListFromMainRelease(),
 
-      contributionList({
-        date: 'date',
-        artistProperty: input.value('trackContributorContributions'),
-      }),
+      exposeConstant(V([])),
     ],
 
     // > Update & expose - General configuration
@@ -1045,11 +1053,6 @@ export class Track extends Thing {
       {message: `Secondary releases inherit samples from the main one`, fields: [
         'Main Release',
         'Sampled Tracks',
-      ]},
-
-      {message: `Secondary releases inherit contributors from the main one`, fields: [
-        'Main Release',
-        'Contributors',
       ]},
 
       {
