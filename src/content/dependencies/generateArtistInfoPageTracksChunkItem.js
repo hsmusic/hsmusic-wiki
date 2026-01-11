@@ -10,9 +10,11 @@ export default {
     query.track =
       contribs[0].thing;
 
-    const creditedAsArtist =
+    const creditedAsNormalArtist =
       contribs
-        .some(contrib => contrib.thingProperty === 'artistContribs');
+        .some(contrib =>
+          contrib.thingProperty === 'artistContribs' &&
+          contrib.annotation !== 'featuring');
 
     const creditedAsContributor =
       contribs
@@ -20,7 +22,9 @@ export default {
 
     const annotatedContribs =
       contribs
-        .filter(contrib => contrib.annotation);
+        .filter(contrib =>
+          contrib.annotation &&
+          contrib.annotation !== 'featuring');
 
     const annotatedArtistContribs =
       annotatedContribs
@@ -39,7 +43,7 @@ export default {
     // Return seemingly only for "bass clarinet" when they're also
     // the one who composed and arranged Renewed Return!
     if (
-      creditedAsArtist &&
+      creditedAsNormalArtist &&
       creditedAsContributor &&
       empty(annotatedArtistContribs)
     ) {
