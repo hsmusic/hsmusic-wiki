@@ -63,9 +63,11 @@ function determineArtistGroups(artist, opts) {
   const contributionGroups =
     contributions.flatMap(contrib => contrib.groups);
 
-  const scores =
-    new Map(
-      unique(contributionGroups).map(group => [group, 0]));
+  const groupToZero =
+    new Map(unique(contributionGroups).map(group => [group, 0]));
+
+  const scores = new Map(groupToZero);
+  const counts = new Map(groupToZero);
 
   const artistNames =
     [artist, ...artist.artistAliases]
@@ -76,6 +78,7 @@ function determineArtistGroups(artist, opts) {
     for (const artistName of artistNames) {
       if (compareKebabCase(group.name, artistName)) {
         scores.delete(group);
+        counts.delete(group);
         continue group;
       }
     }
@@ -83,26 +86,30 @@ function determineArtistGroups(artist, opts) {
 
   for (const group of contributionGroups) {
     scores.set(group, scores.get(group) + 1 / contributions.length);
+    counts.set(group, counts.get(group) + 1);
   }
 
   const dividingGroups =
     opts.wikiInfo.divideTrackListsByGroups;
 
-  const dividingGroupThreshold =
+  const dividingGroupScoreThreshold =
     (contributions.length < 50 ? 0.08 : 0.16);
 
-  const generalGroupThreshold =
+  const generalGroupScoreThreshold =
     (contributions.length < 50 ? 0.00 : 0.12);
 
-  for (const group of scores.keys()) {
-    const threshold =
-      (dividingGroups.includes(group)
-        ? dividingGroupThreshold
-        : generalGroupThreshold);
+  const dividingGroupCountThreshold = 15;
+  const generalGroupCountThreshold = 20;
 
-    if (scores.get(group) < threshold) {
-      scores.delete(group);
-    }
+  for (const group of scores.keys()) {
+    const [scoreThreshold, countThreshold] =
+      (dividingGroups.includes(group)
+        ? [dividingGroupScoreThreshold, dividingGroupCountThreshold]
+        : [generalGroupScoreThreshold, generalGroupCountThreshold]);
+
+    if (scores.get(group) >= scoreThreshold);
+    else if (counts.get(group) >= countThreshold);
+    else scores.delete(group);
   }
 
   return Array.from(scores.keys());
