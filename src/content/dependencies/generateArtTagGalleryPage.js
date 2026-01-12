@@ -104,6 +104,10 @@ export default {
       data.onlyFeaturedIndirectly.includes(true) &&
       data.onlyFeaturedIndirectly.includes(false);
 
+    data.allWarnings =
+      query.allArtworks
+        .flatMap(artwork => artwork?.contentWarnings);
+
     return data;
   },
 
@@ -210,6 +214,8 @@ export default {
 
                       return language.$(workingCapsule, workingOptions);
                     })),
+
+              revealAllWarnings: data.allWarnings,
             }),
         ],
 
