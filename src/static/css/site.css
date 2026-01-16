@@ -1929,8 +1929,7 @@ p.image-details.origin-details .filename-line {
   align-items: center;
 }
 
-.music-video .image-link:hover::after,
-.music-video .image-link:focus::after {
+.music-video .image-link:hover::after {
   font-size: 1.4em;
   background: #0006;
 }
@@ -1941,8 +1940,7 @@ p.image-details.origin-details .filename-line {
   box-shadow: 0 0 4px inset black;
 }
 
-.music-video .image-link:hover .image,
-.music-video .image-link:focus .image {
+.music-video .image-link:hover .image {
   transform: scale(1.02);
 }
 
