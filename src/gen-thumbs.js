@@ -1234,6 +1234,10 @@ export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
         .map(part =>
           fromRoot.to('media.albumWallpaperPart', album.directory, part.asset))),
 
+    wikiData.musicVideoData
+      .filter(musicVideo => musicVideo.path)
+      .map(musicVideo => fromRoot.to(...musicVideo.path)),
+
     wikiData.wikiInfo.wikiWallpaperParts
       .filter(part => part.asset)
       .map(part =>

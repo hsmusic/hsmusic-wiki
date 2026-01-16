@@ -21,6 +21,7 @@ import * as flashClasses from './flash.js';
 import * as groupClasses from './group.js';
 import * as homepageLayoutClasses from './homepage-layout.js';
 import * as languageClasses from './language.js';
+import * as musicVideoClasses from './music-video.js';
 import * as newsEntryClasses from './news-entry.js';
 import * as sortingRuleClasses from './sorting-rule.js';
 import * as staticPageClasses from './static-page.js';
@@ -40,6 +41,7 @@ const allClassLists = {
   'group.js': groupClasses,
   'homepage-layout.js': homepageLayoutClasses,
   'language.js': languageClasses,
+  'music-video.js': musicVideoClasses,
   'news-entry.js': newsEntryClasses,
   'sorting-rule.js': sortingRuleClasses,
   'static-page.js': staticPageClasses,

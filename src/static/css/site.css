@@ -1718,7 +1718,8 @@ hr.cute,
   border-style: none none dotted none;
 }
 
-.cover-artwork {
+.cover-artwork,
+.music-video {
   font-size: 0.8em;
   border: 2px solid var(--primary-color);
 
@@ -1745,7 +1746,8 @@ hr.cute,
   overflow: hidden;
 }
 
-#artwork-column .cover-artwork {
+#artwork-column .cover-artwork,
+#artwork-column .music-video {
   --normal-shadow: 0 0 12px 12px #00000080;
 
   box-shadow:
@@ -1770,16 +1772,17 @@ hr.cute,
   margin-right: 17.5px;
 }
 
-.cover-artwork:where(#artwork-column .cover-artwork:not(:first-child)) {
+#artwork-column *:where(.cover-artwork, .music-video):where(:not(:first-child)) {
   margin-top: 20px;
 }
 
-#artwork-column .cover-artwork:last-child:not(:first-child) {
+#artwork-column *:is(.cover-artwork, .music-video):last-child:not(:first-child) {
   margin-bottom: 25px;
 }
 
-.cover-artwork .image-container {
-  /* Border is handled on the .cover-artwork. */
+.cover-artwork .image-container,
+.music-video .image-container {
+  /* Border is handled on the .cover-artwork or .music-video. */
   border: none;
   border-radius: 0 !important;
 }
@@ -1882,6 +1885,34 @@ p.image-details.origin-details .filename-line {
 
 .cover-artwork-joiner + .cover-artwork {
   margin-top: 0 !important;
+}
+
+.music-video {
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+.music-video .music-video-label {
+  margin: 6px 0 3px;
+  text-align: center;
+}
+
+.music-video .music-video-credits {
+  margin: 5px 5px 6px;
+}
+
+.music-video .image-container {
+  background: transparent;
+  border-style: dashed none;
+  border-width: 2px;
+  border-color: var(--dim-color);
+}
+
+.music-video .image {
+  display: block;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  height: 100%;
 }
 
 .album-art-info {

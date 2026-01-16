@@ -31,6 +31,7 @@ import {
   parseDimensions,
   parseDuration,
   parseLyrics,
+  parseMusicVideos,
 } from '#yaml';
 
 import {
@@ -113,6 +114,7 @@ export class Track extends Thing {
     CommentaryEntry,
     CreditingSourcesEntry,
     LyricsEntry,
+    MusicVideo,
     ReferencingSourcesEntry,
     TrackSection,
     WikiInfo,
@@ -487,6 +489,10 @@ export class Track extends Thing {
         find: soupyFind.input('trackMainReleasesOnly'),
       }),
     ],
+
+    // > Update & expose - Music videos
+
+    musicVideos: thingList(V(MusicVideo)),
 
     // > Update & expose - Additional files
 
@@ -993,6 +999,13 @@ export class Track extends Thing {
       'Referenced Tracks': {property: 'referencedTracks'},
       'Sampled Tracks': {property: 'sampledTracks'},
 
+      // Music videos
+
+      'Music Videos': {
+        property: 'musicVideos',
+        transform: parseMusicVideos,
+      },
+
       // Additional files
 
       'Additional Files': {
@@ -1213,6 +1226,18 @@ export class Track extends Thing {
         : this.directory),
 
       artwork.fileExtension,
+    ];
+  }
+
+  getOwnMusicVideoCoverPath(musicVideo) {
+    if (!this.album) return null;
+    if (!musicVideo.unqualifiedDirectory) return null;
+
+    return [
+      'media.trackCover',
+      this.album.directory,
+      this.directory + '-' + musicVideo.unqualifiedDirectory,
+      musicVideo.coverArtFileExtension,
     ];
   }
 

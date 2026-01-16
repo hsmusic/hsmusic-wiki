@@ -730,6 +730,14 @@ export function parseAdditionalNames(entries, {subdoc, AdditionalName}) {
   });
 }
 
+export function parseMusicVideos(entries, {subdoc, MusicVideo}) {
+  return parseArrayEntries(entries, item => {
+    if (typeof item !== 'object') return item;
+
+    return subdoc(MusicVideo, item, {bindInto: 'thing'});
+  });
+}
+
 export function parseSerieses(entries, {subdoc, Series}) {
   return parseArrayEntries(entries, item => {
     if (typeof item !== 'object') return item;
@@ -1797,6 +1805,8 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
     ['homepageLayout.sections.rows', [/* find */]],
 
     ['lyricsData', [/* find */]],
+
+    ['musicVideoData', [/* find */]],
 
     ['referencingSourceData', [/* find */]],
 

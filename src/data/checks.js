@@ -285,6 +285,11 @@ export function filterReferenceErrors(wikiData, {
       featuredTracks: 'track',
     }],
 
+    ['musicVideoData', {
+      artistContribs: '_contrib',
+      contributorContribs: '_contrib',
+    }],
+
     ['seriesData', {
       albums: 'album',
     }],

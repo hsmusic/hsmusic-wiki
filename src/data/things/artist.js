@@ -211,6 +211,14 @@ export class Artist extends Thing {
       },
     ],
 
+    musicVideoArtistContributions: reverseReferenceList({
+      reverse: soupyReverse.input('musicVideoArtistContributionsBy'),
+    }),
+
+    musicVideoContributorContributions: reverseReferenceList({
+      reverse: soupyReverse.input('musicVideoContributorContributionsBy'),
+    }),
+
     totalDuration: [
       withPropertyFromList('musicContributions', V('thing')),
       withPropertyFromList('#musicContributions.thing', V('isMainRelease')),

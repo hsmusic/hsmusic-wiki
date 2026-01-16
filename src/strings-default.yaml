@@ -605,6 +605,8 @@ misc:
         bannerArt: "banner art"
         coverArt: "cover art"
         flash: "flash"
+        musicVideo: "music video"
+        musicVideoContribution: "video contribution"
         release: "release"
         track: "track"
         trackArt: "track art"
@@ -983,6 +985,19 @@ misc:
     trackArtFromAlbum: "Album cover for {ALBUM}"
 
     sameTagsAsMainArtwork: "Same tags as main artwork"
+
+  # musicVideo:
+  #   Strings for music videos, which are presented in a very similar
+  #   fashion as cover artworks.
+
+  musicVideo:
+    label: "Music video!"
+    label.customLabel: "{LABEL}!"
+
+    by: "Music video by {ARTISTS}"
+    by.customLabel: "{LABEL} by {ARTISTS}"
+
+    contributors: "Contributors: {ARTISTS}"
 
   # coverGrid:
   #   Generic strings for various sorts of gallery grids, displayed

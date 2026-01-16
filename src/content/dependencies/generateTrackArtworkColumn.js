@@ -10,6 +10,10 @@ export default {
         ? track.trackArtworks.map(artwork =>
             relation('generateCoverArtwork', artwork))
         : []),
+
+    trackMusicVideos:
+      track.musicVideos.map(musicVideo =>
+        relation('generateMusicVideo', musicVideo)),
   }),
 
   generate: (relations, {html}) =>
@@ -26,5 +30,7 @@ export default {
           showArtTagDetails: true,
           showReferenceDetails: true,
         })),
+
+      relations.trackMusicVideos,
     ]),
 };
