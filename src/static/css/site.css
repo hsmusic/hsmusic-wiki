@@ -1915,6 +1915,37 @@ p.image-details.origin-details .filename-line {
   height: 100%;
 }
 
+.music-video .image-link::after {
+  content: "▶︎";
+  background: #0008;
+  color: white;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.music-video .image-link:hover::after,
+.music-video .image-link:focus::after {
+  font-size: 1.4em;
+  background: #0006;
+}
+
+.music-video .image-inner-area::after {
+  /* We're overriding normal image-inner-area stuff. */
+  opacity: 0.8;
+  box-shadow: 0 0 4px inset black;
+}
+
+.music-video .image-link:hover .image,
+.music-video .image-link:focus .image {
+  transform: scale(1.02);
+}
+
 .album-art-info {
   font-size: 0.8em;
   border: 2px solid var(--deep-color);
