@@ -178,7 +178,14 @@ listingSpec.push({
   directory: 'tracks/with-lyrics',
   stringsKey: 'listTracks.withLyrics',
   contentFunction: 'listTracksWithLyrics',
-  seeAlso: ['tracks/needing-lyrics'],
+  seeAlso: ['tracks/needing-lyrics', 'tracks/with-music-videos'],
+});
+
+listingSpec.push({
+  directory: 'tracks/with-music-videos',
+  stringsKey: 'listTracks.withMusicVideos',
+  contentFunction: 'listTracksWithMusicVideos',
+  seeAlso: ['tracks/with-lyrics'],
 });
 
 listingSpec.push({

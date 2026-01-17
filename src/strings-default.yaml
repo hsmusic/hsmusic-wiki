@@ -2305,6 +2305,18 @@ listingPage:
         title.withDate: "{ALBUM} ({DATE})"
         item: "{TRACK}"
 
+    # listTracks.withMusicVideos:
+    #   The same as withLyrics, but for music videos.
+
+    withMusicVideos:
+      title: "Tracks - with Music Videos"
+      title.short: "...with Music Videos"
+
+      chunk:
+        title: "{ALBUM}"
+        title.withDate: "{ALBUM} ({DATE})"
+        item: "{TRACK}"
+
     # listTracks.withSheetMusicFiles:
     #   List tracks, chunked by album (which are sorted by date,
     #   falling back alphabetically) and in their usual track order,
