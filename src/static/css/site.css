@@ -1897,8 +1897,16 @@ p.image-details.origin-details .filename-line {
   text-align: center;
 }
 
-.music-video .music-video-info {
-  margin: 5px 5px 6px;
+.music-video .image-container ~ p {
+  margin: 3px 5px;
+}
+
+.music-video .image-container + p {
+  margin-top: 5px;
+}
+
+.music-video .image-container ~ p:last-child {
+  margin-bottom: 6px;
 }
 
 .music-video .image-container {
@@ -1944,17 +1952,17 @@ p.image-details.origin-details .filename-line {
   transform: scale(1.02);
 }
 
-.music-video .release-line {
+.music-video .artists-line {
   display: block;
   padding-left: 1.2ch;
   text-indent: -1.2ch;
 }
 
-.music-video .release-line > * {
+.music-video .artists-line > * {
   text-indent: 0;
 }
 
-.music-video .release-line + br {
+.music-video .artists-line + br {
   display: none;
 }
 
