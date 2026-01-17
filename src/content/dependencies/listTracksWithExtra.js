@@ -52,6 +52,7 @@ export default {
 
   slots: {
     hash: {type: 'string'},
+    showAlbumDates: {type: 'boolean', default: true},
   },
 
   generate(data, relations, slots, {language}) {
@@ -63,7 +64,7 @@ export default {
           albumLink: relations.albumLinks,
           date: data.dates,
         }).map(({albumLink, date}) =>
-            (date
+            (slots.showAlbumDates && date
               ? {
                   stringsKey: 'withDate',
                   album: albumLink,

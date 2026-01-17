@@ -3,5 +3,7 @@ export default {
     ({page: relation('listTracksWithExtra', spec, 'musicVideos', 'array')}),
 
   generate: (relations) =>
-    relations.page,
+    relations.page.slots({
+      showAlbumDates: false,
+    }),
 };
