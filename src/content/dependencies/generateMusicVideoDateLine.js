@@ -20,7 +20,6 @@ function sameDay(musicVideo, thing) {
   }
 
   return null;
-
 }
 
 export default {

@@ -11,31 +11,30 @@ export default {
         : null),
   }),
 
-  generate(data, relations, {html, language}) {
-    const {artistCredit} = relations;
-    const capsule = language.encapsulate('misc.musicVideo');
+  generate: (data, relations, {html, language}) =>
+    language.encapsulate('misc.musicVideo.artistsLine', artistsLineCapsule =>
+      language.encapsulate(artistsLineCapsule, workingCapsule => {
+        const workingOptions = {[language.onlyIfOptions]: ['credit']};
 
-    let artistsLineCapsule = language.encapsulate(capsule, 'artistsLine');
-    let artistsLineOptions = {[language.onlyIfOptions]: ['credit']};
+        if (data.label) {
+          workingCapsule += '.customLabel';
+          workingOptions.label = data.label;
+        }
 
-    if (data.label) {
-      artistsLineCapsule += '.customLabel';
-      artistsLineOptions.label = data.label;
-    }
+        workingOptions.credit =
+          html.tag('span', {class: 'by'},
+            {[html.onlyIfContent]: true},
 
-    artistsLineOptions.credit =
-      html.tag('span', {class: 'by'},
-        {[html.onlyIfContent]: true},
+            relations.artistCredit.slots({
+              normalStringKey:
+                language.encapsulate(artistsLineCapsule, 'credit'),
 
-        artistCredit.slots({
-          normalStringKey: language.encapsulate(capsule, 'artistsLine.credit'),
+              showAnnotation: true,
+              showChronology: true,
 
-          showAnnotation: true,
-          showChronology: true,
+              chronologyKind: 'musicVideo',
+            }));
 
-          chronologyKind: 'musicVideo',
-        }));
-
-    return language.$(artistsLineCapsule, artistsLineOptions);
-  },
-}
+        return language.$(workingCapsule, workingOptions);
+      })),
+};
