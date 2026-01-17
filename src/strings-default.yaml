@@ -1013,6 +1013,15 @@ misc:
     date: >-
       Released {DATE}
 
+    date.sameDayAsTrack: >-
+      Released alongside this track
+
+    date.sameDayAsAlbum: >-
+      Released alongside this album
+
+    date.sameDayAsSingle: >-
+      Released alongside this single
+
     contributorsLine: >-
       Contributors: {CREDIT}
 

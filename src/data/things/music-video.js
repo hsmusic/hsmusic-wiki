@@ -7,9 +7,14 @@ import Thing from '#thing';
 import {isDate, isStringNonEmpty, isURL} from '#validators';
 import {parseContributors, parseDate} from '#yaml';
 
-import {exposeConstant, exposeUpdateValueOrContinue}
-  from '#composite/control-flow';
 import {constituteFrom} from '#composite/wiki-data';
+
+import {
+  exposeConstant,
+  exposeDependency,
+  exposeUpdateValueOrContinue,
+  withResultOfAvailabilityCheck,
+} from '#composite/control-flow';
 
 import {
   contributionList,
@@ -66,6 +71,15 @@ export class MusicVideo extends Thing {
     // Update only
 
     find: soupyFind(),
+
+    // Expose only
+
+    isMusicVideo: exposeConstant(V(true)),
+
+    dateIsSpecified: [
+      withResultOfAvailabilityCheck('_date'),
+      exposeDependency('#availability'),
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {

@@ -14,12 +14,34 @@ export default {
       relation('generateArtistCredit', musicVideo.contributorContribs, []),
   }),
 
-  data: (musicVideo, _track) => ({
+  data: (musicVideo, track) => ({
     label:
       musicVideo.label,
 
     url:
       musicVideo.url,
+
+    sameDay:
+      (() => {
+        if (!musicVideo.dateIsSpecified) return null;
+
+        const compare = (a, b) =>
+          a.toDateString() === b.toDateString();
+
+        if (compare(musicVideo.date, track.album.date)) {
+          if (track.album.style === 'single') {
+            return 'single';
+          } else {
+            return 'album';
+          }
+        }
+
+        if (compare(musicVideo.date, track.date)) {
+          return 'track';
+        }
+
+        return null;
+      })(),
   }),
 
   generate: (data, relations, {language, html}) =>
@@ -41,7 +63,7 @@ export default {
           link: data.url,
         }),
 
-        html.tag('p', {class: 'music-video-credits'},
+        html.tag('p', {class: 'music-video-info'},
           {[html.joinChildren]: html.tag('br')},
 
           [
@@ -49,6 +71,17 @@ export default {
               {[html.onlyIfContent]: true},
 
               relations.releaseLine),
+
+            language.encapsulate(capsule, 'date', capsule => [
+              data.sameDay == 'album' &&
+                language.$(capsule, 'sameDayAsAlbum'),
+
+              data.sameDay == 'single' &&
+                language.$(capsule, 'sameDayAsTrack'),
+
+              data.sameDay === 'track' &&
+                language.$(capsule, 'sameDayAsTrack'),
+            ]),
 
             language.encapsulate(capsule, 'contributorsLine', capsule =>
               language.$(capsule, {
