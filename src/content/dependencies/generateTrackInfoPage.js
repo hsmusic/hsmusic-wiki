@@ -65,7 +65,7 @@ export default {
 
     artworkColumn:
       (query.firstTrackInSingle
-        ? relation('generateAlbumArtworkColumn', track.album)
+        ? relation('generateSingleArtworkColumn', track)
         : relation('generateTrackArtworkColumn', track)),
 
     contentHeading:
