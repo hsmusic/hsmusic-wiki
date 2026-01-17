@@ -21,6 +21,7 @@ export default {
         'year',
         'minimal-difference',
         'year-difference',
+        'full-difference',
       ]),
       default: 'full',
     },
@@ -78,6 +79,17 @@ export default {
           label = language.formatYear(data.date);
           tooltip = language.formatDate(data.date);
         }
+
+        break;
+      }
+
+      case 'full-difference': {
+        if (data.date.toDateString() === data.contextDate?.toDateString()) {
+          return html.blank();
+        }
+
+        label = language.formatDate(data.date);
+        break;
       }
     }
 

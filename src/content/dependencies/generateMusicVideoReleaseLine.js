@@ -18,7 +18,7 @@ export default {
     const {artistCredit, datetimestamp} = relations;
     const capsule = language.encapsulate('misc.musicVideo');
 
-    datetimestamp.setSlot('style', 'year-difference');
+    datetimestamp.setSlot('style', 'full-difference');
 
     let artistsLineCapsule = language.encapsulate(capsule, 'artistsLine');
     let artistsLineOptions = {[language.onlyIfOptions]: ['credit']};
