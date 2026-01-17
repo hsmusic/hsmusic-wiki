@@ -106,6 +106,8 @@ export default {
 
     trimAnnotation: {type: 'boolean', default: false},
 
+    chunkwrap: {type: 'boolean', default: true},
+
     chronologyKind: {type: 'string'},
   },
 
@@ -246,9 +248,13 @@ export default {
       }
     }
 
-    // TODO: This is obviously evil.
-    return (
-      html.metatag('chunkwrap', {split: /,| (?=and)/},
-        html.resolve(content)));
+    if (slots.chunkwrap) {
+      // TODO: This is obviously evil.
+      return (
+        html.metatag('chunkwrap', {split: /,| (?=and)/},
+          html.resolve(content)));
+    } else {
+      return content;
+    }
   },
 };

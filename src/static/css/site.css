@@ -1954,6 +1954,10 @@ p.image-details.origin-details .filename-line {
   text-indent: 0;
 }
 
+.music-video .release-line + br {
+  display: none;
+}
+
 .album-art-info {
   font-size: 0.8em;
   border: 2px solid var(--deep-color);

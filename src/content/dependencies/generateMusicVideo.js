@@ -60,6 +60,7 @@ export default {
 
                     showAnnotation: true,
                     showChronology: true,
+                    chunkwrap: false,
 
                     chronologyKind: 'musicVideoContribution',
                   }),
