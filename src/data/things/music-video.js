@@ -5,7 +5,7 @@ import {input, V} from '#composite';
 import find from '#find';
 import Thing from '#thing';
 import {isDate, isStringNonEmpty, isURL} from '#validators';
-import {parseContributors} from '#yaml';
+import {parseContributors, parseDate} from '#yaml';
 
 import {exposeConstant, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
@@ -72,21 +72,14 @@ export class MusicVideo extends Thing {
     fields: {
       'Label': {property: 'label'},
       'Directory': {property: 'unqualifiedDirectory'},
-      'Date': {property: 'date'},
+      'Date': {property: 'date', transform: parseDate},
       'URL': {property: 'url'},
 
       'Cover Art File Extension': {property: 'coverArtFileExtension'},
       'Cover Art Dimensions': {property: 'coverArtDimensions'},
 
-      'Artists': {
-        property: 'artistContribs',
-        transform: parseContributors,
-      },
-
-      'Contributors': {
-        property: 'contributorContribs',
-        transform: parseContributors,
-      },
+      'Artists': {property: 'artistContribs', transform: parseContributors},
+      'Contributors': {property: 'contributorContribs', transform: parseContributors},
     },
   };
 

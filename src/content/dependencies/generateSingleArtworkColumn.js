@@ -5,7 +5,7 @@ export default {
 
     trackMusicVideos:
       track.musicVideos.map(musicVideo =>
-        relation('generateMusicVideo', musicVideo)),
+        relation('generateMusicVideo', musicVideo, track)),
   }),
 
   generate: (relations, {html}) =>

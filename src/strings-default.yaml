@@ -997,6 +997,12 @@ misc:
     by: "Music video by {ARTISTS}"
     by.customLabel: "{LABEL} by {ARTISTS}"
 
+    by.withDate: >-
+      Music video ({DATE}) by {ARTISTS}
+
+    by.customLabel.withDate: >-
+      {LABEL} ({DATE}) by {ARTISTS}
+
     contributors: "Contributors: {ARTISTS}"
 
   # coverGrid:

@@ -1,11 +1,14 @@
 export default {
-  relations: (relation, musicVideo) => ({
+  relations: (relation, musicVideo, thing) => ({
     image:
       relation('image', {
         path: musicVideo.path,
         artTags: [],
         dimensions: musicVideo.coverArtDimensions,
       }),
+
+    datetimestamp:
+      relation('generateAbsoluteDatetimestamp', musicVideo.date, thing.date),
 
     artistCredit:
       relation('generateArtistCredit', musicVideo.artistContribs, []),
@@ -14,7 +17,7 @@ export default {
       relation('generateArtistCredit', musicVideo.contributorContribs, []),
   }),
 
-  data: (musicVideo) => ({
+  data: (musicVideo, _track) => ({
     label:
       musicVideo.label,
 
@@ -46,16 +49,25 @@ export default {
 
           [
             language.encapsulate(capsule, 'by', workingCapsule => {
-              const additionalStringOptions = {};
+              const workingOptions = {};
 
               if (data.label) {
                 workingCapsule += '.customLabel';
-                additionalStringOptions.label = data.label;
+                workingOptions.label = data.label;
+              }
+
+              const {datetimestamp} = relations;
+
+              datetimestamp.setSlot('style', 'year-difference');
+
+              if (!html.isBlank(datetimestamp)) {
+                workingCapsule += '.withDate';
+                workingOptions.date = datetimestamp;
               }
 
               return relations.artistCredit.slots({
                 normalStringKey: workingCapsule,
-                additionalStringOptions,
+                additionalStringOptions: workingOptions,
 
                 showAnnotation: true,
                 showChronology: true,
