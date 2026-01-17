@@ -492,7 +492,17 @@ export class Track extends Thing {
 
     // > Update & expose - Music videos
 
-    musicVideos: thingList(V(MusicVideo)),
+    musicVideos: [
+      exposeUpdateValueOrContinue(),
+
+      // TODO: Same situation as lyrics. Inherited music videos don't set
+      // the proper .thing property back to this track... but then, it needs
+      // to keep a reference to its original .thing to get its proper path,
+      // so maybe this is okay...
+      inheritFromMainRelease(),
+
+      thingList(V(MusicVideo)),
+    ],
 
     // > Update & expose - Additional files
 
