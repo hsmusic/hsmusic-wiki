@@ -1944,6 +1944,16 @@ p.image-details.origin-details .filename-line {
   transform: scale(1.02);
 }
 
+.music-video .release-line {
+  display: block;
+  padding-left: 1.2ch;
+  text-indent: -1.2ch;
+}
+
+.music-video .release-line > * {
+  text-indent: 0;
+}
+
 .album-art-info {
   font-size: 0.8em;
   border: 2px solid var(--deep-color);

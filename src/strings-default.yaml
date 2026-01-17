@@ -988,22 +988,36 @@ misc:
 
   # musicVideo:
   #   Strings for music videos, which are presented in a very similar
-  #   fashion as cover artworks.
+  #   fashion as cover artworks, although the strings are structured
+  #   a bit differently.
 
   musicVideo:
     label: "Music video!"
     label.customLabel: "{LABEL}!"
 
-    by: "Music video by {ARTISTS}"
-    by.customLabel: "{LABEL} by {ARTISTS}"
+    artistsLine: >-
+      Music video {CREDIT}
 
-    by.withDate: >-
-      Music video ({DATE}) by {ARTISTS}
+    artistsLine.customLabel: >-
+      {LABEL} {CREDIT}
 
-    by.customLabel.withDate: >-
-      {LABEL} ({DATE}) by {ARTISTS}
+    artistsLine.withDate: >-
+      Music video ({DATE}) {CREDIT}
 
-    contributors: "Contributors: {ARTISTS}"
+    artistsLine.customLabel.withDate: >-
+      {LABEL} ({DATE}) {CREDIT}
+
+    artistsLine.credit: >-
+      by {ARTISTS}
+
+    date: >-
+      Released {DATE}
+
+    contributorsLine: >-
+      Contributors: {CREDIT}
+
+    contributorsLine.credit: >-
+      {ARTISTS}
 
   # coverGrid:
   #   Generic strings for various sorts of gallery grids, displayed

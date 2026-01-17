@@ -7,11 +7,8 @@ export default {
         dimensions: musicVideo.coverArtDimensions,
       }),
 
-    datetimestamp:
-      relation('generateAbsoluteDatetimestamp', musicVideo.date, thing.date),
-
-    artistCredit:
-      relation('generateArtistCredit', musicVideo.artistContribs, []),
+    releaseLine:
+      relation('generateMusicVideoReleaseLine', musicVideo, thing),
 
     contributorCredit:
       relation('generateArtistCredit', musicVideo.contributorContribs, []),
@@ -48,42 +45,25 @@ export default {
           {[html.joinChildren]: html.tag('br')},
 
           [
-            language.encapsulate(capsule, 'by', workingCapsule => {
-              const workingOptions = {};
+            html.tag('span', {class: 'release-line'},
+              {[html.onlyIfContent]: true},
 
-              if (data.label) {
-                workingCapsule += '.customLabel';
-                workingOptions.label = data.label;
-              }
+              relations.releaseLine),
 
-              const {datetimestamp} = relations;
+            language.encapsulate(capsule, 'contributorsLine', capsule =>
+              language.$(capsule, {
+                [language.onlyIfOptions]: ['credit'],
 
-              datetimestamp.setSlot('style', 'year-difference');
+                credit:
+                  relations.contributorCredit.slots({
+                    normalStringKey: language.encapsulate(capsule, 'credit'),
 
-              if (!html.isBlank(datetimestamp)) {
-                workingCapsule += '.withDate';
-                workingOptions.date = datetimestamp;
-              }
+                    showAnnotation: true,
+                    showChronology: true,
 
-              return relations.artistCredit.slots({
-                normalStringKey: workingCapsule,
-                additionalStringOptions: workingOptions,
-
-                showAnnotation: true,
-                showChronology: true,
-
-                chronologyKind: 'musicVideo',
-              });
-            }),
-
-            relations.contributorCredit.slots({
-              normalStringKey: language.encapsulate(capsule, 'contributors'),
-
-              showAnnotation: true,
-              showChronology: true,
-
-              chronologyKind: 'musicVideoContribution',
-            }),
+                    chronologyKind: 'musicVideoContribution',
+                  }),
+              })),
           ]),
       ])),
 };
