@@ -1001,12 +1001,6 @@ misc:
     artistsLine.customLabel: >-
       {LABEL} {CREDIT}
 
-    artistsLine.withDate: >-
-      Music video ({DATE}) {CREDIT}
-
-    artistsLine.customLabel.withDate: >-
-      {LABEL} ({DATE}) {CREDIT}
-
     artistsLine.credit: >-
       by {ARTISTS}
 
