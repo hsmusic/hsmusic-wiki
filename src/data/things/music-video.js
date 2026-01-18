@@ -4,7 +4,7 @@ import {colors} from '#cli';
 import {input, V} from '#composite';
 import find from '#find';
 import Thing from '#thing';
-import {isDate, isStringNonEmpty, isURL} from '#validators';
+import {is, isDate, isStringNonEmpty, isURL} from '#validators';
 import {parseContributors, parseDate} from '#yaml';
 
 import {constituteFrom} from '#composite/wiki-data';
@@ -40,6 +40,14 @@ export class MusicVideo extends Thing {
       flags: {update: true, expose: true},
       update: {validate: isStringNonEmpty},
       expose: {transform: value => value ?? 'Music video'},
+    },
+
+    labelStyle: {
+      flags: {update: true, expose: true},
+      update: {
+        validate:
+          is('label', 'title'),
+      },
     },
 
     unqualifiedDirectory: directory({name: 'label'}),
@@ -85,6 +93,7 @@ export class MusicVideo extends Thing {
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Label': {property: 'label'},
+      'Label Style': {property: 'labelStyle'},
       'Directory': {property: 'unqualifiedDirectory'},
       'Date': {property: 'date', transform: parseDate},
       'URL': {property: 'url'},

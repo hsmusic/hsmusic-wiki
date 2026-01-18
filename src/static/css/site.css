@@ -1897,6 +1897,11 @@ p.image-details.origin-details .filename-line {
   text-align: center;
 }
 
+.music-video .music-video-label.title-style {
+  margin-bottom: 4px;
+  font-style: oblique;
+}
+
 .music-video .image-container ~ p {
   margin: 3px 5px;
 }

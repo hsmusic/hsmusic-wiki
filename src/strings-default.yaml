@@ -994,6 +994,7 @@ misc:
   musicVideo:
     label: "Music video!"
     label.customLabel: "{LABEL}!"
+    label.customLabel.title: "{TITLE}"
 
     artistsLine: >-
       Music video {CREDIT}
