@@ -40,7 +40,7 @@ export default {
         language.$(capsule, 'sameDayAsAlbum'),
 
       data.sameDay === 'single' &&
-        language.$(capsule, 'sameDayAsTrack'),
+        language.$(capsule, 'sameDayAsSingle'),
 
       data.sameDay === 'track' &&
         language.$(capsule, 'sameDayAsTrack'),
