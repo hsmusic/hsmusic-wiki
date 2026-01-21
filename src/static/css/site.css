@@ -1892,6 +1892,15 @@ p.image-details.origin-details .filename-line {
   padding: 0 4px;
 }
 
+#artwork-column .cover-artwork + .music-video {
+  /* higher specificity because CSS is annoying */
+  margin-top: 25px;
+}
+
+#artwork-column .cover-artwork + .cover-artwork + .music-video {
+  margin-top: 30px;
+}
+
 .music-video .music-video-label {
   margin: 6px 0 3px;
   text-align: center;
