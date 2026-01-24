@@ -308,8 +308,8 @@ export function filterReferenceErrors(wikiData, {
       artistContribs: '_contrib',
       contributorContribs: '_contrib',
       coverArtistContribs: '_contrib',
-      referencedTracks: '_trackMainReleasesOnly',
-      sampledTracks: '_trackMainReleasesOnly',
+      referencedTracks: '_trackReference',
+      sampledTracks: '_trackReference',
       artTags: '_artTag',
       referencedArtworks: '_artwork',
       mainRelease: '_mainRelease',
@@ -515,9 +515,9 @@ export function filterReferenceErrors(wikiData, {
                 findFn = ref => boundFind.track(ref.reference);
                 break;
 
-              case '_trackMainReleasesOnly':
+              case '_trackReference':
                 findFn = trackRef => {
-                  let track = boundFind.trackMainReleasesOnly(trackRef, {mode: 'quiet'});
+                  let track = boundFind.trackReference(trackRef, {mode: 'quiet', from: thing});
                   if (track) {
                     return track;
                   }

@@ -3,6 +3,7 @@ import {inspect} from 'node:util';
 import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input, V} from '#composite';
+import find, {keyRefRegex} from '#find';
 import {onlyItem} from '#sugar';
 import {sortByDate} from '#sort';
 import Thing from '#thing';
@@ -477,7 +478,7 @@ export class Track extends Thing {
 
       referenceList({
         class: input.value(Track),
-        find: soupyFind.input('trackMainReleasesOnly'),
+        find: soupyFind.input('trackReference'),
       }),
     ],
 
@@ -486,7 +487,7 @@ export class Track extends Thing {
 
       referenceList({
         class: input.value(Track),
-        find: soupyFind.input('trackMainReleasesOnly'),
+        find: soupyFind.input('trackReference'),
       }),
     ],
 
@@ -1119,6 +1120,49 @@ export class Track extends Thing {
         (track.alwaysReferenceByDirectory
           ? []
           : [track.name]),
+    },
+
+    trackReference: {
+      referenceTypes: ['track'],
+      bindTo: 'trackData',
+
+      byob(fullRef, data, opts) {
+        const {from} = opts;
+
+        const acontextual = () =>
+          find.trackMainReleasesOnly(fullRef, data, opts);
+
+        const regexMatch = fullRef.match(keyRefRegex);
+        if (!regexMatch || regexMatch?.keyPart) {
+          // It's a reference by directory or it's malformed.
+          // Either way, we can't handle it here!
+          return acontextual();
+        }
+
+        if (!from?.isTrack) {
+          throw new Error(
+            `Expected to find starting from a track, got: ` +
+            inspect(from, {compact: true}));
+        }
+
+        const referencingTrack = from;
+        const referencedName = fullRef;
+
+        for (const track of referencingTrack.album.tracks) {
+          // Totally ignore alwaysReferenceByDirectory here.
+          // void track.alwaysReferenceByDirectory;
+
+          if (track.name === referencedName) {
+            if (track.isSecondaryRelease) {
+              return track.mainReleaseTrack;
+            } else {
+              return track;
+            }
+          }
+        }
+
+        return acontextual();
+      },
     },
 
     trackWithArtwork: {
