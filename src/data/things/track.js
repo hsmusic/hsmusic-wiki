@@ -1150,9 +1150,9 @@ export class Track extends Thing {
 
       bindTo: 'artworkData',
 
-      include: (artwork, {Artwork, Track}) =>
-        artwork instanceof Artwork &&
-        artwork.thing instanceof Track &&
+      include: (artwork) =>
+        artwork.isArtwork &&
+        artwork.thing.isTrack &&
         artwork === artwork.thing.trackArtworks[0],
 
       getMatchableNames: ({thing: track}) =>

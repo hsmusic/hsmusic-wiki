@@ -70,7 +70,7 @@ export function processAvailableMatchesByName(data, fuzz, {
   multipleNameMatches = Object.create(null),
 }) {
   for (const thing of data) {
-    if (!include(thing, thingConstructors)) continue;
+    if (!include(thing)) continue;
 
     for (const name of getMatchableNames(thing)) {
       if (typeof name !== 'string') {

@@ -513,9 +513,9 @@ export class Album extends Thing {
 
       bindTo: 'artworkData',
 
-      include: (artwork, {Artwork, Album}) =>
-        artwork instanceof Artwork &&
-        artwork.thing instanceof Album &&
+      include: (artwork) =>
+        artwork.isArtwork &&
+        artwork.thing.isAlbum &&
         artwork === artwork.thing.coverArtworks[0],
 
       getMatchableNames: ({thing: album}) =>
