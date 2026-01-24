@@ -288,6 +288,8 @@ function findHelper({
     // console.
     mode = 'warn',
 
+    from = null,
+
     fuzz = {
       capitalization: false,
       kebab: false,

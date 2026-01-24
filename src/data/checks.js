@@ -229,6 +229,16 @@ function decoSuppressFindErrors(findFn, {property}) {
   }, findFn);
 }
 
+function decoFindThing(findFn, thing) {
+  return (ref, opts) => {
+    if (opts) {
+      return findFn(ref, {...opts, from: thing});
+    } else {
+      return findFn(ref, {from: thing});
+    }
+  };
+}
+
 // Warn about references across data which don't match anything.  This involves
 // using the find() functions on all references, setting it to 'error' mode, and
 // collecting everything in a structured logged (which gets logged if there are
@@ -549,6 +559,7 @@ export function filterReferenceErrors(wikiData, {
 
             findFn = decoSuppressFindErrors(findFn, {property});
             findFn = decoAnnotateFindErrors(findFn);
+            findFn = decoFindThing(findFn, thing);
 
             const fieldPropertyMessage =
               getFieldPropertyMessage(

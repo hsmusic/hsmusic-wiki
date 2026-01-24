@@ -49,14 +49,15 @@ export default templateCompositeFrom({
     }),
 
     {
-      dependencies: [input('findOptions')],
+      dependencies: [input('findOptions'), input.myself()],
       compute: (continuation, {
         [input('findOptions')]: findOptions,
+        [input.myself()]: myself,
       }) => continuation({
         ['#findOptions']:
           (findOptions
-            ? {...findOptions, mode: 'quiet'}
-            : {mode: 'quiet'}),
+            ? {...findOptions, mode: 'quiet', from: myself}
+            : {mode: 'quiet', from: myself}),
       }),
     },
 
