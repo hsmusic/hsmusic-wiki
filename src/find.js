@@ -271,6 +271,8 @@ function matchHelper(fullRef, mode, {
 function findHelper({
   referenceTypes,
 
+  byob = undefined,
+
   include = undefined,
   getMatchableNames = undefined,
   getMatchableDirectories = undefined,
@@ -303,6 +305,27 @@ function findHelper({
 
     if (!data) {
       throw new TypeError(`Expected data to be present`);
+    }
+
+    if (byob) {
+      let match = null;
+
+      try {
+        match = byob(fullRef, data, {mode, from, fuzz});
+      } catch (caught) {
+        if (typeof caught === 'string') {
+          return warnOrThrow(mode, caught);
+        } else {
+          throw caught;
+        }
+      }
+
+      if (match) {
+        return match;
+      } else {
+        return warnOrThrow(mode,
+          `Didn't match anything for ${colors.bright(fullRef)}`);
+      }
     }
 
     let dataSubcache = cache.get(data);
