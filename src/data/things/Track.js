@@ -116,7 +116,7 @@ export class Track extends Thing {
     LyricsEntry,
     MusicVideo,
     ReferencingSourcesEntry,
-    TrackTrackArtistContribution,
+    TrackArtistContribution,
     TrackSection,
     WikiInfo,
   }) => ({
@@ -263,7 +263,7 @@ export class Track extends Thing {
     artistContribs: [
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
-        class: input.value(TrackTrackArtistContribution),
+        class: input.value(TrackArtistContribution),
         date: 'date',
         thingProperty: input.thisProperty(),
         artistProperty: input.value('trackArtistContributions'),
