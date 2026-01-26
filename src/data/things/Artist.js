@@ -1,4 +1,4 @@
-export const ARTIST_DATA_FILE = 'artists.yaml';
+const ARTIST_DATA_FILE = 'artists.yaml';
 
 import {inspect} from 'node:util';
 

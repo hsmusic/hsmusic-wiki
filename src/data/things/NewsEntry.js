@@ -1,4 +1,4 @@
-export const NEWS_DATA_FILE = 'news.yaml';
+const NEWS_DATA_FILE = 'news.yaml';
 
 import {V} from '#composite';
 import {sortChronologically} from '#sort';

@@ -1,4 +1,4 @@
-export const DATA_STATIC_PAGE_DIRECTORY = 'static-page';
+const DATA_STATIC_PAGE_DIRECTORY = 'static-page';
 
 import * as path from 'node:path';
 

@@ -1,5 +1,5 @@
-export const DATA_ART_TAGS_DIRECTORY = 'art-tags';
-export const ART_TAG_DATA_FILE = 'tags.yaml';
+const DATA_ART_TAGS_DIRECTORY = 'art-tags';
+const ART_TAG_DATA_FILE = 'tags.yaml';
 
 import {readFile} from 'node:fs/promises';
 import * as path from 'node:path';
