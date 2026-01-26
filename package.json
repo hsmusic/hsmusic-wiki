@@ -47,7 +47,7 @@
         "#sugar": "./src/common-util/sugar.js",
         "#test-lib": "./test/lib/index.js",
         "#thing": "./src/data/thing.js",
-        "#things": "./src/data/things/index.js",
+        "#things": "./src/data/things/init.js",
         "#thumbs": "./src/gen-thumbs.js",
         "#urls": "./src/urls.js",
         "#validators": "./src/validators.js",
