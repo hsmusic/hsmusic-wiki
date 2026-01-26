@@ -121,6 +121,17 @@ export class Contribution extends Thing {
 
     isContribution: exposeConstant(V(true)),
 
+    annotationParts: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['annotation'],
+        compute: ({annotation}) =>
+          (annotation
+            ? annotation.split(',').map(part => part.trim())
+            : []),
+      },
+    },
+
     context: [
       withContributionContext(),
 
