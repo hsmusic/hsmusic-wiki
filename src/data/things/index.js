@@ -1,5 +1,6 @@
 // Not actually the entry point for #things - that's init.js in this folder.
 
+export * from './album/index.js';
 export * from './homepage-layout/index.js';
 
 export * from './AdditionalFile.js';
@@ -15,7 +16,6 @@ export * from './StaticPage.js';
 export * from './Track.js';
 export * from './WikiInfo.js';
 
-export * from './album.js';
 export * from './content.js';
 export * from './flash.js';
 export * from './group.js';
