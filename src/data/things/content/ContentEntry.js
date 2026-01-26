@@ -20,7 +20,6 @@ import {
 } from '#composite/control-flow';
 
 import {
-  hasAnnotationPart,
   withAnnotationPartNodeLists,
   withExpressedOrImplicitArtistReferences,
   withWebArchiveDate,
@@ -244,76 +243,4 @@ export class ContentEntry extends Thing {
       'Body': {property: 'body'},
     },
   };
-}
-
-export class CommentaryEntry extends ContentEntry {
-  static [Thing.wikiData] = 'commentaryData';
-
-  static [Thing.getPropertyDescriptors] = () => ({
-    // Expose only
-
-    isCommentaryEntry: [
-      exposeConstant({
-        value: input.value(true),
-      }),
-    ],
-
-    isWikiEditorCommentary: hasAnnotationPart({
-      part: input.value('wiki editor'),
-    }),
-  });
-}
-
-export class LyricsEntry extends ContentEntry {
-  static [Thing.wikiData] = 'lyricsData';
-
-  static [Thing.getPropertyDescriptors] = () => ({
-    // Update & expose
-
-    originDetails: contentString(),
-
-    // Expose only
-
-    isLyricsEntry: exposeConstant(V(true)),
-
-    isWikiLyrics: hasAnnotationPart(V('wiki lyrics')),
-    helpNeeded: hasAnnotationPart(V('help needed')),
-
-    hasSquareBracketAnnotations: [
-      exitWithoutDependency('isWikiLyrics', V(false), V('falsy')),
-      exitWithoutDependency('body', V(false)),
-
-      {
-        dependencies: ['body'],
-        compute: ({body}) =>
-          /\[.*\]/m.test(body),
-      },
-    ],
-  });
-
-  static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(ContentEntry, {
-    fields: {
-      'Origin Details': {property: 'originDetails'},
-    },
-  });
-}
-
-export class CreditingSourcesEntry extends ContentEntry {
-  static [Thing.wikiData] = 'creditingSourceData';
-
-  static [Thing.getPropertyDescriptors] = () => ({
-    // Expose only
-
-    isCreditingSourcesEntry: exposeConstant(V(true)),
-  });
-}
-
-export class ReferencingSourcesEntry extends ContentEntry {
-  static [Thing.wikiData] = 'referencingSourceData';
-
-  static [Thing.getPropertyDescriptors] = () => ({
-    // Expose only
-
-    isReferencingSourceEntry: exposeConstant(V(true)),
-  });
 }

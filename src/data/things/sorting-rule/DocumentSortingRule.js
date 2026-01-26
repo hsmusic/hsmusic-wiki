@@ -1,19 +1,10 @@
-export const SORTING_RULE_DATA_FILE = 'sorting-rules.yaml';
-
 import {readFile, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
 import {V} from '#composite';
-import {chunkByProperties, compareArrays, unique} from '#sugar';
+import {chunkByProperties, compareArrays} from '#sugar';
 import Thing from '#thing';
 import {isObject, isStringNonEmpty, anyOf, strictArrayOf} from '#validators';
-
-import {
-  compareCaseLessSensitive,
-  sortByDate,
-  sortByDirectory,
-  sortByName,
-} from '#sort';
 
 import {
   documentModes,
@@ -23,7 +14,6 @@ import {
 } from '#yaml';
 
 import {exposeConstant} from '#composite/control-flow';
-import {flag} from '#composite/wiki-properties';
 
 function isSelectFollowingEntry(value) {
   isObject(value);
@@ -36,151 +26,7 @@ function isSelectFollowingEntry(value) {
   return true;
 }
 
-export class SortingRule extends Thing {
-  static [Thing.friendlyName] = `Sorting Rule`;
-  static [Thing.wikiData] = 'sortingRules';
-
-  static [Thing.getPropertyDescriptors] = () => ({
-    // Update & expose
-
-    active: flag(V(true)),
-
-    message: {
-      flags: {update: true, expose: true},
-      update: {validate: isStringNonEmpty},
-    },
-
-    // Expose only
-
-    isSortingRule: exposeConstant(V(true)),
-  });
-
-  static [Thing.yamlDocumentSpec] = {
-    fields: {
-      'Message': {property: 'message'},
-      'Active': {property: 'active'},
-    },
-  };
-
-  static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {allInOne},
-    thingConstructors: {DocumentSortingRule},
-  }) => ({
-    title: `Process sorting rules file`,
-    file: SORTING_RULE_DATA_FILE,
-
-    documentMode: allInOne,
-    documentThing: document =>
-      (document['Sort Documents']
-        ? DocumentSortingRule
-        : null),
-  });
-
-  check(opts) {
-    return this.constructor.check(this, opts);
-  }
-
-  apply(opts) {
-    return this.constructor.apply(this, opts);
-  }
-
-  static check(rule, opts) {
-    const result = this.apply(rule, {...opts, dry: true});
-    if (!result) return true;
-    if (!result.changed) return true;
-    return false;
-  }
-
-  static async apply(_rule, _opts) {
-    throw new Error(`Not implemented`);
-  }
-
-  static async* applyAll(_rules, _opts) {
-    throw new Error(`Not implemented`);
-  }
-
-  static async* go({dataPath, wikiData, dry}) {
-    const rules = wikiData.sortingRules;
-    const constructors = unique(rules.map(rule => rule.constructor));
-
-    for (const constructor of constructors) {
-      yield* constructor.applyAll(
-        rules
-          .filter(rule => rule.active)
-          .filter(rule => rule.constructor === constructor),
-        {dataPath, wikiData, dry});
-    }
-  }
-}
-
-export class ThingSortingRule extends SortingRule {
-  static [Thing.getPropertyDescriptors] = () => ({
-    // Update & expose
-
-    properties: {
-      flags: {update: true, expose: true},
-      update: {
-        validate: strictArrayOf(isStringNonEmpty),
-      },
-    },
-
-    // Expose only
-
-    isThingSortingRule: exposeConstant(V(true)),
-  });
-
-  static [Thing.yamlDocumentSpec] = {
-    fields: {
-      'By Properties': {property: 'properties'},
-    },
-  };
-
-  sort(sortable) {
-    if (this.properties) {
-      for (const property of this.properties.toReversed()) {
-        const get = thing => thing[property];
-        const lc = property.toLowerCase();
-
-        if (lc.endsWith('date')) {
-          sortByDate(sortable, {getDate: get});
-          continue;
-        }
-
-        if (lc.endsWith('directory')) {
-          sortByDirectory(sortable, {getDirectory: get});
-          continue;
-        }
-
-        if (lc.endsWith('name')) {
-          sortByName(sortable, {getName: get});
-          continue;
-        }
-
-        const values = sortable.map(get);
-
-        if (values.every(v => typeof v === 'string')) {
-          sortable.sort((a, b) =>
-            compareCaseLessSensitive(get(a), get(b)));
-          continue;
-        }
-
-        if (values.every(v => typeof v === 'number')) {
-          sortable.sort((a, b) => get(a) - get(b));
-          continue;
-        }
-
-        sortable.sort((a, b) =>
-          (get(a).toString() < get(b).toString()
-            ? -1
-         : get(a).toString() > get(b).toString()
-            ? +1
-            :  0));
-      }
-    }
-
-    return sortable;
-  }
-}
+import {ThingSortingRule} from './ThingSortingRule.js';
 
 export class DocumentSortingRule extends ThingSortingRule {
   static [Thing.getPropertyDescriptors] = () => ({
