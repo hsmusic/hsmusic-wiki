@@ -5,10 +5,10 @@ export default {
     const query = {};
 
     const featuringFilter = contribution =>
-      contribution.annotation === 'featuring';
+      contribution.isFeaturingCredit;
 
     const wikiEditFilter = contribution =>
-      contribution.annotation?.startsWith('edits for wiki');
+      contribution.isEditsForWikiCredit;
 
     const normalFilter = contribution =>
       !featuringFilter(contribution) &&
