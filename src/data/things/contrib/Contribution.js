@@ -121,16 +121,51 @@ export class Contribution extends Thing {
 
     isContribution: exposeConstant(V(true)),
 
-    annotationParts: {
-      flags: {expose: true},
-      expose: {
-        dependencies: ['annotation'],
-        compute: ({annotation}) =>
-          (annotation
-            ? annotation.split(',').map(part => part.trim())
-            : []),
+    recognizedAnnotationFronts: exposeConstant(V([])),
+
+    annotationFront: [
+      exitWithoutDependency('annotation'),
+
+      {
+        dependencies: ['recognizedAnnotationFronts', 'annotation'],
+        compute: ({recognizedAnnotationFronts, annotation}) =>
+          recognizedAnnotationFronts
+            .find(front =>
+              annotation.startsWith(front) && (
+                annotation === front ||
+                annotation.at(front.length) === ':' ||
+                annotation.at(front.length) === ','
+              )) ?? null,
       },
-    },
+    ],
+
+    annotationBack: [
+      exitWithoutDependency('annotation'),
+
+      exitWithoutDependency({
+        dependency: 'annotationFront',
+        value: 'annotation',
+      }),
+
+      {
+        dependencies: ['annotation', 'annotationFront'],
+        compute: ({annotation, annotationFront}) =>
+          annotation.slice(annotationFront.length + 1).trim()
+            || null,
+      },
+    ],
+
+    annotationParts: [
+      exitWithoutDependency('annotationBack', V([])),
+
+      {
+        dependencies: ['annotationBack'],
+        compute: ({annotationBack}) =>
+          annotationBack
+            .split(',')
+            .map(part => part.trim()),
+      },
+    ],
 
     context: [
       withContributionContext(),

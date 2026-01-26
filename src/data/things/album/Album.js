@@ -69,6 +69,8 @@ export class Album extends Thing {
     AdditionalFile,
     AdditionalName,
     AlbumArtistContribution,
+    AlbumBannerArtistContribution,
+    AlbumWallpaperArtistContribution,
     ArtTag,
     Artwork,
     CommentaryEntry,
@@ -266,6 +268,7 @@ export class Album extends Thing {
     ],
 
     wallpaperArtistContribs: contributionList({
+      class: input.value(AlbumWallpaperArtistContribution),
       date: 'coverArtDate',
       artistProperty: input.value('albumWallpaperArtistContributions'),
     }),
@@ -308,6 +311,7 @@ export class Album extends Thing {
     ],
 
     bannerArtistContribs: contributionList({
+      class: input.value(AlbumBannerArtistContribution),
       date: 'coverArtDate',
       artistProperty: input.value('albumBannerArtistContributions'),
     }),
