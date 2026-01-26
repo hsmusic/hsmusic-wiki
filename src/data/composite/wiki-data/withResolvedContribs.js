@@ -7,7 +7,8 @@
 import {input, templateCompositeFrom} from '#composite';
 import {filterMultipleArrays, stitchArrays} from '#sugar';
 import thingConstructors from '#things';
-import {isContributionList, isDate, isStringNonEmpty} from '#validators';
+import {isContributionList, isDate, isStringNonEmpty, isThingClass}
+  from '#validators';
 
 import {raiseOutputWithoutDependency, withAvailabilityFilter}
   from '#composite/control-flow';
@@ -23,6 +24,11 @@ export default templateCompositeFrom({
     from: input({
       validate: isContributionList,
       acceptsNull: true,
+    }),
+
+    class: input({
+      validate: isThingClass,
+      defaultValue: null,
     }),
 
     date: input({
@@ -106,9 +112,21 @@ export default templateCompositeFrom({
     },
 
     {
+      dependencies: [input('class')],
+      compute: (continuation, {
+        [input('class')]: classInput,
+      }) => continuation({
+        ['#contributionConstructor']:
+          classInput ??
+          thingConstructors.Contribution,
+      }),
+    },
+
+    {
       dependencies: [
         '#details',
         '#thingProperty',
+        '#contributionConstructor',
         input('artistProperty'),
         input.myself(),
         '_find',
@@ -117,13 +135,14 @@ export default templateCompositeFrom({
       compute: (continuation, {
         ['#details']: details,
         ['#thingProperty']: thingProperty,
+        ['#contributionConstructor']: contributionConstructor,
         [input('artistProperty')]: artistProperty,
         [input.myself()]: myself,
         ['_find']: find,
       }) => continuation({
         ['#contributions']:
           details.map(details => {
-            const contrib = new thingConstructors.Contribution();
+            const contrib = Reflect.construct(contributionConstructor, []);
 
             Object.assign(contrib, {
               ...details,
