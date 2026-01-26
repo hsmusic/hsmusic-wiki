@@ -14,7 +14,7 @@ export default {
       contribs
         .some(contrib =>
           contrib.thingProperty === 'artistContribs' &&
-          contrib.annotation !== 'featuring');
+         !contrib.isFeaturingCredit);
 
     const creditedAsContributor =
       contribs
@@ -22,9 +22,7 @@ export default {
 
     const annotatedContribs =
       contribs
-        .filter(contrib =>
-          contrib.annotation &&
-          contrib.annotation !== 'featuring');
+        .filter(contrib => !empty(contrib.annotationParts));
 
     const annotatedArtistContribs =
       annotatedContribs
@@ -117,10 +115,10 @@ export default {
     duration:
       query.track.duration,
 
-    contribAnnotations:
+    contribAnnotationParts:
       (query.displayedContributions
         ? query.displayedContributions
-            .map(contrib => contrib.annotation)
+            .flatMap(contrib => contrib.annotationParts)
         : null),
   }),
 
@@ -137,8 +135,8 @@ export default {
       firstReleaseTooltip: relations.firstReleaseTooltip,
 
       annotation:
-        (data.contribAnnotations
-          ? language.formatUnitList(data.contribAnnotations)
+        (data.contribAnnotationParts
+          ? language.formatUnitList(data.contribAnnotationParts)
           : html.blank()),
 
       content:
