@@ -121,24 +121,10 @@ export default {
       ...relations.featuringContributionLinks,
     ]) {
       link.setSlots({
+        showAnnotation: slots.showAnnotation,
         showExternalLinks: slots.showExternalLinks,
         showChronology: slots.showChronology,
         chronologyKind: slots.chronologyKind,
-      });
-    }
-
-    for (const link of relations.normalContributionLinks) {
-      link.setSlots({
-        showAnnotation: slots.showAnnotation,
-      });
-    }
-
-    for (const link of relations.featuringContributionLinks) {
-      link.setSlots({
-        showAnnotation:
-          (slots.featuringStringKey || slots.normalFeaturingStringKey
-            ? false
-            : slots.showAnnotation),
       });
     }
 
