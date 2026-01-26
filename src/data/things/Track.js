@@ -1254,9 +1254,6 @@ export class Track extends Thing {
     },
   };
 
-  // Track YAML loading is handled in album.js.
-  static [Thing.getYamlLoadingSpec] = null;
-
   getOwnAdditionalFilePath(_file, filename) {
     if (!this.album) return null;
 

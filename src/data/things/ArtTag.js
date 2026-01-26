@@ -1,12 +1,4 @@
-const DATA_ART_TAGS_DIRECTORY = 'art-tags';
-const ART_TAG_DATA_FILE = 'tags.yaml';
-
-import {readFile} from 'node:fs/promises';
-import * as path from 'node:path';
-
 import {input, V} from '#composite';
-import {traverse} from '#node-utils';
-import {sortAlphabetically} from '#sort';
 import Thing from '#thing';
 import {unique} from '#sugar';
 import {isName} from '#validators';
@@ -200,31 +192,4 @@ export class ArtTag extends Thing {
       },
     },
   };
-
-  static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {allTogether},
-    thingConstructors: {ArtTag},
-  }) => ({
-    title: `Process art tags file`,
-
-    files: dataPath =>
-      Promise.allSettled([
-        readFile(path.join(dataPath, ART_TAG_DATA_FILE))
-          .then(() => [ART_TAG_DATA_FILE]),
-
-        traverse(path.join(dataPath, DATA_ART_TAGS_DIRECTORY), {
-          filterFile: name => path.extname(name) === '.yaml',
-          prefixPath: DATA_ART_TAGS_DIRECTORY,
-        }),
-      ]).then(results => results
-          .filter(({status}) => status === 'fulfilled')
-          .flatMap(({value}) => value)),
-
-    documentMode: allTogether,
-    documentThing: ArtTag,
-
-    sort({artTagData}) {
-      sortAlphabetically(artTagData);
-    },
-  });
 }

@@ -1,5 +1,3 @@
-const SORTING_RULE_DATA_FILE = 'sorting-rules.yaml';
-
 import {V} from '#composite';
 import {unique} from '#sugar';
 import Thing from '#thing';
@@ -33,20 +31,6 @@ export class SortingRule extends Thing {
       'Active': {property: 'active'},
     },
   };
-
-  static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {allInOne},
-    thingConstructors: {DocumentSortingRule},
-  }) => ({
-    title: `Process sorting rules file`,
-    file: SORTING_RULE_DATA_FILE,
-
-    documentMode: allInOne,
-    documentThing: document =>
-      (document['Sort Documents']
-        ? DocumentSortingRule
-        : null),
-  });
 
   check(opts) {
     return this.constructor.check(this, opts);

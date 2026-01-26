@@ -1,5 +1,3 @@
-export const WIKI_INFO_FILE = 'wiki-info.yaml';
-
 import {input, V} from '#composite';
 import Thing from '#thing';
 import {parseContributionPresets, parseWallpaperParts} from '#yaml';
@@ -156,14 +154,5 @@ export class WikiInfo extends Thing {
     },
   };
 
-  static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {oneDocumentTotal},
-    thingConstructors: {WikiInfo},
-  }) => ({
-    title: `Process wiki info file`,
-    file: WIKI_INFO_FILE,
 
-    documentMode: oneDocumentTotal,
-    documentThing: WikiInfo,
-  });
 }

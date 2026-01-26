@@ -23,7 +23,6 @@ export default class Thing extends CacheableObject {
   static reverseSpecs = Symbol.for('Thing.reverseSpecs');
 
   static yamlDocumentSpec = Symbol.for('Thing.yamlDocumentSpec');
-  static getYamlLoadingSpec = Symbol.for('Thing.getYamlLoadingSpec');
 
   static yamlSourceFilename = Symbol.for('Thing.yamlSourceFilename');
   static yamlSourceDocument = Symbol.for('Thing.yamlSourceDocument');

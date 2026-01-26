@@ -1,0 +1,10 @@
+export {default as getAlbumLoadingSpec} from './album.js';
+export {default as getArtistLoadingSpec} from './artist.js';
+export {default as getArtTagLoadingSpec} from './art-tag.js';
+export {default as getFlashLoadingSpec} from './flash.js';
+export {default as getGroupLoadingSpec} from './group.js';
+export {default as getHomepageLayoutLoadingSpec} from './homepage-layout.js';
+export {default as getNewsLoadingSpec} from './news.js';
+export {default as getSortingRuleLoadingSpec} from './sorting-rule.js';
+export {default as getStaticPageLoadingSpec} from './static-page.js';
+export {default as getWikiInfoLoadingSpec} from './wiki-info.js';

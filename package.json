@@ -29,6 +29,7 @@
         "#cli": "./src/cli.js",
         "#data-checks": "./src/data/checks.js",
         "#external-links": "./src/external-links.js",
+        "#files": "./src/data/files/index.js",
         "#find": "./src/find.js",
         "#html": "./src/html.js",
         "#import-heck": "./src/import-heck.js",

@@ -1,10 +1,4 @@
-const DATA_STATIC_PAGE_DIRECTORY = 'static-page';
-
-import * as path from 'node:path';
-
 import {V} from '#composite';
-import {traverse} from '#node-utils';
-import {sortAlphabetically} from '#sort';
 import Thing from '#thing';
 import {isName} from '#validators';
 
@@ -67,24 +61,4 @@ export class StaticPage extends Thing {
       'Review Points': {ignore: true},
     },
   };
-
-  static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {onePerFile},
-    thingConstructors: {StaticPage},
-  }) => ({
-    title: `Process static page files`,
-
-    files: dataPath =>
-      traverse(path.join(dataPath, DATA_STATIC_PAGE_DIRECTORY), {
-        filterFile: name => path.extname(name) === '.yaml',
-        prefixPath: DATA_STATIC_PAGE_DIRECTORY,
-      }),
-
-    documentMode: onePerFile,
-    documentThing: StaticPage,
-
-    sort({staticPageData}) {
-      sortAlphabetically(staticPageData);
-    },
-  });
 }

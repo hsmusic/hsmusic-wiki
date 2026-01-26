@@ -7,6 +7,7 @@ import {inspect as nodeInspect} from 'node:util';
 
 import yaml from 'js-yaml';
 
+import * as fileLoadingSpecs from '#files';
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import {parseContentNodes, splitContentNodesAround} from '#replacer';
 import {sortByName} from '#sort';
@@ -1157,17 +1158,7 @@ export function getAllDataSteps() {
 
   const steps = [];
 
-  const seenLoadingFns = new Set();
-
-  for (const thingConstructor of Object.values(thingConstructors)) {
-    const getSpecFn = thingConstructor[Thing.getYamlLoadingSpec];
-    if (!getSpecFn) continue;
-
-    // Subclasses can expose literally the same static properties
-    // by inheritence. We don't want to double-count those!
-    if (seenLoadingFns.has(getSpecFn)) continue;
-    seenLoadingFns.add(getSpecFn);
-
+  for (const getSpecFn of Object.values(fileLoadingSpecs)) {
     steps.push(getSpecFn({
       documentModes,
       thingConstructors,
@@ -1837,6 +1828,7 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
 
     for (const thing of things) {
       if (thing === undefined) continue;
+      if (thing === null) continue;
 
       let hasFind;
       if (constructorHasFindMap.has(thing.constructor)) {

@@ -1,7 +1,4 @@
-const NEWS_DATA_FILE = 'news.yaml';
-
 import {V} from '#composite';
-import {sortChronologically} from '#sort';
 import Thing from '#thing';
 import {parseDate} from '#yaml';
 
@@ -58,19 +55,4 @@ export class NewsEntry extends Thing {
       'Content': {property: 'content'},
     },
   };
-
-  static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {allInOne},
-    thingConstructors: {NewsEntry},
-  }) => ({
-    title: `Process news data file`,
-    file: NEWS_DATA_FILE,
-
-    documentMode: allInOne,
-    documentThing: NewsEntry,
-
-    sort({newsData}) {
-      sortChronologically(newsData, {latestFirst: true});
-    },
-  });
 }

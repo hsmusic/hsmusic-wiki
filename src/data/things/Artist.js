@@ -1,5 +1,3 @@
-const ARTIST_DATA_FILE = 'artists.yaml';
-
 import {inspect} from 'node:util';
 
 import CacheableObject from '#cacheable-object';
@@ -11,7 +9,6 @@ import {parseArtistAliases, parseArtwork} from '#yaml';
 import {
   sortAlbumsTracksChronologically,
   sortArtworksChronologically,
-  sortAlphabetically,
   sortContributionsChronologically,
 } from '#sort';
 
@@ -324,21 +321,6 @@ export class Artist extends Thing {
       'Review Points': {ignore: true},
     },
   };
-
-  static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {allInOne},
-    thingConstructors: {Artist},
-  }) => ({
-    title: `Process artists file`,
-    file: ARTIST_DATA_FILE,
-
-    documentMode: allInOne,
-    documentThing: Artist,
-
-    sort({artistData}) {
-      sortAlphabetically(artistData);
-    },
-  });
 
   [inspect.custom]() {
     const parts = [];
