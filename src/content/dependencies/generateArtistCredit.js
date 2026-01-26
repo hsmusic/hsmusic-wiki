@@ -104,8 +104,6 @@ export default {
     showChronology: {type: 'boolean', default: false},
     showWikiEdits: {type: 'boolean', default: false},
 
-    trimAnnotation: {type: 'boolean', default: false},
-
     chunkwrap: {type: 'boolean', default: true},
 
     chronologyKind: {type: 'string'},
@@ -125,7 +123,6 @@ export default {
       link.setSlots({
         showExternalLinks: slots.showExternalLinks,
         showChronology: slots.showChronology,
-        trimAnnotation: slots.trimAnnotation,
         chronologyKind: slots.chronologyKind,
       });
     }

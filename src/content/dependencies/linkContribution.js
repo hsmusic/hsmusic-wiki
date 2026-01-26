@@ -11,7 +11,7 @@ export default {
   }),
 
   data: (contribution) => ({
-    annotation: contribution.annotation,
+    annotationParts: contribution.annotationParts,
     urls: contribution.artist.urls,
   }),
 
@@ -21,8 +21,6 @@ export default {
     showAnnotation: {type: 'boolean', default: false},
     showExternalLinks: {type: 'boolean', default: false},
     showChronology: {type: 'boolean', default: false},
-
-    trimAnnotation: {type: 'boolean', default: false},
 
     preventWrapping: {type: 'boolean', default: false},
     preventTooltip: {type: 'boolean', default: false},
@@ -69,11 +67,9 @@ export default {
               }));
 
         const annotation =
-          (slots.trimAnnotation
-            ? data.annotation?.replace(/^edits for wiki(: )?/, '')
-            : data.annotation);
+          language.formatUnitList(data.annotationParts);
 
-        if (slots.showAnnotation && annotation) {
+        if (slots.showAnnotation && !html.isBlank(annotation)) {
           workingCapsule += '.withContribution';
           workingOptions.contrib = annotation;
         }

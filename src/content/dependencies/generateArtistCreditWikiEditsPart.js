@@ -38,7 +38,6 @@ export default {
                     relations.contributionLinks.map(link =>
                       link.slots({
                         showAnnotation: slots.showAnnotation,
-                        trimAnnotation: true,
                         preventTooltip: true,
                         preventWrapping: true,
                       }))),

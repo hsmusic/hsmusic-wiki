@@ -75,8 +75,6 @@ export default {
                 showChronology: true,
                 showWikiEdits: true,
 
-                trimAnnotation: false,
-
                 chronologyKind: 'coverArt',
 
                 normalStringKey: workingCapsule,

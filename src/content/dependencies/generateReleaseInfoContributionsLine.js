@@ -20,8 +20,6 @@ export default {
       showChronology: true,
       showWikiEdits: true,
 
-      trimAnnotation: false,
-
       chronologyKind: slots.chronologyKind,
 
       normalStringKey: slots.stringKey,
