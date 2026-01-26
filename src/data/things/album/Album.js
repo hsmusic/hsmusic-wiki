@@ -68,11 +68,13 @@ export class Album extends Thing {
   static [Thing.getPropertyDescriptors] = ({
     AdditionalFile,
     AdditionalName,
+    AlbumArtistContribution,
     ArtTag,
     Artwork,
     CommentaryEntry,
     CreditingSourcesEntry,
     Group,
+    TrackArtistContribution,
     TrackSection,
     WikiInfo,
   }) => ({
@@ -119,6 +121,7 @@ export class Album extends Thing {
     // > Update & expose - Credits and contributors
 
     artistContribs: contributionList({
+      class: input.value(AlbumArtistContribution),
       artistProperty: input.value('albumArtistContributions'),
     }),
 
@@ -127,6 +130,7 @@ export class Album extends Thing {
     trackArtistContribs: [
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
+        class: input.value(TrackArtistContribution),
         thingProperty: input.thisProperty(),
         artistProperty: input.value('albumTrackArtistContributions'),
       }).outputs({
@@ -136,6 +140,7 @@ export class Album extends Thing {
       exposeDependencyOrContinue('#trackArtistContribs', V('empty')),
 
       withRecontextualizedContributionList('artistContribs', {
+        reclass: input.value(TrackArtistContribution),
         artistProperty: input.value('albumTrackArtistContributions'),
       }),
 

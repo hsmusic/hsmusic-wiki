@@ -2,6 +2,7 @@
 
 export * from './album/index.js';
 export * from './content/index.js';
+export * from './contrib/index.js';
 export * from './flash/index.js';
 export * from './group/index.js';
 export * from './homepage-layout/index.js';
@@ -12,7 +13,6 @@ export * from './AdditionalName.js';
 export * from './ArtTag.js';
 export * from './Artist.js';
 export * from './Artwork.js';
-export * from './Contribution.js';
 export * from './Language.js';
 export * from './MusicVideo.js';
 export * from './NewsEntry.js';
