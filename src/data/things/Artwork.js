@@ -73,7 +73,10 @@ export class Artwork extends Thing {
     // 'artistContribs', // from attached artwork or thing
   ];
 
-  static [Thing.getPropertyDescriptors] = ({ArtTag}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    ArtTag,
+    ArtworkArtistContribution,
+  }) => ({
     // Update & expose
 
     unqualifiedDirectory: directory({
@@ -128,6 +131,12 @@ export class Artwork extends Thing {
     artistContribs: [
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
+
+        // XXX: All artwork artist contributions, as resolved from update value
+        // (*not* those constituted from thing), are generic artwork contribs.
+        // The class should be specified by whatever the artwork is placed on!!
+        class: input.value(ArtworkArtistContribution),
+
         date: 'date',
         thingProperty: input.thisProperty(),
         artistProperty: 'artistContribsArtistProperty',
