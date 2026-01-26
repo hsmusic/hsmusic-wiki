@@ -69,7 +69,6 @@ import {
   commentatorArtists,
   constitutibleArtworkList,
   contentString,
-  contributionList,
   dimensions,
   directory,
   duration,

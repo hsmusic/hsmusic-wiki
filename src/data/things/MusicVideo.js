@@ -2,7 +2,6 @@ import {inspect} from 'node:util';
 
 import {colors} from '#cli';
 import {input, V} from '#composite';
-import find from '#find';
 import Thing from '#thing';
 import {is, isDate, isStringNonEmpty, isURL} from '#validators';
 import {parseContributors, parseDate} from '#yaml';
@@ -24,14 +23,13 @@ import {
   soupyFind,
   soupyReverse,
   thing,
-  urls,
 } from '#composite/wiki-properties';
 
 export class MusicVideo extends Thing {
   static [Thing.referenceType] = 'music-video';
   static [Thing.wikiData] = 'musicVideoData';
 
-  static [Thing.getPropertyDescriptors] = ({ArtTag}) => ({
+  static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
     thing: thing(),
