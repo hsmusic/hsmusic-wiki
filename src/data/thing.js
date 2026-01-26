@@ -81,9 +81,37 @@ export default class Thing extends CacheableObject {
       (reference ? ` (${reference})` : ''));
   }
 
+  static clone(source, {as = null} = {}) {
+    if (!(source instanceof this)) {
+      throw new TypeError(
+        `Passed thing is ${source.constructor.name}, ` +
+        `which is not a subclass of ${this.name}`);
+    }
+
+    if (as && !(as.prototype instanceof this)) {
+      throw new TypeError(
+        `Passed constructor is ${as.name}, ` +
+        `which is not a subclass of ${this.name}`);
+    }
+
+    let clone;
+
+    if (as) {
+      clone = Reflect.construct(as, []);
+    } else {
+      clone = Reflect.construct(source.constructor, []);
+    }
+
+    CacheableObject.copyUpdateValuesOnto(source, clone);
+
+    return clone;
+  }
+
   static getReference(thing) {
     if (!thing.constructor[Thing.referenceType]) {
-      throw TypeError(`Passed Thing is ${thing.constructor.name}, which provides no [Thing.referenceType]`);
+      throw TypeError(
+        `Passed Thing is ${thing.constructor.name}, ` +
+        `which provides no [Thing.referenceType]`);
     }
 
     if (!thing.directory) {

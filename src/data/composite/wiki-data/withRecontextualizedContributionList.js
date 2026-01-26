@@ -1,14 +1,15 @@
 // Clones all the contributions in a list, with thing and thingProperty both
 // updated to match the current thing. Overwrites the provided dependency.
-// Optionally updates artistProperty as well. Doesn't do anything if
-// the provided dependency is null.
+// Optionally updates artistProperty, and optionally reclasses as another
+// kind of contribution. Does nothing if the provided dependency is null.
 //
 // See also:
 //  - withRedatedContributionList
 //
 
 import {input, templateCompositeFrom} from '#composite';
-import {isStringNonEmpty} from '#validators';
+import thingConstructors from '#thing';
+import {isStringNonEmpty, isThingClass} from '#validators';
 
 import {withClonedThings} from '#composite/wiki-data';
 
@@ -19,6 +20,11 @@ export default templateCompositeFrom({
     list: input.staticDependency({
       type: 'array',
       acceptsNull: true,
+    }),
+
+    reclass: input({
+      validate: isThingClass,
+      defaultValue: null,
     }),
 
     artistProperty: input({
@@ -77,6 +83,8 @@ export default templateCompositeFrom({
 
     withClonedThings({
       things: input('list'),
+      reclass: input('reclass'),
+      reclassUnder: input.value(thingConstructors.Contribution),
       assign: '#assignment',
     }).outputs({
       '#clonedThings': '#newContributions',

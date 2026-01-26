@@ -3,9 +3,9 @@
 // 'assignEach' input is provided, each new thing is assigned the
 // corresponding properties.
 
-import CacheableObject from '#cacheable-object';
 import {input, templateCompositeFrom} from '#composite';
-import {isObject, sparseArrayOf} from '#validators';
+import Thing from '#thing';
+import {isObject, isThingClass, sparseArrayOf} from '#validators';
 
 import {withMappedList} from '#composite/data';
 
@@ -14,6 +14,16 @@ export default templateCompositeFrom({
 
   inputs: {
     things: input({type: 'array'}),
+
+    reclass: input({
+      validate: isThingClass,
+      defaultValue: null,
+    }),
+
+    reclassUnder: input({
+      validate: isThingClass,
+      defaultValue: null,
+    }),
 
     assign: input({
       type: 'object',
@@ -46,15 +56,29 @@ export default templateCompositeFrom({
     },
 
     {
-      dependencies: ['#assignmentMap'],
+      dependencies: [input('reclass'), input('reclassUnder')],
+      compute: (continuation, {
+        [input('reclass')]: reclass,
+        [input('reclassUnder')]: reclassUnder,
+      }) => continuation({
+        ['#cloneOperation']:
+          (reclassUnder && reclass
+            ? source => reclassUnder.clone(source, {as: reclass})
+         : reclass
+            ? source => Thing.clone(source, {as: reclass})
+            : source => Thing.clone(source)),
+      }),
+    },
+
+    {
+      dependencies: ['#assignmentMap', '#cloneOperation'],
       compute: (continuation, {
         ['#assignmentMap']: assignmentMap,
+        ['#cloneOperation']: cloneOperation,
       }) => continuation({
         ['#cloningMap']:
           (thing, index) =>
-            Object.assign(
-              CacheableObject.clone(thing),
-              assignmentMap(index)),
+            Object.assign(cloneOperation(thing), assignmentMap(index)),
       }),
     },
 
