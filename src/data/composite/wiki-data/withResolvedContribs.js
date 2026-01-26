@@ -82,27 +82,33 @@ export default templateCompositeFrom({
 
     withPropertiesFromList({
       list: input('from'),
-      properties: input.value(['artist', 'annotation']),
+      properties: input.value(['artist', 'artistText', 'annotation']),
       prefix: input.value('#contribs'),
     }),
 
     {
       dependencies: [
         '#contribs.artist',
+        '#contribs.artistText',
         '#contribs.annotation',
         input('date'),
       ],
 
       compute(continuation, {
         ['#contribs.artist']: artist,
+        ['#contribs.artistText']: artistText,
         ['#contribs.annotation']: annotation,
         [input('date')]: date,
       }) {
-        filterMultipleArrays(artist, annotation, (artist, _annotation) => artist);
+        filterMultipleArrays(
+          artist,
+          artistText,
+          annotation,
+          (artist, _artistText, _annotation) => artist);
 
         return continuation({
           ['#details']:
-            stitchArrays({artist, annotation})
+            stitchArrays({artist, artistText, annotation})
               .map(details => ({
                 ...details,
                 date: date ?? null,

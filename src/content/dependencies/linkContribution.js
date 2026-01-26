@@ -11,6 +11,7 @@ export default {
   }),
 
   data: (contribution) => ({
+    artistText: contribution.artistText,
     annotationParts: contribution.annotationParts,
     urls: contribution.artist.urls,
   }),
@@ -50,6 +51,12 @@ export default {
           showChronology: slots.showChronology,
           chronologyKind: slots.chronologyKind,
         });
+
+        if (data.artistText) {
+          relations.artistLink.setSlots({
+            content: language.sanitize(data.artistText),
+          });
+        }
 
         workingOptions.artist =
           (html.isBlank(relations.tooltip) || slots.preventTooltip

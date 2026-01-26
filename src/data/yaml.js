@@ -646,6 +646,9 @@ export const extractAccentRegex =
 export const extractPrefixAccentRegex =
   /^(?:\((?<accent>.*)\) )?(?<main>.*?)$/;
 
+export const asNameRegex =
+  /^as (?<name>\S.+?)(?:(?<=\S)[,:] | +- |$)(?: *(?<annotation>.*))?$/;
+
 // TODO: Should this fit better within actual YAML loading infrastructure??
 export function parseArrayEntries(entries, mapFn) {
   // If this isn't something we can parse, just return it as-is.
@@ -679,12 +682,14 @@ export function parseContributors(entries) {
     if (typeof item === 'object' && item['Who'])
       return {
         artist: item['Who'],
+        artistText: item['As'] ?? null,
         annotation: item['What'] ?? null,
       };
 
     if (typeof item === 'object' && item['Artist'])
       return {
         artist: item['Artist'],
+        artistText: item['Artist Text'] ?? null,
         annotation: item['Annotation'] ?? null,
 
         countInContributionTotals: item['Count In Contribution Totals'] ?? null,
@@ -693,13 +698,28 @@ export function parseContributors(entries) {
 
     if (typeof item !== 'string') return item;
 
-    const match = item.match(extractAccentRegex);
+    let match;
+
+    match = item.match(extractAccentRegex);
     if (!match) return item;
 
-    return {
-      artist: match.groups.main,
-      annotation: match.groups.accent ?? null,
-    };
+    const {accent} = match.groups;
+
+    let artist = match.groups.main;
+    let artistText = null;
+    let annotation = null;
+
+    if (accent) {
+      match = accent.match(asNameRegex);
+      if (match) {
+        artistText = match.groups.name;
+        annotation = match.groups.annotation ?? null;
+      } else {
+        annotation = accent;
+      }
+    }
+
+    return {artist, artistText, annotation};
   });
 }
 

@@ -7,7 +7,7 @@ import {empty} from '#sugar';
 import Thing from '#thing';
 import {isBoolean, isStringNonEmpty, isThing} from '#validators';
 
-import {simpleDate, singleReference, soupyFind}
+import {simpleDate, singleReference, simpleString, soupyFind}
   from '#composite/wiki-properties';
 
 import {
@@ -55,6 +55,8 @@ export class Contribution extends Thing {
     artist: singleReference({
       find: soupyFind.input('artist'),
     }),
+
+    artistText: simpleString(),
 
     annotation: {
       flags: {update: true, expose: true},

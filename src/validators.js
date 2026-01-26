@@ -678,6 +678,7 @@ export function isThing(thing) {
 
 export const isContribution = validateProperties({
   artist: isArtistRef,
+  artistText: optional(isStringNonEmpty),
   annotation: optional(isStringNonEmpty),
 
   countInDurationTotals: optional(isBoolean),
