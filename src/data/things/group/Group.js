@@ -1,11 +1,8 @@
-export const GROUP_DATA_FILE = 'groups.yaml';
+const GROUP_DATA_FILE = 'groups.yaml';
 
-import {inspect} from 'node:util';
-
-import {colors} from '#cli';
 import {input, V} from '#composite';
 import Thing from '#thing';
-import {is, isBoolean} from '#validators';
+import {isBoolean} from '#validators';
 import {parseAnnotatedReferences, parseSerieses} from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
@@ -19,7 +16,6 @@ import {
 
 import {
   annotatedReferenceList,
-  color,
   contentString,
   directory,
   flag,
@@ -27,7 +23,6 @@ import {
   referenceList,
   soupyFind,
   soupyReverse,
-  thing,
   thingList,
   urls,
 } from '#composite/wiki-properties';
@@ -234,125 +229,4 @@ export class Group extends Thing {
     // file as-is.
     sort: null,
   });
-}
-
-export class GroupCategory extends Thing {
-  static [Thing.referenceType] = 'group-category';
-  static [Thing.friendlyName] = `Group Category`;
-  static [Thing.wikiData] = 'groupCategoryData';
-
-  static [Thing.getPropertyDescriptors] = ({Group}) => ({
-    // Update & expose
-
-    name: name(V('Unnamed Group Category')),
-    directory: directory(),
-
-    excludeGroupsFromGalleryTabs: flag(V(false)),
-
-    color: color(),
-
-    groups: referenceList({
-      class: input.value(Group),
-      find: soupyFind.input('group'),
-    }),
-
-    // Update only
-
-    find: soupyFind(),
-
-    // Expose only
-
-    isGroupCategory: exposeConstant(V(true)),
-  });
-
-  static [Thing.reverseSpecs] = {
-    groupCategoriesWhichInclude: {
-      bindTo: 'groupCategoryData',
-
-      referencing: groupCategory => [groupCategory],
-      referenced: groupCategory => groupCategory.groups,
-    },
-  };
-
-  static [Thing.yamlDocumentSpec] = {
-    fields: {
-      'Category': {property: 'name'},
-
-      'Color': {property: 'color'},
-
-      'Exclude Groups From Gallery Tabs': {
-        property: 'excludeGroupsFromGalleryTabs',
-      },
-    },
-  };
-}
-
-export class Series extends Thing {
-  static [Thing.wikiData] = 'seriesData';
-
-  static [Thing.getPropertyDescriptors] = ({Album, Group}) => ({
-    // Update & expose
-
-    name: name(V('Unnamed Series')),
-
-    showAlbumArtists: {
-      flags: {update: true, expose: true},
-      update: {
-        validate:
-          is('all', 'differing', 'none'),
-      },
-    },
-
-    description: contentString(),
-
-    group: thing(V(Group)),
-
-    albums: referenceList({
-      class: input.value(Album),
-      find: soupyFind.input('album'),
-    }),
-
-    // Update only
-
-    find: soupyFind(),
-  });
-
-  static [Thing.yamlDocumentSpec] = {
-    fields: {
-      'Name': {property: 'name'},
-
-      'Description': {property: 'description'},
-
-      'Show Album Artists': {property: 'showAlbumArtists'},
-
-      'Albums': {property: 'albums'},
-    },
-  };
-
-  [inspect.custom](depth, options, inspect) {
-    const parts = [];
-
-    parts.push(Thing.prototype[inspect.custom].apply(this));
-
-    if (depth >= 0) showGroup: {
-      let group = null;
-      try {
-        group = this.group;
-      } catch {
-        break showGroup;
-      }
-
-      const groupName = group.name;
-      const groupIndex = group.serieses.indexOf(this);
-
-      const num =
-        (groupIndex === -1
-          ? 'indeterminate position'
-          : `#${groupIndex + 1}`);
-
-      parts.push(` (${colors.yellow(num)} in ${colors.green(`"${groupName}"`)})`);
-    }
-
-    return parts.join('');
-  }
 }
