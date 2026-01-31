@@ -5,7 +5,7 @@ export default {
 
     entries:
       entries
-        .map(entry => relation('generateCommentaryEntry', entry)),
+        .map(entry => relation('generateContentEntry', entry)),
   }),
 
   slots: {

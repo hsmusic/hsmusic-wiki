@@ -60,7 +60,7 @@ export default {
 
       relations.albumCommentaryEntries =
         album.commentary
-          .map(entry => relation('generateCommentaryEntry', entry));
+          .map(entry => relation('generateContentEntry', entry));
     }
 
     relations.trackCommentaryHeadings =
@@ -87,7 +87,7 @@ export default {
       query.tracksWithCommentary
         .map(track =>
           track.commentary
-            .map(entry => relation('generateCommentaryEntry', entry)));
+            .map(entry => relation('generateContentEntry', entry)));
 
     return relations;
   },

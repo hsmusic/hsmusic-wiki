@@ -27,7 +27,7 @@ export default {
       relation('generateColorStyleAttribute'),
 
     date:
-      relation('generateCommentaryEntryDate', entry),
+      relation('generateContentEntryDate', entry),
   }),
 
   data: (entry) => ({

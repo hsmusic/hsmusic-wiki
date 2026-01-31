@@ -20,7 +20,7 @@ export default {
     mainReleaseArtistCommentaryEntries:
       (track.isSecondaryRelease
         ? track.commentaryFromMainRelease
-            .map(entry => relation('generateCommentaryEntry', entry))
+            .map(entry => relation('generateContentEntry', entry))
         : null),
 
     thisReleaseAlbumLink:
@@ -28,7 +28,7 @@ export default {
 
     artistCommentaryEntries:
       track.commentary
-        .map(entry => relation('generateCommentaryEntry', entry)),
+        .map(entry => relation('generateContentEntry', entry)),
 
     otherReleaseTrackLinks:
       query.otherSecondaryReleasesWithCommentary

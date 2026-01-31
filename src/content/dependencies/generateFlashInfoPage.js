@@ -70,7 +70,7 @@ export default {
 
     artistCommentaryEntries:
       flash.commentary
-        .map(entry => relation('generateCommentaryEntry', entry)),
+        .map(entry => relation('generateContentEntry', entry)),
 
     creditingSourcesSection:
       relation('generateCollapsedContentEntrySection',
