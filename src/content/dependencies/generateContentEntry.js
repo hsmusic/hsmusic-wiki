@@ -42,7 +42,7 @@ export default {
   generate: (data, relations, slots, {html, language}) =>
     language.encapsulate('misc.artistCommentary.entry', entryCapsule =>
       html.tags([
-        html.tag('p', {class: 'commentary-entry-heading'},
+        html.tag('p', {class: 'content-entry-heading'},
           slots.color &&
             relations.colorStyle.clone()
               .slot('color', slots.color),
@@ -51,12 +51,12 @@ export default {
             {class: 'dated'},
 
           language.encapsulate(entryCapsule, 'title', titleCapsule => [
-            html.tag('span', {class: 'commentary-entry-heading-text'},
+            html.tag('span', {class: 'content-entry-heading-text'},
               language.encapsulate(titleCapsule, workingCapsule => {
                 const workingOptions = {};
 
                 workingOptions.artists =
-                  html.tag('span', {class: 'commentary-entry-artists'},
+                  html.tag('span', {class: 'content-entry-artists'},
                     (relations.artistsContent
                       ? relations.artistsContent.slot('mode', 'inline')
                    : relations.artistLinks
@@ -64,7 +64,7 @@ export default {
                       : language.$(titleCapsule, 'noArtists')));
 
                 const accent =
-                  html.tag('span', {class: 'commentary-entry-accent'},
+                  html.tag('span', {class: 'content-entry-accent'},
                     {[html.onlyIfContent]: true},
 
                     language.encapsulate(titleCapsule, 'accent', accentCapsule =>
@@ -98,7 +98,7 @@ export default {
             relations.date,
           ])),
 
-        html.tag('blockquote', {class: 'commentary-entry-body'},
+        html.tag('blockquote', {class: 'content-entry-body'},
           slots.color &&
             relations.colorStyle.clone()
               .slot('color', slots.color),

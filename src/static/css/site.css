@@ -1998,7 +1998,7 @@ p.image-details.origin-details .filename-line {
   margin: 0;
 }
 
-.commentary-entry-heading {
+.content-entry-heading {
   margin-left: 15px;
   padding-left: calc(5px + 1.25ch);
   text-indent: -1.25ch;
@@ -2008,28 +2008,28 @@ p.image-details.origin-details .filename-line {
   border-bottom: 1px solid var(--dim-color);
 }
 
-.commentary-entry-accent {
+.content-entry-accent {
   font-style: oblique;
 }
 
-.commentary-entry-heading .commentary-date {
+.content-entry-heading .commentary-date {
   display: inline-block;
   text-indent: 0;
 }
 
-.commentary-entry-heading.dated .commentary-entry-heading-text {
+.content-entry-heading.dated .content-entry-heading-text {
   margin-right: 0.75ch;
 }
 
-.commentary-entry-heading .hoverable {
+.content-entry-heading .hoverable {
   box-shadow: 1px 2px 6px 5px #04040460;
 }
 
-.commentary-entry-body summary {
+.content-entry-body summary {
   list-style-position: outside;
 }
 
-.commentary-entry-body summary > span {
+.content-entry-body summary > span {
   color: var(--primary-color);
 }
 
