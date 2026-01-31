@@ -945,7 +945,7 @@ export function parseContentEntriesFromSourceText(thingClass, sourceText, {subdo
     const artistTextNodes =
       Array.from(
         splitContentNodesAround(
-          parseContentNodes(matchEntry.artistText),
+          parseContentNodes(matchEntry.artists),
           /\|/g));
 
     const separatorIndices =
@@ -955,9 +955,9 @@ export function parseContentEntriesFromSourceText(thingClass, sourceText, {subdo
 
     if (empty(separatorIndices)) {
       if (artistTextNodes.length === 1 && artistTextNodes[0].type === 'text') {
-        artistReferences = matchEntry.artistText;
+        artistReferences = matchEntry.artists;
       } else {
-        artistText = matchEntry.artistText;
+        artistText = matchEntry.artists;
       }
     } else {
       const firstSeparatorIndex =
@@ -968,12 +968,12 @@ export function parseContentEntriesFromSourceText(thingClass, sourceText, {subdo
         artistTextNodes.length;
 
       artistReferences =
-        matchEntry.artistText.slice(
+        matchEntry.artists.slice(
           artistTextNodes.at(0).i,
           artistTextNodes.at(firstSeparatorIndex - 1).iEnd);
 
       artistText =
-        matchEntry.artistText.slice(
+        matchEntry.artists.slice(
           artistTextNodes.at(firstSeparatorIndex).iEnd,
           artistTextNodes.at(secondSeparatorIndex - 1).iEnd);
     }
@@ -1016,7 +1016,7 @@ export function parseContentEntriesFromSourceText(thingClass, sourceText, {subdo
   }
 
   const documents =
-    matchContentEntries(sourceText)
+    Array.from(matchContentEntries(sourceText))
       .map(matchEntry =>
         withEntries(
           map(matchEntry),
