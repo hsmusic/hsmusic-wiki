@@ -2,13 +2,7 @@ import {inspect as nodeInspect} from 'node:util';
 
 import {openAggregate, withAggregate} from '#aggregate';
 import {colors, ENABLE_COLOR} from '#cli';
-import {cut, empty, matchMultiline, typeAppearance} from '#sugar';
-
-import {
-  commentaryRegexCaseInsensitive,
-  commentaryRegexCaseSensitiveOneShot,
-  multipleLyricsDetectionRegex,
-} from '#wiki-data';
+import {empty, matchMultiline, typeAppearance} from '#sugar';
 
 function inspect(value) {
   return nodeInspect(value, {colors: ENABLE_COLOR});
@@ -291,108 +285,6 @@ export function isColor(color) {
 
   throw new TypeError(`Unknown color format`);
 }
-
-export function validateContentEntries({
-  headingPhrase,
-  entryPhrase,
-
-  caseInsensitiveRegex,
-  caseSensitiveOneShotRegex,
-}) {
-  return content => {
-    isContentString(content);
-
-    const rawMatches =
-      Array.from(content.matchAll(caseInsensitiveRegex));
-
-    if (empty(rawMatches)) {
-      throw new TypeError(`Expected at least one ${headingPhrase}`);
-    }
-
-    const niceMatches =
-      rawMatches.map(match => ({
-        position: match.index,
-        length: match[0].length,
-      }));
-
-    validateArrayItems(({position, length}, index) => {
-      if (index === 0 && position > 0) {
-        throw new TypeError(`Expected first ${headingPhrase} to be at top`);
-      }
-
-      const ownInput = content.slice(position, position + length);
-      const restOfInput = content.slice(position + length);
-
-      const upToNextLineBreak =
-        (restOfInput.includes('\n')
-          ? restOfInput.slice(0, restOfInput.indexOf('\n'))
-          : restOfInput);
-
-      if (/\S/.test(upToNextLineBreak)) {
-        throw new TypeError(
-          `Expected ${headingPhrase} to occupy entire line, got extra text:\n` +
-          `${colors.green(`"${cut(ownInput, 40)}"`)} (<- heading)\n` +
-          `(extra on same line ->) ${colors.red(`"${cut(upToNextLineBreak, 30)}"`)}\n` +
-          `(Check for missing "|-" in YAML, or a misshapen annotation)`);
-      }
-
-      if (!caseSensitiveOneShotRegex.test(ownInput)) {
-        throw new TypeError(
-          `Miscapitalization in ${headingPhrase}:\n` +
-          `${colors.red(`"${cut(ownInput, 60)}"`)}\n` +
-          `(Check for ${colors.red(`"<I>"`)} instead of ${colors.green(`"<i>"`)})`);
-      }
-
-      const nextHeading =
-        (index === niceMatches.length - 1
-          ? content.length
-          : niceMatches[index + 1].position);
-
-      const upToNextHeading =
-        content.slice(position + length, nextHeading);
-
-      if (!/\S/.test(upToNextHeading)) {
-        throw new TypeError(
-          `Expected ${entryPhrase} to have body text, only got a heading`);
-      }
-
-      return true;
-    })(niceMatches);
-
-    return true;
-  };
-}
-
-export const isCommentary =
-  validateContentEntries({
-    headingPhrase: `commentary heading`,
-    entryPhrase: `commentary entry`,
-
-    caseInsensitiveRegex: commentaryRegexCaseInsensitive,
-    caseSensitiveOneShotRegex: commentaryRegexCaseSensitiveOneShot,
-  });
-
-export function isOldStyleLyrics(content) {
-  isContentString(content);
-
-  if (multipleLyricsDetectionRegex.test(content)) {
-    throw new TypeError(
-      `Expected old-style lyrics block not to include "<i> ... :</i>" at start of any line`);
-  }
-
-  return true;
-}
-
-export const isLyrics =
-  anyOf(
-    isOldStyleLyrics,
-    validateContentEntries({
-      headingPhrase: `lyrics heading`,
-      entryPhrase: `lyrics entry`,
-
-      caseInsensitiveRegex: commentaryRegexCaseInsensitive,
-      caseSensitiveOneShotRegex: commentaryRegexCaseSensitiveOneShot,
-    }));
 
 const isArtistRef = validateReference('artist');
 
