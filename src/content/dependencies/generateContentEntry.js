@@ -19,9 +19,7 @@ export default {
         : null),
 
     bodyContent:
-      (entry.body
-        ? relation('transformContent', entry.body)
-        : null),
+      relation('transformContent', entry.body),
 
     colorStyle:
       relation('generateColorStyleAttribute'),
@@ -55,41 +53,42 @@ export default {
               language.encapsulate(titleCapsule, workingCapsule => {
                 const workingOptions = {};
 
-                workingOptions.artists =
+                const artists =
                   html.tag('span', {class: 'content-entry-artists'},
+                    {[html.onlyIfContent]: true},
+
                     (relations.artistsContent
                       ? relations.artistsContent.slot('mode', 'inline')
                    : relations.artistLinks
                       ? language.formatConjunctionList(relations.artistLinks)
-                      : language.$(titleCapsule, 'noArtists')));
+                      : html.blank()));
 
-                const accent =
-                  html.tag('span', {class: 'content-entry-accent'},
+                if (!html.isBlank(artists)) {
+                  workingCapsule += '.withArtists';
+                  workingOptions.artists = artists;
+                }
+
+                const annotation =
+                  html.tag('span', {class: 'content-entry-annotation'},
                     {[html.onlyIfContent]: true},
 
-                    language.encapsulate(titleCapsule, 'accent', accentCapsule =>
-                      language.encapsulate(accentCapsule, workingCapsule => {
-                        const workingOptions = {};
+                    (relations.annotationContent
+                      ? relations.annotationContent.slots({
+                          mode: 'inline',
+                          absorbPunctuationFollowingExternalLinks: false,
+                        })
+                      : html.blank()));
 
-                        if (relations.annotationContent) {
-                          workingCapsule += '.withAnnotation';
-                          workingOptions.annotation =
-                            relations.annotationContent.slots({
-                              mode: 'inline',
-                              absorbPunctuationFollowingExternalLinks: false,
-                            });
-                        }
-
-                        if (workingCapsule === accentCapsule) {
-                          return html.blank();
-                        } else {
-                          return language.$(workingCapsule, workingOptions);
-                        }
-                      })));
-
-                if (!html.isBlank(accent)) {
-                  workingCapsule += '.withAccent';
-                  workingOptions.accent = accent;
+                if (!html.isBlank(annotation)) {
+                  if (html.isBlank(artists)) {
+                    workingCapsule += '.withAnnotation';
+                    workingOptions.annotation = annotation;
+                  } else {
+                    workingCapsule += '.withAccent';
+                    workingOptions.accent =
+                      html.tag('span', {class: 'content-entry-accent'},
+                        language.$(titleCapsule, 'accent.withAnnotation', {annotation}));
+                  }
                 }
 
                 return language.$(workingCapsule, workingOptions);
