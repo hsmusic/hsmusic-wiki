@@ -942,47 +942,49 @@ export function parseContentEntriesFromSourceText(thingClass, sourceText, {subdo
   function map(matchEntry) {
     let artistText = null, artistReferences = null;
 
-    const artistTextNodes =
-      Array.from(
-        splitContentNodesAround(
-          parseContentNodes(matchEntry.artists),
-          /\|/g));
+    if (matchEntry.artists) {
+      const artistTextNodes =
+        Array.from(
+          splitContentNodesAround(
+            parseContentNodes(matchEntry.artists),
+            /\|/g));
 
-    const separatorIndices =
-      artistTextNodes
-        .filter(node => node.type === 'separator')
-        .map(node => artistTextNodes.indexOf(node));
+      const separatorIndices =
+        artistTextNodes
+          .filter(node => node.type === 'separator')
+          .map(node => artistTextNodes.indexOf(node));
 
-    if (empty(separatorIndices)) {
-      if (artistTextNodes.length === 1 && artistTextNodes[0].type === 'text') {
-        artistReferences = matchEntry.artists;
+      if (empty(separatorIndices)) {
+        if (artistTextNodes.length === 1 && artistTextNodes[0].type === 'text') {
+          artistReferences = matchEntry.artists;
+        } else {
+          artistText = matchEntry.artists;
+        }
       } else {
-        artistText = matchEntry.artists;
+        const firstSeparatorIndex =
+          separatorIndices.at(0);
+
+        const secondSeparatorIndex =
+          separatorIndices.at(1) ??
+          artistTextNodes.length;
+
+        artistReferences =
+          matchEntry.artists.slice(
+            artistTextNodes.at(0).i,
+            artistTextNodes.at(firstSeparatorIndex - 1).iEnd);
+
+        artistText =
+          matchEntry.artists.slice(
+            artistTextNodes.at(firstSeparatorIndex).iEnd,
+            artistTextNodes.at(secondSeparatorIndex - 1).iEnd);
       }
-    } else {
-      const firstSeparatorIndex =
-        separatorIndices.at(0);
 
-      const secondSeparatorIndex =
-        separatorIndices.at(1) ??
-        artistTextNodes.length;
-
-      artistReferences =
-        matchEntry.artists.slice(
-          artistTextNodes.at(0).i,
-          artistTextNodes.at(firstSeparatorIndex - 1).iEnd);
-
-      artistText =
-        matchEntry.artists.slice(
-          artistTextNodes.at(firstSeparatorIndex).iEnd,
-          artistTextNodes.at(secondSeparatorIndex - 1).iEnd);
-    }
-
-    if (artistReferences) {
-      artistReferences =
-        artistReferences
-          .split(',')
-          .map(ref => ref.trim());
+      if (artistReferences) {
+        artistReferences =
+          artistReferences
+            .split(',')
+            .map(ref => ref.trim());
+      }
     }
 
     return {

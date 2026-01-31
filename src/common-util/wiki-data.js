@@ -83,7 +83,16 @@ const dateRegex = groupName =>
   String.raw`)`;
 
 const contentEntryHeadingRegexRaw =
-  String.raw`^<i>(?<artists>.+?):<\/i>(?: \((?<annotation>.*)\))?$`;
+  String.raw`^(?:` +
+    String.raw`(?:` +
+      String.raw`<i>(?<artists>.+?):<\/i>` +
+      String.raw`(?: \((?<annotation1>.*)\))?` +
+    String.raw`)` +
+    String.raw`|` +
+    String.raw`(?:` +
+      String.raw`@@ (?<annotation2>.*)` +
+    String.raw`)` +
+  String.raw`)$`;
 
 const contentEntryHeadingRegex =
   new RegExp(contentEntryHeadingRegexRaw, 'gm');
@@ -121,7 +130,15 @@ export function* matchContentEntries(sourceText) {
       yield workingEntry;
     }
 
-    workingEntry = {...headingMatch.groups};
+    workingEntry = {
+      artists:
+        headingMatch.groups.artists ?? null,
+
+      annotation:
+        headingMatch.groups.annotation1 ??
+        headingMatch.groups.annotation2 ??
+        null,
+    };
 
     if (workingEntry.annotation) {
       const annotationTailMatch =
