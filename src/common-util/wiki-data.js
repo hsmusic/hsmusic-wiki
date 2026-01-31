@@ -104,19 +104,8 @@ const dateRegex = groupName =>
 
 const commentaryRegexRaw =
   String.raw`^<i>(?<artistText>.+?):<\/i>(?: \((?<annotation>(?:.*?(?=,|\)[^)]*$))*?)(?:,? ?(?:(?<dateKind>sometime|throughout|around) )?${dateRegex('date')}(?: ?- ?${dateRegex('secondDate')})?(?: (?<accessKind>captured|accessed) ${dateRegex('accessDate')})?)?\))?`;
-export const commentaryRegexCaseInsensitive =
-  new RegExp(commentaryRegexRaw, 'gmi');
-export const commentaryRegexCaseSensitive =
+const commentaryRegex =
   new RegExp(commentaryRegexRaw, 'gm');
-export const commentaryRegexCaseSensitiveOneShot =
-  new RegExp(commentaryRegexRaw);
-
-export const languageOptionRegex = /{(?<name>[A-Z0-9_]+)}/g;
-
-// The #validators function isOldStyleLyrics() describes
-// what this regular expression detects against.
-export const multipleLyricsDetectionRegex =
-  /^<i>.*:<\/i>/m;
 
 export function matchContentEntries(sourceText) {
   const matchEntries = [];
@@ -130,7 +119,7 @@ export function matchContentEntries(sourceText) {
       .replace(/\n*$/, '');
 
   for (const {0: matchText, index: startIndex, groups: matchEntry}
-          of sourceText.matchAll(commentaryRegexCaseSensitive)) {
+          of sourceText.matchAll(commentaryRegex)) {
     if (previousMatchEntry) {
       previousMatchEntry.body =
         trimBody(sourceText.slice(previousEndIndex, startIndex));

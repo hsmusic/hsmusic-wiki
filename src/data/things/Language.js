@@ -7,7 +7,6 @@ import * as html from '#html';
 import {accumulateSum, empty, withEntries} from '#sugar';
 import {isLanguageCode, isObject} from '#validators';
 import Thing from '#thing';
-import {languageOptionRegex} from '#wiki-data';
 
 import {
   externalLinkSpec,
@@ -20,6 +19,8 @@ import {
 import {exitWithoutDependency, exposeConstant}
   from '#composite/control-flow';
 import {flag, name} from '#composite/wiki-properties';
+
+const languageOptionRegex = /{(?<name>[A-Z0-9_]+)}/g;
 
 export class Language extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({

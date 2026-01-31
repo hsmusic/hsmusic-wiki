@@ -13,7 +13,7 @@ import {parseContentNodes, splitContentNodesAround} from '#replacer';
 import {sortByName} from '#sort';
 import Thing from '#thing';
 import thingConstructors from '#things';
-import {matchContentEntries, multipleLyricsDetectionRegex} from '#wiki-data';
+import {matchContentEntries} from '#wiki-data';
 
 import {
   aggregateThrows,
@@ -1055,10 +1055,7 @@ export function parseReferencingSources(value, {subdoc, ReferencingSourcesEntry}
 }
 
 export function parseLyrics(value, {subdoc, LyricsEntry}) {
-  if (
-    typeof value === 'string' &&
-    !multipleLyricsDetectionRegex.test(value)
-  ) {
+  if (typeof value === 'string' && !/^<i>.*:<\/i>/m.test(value)) {
     const document = {'Body': value};
 
     return [subdoc(LyricsEntry, document, {bindInto: 'thing'})];
