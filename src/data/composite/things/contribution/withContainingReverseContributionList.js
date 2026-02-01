@@ -12,36 +12,16 @@ import {withPropertyFromObject} from '#composite/data';
 export default templateCompositeFrom({
   annotation: `withContainingReverseContributionList`,
 
-  inputs: {
-    artistProperty: input({
-      defaultDependency: '_artistProperty',
-      acceptsNull: true,
-    }),
-  },
-
   outputs: ['#containingReverseContributionList'],
 
   steps: () => [
-    raiseOutputWithoutDependency({
-      dependency: input('artistProperty'),
-      output: input.value({
-        ['#containingReverseContributionList']:
-          null,
-      }),
-    }),
+    raiseOutputWithoutDependency('artistProperty'),
 
-    withPropertyFromObject({
-      object: 'artist',
-      property: input('artistProperty'),
-    }).outputs({
-      ['#value']: '#list',
-    }),
+    withPropertyFromObject('artist', 'artistProperty')
+      .outputs({'#value': '#list'}),
 
-    withResultOfAvailabilityCheck({
-      from: 'date',
-    }).outputs({
-      ['#availability']: '#hasDate',
-    }),
+    withResultOfAvailabilityCheck({from: 'date'})
+      .outputs({'#availability': '#hasDate'}),
 
     {
       dependencies: ['#hasDate', '#list'],
