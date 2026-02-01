@@ -1057,7 +1057,7 @@ export function parseReferencingSources(value, {subdoc, ReferencingSourcesEntry}
 }
 
 export function parseLyrics(value, {subdoc, LyricsEntry}) {
-  if (typeof value === 'string' && !/^<i>.*:<\/i>/m.test(value)) {
+  if (typeof value === 'string' && !/^(@@|<i>.*:<\/i>)/m.test(value)) {
     const document = {'Body': value};
 
     return [subdoc(LyricsEntry, document, {bindInto: 'thing'})];
