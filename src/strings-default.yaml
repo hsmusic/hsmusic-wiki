@@ -1002,6 +1002,9 @@ misc:
     artistsLine.credit: >-
       by {ARTISTS}
 
+    artistsLine.noLabel:
+      By {ARTISTS}
+
     date: >-
       Released {DATE}
 
