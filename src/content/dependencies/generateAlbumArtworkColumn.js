@@ -31,6 +31,10 @@ export default {
             .map(artwork => relation('generateCoverArtwork', artwork))
 
         : []),
+
+    musicVideos:
+      album.musicVideos.map(musicVideo =>
+        relation('generateMusicVideo', musicVideo, album)),
   }),
 
   generate(relations, {html}) {
@@ -46,6 +50,7 @@ export default {
       relations.firstCovers,
       relations.albumArtInfoBox,
       relations.restCovers,
+      relations.musicVideos,
     ]);
   },
 };

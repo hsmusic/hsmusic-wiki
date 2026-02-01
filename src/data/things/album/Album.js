@@ -14,6 +14,7 @@ import {
   parseCreditingSources,
   parseDate,
   parseDimensions,
+  parseMusicVideos,
   parseWallpaperParts,
 } from '#yaml';
 
@@ -76,6 +77,7 @@ export class Album extends Thing {
     CommentaryEntry,
     CreditingSourcesEntry,
     Group,
+    MusicVideo,
     TrackArtistContribution,
     TrackSection,
     WikiInfo,
@@ -349,6 +351,10 @@ export class Album extends Thing {
       class: input.value(Group),
       find: soupyFind.input('group'),
     }),
+
+    // > Update & expose - Music videos
+
+    musicVideos: thingList(V(MusicVideo)),
 
     // > Update & expose - Content entries
 
@@ -744,6 +750,13 @@ export class Album extends Thing {
 
       'Groups': {property: 'groups'},
 
+      // Music videos
+
+      'Music Videos': {
+        property: 'musicVideos',
+        transform: parseMusicVideos,
+      },
+
       // Content entries
 
       'Commentary': {
@@ -840,6 +853,18 @@ export class Album extends Thing {
         : 'cover'),
 
       artwork.fileExtension,
+    ];
+  }
+
+  getOwnMusicVideoCoverPath(musicVideo) {
+    // Lala, same shenanigan as above, this is media.trackCover
+    // where it shouldn't be.
+
+    return [
+      'media.trackCover',
+      this.directory,
+      musicVideo.unqualifiedDirectory,
+      musicVideo.coverArtFileExtension,
     ];
   }
 

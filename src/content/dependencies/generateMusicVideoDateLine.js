@@ -2,6 +2,7 @@ function sameDay(musicVideo, thing) {
   if (!musicVideo.dateIsSpecified) return null;
 
   const compare = (a, b) =>
+    a && b &&
     a.toDateString() === b.toDateString();
 
   const album = thing.isTrack ? thing.album : thing;
@@ -15,7 +16,7 @@ function sameDay(musicVideo, thing) {
     }
   }
 
-  if (compare(musicVideo.date, track.date)) {
+  if (compare(musicVideo.date, track?.date)) {
     return 'track';
   }
 
