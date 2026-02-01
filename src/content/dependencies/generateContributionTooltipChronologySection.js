@@ -3,7 +3,7 @@ function getName(thing) {
     return null;
   }
 
-  if (thing.isArtwork) {
+  if (thing.isArtwork || thing.isMusicVideo) {
     return thing.thing.name;
   }
 

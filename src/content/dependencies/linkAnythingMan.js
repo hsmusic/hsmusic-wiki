@@ -9,6 +9,8 @@ export default {
         ? relation('linkFlash', thing)
      : thing.isTrack
         ? relation('linkTrack', thing)
+     : thing.isMusicVideo
+        ? relation('linkAnythingMan', thing.thing)
         : null),
   }),
 
