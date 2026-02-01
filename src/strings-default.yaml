@@ -517,9 +517,10 @@ misc:
 
     entry:
       title:
-        withArtists: "{ARTISTS}"
-        withArtists.withAccent: "{ARTISTS}: {ACCENT}"
-        accent.withAnnotation: "({ANNOTATION})"
+        withArtists: "{ARTISTS} ✑"
+        withArtists.withAccent: "{ARTISTS} ✑ {ACCENT}"
+        withArtists.withAccent.wikiEditor: "{ARTISTS} ({ACCENT})"
+        accent.withAnnotation: "{ANNOTATION}"
         withAnnotation: "{ANNOTATION}"
 
         date: "{DATE}"

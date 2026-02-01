@@ -88,6 +88,10 @@ export default {
                     workingOptions.accent =
                       html.tag('span', {class: 'content-entry-accent'},
                         language.$(titleCapsule, 'accent.withAnnotation', {annotation}));
+
+                    if (data.isWikiEditorCommentary) {
+                      workingCapsule += '.wikiEditor';
+                    }
                   }
                 }
 
