@@ -1,6 +1,7 @@
 const contributionSlots = {
   showAnnotation: true,
   showChronology: true,
+  showExternalLinks: true,
   chronologyKind: 'musicVideoContribution',
 };
 

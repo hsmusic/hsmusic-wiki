@@ -20,6 +20,7 @@ export default {
 
           showAnnotation: true,
           showChronology: true,
+          showExternalLinks: true,
 
           chronologyKind: 'musicVideo',
         });
