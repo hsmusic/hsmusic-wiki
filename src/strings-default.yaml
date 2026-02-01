@@ -1019,6 +1019,9 @@ misc:
     contributorsLine.credit: >-
       {ARTISTS}
 
+    contributorsList.title: >-
+      Contributors:
+
   # coverGrid:
   #   Generic strings for various sorts of gallery grids, displayed
   #   on the homepage, album galleries, artist artwork galleries, and

@@ -13,6 +13,9 @@ export default {
     dateLine:
       relation('generateMusicVideoDateLine', musicVideo, thing),
 
+    musicVideoContributors:
+      relation('generateMusicVideoContributors', musicVideo),
+
     contributorCredit:
       relation('generateArtistCredit', musicVideo.contributorContribs, []),
   }),
@@ -65,21 +68,6 @@ export default {
             relations.dateLine,
           ]),
 
-        html.tag('p',
-          language.encapsulate(capsule, 'contributorsLine', capsule =>
-            language.$(capsule, {
-              [language.onlyIfOptions]: ['credit'],
-
-              credit:
-                relations.contributorCredit.slots({
-                  normalStringKey: language.encapsulate(capsule, 'credit'),
-
-                  showAnnotation: true,
-                  showChronology: true,
-                  chunkwrap: false,
-
-                  chronologyKind: 'musicVideoContribution',
-                }),
-            }))),
+        relations.musicVideoContributors,
       ])),
 };

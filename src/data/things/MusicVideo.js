@@ -81,6 +81,21 @@ export class MusicVideo extends Thing {
       artistProperty: input.value('musicVideoArtistContributions'),
     }),
 
+    contributorStyle: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(
+          is('list', 'line')),
+      }),
+
+      {
+        dependencies: ['contributorContribs'],
+        compute: ({contributorContribs}) =>
+          (contributorContribs.length > 1
+            ? 'list'
+            : 'line'),
+      },
+    ],
+
     contributorContribs: contributionList({
       artistProperty: input.value('musicVideoContributorContributions'),
     }),
@@ -108,6 +123,7 @@ export class MusicVideo extends Thing {
       'Cover Art Dimensions': {property: 'coverArtDimensions'},
 
       'Artists': {property: 'artistContribs', transform: parseContributors},
+      'Contributor Style': {property: 'contributorStyle'},
       'Contributors': {property: 'contributorContribs', transform: parseContributors},
     },
   };
