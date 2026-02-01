@@ -1285,10 +1285,19 @@ export class Track extends Thing {
     if (!this.album) return null;
     if (!musicVideo.unqualifiedDirectory) return null;
 
+    const isSingleFirstTrack =
+      this.album.style === 'single' &&
+      this.album.tracks[0] === this;
+
+    const trackPrefix =
+      (isSingleFirstTrack
+        ? ''
+        : this.directory + '-');
+
     return [
       'media.trackCover',
       this.album.directory,
-      this.directory + '-' + musicVideo.unqualifiedDirectory,
+      trackPrefix + musicVideo.unqualifiedDirectory,
       musicVideo.coverArtFileExtension,
     ];
   }
