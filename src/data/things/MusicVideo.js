@@ -12,7 +12,8 @@ import {
   exposeConstant,
   exposeDependency,
   exposeUpdateValueOrContinue,
-  withResultOfAvailabilityCheck,
+  exposeWhetherDependencyAvailable,
+  exitWithoutDependency,
 } from '#composite/control-flow';
 
 import {
@@ -34,21 +35,31 @@ export class MusicVideo extends Thing {
 
     thing: thing(),
 
-    label: {
+    title: {
       flags: {update: true, expose: true},
       update: {validate: isStringNonEmpty},
-      expose: {transform: value => value ?? 'Music video'},
     },
 
-    labelStyle: {
-      flags: {update: true, expose: true},
-      update: {
-        validate:
-          is('label', 'title'),
+    label: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isStringNonEmpty),
+      }),
+
+      exitWithoutDependency('title', V('Music video')),
+      exposeConstant(V(null)),
+    ],
+
+    unqualifiedDirectory: [
+      {
+        dependencies: ['title', 'label'],
+        compute: (continuation, {title, label}) =>
+          continuation({
+            '#name': label ?? title,
+          }),
       },
-    },
 
-    unqualifiedDirectory: directory({name: 'label'}),
+      directory({name: '#name'}),
+    ],
 
     date: [
       exposeUpdateValueOrContinue({
@@ -82,16 +93,13 @@ export class MusicVideo extends Thing {
 
     isMusicVideo: exposeConstant(V(true)),
 
-    dateIsSpecified: [
-      withResultOfAvailabilityCheck('_date'),
-      exposeDependency('#availability'),
-    ],
+    dateIsSpecified: exposeWhetherDependencyAvailable('_date'),
   });
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
+      'Title': {property: 'title'},
       'Label': {property: 'label'},
-      'Label Style': {property: 'labelStyle'},
       'Directory': {property: 'unqualifiedDirectory'},
       'Date': {property: 'date', transform: parseDate},
       'URL': {property: 'url'},

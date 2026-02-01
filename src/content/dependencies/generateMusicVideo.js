@@ -18,11 +18,11 @@ export default {
   }),
 
   data: (musicVideo, _thing) => ({
+    title:
+      musicVideo.title,
+
     label:
       musicVideo.label,
-
-    labelStyle:
-      musicVideo.labelStyle,
 
     url:
       musicVideo.url,
@@ -32,21 +32,18 @@ export default {
     language.encapsulate('misc.musicVideo', capsule =>
       html.tag('div', {class: 'music-video'}, [
         html.tag('p', {class: 'music-video-label'},
-          data.labelStyle !== 'label' &&
-            {class: data.labelStyle + '-style'},
+          data.title &&
+            {class: 'title-style'},
 
           language.encapsulate(capsule, 'label', workingCapsule => {
             const workingOptions = {};
 
-            if (data.label) {
+            if (data.title) {
+              workingCapsule += '.customLabel.title';
+              workingOptions.title = data.title;
+            } else if (data.label) {
               workingCapsule += '.customLabel';
-
-              if (data.labelStyle === 'title') {
-                workingCapsule += '.title';
-                workingOptions.title = data.label;
-              } else {
-                workingOptions.label = data.label;
-              }
+              workingOptions.label = data.label;
             }
 
             return language.$(workingCapsule, workingOptions);
