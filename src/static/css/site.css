@@ -1888,6 +1888,8 @@ p.image-details.origin-details .filename-line {
 }
 
 .music-video {
+  width: 88.888888%;
+  margin-left: auto;
   border-radius: 4px;
   padding: 0 4px;
 }
@@ -1902,7 +1904,7 @@ p.image-details.origin-details .filename-line {
 }
 
 .music-video .music-video-label {
-  margin: 6px 0 3px;
+  margin: 6px 12px 3px;
   text-align: center;
 }
 
@@ -4488,6 +4490,16 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   #artwork-column .cover-artwork-joiner {
     margin-left: 30px;
     margin-right: 30px;
+  }
+
+  .music-video {
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .music-video .image {
+    aspect-ratio: 32 / 9;
   }
 
   #additional-names-box {
