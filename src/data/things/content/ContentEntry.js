@@ -26,6 +26,8 @@ import {
 } from '#composite/things/content';
 
 export class ContentEntry extends Thing {
+  static [Thing.friendlyName] = `Content Entry`;
+
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 

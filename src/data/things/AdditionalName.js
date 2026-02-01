@@ -5,6 +5,8 @@ import {exposeConstant} from '#composite/control-flow';
 import {contentString, thing} from '#composite/wiki-properties';
 
 export class AdditionalName extends Thing {
+  static [Thing.friendlyName] = `Additional Name`;
+
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 

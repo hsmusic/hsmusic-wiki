@@ -28,6 +28,7 @@ import {
 
 export class MusicVideo extends Thing {
   static [Thing.referenceType] = 'music-video';
+  static [Thing.friendlyName] = `Music Video`;
   static [Thing.wikiData] = 'musicVideoData';
 
   static [Thing.getPropertyDescriptors] = () => ({

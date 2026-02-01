@@ -6,6 +6,7 @@ import {exposeConstant} from '#composite/control-flow';
 import {ContentEntry} from './ContentEntry.js';
 
 export class ReferencingSourcesEntry extends ContentEntry {
+  static [Thing.friendlyName] = `Referencing Sources Entry`;
   static [Thing.wikiData] = 'referencingSourceData';
 
   static [Thing.getPropertyDescriptors] = () => ({

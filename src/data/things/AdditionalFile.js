@@ -7,6 +7,8 @@ import {exposeConstant, exposeUpdateValueOrContinue}
 import {contentString, simpleString, thing} from '#composite/wiki-properties';
 
 export class AdditionalFile extends Thing {
+  static [Thing.friendlyName] = `Additional File`;
+
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 

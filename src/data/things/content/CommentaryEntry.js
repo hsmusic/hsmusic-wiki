@@ -8,6 +8,7 @@ import {hasAnnotationPart} from '#composite/things/content';
 import {ContentEntry} from './ContentEntry.js';
 
 export class CommentaryEntry extends ContentEntry {
+  static [Thing.friendlyName] = `Commentary Entry`;
   static [Thing.wikiData] = 'commentaryData';
 
   static [Thing.getPropertyDescriptors] = () => ({

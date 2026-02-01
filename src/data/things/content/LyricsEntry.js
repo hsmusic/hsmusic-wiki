@@ -9,6 +9,7 @@ import {hasAnnotationPart} from '#composite/things/content';
 import {ContentEntry} from './ContentEntry.js';
 
 export class LyricsEntry extends ContentEntry {
+  static [Thing.friendlyName] = `Lyrics Entry`;
   static [Thing.wikiData] = 'lyricsData';
 
   static [Thing.getPropertyDescriptors] = () => ({
