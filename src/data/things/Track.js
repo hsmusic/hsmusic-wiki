@@ -273,10 +273,6 @@ export class Track extends Thing {
 
       exposeDependencyOrContinue('#artistContribs', V('empty')),
 
-      // Specifically inherit artist contributions later than artist contribs.
-      // Secondary releases' artists may differ from the main release.
-      inheritContributionListFromMainRelease(),
-
       withPropertyFromObject('album', V('trackArtistContribs')),
 
       withRecontextualizedContributionList({
