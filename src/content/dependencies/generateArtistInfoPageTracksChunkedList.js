@@ -8,6 +8,7 @@ export default {
     const query = {};
 
     const allContributions = [
+      ...artist.albumArtistContributions,
       ...artist.trackArtistContributions,
       ...artist.trackContributorContributions,
     ];
@@ -21,8 +22,8 @@ export default {
 
     query.albums =
       query.contribs
-        .map(contribs =>
-          contribs[0][0].thing.album);
+        .map(contribs => contribs[0][0].thing)
+        .map(thing => thing.isTrack ? thing.album : thing);
 
     return query;
   },

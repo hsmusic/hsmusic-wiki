@@ -256,13 +256,18 @@ export function getArtistAvatar(artist, {to}) {
 // Used in multiple content functions for the artist info page,
 // because shared logic is torture oooooooooooooooo.
 export function chunkArtistTrackContributions(contributions) {
+  const date = contrib => contrib.date;
+
+  const album = contrib =>
+    (contrib.thing.isTrack
+      ? contrib.thing.album
+      : contrib.thing);
+
   return (
     // First chunk by (contribution) date and album.
     chunkByConditions(contributions, [
-      ({date: date1}, {date: date2}) =>
-        +date1 !== +date2,
-      ({thing: track1}, {thing: track2}) =>
-        track1.album !== track2.album,
+      (a, b) => +date(a) !== +date(b),
+      (a, b) => album(a) !== album(b),
     ]).map(contribs =>
         // Then, *within* the boundaries of the existing chunks,
         // chunk contributions to the same thing together.

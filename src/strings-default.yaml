@@ -1402,6 +1402,7 @@ artistPage:
       #   credits too, and those entreis get the strings below.
 
       album:
+        albumArtistOnly: "Credited as album artist only—track credits vary"
         coverArt: "(cover art)"
         wallpaperArt: "(wallpaper art)"
         bannerArt: "(banner art)"

@@ -2,8 +2,11 @@ import {sortAlbumsTracksChronologically} from '#sort';
 import {empty, unique} from '#sugar';
 import {getTotalDuration} from '#wiki-data';
 
-function countTowardTotals(contribs) {
-  const track = contribs[0].thing;
+function countTowardTrackTotals(contribs) {
+  const {thing} = contribs[0];
+  const track = thing.isTrack ? thing : null;
+
+  if (!track) return null;
 
   if (track.isSecondaryRelease) {
     const all =
@@ -33,13 +36,19 @@ function countTowardTotals(contribs) {
 
 export default {
   query: (_artist, _album, trackContribLists) => ({
+    isAlbumArtist:
+      trackContribLists.flat()
+        .some(contrib =>
+          contrib.thingProperty === 'artistContribs' &&
+          contrib.thing.isAlbum),
+
     contribListsCountingTowardTotals:
       trackContribLists
-        .filter(contribs => countTowardTotals(contribs)),
+        .filter(contribs => countTowardTrackTotals(contribs) === true),
 
     contribListsNotCountingTowardTotals:
       trackContribLists
-        .filter(contribs => !countTowardTotals(contribs)),
+        .filter(contribs => countTowardTrackTotals(contribs) === false),
   }),
 
   relations: (relation, query, artist, album, _trackContribLists) => ({
@@ -51,6 +60,13 @@ export default {
 
     albumArtistCredit:
       relation('generateArtistCredit', album.artistContribs, []),
+
+    albumArtistOnlyItem:
+     (query.isAlbumArtist &&
+      empty(query.contribListsCountingTowardTotals) &&
+      empty(query.contribListsNotCountingTowardTotals)
+        ? relation('generateArtistInfoPageAlbumArtistOnlyChunkItem')
+        : null),
 
     itemsCountingTowardTotals:
       query.contribListsCountingTowardTotals.map(trackContribs =>
@@ -91,7 +107,9 @@ export default {
       durationTerms.length > 1;
 
     const tracks =
-      trackContribLists.map(contribs => contribs[0].thing);
+      trackContribLists
+        .map(contribs => contribs[0].thing)
+        .filter(thing => thing.isTrack);
 
     data.numLinkingOtherReleases =
       tracks.filter(track => {
@@ -150,6 +168,8 @@ export default {
             {class: 'offset-tooltips'},
 
           [
+            relations.albumArtistOnlyItem,
+
             relations.itemsCountingTowardTotals,
 
             !empty(relations.itemsCountingTowardTotals) &&
