@@ -8,11 +8,6 @@ export default {
   query: (artwork) => ({
     linkableArtTags:
       artwork.artTags.filter(linkable),
-
-    mainArtworkLinkableArtTags:
-      (artwork.mainArtwork
-        ? artwork.mainArtwork.artTags.filter(linkable)
-        : null),
   }),
 
   relations: (relation, query, _artwork) => ({
@@ -24,15 +19,19 @@ export default {
   data: (query, artwork) => {
     const data = {};
 
-    data.attachAbove = artwork.attachAbove;
+    const compare = against =>
+      !empty(query.linkableArtTags) &&
+      against &&
+      compareArrays(
+        query.linkableArtTags,
+        against.artTags.filter(linkable));
 
     data.sameAsMainArtwork =
       !artwork.isMainArtwork &&
-      query.mainArtworkLinkableArtTags &&
-      !empty(query.mainArtworkLinkableArtTags) &&
-      compareArrays(
-        query.mainArtworkLinkableArtTags,
-        query.linkableArtTags);
+      compare(artwork.mainArtwork);
+
+    data.sameAsAttachedArtwork =
+      compare(artwork.attachedArtwork);
 
     const seenShortNames = new Set();
     const duplicateShortNames = new Set();
@@ -59,7 +58,7 @@ export default {
 
         {class: 'art-tag-details'},
 
-        (data.sameAsMainArtwork && data.attachAbove
+        (data.sameAsAttachedArtwork
           ? html.blank()
        : data.sameAsMainArtwork && relations.artTagLinks.length >= 3
           ? language.$(capsule, 'sameTagsAsMainArtwork')
