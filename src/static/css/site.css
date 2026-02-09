@@ -2024,6 +2024,14 @@ p.image-details.origin-details .filename-line {
   border-bottom: 1px solid var(--dim-color);
 }
 
+.content-entry-accent {
+  margin-left: 0.25ch;
+}
+
+.content-entry-heading.dated .content-entry-accent {
+  margin-right: 0.75ch;
+}
+
 .content-entry-annotation {
   font-style: oblique;
 }
@@ -2031,10 +2039,6 @@ p.image-details.origin-details .filename-line {
 .content-entry-heading .commentary-date {
   display: inline-block;
   text-indent: 0;
-}
-
-.content-entry-heading.dated .content-entry-heading-text {
-  margin-right: 0.75ch;
 }
 
 .content-entry-heading .hoverable {
