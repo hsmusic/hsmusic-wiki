@@ -483,6 +483,7 @@ body::before, .wallpaper-part {
 
 .sidebar li {
   overflow-wrap: break-word;
+  padding-right: 3px;
 }
 
 .sidebar li.structured {
