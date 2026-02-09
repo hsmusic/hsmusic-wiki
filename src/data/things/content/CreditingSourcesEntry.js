@@ -3,6 +3,8 @@ import Thing from '#thing';
 
 import {exposeConstant} from '#composite/control-flow';
 
+import {hasAnnotationPart} from '#composite/things/content';
+
 import {ContentEntry} from './ContentEntry.js';
 
 export class CreditingSourcesEntry extends ContentEntry {
@@ -13,5 +15,7 @@ export class CreditingSourcesEntry extends ContentEntry {
     // Expose only
 
     isCreditingSourcesEntry: exposeConstant(V(true)),
+
+    isWikiEditorSource: hasAnnotationPart(V('wiki editor')),
   });
 }

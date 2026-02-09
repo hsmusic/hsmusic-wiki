@@ -1,3 +1,6 @@
+// junk component which only exists because you can't
+// "extend" the slots of underlying linkThing.
+
 export default {
   relations: (relation, flashAct) => ({
     link:
@@ -15,7 +18,7 @@ export default {
   generate: (data, relations, {html, language}) =>
     relations.link.slot('content',
       html.ifelse([
-        html.permit(data.nameHTML),
+        html.permit(data.nameHTML, {inline: true}),
         language.sanitize(data.name),
       ])),
 };

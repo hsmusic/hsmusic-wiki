@@ -17,7 +17,7 @@ export default {
     sideActLinks:
       sprawl.flashSideData
         .map(side => side.acts
-          .map(act => relation('linkFlashAct', act))),
+          .map(act => relation('linkFlashActInline', act))),
   }),
 
   data: (sprawl, act, flash) => ({

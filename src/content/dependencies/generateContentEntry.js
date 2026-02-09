@@ -29,8 +29,9 @@ export default {
   }),
 
   data: (entry) => ({
-    isWikiEditorCommentary:
-      entry.isWikiEditorCommentary,
+    isWikiEditorEntry:
+      entry.isWikiEditorCommentary ||
+      entry.isWikiEditorSource,
   }),
 
   slots: {
@@ -89,7 +90,7 @@ export default {
                       html.tag('span', {class: 'content-entry-accent'},
                         language.$(titleCapsule, 'accent.withAnnotation', {annotation}));
 
-                    if (data.isWikiEditorCommentary) {
+                    if (data.isWikiEditorEntry) {
                       workingCapsule += '.wikiEditor';
                     }
                   }
@@ -106,7 +107,7 @@ export default {
             relations.colorStyle.clone()
               .slot('color', slots.color),
 
-          data.isWikiEditorCommentary &&
+          data.isWikiEditorEntry &&
             {class: 'wiki-commentary'},
 
           relations.bodyContent.slot('mode', 'multiline')),

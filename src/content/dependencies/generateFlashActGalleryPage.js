@@ -1,5 +1,3 @@
-import striptags from 'striptags';
-
 export default {
   relations: (relation, act) => ({
     layout:
@@ -9,7 +7,7 @@ export default {
       relation('linkFlashIndex'),
 
     flashActNavLink:
-      relation('linkFlashAct', act),
+      relation('linkFlashActInline', act),
 
     flashActNavAccent:
       relation('generateFlashActNavAccent', act),
@@ -31,18 +29,23 @@ export default {
 
   data: (act) => ({
     name: act.name,
+    nameHTML: act.nameHTML,
     color: act.color,
 
     flashNames:
       act.flashes.map(flash => flash.name),
   }),
 
-  generate: (data, relations, {language}) =>
+  generate: (data, relations, {html, language}) =>
     language.encapsulate('flashPage', pageCapsule =>
       relations.layout.slots({
         title:
           language.$(pageCapsule, 'title', {
-            flash: striptags(data.name),
+            flash:
+              html.ifelse([
+                html.permit(data.nameHTML, {strip: true}),
+                language.sanitize(data.name),
+              ]),
           }),
 
         color: data.color,

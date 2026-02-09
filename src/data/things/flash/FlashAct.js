@@ -1,13 +1,26 @@
-
 import {input, V} from '#composite';
 import Thing from '#thing';
-import {isContentString} from '#validators';
+import {isContentString, isString} from '#validators';
 
 import {withPropertyFromObject} from '#composite/data';
-import {exposeConstant, exposeDependency, exposeUpdateValueOrContinue}
-  from '#composite/control-flow';
-import {color, directory, name, soupyFind, soupyReverse, thing, thingList}
-  from '#composite/wiki-properties';
+
+import {
+  exitWithoutDependency,
+  exposeConstant,
+  exposeDependency,
+  exposeUpdateValueOrContinue,
+} from '#composite/control-flow';
+
+import {
+  color,
+  directory,
+  name,
+  simpleString,
+  soupyFind,
+  soupyReverse,
+  thing,
+  thingList
+} from '#composite/wiki-properties';
 
 export class FlashAct extends Thing {
   static [Thing.referenceType] = 'flash-act';
@@ -20,6 +33,7 @@ export class FlashAct extends Thing {
     side: thing(V(FlashSide)),
 
     name: name(V('Unnamed Flash Act')),
+    nameHTML: simpleString(),
     directory: directory(),
     color: color(),
 
@@ -63,6 +77,7 @@ export class FlashAct extends Thing {
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Act': {property: 'name'},
+      'Act HTML': {property: 'nameHTML'},
       'Directory': {property: 'directory'},
 
       'Color': {property: 'color'},

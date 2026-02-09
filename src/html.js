@@ -296,6 +296,14 @@ export function isBlank(content) {
   return false;
 }
 
+export function ifelse(options) {
+  for (const option of options) {
+    if (!isBlank(option)) return option;
+  }
+
+  return blank();
+}
+
 export const validators = {
   isBlank(value) {
     if (!isBlank(value)) {
@@ -406,6 +414,37 @@ export function escape(string, {attribute = false} = {}) {
 
   if (attribute) {
     string = string.replaceAll('"', '&quot;');
+  }
+
+  return string;
+}
+
+export function permit(string, adjustment) {
+  if (typeof string === 'string') {
+    if (string.length) {
+      return new Tag(null, null, adjust(string, adjustment));
+    } else {
+      return blank();
+    }
+  } else if (string === null) {
+    return blank();
+  } else {
+    throw new TypeError(`expected string or null`);
+  }
+}
+
+export function adjust(string, {
+  inline = false,
+  strip = false,
+} = {}) {
+  // zalgo
+
+  if (inline || strip) {
+    string = string.replace(/<br\/?>/g, ' ');
+  }
+
+  if (strip) {
+    string = striptags(string);
   }
 
   return string;
