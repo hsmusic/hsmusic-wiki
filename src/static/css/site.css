@@ -485,6 +485,10 @@ body::before, .wallpaper-part {
   overflow-wrap: break-word;
 }
 
+.sidebar li.structured {
+  margin-bottom: 3px;
+}
+
 .sidebar > details.current summary {
   font-weight: 800;
 }
@@ -1588,6 +1592,15 @@ label > input[type=checkbox]:not(:checked) + span {
 
 .other-group-accent a {
   color: var(--page-primary-color);
+}
+
+.flash-act-title {
+  display: inline-block;
+  text-decoration: inherit;
+}
+
+a .flash-act-title {
+  color: var(--primary-color);
 }
 
 .wiki-commentary s:not(.spoiler) {

@@ -1,6 +1,6 @@
 import {input, V} from '#composite';
 import Thing from '#thing';
-import {isContentString, isString} from '#validators';
+import {isColor, isContentString, isString} from '#validators';
 
 import {withPropertyFromObject} from '#composite/data';
 
@@ -33,9 +33,41 @@ export class FlashAct extends Thing {
     side: thing(V(FlashSide)),
 
     name: name(V('Unnamed Flash Act')),
-    nameHTML: simpleString(),
-    directory: directory(),
+
+    title: simpleString(),
+
+    shortName: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isString),
+      }),
+
+      exposeDependency('name'),
+    ],
+
+    directory: [
+      {
+        dependencies: ['name', 'shortName'],
+        compute: (continuation, {name, shortName}) =>
+          continuation({
+            ['#name']:
+              shortName ?? name,
+          }),
+      },
+
+      directory('#name'),
+    ],
+
     color: color(),
+
+    titleColor: [
+      exitWithoutDependency('title'),
+
+      exposeUpdateValueOrContinue({
+        validate: input.value(isColor),
+      }),
+
+      exposeDependency('color'),
+    ],
 
     listTerminology: [
       exposeUpdateValueOrContinue({
@@ -77,10 +109,13 @@ export class FlashAct extends Thing {
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Act': {property: 'name'},
-      'Act HTML': {property: 'nameHTML'},
+      'Title': {property: 'title'},
+      'Short': {property: 'shortName'},
       'Directory': {property: 'directory'},
 
       'Color': {property: 'color'},
+      'Title Color': {property: 'titleColor'},
+
       'List Terminology': {property: 'listTerminology'},
 
       'Review Points': {ignore: true},

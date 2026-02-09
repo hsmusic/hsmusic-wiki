@@ -17,7 +17,7 @@ export default {
     sideActLinks:
       sprawl.flashSideData
         .map(side => side.acts
-          .map(act => relation('linkFlashActInline', act))),
+          .map(act => relation('linkFlashActWithTitle', act))),
   }),
 
   data: (sprawl, act, flash) => ({
@@ -33,6 +33,11 @@ export default {
 
     currentActIndex:
       act.side.acts.indexOf(act),
+
+    sideActTitles:
+      sprawl.flashSideData
+        .map(side => side.acts
+          .map(act => act.title)),
   }),
 
   generate: (data, relations, {html}) =>
@@ -46,7 +51,8 @@ export default {
           sideName: data.sideNames,
           sideColorStyle: relations.sideColorStyles,
           actLinks: relations.sideActLinks,
-        }).map(({sideName, sideColorStyle, actLinks}, sideIndex) =>
+          actTitles: data.sideActTitles,
+        }).map(({sideName, sideColorStyle, actLinks, actTitles}, sideIndex) =>
             html.tag('details',
               sideIndex === data.currentSideIndex &&
                 {class: 'current'},
@@ -63,13 +69,19 @@ export default {
                     html.tag('b', sideName))),
 
                 html.tag('ul',
-                  actLinks.map((actLink, actIndex) =>
-                    html.tag('li',
-                      sideIndex === data.currentSideIndex &&
-                      actIndex === data.currentActIndex &&
-                        {class: 'current'},
+                  stitchArrays({
+                    actLink: actLinks,
+                    actTitle: actTitles,
+                  }).map(({actLink, actTitle}, actIndex) =>
+                      html.tag('li',
+                        sideIndex === data.currentSideIndex &&
+                        actIndex === data.currentActIndex &&
+                          {class: 'current'},
 
-                      actLink))),
+                        actTitle &&
+                          {class: 'structured'},
+
+                        actLink))),
               ])),
       ],
     }),

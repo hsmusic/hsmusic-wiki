@@ -4,7 +4,7 @@ export default {
       relation('generatePageSidebarBox'),
 
     actLink:
-      relation('linkFlashAct', act),
+      relation('linkFlashActWithTitle', act),
 
     flashLinks:
       act.flashes

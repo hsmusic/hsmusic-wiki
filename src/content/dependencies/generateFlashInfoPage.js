@@ -56,6 +56,9 @@ export default {
     readCommentaryLine:
       relation('generateReadCommentaryLine', flash),
 
+    flashIndexLink:
+      relation('linkFlashIndex'),
+
     flashActLink:
       relation('linkFlashAct', flash.act),
 
@@ -87,6 +90,9 @@ export default {
 
     date:
       flash.date,
+
+    flashActShortName:
+      flash.act.shortName,
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -180,7 +186,14 @@ export default {
         navLinkStyle: 'hierarchical',
         navLinks: [
           {auto: 'home'},
-          {html: relations.flashActLink.slot('color', false)},
+          {html: relations.flashIndexLink},
+
+          {
+            html:
+              relations.flashActLink.slot('content',
+                language.sanitize(data.flashActShortName)),
+          },
+
           {auto: 'current'},
         ],
 

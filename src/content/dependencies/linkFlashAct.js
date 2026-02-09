@@ -1,21 +1,6 @@
 export default {
-  relations: (relation, flashAct) => ({
-    link:
-      relation('linkThing', 'localized.flashActGallery', flashAct),
-  }),
+  relations: (relation, flashAct) =>
+    ({link: relation('linkThing', 'localized.flashActGallery', flashAct)}),
 
-  data: (flashAct) => ({
-    name:
-      flashAct.name,
-
-    nameHTML:
-      flashAct.nameHTML,
-  }),
-
-  generate: (data, relations, {html, language}) =>
-    relations.link.slot('content',
-      html.ifelse([
-        html.permit(data.nameHTML),
-        language.sanitize(data.name),
-      ])),
+  generate: (relations) => relations.link,
 };

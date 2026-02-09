@@ -7,7 +7,7 @@ export default {
       relation('linkFlashIndex'),
 
     flashActNavLink:
-      relation('linkFlashActInline', act),
+      relation('linkFlashActWithTitle', act),
 
     flashActNavAccent:
       relation('generateFlashActNavAccent', act),
@@ -29,7 +29,7 @@ export default {
 
   data: (act) => ({
     name: act.name,
-    nameHTML: act.nameHTML,
+    title: act.title,
     color: act.color,
 
     flashNames:
@@ -37,15 +37,20 @@ export default {
   }),
 
   generate: (data, relations, {html, language}) =>
-    language.encapsulate('flashPage', pageCapsule =>
+    language.encapsulate('flashActPage', pageCapsule =>
       relations.layout.slots({
         title:
-          language.$(pageCapsule, 'title', {
-            flash:
-              html.ifelse([
-                html.permit(data.nameHTML, {strip: true}),
-                language.sanitize(data.name),
-              ]),
+          language.encapsulate(pageCapsule, 'title', workingCapsule => {
+            const workingOptions = {act: data.name};
+
+            if (data.title) {
+              workingCapsule += '.withTitle'; // sigh
+              workingOptions.title =
+                html.tag('span', {class: 'flash-act-title'},
+                  data.title);
+            }
+
+            return language.$(workingCapsule, workingOptions);
           }),
 
         color: data.color,

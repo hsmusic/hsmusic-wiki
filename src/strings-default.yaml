@@ -716,6 +716,8 @@ misc:
       playlist: "YouTube (playlist)"
       fullAlbum: "YouTube (full album)"
 
+  flashActWithTitle: "{ACT}: {TITLE}"
+
   # lyrics:
 
   lyrics:
@@ -1671,6 +1673,10 @@ flashSidebar:
     # This is the default string used when neither a flash act nor its side
     # specifies a custom phrasing.
     entriesInThisSection: "Entries in this section"
+
+flashActPage:
+  title: "{ACT}"
+  title.withTitle: "{ACT}: {TITLE}"
 
 #
 # flashPage:

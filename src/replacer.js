@@ -82,7 +82,7 @@ export const replacerSpec = {
 
   'flash-act': {
     find: 'flashAct',
-    link: 'linkFlashAct',
+    link: 'linkFlashActWithTitle',
   },
 
   'flash-side': {
