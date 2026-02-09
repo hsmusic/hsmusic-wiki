@@ -28,7 +28,7 @@ export default {
 
     actLinks:
       query.flashActs
-        .map(act => relation('linkFlashAct', act)),
+        .map(act => relation('linkFlashActWithTitle', act)),
 
     actCoverGrids:
       query.flashActs
