@@ -528,7 +528,7 @@ function queryIndex({termsKey, indexKey}, query, options) {
 
 function processTerms(query) {
   const kindTermSpec = [
-    {kind: 'album', terms: ['album', 'albums']},
+    {kind: 'album', terms: ['album', 'albums', 'release', 'releases']},
     {kind: 'artist', terms: ['artist', 'artists']},
     {kind: 'flash', terms: ['flash', 'flashes']},
     {kind: 'group', terms: ['group', 'groups']},

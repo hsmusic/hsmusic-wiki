@@ -850,7 +850,7 @@ misc:
       track.artists: "(by {ARTISTS})"
 
     resultFilter:
-      album: "Albums"
+      album: "Releases"
       artTag: "Art Tags"
       artist: "Artists"
       flash: "Flashes"
