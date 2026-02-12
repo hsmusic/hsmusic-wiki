@@ -8,7 +8,7 @@
 
 const baselineStore = [
   'primaryName',
-  'disambiguator',
+  'disambiguators',
   'classification',
   'artwork',
   'color',

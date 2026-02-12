@@ -844,9 +844,10 @@ misc:
       single: "(single)"
 
     resultDisambiguator:
-      group: "({DISAMBIGUATOR})"
-      flash: "(in {DISAMBIGUATOR})"
-      track: "(from {DISAMBIGUATOR})"
+      group: "({CATEGORY})"
+      flash: "(in {ACT})"
+      track.album: "(from {ALBUM})"
+      track.artists: "(by {ARTISTS})"
 
     resultFilter:
       album: "Albums"

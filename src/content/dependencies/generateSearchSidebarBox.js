@@ -69,17 +69,26 @@ export default {
           language.encapsulate(capsule, 'resultDisambiguator', capsule => [
             html.tag('template', {class: 'wiki-search-group-result-disambiguator-string'},
               language.$(capsule, 'group', {
-                disambiguator: html.tag('slot', {name: 'disambiguator'}),
+                category:
+                  html.tag('slot', {name: 'disambiguator'}),
               })),
 
             html.tag('template', {class: 'wiki-search-flash-result-disambiguator-string'},
               language.$(capsule, 'flash', {
-                disambiguator: html.tag('slot', {name: 'disambiguator'}),
+                act:
+                  html.tag('slot', {name: 'disambiguator'}),
               })),
 
-            html.tag('template', {class: 'wiki-search-track-result-disambiguator-string'},
-              language.$(capsule, 'track', {
-                disambiguator: html.tag('slot', {name: 'disambiguator'}),
+            html.tag('template', {class: 'wiki-search-track-result-album-disambiguator-string'},
+              language.$(capsule, 'track.album', {
+                album:
+                  html.tag('slot', {name: 'disambiguator'}),
+              })),
+
+            html.tag('template', {class: 'wiki-search-track-result-artist-disambiguator-string'},
+              language.$(capsule, 'track.artists', {
+                artists:
+                  html.tag('slot', {name: 'disambiguator'}),
               })),
           ]),
 

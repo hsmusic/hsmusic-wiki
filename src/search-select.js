@@ -3,7 +3,7 @@
 // These files totally go together, so read them side by side, okay?
 
 import baseSearchSpec from '#search-shape';
-import {unique} from '#sugar';
+import {empty, unique} from '#sugar';
 import {compareKebabCase} from '#wiki-data';
 
 function prepareArtwork(artwork, thing, {
@@ -127,8 +127,8 @@ function baselineProcess(thing, _opts) {
   fields.color =
     thing.color;
 
-  fields.disambiguator =
-    null;
+  fields.disambiguators =
+    [];
 
   return fields;
 }
@@ -209,8 +209,21 @@ function genericProcess(thing, opts) {
         : 'track')
       : null);
 
-  fields.disambiguator =
-    fields.parentName;
+  fields.disambiguators =
+    (thing.isTrack
+      ? [
+          (fields.classification === 'single'
+            ? null
+            : fields.parentName),
+
+          (empty(thing.artistContribs)
+            ? null
+            : thing.artistContribs
+                .map(contrib => contrib.artist.name)
+                .join(', ')),
+        ]
+
+      : [thing.parentName]);
 
   fields.artTags =
     (Array.from(new Set(

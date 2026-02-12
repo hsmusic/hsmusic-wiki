@@ -1,5 +1,11 @@
 import {getColors} from '../../shared-util/colors.js';
-import {accumulateSum, empty, unique} from '../../shared-util/sugar.js';
+
+import {
+  accumulateSum,
+  compareArrays,
+  empty,
+  unique,
+} from '../../shared-util/sugar.js';
 
 import {
   cssProp,
@@ -80,7 +86,8 @@ export const info = {
 
   groupResultDisambiguatorString: null,
   flashResultDisambiguatorString: null,
-  trackResultDisambiguatorString: null,
+  trackResultDisambiguatorString1: null,
+  trackResultDisambiguatorString2: null,
 
   albumResultFilterString: null,
   artistResultFilterString: null,
@@ -224,8 +231,11 @@ export function getPageReferences() {
   info.flashResultDisambiguatorString =
     findString('flash-result-disambiguator');
 
-  info.trackResultDisambiguatorString =
-    findString('track-result-disambiguator');
+  info.trackResultDisambiguatorString1 =
+    findString('track-result-album-disambiguator');
+
+  info.trackResultDisambiguatorString2 =
+    findString('track-result-artist-disambiguator');
 
   info.albumResultFilterString =
     findString('album-result-filter');
@@ -1087,18 +1097,76 @@ function generateSidebarSearchResult(result, results) {
   const compareName = otherResult =>
     getSearchResultName(otherResult) === getSearchResultName(result);
 
-  const ambiguous =
-    results.some(otherResult =>
+  const ambiguousWith =
+    results.filter(otherResult =>
       otherResult !== result &&
       compareReferenceType(otherResult) &&
       compareName(otherResult));
 
-  if (ambiguous) {
-    preparedSlots.disambiguate =
-      result.data.disambiguator;
+  if (!empty(ambiguousWith)) disambiguate: {
+    const allAmbiguous = [result, ...ambiguousWith];
 
-    preparedSlots.disambiguatorString =
-      info[result.referenceType + 'ResultDisambiguatorString'];
+    // First search for an ideal disambiguation, which disambiguates
+    // all ambiguous results in the same way.
+    let disambiguation = null, i;
+    for (i = 0; i < result.data.disambiguators.length; i++) {
+      const disambiguations =
+        allAmbiguous.map(r => r.data.disambiguators[i]);
+
+      if (unique(disambiguations).length === allAmbiguous.length) {
+        disambiguation = result.data.disambiguators[i];
+        break;
+      }
+    }
+
+    // Otherwise, search for a disambiguation which disambiguates
+    // *this result* with at least one other result which it is
+    // *otherwise* ambiguous with.
+    if (!disambiguation) {
+      for (i = 1; i < result.data.disambiguators.length; i++) {
+        const otherwiseAmbiguousWith =
+          ambiguousWith.filter(otherResult =>
+            compareArrays(
+              otherResult.data.disambiguators.slice(0, i),
+              result.data.disambiguators.slice(0, i)));
+
+        if (
+          otherwiseAmbiguousWith.find(otherResult =>
+            otherResult.data.disambiguators[i] !==
+            result.data.disambiguators[i])
+        ) {
+          disambiguation = result.data.disambiguators[i];
+          break;
+        }
+      }
+    }
+
+    // Otherwise, search for a disambiguation which disambiguates
+    // this result at all.
+    if (!disambiguation) {
+      for (i = 0; i < result.data.disambiguators.length; i++) {
+        if (
+          ambiguousWith.find(otherResult =>
+            otherResult.data.disambiguators[i] !==
+            result.data.disambiguators[i])
+        ) {
+          disambiguation = result.data.disambiguators[i];
+          break;
+        }
+      }
+    }
+
+    if (!disambiguation) {
+      break disambiguate;
+    }
+
+    const string =
+      info[result.referenceType + 'ResultDisambiguatorString' + (i + 1)];
+
+    if (!string) break disambiguate;
+
+    preparedSlots.disambiguate = disambiguation;
+    preparedSlots.disambiguatorString = string;
   }
 
   return generateSidebarSearchResultTemplate(preparedSlots);
