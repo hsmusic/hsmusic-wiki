@@ -920,7 +920,14 @@ function fillResultElements(results, {
   }
 
   for (const result of filteredResults) {
-    const el = generateSidebarSearchResult(result, filteredResults);
+    let el;
+    try {
+      el = generateSidebarSearchResult(result, filteredResults);
+    } catch (error) {
+      console.error(`Error showing result:`, result);
+      console.error(error);
+    }
+
     if (!el) continue;
 
     info.results.appendChild(el);
