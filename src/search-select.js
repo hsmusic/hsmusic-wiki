@@ -219,7 +219,9 @@ function genericProcess(thing, opts) {
           (empty(thing.artistContribs)
             ? null
             : thing.artistContribs
-                .map(contrib => contrib.artist.name)
+                .map(contrib =>
+                  contrib.artistText ??
+                  contrib.artist.name)
                 .join(', ')),
         ]
 
