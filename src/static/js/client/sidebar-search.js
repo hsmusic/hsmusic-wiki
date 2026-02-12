@@ -701,16 +701,7 @@ async function activateSidebarSearch(query) {
   state.searchStage = 'complete';
   updateSidebarSearchStatus();
 
-  session.activeQueryContextPageName =
-    document.querySelector('title').dataset.withoutWikiName ??
-    document.title;
-
-  session.activeQueryContextPagePathname =
-    location.pathname;
-
-  session.activeQueryContextPageColor =
-    document.querySelector('.color-style')?.dataset.color ??
-    null;
+  recordActiveQueryContext();
 
   session.activeQuery = query;
   session.activeQueryResults = results;
@@ -723,6 +714,25 @@ async function activateSidebarSearch(query) {
     state.focusFirstResultTimeout = null;
     focusFirstSidebarSearchResult();
   }
+}
+
+function recordActiveQueryContext() {
+  const {session} = info;
+
+  if (document.documentElement.dataset.urlKey === 'localized.home') {
+    return;
+  }
+
+  session.activeQueryContextPageName =
+    document.querySelector('title').dataset.withoutWikiName ??
+    document.title;
+
+  session.activeQueryContextPagePathname =
+    location.pathname;
+
+  session.activeQueryContextPageColor =
+    document.querySelector('.color-style')?.dataset.color ??
+    null;
 }
 
 function clearSidebarSearch() {
