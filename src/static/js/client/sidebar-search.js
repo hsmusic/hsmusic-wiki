@@ -73,6 +73,7 @@ export const info = {
 
   albumResultKindString: null,
   artistResultKindString: null,
+  flashResultKindString: null,
   groupResultKindString: null,
   singleResultKindString: null,
   tagResultKindString: null,
@@ -204,6 +205,9 @@ export function getPageReferences() {
 
   info.artistResultKindString =
     findString('artist-result-kind');
+
+  info.flashResultKindString =
+    findString('flash-result-kind');
 
   info.groupResultKindString =
     findString('group-result-kind');
@@ -1042,6 +1046,9 @@ function generateSidebarSearchResult(result, results) {
     case 'flash': {
       preparedSlots.href =
         openFlash(result.directory);
+
+      preparedSlots.kindString =
+        info.flashResultKindString;
 
       break;
     }

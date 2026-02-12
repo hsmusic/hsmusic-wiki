@@ -839,6 +839,7 @@ misc:
       album: "(album)"
       artTag: "(art tag)"
       artist: "(artist)"
+      flash: "(flash)"
       group: "(group)"
       single: "(single)"
 
