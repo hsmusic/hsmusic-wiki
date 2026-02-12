@@ -65,6 +65,14 @@ export function templateContent(el, slots = {}) {
   return content;
 }
 
+export function decodeEntities(string) {
+  if (!string) return string;
+
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = string;
+  return textarea.value;
+}
+
 // Curry-style, so multiple points can more conveniently be tested at once.
 export function pointIsOverAnyOf(elements) {
   return (clientX, clientY) => {

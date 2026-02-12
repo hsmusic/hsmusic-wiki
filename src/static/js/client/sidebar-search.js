@@ -9,6 +9,7 @@ import {
 
 import {
   cssProp,
+  decodeEntities,
   openAlbum,
   openArtist,
   openArtTag,
@@ -724,7 +725,7 @@ function recordActiveQueryContext() {
   }
 
   session.activeQueryContextPageName =
-    document.querySelector('title').dataset.withoutWikiName ??
+    decodeEntities(document.querySelector('title').dataset.withoutWikiName) ||
     document.title;
 
   session.activeQueryContextPagePathname =
