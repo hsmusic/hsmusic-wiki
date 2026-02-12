@@ -840,6 +840,7 @@ misc:
       artTag: "(art tag)"
       artist: "(artist)"
       group: "(group)"
+      single: "(single)"
 
     resultDisambiguator:
       group: "({DISAMBIGUATOR})"

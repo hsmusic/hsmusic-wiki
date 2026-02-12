@@ -200,6 +200,15 @@ function genericProcess(thing, opts) {
    : thing.isFlash ? thing.act.name
       : null);
 
+  fields.classification =
+    (thing.isAlbum ? thing.style
+   : thing.isTrack ?
+      (thing.album.style === 'single' &&
+       thing === thing.album.tracks[0]
+        ? 'single'
+        : 'track')
+      : null);
+
   fields.disambiguator =
     fields.parentName;
 

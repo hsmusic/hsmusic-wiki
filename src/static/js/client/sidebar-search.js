@@ -74,6 +74,7 @@ export const info = {
   albumResultKindString: null,
   artistResultKindString: null,
   groupResultKindString: null,
+  singleResultKindString: null,
   tagResultKindString: null,
 
   groupResultDisambiguatorString: null,
@@ -206,6 +207,9 @@ export function getPageReferences() {
 
   info.groupResultKindString =
     findString('group-result-kind');
+
+  info.singleResultKindString =
+    findString('single-result-kind');
 
   info.tagResultKindString =
     findString('tag-result-kind');
@@ -879,10 +883,26 @@ function fillResultElements(results, {
 } = {}) {
   const tidiedResults = tidyResults(results);
 
-  const filteredResults =
-    (filterType
-      ? tidiedResults.filter(result => result.referenceType === filterType)
-      : tidiedResults);
+  let filteredResults = tidiedResults;
+
+  if (filterType) {
+    filteredResults = filteredResults
+      .filter(result => result.referenceType === filterType);
+  }
+
+  if (!filterType) {
+    filteredResults = filteredResults
+      .filter(result => {
+        if (result.referenceType !== 'track') return true;
+        if (result.data.classification !== 'single') return true;
+        return !filteredResults.find(otherResult => {
+          if (otherResult.referenceType !== 'album') return false;
+          return otherResult.name === result.parentName;
+        });
+      });
+  }
+
+  filteredResults = filteredResults
 
   while (info.results.firstChild) {
     info.results.firstChild.remove();
@@ -992,7 +1012,9 @@ function generateSidebarSearchResult(result, results) {
         openAlbum(result.directory);
 
       preparedSlots.kindString =
-        info.albumResultKindString;
+        (result.data.classification === 'single'
+          ? info.singleResultKindString
+          : info.albumResultKindString);
 
       break;
     }

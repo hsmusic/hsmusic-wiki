@@ -56,6 +56,9 @@ export default {
             html.tag('template', {class: 'wiki-search-group-result-kind-string'},
               language.$(capsule, 'group')),
 
+            html.tag('template', {class: 'wiki-search-single-result-kind-string'},
+              language.$(capsule, 'single')),
+
             html.tag('template', {class: 'wiki-search-tag-result-kind-string'},
               language.$(capsule, 'artTag')),
           ]),
