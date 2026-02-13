@@ -2246,6 +2246,15 @@ h1 {
   width: 100%;
 }
 
+#content.flash-index h2 .flash-act-title,
+#content.flash-index h1 .flash-act-title {
+  display: block;
+}
+
+#content.flash-index h2 .flash-act-title {
+  text-transform: uppercase;
+}
+
 #content.top-index h2 {
   text-align: center;
   font-size: 2em;
