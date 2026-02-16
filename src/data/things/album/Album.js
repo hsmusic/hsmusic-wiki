@@ -7,6 +7,7 @@ import {is, isContributionList, isDate, isDirectory, isNumber}
 import {
   parseAdditionalFiles,
   parseAdditionalNames,
+  parseAlwaysReferenceByDirectory,
   parseAnnotatedReferences,
   parseArtwork,
   parseCommentary,
@@ -100,7 +101,21 @@ export class Album extends Thing {
     ],
 
     alwaysReferenceByDirectory: flag(V(false)),
-    alwaysReferenceTracksByDirectory: flag(V(false)),
+
+    referenceTracksByDirectory: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(
+          is(...[
+            'always',
+            'outside album',
+            // 'outside groups',
+            'normally',
+          ])),
+      }),
+
+      exposeConstant(V('normally')),
+    ],
+
     suffixTrackDirectories: flag(V(false)),
 
     style: [
@@ -567,7 +582,14 @@ export class Album extends Thing {
       'Directory Suffix': {property: 'directorySuffix'},
       'Suffix Track Directories': {property: 'suffixTrackDirectories'},
       'Always Reference By Directory': {property: 'alwaysReferenceByDirectory'},
-      'Always Reference Tracks By Directory': {property: 'alwaysReferenceTracksByDirectory'},
+
+      'Reference Tracks By Directory': {property: 'referenceTracksByDirectory'},
+
+      'Always Reference Tracks By Directory': {
+        property: 'referenceTracksByDirectory',
+        transform: parseAlwaysReferenceByDirectory,
+      },
+
       'Style': {property: 'style'},
 
       'Bandcamp Album ID': {

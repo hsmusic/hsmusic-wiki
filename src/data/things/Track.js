@@ -10,6 +10,7 @@ import Thing from '#thing';
 import {compareKebabCase} from '#wiki-data';
 
 import {
+  is,
   isBoolean,
   isColor,
   isContentString,
@@ -22,6 +23,7 @@ import {
 import {
   parseAdditionalFiles,
   parseAdditionalNames,
+  parseAlwaysReferenceByDirectory,
   parseAnnotatedReferences,
   parseArtwork,
   parseCommentary,
@@ -143,26 +145,31 @@ export class Track extends Thing {
       exposeDependency('#trackSection.suffixTrackDirectories'),
     ],
 
-    // Controls how find.track works - it'll never be matched by
-    // a reference just to the track's name, which means you don't
-    // have to always reference some *other* (much more commonly
-    // referenced) track by directory instead of more naturally by name.
-    alwaysReferenceByDirectory: [
+    referenceByDirectory: [
       exposeUpdateValueOrContinue({
-        validate: input.value(isBoolean),
+        validate: input.value(
+          is(...[
+            'always',
+            'outside album',
+            // 'outside groups',
+            'normally',
+          ])),
       }),
 
-      withPropertyFromObject('album', V('alwaysReferenceTracksByDirectory')),
+      withPropertyFromObject('album', V('referenceTracksByDirectory')),
 
-      // Falsy mode means this exposes true if the album's property is true,
-      // but continues if the property is false (which is also the default).
-      exposeDependencyOrContinue({
-        dependency: '#album.alwaysReferenceTracksByDirectory',
-        mode: input.value('falsy'),
-      }),
+      {
+        dependencies: ['#album.referenceTracksByDirectory'],
+        compute: (continuation, {
+          ['#album.referenceTracksByDirectory']: referenceTracksByDirectory,
+        }) =>
+          (referenceTracksByDirectory === 'normally'
+            ? continuation()
+            : referenceTracksByDirectory),
+      },
 
-      exitWithoutDependency('_mainRelease', V(false)),
-      exitWithoutDependency('mainReleaseTrack', V(false)),
+      exitWithoutDependency('_mainRelease', V('normally')),
+      exitWithoutDependency('mainReleaseTrack', V('normally')),
 
       withPropertyFromObject('mainReleaseTrack', V('name')),
 
@@ -172,7 +179,9 @@ export class Track extends Thing {
           ['name']: name,
           ['#mainReleaseTrack.name']: mainReleaseName,
         }) =>
-          compareKebabCase(name, mainReleaseName),
+          (compareKebabCase(name, mainReleaseName)
+            ? 'always'
+            : 'normally'),
       },
     ],
 
@@ -888,7 +897,14 @@ export class Track extends Thing {
       'Track Text': {property: 'nameText'},
       'Directory': {property: 'directory'},
       'Suffix Directory': {property: 'suffixDirectoryFromAlbum'},
-      'Always Reference By Directory': {property: 'alwaysReferenceByDirectory'},
+
+      'Reference By Directory': {property: 'referenceByDirectory'},
+
+      'Always Reference By Directory': {
+        property: 'referenceByDirectory',
+        transform: parseAlwaysReferenceByDirectory,
+      },
+
       'Main Release': {property: 'mainRelease'},
 
       'Bandcamp Track ID': {
@@ -1096,10 +1112,12 @@ export class Track extends Thing {
 
       bindTo: 'trackData',
 
+      // When referencing without any particular context, all values
+      // except for 'normally' count against referencing by name.
       getMatchableNames: track =>
-        (track.alwaysReferenceByDirectory
-          ? []
-          : [track.name]),
+        (track.referenceByDirectory === 'normally'
+          ? [track.name]
+          : []),
     },
 
     trackMainReleasesOnly: {
@@ -1109,14 +1127,11 @@ export class Track extends Thing {
       include: track =>
         !CacheableObject.getUpdateValue(track, 'mainRelease'),
 
-      // It's still necessary to check alwaysReferenceByDirectory here, since
-      // it may be set manually (with `Always Reference By Directory: true`),
-      // and these shouldn't be matched by name (as per usual).
-      // See the definition for that property for more information.
+      // This is an acontextual reference.
       getMatchableNames: track =>
-        (track.alwaysReferenceByDirectory
-          ? []
-          : [track.name]),
+        (track.referenceByDirectory === 'normally'
+          ? [track.name]
+          : []),
     },
 
     trackReference: {
@@ -1146,8 +1161,9 @@ export class Track extends Thing {
         const referencedName = fullRef;
 
         for (const track of referencingTrack.album.tracks) {
-          // Totally ignore alwaysReferenceByDirectory here.
-          // void track.alwaysReferenceByDirectory;
+          if (track.referenceByDirectory === 'always') {
+            continue;
+          }
 
           if (track.name === referencedName) {
             if (track.isSecondaryRelease) {
@@ -1174,10 +1190,11 @@ export class Track extends Thing {
       include: track =>
         track.hasUniqueCoverArt,
 
+      // This is an acontextual reference.
       getMatchableNames: track =>
-        (track.alwaysReferenceByDirectory
-          ? []
-          : [track.name]),
+        (track.referenceByDirectory === 'normally'
+          ? [track.name]
+          : []),
     },
 
     trackPrimaryArtwork: {
@@ -1196,10 +1213,11 @@ export class Track extends Thing {
         artwork.thing.isTrack &&
         artwork === artwork.thing.trackArtworks[0],
 
+      // This is an acontextual reference.
       getMatchableNames: ({thing: track}) =>
-        (track.alwaysReferenceByDirectory
-          ? []
-          : [track.name]),
+        (track.referenceByDirectory === 'normally'
+          ? [track.name]
+          : []),
 
       getMatchableDirectories: ({thing: track}) =>
         [track.directory],

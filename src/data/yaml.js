@@ -640,6 +640,16 @@ export function parseDuration(string) {
   }
 }
 
+export function parseAlwaysReferenceByDirectory(value) {
+  if (value === true) {
+    return 'always';
+  } else if (value === false) {
+    return 'normally';
+  } else {
+    return value;
+  }
+}
+
 export const extractAccentRegex =
   /^(?<main>.*?)(?: \((?<accent>.*)\))?$/;
 
