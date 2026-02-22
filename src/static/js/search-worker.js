@@ -33,7 +33,7 @@ postStatus('alive');
 Promise.all([
   loadDependencies(),
   loadDatabase(),
-]).then(main)
+]).then(() => main())
   .then(
     () => {
       postStatus('ready');
@@ -183,7 +183,7 @@ function fetchIndexes(keysNeedingFetch) {
           })));
 }
 
-async function main() {
+async function main(fromRetry = false) {
   const prepareIndexDataPromise = prepareIndexData();
 
   indexes =
@@ -195,17 +195,50 @@ async function main() {
 
   const {indexData, idbIndexData} = await prepareIndexDataPromise;
 
+  const understoodKeys = Object.keys(searchSpec);
+  const unexpectedKeysFromCache =
+    Object.keys(idbIndexData)
+      .filter(key => !understoodKeys.includes(key));
+
+  // This step is largely "unnecessary" because the rest of the code pays
+  // attention to which keys are understood anyway, but we delete unexpected
+  // keys from the index anyway, to trim stored data that isn't being used.
+  if (idb && !empty(unexpectedKeysFromCache)) {
+    for (const key of unexpectedKeysFromCache) {
+      console.warn(`Unexpected search index in cache, deleting: ${key}`);
+    }
+
+    const transaction =
+      idb.transaction(['indexes'], 'readwrite');
+
+    const store =
+      transaction.objectStore('indexes');
+
+    for (const [key] of unexpectedKeysFromCache) {
+      try {
+        await promisifyIDBRequest(store.delete(key));
+      } catch (error) {
+        console.warn(`Error deleting ${key} from internal search cache`);
+        console.warn(error);
+        continue;
+      }
+    }
+  }
+
   const keysNeedingFetch =
     (idbIndexData
       ? Object.keys(indexData)
+          .filter(key => understoodKeys.includes(key))
           .filter(key =>
             indexData[key].md5 !==
             idbIndexData[key]?.md5)
-      : Object.keys(indexData));
+      : Object.keys(indexData)
+          .filter(key => understoodKeys.includes(key)));
 
   const keysFromCache =
     Object.keys(indexData)
-      .filter(key => !keysNeedingFetch.includes(key))
+      .filter(key => understoodKeys.includes(key))
+      .filter(key => !keysNeedingFetch.includes(key));
 
   const cacheArrayBufferPromises =
     keysFromCache
@@ -234,16 +267,28 @@ async function main() {
   }
 
   function importIndexes(keys, jsons) {
+    const succeeded = [];
+    const failed = [];
+
     stitchArrays({key: keys, json: jsons})
       .forEach(({key, json}) => {
-        importIndex(key, json);
+        try {
+          importIndex(key, json);
+          succeeded.push([key, null]);
+        } catch (caughtError) {
+          failed.push([key, caughtError]);
+        }
       });
+
+    return {succeeded, failed};
   }
 
   if (idb) {
     console.debug(`Reusing indexes from search cache:`, keysFromCache);
     console.debug(`Fetching indexes anew:`, keysNeedingFetch);
   }
+
+  let signalRetryNeeded = false;
 
   await Promise.all([
     async () => {
@@ -254,7 +299,34 @@ async function main() {
         cacheArrayBuffers
           .map(arrayBufferToJSON);
 
-      importIndexes(keysFromCache, cacheJSONs);
+      const importResults =
+        importIndexes(keysFromCache, cacheJSONs);
+
+      if (empty(importResults.failed)) return;
+      if (!idb) return;
+
+      const transaction =
+        idb.transaction(['indexes'], 'readwrite');
+
+      const store =
+        transaction.objectStore('indexes');
+
+      for (const [key, error] of importResults.failed) {
+        console.warn(`Failed to import search index from cache: ${key}`);
+        console.warn(error);
+      }
+
+      for (const [key] of importResults.failed) {
+        try {
+          await promisifyIDBRequest(store.delete(key));
+        } catch (error) {
+          console.warn(`Error deleting ${key} from internal search cache`);
+          console.warn(error);
+          continue;
+        }
+      }
+
+      signalRetryNeeded = true;
     },
 
     async () => {
@@ -265,7 +337,21 @@ async function main() {
         fetchArrayBuffers
           .map(arrayBufferToJSON);
 
-      importIndexes(keysNeedingFetch, fetchJSONs);
+      const importResults =
+        importIndexes(keysNeedingFetch, fetchJSONs);
+
+      if (empty(importResults.failed)) return;
+
+      for (const [key, error] of importResults.failed) {
+        console.warn(`Failed to import search index from fetch: ${key}`);
+        console.warn(error);
+      }
+
+      console.warn(
+        `Trying again would just mean fetching this same data, ` +
+        `so this is needs outside intervention.`);
+
+      throw new Error(`Failed to load search data from fresh fetch`);
     },
 
     async () => {
@@ -300,11 +386,19 @@ async function main() {
       }
     },
   ].map(fn => fn()));
+
+  if (signalRetryNeeded) {
+    if (fromRetry) {
+      console.error(`Already retried, this is probably a logic / code flow error.`);
+      throw new Error(`Failed to load good search data even on a retry`);
+    } else {
+      console.warn(`Trying to load search data again, hopefully from fresh conditions`);
+      return main(true);
+    }
+  }
 }
 
 function importIndex(indexKey, indexData) {
-  // If this fails, it's because an outdated index was cached.
-  // TODO: If this fails, try again once with a cache busting url.
   for (const [key, value] of Object.entries(indexData)) {
     indexes[indexKey].import(key, JSON.stringify(value));
   }
