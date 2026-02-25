@@ -168,6 +168,7 @@ export default {
             // const enteredLabel = node.data.label && transformNode(node.data.label, opts);
             const enteredLabel = node.data.label?.data;
             const enteredHash = node.data.hash?.data;
+            const enteredColor = getArg(node, 'color')?.[0].data;
 
             data.label =
               enteredLabel ??
@@ -183,6 +184,7 @@ export default {
                 : null);
 
             data.hash = enteredHash ?? null;
+            data.color = enteredColor ?? null;
 
             return {i: node.i, iEnd: node.iEnd, type: 'internal-link', data};
           }
@@ -248,6 +250,7 @@ export default {
               link: relation(name, arg),
               label: node.data.label,
               hash: node.data.hash,
+              color: node.data.color,
               name: arg?.name,
               shortName: arg?.shortName ?? arg?.nameShort,
             }
@@ -605,7 +608,7 @@ export default {
                 nodeFromRelations.link,
                 {slots: ['content', 'hash']});
 
-            const {label, hash, shortName, name} = nodeFromRelations;
+            const {label, hash, color, shortName, name} = nodeFromRelations;
 
             if (slots.textOnly) {
               if (label) {
@@ -660,6 +663,10 @@ export default {
 
             if (doTheAbsorbyThing) {
               absorbFollowingPunctuation(link);
+            }
+
+            if (color) {
+              link.setSlot('color', color);
             }
 
             return {type: 'processed-internal-link', data: link};
