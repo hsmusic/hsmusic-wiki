@@ -75,6 +75,10 @@ const situationalSteps = {
 
 const stepInfoSymbol = Symbol();
 
+const boundSessionStorage =
+  window.hsmusicBoundSessionStorage =
+  Object.create(null);
+
 for (const module of modules) {
   const {info} = module;
 
@@ -159,12 +163,47 @@ for (const module of modules) {
 
       const storageKey = `hsmusic.${infoKey}.${key}`;
 
+      // There are two storage systems besides actual session storage in play.
+      //
+      // "Fallback" is for if session storage is not available, which may
+      // suddenly become the case, i.e. access is temporarily revoked or fails.
+      // The fallback value is controlled completely internally i.e. in this
+      // infrastructure, in this lexical scope.
+      //
+      // "Bound" is for if the value kept in session storage was saved to
+      // the page when the page was initially loaded, rather than a living
+      // window on session storage (which may be affected by pages later in
+      // the history stack). Whether or not bound storage is in effect is
+      // controlled at page load (of course), by each module's own logic.
+      //
+      // Asterisk: Bound storage can't work miracles and if the page is
+      // actually deloaded with its JavaScript state discarded, the bound
+      // values are lost, even if the browser recreates on-page form state.
+
       let fallbackValue = defaultValue;
+      let boundValue = undefined;
+
+      const updateBoundValue = (givenValue = undefined) => {
+        if (givenValue) {
+          if (
+            infoKey in boundSessionStorage &&
+            key in boundSessionStorage[infoKey]
+          ) {
+            boundSessionStorage[infoKey][key] = givenValue;
+          }
+        } else {
+          boundValue = boundSessionStorage[infoKey]?.[key];
+        }
+      };
 
       Object.defineProperty(info.session, key, {
         get: () => {
+          updateBoundValue();
+
           let value;
-          try {
+          if (boundValue !== undefined) {
+            value = boundValue ?? defaultValue;
+          } else try {
             value = sessionStorage.getItem(storageKey) ?? defaultValue;
           } catch (error) {
             if (error instanceof DOMException) {
@@ -200,21 +239,23 @@ for (const module of modules) {
             return;
           }
 
-          let operation;
+          let sessionOperation;
           if (value === '') {
             fallbackValue = null;
-            operation = () => {
+            updateBoundValue(null);
+            sessionOperation = () => {
               sessionStorage.removeItem(storageKey);
             };
           } else {
             fallbackValue = value;
-            operation = () => {
+            updateBoundValue(value);
+            sessionOperation = () => {
               sessionStorage.setItem(storageKey, value);
             };
           }
 
           try {
-            operation();
+            sessionOperation();
           } catch (error) {
             if (!(error instanceof DOMException)) {
               throw error;
@@ -241,6 +282,40 @@ for (const module of modules) {
         stepsObject[key].push(fn);
       }
     }
+  }
+}
+
+function evaluateBindSessionStorageStep(bindSessionStorage) {
+  const {id: infoKey, session: moduleExposedSessionObject} =
+    bindSessionStorage[stepInfoSymbol];
+
+  const generator = bindSessionStorage();
+
+  let lastBoundValue;
+  while (true) {
+    const {value: key, done} = generator.next(lastBoundValue);
+    const storageKey = `hsmusic.${infoKey}.${key}`;
+
+    let value = undefined;
+    try {
+      value = sessionStorage.getItem(storageKey);
+    } catch (error) {
+      if (!(error instanceof DOMException)) {
+        throw error;
+      }
+    }
+
+    if (value === undefined) {
+      // This effectively gets the default value.
+      value = moduleExposedSessionObject[key];
+    }
+
+    boundSessionStorage[infoKey] ??= Object.create(null);
+    boundSessionStorage[infoKey][key] = value;
+
+    lastBoundValue = value;
+
+    if (done) break;
   }
 }
 

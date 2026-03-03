@@ -158,6 +158,17 @@ export const info = {
   },
 };
 
+export function* bindSessionStorage() {
+  if (yield 'activeQuery') {
+    yield 'activeQueryContextPageName';
+    yield 'activeQueryContextPagePathname';
+    yield 'activeQueryContextPageColor';
+    yield 'activeQueryResults';
+    yield 'activeFilterType';
+    yield 'resultsScrollOffset';
+  }
+}
+
 export function getPageReferences() {
   info.pageContainer =
     document.getElementById('page-container');
@@ -443,6 +454,12 @@ export function mutatePageContent() {
 
   info.searchBox.appendChild(info.endSearchRule);
   info.searchBox.appendChild(info.endSearchLine);
+
+  // Accommodate the web browser reconstructing the search input with a value
+  // that was previously entered (or restored after recall), i.e. because
+  // the user is traversing very far back in history and yet the browser is
+  // trying to rebuild the page as-was anyway, by telling it "no don't".
+  info.searchInput.value = '';
 }
 
 export function addPageListeners() {
