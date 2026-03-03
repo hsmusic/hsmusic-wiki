@@ -1,6 +1,6 @@
 export default {
   slots: {
-    showing: {
+    filter: {
       validate: v => v.is('all', 'direct', 'indirect'),
     },
 
@@ -9,12 +9,12 @@ export default {
 
   generate: (slots, {html, language}) =>
     language.encapsulate('artTagGalleryPage', pageCapsule =>
-      html.tag('p', {class: 'quick-info'},
-        {id: `showing-${slots.showing}-line`},
+      html.tag('span',
+        {id: `showing-${slots.filter}-line`},
 
         language.$(pageCapsule, 'showingLine', {
           showing:
             html.tag('a', {href: '#'},
-              language.$(pageCapsule, 'showingLine', slots.showing)),
+              language.$(pageCapsule, 'showingLine', slots.filter)),
         }))),
 };

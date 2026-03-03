@@ -1609,8 +1609,11 @@ artTagGalleryPage:
   descendants: "Down: {TAGS}."
 
   featuredLine:
-    all: >-
+    simple: >-
       Featured in {COVER_ARTS}.
+
+    altogether: >-
+      Altogether, featured in {COVER_ARTS}.
 
     direct: >-
       Featured directly in {COVER_ARTS}.
@@ -1626,16 +1629,16 @@ artTagGalleryPage:
         Maybe your track will be the first!
 
   showingLine:
-    _: "({SHOWING})"
+    _: "Showing: {SHOWING}."
 
     all: >-
-      Showing all artworks.
+      all artworks featuring this tag
 
     indirect: >-
-      Showing artworks where this tag is only featured indirectly.
+      artworks indirectly featuring this tag
 
     direct: >-
-      Showing artworks where this tag is featured directly.
+      artworks directly featuring this tag
 
 #
 # commentaryIndex:

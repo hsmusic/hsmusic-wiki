@@ -140,8 +140,8 @@ export function addPageListeners() {
       currentFeaturedLine.style.display = 'none';
       currentShowingLine.style.display = 'none';
 
-      nextFeaturedLine.style.display = 'block';
-      nextShowingLine.style.display = 'block';
+      nextFeaturedLine.style.display = 'inline';
+      nextShowingLine.style.display = 'inline';
 
       filterArtTagGallery(nextShowing);
     });

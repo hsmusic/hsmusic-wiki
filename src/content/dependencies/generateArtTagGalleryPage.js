@@ -130,34 +130,52 @@ export default {
             extraReadingLinks: relations.extraReadingLinks ?? null,
           }),
 
-          data.numArtworksTotal === 0 &&
-            html.tag('p', {class: 'quick-info'},
+          html.tag('p', {class: 'quick-info'}, [
+            data.numArtworksTotal === 0 &&
               language.encapsulate(pageCapsule, 'featuredLine.notFeatured', capsule => [
                 language.$(capsule),
                 html.tag('br'),
                 language.$(capsule, 'callToAction'),
-              ])),
+              ]),
 
-          data.numArtworksTotal >= 1 &&
-            relations.featuredLine.clone()
-              .slots({
-                showing: 'all',
+            data.numArtworksTotal >= 1 &&
+              relations.featuredLine.clone().slots({
+                string:
+                  (data.hasMixedDirectIndirect
+                    ? 'altogether'
+                    : 'simple'),
+
+                filter: 'all',
                 count: data.numArtworksTotal,
               }),
 
-          data.hasMixedDirectIndirect && [
-            relations.featuredLine.clone()
-              .slots({
-                showing: 'direct',
+            data.hasMixedDirectIndirect && [
+              relations.featuredLine.clone().slots({
+                string: 'direct',
+                filter: 'direct',
                 count: data.numArtworksDirectly,
               }),
 
-            relations.featuredLine.clone()
-              .slots({
-                showing: 'indirect',
+              relations.featuredLine.clone().slots({
+                string: 'indirect',
+                filter: 'indirect',
                 count: data.numArtworksIndirectly,
               }),
-          ],
+            ],
+
+            data.hasMixedDirectIndirect && [
+              html.tag('br'),
+
+              relations.showingLine.clone()
+                .slot('filter', 'all'),
+
+              relations.showingLine.clone()
+                .slot('filter', 'direct'),
+
+              relations.showingLine.clone()
+                .slot('filter', 'indirect'),
+            ],
+          ]),
 
           relations.ancestorLinks &&
             html.tag('p', {id: 'descends-from-line'},
@@ -172,17 +190,6 @@ export default {
               language.$(pageCapsule, 'descendants', {
                 tags: language.formatUnitList(relations.descendantLinks),
               })),
-
-          data.hasMixedDirectIndirect && [
-            relations.showingLine.clone()
-              .slot('showing', 'all'),
-
-            relations.showingLine.clone()
-              .slot('showing', 'direct'),
-
-            relations.showingLine.clone()
-              .slot('showing', 'indirect'),
-          ],
 
           relations.coverGrid
             .slots({
