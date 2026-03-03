@@ -56,13 +56,24 @@ export const modules = [
 
 const clientInfo = window.hsmusicClientInfo = Object.create(null);
 
-const clientSteps = {
+// These steps are always run in the listed order, on page load.
+// So for example, all modules' getPageReferences steps are evaluated, then
+// all modules' addInternalListeners steps are evaluated, and so on.
+const setupSteps = {
   getPageReferences: [],
   addInternalListeners: [],
   mutatePageContent: [],
   initializeState: [],
   addPageListeners: [],
 };
+
+// These steps are run only on certain triggers. Those are global events,
+// so all modules (which specify that step) respond in sequence.
+const situationalSteps = {
+  /* There's none yet... sorry... */
+};
+
+const stepInfoSymbol = Symbol();
 
 for (const module of modules) {
   const {info} = module;
@@ -216,28 +227,34 @@ for (const module of modules) {
     Object.preventExtensions(info.session);
   }
 
-  for (const key of Object.keys(clientSteps)) {
-    if (Object.hasOwn(module, key)) {
-      const fn = module[key];
+  for (const stepsObject of [setupSteps, situationalSteps]) {
+    for (const key of Object.keys(stepsObject)) {
+      if (Object.hasOwn(module, key)) {
+        const fn = module[key];
 
-      Object.defineProperty(fn, 'name', {
-        value: `${infoKey}/${fn.name}`,
-      });
+        fn[stepInfoSymbol] = info;
 
-      clientSteps[key].push(fn);
+        Object.defineProperty(fn, 'name', {
+          value: `${infoKey}/${fn.name}`,
+        });
+
+        stepsObject[key].push(fn);
+      }
     }
   }
 }
 
-for (const [key, steps] of Object.entries(clientSteps)) {
-  for (const step of steps) {
+function evaluateStep(stepsObject, key) {
+  for (const step of stepsObject[key]) {
     try {
       step();
     } catch (error) {
-      // TODO: Be smarter about not running later steps for the same module!
-      // Or maybe not, since an error is liable to cause explosions anyway.
       console.error(`During ${key}, failed to run ${step.name}`);
       console.error(error);
     }
   }
+}
+
+for (const key of Object.keys(setupSteps)) {
+  evaluateStep(setupSteps, key);
 }
