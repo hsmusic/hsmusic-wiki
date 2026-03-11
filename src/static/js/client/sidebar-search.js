@@ -604,6 +604,18 @@ export function addPageListeners() {
         saveSidebarSearchResultsScrollOffset();
       }, settings.stoppedScrollingDelay);
   });
+
+  document.addEventListener('keypress', domEvent => {
+    const {tagName} = document.activeElement ?? {};
+    if (tagName === 'INPUT' || tagName === 'TEXTAREA') {
+      return;
+    }
+
+    if (event.shiftKey && event.code === 'Slash') {
+      domEvent.preventDefault();
+      info.searchLabel.click();
+    }
+  });
 }
 
 export function initializeState() {
