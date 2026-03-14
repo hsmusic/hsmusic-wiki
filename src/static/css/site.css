@@ -90,7 +90,6 @@ body::before, .wallpaper-part {
 #banner {
   margin: 10px calc(-1 * var(--page-border-width));
   position: relative;
-  z-index: 2;
 
   --banner-shine: 4%;
   -webkit-box-reflect: below -12px linear-gradient(transparent, color-mix(in srgb, transparent, var(--banner-shine) white));
