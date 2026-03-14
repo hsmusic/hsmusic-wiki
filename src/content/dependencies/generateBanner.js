@@ -11,10 +11,17 @@ export default {
     alt: {
       type: 'string',
     },
+
+    attributes: {
+      type: 'attributes',
+      mutable: false,
+    },
   },
 
   generate: (slots, {html, to}) =>
     html.tag('div', {id: 'banner'},
+      slots.attributes,
+
       html.tag('img',
         {src: to(...slots.path)},
 

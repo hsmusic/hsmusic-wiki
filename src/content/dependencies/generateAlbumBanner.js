@@ -5,7 +5,11 @@ export default {
     }
 
     return {
-      banner: relation('generateBanner'),
+      banner:
+        relation('generateBanner'),
+
+      colorAttribute:
+        relation('generateColorStyleAttribute', album.color),
     };
   },
 
@@ -20,7 +24,14 @@ export default {
     };
   },
 
-  generate(data, relations, {html, language}) {
+  slots: {
+    mode: {
+      validate: v => v.is('main', 'sub'),
+      default: 'main',
+    },
+  },
+
+  generate(data, relations, slots, {html, language}) {
     if (!relations.banner) {
       return html.blank();
     }
@@ -29,6 +40,13 @@ export default {
       path: data.path,
       dimensions: data.dimensions,
       alt: language.$('misc.alt.albumBanner'),
+
+      attributes: [
+        slots.mode === 'sub' && [
+          {class: ['dim', 'short']},
+          relations.colorAttribute.slot('context', 'banner'),
+        ],
+      ],
     });
   },
 };

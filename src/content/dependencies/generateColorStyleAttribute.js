@@ -18,6 +18,7 @@ export default {
       validate: v => v.is(
         'any-content',
         'image-box',
+        'banner',
         'primary-only'),
 
       default: 'any-content',

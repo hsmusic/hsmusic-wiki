@@ -96,9 +96,13 @@ body::before, .wallpaper-part {
   transition: --banner-shine 0.8s;
 }
 
-#banner:hover {
+#banner:not(.dim, .collapsed):hover {
   --banner-shine: 35%;
   transition-delay: 0.3s;
+}
+
+#banner.dim, #banner.collapsed {
+  --banner-shine: 0%;
 }
 
 #banner::after, #banner::before {
@@ -347,7 +351,6 @@ body::before, .wallpaper-part {
 
 #banner {
   background: black;
-  background-color: var(--dim-color);
   border-bottom: 1px solid var(--primary-color);
 }
 
@@ -366,8 +369,29 @@ body::before, .wallpaper-part {
   pointer-events: none;
 }
 
+#banner {
+  background-color: var(--abyss-color);
+}
+
 #banner.dim img {
-  opacity: 0.8;
+  opacity: 0.32;
+}
+
+#banner.short, #banner.short img {
+  /* 1100px -> 72.5px, 900px -> 60px
+   * 12.5px height per 200px width
+   * Viewport maxes at 1124px, so:
+   *   Start from 72.5px
+   *   Get width below maximum:
+   *     (1124px - min(1124px, 100vw))
+   *   Multiply by rate of change:
+   *     (12.5 / 200)
+   */
+  max-height: calc(72.5px - (1124px - min(1124px, 100vw)) * (12.5 / 200));
+}
+
+#banner.short img {
+  object-position: 0 var(--short-banner-alignment, 50%);
 }
 
 #header,

@@ -68,6 +68,11 @@ export default {
         ? relation('generateSingleArtworkColumn', track)
         : relation('generateTrackArtworkColumn', track)),
 
+    banner:
+      (track.album.hasBannerArt
+        ? relation('generateAlbumBanner', track.album)
+        : null),
+
     contentHeading:
       relation('generateContentHeading'),
 
@@ -424,6 +429,11 @@ export default {
                 showTrackNavigation: true,
                 showExtraLinks: false,
               })),
+
+        banner:
+          relations.banner
+            ?.slot('mode', data.firstTrackInSingle ? 'main' : 'sub') ??
+          null,
 
         secondaryNav:
           relations.secondaryNav

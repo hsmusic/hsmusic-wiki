@@ -10,6 +10,7 @@ export default {
         'image-box',
         'page-root',
         'image-box',
+        'banner',
         'primary-only'),
 
       default: 'any-content',
@@ -30,6 +31,7 @@ export default {
       dim,
       deep,
       deepGhost,
+      abyss,
       lightGhost,
       bg,
       bgBlack,
@@ -42,13 +44,14 @@ export default {
       `--dim-color: ${dim}`,
       `--deep-color: ${deep}`,
       `--deep-ghost-color: ${deepGhost}`,
+      `--abyss-color: ${abyss}`,
       `--light-ghost-color: ${lightGhost}`,
       `--bg-color: ${bg}`,
       `--bg-black-color: ${bgBlack}`,
       `--shadow-color: ${shadow}`,
     ];
 
-    let selectedDeclarations;
+    let selectedDeclarations = [];
 
     switch (slots.context) {
       case 'any-content':
@@ -74,6 +77,12 @@ export default {
       case 'primary-only':
         selectedDeclarations = [
           `--primary-color: ${primary}`,
+        ];
+        break;
+
+      case 'banner':
+        selectedDeclarations = [
+          `--abyss-color: ${abyss}`,
         ];
         break;
     }
