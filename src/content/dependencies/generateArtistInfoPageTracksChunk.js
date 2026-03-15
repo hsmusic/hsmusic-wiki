@@ -8,25 +8,35 @@ function countTowardTrackTotals(contribs) {
 
   if (!track) return null;
 
+  // For secondary releases the goal is to check if the corresponding
+  // contribution on the main release would be counted toward track totals.
+  // If any of the artist's contributions on the secondary release don't
+  // apparently correspond to any on the main release, those will just
+  // get checked themselves.
   if (track.isSecondaryRelease) {
-    const all =
-      Object.fromEntries(
-        unique(contribs.map(contrib => contrib.thingProperty))
-          .map(prop => [
-            prop,
-            track.mainReleaseTrack[prop].slice(),
-          ]));
+    const relevantProperties =
+      unique(contribs.map(contrib => contrib.thingProperty));
 
-    contribs = contribs.flatMap(a => {
-      const array = all[a.thingProperty];
+    const arrays =
+      Object.fromEntries(
+        relevantProperties.map(prop => [
+          prop,
+          track.mainReleaseTrack[prop].slice(),
+        ]));
+
+    contribs = contribs.map(a => {
+      const array = arrays[a.thingProperty];
       const index =
         array.findIndex(b =>
           b.artist === a.artist &&
           b.annotation === a.annotation);
 
-      if (index === -1) return [];
-      return array.splice(index, 1);
-    }).filter(Boolean);
+      if (index >= 0) {
+        return array.splice(index, 1).at(0);
+      } else {
+        return a;
+      }
+    });
   }
 
   return contribs.some(contrib =>
