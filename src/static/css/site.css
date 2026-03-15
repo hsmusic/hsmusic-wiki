@@ -1172,16 +1172,17 @@ a .normal-content {
   display: inline-block;
 }
 
-.series-nav-links:not(:first-child)::before {
+.group-with-series .group-nav-links + .series-nav-links::before {
   content: "\00a0»\00a0";
   font-weight: normal;
 }
 
-.series-nav-links:not(:last-child)::after {
+.group-with-series .series-nav-links:not(:last-child)::after {
   content: ",\00a0";
+  font-weight: normal;
 }
 
-.series-nav-links + .series-nav-links::before {
+.group-with-series .series-nav-links + .series-nav-links::before {
   content: "";
 }
 

@@ -94,8 +94,14 @@ export default {
           }
         });
 
+    const disconnectedSeriesParts =
+      relations.disconnectedSeriesParts.map(seriesPart => {
+        seriesPart.setSlot('mode', slots.mode);
+        return seriesPart;
+      });
+
     const allParts = [
-      ...relations.disconnectedSeriesParts,
+      ...disconnectedSeriesParts,
       ...groupConnectedParts,
     ];
 
