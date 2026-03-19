@@ -67,7 +67,7 @@ export class ContentEntry extends Thing {
     },
 
     accessKind: [
-      exitWithoutDependency('_accessDate'),
+      exitWithoutDependency('accessDate'),
 
       exposeUpdateValueOrContinue({
         validate: input.value(

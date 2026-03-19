@@ -9,13 +9,14 @@ export default templateCompositeFrom({
 
   steps: () => [
     {
-      dependencies: ['annotation'],
+      dependencies: ['sourceURLs'],
 
-      compute: (continuation, {annotation}) =>
+      compute: (continuation, {sourceURLs}) =>
         continuation({
           ['#dateText']:
-            annotation
-              ?.match(/https?:\/\/web.archive.org\/web\/([0-9]{8,8})[0-9]*\//)
+            sourceURLs
+              .find(url => url.match(/https?:\/\/web\.archive\.org/))
+              ?.match(/\/web\/([0-9]{8,8})[0-9]*\//)
               ?.[1] ??
             null,
         }),
