@@ -302,7 +302,7 @@ export class Track extends Thing {
         from: input.updateValue({validate: isContributionList}),
         date: 'date',
         thingProperty: input.thisProperty(),
-        artistProperty: input.value('trackArtistContributions'),
+        artistProperty: input.value('trackContributorContributions'),
       }).outputs({
         '#resolvedContribs': '#contributorContribs',
       }),
