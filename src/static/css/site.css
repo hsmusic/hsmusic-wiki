@@ -3333,10 +3333,13 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 }
 
 #image-overlay-content-container {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
   border-radius: 0 0 8px 8px;
   border: 2px solid var(--primary-color);
   background: var(--deep-ghost-color);
-  overflow: hidden;
 
   box-shadow:
     0 0 90px 30px #00000060,
@@ -3358,6 +3361,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 #image-overlay-image-layout {
   display: block;
   position: relative;
+  max-height: 100%;
   margin: 4px 3px;
   background: rgba(0, 0, 0, 0.65);
 }
@@ -3371,6 +3375,8 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 
 #image-overlay-image {
   position: absolute;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 #image-overlay-container.no-thumb #image-overlay-image {
