@@ -1,0 +1,419 @@
+@layer layout {
+  .text-with-tooltip {
+    position: relative;
+  }
+
+  .tooltip {
+    position: absolute;
+    z-index: 3;
+    left: -10px;
+    top: calc(1em + 1px);
+
+    display: none;
+  }
+
+  .tooltip-content {
+    display: block;
+  }
+
+  :where(.isolate-tooltip-z-indexing) {
+    position: relative;
+    z-index: 1;
+  }
+
+  :where(.isolate-tooltip-z-indexing > *) {
+    position: relative;
+    z-index: -1;
+  }
+}
+
+@layer material {
+  .tooltip {
+    font-size: 1rem;
+  }
+
+  .cover-artwork .tooltip,
+  #sidebar .tooltip {
+    font-size: 0.9rem;
+  }
+
+  .offset-tooltips .tooltip {
+    left: 14px;
+  }
+
+  .tooltip-content {
+    background: var(--bg-black-color);
+    border: 1px dotted var(--primary-color);
+    border-radius: 6px;
+
+    -webkit-backdrop-filter:
+      brightness(1.5) saturate(1.4) blur(4px);
+
+            backdrop-filter:
+      brightness(1.5) saturate(1.4) blur(4px);
+
+    box-shadow:
+      0 3px 4px 4px #000000aa,
+      0 -2px 4px -2px var(--primary-color) inset;
+
+    text-indent: 0;
+  }
+}
+
+@layer print {
+  .tooltip-content {
+    font-size: 1rem;
+  }
+
+  .cover-artwork .content-tooltip .tooltip-content {
+    font-size: 0.85rem;
+  }
+}
+
+@layer interaction {
+  .tooltip {
+    display: none;
+  }
+
+  .text-with-tooltip .text-with-tooltip-interaction-cue {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+
+  .text-with-tooltip > .hoverable:hover .text-with-tooltip-interaction-cue,
+  .text-with-tooltip > .hoverable.has-visible-tooltip .text-with-tooltip-interaction-cue {
+    text-decoration-style: wavy !important;
+  }
+}
+
+/* "General" tooltips */
+
+@layer layout {
+  .datetimestamp-tooltip,
+  .missing-duration-tooltip,
+  .commentary-date-tooltip,
+  .rerelease-tooltip,
+  .first-release-tooltip,
+  .other-release-tooltip,
+  .content-tooltip {
+    padding: 3px 4px 2px 2px;
+    left: -10px;
+  }
+
+  .datetimestamp-tooltip .tooltip-content,
+  .missing-duration-tooltip .tooltip-content,
+  .commentary-date-tooltip .tooltip-content {
+    padding: 5px 6px;
+    white-space: nowrap;
+    font-size: 0.9em;
+  }
+}
+
+@layer interaction {
+  .text-with-tooltip.datetimestamp .text-with-tooltip-interaction-cue,
+  .text-with-tooltip.missing-duration .text-with-tooltip-interaction-cue,
+  .text-with-tooltip.commentary-date .text-with-tooltip-interaction-cue,
+  .text-with-tooltip.wiki-edits .text-with-tooltip-interaction-cue,
+  .text-with-tooltip.rerelease .text-with-tooltip-interaction-cue,
+  .text-with-tooltip.first-release .text-with-tooltip-interaction-cue {
+    cursor: default;
+  }
+}
+
+/* Contribution tooltip */
+
+@layer interactivity {
+  .contribution-tooltip .tooltip-content {
+    -webkit-user-select: none;
+            user-select: none;
+  }
+}
+
+@layer layout {
+  .contribution-tooltip {
+    padding: 3px 6px 6px 6px;
+    left: -34px;
+  }
+
+  .contribution-tooltip .tooltip-content {
+    display: grid;
+    grid-template-columns:
+      [icon-start] 26px [icon-end handle-start] auto [handle-end platform-start] auto [platform-end];
+
+    padding: 6px 2px 2px 2px;
+  }
+
+  .contribution-tooltip .external-link {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column-start: icon-start;
+    grid-column-end: handle-end;
+
+    height: 1.4em;
+  }
+
+  .contribution-tooltip .chronology-heading {
+    grid-column-start: handle-start;
+    grid-column-end: platform-end;
+
+    min-width: 30ch;
+    margin-bottom: 2px;
+  }
+
+  .contribution-tooltip .chronology-link {
+    display: grid;
+    grid-column-start: icon-start;
+    grid-column-end: handle-end;
+    grid-template-columns: subgrid;
+
+    height: 1.2em;
+  }
+
+  .contribution-tooltip .external-icon,
+  .contribution-tooltip .chronology-symbol {
+    grid-column-start: icon-start;
+    grid-column-end: icon-end;
+  }
+
+  .contribution-tooltip .external-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+    top: -0.1em;
+  }
+
+  .contribution-tooltip .chronology-symbol {
+    text-align: center;
+  }
+
+  .contribution-tooltip .external-handle,
+  .contribution-tooltip .chronology-text {
+    grid-column-start: handle-start;
+    grid-column-end: handle-end;
+
+    width: max-content;
+    max-width: 200px;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .contribution-tooltip .external-handle {
+    padding-right: 8px;
+  }
+
+  .contribution-tooltip .chronology-text {
+    padding-right: 6px;
+  }
+
+  .contribution-tooltip .external-platform,
+  .contribution-tooltip .chronology-info {
+    grid-column-start: platform-start;
+    grid-column-end: platform-end;
+    white-space: nowrap;
+    padding-right: 4px;
+  }
+}
+
+@layer print {
+  .contribution-tooltip .tooltip-divider,
+  .tooltip-content hr.cute,
+  .tooltip-content span.cute-break {
+    display: block;
+    grid-column-start: icon-start;
+    grid-column-end: platform-end;
+    border-top: 1px dotted var(--primary-color);
+  }
+
+  /* Don't mind me... */
+  .tooltip-content .tooltip-divider,
+  .tooltip-content hr.cute {
+    margin-top: 3px;
+    margin-bottom: 4px;
+  }
+
+  .contribution-tooltip .chronology-heading {
+    font-size: 0.85em;
+    font-style: oblique;
+  }
+
+  .contribution-tooltip .chronology-text,
+  .contribution-tooltip .chronology-info {
+    font-size: 0.85em;
+  }
+}
+
+@layer interaction {
+  .contribution-tooltip .tooltip-content {
+    cursor: default;
+  }
+
+  .contribution-tooltip.show-info .external-platform,
+  .contribution-tooltip.show-info .chronology-info {
+    display: inline;
+    animation: external-platform 0.2s forwards linear;
+  }
+
+  @keyframes external-platform {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: var(--external-platform-opacity);
+    }
+  }
+
+  .contribution-tooltip .external-platform,
+  .contribution-tooltip .chronology-info {
+    display: none;
+
+    --external-platform-opacity: 0.8;
+    opacity: 0.8;
+  }
+
+  .contribution-tooltip .external-link:hover,
+  .contribution-tooltip .chronology-link:hover {
+    filter: brightness(1.4);
+    text-decoration: none;
+  }
+
+  .contribution-tooltip .external-link:hover .external-handle,
+  .contribution-tooltip .chronology-link:hover .chronology-text {
+    text-decoration: underline;
+  }
+
+  .contribution-tooltip .external-link:hover + .external-platform,
+  .contribution-tooltip .chronology-link:hover + .chronology-info {
+    --external-platform-opacity: 1;
+    text-decoration: underline;
+    text-decoration-color: #ffffffaa;
+  }
+}
+
+/* Missing duration tooltip */
+
+@layer interaction {
+  .text-with-tooltip.missing-duration > .hoverable {
+    opacity: 0.5;
+  }
+
+  .text-with-tooltip.missing-duration > .hoverable:hover,
+  .text-with-tooltip.missing-duration > .hoverable.has-visible-tooltip {
+    opacity: 1;
+  }
+
+  .text-with-tooltip.missing-duration .text-with-tooltip-interaction-cue {
+    text-decoration: none !important;
+  }
+}
+
+/* Rerelease, first release, other release tooltips */
+
+@layer layout {
+  .rerelease-tooltip .tooltip-content,
+  .first-release-tooltip .tooltip-content,
+  .other-release-tooltip .tooltip-content {
+    padding: 3px 4.5px;
+  }
+
+  .rerelease-tooltip .tooltip-content,
+  .first-release-tooltip .tooltip-content {
+    width: 260px;
+  }
+
+  .other-release-tooltip .tooltip-content {
+    width: max-content;
+    max-width: 250px;
+  }
+
+  .other-release-tooltip .tooltip-content .when {
+    /* technically just putting this in a <span> was enough
+     * to keep it from wrapping all tight-like, for some
+     * reason, but im not taking any chances...
+     */
+    white-space: nowrap;
+  }
+}
+
+@layer print {
+  .rerelease-tooltip .tooltip-content,
+  .first-release-tooltip .tooltip-content,
+  .other-release-tooltip .tooltip-content {
+    font-size: 0.9rem;
+  }
+
+  .rerelease-tooltip .not-credited-on-first-release {
+    opacity: 0.9;
+  }
+}
+
+/* Thing name & wiki edits tooltips */
+
+@layer layout {
+  .thing-name-tooltip,
+  .wiki-edits-tooltip {
+    padding: 3px 4px 2px 2px;
+    left: -6px;
+  }
+
+  .thing-name-tooltip .tooltip-content,
+  .wiki-edits-tooltip .tooltip-content {
+    width: max-content;
+    padding: 3px 4.5px;
+  }
+
+  .thing-name-tooltip .tooltip-content,
+    max-width: 120px;
+  }
+
+  .wiki-edits-tooltip .tooltip-content {
+    max-width: 200px;
+  }
+}
+
+@layer print {
+  .text-with-tooltip.wiki-edits > .hoverable {
+    white-space: nowrap;
+  }
+
+  .thing-name-tooltip .tooltip-content,
+  .wiki-edits-tooltip .tooltip-content {
+    font-size: 0.85rem;
+  }
+}
+
+/* Content tooltips */
+
+@layer layout {
+  .content-tooltip-guy {
+    display: inline-block;
+  }
+
+  .content-tooltip-guy:not(.has-link) .hoverable {
+    cursor: default;
+  }
+
+  .content-tooltip-guy.has-link .text-with-tooltip-interaction-cue {
+    text-decoration-color: var(--primary-color);
+  }
+
+  .content-tooltip .tooltip-content {
+    padding: 3px 4.5px;
+    width: max-content;
+    max-width: 240px;
+  }
+
+  .cover-artwork .content-tooltip {
+    padding: 2px 3px;
+    width: max-content;
+    max-width: 220px;
+  }
+}
+
+@layer interaction {
+  .content-tooltip-guy .hoverable a {
+    text-decoration-color: transparent;
+    text-decoration-style: dotted;
+  }
+}

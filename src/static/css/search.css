@@ -1,0 +1,490 @@
+/* Sidebar box */
+
+@layer layout {
+  .wiki-search-sidebar-box {
+    padding: 1px 0 0 0;
+
+    z-index: 100;
+    max-height: calc(100vh - 20px);
+
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@layer material {
+  .wiki-search-sidebar-box {
+    background-color: #000000c0;
+
+    -webkit-backdrop-filter:
+      brightness(1.2) blur(4px);
+            backdrop-filter:
+      brightness(1.2) blur(4px);
+  }
+
+  .wiki-search-sidebar-box.showing-results {
+    box-shadow:
+      0 4px 16px -8px var(--primary-color),
+      0 10px 6px var(--bg-black-color),
+      0 6px 4px #00000040;
+  }
+}
+
+/* Interactions with other sidebar boxes */
+
+@layer interaction {
+  /* This is to say, any sidebar that's *not*
+   * the first sidebar after the search box.
+   */
+  .wiki-search-sidebar-box.showing-results + .sidebar ~ .sidebar {
+    margin-top: 5px;
+  }
+
+  .wiki-search-sidebar-box.showing-results ~ .sidebar:not(:hover) {
+    opacity: 0.8;
+    filter: brightness(0.7);
+  }
+}
+
+/* Label and input elements */
+
+@layer layout {
+  .wiki-search-label {
+    width: calc(100% - 4px);
+    padding: 2px 4px;
+    margin: 2px 2px 3px 2px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: row;
+  }
+}
+
+@layer material {
+  .wiki-search-label {
+    background: transparent;
+    border: 1px solid var(--dim-color);
+    border-radius: 3px;
+  }
+
+  .wiki-search-label::before {
+    display: inline-block;
+    padding-left: 3px;
+    padding-right: 3px;
+    margin-right: 3px;
+    width: 1.8em;
+    text-align: center;
+    content: '\1f50d\fe0e';
+  }
+
+  .wiki-search-input {
+    background: transparent;
+    border: transparent;
+    color: inherit;
+    flex-grow: 1;
+  }
+
+  .wiki-search-input::-webkit-search-cancel-button {
+    filter: grayscale(1) invert(1);
+  }
+
+  .wiki-search-input::placeholder {
+    color: var(--primary-color);
+    font-style: oblique;
+  }
+}
+
+@layer interaction {
+  .wiki-search-label.disabled {
+    opacity: 0.6;
+  }
+
+  .wiki-search-label.disabled,
+  .wiki-search-input[disabled] {
+    cursor: not-allowed;
+  }
+
+  .wiki-search-label:not(.disabled):hover,
+  .wiki-search-label:focus-within {
+    background: var(--light-ghost-color);
+  }
+
+  .wiki-search-label:focus-within {
+    border-color: var(--primary-color);
+  }
+
+  .wiki-search-label:focus-within::before {
+    opacity: 0.7;
+  }
+
+  .wiki-search-input:focus {
+    border: none;
+    outline: none;
+  }
+
+  /* This is always the "Search for anything" text,
+   * if any placeholder is visible while focused.
+   */
+  .wiki-search-input:focus::placeholder {
+    color: var(--dim-color);
+  }
+}
+
+/* Progress area ("Loading data..." etc) */
+
+@layer layout {
+  .wiki-search-progress-container {
+    padding: 2px 6px 4px 6px;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .wiki-search-progress-label {
+    margin-right: 1ch;
+  }
+
+  .wiki-search-progress-bar {
+    flex-grow: 1;
+  }
+}
+
+@layer print {
+  .wiki-search-progress-label {
+    font-size: 0.9em;
+    font-style: oblique;
+  }
+}
+
+@layer interaction {
+  .wiki-search-progress-label {
+    cursor: default;
+  }
+}
+
+/* "Failed to search" and "no results" info */
+
+@layer layout {
+  .wiki-search-failed-container,
+  .wiki-search-no-results {
+    padding: 2px 3px 4px 6px;
+  }
+
+  .wiki-search-failed-container p {
+    margin: 0;
+  }
+}
+
+@layer print {
+  .wiki-search-no-results {
+    font-size: 0.9em;
+  }
+}
+
+@layer interaction {
+  .wiki-search-no-results {
+    cursor: default;
+  }
+}
+
+/* Context area ("Return to...") */
+
+@layer layout {
+  .wiki-search-context-container {
+    padding: 2px 12px 4px;
+  }
+}
+
+@layer material {
+  .wiki-search-context-container {
+    border-bottom: 1px solid var(--dim-color);
+  }
+}
+
+@layer print {
+  .wiki-search-context-container {
+    font-size: 0.9em;
+  }
+}
+
+/* Filters */
+
+@layer layout {
+  .wiki-search-filter-container {
+    padding: 4px;
+  }
+
+  .wiki-search-filter-link {
+    display: inline-block;
+    margin: 2px;
+    padding: 2px 4px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+  }
+}
+
+@layer interaction {
+  .wiki-search-filter-link:where(.active.shown) {
+    animation:
+      0.15s ease   0.00s forwards normal    show-filter,
+      0.60s linear 0.15s infinite alternate blink-filter;
+  }
+
+  .wiki-search-filter-link:where(.active:not(.shown)) {
+    animation:
+      0.00s linear 0.00s forwards normal    show-filter,
+      0.60s linear 0.00s infinite alternate blink-filter;
+  }
+
+  .wiki-search-filter-link:where(:not(.active).hidden) {
+    /* We can't just reverse the show-filter animation,
+     * because that won't actually start it over again.
+     */
+    animation:
+      0.15s ease   0.00s forwards reverse   show-filter-the-sequel;
+  }
+
+  .wiki-search-filter-link.active-from-query {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #000a;
+    animation: none;
+  }
+
+  .wiki-search-filter-link.active-from-query::after {
+    content: "I";
+    color: black;
+    font-family: monospace;
+    font-weight: 800;
+    font-size: 1.2em;
+    margin-left: 0.5ch;
+    vertical-align: middle;
+    animation: 1s steps(2, jump-none) 0.6s infinite blink-caret;
+  }
+
+  @keyframes show-filter {
+    from {
+      background: transparent;
+      border-color: transparent;
+      color: var(--primary-color);
+    }
+
+    to {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      color: black;
+    }
+  }
+
+  /* Exactly the same as show-filter above. */
+  @keyframes show-filter-the-sequel {
+    from {
+      background: transparent;
+      border-color: transparent;
+      color: var(--primary-color);
+    }
+
+    to {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      color: black;
+    }
+  }
+
+  @keyframes blink-filter {
+    to {
+      background: color-mix(in srgb, var(--primary-color) 90%, transparent);
+    }
+  }
+
+  @keyframes blink-caret {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+/* Divider above search result list */
+
+@layer material {
+  .wiki-search-sidebar-box hr {
+    margin-top: 3px !important;
+    margin-bottom: 3px !important;
+  }
+}
+
+@layer layout {
+  .wiki-search-sidebar-box hr {
+    border-color: var(--primary-color);
+    border-style: none none dotted none;
+  }
+}
+
+/* Result list */
+
+@layer layout {
+  .wiki-search-results-container {
+    margin-bottom: 0;
+    padding: 2px;
+  }
+}
+
+/* Basic result styling, including interactions */
+
+@layer layout {
+  .wiki-search-result {
+    position: relative;
+    display: flex;
+    padding: 4px 3px 4px 6px;
+  }
+
+  .wiki-search-result::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+  }
+}
+
+@layer material {
+  .wiki-search-result::before {
+    border: 1.5px solid var(--primary-color);
+    border-radius: 4px;
+  }
+}
+
+@layer interaction {
+  .wiki-search-result:hover {
+    text-decoration: none !important;
+  }
+
+  .wiki-search-result::before {
+    display: none;
+  }
+
+  .wiki-search-result:hover::before,
+  .wiki-search-result:focus::before {
+    display: block;
+    background: var(--light-ghost-color);
+  }
+
+  .wiki-search-result.current-result {
+    background: var(--light-ghost-color);
+    border-top: 1px solid var(--dim-color);
+    border-bottom: 1px solid var(--dim-color);
+  }
+
+  .wiki-search-result.current-result:hover {
+    background: none;
+    border-color: transparent;
+  }
+}
+
+/* Stuff inside results */
+
+@layer layout {
+  .wiki-search-result-text-area {
+    align-self: center;
+    flex-grow: 1;
+    min-width: 0;
+    padding-bottom: 2px;
+  }
+
+  .wiki-search-result-name {
+    margin-right: 0.25em;
+  }
+
+  .wiki-search-result-image-container {
+    align-self: flex-start;
+    flex-shrink: 0;
+    margin-right: 6px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .wiki-search-result-image,
+  .wiki-search-result-image-placeholder {
+    display: block;
+    width: 1.8em;
+    height: 1.8em;
+    aspect-ratio: 1 / 1;
+    border-radius: 1.5px;
+  }
+}
+
+@layer material {
+  .wiki-search-result-image-container {
+    background-color: var(--deep-color);
+    border: 2px solid var(--deep-color);
+  }
+
+  .wiki-search-result-image-placeholder {
+    background-color: #0004;
+    box-shadow: 0 1px 3px -1px #0008 inset;
+  }
+
+  .wiki-search-result-image.has-warning {
+    filter: blur(2px) brightness(0.8);
+  }
+}
+
+@layer print {
+  .wiki-search-result-text-area {
+    overflow-wrap: break-word;
+  }
+
+  .wiki-search-result:hover .wiki-search-result-name {
+    text-decoration: underline;
+  }
+
+  .wiki-search-current-result-text,
+  .wiki-search-result-kind,
+  .wiki-search-result-disambiguator {
+    opacity: 0.9;
+    display: inline-block;
+  }
+
+  .wiki-search-current-result-text,
+  .wiki-search-result-kind {
+    font-style: oblique;
+  }
+}
+
+@layer interaction {
+  .wiki-search-result.current-result:hover .wiki-search-current-result-text {
+    filter: saturate(0.8) brightness(1.4);
+  }
+
+  .wiki-search-results:not(:has(.wiki-search-result-image)) .wiki-search-result-image-container {
+    display: none;
+  }
+}
+
+/* "I'm done searching" line */
+
+@layer layout {
+  .wiki-search-end-search-line {
+    text-align: center;
+    margin-top: 6px;
+    margin-bottom: 2px;
+  }
+}
+
+@layer material {
+  .wiki-search-end-search-line a {
+    display: inline-block;
+    font-style: oblique;
+    opacity: 0.9;
+    padding: 3px 6px 4px 6px;
+    border: 1.5px solid transparent;
+    border-radius: 4px;
+  }
+}
+
+@layer interaction {
+  .wiki-search-end-search-line a:hover {
+    opacity: 1;
+    background: var(--light-ghost-color);
+    border-color: var(--deep-color);
+  }
+}

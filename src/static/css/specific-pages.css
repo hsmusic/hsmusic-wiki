@@ -1,0 +1,288 @@
+/* Obviously this file should be split up.
+ * Just porting from old CSS for now.
+ */
+
+/* Album commentary page */
+
+@layer layout {
+  html[data-url-key="localized.albumCommentary"] .content-heading-main-title {
+    margin-right: 0.25em;
+  }
+
+  html[data-url-key="localized.albumCommentary"] .content-heading-accent {
+    display: inline-block;
+  }
+
+  html[data-url-key="localized.albumCommentary"] p.track-info {
+    margin-left: 20px;
+  }
+}
+
+@layer print {
+  html[data-url-key="localized.albumCommentary"] li.no-commentary {
+    opacity: 0.7;
+  }
+
+  html[data-url-key="localized.albumCommentary"] .content-heading-accent {
+    font-weight: normal;
+    font-style: oblique;
+    font-size: 0.9rem;
+  }
+}
+
+/* Art tag gallery page */
+
+@layer layout {
+  html[data-url-key="localized.artTagGallery"] #descends-from-line {
+    margin-bottom: 0.25em;
+  }
+
+  html[data-url-key="localized.artTagGallery"] #descendants-line {
+    margin-top: 0.25em;
+  }
+
+  html[data-url-key="localized.artTagGallery"] #descends-from-line a,
+  html[data-url-key="localized.artTagGallery"] #descendants-line a {
+    display: inline-block;
+  }
+}
+
+@layer interaction {
+  html[data-url-key="localized.artTagGallery"] #featured-direct-line,
+  html[data-url-key="localized.artTagGallery"] #featured-indirect-line,
+  html[data-url-key="localized.artTagGallery"] #showing-direct-line,
+  html[data-url-key="localized.artTagGallery"] #showing-indirect-line {
+    display: none;
+  }
+
+  html[data-url-key="localized.artTagGallery"] #showing-all-line a,
+  html[data-url-key="localized.artTagGallery"] #showing-direct-line a,
+  html[data-url-key="localized.artTagGallery"] #showing-indirect-line a {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+}
+
+/* "Art Tag Network" listing */
+
+@layer layout {
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:not(#network-top-dl > dd) {
+    margin-left: 20px;
+    margin-bottom: 0;
+    padding-left: 10px;
+  }
+
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:not(#network-top-dl > dd):not(:last-child) {
+    padding-bottom: 20px;
+  }
+
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] #network-stat-line {
+    padding-left: 10px;
+    margin-left: 20px;
+  }
+
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] .network-tag-stat {
+    display: inline-block;
+    text-align: right;
+    min-width: 5ch;
+    margin-right: 2px;
+  }
+
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] #network-top-dl > dt:has(.network-tag.with-stat:not([style*="display: none"])) {
+    padding-left: 20px;
+  }
+
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] dt + dt:has(+ dd) {
+    padding-top: 20px;
+  }
+
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt {
+    padding-left: 10px;
+    margin-left: 20px;
+    margin-bottom: 0;
+    padding-bottom: 2px;
+    max-width: unset;
+    position: relative;
+  }
+}
+
+@layer material {
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:not(#network-top-dl > dd).even,
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:not(#network-top-dl > dt).even {
+    border-left: 1px solid #eaeaea;
+  }
+
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:not(#network-top-dl > dd).odd,
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:not(#network-top-dl > dt).odd {
+    border-left: 1px solid #7b7b7b;
+  }
+
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:last-child:not(#network-top-dl > dd).odd::after,
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:last-child:not(#network-top-dl > dt).odd::after {
+    content: "";
+    display: block;
+    width: 7px;
+    height: 7px;
+    background: #7b7b7b;
+    position: absolute;
+    bottom: -4px;
+    left: -4px;
+  }
+
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:last-child:not(#network-top-dl > dd).even::after,
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:last-child:not(#network-top-dl > dt).even::after {
+    content: "";
+    display: block;
+    width: 6px;
+    height: 6px;
+    background: #eaeaea;
+    position: absolute;
+    bottom: -3px;
+    left: -3px;
+    border-bottom-right-radius: 6px;
+    border-top-left-radius: 3px;
+  }
+}
+
+@layer print {
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] .network-tag-stat {
+    text-align: right;
+  }
+
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] dt:has(+ dd) .network-tag-stat {
+    text-align: center;
+  }
+}
+
+@layer interaction {
+  html[data-url-key="localized.listing"][data-url-value0="tags/network"] #network-stat-line a {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+}
+
+/* Artist rolling window page */
+
+@layer layout {
+  html[data-url-key="localized.artistRollingWindow"] #content p {
+    text-align: center;
+  }
+
+  html[data-url-key="localized.artistRollingWindow"] #timeframe-selection-control a {
+    display: inline-block;
+    padding: 5px;
+  }
+
+
+  html[data-url-key="localized.artistRollingWindow"] #timeframe-source-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100vh - 260px);
+  }
+
+  html[data-url-key="localized.artistRollingWindow"] #timeframe-source-area .grid-listing {
+    width: 100%;
+  }
+}
+
+@layer material {
+  html[data-url-key="localized.artistRollingWindow"] #content input[type=number] {
+    width: 3em;
+    margin: 0 0.25em;
+    background: black;
+    color: white;
+    border: 1px dotted var(--primary-color);
+    padding: 4px;
+    border-radius: 3px;
+  }
+
+  html[data-url-key="localized.artistRollingWindow"] #timeframe-source-area {
+    border: 1px dashed #ffffff42;
+    border-top-style: solid;
+    border-bottom-style: solid;
+  }
+}
+
+@layer material {
+  html[data-url-key="localized.artistRollingWindow"] .grid-item.peeking {
+    opacity: 0.8;
+    background: #ffffff24;
+  }
+}
+
+@layer construction {
+  html[data-url-key="localized.artistRollingWindow"] .grid-item > span:not(:first-of-type) {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@layer interaction {
+  html[data-url-key="localized.artistRollingWindow"] #timeframe-selection-control a {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+
+  html[data-url-key="localized.artistRollingWindow"] #timeframe-selection-control a:not([href]) {
+    text-decoration: none;
+    opacity: 0.7;
+  }
+}
+
+@layer construction {
+  html[data-url-key="localized.artistRollingWindow"] .grid-item > span:not(:first-of-type) > *:not([style*="display: none"]) ~ *::before {
+    content: '\00b7';
+    margin-left: 0.5ch;
+    margin-right: 0.5ch;
+  }
+}
+
+/* Group info page */
+
+@layer print {
+  html[data-url-key="localized.groupInfo"] .by a {
+    color: var(--page-primary-color);
+  }
+}
+
+/* Homepage */
+
+@layer print {
+  html[data-url-key="localized.home"] #content h1 {
+    text-align: center;
+    font-size: 2.5em;
+  }
+
+  html[data-language-code="preview-en"][data-url-key="localized.home"] #content h1::after {
+    font-family: cursive;
+    display: block;
+    content: "(Preview Build)";
+    font-size: 0.8em;
+  }
+}
+
+/* "Random Pages" listing */
+
+@layer interaction {
+  html[data-url-key="localized.listing"][data-url-value0="random"] #data-loading-line,
+  html[data-url-key="localized.listing"][data-url-value0="random"] #data-loaded-line,
+  html[data-url-key="localized.listing"][data-url-value0="random"] #data-error-line {
+    display: none;
+  }
+
+  html[data-url-key="localized.listing"][data-url-value0="random"] #content a:not([href]) {
+    opacity: 0.7;
+  }
+}
+
+/* News entries */
+
+@layer print {
+  html[data-url-key="localized.newsEntry"] .read-another-links {
+    font-style: oblique;
+    font-size: 0.9em;
+  }
+}

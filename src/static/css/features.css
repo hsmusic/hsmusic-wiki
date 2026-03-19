@@ -1,0 +1,2359 @@
+/* Additional files lists */
+
+@layer layout {
+  .additional-files-list {
+    padding-left: 0;
+  }
+
+  .additional-files-list > li {
+    list-style-type: none;
+  }
+
+  .additional-files-list summary {
+    /* Sorry, Safari!
+     * https://bugs.webkit.org/show_bug.cgi?id=157323
+     */
+    list-style-position: outside;
+    margin-left: 40px;
+  }
+
+  .additional-files-list details ul {
+    margin-left: 40px;
+    margin-top: 2px;
+    margin-bottom: 10px;
+  }
+
+  .additional-files-list .entry-description {
+    list-style-type: none;
+    max-width: 540px;
+
+    /* This should be margin-bottom, but cascading rules
+     * cause some awkwardness - `#content li` takes precedence.
+     */
+    padding-bottom: 3px;
+  }
+}
+
+/* Additional names (heading and box) */
+
+@layer layout {
+  #additional-names-box {
+    --custom-scroll-offset: calc(0.5em - 2px);
+
+    margin: 1em 0 1em -10px;
+    max-width: min(60vw, 600px);
+
+    padding: 15px 20px 10px 20px;
+  }
+
+  #additional-names-box > :first-child { margin-top: 0; }
+  #additional-names-box > :last-child { margin-bottom: 0; }
+
+  #additional-names-box p {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 0;
+  }
+
+  #additional-names-box ul {
+    padding-left: 10px;
+    margin-top: 0.5em;
+  }
+
+  #additional-names-box li .additional-name {
+    margin-right: 0.25em;
+  }
+
+  #additional-names-box li .additional-name .content-image {
+    margin-bottom: 0.25em;
+    margin-top: 0.5em;
+  }
+
+  #content.top-index #additional-names-box {
+    margin-left: auto;
+    margin-right: auto;
+
+    /* So like, these were in two separate, right-nearby
+     * rules with the same selector, lol
+     */
+    margin-bottom: 2em;
+    margin-bottom: 0.75em;
+  }
+}
+
+@layer print {
+  #additional-names-box p {
+    font-style: oblique;
+  }
+
+  #additional-names-box li .accent {
+    opacity: 0.8;
+  }
+
+  #additional-names-box li .additional-name > img {
+    vertical-align: text-bottom;
+  }
+
+  #content.top-index #additional-names-box {
+    text-align: center;
+  }
+}
+
+@layer interaction {
+  h1 a[href="#additional-names-box"] {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+
+  h1 a[href="#additional-names-box"]:hover {
+    text-decoration-style: solid;
+  }
+
+  #additional-names-box:not(.always-visible) {
+    display: none;
+  }
+}
+
+/* Carousels */
+
+@layer layout {
+  .carousel-container {
+    --carousel-tile-min-width: 120px;
+    --carousel-row-count: 3;
+    --carousel-column-count: 6;
+
+    position: relative;
+    overflow: hidden;
+    margin: 20px 0 5px 0;
+    padding: 8px 0;
+  }
+
+  .carousel-container + .quick-info,
+  .carousel-container + .quick-description {
+    margin-top: 25px;
+  }
+
+  html[data-url-key="localized.home"] .carousel-container {
+    /* This is currently unused... */
+    --carousel-tile-size: 140px;
+  }
+
+  .carousel-container[data-carousel-rows="1"] { --carousel-row-count: 1; }
+  .carousel-container[data-carousel-rows="2"] { --carousel-row-count: 2; }
+  .carousel-container[data-carousel-rows="3"] { --carousel-row-count: 3; }
+  .carousel-container[data-carousel-columns="4"] { --carousel-column-count: 4; }
+  .carousel-container[data-carousel-columns="5"] { --carousel-column-count: 5; }
+  .carousel-container[data-carousel-columns="6"] { --carousel-column-count: 6; }
+
+  .carousel-grid {
+    /* Thanks to: https://css-tricks.com/an-auto-filling-css-grid-with-max-columns/ */
+    --carousel-gap-count: calc(var(--carousel-column-count) - 1);
+    --carousel-total-gap-width: calc(var(--carousel-gap-count) * 10px);
+    --carousel-calculated-tile-max-width: calc((100% - var(--carousel-total-gap-width)) / var(--carousel-column-count));
+
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(max(var(--carousel-tile-min-width), var(--carousel-calculated-tile-max-width)), 1fr));
+    grid-template-rows: repeat(var(--carousel-row-count), auto);
+    grid-auto-flow: dense;
+    grid-auto-rows: 0;
+    overflow: hidden;
+    margin: auto;
+
+    z-index: 5;
+  }
+
+  .carousel-grid:nth-child(2),
+  .carousel-grid:nth-child(3) {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    right: 0;
+  }
+
+  .carousel-item {
+    display: inline-block;
+    margin: 0;
+    flex: 1 1 150px;
+    padding: 3px;
+  }
+
+  .carousel-item .image-outer-area {
+    padding: 0;
+  }
+
+  .carousel-item .image {
+    width: 100%;
+    height: 100%;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+}
+
+@layer material {
+  .carousel-container {
+    border-radius: 4px;
+  }
+
+  .carousel-container::before,
+  .carousel-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .carousel-container::before {
+    background-color: var(--dim-color);
+    filter: brightness(0.6);
+  }
+
+  .carousel-container::after {
+    z-index: 40;
+    pointer-events: none;
+
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+
+    box-shadow:
+      inset 20px 2px 40px var(--shadow-color),
+      inset -20px -2px 40px var(--shadow-color);
+  }
+
+  .carousel-item {
+    border-radius: 7px;
+  }
+
+  .carousel-item .image-container {
+    border: none;
+    border-radius: 6px;
+  }
+
+  .carousel-item .image-inner-area::after {
+    box-shadow: none;
+  }
+}
+
+@layer interaction {
+  .carousel-container:hover .carousel-grid {
+    animation-play-state: running;
+  }
+
+  .carousel-grid {
+    transform: translateX(0);
+    animation: carousel-marquee1 40s linear infinite;
+    animation-play-state: paused;
+  }
+
+  .carousel-grid:nth-child(2) {
+    animation-name: carousel-marquee2;
+  }
+
+  .carousel-grid:nth-child(3) {
+    animation-name: carousel-marquee3;
+  }
+
+  @keyframes carousel-marquee1 {
+    0% {
+      transform: translateX(-100%) translateX(70px);
+    }
+
+    100% {
+      transform: translateX(-200%) translateX(70px);
+    }
+  }
+
+  @keyframes carousel-marquee2 {
+    0% {
+      transform: translateX(0%) translateX(70px);
+    }
+
+    100% {
+      transform: translateX(-100%) translateX(70px);
+    }
+  }
+
+  @keyframes carousel-marquee3 {
+    0% {
+      transform: translateX(100%) translateX(70px);
+    }
+
+    100% {
+      transform: translateX(0%) translateX(70px);
+    }
+  }
+
+  .carousel-item {
+    filter: brightness(0.8);
+  }
+
+  .carousel-item:hover {
+    filter: brightness(1);
+    background: var(--dim-color);
+  }
+}
+
+/* Content entries (at large) */
+
+@layer layout {
+  #content blockquote {
+    margin-left: 40px;
+    margin-right: min(8vw, 75px);
+    width: auto;
+  }
+
+  #content blockquote blockquote {
+    margin-left: 10px;
+    padding-left: 10px;
+    margin-right: 20px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  #content blockquote blockquote > :first-child {
+    margin-top: 0;
+  }
+
+  #content blockquote blockquote > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+@layer material {
+  #content blockquote blockquote {
+    border-left: dotted 1px;
+  }
+}
+
+@layer print {
+  #content blockquote h2 {
+    font-size: 1em;
+    font-weight: 800;
+  }
+
+  #content blockquote h3 {
+    font-size: 1em;
+    font-weight: normal;
+    font-style: oblique;
+  }
+}
+
+/* Commentary-style content entries */
+
+@layer layout {
+  .inherited-commentary-section {
+    clear: right;
+    margin-top: 1em;
+    margin-bottom: 1.5em;
+    margin-right: min(4vw, 60px);
+  }
+
+  .commentary-art {
+    float: right;
+    width: 30%;
+    max-width: 250px;
+    margin: 15px 0 10px 20px;
+  }
+}
+
+@layer material {
+  .inherited-commentary-section {
+    border: 2px solid var(--deep-color);
+    border-radius: 4px;
+    background: #ffffff07;
+  }
+
+  .cover-artwork.commentary-art {
+    box-shadow: 0 0 4px 5px rgba(0, 0, 0, 0.25) !important;
+  }
+}
+
+@layer print {
+  .content-entry-heading {
+    margin-left: 15px;
+    padding-left: calc(5px + 1.25ch);
+    text-indent: -1.25ch;
+    margin-right: min(calc(8vw - 35px), 45px);
+    padding-bottom: 0.2em;
+
+    border-bottom: 1px solid var(--dim-color);
+  }
+
+  .content-entry-accent {
+    margin-left: 0.25ch;
+  }
+
+  .content-entry-heading.dated .content-entry-accent {
+    margin-right: 0.75ch;
+  }
+
+  .content-entry-annotation {
+    font-style: oblique;
+  }
+
+  .content-entry-heading .commentary-date {
+    display: inline-block;
+    text-indent: 0;
+  }
+
+  .content-entry-heading .hoverable {
+    box-shadow: 1px 2px 6px 5px #04040460;
+  }
+
+  .content-entry-body summary {
+    list-style-position: outside;
+  }
+
+  .content-entry-body summary > span {
+    color: var(--primary-color);
+  }
+
+  .wiki-commentary s:not(.spoiler) {
+    text-decoration-color: #fff9;
+    text-decoration-thickness: 1.4px;
+    color: #fffb;
+  }
+}
+
+/* Content headings */
+
+@layer layout {
+  .content-heading {
+    border-bottom: 3px double transparent;
+    margin-bottom: -3px;
+  }
+
+  dl dt.content-heading {
+    /* Basic margin-bottom for dt is 2px,
+     * so just subtract 3px from that.
+     */
+    margin-bottom: -1px;
+  }
+
+  h3.content-heading {
+    clear: both;
+  }
+}
+
+@layer construction {
+  summary.content-heading {
+    list-style-type: none;
+  }
+
+  summary.content-heading .cue {
+    display: inline-flex;
+  }
+
+  summary.content-heading .cue::after {
+    content: "";
+    padding-left: 0.5ch;
+    display: list-item;
+    list-style-position: inside;
+  }
+}
+
+@layer interaction {
+  .content-heading.highlight-hash-link {
+    animation: highlight-hash-link 4s;
+    animation-delay: 125ms;
+  }
+
+  /* This animation's name is referenced in JavaScript */
+  @keyframes highlight-hash-link {
+    0% {
+      border-bottom-color: transparent;
+    }
+
+    10% {
+      border-bottom-color: white;
+    }
+
+    25% {
+      border-bottom-color: white;
+    }
+
+    100% {
+      border-bottom-color: transparent;
+    }
+  }
+
+  summary.content-heading .cue {
+    color: var(--primary-color);
+  }
+
+  summary.content-heading .cue::after {
+    list-style-type: disclosure-closed;
+  }
+
+  details[open] > summary.content-heading .cue::after {
+    list-style-type: disclosure-open;
+  }
+
+  summary.content-heading > span:hover {
+    text-decoration: none !important;
+  }
+
+  summary.content-heading > span:hover .cue {
+    text-decoration: underline;
+    text-decoration-style: wavy;
+  }
+
+  summary.content-heading .when-open {
+    display: none;
+  }
+
+  details[open] > summary.content-heading .when-open {
+    display: unset;
+  }
+
+  details[open] > summary.content-heading .when-collapsed {
+    display: none;
+  }
+}
+
+/* Cover artworks, music videos, and album art info */
+
+@layer layout {
+  .cover-artwork .image {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .music-video .image {
+    display: block;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    height: 100%;
+  }
+
+  #artwork-column .album-art-info {
+    margin: 10px min(15px, 1vw) 15px;
+  }
+
+  #artwork-column .cover-artwork:not(:first-child),
+  #artwork-column .cover-artwork-joiner {
+    margin-left: 30px;
+    margin-right: 5px;
+  }
+
+  #artwork-column .cover-artwork:first-child + .cover-artwork-joiner,
+  #artwork-column .cover-artwork.attached-artwork-is-main-artwork,
+  #artwork-column .cover-artwork.attached-artwork-is-main-artwork + .cover-artwork-joiner {
+    margin-left: 17.5px;
+    margin-right: 17.5px;
+  }
+
+  #artwork-column *:where(.cover-artwork, .music-video):where(:not(:first-child)) {
+    margin-top: 20px;
+  }
+
+  #artwork-column *:is(.cover-artwork, .music-video):last-child:not(:first-child) {
+    margin-bottom: 25px;
+  }
+
+  .cover-artwork-joiner {
+    z-index: -2;
+  }
+
+  .cover-artwork-joiner + .cover-artwork {
+    margin-top: 0 !important;
+  }
+
+  #artwork-column .music-video {
+    width: 88.888888%;
+    margin-left: auto;
+  }
+
+  #artwork-column .cover-artwork + .music-video {
+    margin-top: 25px;
+  }
+
+  #artwork-column .cover-artwork + .cover-artwork + .music-video {
+    margin-top: 30px;
+  }
+}
+
+@layer material {
+  .cover-artwork,
+  .music-video,
+  .album-art-info {
+    border: 2px solid var(--primary-color);
+    background: var(--bg-black-color);
+
+    -webkit-backdrop-filter: blur(3px);
+            backdrop-filter: blur(3px);
+  }
+
+  .cover-artwork {
+    border-radius: 0 0 4px 4px;
+  }
+
+  .cover-artwork:has(.image-details),
+  .cover-artwork.has-image-details {
+    border-radius: 0 0 6px 6px;
+  }
+
+  .music-video {
+    border-radius: 4px;
+    padding: 0 4px;
+  }
+
+  .album-art-info {
+    border-color: var(--deep-color);
+    border-radius: 5px;
+
+    background: var(--bg-black-color);
+    padding: 6px;
+  }
+
+  .album-art-info p {
+    margin: 0;
+  }
+
+  .cover-artwork .image-container,
+  .music-video .image-container {
+    border: none;
+    border-radius: 0 !important;
+  }
+
+  .music-video .image-container {
+    background: transparent;
+    border-style: dashed none;
+    border-width: 2px;
+    border-color: var(--dim-color);
+  }
+
+  .cover-artwork:not(:has(.image-details)),
+  .cover-artwork:not(.has-image-details) {
+    /* Hacky: `overflow: hidden` hides tag tooltips, so it can't be applied
+     * if we've got tags/details visible. But it's okay, because we only
+     * need to apply it if it *doesn't* - that's when the rounded border
+     * of the .cover-artwork needs to cut off its child .image-container
+     * (which has a background that otherwise causes sharp corners).
+     */
+    overflow: hidden;
+  }
+
+  #artwork-column .cover-artwork,
+  #artwork-column .music-video {
+    --normal-shadow: 0 0 12px 12px #00000080;
+
+    box-shadow:
+      0 2px 14px -6px var(--primary-color),
+      var(--normal-shadow);
+  }
+
+  #artwork-column .cover-artwork:not(:first-child) {
+    --normal-shadow: 0 0 9px 9px #00000068;
+  }
+
+  .cover-artwork .image-details {
+    border-top-color: var(--deep-color);
+  }
+
+  .cover-artwork .image-details + .image-details {
+    border-top-color: var(--primary-color);
+  }
+
+  .image-details {
+    display: block;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .image-details:not(.image-details + .image-details) {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 9px;
+    padding-right: 9px;
+
+    padding-top: 6px;
+    padding-bottom: 4px;
+
+    border-top: 1px dashed var(--deep-color);
+  }
+
+  .image-details + .image-details {
+    display: block;
+
+    margin-left: 6px;
+    margin-right: 6px;
+    padding-left: 3px;
+    padding-right: 3px;
+
+    padding-top: 4px;
+    padding-bottom: 4px;
+
+    border-top: 1px dotted var(--primary-color);
+  }
+
+  .image-details:last-child {
+    margin-bottom: 2px;
+  }
+}
+
+@layer print {
+  .cover-artwork,
+  .music-video,
+  .album-art-info {
+    font-size: 0.8em;
+  }
+
+  p.image-details.illustrator-details {
+    text-align: center;
+    font-style: oblique;
+  }
+
+  p.image-details.origin-details {
+    margin-bottom: 2px;
+  }
+
+  p.image-details.origin-details .origin-details-line {
+    display: block;
+    margin-top: 0.25em;
+  }
+
+  p.image-details.origin-details .filename-line {
+    display: block;
+    margin-top: 0.25em;
+  }
+
+  .music-video .music-video-label {
+    margin: 6px 12px 3px;
+    text-align: center;
+  }
+
+  .music-video .music-video-label.title-style {
+    margin-bottom: 4px;
+    font-style: oblique;
+  }
+
+  .music-video .image-container ~ p {
+    margin: 3px 5px;
+  }
+
+  .music-video .image-container + p {
+    margin-top: 5px;
+  }
+
+  .music-video .image-container ~ p:last-child {
+    margin-bottom: 6px;
+  }
+
+  .music-video .artists-line {
+    display: block;
+    padding-left: 1.2ch;
+    text-indent: -1.2ch;
+  }
+
+  .music-video .artists-line > * {
+    text-indent: 0;
+  }
+
+  .music-video .artists-line + br {
+    display: none;
+  }
+}
+
+@layer construction {
+  ul.image-details.art-tag-details {
+    padding-bottom: 0;
+  }
+
+  ul.image-details.art-tag-details li {
+    display: inline-block;
+  }
+
+  ul.image-details.art-tag-details li:not(:last-child)::after {
+    content: " \00b7 ";
+  }
+
+  .cover-artwork-joiner::after {
+    content: "";
+    display: block;
+    width: 0;
+    height: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    border-right: 3px solid var(--primary-color);
+  }
+}
+
+@layer interaction {
+  .music-video .image-link::after {
+    content: "▶︎";
+    background: #0008;
+    color: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .music-video .image-link:hover::after {
+    font-size: 1.4em;
+    background: #0006;
+  }
+
+  .music-video .image-inner-area::after {
+    /* We're overriding normal image-inner-area stuff. */
+    opacity: 0.8;
+    box-shadow: 0 0 4px inset black;
+  }
+
+  .music-video .image-link:hover .image {
+    transform: scale(1.02);
+  }
+}
+
+/* Dot switchers */
+
+@layer print {
+  .dot-switcher > span {
+    color: #ffffffcc;
+  }
+
+  .dot-switcher > span.current {
+    font-weight: normal;
+    color: #ffffffff;
+  }
+
+  .dot-switcher > span.current a {
+    font-weight: 800;
+  }
+
+  .group-view-switcher {
+    margin-left: 1ch;
+  }
+}
+
+@layer construction {
+  .dot-switcher > span:not(:first-child) {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .dot-switcher > span:not(:first-child)::before {
+    content: "\0020\00b7\0020";
+    white-space: pre;
+    font-weight: 800;
+    color: white;
+  }
+
+  /* Yeah, all this stuff only applies to elements of the dot switcher
+   * besides the first, which will necessarily have a bullet point at left.
+   */
+  .dot-switcher *:where(.dot-switcher > span:not(:first-child) > *) {
+    display: inline-block;
+    white-space: wrap;
+    text-align: left;
+    vertical-align: top;
+  }
+}
+
+@layer interaction {
+  .dot-switcher.intrapage > span:not(.current) a {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+
+  .dot-switcher.intrapage > span.current a {
+    /* Keeping cursor: pointer (the default) is intentional here. */
+    text-decoration: none !important;
+  }
+}
+
+/* External icons */
+
+@layer print {
+  .external-icon {
+    display: inline-block;
+    padding: 0 3px;
+    width: 24px;
+    height: 1em;
+    position: relative;
+  }
+
+  .external-icon svg {
+    width: 24px;
+    height: 24px;
+    top: -0.25em;
+    position: absolute;
+    fill: var(--primary-color);
+  }
+}
+
+/* Gallery switchers (of various sorts) */
+
+@layer layout {
+  .gallery-set-switcher {
+    text-align: center;
+  }
+
+  .gallery-view-switcher,
+  .gallery-style-selector {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .gallery-style-selector .styles {
+    display: inline-flex;
+    justify-content: center;
+  }
+
+  .gallery-style-selector .styles label:not(:last-child) {
+    margin-right: 1.25ch;
+  }
+
+  .gallery-style-selector .count {
+    position: relative;
+    bottom: -0.25em;
+  }
+}
+
+@layer print {
+  .gallery-view-switcher,
+  .gallery-style-selector {
+    line-height: 1.4;
+  }
+
+  .gallery-style-selector .count {
+    font-size: 0.85em;
+    opacity: 0.9;
+  }
+}
+
+/* Grid listings and grid items */
+
+@layer layout {
+  .grid-listing {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 5px 15px;
+    box-sizing: border-box;
+    margin-top: 1em;
+  }
+
+  .grid-listing .reveal-all-container {
+    flex-basis: 100%;
+  }
+
+  .grid-listing .reveal-all-container.has-nearby-tab {
+    margin-bottom: 0.6em;
+  }
+
+  .grid-listing .reveal-all {
+    max-width: 400px;
+    margin: 0.20em auto 0;
+    text-align: center;
+  }
+
+  .grid-listing .reveal-all a {
+    display: inline-block;
+    margin-bottom: 0.15em;
+  }
+
+  .grid-listing .reveal-all b {
+    white-space: nowrap;
+  }
+
+  .grid-item {
+    --tab-lift: 0px;
+    --tabnt-offset: 0px;
+
+    margin: 10px;
+    margin-top:
+      calc(
+         10px
+       - var(--tab-lift)
+       + var(--tabnt-offset));
+
+    padding: 5px;
+  }
+
+  .grid-item.has-tab {
+    border-radius: 8px 8px 3px 3px;
+  }
+
+  .grid-item:not(.has-tab) {
+    --tabnt-offset: calc(1.2em - 4px);
+  }
+
+  .grid-item .image-container {
+    width: 100%;
+  }
+
+  .grid-item .image {
+    width: 100%;
+    height: 100% !important;
+    margin-top: auto;
+    margin-bottom: auto;
+    object-fit: contain;
+  }
+
+  .grid-listing > .grid-item {
+    flex: 1 25%;
+    max-width: 200px;
+  }
+
+  .grid-actions {
+    margin: 15px;
+    align-self: center;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .grid-actions > .grid-item {
+    flex-basis: unset !important;
+    margin: 5px;
+    width: 120px;
+    --primary-color: inherit !important;
+    --dim-color: inherit !important;
+  }
+
+  .grid-listing > .grid-caption,
+  .grid-listing > .grid-expando {
+    flex-basis: 100%;
+  }
+
+  .grid-expando {
+    margin-top: 1em;
+    margin-bottom: 2em;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .grid-expando-content {
+    margin: 0;
+  }
+}
+
+@layer material {
+  .grid-listing:not(:has(.grid-item:not([class*="hidden-by-"]))) {
+    padding-bottom: 140px;
+    background: #cccccc07;
+    border-radius: 10px;
+    border: 1px dashed #fff3;
+  }
+
+  .grid-listing:not(:has(.grid-item:not([class*="hidden-by-"]))) .reveal-all-container {
+    display: none;
+  }
+
+  .grid-item {
+    background-color: #111111;
+    border: 1px dotted var(--primary-color);
+    border-radius: 2px;
+  }
+
+  .grid-item .image-inner-area {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .grid-item .image-inner-area::after {
+    box-shadow: none;
+  }
+
+  .grid-item .image {
+    --shadow-filter:
+      drop-shadow(0 3px 2px #0004)
+      drop-shadow(0 1px 5px #0001)
+      drop-shadow(0 3px 4px #0001);
+  }
+}
+
+@layer print {
+  .grid-item {
+    text-align: center;
+    line-height: 1.2;
+    font-size: 0.9em;
+  }
+
+  .grid-item > span {
+    display: block;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  /* tab */
+  .grid-item > span:first-child {
+    margin-bottom: calc(3px + var(--tab-lift));
+
+    font-style: oblique;
+  }
+
+  /* title */
+  .grid-item > .image-container + span {
+    margin-top: 6px;
+  }
+
+  .grid-name-marker {
+    color: white;
+  }
+
+  /* info */
+  .grid-item > .image-container + span ~ span {
+    margin-top: 2px;
+
+    font-size: 0.9em;
+    opacity: 0.8;
+  }
+
+  .grid-caption {
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .grid-expando-content {
+    text-align: center;
+    line-height: 1.5;
+  }
+}
+
+@layer interaction {
+  .grid-listing .reveal-all a {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+
+  .grid-listing .reveal-all .warnings {
+    opacity: 0.4;
+  }
+
+  .grid-listing .reveal-all:hover .warnings {
+    opacity: 1;
+  }
+
+  .grid-item.has-tab:hover {
+    --tab-lift: 3px;
+  }
+
+  .grid-item[class*="hidden-by-"] {
+    display: none;
+  }
+
+  .grid-item:hover {
+    text-decoration: none;
+  }
+
+  .grid-actions .grid-item:hover {
+    text-decoration: underline;
+  }
+
+  /* title */
+  .grid-item:hover > .image-container + span {
+    text-decoration: underline;
+  }
+
+  .grid-expando-toggle {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+
+  .grid-item.shown-by-expandable-cut {
+    animation: expand-cover-grid 0.8s forwards;
+  }
+
+  @keyframes expand-cover-grid {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* Group-contributions tables */
+
+@layer layout {
+  .group-contributions-table {
+    display: inline-block;
+  }
+
+  .group-contributions-table .group-contributions-row {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .group-contributions-table .group-contributions-metrics {
+    margin-left: 1.5ch;
+    white-space: nowrap;
+  }
+}
+
+@layer interaction {
+  .group-contributions-sorted-by-count:not(.visible),
+  .group-contributions-sorted-by-duration:not(.visible) {
+    display: none;
+  }
+
+  .group-contributions-sort-button {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+}
+
+/* Image and media containers */
+
+@layer layout {
+  .image-container {
+    display: block;
+    box-sizing: border-box;
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .content-image-container,
+  .content-video-container,
+  .content-audio-container {
+    margin-top: 1em;
+    margin-bottom: 1em;
+  }
+
+  .content-video-container,
+  .content-audio-container {
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .content-video-container video,
+  .content-audio-container audio {
+    display: block;
+    max-width: 100%;
+  }
+
+  .image-text-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 5px 15px;
+  }
+
+  .image-outer-area {
+    width: 100%;
+    height: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+  }
+
+  .image-link {
+    display: block;
+    overflow: hidden;
+  }
+
+  .square .image-link {
+    width: 100%;
+    height: 100%;
+  }
+
+  .image-inner-area {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .image-link .image-inner-area {
+    /* Jankily fix a rendering issue with border-radius on Safari.
+     * The `-webkit-` prefix is only to keep this from applying on
+     * other browsers (well, Firefox), where it doesn't *break*
+     * anything, but also isn't necessary.
+     */
+    -webkit-transform: translateZ(0);
+  }
+
+  img {
+    object-fit: cover;
+  }
+
+  .square .image {
+    width: 100%;
+    height: 100%;
+  }
+
+  .image-link .image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .reveal-text-container {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .reveal-text {
+    padding-bottom: 0.5em;
+  }
+
+  .reveal .image.reveal-thumbnail {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .reveal.has-reveal-thumbnail:not(.revealed) .image:not(.reveal-thumbnail) {
+    /* Keep the main image as part of the box model.
+     * It's what actually defines the dimensions of the
+     * image-container, so those dimensions never shift
+     * once the image is actually revealed.
+     */
+    visibility: hidden;
+  }
+}
+
+@layer material {
+  .image-container {
+    background-color: var(--dim-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 0;
+    box-shadow: 0 2px 4px -2px var(--bg-black-color) inset;
+  }
+
+  .content-video-container,
+  .content-audio-container {
+    background-color: var(--dark-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 2.5px 2.5px 3px 3px;
+    padding: 5px;
+  }
+
+  .image-text-area {
+    background: rgba(0, 0, 0, 0.65);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5) inset;
+
+    line-height: 1.35em;
+    color: var(--primary-color);
+    font-style: oblique;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.75);
+  }
+
+  .image-link {
+    border-bottom: 1px solid #ffffff03;
+    border-radius: 2.5px 2.5px 3px 3px;
+    box-shadow:
+      0 1px 8px -3px var(--bg-black-color);
+  }
+
+  .image-inner-area::after {
+    content: "";
+    display: block;
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-bottom-left-radius: 0.5px;
+    opacity: 0.035;
+    box-shadow:
+      6px -6px 2px -4px white inset;
+  }
+
+  .image {
+    --reveal-filter: ;
+    --shadow-filter: ;
+
+    backdrop-filter: blur(0);
+    filter:
+      var(--reveal-filter)
+      var(--shadow-filter);
+  }
+
+  .reveal .image.reveal-thumbnail {
+    image-rendering: pixelated;
+  }
+}
+
+@layer print {
+  .image-container {
+    text-align: left;
+    color: white;
+  }
+
+  .content-image-container.align-center {
+    text-align: center;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+  }
+
+  .content-video-container.align-center,
+  .content-audio-container.align-center {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .content-image-container.align-full,
+  .content-video-container.align-full,
+  .content-audio-container.align-full {
+    width: 100%;
+  }
+
+  .content-audio-container .filename {
+    color: white;
+    font-family: monospace;
+    display: block;
+    font-size: 0.9em;
+    padding-left: 1ch;
+    padding-right: 1ch;
+    padding-bottom: 0.25em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid #fff4;
+  }
+
+  .reveal-text {
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+  }
+
+  .grid-item .reveal-text {
+    font-size: 0.9em;
+  }
+
+  .reveal-symbol {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-bottom: 0.1em;
+
+    font-size: 1.6em;
+    opacity: 0.8;
+  }
+
+  .sidebar .image-container {
+    max-width: 350px;
+  }
+}
+
+@layer interaction {
+  .image-link:focus {
+    outline: 3px double white;
+  }
+
+  .image-link:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  .image-container.has-link:not(.no-image-preview) {
+    background: var(--deep-color);
+    box-shadow: none;
+    border-radius: 0 0 4px 4px;
+  }
+
+  .reveal-interaction {
+    opacity: 0.8;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+
+  .reveal:not(.revealed) .image {
+    opacity: 0.7;
+    --reveal-filter: blur(20px) brightness(0.7);
+  }
+
+  .reveal:not(.revealed) .image-outer-area > * {
+    position: relative;
+    border-radius: 6px;
+  }
+
+  .reveal:not(.revealed) .image-outer-area > *::after {
+    content: "";
+    position: absolute;
+    box-sizing: border-box;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    border: 1px dotted var(--primary-color);
+    border-radius: 6px;
+    pointer-events: none;
+
+    /* By an awkward DOM intersection, this element might be
+     * .image-inner-area::after, which is already styled with
+     * a slight visual effect. Guarantee that the properties
+     * set to that end are overwritten, and fully co-opt it
+     * to serve as the interaction cue instead.
+     */
+    box-shadow: none;
+    opacity: 1;
+  }
+
+  .reveal:not(.revealed) .image-inner-area {
+    background: var(--deep-color);
+  }
+
+  .reveal:not(.revealed) .image-outer-area > *:hover::after {
+    border-style: solid;
+    box-shadow: 0 0 0 1.5px #00000099 inset;
+  }
+
+  .reveal:not(.revealed) .image-outer-area > *:hover .image {
+    --reveal-filter: blur(20px) brightness(0.6);
+    opacity: 0.6;
+  }
+
+  .reveal:not(.revealed) .image-outer-area > *:hover .reveal-interaction {
+    text-decoration-style: solid;
+  }
+
+  .reveal.revealed.has-reveal-thumbnail .image.reveal-thumbnail {
+    display: none !important;
+  }
+
+  .reveal.revealed .image {
+    opacity: 1;
+  }
+
+  .reveal.revealed .reveal-text-container {
+    display: none;
+  }
+}
+
+/* Image overlay */
+
+@layer layout {
+  #image-overlay-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 4000;
+
+    padding: 20px 40px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #image-overlay-content-container {
+    overflow: hidden;
+  }
+
+  #image-overlay-image-area {
+    display: block;
+    overflow: hidden;
+    width: 80vmin;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #image-overlay-image-layout {
+    display: block;
+    position: relative;
+    margin: 4px 3px;
+  }
+
+  #image-overlay-image,
+  #image-overlay-image-thumb {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  #image-overlay-image {
+    position: absolute;
+  }
+
+  #image-overlay-container.no-thumb #image-overlay-image {
+    position: static;
+  }
+
+  #image-overlay-action-container {
+    padding: 7px 4px 7px 4px;
+    text-align: center;
+  }
+}
+
+@layer material {
+  #image-overlay-container {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+  }
+
+  #image-overlay-container::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background: var(--deep-color);
+    opacity: 0.20;
+  }
+
+  #image-overlay-content-container {
+    border-radius: 0 0 8px 8px;
+    border: 2px solid var(--primary-color);
+    background: var(--deep-ghost-color);
+
+    box-shadow:
+      0 0 90px 30px #00000060,
+      0 0 20px 10px #00000040,
+      0 0 10px 3px #00000080;
+
+    -webkit-backdrop-filter: blur(3px);
+            backdrop-filter: blur(3px);
+  }
+
+  #image-overlay-image-layout {
+    background: rgba(0, 0, 0, 0.65);
+  }
+
+  #image-overlay-image-thumb {
+    filter: blur(16px);
+    transform: scale(1.5);
+  }
+
+  #image-overlay-action-container {
+    border-radius: 0 0 5px 5px;
+    background: var(--bg-black-color);
+    box-shadow:
+      0 3px 8px -5px var(--primary-color) inset;
+  }
+}
+
+@layer print {
+  #image-overlay-action-container {
+    color: white;
+    font-style: oblique;
+    text-align: center;
+  }
+
+  #image-overlay-file-size-warning {
+    opacity: 0.8;
+    font-size: 0.9em;
+  }
+}
+
+@layer construction {
+  #image-overlay-image-area::after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: var(--download-progress);
+    background: var(--primary-color);
+    box-shadow: 0 -3px 12px 4px var(--primary-color);
+    transition: 0.25s;
+  }
+
+  #image-overlay-container.loaded #image-overlay-image-area::after {
+    width: 100%;
+    background: white;
+    opacity: 0;
+  }
+
+  #image-overlay-container.errored #image-overlay-image-area::after {
+    width: 100%;
+    background: red;
+  }
+
+  #image-overlay-container:not(.visible) #image-overlay-image-area::after {
+    width: 0 !important;
+  }
+
+  #image-overlay-container #image-overlay-action-content-without-size:not(.visible),
+  #image-overlay-container #image-overlay-action-content-with-size:not(.visible),
+  #image-overlay-container #image-overlay-file-size-warning:not(.visible),
+  #image-overlay-container #image-overlay-file-size-kilobytes:not(.visible),
+  #image-overlay-container #image-overlay-file-size-megabytes:not(.visible) {
+    display: none;
+  }
+}
+
+@layer interaction {
+  #image-overlay-container {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+
+  #image-overlay-container.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #image-overlay-container.loaded #image-overlay-image-thumb {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+}
+
+/* Info card */
+
+@layer interactivity {
+  #info-card-container {
+    pointer-events: none; /* Padding area shouldn't 8e interactive. */
+  }
+
+  .info-card {
+    pointer-events: none;
+  }
+
+  #info-card-container.show .info-card {
+    animation: 0.01s linear 0.2s forwards info-card-become-interactive;
+  }
+
+  @keyframes info-card-become-interactive {
+    to {
+      pointer-events: auto;
+    }
+  }
+}
+
+@layer layout {
+  #info-card-container {
+    position: absolute;
+    left: 0;
+    right: 10px;
+
+    display: none;
+  }
+
+  #info-card-container.show,
+  #info-card-container.hide {
+    display: flex;
+  }
+
+  #info-card-container > * {
+    flex-basis: 400px;
+  }
+
+  .info-card {
+    padding: 5px;
+  }
+
+  .info-card-art-container {
+    float: right;
+    width: 40%;
+    margin: 5px;
+
+    /* Dynamically shown. */
+    display: none;
+  }
+
+  .info-card-art-container .image-container {
+    padding: 2px;
+  }
+
+  .info-card-art {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .info-card::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+}
+
+@layer material {
+  .info-card-decor {
+    padding-left: 3ch;
+    border-top: 1px solid white;
+  }
+
+  .info-card {
+    background-color: black;
+    color: white;
+
+    border: 1px dotted var(--primary-color);
+    border-radius: 3px;
+    box-shadow: 0 5px 5px black;
+  }
+
+  .info-card-name {
+    font-size: 1em;
+    border-bottom: 1px dotted;
+    margin: 0;
+  }
+
+  .info-card p {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+  }
+
+  .info-card p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@layer print {
+  .info-card {
+    font-size: 0.9em;
+  }
+
+  .info-card-art-container {
+    font-size: 0.8em;
+  }
+}
+
+@layer interaction {
+  #info-card-container.show {
+    animation: 0.2s linear forwards info-card-show;
+    transition: top 0.1s, left 0.1s;
+  }
+
+  #info-card-container.hide {
+    animation: 0.2s linear forwards info-card-hide;
+  }
+
+  @keyframes info-card-show {
+    0% {
+      opacity: 0;
+      margin-top: -5px;
+    }
+
+    100% {
+      opacity: 1;
+      margin-top: 0;
+    }
+  }
+
+  @keyframes info-card-hide {
+    0% {
+      opacity: 1;
+      margin-top: 0;
+    }
+
+    100% {
+      opacity: 0;
+      margin-top: 5px;
+      display: none !important;
+    }
+  }
+}
+
+/* Lyrics */
+
+@layer layout {
+  .lyrics-switcher {
+    padding-left: 20px;
+  }
+}
+
+@layer print {
+  .lyrics-entry .lyrics-details,
+  .lyrics-entry .origin-details {
+    font-size: 0.9em;
+    font-style: oblique;
+  }
+
+  .lyrics-entry .lyrics-details {
+    margin-bottom: 0;
+  }
+
+  .lyrics-entry .origin-details {
+    margin-top: 0.25em;
+  }
+
+  .lyrics-entry sup {
+    vertical-align: text-top;
+    opacity: 0.8;
+    cursor: default;
+  }
+}
+
+@layer interaction {
+  .lyrics-entry.long-lyrics {
+    clip-path: inset(-15px -20px);
+  }
+
+  .lyrics-entry.long-lyrics::after {
+    content: "";
+    pointer-events: none;
+    display: block;
+
+    /* Slight stretching past the bottom of the screen seems
+     * to make resizing the window (and "revealing" that area)
+     * a bit smoother.
+     */
+    position: fixed;
+    bottom: -20px;
+    left: 0;
+    right: 0;
+
+    height: calc(20px + min(90px, 13.5vh));
+    background: linear-gradient(to bottom, transparent, black 70%, black);
+    opacity: 0.6;
+  }
+}
+
+/* Quick description */
+
+@layer layout {
+  .quick-description:not(.has-external-links-only) {
+    --clamped-padding-ratio: max(var(--responsive-padding-ratio), 0.06);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: calc(0.40 * var(--clamped-padding-ratio) * 100%);
+    padding-right: calc(0.40 * var(--clamped-padding-ratio) * 100%);
+    padding-top: 0.25em;
+    padding-bottom: 0.75em;
+    max-width: 500px;
+  }
+
+  .quick-description.has-external-links-only {
+    padding-left: 12%;
+    padding-right: 12%;
+  }
+
+  .quick-description.has-content-only {
+    padding-bottom: 0.5em;
+  }
+}
+
+@layer material {
+  .quick-description:not(.has-external-links-only) {
+    border-left: 1px solid var(--dim-color);
+    border-right: 1px solid var(--dim-color);
+  }
+}
+
+@layer print {
+  .quick-description:not(.has-external-links-only) {
+    line-height: 1.25em;
+  }
+
+  .quick-description p {
+    text-align: center;
+  }
+
+  .quick-description > blockquote {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .quick-description .description-content.long hr ~ p {
+    text-align: left;
+  }
+
+  .quick-description .description-content :first-child {
+    margin-top: 0;
+  }
+
+  .quick-description .quick-description-actions,
+  .quick-description.has-content-only .description-content :last-child {
+    margin-bottom: 0;
+  }
+}
+
+@layer interaction {
+  .quick-description:not(.collapsed) .description-content.short,
+  .quick-description:not(.collapsed) .quick-description-actions.when-collapsed,
+  .quick-description:not(.expanded) .description-content.long,
+  .quick-description:not(.expanded) .quick-description-actions.when-expanded {
+    display: none;
+  }
+
+  .quick-description .quick-description-actions .expand-link,
+  .quick-description .quick-description-actions .collapse-link {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+}
+
+/* Quick info */
+
+@layer layout {
+  .quick-info {
+    padding-left: calc(var(--responsive-padding-ratio) * 100%);
+    padding-right: calc(var(--responsive-padding-ratio) * 100%);
+  }
+}
+
+@layer print {
+  .quick-info {
+    text-align: center;
+    line-height: 1.25em;
+  }
+}
+
+@layer construction {
+  ul.quick-info {
+    list-style: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  ul.quick-info li {
+    display: inline-block;
+  }
+
+  ul.quick-info li:not(:last-child)::after {
+    content: " \00b7 ";
+    font-weight: 800;
+  }
+}
+
+/* Sticky heading */
+
+@layer layout {
+  :where([id]) {
+    --custom-scroll-offset: 0px;
+  }
+
+  :where(#content [id]) {
+    /* Adjust scroll margin. */
+    scroll-margin-top: calc(
+        74px /* Sticky heading */
+      + 33px /* Sticky subheading */
+      - 1em  /* One line of text (align bottom) */
+      - 12px /* Padding for hanging letters & focus ring */
+      + var(--custom-scroll-offset) /* Customizable offset */
+    ) !important;
+  }
+
+  .content-sticky-heading-root {
+    width: calc(100% + 2 * var(--content-padding));
+    margin: calc(-1 * var(--content-padding));
+    margin-bottom: 0;
+  }
+
+  .content-sticky-heading-anchor,
+  .content-sticky-heading-container {
+    width: 100%;
+  }
+
+  .content-sticky-heading-root:not([inert]) {
+    position: sticky;
+    top: 0;
+  }
+
+  .content-sticky-heading-anchor:not(:where(.content-sticky-heading-root[inert]) *) {
+    position: relative;
+  }
+
+  .content-sticky-heading-container:not(:where(.content-sticky-heading-root[inert]) *) {
+    position: absolute;
+  }
+
+  .content-sticky-heading-root[inert] {
+    visibility: hidden;
+  }
+
+  main.long-content .content-sticky-heading-container {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  main.long-content .content-sticky-heading-container .content-sticky-heading-row,
+  main.long-content .content-sticky-heading-container .content-sticky-subheading-row {
+    padding-left: calc(var(--long-content-padding-ratio) * (100% - 2 * var(--content-padding)) + var(--content-padding));
+    padding-right: calc(var(--long-content-padding-ratio) * (100% - 2 * var(--content-padding)) + var(--content-padding));
+  }
+
+  .content-sticky-heading-row {
+    box-sizing: border-box;
+    padding:
+      calc(1.25 * var(--content-padding) + 5px)
+      20px
+      calc(0.75 * var(--content-padding))
+      20px;
+
+    width: 100%;
+    margin: 0;
+  }
+
+  .content-sticky-heading-container.has-cover .content-sticky-heading-row,
+  .content-sticky-heading-container.has-cover .content-sticky-subheading-row {
+    display: grid;
+    grid-template-areas:
+      "title cover";
+    grid-template-columns: 1fr min(40%, 400px);
+  }
+
+  .content-sticky-heading-container.cover-visible .content-sticky-heading-row {
+    grid-template-columns: 1fr min(40%, 90px);
+  }
+
+  .content-sticky-heading-row h1 {
+    position: relative;
+    margin: 0;
+    padding-right: 20px;
+    overflow-x: hidden;
+  }
+
+  .content-sticky-heading-row h1 .reference-collapsed-heading {
+    position: absolute;
+    white-space: nowrap;
+    visibility: hidden;
+  }
+
+  .content-sticky-heading-cover-container {
+    position: relative;
+    height: 0;
+    margin: -15px 0px -5px -5px;
+  }
+
+  .content-sticky-heading-cover {
+    position: absolute;
+    top: 0;
+    width: 80px;
+    right: 10px;
+  }
+
+  .content-sticky-heading-container .image-outer-area {
+    padding: 3px;
+  }
+
+  .content-sticky-heading-cover .image {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .content-sticky-subheading-row {
+    position: absolute;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 20px 5px 20px;
+    margin-top: 0;
+    z-index: -1;
+  }
+
+  .content-sticky-subheading-row h2 {
+    margin: 0;
+  }
+
+  .content-sticky-subheading {
+    padding-right: 20px;
+  }
+}
+
+@layer material {
+  .content-sticky-heading-row {
+    background: var(--bg-black-color);
+    border-bottom: 1px dotted rgba(220, 220, 220, 0.4);
+
+    box-shadow:
+      inset 0 10px 10px -5px var(--shadow-color),
+      0 4px 8px -4px #000000b0;
+
+    -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+  }
+
+  .content-sticky-heading-cover {
+    box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.25);
+  }
+
+  .content-sticky-heading-cover .cover-artwork {
+    border-width: 1px;
+    border-radius: 1.25px;
+    box-shadow: none;
+  }
+
+  .content-sticky-heading-container .image-inner-area {
+    border-radius: 1.75px;
+
+    /* Editor's note: I don't know what this overflow: hidden is for. */
+    overflow: hidden;
+  }
+
+  .content-sticky-subheading-row {
+    background: var(--bg-black-color);
+    border-bottom: 1px dotted rgba(220, 220, 220, 0.4);
+
+    box-shadow:
+      0 2px 2px -1px #00000060,
+      0 4px 12px -4px #00000090;
+
+    -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+  }
+}
+
+@layer print {
+  .content-sticky-subheading-row h2 {
+    font-size: 0.9em !important;
+    font-weight: normal;
+    font-style: oblique;
+    color: #eee;
+  }
+}
+
+@layer interaction {
+  .content-sticky-heading-container.collapse h1 {
+    white-space: nowrap;
+    overflow-wrap: normal;
+
+    animation: collapse-sticky-heading 0.35s forwards;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+  }
+
+  @keyframes collapse-sticky-heading {
+    from {
+      height: var(--uncollapsed-heading-height);
+    }
+
+    99.9% {
+      height: var(--collapsed-heading-height);
+    }
+
+    to {
+      height: auto;
+    }
+  }
+
+  .content-sticky-heading-container h1 a {
+    transition: text-decoration-color 0.35s;
+  }
+
+  .content-sticky-heading-container h1 a:not([href]) {
+    color: inherit;
+    cursor: text;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: transparent;
+  }
+
+  .content-sticky-heading-cover-needs-reveal {
+    display: none;
+  }
+
+  .content-sticky-heading-cover {
+    transition: transform 0.35s, opacity 0.25s;
+  }
+
+  .content-sticky-heading-cover-container:not(.visible) .content-sticky-heading-cover {
+    opacity: 0;
+    transform: translateY(15px);
+    transition: transform 0.35s, opacity 0.30s;
+  }
+
+  .content-sticky-subheading-row {
+    transition: margin-top 0.35s, opacity 0.25s;
+  }
+
+  .content-sticky-subheading-row:not(.visible) {
+    margin-top: -20px;
+    opacity: 0;
+  }
+}
+
+/* Sticky sidebar */
+
+@layer layout {
+  .sidebar-column:not(.sticky-column) {
+    align-self: stretch;
+  }
+
+  .sidebar-column.sticky-column {
+    align-self: flex-start;
+
+    position: sticky;
+    top: 10px;
+    max-height: calc(100vh - 20px);
+
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-multiple.sticky-column .sidebar:last-child {
+    flex-shrink: 1;
+    overflow-y: scroll;
+  }
+
+  .wiki-search-sidebar-box .wiki-search-results-container {
+    overflow-y: scroll;
+  }
+
+  .sidebar-column.sidebar.sticky-column > h1 {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    margin: 0 calc(-1 * var(--content-padding));
+    margin-bottom: 10px;
+
+    padding: 10px 5px;
+  }
+}
+
+@layer material {
+  .sidebar-multiple.sticky-column .sidebar:last-child {
+    scrollbar-width: thin;
+    scrollbar-color: var(--dim-color) var(--dark-color);
+  }
+
+  .wiki-search-sidebar-box .wiki-search-results-container {
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    scrollbar-color: var(--dim-color) var(--dark-color);
+  }
+
+  .sidebar-column.sticky-column .sidebar:last-child::-webkit-scrollbar,
+  .wiki-search-sidebar-box .wiki-search-results-container::-webkit-scrollbar {
+    background: var(--dark-color);
+    width: 12px;
+  }
+
+  .sidebar-column.sticky-column .sidebar:last-child::-webkit-scrollbar-thumb,
+  .wiki-search-sidebar-box .wiki-search-results-container::-webkit-scrollbar-thumb {
+    transition: background 0.2s;
+    background: rgba(255, 255, 255, 0.2);
+    border: 3px solid transparent;
+    border-radius: 10px;
+    background-clip: content-box;
+  }
+
+  .sidebar-column.sidebar.sticky-column > h1 {
+    border-bottom: 1px dotted rgba(220, 220, 220, 0.4);
+
+    background: var(--bg-black-color);
+
+    -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+
+    box-shadow:
+      0 2px 3px -1px #0006,
+      0 4px 8px -2px #0009;
+  }
+}

@@ -1,0 +1,223 @@
+/* Layout - Wide (most computers) */
+
+@media (min-width: 850px) {
+  #page-container.showing-sidebar-left:not(.sidebars-in-content-column) #secondary-nav:not(.always-visible),
+  #page-container.showing-sidebar-right:not(.sidebars-in-content-column) #secondary-nav:not(.always-visible) {
+    display: none;
+  }
+}
+
+/* Layout - Medium (tablets, some landscape mobiles)
+ *
+ * Note: Rules defined here are exclusive to "medium" width, i.e. they don't
+ * additionally apply to "thin". Use the later section which applies to both
+ * if so desired.
+ */
+
+@media (min-width: 600px) and (max-width: 849.98px) {
+  /* Medium layout is mainly defined (to the user) by hiding the sidebar, so
+   * don't apply the similar layout change of widening the long-content area
+   * if this page doesn't have a sidebar to hide in the first place.
+   */
+  #page-container.showing-sidebar-left main,
+  #page-container.showing-sidebar-right main {
+    --responsive-padding-ratio: 0.06;
+  }
+}
+
+/* Layout - Wide or Medium */
+
+@media (min-width: 600px) {
+  .content-sticky-heading-root {
+    /* Safari doesn't always play nicely with position: sticky,
+     * this seems to fix images sometimes displaying above the
+     * position: absolute subheading (h2) child
+     *
+     * See also: https://stackoverflow.com/questions/50224855/
+     */
+    transform: translate3d(0, 0, 0);
+    z-index: 1;
+  }
+
+  /* Cover art floats to the right. It's positioned in HTML beneath the
+   * heading, so pull it up a little to "float" on top.
+   */
+  #artwork-column {
+    float: right;
+    width: 40%;
+    min-width: 220px;
+    max-width: 280px;
+    margin: -60px 0 10px 20px;
+
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ...Except on top-indexes, where cover art is displayed prominently
+   * between the heading and subheading.
+   */
+  #content.top-index #artwork-column {
+    float: none;
+    margin: 2em auto 2.5em auto;
+    max-width: 375px;
+  }
+
+  html[data-url-key="localized.home"] #page-container.showing-sidebar-left .grid-listing > .grid-item:not(:nth-child(n+7)) {
+    flex-basis: 23%;
+    margin: 15px;
+  }
+
+  html[data-url-key="localized.home"] #page-container.showing-sidebar-left .grid-listing > .grid-item:nth-child(n+7) {
+    flex-basis: 18%;
+    margin: 10px;
+  }
+}
+
+/* Layout - Medium or Thin */
+
+@media (max-width: 849.98px) {
+  .sidebar.collapsible,
+  .sidebar-box-joiner.collapsible,
+  .sidebar-column.all-boxes-collapsible {
+    display: none;
+  }
+
+  /* Duplicated for "sidebars in content column" */
+
+  .layout-columns {
+    flex-direction: column;
+  }
+
+  .layout-columns > *:not(:last-child) {
+    margin-bottom: 10px;
+  }
+
+  .sidebar-column {
+    position: static !important;
+    max-width: unset !important;
+    flex-basis: unset !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    width: 100%;
+  }
+
+  .sidebar .news-entry:not(.first-news-entry) {
+    display: none;
+  }
+
+  .wiki-search-sidebar-box {
+    max-height: max(245px, 60vh, calc(100vh - 205px));
+  }
+
+  /* End duplicated for "sidebars in content column" */
+
+  .grid-listing > .grid-item {
+    flex-basis: 40%;
+  }
+}
+
+/* Layout - "sidebars in content column"
+ * This is the same code as immediately above, for medium and
+ * thin layouts, but can be opted into by the page itself
+ * instead of through a media query.
+ */
+
+#page-container.sidebars-in-content-column
+.layout-columns {
+  flex-direction: column;
+}
+
+#page-container.sidebars-in-content-column
+.layout-columns > *:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+#page-container.sidebars-in-content-column
+.sidebar-column {
+  position: static !important;
+  max-width: unset !important;
+  flex-basis: unset !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  width: 100%;
+}
+
+#page-container.sidebars-in-content-column
+.sidebar .news-entry:not(.first-news-entry) {
+  display: none;
+}
+
+#page-container.sidebars-in-content-column
+.wiki-search-sidebar-box {
+  max-height: max(245px, 60vh, calc(100vh - 205px));
+}
+
+/* Layout - Thin (phones) */
+
+@media (max-width: 600px) {
+  main {
+    --responsive-padding-ratio: 0.02;
+  }
+
+  #artwork-column {
+    margin: 25px 0 5px 0;
+    width: 100%;
+    max-width: unset;
+  }
+
+  #artwork-column .cover-artwork {
+    --normal-shadow: 0 0 transparent;
+  }
+
+  #artwork-column .cover-artwork:not(:first-child),
+  #artwork-column .cover-artwork-joiner {
+    margin-left: 30px;
+    margin-right: 30px;
+  }
+
+  .music-video {
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .music-video .image {
+    aspect-ratio: 32 / 9;
+  }
+
+  #additional-names-box {
+    width: unset;
+    max-width: unset;
+  }
+
+  .nav-has-content .nav-main-links .nav-link-accent {
+    display: block;
+  }
+
+  /* Show sticky heading above cover art */
+
+  .content-sticky-heading-root {
+    z-index: 2;
+  }
+
+  .content-sticky-heading-row h1 {
+    padding-right: 10px;
+  }
+
+  /* Let sticky heading text span past lower-index cover art */
+
+  .content-sticky-heading-container.has-cover .content-sticky-heading-row,
+  .content-sticky-heading-container.has-cover .content-sticky-subheading-row {
+    grid-template-columns: 1fr 90px;
+  }
+
+  /* Disable grid features, just line header children up vertically */
+
+  #header {
+    display: block;
+  }
+
+  #header > div:not(:first-child) {
+    margin-top: 0.5em;
+  }
+}
