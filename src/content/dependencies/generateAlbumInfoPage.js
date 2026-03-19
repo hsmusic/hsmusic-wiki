@@ -1,4 +1,4 @@
-import {empty} from '#sugar';
+import {albumHasSubstantialCommentaryPage} from '#wiki-data';
 
 export default {
   relations: (relation, album) => ({
@@ -43,7 +43,7 @@ export default {
         : null),
 
     commentaryLink:
-      (album.tracks.some(track => !empty(track.commentary))
+      (albumHasSubstantialCommentaryPage(album)
         ? relation('linkAlbumCommentary', album)
         : null),
 

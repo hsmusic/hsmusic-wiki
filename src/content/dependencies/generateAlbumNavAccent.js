@@ -1,4 +1,5 @@
-import {atOffset, empty} from '#sugar';
+import {atOffset} from '#sugar';
+import {albumHasSubstantialCommentaryPage} from '#wiki-data';
 
 export default {
   query(album, track) {
@@ -54,7 +55,7 @@ export default {
       album.tracks.length > 1,
 
     hasSubstantialCommentaryPage:
-      album.tracks.some(track => !empty(track.commentary)),
+      albumHasSubstantialCommentaryPage(album),
 
     galleryIsStub:
       album.tracks.every(t => !t.hasUniqueCoverArt),

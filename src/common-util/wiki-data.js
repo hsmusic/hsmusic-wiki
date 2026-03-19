@@ -610,3 +610,9 @@ export function* matchInlineLinks(source) {
     yield {href, length, index};
   }
 }
+
+export const albumHasSubstantialCommentaryPage = album =>
+  !empty(
+    album.tracks
+      .flatMap(track => track.commentary)
+      .filter(entry => !entry.isWikiEditorCommentary));
