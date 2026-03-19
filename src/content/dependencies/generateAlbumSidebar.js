@@ -1,5 +1,6 @@
 import {sortAlbumsTracksChronologically} from '#sort';
 import {stitchArrays, transposeArrays} from '#sugar';
+import {compareKebabCase} from '#wiki-data';
 
 export default {
   sprawl: ({groupData}) => ({
@@ -98,11 +99,19 @@ export default {
         : null),
   }),
 
-  data: (_query, _sprawl, album, track) => ({
+  data: (query, _sprawl, album, track) => ({
     isAlbumPage: !track,
     isTrackPage: !!track,
 
     albumStyle: album.style,
+
+    seriesBoxesResembleGroup:
+      stitchArrays({
+        group: query.groups,
+        serieses: query.groupSerieses,
+      }).map(({group, serieses}) =>
+          serieses.map(series =>
+            compareKebabCase(series.name, group.name))),
   }),
 
   generate(data, relations, {html}) {
@@ -122,7 +131,6 @@ export default {
       (presentGroupsLikeAlbum
         ? [
             relations.disconnectedSeriesBoxes,
-
             stitchArrays({
               groupBox: relations.groupBoxes,
               seriesBoxes: relations.seriesBoxes,
@@ -144,9 +152,19 @@ export default {
                   stitchArrays({
                     groupBox: relations.groupBoxes,
                     seriesBoxes: relations.seriesBoxes,
-                  }).flatMap(({groupBox, seriesBoxes}) => [
+                    seriesBoxesResembleGroup: data.seriesBoxesResembleGroup,
+                  }).flatMap(({
                       groupBox,
-                      ...seriesBoxes,
+                      seriesBoxes,
+                      seriesBoxesResembleGroup,
+                    }) => [
+                      groupBox,
+                      ...
+                        stitchArrays({
+                          seriesBox: seriesBoxes,
+                          resemblesGroup: seriesBoxesResembleGroup,
+                        }).filter(({resemblesGroup}) => !resemblesGroup)
+                          .map(({seriesBox}) => seriesBox),
                     ]),
                 ]).flat()
                   .map(box => box.content), /* TODO: Kludge. */
