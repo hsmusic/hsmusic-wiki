@@ -1565,6 +1565,9 @@
   }
 
   #image-overlay-content-container {
+    display: flex;
+    flex-direction: column;
+
     overflow: hidden;
   }
 
@@ -1579,6 +1582,7 @@
   #image-overlay-image-layout {
     display: block;
     position: relative;
+    max-height: 100%;
     margin: 4px 3px;
   }
 
@@ -1591,6 +1595,8 @@
 
   #image-overlay-image {
     position: absolute;
+    max-height: 100%;
+    object-fit: contain;
   }
 
   #image-overlay-container.no-thumb #image-overlay-image {
