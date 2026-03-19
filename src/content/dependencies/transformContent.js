@@ -715,6 +715,7 @@ export default {
             if (externalLink) {
               externalLink.setSlots({
                 content: label,
+                attributes: {class: 'text-with-tooltip-interaction-cue'},
                 fromContent: true,
               });
 
@@ -736,15 +737,17 @@ export default {
               content: tooltipContent, // Not sanitized!
             });
 
-            textWithTooltip.setSlots({
-              attributes: [
-                {class: 'content-tooltip-guy'},
-                externalLink && {class: 'has-link'},
-              ],
+            const attributes = html.attributes();
+            attributes.add('class', 'content-tooltip-guy');
 
-              text: externalLink ?? label,
-              tooltip,
-            });
+            if (externalLink) {
+              attributes.add('class', 'has-link');
+              textWithTooltip.setSlot('text', externalLink);
+            } else {
+              textWithTooltip.setSlot('text', label);
+            }
+
+            textWithTooltip.setSlots({attributes, tooltip});
 
             return {type: 'processed-tooltip', data: textWithTooltip};
           }

@@ -22,6 +22,11 @@ export default {
       mutable: false,
     },
 
+    attributes: {
+      type: 'attributes',
+      mutable: false,
+    },
+
     suffixNormalContent: {
       type: 'html',
       mutable: false,
@@ -177,6 +182,8 @@ export default {
             slots.suffixNormalContent),
         ], {[html.joinChildren]: ''});
     }
+
+    linkAttributes.add(slots.attributes);
 
     return html.tag('a', linkAttributes, linkContent);
   },

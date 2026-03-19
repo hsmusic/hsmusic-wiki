@@ -30,7 +30,10 @@ export default {
         {[html.onlyIfContent]: true},
 
         (willDisplayTooltip
-          ? {class: 'text-with-tooltip-interaction-cue'}
+          ? [
+              {class: 'text-with-tooltip-interaction-cue'},
+              {tabindex: '0'},
+            ]
           : topAttributes),
 
         language.encapsulate(titleCapsule, 'date', workingCapsule => {

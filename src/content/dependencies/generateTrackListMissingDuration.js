@@ -18,6 +18,8 @@ export default {
             language.$(durationCapsule, {
               duration:
                 html.tag('span', {class: 'text-with-tooltip-interaction-cue'},
+                  {tabindex: '0'},
+
                   language.$(durationCapsule, 'missing')),
             }),
 

@@ -51,6 +51,7 @@ export default {
      : hasTooltip
         ? html.tag('span', {class: 'hoverable'},
             {[html.onlyIfContent]: true},
+            {tabindex: '0'},
 
             html.tag('span', {class: 'text-with-tooltip-interaction-cue'},
               {[html.onlyIfContent]: true},
