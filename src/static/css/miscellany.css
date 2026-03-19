@@ -143,11 +143,6 @@
     text-decoration: none;
   }
 
-  a:hover {
-    text-decoration: underline;
-    text-decoration-style: solid !important;
-  }
-
   a.current {
     font-weight: 800;
   }
@@ -162,6 +157,24 @@
 
   a:not([href]):hover {
     text-decoration: none;
+  }
+}
+
+@Layer interaction {
+  /* This is an !important rule because it's really applicable
+   * pretty much anywhere, but the selector specificity is lower
+   * than most selectors which, say, add a dotted underline to
+   * begin with - those would take cascading priority.
+   *
+   * Similarly, this rule has to live in the interaction layer,
+   * because that's where other underline hover cues are set.
+   * If we set set it any higher (e.g. in print) the !important
+   * takes universal priority over !important's set in deeper
+   * layers - like interaction.
+   */
+  a:hover {
+    text-decoration: underline;
+    text-decoration-style: solid !important;
   }
 }
 
