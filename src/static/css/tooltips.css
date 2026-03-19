@@ -76,7 +76,7 @@
   }
 
   .text-with-tooltip .text-with-tooltip-interaction-cue {
-    text-decoration: underline;
+    text-decoration-line: underline;
     text-decoration-style: dotted;
   }
 
