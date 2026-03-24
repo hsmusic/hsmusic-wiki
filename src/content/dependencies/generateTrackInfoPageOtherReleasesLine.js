@@ -50,6 +50,11 @@ export default {
     albumColors:
       query.regularReleases
         .map(track => track.album.color),
+
+    singlePlacement:
+      (query.singleSingle
+        ? query.singleSingle.trackNumber === 1 ? 'as' : 'on'
+        : null),
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -94,7 +99,11 @@ export default {
 
         if (relations.singleLink) {
           any = true;
-          workingCapsule += '.asSingle';
+
+          const singleStringPart = `${data.singlePlacement}Single`;
+          const singleCapsule = language.encapsulate(capsule, singleStringPart);
+
+          workingCapsule += '.' + singleStringPart;
           workingOptions.single =
             relations.textWithTooltip.clone().slots({
               customInteractionCue: true,
@@ -102,7 +111,7 @@ export default {
               text:
                 relations.singleLink.slots({
                   attributes: {class: 'text-with-tooltip-interaction-cue'},
-                  content: language.$(capsule, 'single'),
+                  content: language.$(singleCapsule, 'link'),
                 }),
 
               tooltip:

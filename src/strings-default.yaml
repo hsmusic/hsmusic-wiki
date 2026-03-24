@@ -296,10 +296,17 @@ releaseInfo:
     asSingle: >-
       Also released {SINGLE}.
 
+    onSingle: >-
+      Also released {SINGLE}.
+
     onAlbums.asSingle: >-
       Also released on {ALBUMS}, and {SINGLE}.
 
-    single: "as a single"
+    onAlbums.onSingle: >-
+      Also released on {ALBUMS}, and {SINGLE}.
+
+    asSingle.link: "as a single"
+    onSingle.link: "on a single"
 
     tooltip:
       differentName: "as {NAME}"
