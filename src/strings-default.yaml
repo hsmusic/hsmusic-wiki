@@ -101,11 +101,11 @@ count:
     _: "{FLASHES}"
     withUnit:
       zero: ""
-      one: "{FLASHES} flashes & games"
+      one: "{FLASHES} flashes"
       two: ""
       few: ""
       many: ""
-      other: "{FLASHES} flashes & games"
+      other: "{FLASHES} flashes"
 
   tracks:
     _: "{TRACKS}"
@@ -336,8 +336,8 @@ releaseInfo:
       fromOther: "Tracks that sample this one — from somewhere else:"
 
   flashesThatFeature:
-    _: "Flashes & games that feature {TRACK}:"
-    sticky: "Flashes & games that feature this track:"
+    _: "Flashes that feature {TRACK}:"
+    sticky: "Flashes that feature this track:"
 
     item:
       _: "{FLASH}"
@@ -903,7 +903,7 @@ misc:
 
     tracks: "Tracks"
     artworks: "Artworks"
-    flashes: "Flashes & Games"
+    flashes: "Flashes"
     commentary: "Commentary"
 
     # Displayed on track and flash info pages.
@@ -1468,7 +1468,7 @@ artistPage:
     title: "Artworks"
 
   flashList:
-    title: "Flashes & Games"
+    title: "Flashes"
 
   commentaryList:
     title: "Commentary"
@@ -1671,7 +1671,7 @@ commentaryIndex:
 #   section ("side") of flash acts.
 #
 flashIndex:
-  title: "Flashes & Games"
+  title: "Flashes"
 
 #
 # flashSidebar:
@@ -2087,7 +2087,7 @@ listingPage:
         title:
           trackContributors: "Contributed tracks:"
           artContributors: "Contributed artworks:"
-          flashContributors: "Contributed to flashes & games:"
+          flashContributors: "Contributed to flashes:"
 
     # listArtists.byCommentary:
     #   Lists artists by number of commentary entries, most to least,
@@ -2313,8 +2313,8 @@ listingPage:
     #   excluded from the list.
 
     inFlashes.byAlbum:
-      title: "Tracks - in Flashes & Games (by Album)"
-      title.short: "...in Flashes & Games (by Album)"
+      title: "Tracks - in Flashes (by Album)"
+      title.short: "...in Flashes (by Album)"
 
       chunk:
         title: "{ALBUM}"
@@ -2329,8 +2329,8 @@ listingPage:
     #   any flashes are totally excluded from the list.
 
     inFlashes.byFlash:
-      title: "Tracks - in Flashes & Games (by Flash)"
-      title.short: "...in Flashes & Games (by Flash)"
+      title: "Tracks - in Flashes (by Flash)"
+      title.short: "...in Flashes (by Flash)"
 
       chunk:
         title: "{FLASH}"
