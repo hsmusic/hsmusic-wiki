@@ -1,6 +1,5 @@
 import {input, V} from '#composite';
 import Thing from '#thing';
-import {parseContributionPresets, parseWallpaperParts} from '#yaml';
 
 import {
   isBoolean,
@@ -10,9 +9,16 @@ import {
   isNumber,
 } from '#validators';
 
+import {
+  parseAnnotatedReferences,
+  parseContributionPresets,
+  parseWallpaperParts,
+} from '#yaml';
+
 import {exitWithoutDependency, exposeConstant} from '#composite/control-flow';
 
 import {
+  annotatedReferenceList,
   canonicalBase,
   color,
   contentString,
@@ -30,7 +36,7 @@ export class WikiInfo extends Thing {
   static [Thing.wikiData] = 'wikiInfo';
   static [Thing.oneInstancePerWiki] = true;
 
-  static [Thing.getPropertyDescriptors] = ({Group}) => ({
+  static [Thing.getPropertyDescriptors] = ({FlashSide, Group}) => ({
     // Update & expose
 
     name: name(V('Unnamed Wiki')),
@@ -73,6 +79,15 @@ export class WikiInfo extends Thing {
     divideTrackListsByGroups: referenceList({
       class: input.value(Group),
       find: soupyFind.input('group'),
+    }),
+
+    divideFlashListsBySides: annotatedReferenceList({
+      class: input.value(FlashSide),
+      find: soupyFind.input('flashSide'),
+
+      reference: input.value('side'),
+      annotation: input.value('label'),
+      thing: input.value('side'),
     }),
 
     contributionPresets: {
@@ -146,6 +161,17 @@ export class WikiInfo extends Thing {
       'Enable Group UI': {property: 'enableGroupUI'},
 
       'Divide Track Lists By Groups': {property: 'divideTrackListsByGroups'},
+
+      'Divide Flash Lists By Sides': {
+        property: 'divideFlashListsBySides',
+        transform: value =>
+          parseAnnotatedReferences(value, {
+            referenceField: 'Side',
+            referenceProperty: 'side',
+            annotationField: 'Label',
+            annotationProperty: 'label',
+          }),
+      },
 
       'Contribution Presets': {
         property: 'contributionPresets',

@@ -100,7 +100,7 @@ export default {
 
                     title:
                       language.$(capsule, {
-                        group: groupLink
+                        group: groupLink.slot('color', false),
                       }),
 
                     stickyTitle:
@@ -110,7 +110,7 @@ export default {
                   })
                 : html.tag('dt',
                     language.$(capsule, {
-                      group: groupLink
+                      group: groupLink.slot('color', false),
                     })))),
 
             html.tag('dd', trackList),

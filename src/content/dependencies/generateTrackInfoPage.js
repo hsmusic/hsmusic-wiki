@@ -108,7 +108,7 @@ export default {
         track),
 
     flashesThatFeatureList:
-      relation('generateTrackInfoPageFeaturedByFlashesList', track),
+      relation('generateDividedFeaturedInFlashesList', track.featuredInFlashes, track),
 
     lyricsSection:
       relation('generateLyricsSection', track.lyrics),

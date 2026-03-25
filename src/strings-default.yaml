@@ -339,10 +339,6 @@ releaseInfo:
     _: "Flashes that feature {TRACK}:"
     sticky: "Flashes that feature this track:"
 
-    item:
-      _: "{FLASH}"
-      asDifferentRelease: "{FLASH} (as {TRACK})"
-
   referencesArtworks: "References {ARTWORKS}."
   referencedByArtworks: "Referenced by {ARTWORKS}."
 
@@ -471,6 +467,13 @@ trackList:
 
     rerelease: >-
       {TRACK} (rerelease)
+
+flashList:
+  underSide: "under {SIDE}:"
+
+  item:
+    _: "{FLASH}"
+    asDifferentRelease: "{FLASH} (as {TRACK})"
 
 #
 # misc:

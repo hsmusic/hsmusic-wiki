@@ -1,36 +1,14 @@
-import {sortFlashesChronologically} from '#sort';
 import {stitchArrays} from '#sugar';
 
 export default {
-  sprawl: ({wikiInfo}) => ({
-    enableFlashesAndGames:
-      wikiInfo.enableFlashesAndGames,
-  }),
-
-  query: (sprawl, track) => ({
-    sortedFeatures:
-      (sprawl.enableFlashesAndGames
-        ? sortFlashesChronologically(
-            track.allReleases.flatMap(track =>
-              track.featuredInFlashes.map(flash => ({
-                flash,
-                track,
-
-                // These properties are only used for the sort.
-                act: flash.act,
-                date: flash.date,
-              }))))
-        : []),
-  }),
-
-  relations: (relation, query, _sprawl, track) => ({
+  relations: (relation, features, track) => ({
     flashLinks:
-      query.sortedFeatures
+      features
         .map(({flash}) => relation('linkFlash', flash)),
 
     trackLinks:
-      query.sortedFeatures
-        .map(({track: directlyFeaturedTrack}) =>
+      features
+        .map(({as: directlyFeaturedTrack}) =>
           (directlyFeaturedTrack === track
             ? null
          : directlyFeaturedTrack.name === track.name
@@ -47,7 +25,7 @@ export default {
         trackLink: relations.trackLinks,
       }).map(({flashLink, trackLink}) => {
           const attributes = html.attributes();
-          const parts = ['releaseInfo.flashesThatFeature.item'];
+          const parts = ['flashList.item'];
           const options = {flash: flashLink};
 
           if (trackLink) {

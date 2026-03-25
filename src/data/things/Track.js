@@ -5,7 +5,7 @@ import {colors} from '#cli';
 import {input, V} from '#composite';
 import find, {keyRefRegex} from '#find';
 import {onlyItem} from '#sugar';
-import {sortByDate} from '#sort';
+import {sortByDate, sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
 import {compareKebabCase} from '#wiki-data';
 
@@ -884,9 +884,44 @@ export class Track extends Thing {
       reverse: soupyReverse.input('tracksWhichSample'),
     }),
 
-    featuredInFlashes: reverseReferenceList({
+    ownFeaturedInFlashes: reverseReferenceList({
       reverse: soupyReverse.input('flashesWhichFeature'),
     }),
+
+    featuredInFlashes: [
+      {
+        dependencies: ['allReleases'],
+        compute: (continuation, {allReleases}) => continuation({
+          ['#data']:
+            allReleases.flatMap(track =>
+              track.ownFeaturedInFlashes.map(flash => ({
+                flash,
+                track,
+
+                // These properties are used for the upcoming sort.
+                act: flash.act,
+                date: flash.date,
+              }))),
+        }),
+      },
+
+      {
+        dependencies: ['#data'],
+        compute: (continuation, {'#data': data}) => continuation({
+          ['#sortedData']:
+            sortFlashesChronologically(data),
+        }),
+      },
+
+      {
+        dependencies: ['#sortedData'],
+        compute: ({'#sortedData': sortedData}) =>
+          sortedData.map(item => ({
+            flash: item.flash,
+            as: item.track,
+          })),
+      },
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {

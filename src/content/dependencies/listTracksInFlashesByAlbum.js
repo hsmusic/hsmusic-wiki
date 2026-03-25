@@ -16,7 +16,7 @@ export default {
     const flashes =
       tracks.map(tracks =>
         tracks.map(track =>
-          track.featuredInFlashes));
+          track.ownFeaturedInFlashes));
 
     // Filter out tracks that aren't featured in any flashes.
     // This listing doesn't perform any sorting within albums.
