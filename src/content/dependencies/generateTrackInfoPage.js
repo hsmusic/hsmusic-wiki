@@ -98,12 +98,12 @@ export default {
       relation('generateNearbyTrackList', track.sampledTracks, track, []),
 
     referencedByTracksList:
-      relation('generateTrackListDividedByGroups',
+      relation('generateDividedTrackList',
         query.mainReleaseTrack.referencedByTracks,
         track),
 
     sampledByTracksList:
-      relation('generateTrackListDividedByGroups',
+      relation('generateDividedTrackList',
         query.mainReleaseTrack.sampledByTracks,
         track),
 
