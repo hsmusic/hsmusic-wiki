@@ -154,7 +154,7 @@
     content: "";
     display: block;
     width: 220px;
-    border-bottom: 1px solid #777;
+    border-bottom: 1px solid var(--dim-color);
     margin-bottom: 0.6em;
   }
 }
