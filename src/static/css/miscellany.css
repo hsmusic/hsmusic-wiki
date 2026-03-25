@@ -44,31 +44,6 @@
 /* Totally miscellaneous typography */
 
 @layer layout {
-  dl dt {
-    padding-left: 40px;
-  }
-
-  dl dt {
-    /* Heads up, this affects the measurement
-     * for dl dt which are .content-heading!
-     */
-    margin-bottom: 2px;
-  }
-
-  dl dt[id]:not(.content-heading) {
-    --custom-scroll-offset: calc(2.5em - 2px);
-  }
-
-  dl dd {
-    margin-bottom: 1em;
-  }
-
-  dl ul,
-  dl ol {
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-
   li .origin-details {
     display: block;
     margin-left: 2ch;
@@ -132,6 +107,55 @@
   li .origin-details {
     font-size: 0.9em;
     font-style: oblique;
+  }
+}
+
+/* Definition lists and division lists */
+
+@layer layout {
+  dl dt {
+    padding-left: 40px;
+  }
+
+  dl dt {
+    /* Heads up, this affects the measurement
+     * for dl dt which are .content-heading!
+     */
+    margin-bottom: 2px;
+  }
+
+  dl dt[id]:not(.content-heading) {
+    --custom-scroll-offset: calc(2.5em - 2px);
+  }
+
+  dl dd {
+    margin-bottom: 1em;
+  }
+
+  dl ul,
+  dl ol {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  dl.division-list dd ul {
+    padding-left: 0;
+  }
+
+  dl.division-list dt {
+    font-size: 0.88em;
+  }
+
+  dl.division-list dd {
+    margin-bottom: 0.4em;
+  }
+
+  dl.division-list dd + dt::before {
+    content: "";
+    display: block;
+    width: 220px;
+    border-bottom: 1px solid #777;
+    margin-bottom: 0.6em;
   }
 }
 
