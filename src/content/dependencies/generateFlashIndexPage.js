@@ -54,6 +54,10 @@ export default {
       query.jumpActs
         .map(act => act.side.name),
 
+    jumpLinksSplitAbove:
+      query.jumpActs
+        .map(act => act.side.splitAbove),
+
     actAnchors:
       query.flashActs
         .map(act => act.directory),
@@ -81,14 +85,19 @@ export default {
               {[html.onlyIfContent]: true},
               stitchArrays({
                 colorStyle: relations.jumpLinkColorStyles,
+                splitAbove: data.jumpLinksSplitAbove,
                 anchor: data.jumpLinkAnchors,
                 label: data.jumpLinkLabels,
-              }).map(({colorStyle, anchor, label}) =>
+              }).map(({colorStyle, splitAbove, anchor, label}) => [
+                  splitAbove &&
+                    html.tag('br'),
+
                   html.tag('li',
                     html.tag('a',
                       {href: '#' + anchor},
                       colorStyle,
-                      label)))),
+                      label)),
+                ])),
           ]),
 
           stitchArrays({

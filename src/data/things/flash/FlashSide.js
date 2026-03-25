@@ -2,7 +2,7 @@ import {V} from '#composite';
 import Thing from '#thing';
 
 import {exposeConstant} from '#composite/control-flow';
-import {color, contentString, directory, name, soupyFind, thingList}
+import {color, contentString, directory, flag, name, soupyFind, thingList}
   from '#composite/wiki-properties';
 
 export class FlashSide extends Thing {
@@ -17,6 +17,8 @@ export class FlashSide extends Thing {
     directory: directory(),
     color: color(),
     listTerminology: contentString(),
+
+    splitAbove: flag(V(false)),
 
     acts: thingList(V(FlashAct)),
 
@@ -35,6 +37,8 @@ export class FlashSide extends Thing {
       'Directory': {property: 'directory'},
       'Color': {property: 'color'},
       'List Terminology': {property: 'listTerminology'},
+
+      'Split Above': {property: 'splitAbove'},
     },
   };
 

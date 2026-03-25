@@ -2035,6 +2035,10 @@
     content: " \00b7 ";
     font-weight: 800;
   }
+
+  ul.quick-info li:has(+ br)::after {
+    content: unset !important;
+  }
 }
 
 /* Sticky heading */
