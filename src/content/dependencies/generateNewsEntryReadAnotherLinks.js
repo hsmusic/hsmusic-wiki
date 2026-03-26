@@ -70,8 +70,6 @@ export default {
       entryLines.push(language.$(...parts, options));
     }
 
-    console.log(language.$order(prefix, 'previous.withDate', 0));
-
     return (
       html.tag('p', {class: 'read-another-links'},
         {[html.onlyIfContent]: true},
