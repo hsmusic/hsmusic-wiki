@@ -49,58 +49,66 @@ export default {
           !html.isBlank(relations.date) &&
             {class: 'dated'},
 
-          language.encapsulate(entryCapsule, 'title', titleCapsule => [
-            html.tag('span', {class: 'content-entry-heading-text'},
-              language.encapsulate(titleCapsule, workingCapsule => {
-                const workingOptions = {};
+          html.tag('span', {class: 'content-entry-heading-inner-box'},
+            language.encapsulate(entryCapsule, 'title', titleCapsule => [
+              html.tags([
+                html.tag('span', {class: 'float-spacer'},
+                  {[html.onlyIfSiblings]: true}),
 
-                const artists =
-                  html.tag('span', {class: 'content-entry-artists'},
-                    {[html.onlyIfContent]: true},
+                relations.date,
+              ]),
 
-                    (relations.artistsContent
-                      ? relations.artistsContent.slot('mode', 'inline')
-                   : relations.artistLinks
-                      ? language.formatConjunctionList(relations.artistLinks)
-                      : html.blank()));
+              html.tag('span', {class: 'content-entry-heading-text'},
+                language.encapsulate(titleCapsule, workingCapsule => {
+                  const workingOptions = {};
 
-                if (!html.isBlank(artists)) {
-                  workingCapsule += '.withArtists';
-                  workingOptions.artists = artists;
-                }
+                  const artists =
+                    html.tag('span', {class: 'content-entry-artists'},
+                      {[html.onlyIfContent]: true},
 
-                const annotation =
-                  html.tag('span', {class: 'content-entry-annotation'},
-                    {[html.onlyIfContent]: true},
+                      (relations.artistsContent
+                        ? relations.artistsContent.slot('mode', 'inline')
+                     : relations.artistLinks
+                        ? language.formatConjunctionList(relations.artistLinks)
+                        : html.blank()));
 
-                    (relations.annotationContent
-                      ? relations.annotationContent.slots({
-                          mode: 'inline',
-                          absorbPunctuationFollowingExternalLinks: false,
-                        })
-                      : html.blank()));
+                  if (!html.isBlank(artists)) {
+                    workingCapsule += '.withArtists';
+                    workingOptions.artists = artists;
+                  }
 
-                if (!html.isBlank(annotation)) {
-                  if (html.isBlank(artists)) {
-                    workingCapsule += '.withAnnotation';
-                    workingOptions.annotation = annotation;
-                  } else {
-                    workingCapsule += '.withAccent';
-                    workingOptions.accent =
-                      html.tag('span', {class: 'content-entry-accent'},
-                        language.$(titleCapsule, 'accent.withAnnotation', {annotation}));
+                  let annotation = html.blank();
+                  if (relations.annotationContent) {
+                    relations.annotationContent.slots({
+                      mode: 'inline',
+                      absorbPunctuationFollowingExternalLinks: false,
+                    });
 
-                    if (data.isWikiEditorEntry) {
-                      workingCapsule += '.wikiEditor';
+                    annotation =
+                      html.tag('span', {class: 'content-entry-annotation'},
+                        html.metatag('chunkwrap', {split: ','},
+                          relations.annotationContent));
+                  }
+
+                  if (!html.isBlank(annotation)) {
+                    if (html.isBlank(artists)) {
+                      workingCapsule += '.withAnnotation';
+                      workingOptions.annotation = annotation;
+                    } else {
+                      workingCapsule += '.withAccent';
+                      workingOptions.accent =
+                        html.tag('span', {class: 'content-entry-accent'},
+                          language.$(titleCapsule, 'accent.withAnnotation', {annotation}));
+
+                      if (data.isWikiEditorEntry) {
+                        workingCapsule += '.wikiEditor';
+                      }
                     }
                   }
-                }
 
-                return language.$(workingCapsule, workingOptions);
-              })),
-
-            relations.date,
-          ])),
+                  return language.$(workingCapsule, workingOptions);
+                })),
+            ]))),
 
         html.tag('blockquote', {class: 'content-entry-body'},
           slots.color &&

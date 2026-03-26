@@ -357,6 +357,40 @@
     max-width: 250px;
     margin: 15px 0 10px 20px;
   }
+
+  .content-entry-heading {
+    display: flex;
+
+    margin-left: 15px;
+    margin-right: min(calc(8vw - 35px), 45px);
+    padding-left: calc(5px + 1.25ch);
+    padding-right: 1ch;
+    padding-bottom: 0.2em;
+  }
+
+  .content-entry-heading-inner-box {
+    flex-grow: 1;
+  }
+
+  .content-entry-accent {
+    margin-left: 0.25ch;
+  }
+
+  .content-entry-heading .float-spacer {
+    float: right;
+    display: block;
+    height: calc(100% - 1em);
+
+    /* Width here controls margin (inset) on wrapped lines above the date. */
+    width: 3ch;
+  }
+
+  .content-entry-heading .commentary-date {
+    display: inline-block;
+    float: right;
+    clear: right;
+    margin-left: 1.75ch;
+  }
 }
 
 @layer material {
@@ -369,38 +403,36 @@
   .cover-artwork.commentary-art {
     box-shadow: 0 0 4px 5px rgba(0, 0, 0, 0.25) !important;
   }
+
+  .content-entry-heading {
+    border-bottom: 1px solid var(--dim-color);
+  }
+
+  .content-entry-heading .hoverable {
+    box-shadow: 1px 2px 6px 5px #04040460;
+  }
 }
 
 @layer print {
   .content-entry-heading {
-    margin-left: 15px;
-    padding-left: calc(5px + 1.25ch);
     text-indent: -1.25ch;
-    margin-right: min(calc(8vw - 35px), 45px);
-    padding-bottom: 0.2em;
-
-    border-bottom: 1px solid var(--dim-color);
-  }
-
-  .content-entry-accent {
-    margin-left: 0.25ch;
-  }
-
-  .content-entry-heading.dated .content-entry-accent {
-    margin-right: 0.75ch;
   }
 
   .content-entry-annotation {
     font-style: oblique;
   }
 
-  .content-entry-heading .commentary-date {
-    display: inline-block;
+  .content-entry-annotation .chunkwrap:first-child {
+    /* Cheat. */
+    display: inline;
+  }
+
+  .content-entry-annotation .chunkwrap:nth-child(n + 1) {
     text-indent: 0;
   }
 
-  .content-entry-heading .hoverable {
-    box-shadow: 1px 2px 6px 5px #04040460;
+  .content-entry-heading .commentary-date {
+    text-indent: 0;
   }
 
   .content-entry-body summary {
