@@ -1937,6 +1937,7 @@
   }
 }
 
+/*
 @layer interaction {
   .lyrics-entry.long-lyrics {
     clip-path: inset(-15px -20px);
@@ -1961,6 +1962,7 @@
     opacity: 0.6;
   }
 }
+*/
 
 /* Quick description */
 
