@@ -1,27 +1,4 @@
-function sameDay(musicVideo, thing) {
-  if (!musicVideo.dateIsSpecified) return null;
-
-  const compare = (a, b) =>
-    a && b &&
-    a.toDateString() === b.toDateString();
-
-  const album = thing.isTrack ? thing.album : thing;
-  const track = thing.isTrack ? thing : null;
-
-  if (compare(musicVideo.date, album.date)) {
-    if (album.style === 'single') {
-      return 'single';
-    } else {
-      return 'album';
-    }
-  }
-
-  if (compare(musicVideo.date, track?.date)) {
-    return 'track';
-  }
-
-  return null;
-}
+import {sameDayAs} from '#wiki-data';
 
 export default {
   data: (musicVideo, thing) => ({
@@ -31,22 +8,24 @@ export default {
     dateIsSpecified:
       musicVideo.dateIsSpecified,
 
-    sameDay:
-      sameDay(musicVideo, thing),
+    sameDayAs:
+      (musicVideo.dateIsSpecified
+        ? sameDayAs(musicVideo.date, thing)
+        : null),
   }),
 
   generate: (data, {language}) =>
     language.encapsulate('misc.musicVideo.date', capsule => [
-      data.sameDay === 'album' &&
+      data.sameDayAs === 'album' &&
         language.$(capsule, 'sameDayAsAlbum'),
 
-      data.sameDay === 'single' &&
+      data.sameDayAs === 'single' &&
         language.$(capsule, 'sameDayAsSingle'),
 
-      data.sameDay === 'track' &&
+      data.sameDayAs === 'track' &&
         language.$(capsule, 'sameDayAsTrack'),
 
-      data.sameDay === null &&
+      data.sameDayAs === null &&
       data.dateIsSpecified &&
         language.$(capsule, {
           date:

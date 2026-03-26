@@ -616,3 +616,30 @@ export const albumHasSubstantialCommentaryPage = album =>
     album.tracks
       .flatMap(track => track.commentary)
       .filter(entry => !entry.isWikiEditorCommentary));
+
+export function sameDayAs(givenDate, thing) {
+  if (!givenDate) return null;
+
+  const compare = (a, b) =>
+    a && b &&
+    a.toDateString() === b.toDateString();
+
+  if (thing.isAlbum || thing.isTrack) {
+    const album = thing.isTrack ? thing.album : thing;
+    const track = thing.isTrack ? thing : null;
+
+    if (compare(givenDate, album.date)) {
+      if (album.style === 'single') {
+        return 'single';
+      } else {
+        return 'album';
+      }
+    }
+
+    if (compare(givenDate, track?.date)) {
+      return 'track';
+    }
+  }
+
+  return null;
+}
