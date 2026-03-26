@@ -53,8 +53,8 @@
       brightness(1.5) saturate(1.4) blur(4px);
 
     box-shadow:
-      0 3px 6px 7px #0007,
-      0 3px 4px 2px #0006,
+      0 4px 6px 7px #0007,
+      0 4px 4px 2px #0004,
       0 -2px 4px -2px var(--primary-color) inset;
 
     text-indent: 0;
@@ -124,7 +124,7 @@
 @layer layout {
   .commentary-date-tooltip {
     right: -10px;
-    padding: 3px 4px 2px 2px;
+    padding: 4px 4px 2px 2px;
     left: unset;
   }
 
