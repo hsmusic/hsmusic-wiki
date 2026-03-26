@@ -545,6 +545,18 @@ misc:
         date.sometime.range: "sometime {DATE_RANGE}"
         date.throughout.range: "throughout {DATE_RANGE}"
 
+        date.sameDayAsAlbum: "same date as this album"
+        date.sameDayAsSingle: "same date as this single"
+        date.sameDayAsTrack: "same date as this track"
+        date.sameDayAsFlash: "same date as this flash"
+
+        date.relativeTo:
+          _: "with respect to {THING} —"
+          album: "this album"
+          single: "this single"
+          track: "this track"
+          flash: "this flash"
+
     info:
       fromMainRelease: >-
         The following commentary is properly placed on this track's main release, {ALBUM}.

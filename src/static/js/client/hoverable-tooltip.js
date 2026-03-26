@@ -714,6 +714,8 @@ export function positionTooltip(tooltip, x, y) {
   cssProp(tooltip, {
     left: `${x - tooltipRect.x}px`,
     top: `${y - tooltipRect.y}px`,
+    right: 'unset',
+    bottom: 'unset',
   });
 }
 
@@ -721,6 +723,8 @@ export function resetDynamicTooltipPositioning(tooltip) {
   cssProp(tooltip, {
     left: null,
     top: null,
+    right: null,
+    bottom: null,
   });
 }
 

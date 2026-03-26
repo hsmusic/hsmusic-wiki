@@ -407,10 +407,6 @@
   .content-entry-heading {
     border-bottom: 1px solid var(--dim-color);
   }
-
-  .content-entry-heading .hoverable {
-    box-shadow: 1px 2px 6px 5px #04040460;
-  }
 }
 
 @layer print {
@@ -447,6 +443,12 @@
     text-decoration-color: #fff9;
     text-decoration-thickness: 1.4px;
     color: #fffb;
+  }
+}
+
+@layer interaction {
+  .content-entry-heading .commentary-date .hoverable {
+    box-shadow: 1px 2px 6px 5px #04040460;
   }
 }
 

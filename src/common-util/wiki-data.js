@@ -641,5 +641,11 @@ export function sameDayAs(givenDate, thing) {
     }
   }
 
+  if (thing.isFlash) {
+    if (comapre(givenDate, thing.date)) {
+      return 'flash';
+    }
+  }
+
   return null;
 }

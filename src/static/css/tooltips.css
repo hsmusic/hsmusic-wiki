@@ -53,7 +53,8 @@
       brightness(1.5) saturate(1.4) blur(4px);
 
     box-shadow:
-      0 3px 4px 4px #000000aa,
+      0 3px 6px 7px #0007,
+      0 3px 4px 2px #0006,
       0 -2px 4px -2px var(--primary-color) inset;
 
     text-indent: 0;
@@ -91,7 +92,6 @@
 @layer layout {
   .datetimestamp-tooltip,
   .missing-duration-tooltip,
-  .commentary-date-tooltip,
   .rerelease-tooltip,
   .first-release-tooltip,
   .other-release-tooltip,
@@ -101,8 +101,7 @@
   }
 
   .datetimestamp-tooltip .tooltip-content,
-  .missing-duration-tooltip .tooltip-content,
-  .commentary-date-tooltip .tooltip-content {
+  .missing-duration-tooltip .tooltip-content {
     padding: 5px 6px;
     white-space: nowrap;
     font-size: 0.9em;
@@ -117,6 +116,33 @@
   .text-with-tooltip.rerelease .text-with-tooltip-interaction-cue,
   .text-with-tooltip.first-release .text-with-tooltip-interaction-cue {
     cursor: default;
+  }
+}
+
+/* Commentary date tooltip */
+
+@layer layout {
+  .commentary-date-tooltip {
+    right: -10px;
+    padding: 3px 4px 2px 2px;
+    left: unset;
+  }
+
+  .commentary-date-tooltip .tooltip-content {
+    padding: 2px 6px;
+    white-space: nowrap;
+    font-size: 0.9em;
+  }
+
+  .commentary-date-tooltip span.cute-break {
+    margin-top: 3px;
+    margin-bottom: 3px;
+  }
+}
+
+@layer print {
+  .commentary-date-tooltip .relative-to {
+    opacity: 0.8;
   }
 }
 
