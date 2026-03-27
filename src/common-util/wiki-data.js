@@ -642,7 +642,7 @@ export function sameDayAs(givenDate, thing) {
   }
 
   if (thing.isFlash) {
-    if (comapre(givenDate, thing.date)) {
+    if (compare(givenDate, thing.date)) {
       return 'flash';
     }
   }
