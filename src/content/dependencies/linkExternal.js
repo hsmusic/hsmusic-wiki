@@ -14,6 +14,9 @@ export default {
 
     canonicalBase:
       sprawl.canonicalBase,
+
+    canonicalMediaBase:
+      sprawl.canonicalMediaBase,
   }),
 
   slots: {
