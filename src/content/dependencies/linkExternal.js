@@ -83,10 +83,11 @@ export default {
     let href;
     if (urlIsValid) {
       const {canonicalBase, canonicalMediaBase} = data;
+      const past = front => decodeURIComponent(url.slice(front.length));
       if (canonicalMediaBase && url.startsWith(canonicalMediaBase)) {
-        href = to('media.path', url.slice(canonicalMediaBase.length));
+        href = to('media.path', past(canonicalMediaBase));
       } else if (canonicalBase && url.startsWith(canonicalBase)) {
-        href = to('shared.path', url.slice(canonicalBase.length));
+        href = to('shared.path', past(canonicalBase));
       } else {
         href = url;
       }
