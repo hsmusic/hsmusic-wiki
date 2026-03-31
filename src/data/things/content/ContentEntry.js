@@ -1,5 +1,5 @@
 import {input, V} from '#composite';
-import {transposeArrays} from '#sugar';
+import {transposeArrays, unique} from '#sugar';
 import Thing from '#thing';
 import {is, isDate, validateReferenceList} from '#validators';
 import {parseDate} from '#yaml';
@@ -33,14 +33,14 @@ export class ContentEntry extends Thing {
 
     thing: thing(),
 
-    artists: [
+    headingArtists: [
       withExpressedOrImplicitArtistReferences({
-        from: input.updateValue({
+        fromExpressed: input.updateValue({
           validate: validateReferenceList('artist'),
         }),
-      }),
 
-      exitWithoutDependency('#artistReferences', V([])),
+        fromContent: 'headingArtistText',
+      }),
 
       withResolvedReferenceList({
         list: '#artistReferences',
@@ -50,7 +50,36 @@ export class ContentEntry extends Thing {
       exposeDependency('#resolvedReferenceList'),
     ],
 
-    artistText: contentString(),
+    quotedArtists: [
+      exitWithoutDependency('body', V([])),
+
+      {
+        dependencies: ['body'],
+        compute: (continuation, {body}) => continuation({
+          ['#filterArtistTags']: node =>
+            /(\n|^)> <i>$/.test(body.slice(0, node.i)) &&
+            /^:<\/i>/.test(body.slice(node.iEnd)),
+        }),
+      },
+
+      withExpressedOrImplicitArtistReferences({
+        fromExpressed: input.updateValue({
+          validate: validateReferenceList('artist'),
+        }),
+
+        fromContent: 'body',
+        filterArtistTags: '#filterArtistTags',
+      }),
+
+      withResolvedReferenceList({
+        list: '#artistReferences',
+        find: soupyFind.input('artist'),
+      }),
+
+      exposeDependency('#resolvedReferenceList'),
+    ],
+
+    headingArtistText: contentString(),
 
     annotation: contentString(),
 
@@ -118,6 +147,14 @@ export class ContentEntry extends Thing {
     // Expose only
 
     isContentEntry: exposeConstant(V(true)),
+
+    artists: [
+      {
+        dependencies: ['headingArtists', 'quotedArtists'],
+        compute: ({headingArtists, quotedArtists}) =>
+          unique([...headingArtists, ...quotedArtists]),
+      },
+    ],
 
     annotationParts: [
       withAnnotationPartNodeLists(),
@@ -230,8 +267,10 @@ export class ContentEntry extends Thing {
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
-      'Artists': {property: 'artists'},
-      'Artist Text': {property: 'artistText'},
+      'Artists': {property: 'headingArtists'},
+      'Artist Text': {property: 'headingArtistText'},
+
+      'Quoted Artists': {property: 'quotedArtists'},
 
       'Annotation': {property: 'annotation'},
 

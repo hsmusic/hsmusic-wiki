@@ -3,14 +3,14 @@ import {empty} from '#sugar';
 export default {
   relations: (relation, entry) => ({
     artistLinks:
-      (!empty(entry.artists) && !entry.artistText
-        ? entry.artists
+      (!empty(entry.headingArtists) && !entry.headingArtistText
+        ? entry.headingArtists
             .map(artist => relation('linkArtist', artist))
         : null),
 
     artistsContent:
-      (entry.artistText
-        ? relation('transformContent', entry.artistText)
+      (entry.headingArtistText
+        ? relation('transformContent', entry.headingArtistText)
         : null),
 
     annotationContent:

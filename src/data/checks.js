@@ -352,6 +352,9 @@ export function filterReferenceErrors(wikiData, {
 
             switch (findFnKey) {
               case '_content':
+                // note: quoted artists ("Quoted Artists" field)`) currently
+                // not handled here at all. limitation of current code! oops!
+
                 if (value) {
                   value =
                     value.map(entry =>
@@ -721,13 +724,13 @@ export function reportContentTextErrors(wikiData, {
 
   const commentaryShape = {
     body: 'commentary body',
-    artistText: 'commentary artist text',
+    headingArtistText: 'commentary artist text',
     annotation: 'commentary annotation',
   };
 
   const lyricsShape = {
     body: 'lyrics body',
-    artistText: 'lyrics artist text',
+    headingArtistText: 'lyrics artist text',
     annotation: 'lyrics annotation',
   };
 

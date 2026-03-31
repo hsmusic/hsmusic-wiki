@@ -4,10 +4,10 @@ export default {
       relation('transformContent', entry.body),
 
     artistText:
-      relation('transformContent', entry.artistText),
+      relation('transformContent', entry.headingArtistText),
 
     artistLinks:
-      entry.artists
+      entry.headingArtists
         .filter(artist => artist.name !== 'HSMusic Wiki') // smh
         .map(artist => relation('linkArtist', artist)),
 

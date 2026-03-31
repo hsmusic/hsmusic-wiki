@@ -8,16 +8,19 @@ export default templateCompositeFrom({
   annotation: `withExpressedOrImplicitArtistReferences`,
 
   inputs: {
-    from: input({type: 'array', acceptsNull: true}),
+    fromExpressed: input({type: 'array', acceptsNull: true}),
+    fromContent: input({type: 'string', acceptsNull: true}),
+
+    filterArtistTags: input({type: 'function', defaultValue: () => true}),
   },
 
   outputs: ['#artistReferences'],
 
   steps: () => [
     {
-      dependencies: [input('from')],
+      dependencies: [input('fromExpressed')],
       compute: (continuation, {
-        [input('from')]: expressedArtistReferences,
+        [input('fromExpressed')]: expressedArtistReferences,
       }) =>
         (expressedArtistReferences
           ? continuation.raiseOutput({'#artistReferences': expressedArtistReferences})
@@ -25,12 +28,12 @@ export default templateCompositeFrom({
     },
 
     raiseOutputWithoutDependency({
-      dependency: 'artistText',
-      output: input.value({'#artistReferences': null}),
+      dependency: input('fromContent'),
+      output: input.value({'#artistReferences': []}),
     }),
 
     withContentNodes({
-      from: 'artistText',
+      from: input('fromContent'),
     }),
 
     withMappedList({
@@ -42,12 +45,18 @@ export default templateCompositeFrom({
       '#mappedList': '#artistTagFilter',
     }),
 
-    withFilteredList({
-      list: '#contentNodes',
-      filter: '#artistTagFilter',
+    withFilteredList('#contentNodes', '#artistTagFilter')
+      .outputs({'#filteredList': '#artistTags'}),
+
+    withMappedList({
+      list: '#artistTags',
+      map: input('filterArtistTags'),
     }).outputs({
-      '#filteredList': '#artistTags',
+      '#mappedList': '#customFilter',
     }),
+
+    withFilteredList({list: '#artistTags', filter: '#customFilter'})
+      .outputs({'#filteredList': '#artistTags'}),
 
     withMappedList({
       list: '#artistTags',
