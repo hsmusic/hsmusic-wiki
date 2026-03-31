@@ -12,6 +12,10 @@
     display: flex;
     flex-direction: column;
   }
+
+  #banner.short ~ * .wiki-search-sidebar-box {
+    --keep-viewport-visible: 180px;
+  }
 }
 
 @layer material {
