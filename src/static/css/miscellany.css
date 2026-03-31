@@ -478,7 +478,9 @@
     font-weight: normal;
     color: var(--primary-color);
   }
+}
 
+@layer interaction {
   summary > span:hover {
     cursor: pointer;
     text-decoration: underline;

@@ -416,10 +416,6 @@
     display: inline-block;
   }
 
-  .content-tooltip-guy:not(.has-link) .hoverable {
-    cursor: default;
-  }
-
   .content-tooltip-guy.has-link .text-with-tooltip-interaction-cue {
     text-decoration-color: var(--primary-color);
   }
@@ -438,6 +434,10 @@
 }
 
 @layer interaction {
+  .content-tooltip-guy:not(.has-link) .hoverable {
+    cursor: default;
+  }
+
   .content-tooltip-guy .hoverable a {
     text-decoration-color: transparent;
     text-decoration-style: dotted;
