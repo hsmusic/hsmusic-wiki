@@ -127,6 +127,7 @@ export const info = {
     activeQueryContextPageName: {type: 'string'},
     activeQueryContextPagePathname: {type: 'string'},
     activeQueryContextPageColor: {type: 'string'},
+    zapActiveQueryContext: {type: 'boolean'},
 
     activeQueryResults: {
       type: 'json',
@@ -163,6 +164,8 @@ export function* bindSessionStorage() {
     yield 'activeQueryContextPageName';
     yield 'activeQueryContextPagePathname';
     yield 'activeQueryContextPageColor';
+    yield 'zapActiveQueryContext';
+
     yield 'activeQueryResults';
     yield 'activeFilterType';
     yield 'resultsScrollOffset';
@@ -750,6 +753,15 @@ function recordActiveQueryContext() {
   const {session} = info;
 
   if (document.documentElement.dataset.urlKey === 'localized.home') {
+    session.activeQueryContextPageName = null;
+    session.activeQueryContextPagePathname = null;
+    session.activeQueryContextPageColor = null;
+    session.zapActiveQueryContext = true;
+    return;
+  }
+
+  // Zapping means subsequent searches don't record context.
+  if (session.zapActiveQueryContext) {
     return;
   }
 
@@ -795,6 +807,7 @@ function clearActiveQuery() {
   session.activeQueryContextPageName = null;
   session.activeQueryContextPagePathname = null;
   session.activeQueryContextPageColor = null;
+  session.zapActiveQueryContext = false;
 }
 
 function clearSidebarFilter() {
