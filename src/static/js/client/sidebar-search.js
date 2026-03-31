@@ -106,6 +106,8 @@ export const info = {
     recallingRecentSearch: null,
     recallingRecentSearchFromMouse: null,
 
+    justPerformedActiveQuery: false,
+
     currentValue: null,
 
     workerStatus: null,
@@ -731,6 +733,7 @@ async function activateSidebarSearch(query) {
     return;
   }
 
+  state.justPerformedActiveQuery = true;
   state.searchStage = 'complete';
   updateSidebarSearchStatus();
 
@@ -796,6 +799,7 @@ function clearSidebarSearch() {
   info.searchInput.value = '';
 
   state.searchStage = null;
+  state.justPerformedActiveQuery = false;
 
   clearActiveQuery();
 
@@ -1485,7 +1489,7 @@ function tidySidebarSearchColumn() {
 
   // Don't tidy the sidebar if you've navigated to some other page than
   // what's in the current result list.
-  if (!currentPageIsResult) {
+  if (!state.justPerformedActiveQuery && !currentPageIsResult) {
     return;
   }
 
