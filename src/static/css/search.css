@@ -5,7 +5,9 @@
     padding: 1px 0 0 0;
 
     z-index: 100;
-    max-height: calc(100vh - 20px);
+
+    --keep-viewport-visible: 125px;
+    max-height: max(245px, 60vh, calc(100vh - var(--keep-viewport-visible)));
 
     display: flex;
     flex-direction: column;
