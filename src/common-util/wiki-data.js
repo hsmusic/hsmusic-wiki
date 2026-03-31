@@ -76,55 +76,48 @@ export function compareKebabCase(name1, name2) {
 //   by slashes or dashes (only valid orders are MM/DD/YYYY and YYYY/MM/DD)
 //
 const dateRegex = groupName =>
-  re`
-    (?<${groupName}>
-      ${[
-        /[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}/, '|',
-        /[0-9]{1,2} [^,]*[0-9]{4,4}/, '|',
-        /[0-9]{1,4}[-/][0-9]{1,4}[-/][0-9]{1,4}/,
-      ]}
-    )
-  `;
+  re([
+    `(?<${groupName}>`,
+      /[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}/, '|',
+      /[0-9]{1,2} [^,]*[0-9]{4,4}/, '|',
+      /[0-9]{1,4}[-/][0-9]{1,4}[-/][0-9]{1,4}/,
+    `)`,
+  ]);
 
 const contentEntryHeadingRegex =
-  re('gm')`
-    ^(?:
-      (?:${[
+  re('gm', [
+    '^(?:',
+      '(?:',
         /<i>(?<artists>.+?):<\/i>/,
         /(?: \((?<annotation1>.*)\))?/,
-      ]})
-      |
-      (?:${[
+      ')',
+      '|',
+      '(?:',
         /@@ (?<annotation2>.*)/,
-      ]})
-    )$
-  `;
+      ')',
+    ')$',
+  ]);
 
 const contentEntryAnnotationTailRegex =
-  re`
-    ${/(?:, |^)/}
+  re([
+    /(?:, |^)/,
 
-    ${/(?:(?<dateKind>sometime|throughout|around) )?/}
+    /(?:(?<dateKind>sometime|throughout|around) )?/,
+    dateRegex('date'),
 
-    ${dateRegex('date')}
+    '(?:',
+      ' ?',
+      '-',
+      ' ?',
+      dateRegex('secondDate'),
+    ')?',
 
-    ${[
-      '(?:',
-        ' ?',
-        '-',
-        ' ?',
-        dateRegex('secondDate'),
-      ')?',
-    ]}
-
-    ${[
-      '(?: ?(?<= )',
-        /(?<accessKind>captured|accessed)/,
-        ' ',
-        dateRegex('accessDate'),
-      ')?',
-    ]}
-  `;
+    '(?: ?(?<= )',
+      /(?<accessKind>captured|accessed)/,
+      ' ',
+      dateRegex('accessDate'),
+    ')?',
+  ]);
 
 export function* matchContentEntries(sourceText) {
   let workingEntry = null;
@@ -606,20 +599,21 @@ export function* matchMarkdownLinks(markdownSource, {marked}) {
 }
 
 export function* matchInlineLinks(source) {
-  const plausibleLinkRegexp = re('gmi')`
-    ${/\b[a-z]*:\/\//}
-    ${/.*?/}
+  const plausibleLinkRegexp =
+    re('gmi', [
+      /\b[a-z]*:\/\//,
+      /.*?/,
 
-    (?=${[
-      // Ordinary in-sentence punctuation doesn't terminate the
-      // un-greedy URL match above, but it shouldn't be counted
-      // as part of the link either, if it's at the end.
-      /(?:[,.!?]*)/,
+      '(?=',
+        // Ordinary in-sentence punctuation doesn't terminate the
+        // un-greedy URL match above, but it shouldn't be counted
+        // as part of the link either, if it's at the end.
+        /(?:[,.!?]*)/,
 
-      // Actual terminators.
-      /(?:\s|$|<br>)/,
-    ]})
-  `;
+        // Actual terminators.
+        /(?:\s|$|<br>)/,
+      ')',
+    ]);
 
   let plausibleMatch = null;
   while (plausibleMatch = plausibleLinkRegexp.exec(source)) {

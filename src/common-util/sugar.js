@@ -418,39 +418,28 @@ export function escapeRegex(string) {
 }
 
 // Adapted from here: https://emnudge.dev/notes/multiline-regex/
+// ...with a lot of changes
 export function re(...args) {
-  let flags = '';
-
-  const fn = (strings, ...substitutions) => {
-    strings = strings
-      .map(str => str.replace(/(?:\/\/.+)/gm, ''))
-      .map(str => str.replace(/\s+/g, ''));
-
-    substitutions = substitutions
-      .map(sub => [sub].flat(Infinity))
-      .map(sub => sub
-        .map(item =>
-          (item instanceof RegExp
-            ? item.source
-            : item.toString())))
-      .map(sub => sub.join(''));
-
-    const source =
-      String.raw({raw: strings}, ...substitutions);
-
-    return new RegExp(source, flags);
-  };
-
-  if (
-    args.length === 1 &&
-    typeof args[0] === 'string' &&
-    args[0].match(/^[a-z]+$/)
-  ) {
+  let flags, parts;
+  if (args.length === 2) {
     flags = args[0];
-    return fn;
+    parts = args[1];
+  } else if (args.length === 1) {
+    flags = '';
+    parts = args[0];
   } else {
-    return fn(...args);
+    throw new Error(`Expected 1 or 2 arguments`);
   }
+
+  const source = parts
+    .flat(Infinity)
+    .map(item =>
+      (item instanceof RegExp
+        ? item.source
+        : item.toString()))
+    .join('');
+
+  return new RegExp(source, flags);
 }
 
 export function splitKeys(key) {
