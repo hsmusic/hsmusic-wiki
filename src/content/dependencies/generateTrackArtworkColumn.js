@@ -21,7 +21,7 @@ export default {
       relations.albumCover?.slots({
         showOriginDetails: true,
         showArtTagDetails: true,
-        showReferenceDetails: true,
+        showReferenceDetails: false,
       }),
 
       relations.trackCovers.map(cover =>
