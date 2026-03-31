@@ -65,6 +65,7 @@ function quickNodeDependency({
 export const dependencyRoutes = [
   quickNodeDependency({
     name: 'chroma-js',
+    path: 'dist',
   }),
 
   quickNodeDependency({

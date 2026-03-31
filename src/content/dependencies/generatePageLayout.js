@@ -741,7 +741,7 @@ export default {
             slottedStyleTags,
 
             html.tag('script', {
-              src: to('staticLib.path', 'chroma-js/chroma.min.js'),
+              src: to('staticLib.path', 'chroma-js/chroma.min.cjs'),
             }),
 
             html.tag('script', {
