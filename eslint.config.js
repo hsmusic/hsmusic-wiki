@@ -55,7 +55,9 @@ export default defineConfig([
       'no-constant-condition': ['off'],
       'no-unsafe-finally': ['off'],
       'no-self-assign': ['off'],
+      'no-useless-assignment': ['off'],
       'require-yield': ['off'],
+      'preserve-caught-error': ['off'],
     },
   },
 
