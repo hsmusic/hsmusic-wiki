@@ -356,7 +356,7 @@
   /* Shadow along top edge */
 
   .wiki-search-results-container > :first-child {
-    margin-top: -6px;
+    margin-top: -4px;
   }
 
   .wiki-search-results-container::before {
@@ -368,7 +368,7 @@
   /* Shadow along bottom edge */
 
   .wiki-search-results-container > :last-child {
-    margin-bottom: -12px;
+    margin-bottom: -10px;
   }
 
   .wiki-search-results-container::after {
