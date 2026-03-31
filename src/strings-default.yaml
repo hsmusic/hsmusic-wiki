@@ -1395,6 +1395,10 @@ artistPage:
 
       withCitation: "{ENTRY} ({CITATION})"
 
+      citation: "{CITATION}"
+      citation.quoted: "quoted: {CITATION}"
+      quoted: "quoted"
+
       # rerelease:
       #   Tracks which aren't the original release don't display co-
       #   artists or contributors, and get dimmed a little compared

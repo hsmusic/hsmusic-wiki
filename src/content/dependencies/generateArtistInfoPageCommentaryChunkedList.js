@@ -30,6 +30,10 @@ export default {
         flashAct,
         flash,
 
+        quoted:
+         !entry.headingArtists.includes(artist) &&
+          entry.quotedArtists.includes(artist),
+
         annotation: entry.annotation,
         annotationParts: entry.annotationParts,
       },
@@ -191,6 +195,11 @@ export default {
       query.chunks
         .map(({chunk}) => chunk
           .map(({itemType}) => itemType)),
+
+    itemQuoted:
+      query.chunks
+        .map(({chunk}) => chunk
+          .map(({quoted}) => quoted)),
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -206,6 +215,7 @@ export default {
         itemLinks: relations.itemLinks,
         itemAnnotations: relations.itemAnnotations,
         itemTypes: data.itemTypes,
+        itemQuoted: data.itemQuoted,
       }).map(({
           chunk,
           chunkLink,
@@ -215,64 +225,77 @@ export default {
           itemLinks,
           itemAnnotations,
           itemTypes,
+          itemQuoted,
         }) =>
-          language.encapsulate('artistPage.creditList.entry', capsule =>
-            (chunkType === 'album'
-              ? chunk.slots({
-                  mode: 'album',
-                  link: chunkLink,
+          language.encapsulate('artistPage.creditList.entry', capsule => {
+            // The citation slot, instead of annotation, gives commentary
+            // a specially custom look.
+            const citations =
+              stitchArrays({annotation: itemAnnotations, quoted: itemQuoted})
+                .map(({annotation, quoted}) =>
+                  language.encapsulate(capsule, workingCapsule => {
+                    const workingOptions = {};
 
-                  list:
-                    html.tag('ul',
-                      stitchArrays({
-                        item: items,
-                        link: itemLinks,
-                        annotation: itemAnnotations,
-                        type: itemTypes,
-                      }).map(({item, link, annotation, type}) =>
-                        item.slots({
-                          // The citation slot, instead of annotation, gives commentary
-                          // a specially custom look.
-                          citation:
-                            annotation.slots({
-                              mode: 'inline',
-                              absorbPunctuationFollowingExternalLinks: false,
-                            }),
+                    let any = false;
 
-                          content:
-                            (type === 'album'
-                              ? html.tag('i',
-                                  language.$(capsule, 'album.commentary'))
-                              : language.$(capsule, 'track', {track: link})),
-                        }))),
-                })
+                    annotation.setSlots({
+                      mode: 'inline',
+                      absorbPunctuationFollowingExternalLinks: false,
+                    });
 
-             : chunkType === 'flash-act'
-              ? chunk.slots({
-                  mode: 'flash',
-                  link: chunkLink,
+                    if (!html.isBlank(annotation)) {
+                      workingCapsule += '.citation';
+                      workingOptions.citation = annotation;
+                      any = true;
+                    }
 
-                  list:
-                    html.tag('ul',
-                      stitchArrays({
-                        item: items,
-                        link: itemLinks,
-                        annotation: itemAnnotations,
-                      }).map(({item, link, annotation}) =>
-                        item.slots({
-                          annotation:
-                            (annotation
-                              ? annotation.slots({
-                                  mode: 'inline',
-                                  absorbPunctuationFollowingExternalLinks: false,
-                                })
-                              : null),
+                    if (quoted) {
+                      workingCapsule += '.quoted';
+                      any = true;
+                    }
 
-                          content:
-                            language.$(capsule, 'flash', {
-                              flash: link,
-                            }),
-                        }))),
-                })
-              : null)))),
+                    if (any) {
+                      return language.$(workingCapsule, workingOptions);
+                    } else {
+                      return html.blank();
+                    }
+                  }));
+
+            let contents;
+
+            if (chunkType === 'album') {
+              chunk.setSlot('mode', 'album');
+              contents =
+                stitchArrays({link: itemLinks, type: itemTypes})
+                  .map(({link, type}) =>
+                    (type === 'album'
+                      ? html.tag('i',
+                          language.$(capsule, 'album.commentary'))
+                      : language.$(capsule, 'track', {track: link})));
+
+            } else if (chunkType === 'flash-act') {
+              chunk.setSlot('mode', 'flash');
+              contents =
+                itemLinks.map(link =>
+                  language.$(capsule, 'flash', {flash: link}));
+
+            } else {
+              throw new Error(`Gyeep!!`);
+            }
+
+            chunk.setSlots({
+              link: chunkLink,
+
+              list:
+                html.tag('ul',
+                  stitchArrays({
+                    item: items,
+                    citation: citations,
+                    content: contents,
+                  }).map(({item, citation, content}) =>
+                      item.slots({citation, content}))),
+            });
+
+            return chunk;
+          }))),
 };
