@@ -417,6 +417,42 @@ export function escapeRegex(string) {
   return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
+// Adapted from here: https://emnudge.dev/notes/multiline-regex/
+export function re(...args) {
+  let flags = '';
+
+  const fn = (strings, ...substitutions) => {
+    strings = strings
+      .map(str => str.replace(/(?:\/\/.+)/gm, ''))
+      .map(str => str.replace(/\s+/g, ''));
+
+    substitutions = substitutions
+      .map(sub => [sub].flat(Infinity))
+      .map(sub => sub
+        .map(item =>
+          (item instanceof RegExp
+            ? item.source
+            : item.toString())))
+      .map(sub => sub.join(''));
+
+    const source =
+      String.raw({raw: strings}, ...substitutions);
+
+    return new RegExp(source, flags);
+  };
+
+  if (
+    args.length === 1 &&
+    typeof args[0] === 'string' &&
+    args[0].match(/^[a-z]+$/)
+  ) {
+    flags = args[0];
+    return fn;
+  } else {
+    return fn(...args);
+  }
+}
+
 export function splitKeys(key) {
   return key.split(/(?<=(?<!\\)(?:\\\\)*)\./);
 }
