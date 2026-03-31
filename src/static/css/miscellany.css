@@ -174,14 +174,6 @@
   a.series {
     font-style: oblique;
   }
-
-  a:not([href]) {
-    cursor: default;
-  }
-
-  a:not([href]):hover {
-    text-decoration: none;
-  }
 }
 
 @Layer interaction {
@@ -199,6 +191,14 @@
   a:hover {
     text-decoration: underline;
     text-decoration-style: solid !important;
+  }
+
+  a:not([href]) {
+    cursor: default;
+  }
+
+  a:not([href]):hover {
+    text-decoration: none;
   }
 }
 
