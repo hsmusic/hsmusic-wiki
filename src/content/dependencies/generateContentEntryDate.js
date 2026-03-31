@@ -35,7 +35,7 @@ export default {
 
      : entry.thing.isTrack &&
        entry.thing.date === entry.thing.album.date &&
-       entry.thing.style === 'single'
+       entry.thing.album.style === 'single'
         ? 'single'
 
      : entry.thing.isTrack &&
