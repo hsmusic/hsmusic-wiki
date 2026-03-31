@@ -79,7 +79,6 @@
     },
     "license": "MIT",
     "devDependencies": {
-        "tap": "21.6.2",
-        "tcompare": "^6.0.0"
+        "tap": "21.6.2"
     }
 }
