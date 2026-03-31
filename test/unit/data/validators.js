@@ -17,7 +17,6 @@ import {
 
   // Wiki data
   isColor,
-  isCommentary,
   isContentString,
   isContribution,
   isContributionList,
@@ -150,21 +149,6 @@ t.test('isColor', t => {
   t.throws(() => isColor('#ggg'), TypeError);
   t.throws(() => isColor('red'), TypeError);
   t.throws(() => isColor('hsl(150deg 30% 60%)'), TypeError);
-});
-
-t.test('isCommentary', t => {
-  t.plan(9);
-
-  // TODO: Test specific error messages.
-  t.ok(isCommentary(`<i>Toby Fox:</i>\ndogsong.mp3`));
-  t.ok(isCommentary(`<i>Toby Fox:</i> (music)\ndogsong.mp3`));
-  t.throws(() => isCommentary(`dogsong.mp3\n<i>Toby Fox:</i>\ndogsong.mp3`));
-  t.throws(() => isCommentary(`<i>Toby Fox:</i> dogsong.mp3`));
-  t.throws(() => isCommentary(`<i>Toby Fox:</i> (music) dogsong.mp3`));
-  t.throws(() => isCommentary(`<i>I Have Nothing To Say:</i>`));
-  t.throws(() => isCommentary(123));
-  t.throws(() => isCommentary(``));
-  t.throws(() => isCommentary(`Technically, ah, er:</i>\nCorrect`));
 });
 
 t.test('isContentString', t => {
