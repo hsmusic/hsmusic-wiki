@@ -76,42 +76,55 @@ export function compareKebabCase(name1, name2) {
 //   by slashes or dashes (only valid orders are MM/DD/YYYY and YYYY/MM/DD)
 //
 const dateRegex = groupName =>
-  String.raw`(?<${groupName}>` +
-    String.raw`[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|` +
-    String.raw`[0-9]{1,2} [^,]*[0-9]{4,4}|` +
-    String.raw`[0-9]{1,4}[-/][0-9]{1,4}[-/][0-9]{1,4}` +
-  String.raw`)`;
-
-const contentEntryHeadingRegexRaw =
-  String.raw`^(?:` +
-    String.raw`(?:` +
-      String.raw`<i>(?<artists>.+?):<\/i>` +
-      String.raw`(?: \((?<annotation1>.*)\))?` +
-    String.raw`)` +
-    String.raw`|` +
-    String.raw`(?:` +
-      String.raw`@@ (?<annotation2>.*)` +
-    String.raw`)` +
-  String.raw`)$`;
+  re`
+    (?<${groupName}>
+      ${[
+        /[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}/, '|',
+        /[0-9]{1,2} [^,]*[0-9]{4,4}/, '|',
+        /[0-9]{1,4}[-/][0-9]{1,4}[-/][0-9]{1,4}/,
+      ]}
+    )
+  `;
 
 const contentEntryHeadingRegex =
-  new RegExp(contentEntryHeadingRegexRaw, 'gm');
-
-const contentEntryAnnotationTailRegexRaw =
-  String.raw`(?:, |^)` +
-
-  String.raw`(?:(?<dateKind>sometime|throughout|around) )?` +
-  String.raw`${dateRegex('date')}` +
-  String.raw`(?: ?- ?${dateRegex('secondDate')})?` +
-
-  String.raw`(?: ?(?<= )` +
-    String.raw`(?<accessKind>captured|accessed) ${dateRegex('accessDate')}` +
-  String.raw`)?` +
-
-  String.raw`$`;
+  re('gm')`
+    ^(?:
+      (?:${[
+        /<i>(?<artists>.+?):<\/i>/,
+        /(?: \((?<annotation1>.*)\))?/,
+      ]})
+      |
+      (?:${[
+        /@@ (?<annotation2>.*)/,
+      ]})
+    )$
+  `;
 
 const contentEntryAnnotationTailRegex =
-  new RegExp(contentEntryAnnotationTailRegexRaw);
+  re`
+    ${/(?:, |^)/}
+
+    ${/(?:(?<dateKind>sometime|throughout|around) )?/}
+
+    ${dateRegex('date')}
+
+    ${[
+      '(?:',
+        ' ?',
+        '-',
+        ' ?',
+        dateRegex('secondDate'),
+      ')?',
+    ]}
+
+    ${[
+      '(?: ?(?<= )',
+        /(?<accessKind>captured|accessed)/,
+        ' ',
+        dateRegex('accessDate'),
+      ')?',
+    ]}
+  `;
 
 export function* matchContentEntries(sourceText) {
   let workingEntry = null;
