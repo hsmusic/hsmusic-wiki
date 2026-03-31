@@ -191,6 +191,8 @@
 @layer layout {
   .wiki-search-context-container {
     padding: 2px 12px 4px;
+    padding-left: calc(12px + 1.2ch);
+    text-indent: -1.2ch;
   }
 }
 
