@@ -50,7 +50,10 @@ export default class CacheableObject {
       if (!flags.update) continue;
 
       if (typeof update === 'object' && update !== null && 'default' in update) {
-        validatePropertyValue(property, null, update.default, update);
+        if (update.validate) {
+          validatePropertyValue(property, null, update.default, update);
+        }
+
         this.prototype[CacheableObject.updateValue][property] = update.default;
       } else {
         this.prototype[CacheableObject.updateValue][property] = null;
