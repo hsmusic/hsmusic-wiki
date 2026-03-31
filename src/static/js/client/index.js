@@ -60,6 +60,7 @@ const clientInfo = window.hsmusicClientInfo = Object.create(null);
 // So for example, all modules' getPageReferences steps are evaluated, then
 // all modules' addInternalListeners steps are evaluated, and so on.
 const setupSteps = {
+  bindSessionStorage: [],
   getPageReferences: [],
   addInternalListeners: [],
   mutatePageContent: [],
@@ -322,7 +323,11 @@ function evaluateBindSessionStorageStep(bindSessionStorage) {
 function evaluateStep(stepsObject, key) {
   for (const step of stepsObject[key]) {
     try {
-      step();
+      if (key === 'bindSessionStorage') {
+        evaluateBindSessionStorageStep(step);
+      } else {
+        step();
+      }
     } catch (error) {
       console.error(`During ${key}, failed to run ${step.name}`);
       console.error(error);
