@@ -10,17 +10,27 @@ import {TupleMap} from '#wiki-data';
 
 const globalCompositeCache = {};
 
-const _valueIntoToken = shape =>
-  (value = null) =>
-    (value === null
-      ? Symbol.for(`hsmusic.composite.${shape}`)
-   : typeof value === 'string'
-      ? Symbol.for(`hsmusic.composite.${shape}:${value}`)
-      : {
-          symbol: Symbol.for(`hsmusic.composite.${shape.split('.')[0]}`),
-          shape,
-          value,
-        });
+const _valueIntoToken = shape => (value = null) => {
+  if (value === null) {
+    return Symbol.for(`hsmusic.composite.${shape}`);
+  }
+
+  if (typeof value === 'string') {
+    return Symbol.for(`hsmusic.composite.${shape}:${value}`);
+  }
+
+  if (typeof value === 'object') {
+    if (Object.values(value).some(isInputToken)) {
+      throw new TypeError(`Don't nest input tokens inside ${shape}()`);
+    }
+  }
+
+  return {
+    symbol: Symbol.for(`hsmusic.composite.${shape.split('.')[0]}`),
+    shape,
+    value,
+  };
+};
 
 export const input = _valueIntoToken('input');
 input.symbol = Symbol.for('hsmusic.composite.input');
