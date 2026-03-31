@@ -46,7 +46,7 @@
         "#serialize": "./src/data/serialize.js",
         "#sort": "./src/common-util/sort.js",
         "#sugar": "./src/common-util/sugar.js",
-        "#test-lib": "./test/lib/index.js",
+        "#test-lib": "./test/test-lib.js",
         "#thing": "./src/data/thing.js",
         "#things": "./src/data/things/init.js",
         "#thumbs": "./src/gen-thumbs.js",
