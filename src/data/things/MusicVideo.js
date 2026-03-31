@@ -10,7 +10,6 @@ import {constituteFrom} from '#composite/wiki-data';
 
 import {
   exposeConstant,
-  exposeDependency,
   exposeUpdateValueOrContinue,
   exposeWhetherDependencyAvailable,
   exitWithoutDependency,

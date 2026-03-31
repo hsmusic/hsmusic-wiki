@@ -615,7 +615,7 @@ export function addPageListeners() {
       return;
     }
 
-    if (event.shiftKey && event.code === 'Slash') {
+    if (domEvent.shiftKey && domEvent.code === 'Slash') {
       domEvent.preventDefault();
       info.searchLabel.click();
     }
@@ -785,7 +785,7 @@ function recordActiveQueryContext() {
 }
 
 function clearSidebarSearch() {
-  const {session, state} = info;
+  const {state} = info;
 
   if (state.stoppedTypingTimeout) {
     clearTimeout(state.stoppedTypingTimeout);

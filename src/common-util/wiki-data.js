@@ -575,7 +575,7 @@ export function* matchMarkdownLinks(markdownSource, {marked}) {
   // This is just an optimization. Don't let Marked try to process tokens
   // recursively, i.e. within the text/label of the link. We only care about
   // the text itself, as a string.
-  lexer.inlineTokens = x => [];
+  lexer.inlineTokens = _x => [];
 
   // This is cheating, because the lexer's tokenizer is a private property,
   // but we can apparently access it anyway.

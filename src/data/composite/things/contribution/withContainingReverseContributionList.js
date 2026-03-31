@@ -3,7 +3,7 @@
 // current contribution is dateless, the list is filtered to only include
 // dateless contributions from the same immediately nearby context.
 
-import {input, templateCompositeFrom} from '#composite';
+import {templateCompositeFrom} from '#composite';
 
 import {raiseOutputWithoutDependency, withResultOfAvailabilityCheck}
   from '#composite/control-flow';
