@@ -133,7 +133,7 @@ for (const module of modules) {
             break;
 
           case 'boolean':
-            formatRead = Boolean;
+            formatRead = value => value === 'true' ? true : false;
             formatWrite = String;
             break;
 
