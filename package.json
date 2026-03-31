@@ -70,7 +70,7 @@
         "image-size": "2.0.2",
         "js-yaml": "4.1.0",
         "marked": "17.0.5",
-        "msgpackr": "1.11.1",
+        "msgpackr": "1.11.9",
         "rimraf": "5.0.7",
         "striptags": "4.0.0-alpha.4",
         "word-count": "0.3.1",
