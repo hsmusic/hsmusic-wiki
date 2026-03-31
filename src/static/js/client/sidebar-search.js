@@ -38,6 +38,9 @@ export const info = {
   searchLabel: null,
   searchInput: null,
 
+  contextContainer: null,
+  contextBackLink: null,
+
   progressRule: null,
   progressContainer: null,
   progressLabel: null,
@@ -45,9 +48,6 @@ export const info = {
 
   failedRule: null,
   failedContainer: null,
-
-  contextContainer: null,
-  contextBackLink: null,
 
   filterContainer: null,
   albumFilterLink: null,
@@ -305,6 +305,25 @@ export function addInternalListeners() {
 export function mutatePageContent() {
   if (!info.searchBox) return;
 
+  // Context section
+
+  info.contextContainer =
+    document.createElement('div');
+
+  info.contextContainer.classList.add('wiki-search-context-container');
+
+  info.contextBackLink =
+    document.createElement('a');
+
+  info.contextContainer.appendChild(
+    templateContent(info.backString, {
+      page: info.contextBackLink,
+    }));
+
+  cssProp(info.contextContainer, 'display', 'none');
+
+  info.searchBox.appendChild(info.contextContainer);
+
   // Progress section
 
   info.progressRule =
@@ -357,25 +376,6 @@ export function mutatePageContent() {
 
   info.searchBox.appendChild(info.failedRule);
   info.searchBox.appendChild(info.failedContainer);
-
-  // Context section
-
-  info.contextContainer =
-    document.createElement('div');
-
-  info.contextContainer.classList.add('wiki-search-context-container');
-
-  info.contextBackLink =
-    document.createElement('a');
-
-  info.contextContainer.appendChild(
-    templateContent(info.backString, {
-      page: info.contextBackLink,
-    }));
-
-  cssProp(info.contextContainer, 'display', 'none');
-
-  info.searchBox.appendChild(info.contextContainer);
 
   // Filter section
 
