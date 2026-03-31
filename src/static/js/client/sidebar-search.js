@@ -587,7 +587,6 @@ export function addPageListeners() {
     clearSidebarSearch();
     clearSidebarFilter();
     possiblyHideSearchSidebarColumn();
-    restoreSidebarSearchColumn();
   });
 
   forEachFilter((type, filterLink) => {
@@ -1387,6 +1386,8 @@ function hideSidebarSearchResults() {
 
   cssProp(info.endSearchRule, 'display', 'none');
   cssProp(info.endSearchLine, 'display', 'none');
+
+  restoreSidebarSearchColumn();
 }
 
 function focusFirstSidebarSearchResult() {
