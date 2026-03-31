@@ -1,6 +1,6 @@
 // Utility functions for interacting with wiki data.
 
-import {accumulateSum, chunkByConditions, empty, unique} from './sugar.js';
+import {accumulateSum, chunkByConditions, empty, re, unique} from './sugar.js';
 import {sortByDate} from './sort.js';
 
 // This is a duplicate binding of filterMultipleArrays that's included purely
@@ -593,7 +593,20 @@ export function* matchMarkdownLinks(markdownSource, {marked}) {
 }
 
 export function* matchInlineLinks(source) {
-  const plausibleLinkRegexp = /\b[a-z]*:\/\/[^ ]*?(?=(?:[,.!?]*)(?:\s|$))/gm;
+  const plausibleLinkRegexp = re('gmi')`
+    ${/\b[a-z]*:\/\//}
+    ${/.*?/}
+
+    (?=${[
+      // Ordinary in-sentence punctuation doesn't terminate the
+      // un-greedy URL match above, but it shouldn't be counted
+      // as part of the link either, if it's at the end.
+      /(?:[,.!?]*)/,
+
+      // Actual terminators.
+      /(?:\s|$|<br>)/,
+    ]})
+  `;
 
   let plausibleMatch = null;
   while (plausibleMatch = plausibleLinkRegexp.exec(source)) {
