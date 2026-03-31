@@ -425,8 +425,8 @@ export function templateCompositeFrom(description) {
       }
 
       for (const index of namedAndPositionalConflictInputPositions) {
-        const conflictingName = positionalInputNames[index];
-        push(new Error(`${name}: Provided as both named and positional (i = ${index}) input`));
+        const conflictingName = positionalInputs[index];
+        push(new Error(`${conflictingName}: Provided as both named and positional (i = ${index}) input`));
       }
 
       for (const {skipped, before} of skippedInputNames) {
