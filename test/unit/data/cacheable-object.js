@@ -26,8 +26,8 @@ t.test(`CacheableObject simple separate update & expose`, t => {
       },
 
       expose: {
-        dependencies: ['number'],
-        compute: ({ number }) => number * 2
+        dependencies: ['_number'],
+        compute: ({ _number: number }) => number * 2
       }
     }
   });
@@ -53,8 +53,8 @@ t.test(`CacheableObject basic cache behavior`, t => {
       },
 
       expose: {
-        dependencies: ['string'],
-        compute: ({ string }) => {
+        dependencies: ['_string'],
+        compute: ({ _string: string }) => {
           computeCount++;
           return string.toUpperCase();
         }
@@ -136,8 +136,8 @@ t.test(`CacheableObject combined update & expose (transform with dependency)`, t
       },
 
       expose: {
-        dependencies: ['times'],
-        transform: (value, { times }) => value.repeat(times)
+        dependencies: ['_times'],
+        transform: (value, { _times: times }) => value.repeat(times)
       }
     },
 
