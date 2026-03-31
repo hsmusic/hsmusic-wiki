@@ -765,6 +765,11 @@ function recordActiveQueryContext() {
     return;
   }
 
+  // We also don't overwrite existing context.
+  if (session.activeQueryContextPagePathname) {
+    return;
+  }
+
   session.activeQueryContextPageName =
     decodeEntities(document.querySelector('title').dataset.withoutWikiName) ||
     document.title;
