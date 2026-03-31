@@ -62,7 +62,7 @@
     "dependencies": {
         "@eslint/js": "10.0.1",
         "@js-temporal/polyfill": "0.4.4",
-        "chroma-js": "2.4.2",
+        "chroma-js": "3.2.0",
         "command-exists": "1.2.9",
         "compress-json": "3.4.0",
         "eslint": "10.1.0",
