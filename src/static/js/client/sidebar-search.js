@@ -780,11 +780,21 @@ function clearSidebarSearch() {
 
   state.searchStage = null;
 
+  clearActiveQuery();
+
+  hideSidebarSearchResults();
+}
+
+function clearActiveQuery() {
+  const {session} = info;
+
   session.activeQuery = null;
   session.activeQueryResults = null;
   session.resultsScrollOffset = null;
 
-  hideSidebarSearchResults();
+  session.activeQueryContextPageName = null;
+  session.activeQueryContextPagePathname = null;
+  session.activeQueryContextPageColor = null;
 }
 
 function clearSidebarFilter() {
@@ -1537,16 +1547,7 @@ function considerRecallingRecentSidebarSearch() {
 }
 
 function forgetRecentSidebarSearch() {
-  const {session} = info;
-
-  session.activeQuery = null;
-
-  session.activeQueryContextPageName = null;
-  session.activeQueryContextPagePathname = null;
-  session.activeQueryContextPageColor = null;
-
-  session.activeQueryResults = null;
-
+  clearActiveQuery();
   clearSidebarFilter();
 }
 
