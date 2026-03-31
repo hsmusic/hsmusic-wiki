@@ -1470,7 +1470,7 @@ function possiblyHideSearchSidebarColumn() {
 // This should be called after results are shown, since it checks the
 // elements added to understand the current search state.
 function tidySidebarSearchColumn() {
-  const {state} = info;
+  const {session, state} = info;
 
   // Don't *re-tidy* the sidebar if we've already tidied it to display
   // some results. This flag will get cleared if the search is dismissed
@@ -1479,17 +1479,24 @@ function tidySidebarSearchColumn() {
     return;
   }
 
-  const here = location.href.replace(/\/$/, '');
+  const hrefHere = location.href.replace(/\/$/, '');
   const currentPageIsResult =
     Array.from(info.results.querySelectorAll('a'))
       .some(link => {
-        const there = link.href.replace(/\/$/, '');
-        return here === there;
+        const hrefThere = link.href.replace(/\/$/, '');
+        return hrefHere === hrefThere;
       });
+
+  const currentPageIsContext =
+    location.pathname === session.activeQueryContextPagePathname;
 
   // Don't tidy the sidebar if you've navigated to some other page than
   // what's in the current result list.
-  if (!state.justPerformedActiveQuery && !currentPageIsResult) {
+  if (
+    !state.justPerformedActiveQuery &&
+    !currentPageIsResult &&
+    !currentPageIsContext
+  ) {
     return;
   }
 
