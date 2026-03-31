@@ -407,9 +407,9 @@ export function templateCompositeFrom(description) {
         }
       }
 
-      const inputAppearance = name =>
-        (isInputToken(preparedInputs[name])
-          ? `${getInputTokenShape(preparedInputs[name])}() call`
+      const inputAppearance = token =>
+        (isInputToken(token)
+          ? `${getInputTokenShape(token)}() call`
           : `dependency name`);
 
       if (!empty(misplacedInputNames)) {
