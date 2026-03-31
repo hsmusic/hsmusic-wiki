@@ -20,6 +20,9 @@ export default {
       (compareKebabCase(otherTrack.name, currentTrack.name)
         ? null
         : otherTrack.name),
+
+    onSingle:
+      otherTrack.album.style === 'single',
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -36,10 +39,17 @@ export default {
         ],
 
         content: [
-          language.$(capsule, 'differentName', {
-            [language.onlyIfOptions]: ['name'],
+          language.encapsulate(capsule, 'differentName', workingCapsule => {
+            const workingOptions = {
+              [language.onlyIfOptions]: ['name'],
+              name: data.differentName,
+            };
 
-            name: data.differentName,
+            if (data.onSingle) {
+              workingCapsule += '.onSingle';
+            }
+
+            return language.$(workingCapsule, workingOptions);
           }),
 
           data.otherDate && data.currentDate &&

@@ -310,6 +310,7 @@ releaseInfo:
 
     tooltip:
       differentName: "as {NAME}"
+      differentName.onSingle: "{NAME}"
 
   tracksReferenced:
     _: "Tracks that {TRACK} references:"
