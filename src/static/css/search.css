@@ -38,17 +38,20 @@
 
 /* Interactions with other sidebar boxes */
 
-@layer interaction {
-  /* This is to say, any sidebar that's *not*
-   * the first sidebar after the search box.
+@layer layout {
+  /* This is to say, any sidebar that's *not* the first sidebar
+   * after the search box, effectively squishing the rest of the
+   * boxes a bit tighter together.
    */
   .wiki-search-sidebar-box.showing-results + .sidebar ~ .sidebar {
-    margin-top: 5px;
+    margin-top: 8px;
   }
+}
 
+@layer interaction {
   .wiki-search-sidebar-box.showing-results ~ .sidebar:not(:hover) {
     opacity: 0.8;
-    filter: brightness(0.7);
+    filter: brightness(0.85);
   }
 }
 
@@ -330,8 +333,48 @@
 
 @layer layout {
   .wiki-search-results-container {
+    position: relative;
     margin-bottom: 0;
     padding: 2px;
+  }
+}
+
+@layer interaction {
+  .wiki-search-results-container::before,
+  .wiki-search-results-container::after {
+    content: "";
+    display: block;
+    position: sticky;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .wiki-search-result:hover {
+    z-index: 2;
+  }
+
+  /* Shadow along top edge */
+
+  .wiki-search-results-container > :first-child {
+    margin-top: -6px;
+  }
+
+  .wiki-search-results-container::before {
+    height: 8px; top: -2px;
+    background: linear-gradient(to bottom, black, black 50%, transparent);
+    opacity: 0.4;
+  }
+
+  /* Shadow along bottom edge */
+
+  .wiki-search-results-container > :last-child {
+    margin-bottom: -12px;
+  }
+
+  .wiki-search-results-container::after {
+    height: 16px; bottom: -2px;
+    background: linear-gradient(to top, black, black 30%, transparent);
+    opacity: 0.4;
   }
 }
 
