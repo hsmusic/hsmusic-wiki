@@ -158,7 +158,8 @@ function genericSelect(wikiData) {
   return [
     sortByGroupRank(wikiData.albumData.slice()),
 
-    wikiData.artTagData,
+    wikiData.artTagData
+      .filter(artTag => !artTag.isContentWarning),
 
     wikiData.artistData
       .filter(artist => !artist.isAlias),
