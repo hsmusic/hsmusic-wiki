@@ -639,6 +639,22 @@ misc:
     cue: "Crediting sources"
     sticky: "Crediting sources:"
 
+  downloadLayoutMedia:
+    withWallpaper: >-
+      Wiki files: {WALLPAPER}
+
+    withBanner: >-
+      Wiki files: {BANNER}
+
+    withWallpaper.withBanner: >-
+      Wiki files: {WALLPAPER}, {BANNER}
+
+    withWallpaperParts: >-
+      Wallpaper: {PARTS}
+
+    wallpaper: "Wallpaper"
+    banner: "Banner"
+
   # external:
   #   Links which will generally bring you somewhere off of the wiki.
   #   The list of sites is hard-coded into the wiki software, so it
