@@ -187,7 +187,7 @@ export default {
 
        : !html.isBlank(relations.bottomCaption)
           ? html.tag('p', {class: 'grid-caption'},
-              slots.caption)
+              slots.bottomCaption)
 
           : html.blank()),
       ]),
