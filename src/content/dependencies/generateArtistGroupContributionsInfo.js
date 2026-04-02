@@ -196,14 +196,25 @@ export default {
 
         html.tag('dd', {class: topLevelClasses},
           html.tag('table', {class: 'group-contributions-table'},
-            stitchArrays({
-              group: relations.groupLinksSortedByCount,
-              count: getCounts(data.groupCountsSortedByCount),
-              duration:
-                getDurations(
-                  data.groupDurationsSortedByCount,
-                  data.groupDurationsApproximateSortedByCount),
-            }).map(({group, count, duration}) =>
+            (stitchArrays(
+              (slots.sort === 'count'
+                ? {
+                    group: relations.groupLinksSortedByCount,
+                    count: getCounts(data.groupCountsSortedByCount),
+                    duration:
+                      getDurations(
+                        data.groupDurationsSortedByCount,
+                        data.groupDurationsApproximateSortedByCount),
+                  }
+                : {
+                    group: relations.groupLinksSortedByDuration,
+                    count: getCounts(data.groupCountsSortedByDuration),
+                    duration:
+                      getDurations(
+                        data.groupDurationsSortedByDuration,
+                        data.groupDurationsApproximateSortedByDuration),
+                  })
+            )).map(({group, count, duration}) =>
                 language.encapsulate(capsule, 'item', capsule =>
                   html.tag('tr', [
                     html.tag('td', {class: 'group-contributions-link-cell'},
