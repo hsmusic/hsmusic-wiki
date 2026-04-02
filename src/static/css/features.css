@@ -1219,21 +1219,26 @@
   }
 }
 
-/* Group-contributions tables */
+/* Group contributions tables */
 
 @layer layout {
   .group-contributions-table {
-    display: inline-block;
+    margin-left: 40px;
+    border-collapse: collapse;
   }
 
-  .group-contributions-table .group-contributions-row {
-    display: flex;
-    justify-content: space-between;
+  .group-contributions-table td {
+    padding: 0 0 4px 0;
   }
 
-  .group-contributions-table .group-contributions-metrics {
-    margin-left: 1.5ch;
+  .group-contributions-table .group-contributions-link-cell {
+    display: list-item;
+  }
+
+  .group-contributions-table .group-contributions-metrics-cell {
+    padding-left: 1.5ch;
     white-space: nowrap;
+    text-align: right;
   }
 }
 

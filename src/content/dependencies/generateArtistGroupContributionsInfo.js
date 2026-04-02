@@ -195,50 +195,35 @@ export default {
               : slots.title))),
 
         html.tag('dd', {class: topLevelClasses},
-          html.tag('ul', {class: 'group-contributions-table'},
-            {role: 'list'},
+          html.tag('table', {class: 'group-contributions-table'},
+            stitchArrays({
+              group: relations.groupLinksSortedByCount,
+              count: getCounts(data.groupCountsSortedByCount),
+              duration:
+                getDurations(
+                  data.groupDurationsSortedByCount,
+                  data.groupDurationsApproximateSortedByCount),
+            }).map(({group, count, duration}) =>
+                language.encapsulate(capsule, 'item', capsule =>
+                  html.tag('tr', [
+                    html.tag('td', {class: 'group-contributions-link-cell'},
+                      html.tag('span', group)),
 
-            (slots.sort === 'count'
-              ? stitchArrays({
-                  group: relations.groupLinksSortedByCount,
-                  count: getCounts(data.groupCountsSortedByCount),
-                  duration:
-                    getDurations(
-                      data.groupDurationsSortedByCount,
-                      data.groupDurationsApproximateSortedByCount),
-                }).map(({group, count, duration}) =>
-                    language.encapsulate(capsule, 'item', capsule =>
-                      html.tag('li',
-                        html.tag('div', {class: 'group-contributions-row'}, [
-                          group,
-                          html.tag('span', {class: 'group-contributions-metrics'},
-                            // When sorting by count, duration details aren't necessarily
-                            // available for all items.
-                            (slots.showBothColumns && duration
-                              ? language.$(capsule, 'countDurationAccent', {count, duration})
-                              : language.$(capsule, 'countAccent', {count}))),
-                        ]))))
+                    html.tag('td', {class: 'group-contributions-metrics-cell'},
+                      (slots.sort === 'count'
+                          // When sorting by count, duration details aren't necessarily
+                          // available for all items.
+                        ? (slots.showBothColumns && duration
+                            ? language.$(capsule, 'countDurationAccent', {count, duration})
+                            : language.$(capsule, 'countAccent', {count}))
 
-              : stitchArrays({
-                  group: relations.groupLinksSortedByDuration,
-                  count: getCounts(data.groupCountsSortedByDuration),
-                  duration:
-                    getDurations(
-                      data.groupDurationsSortedByDuration,
-                      data.groupDurationsApproximateSortedByDuration),
-                }).map(({group, count, duration}) =>
-                    language.encapsulate(capsule, 'item', capsule =>
-                      html.tag('li',
-                        html.tag('div', {class: 'group-contributions-row'}, [
-                          group,
-                          html.tag('span', {class: 'group-contributions-metrics'},
-                            // Count details are always available, since they're just the
-                            // number of contributions directly. And duration details are
-                            // guaranteed for every item when sorting by duration.
-                            (slots.showBothColumns
-                              ? language.$(capsule, 'durationCountAccent', {duration, count})
-                              : language.$(capsule, 'durationAccent', {duration}))),
-                        ]))))))),
+                          // Count details are always available, since they're just the
+                          // number of contributions directly. And duration details are
+                          // guaranteed for every item when sorting by duration.
+                        : (slots.showBothColumns
+                            ? language.$(capsule, 'durationCountAccent', {duration, count})
+                            : language.$(capsule, 'durationAccent', {duration})))),
+                  ]))))),
       ]);
     }),
 };
