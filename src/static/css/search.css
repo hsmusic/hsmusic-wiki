@@ -49,9 +49,16 @@
 }
 
 @layer interaction {
-  .wiki-search-sidebar-box.showing-results ~ .sidebar:not(:hover) {
+  .wiki-search-sidebar-box.showing-results ~ .sidebar:not(:hover),
+  .wiki-search-sidebar-box.showing-results ~ .sidebar-box-joiner {
     opacity: 0.8;
     filter: brightness(0.85);
+  }
+
+  .wiki-search-sidebar-box.showing-results ~ .sidebar:hover + .sidebar-box-joiner,
+  .wiki-search-sidebar-box.showing-results ~ .sidebar-box-joiner:has(+ .sidebar:hover) {
+    opacity: revert-layer;
+    filter: revert-layer;
   }
 }
 
