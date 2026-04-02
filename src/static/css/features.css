@@ -1955,7 +1955,7 @@
     /* Slight stretching past the bottom of the screen seems
      * to make resizing the window (and "revealing" that area)
      * a bit smoother.
-     */
+     *....../
     position: fixed;
     bottom: -20px;
     left: 0;
