@@ -506,8 +506,23 @@ export class TupleMap {
 }
 
 export class TupleMapForBabies {
-  #here = new WeakMap();
-  #next = new WeakMap();
+  #here;
+  #next;
+  #mode;
+
+  constructor(mode = 'weak') {
+    if (mode === 'weak') {
+      this.#mode = 'weak';
+      this.#here = new WeakMap();
+      this.#next = new WeakMap();
+    } else if (mode === 'strong') {
+      this.#mode = 'strong';
+      this.#here = new Map();
+      this.#next = new Map();
+    } else {
+      throw new Error(`Expected mode to be weak or strong`);
+    }
+  }
 
   set(...args) {
     const first = args.at(0);
@@ -519,7 +534,7 @@ export class TupleMapForBabies {
     } else if (this.#next.has(first)) {
       this.#next.get(first).set(...rest, last);
     } else {
-      const tupleMap = new TupleMapForBabies();
+      const tupleMap = new TupleMapForBabies(this.#mode);
       this.#next.set(first, tupleMap);
       tupleMap.set(...rest, last);
     }
@@ -548,6 +563,36 @@ export class TupleMapForBabies {
       return this.#next.get(first).has(...rest);
     } else {
       return false;
+    }
+  }
+
+  *keys() {
+    if (this.#mode === 'weak') {
+      throw new Error(`Can't get keys of a weak tuple map`);
+    }
+
+    for (const key of this.#here.keys()) {
+      yield [key];
+
+      if (this.#next.has(key)) {
+        for (const next of this.#next.get(key).keys()) {
+          yield [key, ...next];
+        }
+      }
+    }
+  }
+
+  *values() {
+    if (this.#mode === 'weak') {
+      throw new Error(`Can't get values of a weak tuple map`);
+    }
+
+    for (const key of this.#here.keys()) {
+      yield this.#here.get(key);
+
+      if (this.#next.has(key)) {
+        yield* this.#next.get(key).values();
+      }
     }
   }
 }

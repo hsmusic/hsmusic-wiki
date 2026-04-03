@@ -6,6 +6,7 @@ import {default as searchSpec, makeSearchIndex}
 import {
   empty,
   groupArray,
+  permutations,
   promiseWithResolvers,
   stitchArrays,
   unique,
@@ -542,7 +543,7 @@ function queryIndex({termsKey, indexKey}, query, options) {
 
   const queriesBy = keys =>
     (groupedParticles.get(keys.length) ?? [])
-      .flatMap(permutations)
+      .flatMap(particles => Array.from(permutations(particles)))
       .map(values => values.map(({terms}) => terms.join(' ')))
       .map(values =>
         stitchArrays({
@@ -690,27 +691,6 @@ function particulate(terms) {
   results.push([{terms}]);
 
   return results;
-}
-
-// This function doesn't even come close to "performant",
-// but it only operates on small data here.
-function permutations(array) {
-  switch (array.length) {
-    case 0:
-      return [];
-
-    case 1:
-      return [array];
-
-    default:
-      return array.flatMap((item, index) => {
-        const behind = array.slice(0, index);
-        const ahead = array.slice(index + 1);
-        return (
-          permutations([...behind, ...ahead])
-            .map(rest => [item, ...rest]));
-      });
-  }
 }
 
 function queryBoilerplate(index) {

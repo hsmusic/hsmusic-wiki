@@ -1,4 +1,5 @@
-import {empty, filterMultipleArrays, stitchArrays} from '#sugar';
+import {empty, filterMultipleArrays, runs, stitchArrays, unique} from '#sugar';
+import {TupleMapForBabies} from '#wiki-data';
 
 export default {
   sprawl: ({wikiInfo}) => ({
@@ -6,40 +7,81 @@ export default {
       wikiInfo.divideTrackListsByGroups,
   }),
 
-  query(sprawl, tracks, _contextTrack) {
-    const dividingGroups = sprawl.divideTrackListsByGroups;
+  query(sprawl, tracks, contextTrack) {
+    const wikiDividingGroups = sprawl.divideTrackListsByGroups;
 
-    const groupings = new Map();
+    const contextDividingGroups =
+      contextTrack.groups
+        .filter(group => !wikiDividingGroups.includes(group));
+
+    const contextGroupRuns =
+      Array.from(runs(contextDividingGroups));
+
+    const groupings = new TupleMapForBabies('strong');
     const ungroupedTracks = [];
 
-    // Entry order matters! Add blank lists for each group
-    // in the order that those groups are provided.
-    for (const group of dividingGroups) {
-      groupings.set(group, []);
-    }
+    const order = [
+      ...contextGroupRuns,
+      ...wikiDividingGroups.map(group => [group]),
+    ];
 
     for (const track of tracks) {
-      const firstMatchingGroup =
-        dividingGroups.find(group => group.albums.includes(track.album));
+      let run;
+      getRun: {
+        run =
+          contextDividingGroups
+            .filter(group => track.groups.includes(group));
 
-      if (firstMatchingGroup) {
-        groupings.get(firstMatchingGroup).push(track);
-      } else {
+        if (!empty(run)) {
+          break getRun;
+        }
+
+        const wikiGroup =
+          wikiDividingGroups.find(group => track.groups.includes(group));
+
+        if (wikiGroup) {
+          run = [wikiGroup];
+          break getRun;
+        }
+
         ungroupedTracks.push(track);
+        continue;
+      }
+
+      if (groupings.has(...run)) {
+        groupings.get(...run).push(track);
+      } else {
+        groupings.set(...run, [track]);
       }
     }
 
-    const groups = Array.from(groupings.keys());
-    const groupedTracks = Array.from(groupings.values());
+    let groupingGroups = order.slice();
+    const groupedTracks = order.map(run => groupings.get(...run) ?? []);
 
-    // Drop the empty lists, so just the groups which
-    // at least a single track matched are left.
     filterMultipleArrays(
-      groups,
+      groupingGroups,
       groupedTracks,
-      (_group, tracks) => !empty(tracks));
+      (_groups, tracks) => !empty(tracks));
 
-    return {groups, groupedTracks, ungroupedTracks};
+    const presentContextDividingGroups =
+      unique(groupingGroups.flat())
+        .filter(group => contextDividingGroups.includes(group));
+
+    const uninformativeGroups =
+      presentContextDividingGroups.filter((group, index) =>
+        presentContextDividingGroups
+          .slice(0, index)
+          .some(earlier =>
+            groupingGroups.every(run =>
+              run.includes(earlier) && run.includes(group) ||
+             !run.includes(earlier) && !run.includes(group))));
+
+    groupingGroups =
+      groupingGroups.map(groups =>
+        groups.filter(group =>
+          !uninformativeGroups.includes(group)));
+
+    return {groupingGroups, groupedTracks, ungroupedTracks};
   },
 
   relations: (relation, query, sprawl, tracks, contextTrack) => ({
@@ -52,8 +94,9 @@ export default {
       relation('generateContentHeading'),
 
     groupLinks:
-      query.groups
-        .map(group => relation('linkGroup', group)),
+      query.groupingGroups
+        .map(groups => groups
+          .map(group => relation('linkGroup', group))),
 
     groupedTrackLists:
       query.groupedTracks
@@ -67,8 +110,9 @@ export default {
 
   data: (query, _sprawl, _tracks) => ({
     groupNames:
-      query.groups
-        .map(group => group.name),
+      query.groupingGroups
+        .map(groups => groups
+          .map(group => group.name)),
   }),
 
   slots: {
@@ -85,33 +129,36 @@ export default {
 
       language.encapsulate('trackList', listCapsule => [
         stitchArrays({
-          groupName: data.groupNames,
-          groupLink: relations.groupLinks,
+          groupNames: data.groupNames,
+          groupLinks: relations.groupLinks,
           trackList: relations.groupedTrackLists,
         }).map(({
-            groupName,
-            groupLink,
+            groupNames,
+            groupLinks,
             trackList,
           }) => [
-            language.encapsulate(listCapsule, 'fromGroup', capsule =>
-              (slots.headingString
-                ? relations.contentHeading.clone().slots({
-                    tag: 'dt',
+            language.encapsulate(listCapsule, 'fromGroup', capsule => {
+              const title =
+                language.$(capsule, {
+                  group:
+                    language.formatConjunctionList(
+                      groupLinks.map(link => link.slot('color', false))),
+                });
 
-                    title:
-                      language.$(capsule, {
-                        group: groupLink.slot('color', false),
-                      }),
-
-                    stickyTitle:
-                      language.$(slots.headingString, 'sticky', 'fromGroup', {
-                        group: groupName,
-                      }),
-                  })
-                : html.tag('dt',
-                    language.$(capsule, {
-                      group: groupLink.slot('color', false),
-                    })))),
+              if (slots.headingString) {
+                return relations.contentHeading.clone().slots({
+                  tag: 'dt',
+                  title,
+                  stickyTitle:
+                    language.$(slots.headingString, 'sticky', 'fromGroup', {
+                      group:
+                        language.formatConjunctionList(groupNames),
+                    }),
+                });
+              } else {
+                return html.tag('dt', title);
+              }
+            }),
 
             html.tag('dd', trackList),
           ]),

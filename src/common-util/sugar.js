@@ -229,6 +229,38 @@ export const mapInPlace = (array, fn) =>
 
 export const unique = (arr) => Array.from(new Set(arr));
 
+export function* permutations(array) {
+  switch (array.length) {
+    case 0: return;
+    case 1: yield array; return;
+    default: {
+      const behind = [];
+      const ahead = array.slice();
+      while (ahead.length) {
+        const here = ahead.shift();
+
+        yield*
+          permutations([...behind, ...ahead])
+            .map(slice => [here, ...slice]);
+
+        behind.push(here);
+      }
+    }
+  }
+}
+
+export function* runs(array) {
+  switch (array.length) {
+    case 0: return;
+    case 1: yield array; return;
+    default: {
+      yield* runs(array.slice(1)).map(run => [array[0], ...run]);
+      yield [array[0]];
+      yield* runs(array.slice(1));
+    }
+  }
+}
+
 export const compareArrays = (arr1, arr2, {checkOrder = true} = {}) =>
   arr1.length === arr2.length &&
   (checkOrder
