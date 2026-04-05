@@ -29,7 +29,7 @@ export default {
           return html.blank();
         }
 
-        if (data.label === 'Music video' || !data.label) {
+        if (!data.label) {
           credit.setSlots({
             normalStringKey:
               language.encapsulate(artistsLineCapsule, 'noLabel'),

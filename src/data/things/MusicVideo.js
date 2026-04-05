@@ -40,21 +40,17 @@ export class MusicVideo extends Thing {
       update: {validate: isStringNonEmpty},
     },
 
-    label: [
-      exposeUpdateValueOrContinue({
-        validate: input.value(isStringNonEmpty),
-      }),
-
-      exitWithoutDependency('title', V('Music video')),
-      exposeConstant(V(null)),
-    ],
+    label: {
+      flags: {update: true, expose: true},
+      update: {validate: isStringNonEmpty},
+    },
 
     unqualifiedDirectory: [
       {
         dependencies: ['title', 'label'],
         compute: (continuation, {title, label}) =>
           continuation({
-            '#name': label ?? title,
+            '#name': label ?? title ?? 'music video',
           }),
       },
 
