@@ -12,7 +12,8 @@ export default {
 
     const contextDividingGroups =
       contextTrack.groups
-        .filter(group => !wikiDividingGroups.includes(group));
+        .filter(group => !wikiDividingGroups.includes(group))
+        .filter(group => group.useForDividingReferenceLists);
 
     const contextGroupRuns =
       Array.from(runs(contextDividingGroups));

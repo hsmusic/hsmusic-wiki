@@ -35,18 +35,23 @@ export class Group extends Thing {
     name: name(V('Unnamed Group')),
     directory: directory(),
 
+    useForDividingReferenceLists: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      withPropertyFromObject('category', V('useGroupsForDividingReferenceLists')),
+      exposeDependencyOrContinue('#category.useGroupsForDividingReferenceLists'),
+
+      exposeConstant(V(false)),
+    ],
+
     excludeFromGalleryTabs: [
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
       }),
 
-      withUniqueReferencingThing({
-        reverse: soupyReverse.input('groupCategoriesWhichInclude'),
-      }).outputs({
-        '#uniqueReferencingThing': '#category',
-      }),
-
-      withPropertyFromObject('#category', V('excludeGroupsFromGalleryTabs')),
+      withPropertyFromObject('category', V('excludeGroupsFromGalleryTabs')),
       exposeDependencyOrContinue('#category.excludeGroupsFromGalleryTabs'),
 
       exposeConstant(V(false)),
@@ -158,8 +163,17 @@ export class Group extends Thing {
       'Group': {property: 'name'},
       'Directory': {property: 'directory'},
 
-      'Exclude From Gallery Tabs': {property: 'excludeFromGalleryTabs'},
-      'Divide Albums By Style': {property: 'divideAlbumsByStyle'},
+      'Use For Dividing Reference Lists': {
+        property: 'useForDividingReferenceLists',
+      },
+
+      'Exclude From Gallery Tabs': {
+        property: 'excludeFromGalleryTabs',
+      },
+
+      'Divide Albums By Style': {
+        property: 'divideAlbumsByStyle',
+      },
 
       'Description': {property: 'description'},
       'URLs': {property: 'urls'},

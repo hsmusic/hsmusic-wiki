@@ -17,6 +17,7 @@ export class GroupCategory extends Thing {
     name: name(V('Unnamed Group Category')),
     directory: directory(),
 
+    useGroupsForDividingReferenceLists: flag(V(false)),
     excludeGroupsFromGalleryTabs: flag(V(false)),
 
     color: color(),
@@ -49,6 +50,10 @@ export class GroupCategory extends Thing {
       'Category': {property: 'name'},
 
       'Color': {property: 'color'},
+
+      'Use Groups For Dividing Reference Lists': {
+        property: 'useGroupsForDividingReferenceLists',
+      },
 
       'Exclude Groups From Gallery Tabs': {
         property: 'excludeGroupsFromGalleryTabs',
