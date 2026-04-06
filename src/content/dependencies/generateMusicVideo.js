@@ -18,6 +18,10 @@ export default {
 
     contributorCredit:
       relation('generateArtistCredit', musicVideo.contributorContribs, []),
+
+    watchLinks:
+      musicVideo.urls
+        .map(url => relation('linkExternal', url)),
   }),
 
   data: (musicVideo, _thing) => ({
@@ -27,7 +31,7 @@ export default {
     label:
       musicVideo.label,
 
-    url:
+    primaryURL:
       musicVideo.url,
   }),
 
@@ -53,10 +57,20 @@ export default {
           })),
 
         relations.image.slots({
-          link: data.url,
+          link: data.primaryURL,
         }),
 
         html.tag('p',
+          {[html.onlyIfContent]: true},
+
+          html.tag('span', {class: 'watch-line'},
+            language.$(capsule, 'watchOn', {
+              links:
+                language.formatUnitList(relations.watchLinks),
+            }))),
+
+        html.tag('p',
+          {[html.onlyIfContent]: true},
           {[html.joinChildren]: html.tag('br')},
 
           [

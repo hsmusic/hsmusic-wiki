@@ -780,13 +780,16 @@
     margin-bottom: 6px;
   }
 
-  .music-video .artists-line {
+  .music-video .artists-line,
+  .music-video .watch-line {
     display: block;
+    padding-right: 0.4ch;
     padding-left: 1.2ch;
     text-indent: -1.2ch;
   }
 
-  .music-video .artists-line > * {
+  .music-video .artists-line > *,
+  .music-video .watch-line > * {
     text-indent: 0;
   }
 

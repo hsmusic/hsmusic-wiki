@@ -377,6 +377,7 @@ releaseInfo:
 
   visitOn: "Visit on {LINKS}."
   playOn: "Play on {LINKS}."
+  watchOn: "Watch on {LINKS}."
 
   readCommentary:
     _: "Read {LINK}."
@@ -1036,6 +1037,9 @@ misc:
     label: "Music video!"
     label.customLabel: "{LABEL}!"
     label.customLabel.title: "{TITLE}"
+
+    watchOn: >-
+      Watch on: {LINKS}
 
     artistsLine: >-
       Music video {CREDIT}

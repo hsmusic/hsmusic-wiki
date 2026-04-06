@@ -23,6 +23,7 @@ import {
   soupyFind,
   soupyReverse,
   thing,
+  urls,
 } from '#composite/wiki-properties';
 
 export class MusicVideo extends Thing {
@@ -65,10 +66,20 @@ export class MusicVideo extends Thing {
       constituteFrom('thing', V('date')),
     ],
 
-    url: {
-      flags: {update: true, expose: true},
-      update: {validate: isURL},
-    },
+    url: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isURL),
+      }),
+
+      exitWithoutDependency('urls', V(null), V('empty')),
+
+      {
+        dependencies: ['urls'],
+        compute: ({urls}) => urls[0],
+      },
+    ],
+
+    urls: urls(),
 
     coverArtFileExtension: fileExtension(V('jpg')),
     coverArtDimensions: dimensions(),
@@ -114,6 +125,7 @@ export class MusicVideo extends Thing {
       'Directory': {property: 'unqualifiedDirectory'},
       'Date': {property: 'date', transform: parseDate},
       'URL': {property: 'url'},
+      'URLs': {property: 'urls'},
 
       'Cover Art File Extension': {property: 'coverArtFileExtension'},
       'Cover Art Dimensions': {property: 'coverArtDimensions'},
@@ -122,6 +134,13 @@ export class MusicVideo extends Thing {
       'Contributor Style': {property: 'contributorStyle'},
       'Contributors': {property: 'contributorContribs', transform: parseContributors},
     },
+
+    invalidFieldCombinations: [
+      {message: `Specify all URLs on "URLs" field, if specifying multiple`, fields: [
+        'URL',
+        'URLs',
+      ]},
+    ],
   };
 
   static [Thing.reverseSpecs] = {
