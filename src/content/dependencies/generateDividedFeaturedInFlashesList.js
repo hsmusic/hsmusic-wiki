@@ -14,13 +14,26 @@ export default {
 
   query(sprawl, features, _contextTrack) {
     if (!sprawl.enableFlashesAndGames) {
-      return {dividingSides: [], dividedFeatures: []};
+      return {
+        dividingSides: [], dividingLabels: [],
+        dividedFeatures: [],
+        undividedFeatures: [],
+      };
+    }
+
+    if (empty(sprawl.divideFlashListsBySides)) {
+      return {
+        dividingSides: [], dividingLabels: [],
+        dividedFeatures: [],
+        undividedFeatures: features,
+      };
     }
 
     const {allSides} = sprawl;
 
     const divisions = new Map();
     const dividingSideIndices = [];
+    const undividedFeatures = [];
     for (const {side, label} of sprawl.divideFlashListsBySides) {
       divisions.set(side, {label, features: []});
       dividingSideIndices.push(allSides.indexOf(side));
@@ -33,11 +46,13 @@ export default {
       const closestDividingSideIndex =
         dividingSideIndices.findLast(i => i <= sideIndex);
 
-      const closestDividingSide =
-        allSides.at(closestDividingSideIndex);
+      if (typeof closestDividingSideIndex === 'number') {
+        const closestDividingSide =
+          allSides.at(closestDividingSideIndex);
 
-      if (closestDividingSide) {
         divisions.get(closestDividingSide).features.push(feature);
+      } else {
+        undividedFeatures.push(feature);
       }
     }
 
@@ -51,12 +66,16 @@ export default {
       dividedFeatures,
       (_side, _label, dividedFeatures) => !empty(dividedFeatures));
 
-    return {dividingSides, dividingLabels, dividedFeatures};
+    return {
+      dividingSides, dividingLabels,
+      dividedFeatures,
+      undividedFeatures,
+    };
   },
 
-  relations: (relation, query, sprawl, features, contextTrack) => ({
+  relations: (relation, query, _sprawl, features, contextTrack) => ({
     flatList:
-      (empty(sprawl.divideFlashListsBySides)
+      (empty(query.dividedFeatures)
         ? relation('generateTrackFeaturedInFlashesList', features, contextTrack)
         : null),
 
@@ -70,24 +89,19 @@ export default {
     dividedFlashLists:
       query.dividedFeatures
         .map(features => relation('generateTrackFeaturedInFlashesList', features, contextTrack)),
+
+    undividedFlashList:
+      (empty(query.undividedFeatures)
+        ? null
+        : relation('generateTrackFeaturedInFlashesList', query.undividedFeatures, contextTrack)),
   }),
 
   data: (query, _sprawl, _tracks) => ({
-    dividingSideNames:
-      query.dividingSides
-        .map(side => side.name),
-
     dividingLabels:
       query.dividingLabels,
   }),
 
-  slots: {
-    headingString: {
-      type: 'string',
-    },
-  },
-
-  generate(data, relations, slots, {html, language}) {
+  generate(data, relations, {html, language}) {
     if (relations.flatList) {
       return relations.flatList;
     }
@@ -107,36 +121,26 @@ export default {
       html.tag('dl', {class: 'division-list'},
         {[html.onlyIfContent]: true},
 
-        language.encapsulate('flashList', listCapsule =>
+        language.encapsulate('flashList', listCapsule => [
           stitchArrays({
             sideLink: relations.dividingSideLinks,
             flashList: relations.dividedFlashLists,
-            sideName: data.dividingSideNames,
-            label: data.dividingLabels,
-          }).map(({sideLink, flashList, sideName, label}) => [
-              language.encapsulate(listCapsule, 'underSide', capsule =>
-                (slots.headingString
-                  ? relations.contentHeading.clone().slots({
-                      tag: 'dt',
-
-                      title:
-                        language.$(capsule, {side: sideLink}),
-
-                      stickyTitle:
-                        language.$(slots.headingString, 'sticky', 'fromGroup', {
-                          side:
-                            (label
-                              ? language.sanitize(label)
-                              : language.sanitize(sideName)),
-                        }),
-                    })
-
-                  : html.tag('dt',
-                      language.$(capsule, {
-                        side: sideLink,
-                      })))),
+          }).map(({sideLink, flashList}) => [
+              html.tag('dt',
+                language.$(listCapsule, 'underSide', {side: sideLink})),
 
               html.tag('dd', flashList),
-            ]))));
+            ]),
+
+          html.tags([
+            html.tag('dt',
+              {[html.onlyIfSiblings]: true},
+              language.$(listCapsule, 'underOther')),
+
+            html.tag('dd',
+              {[html.onlyIfContent]: true},
+              relations.undividedFlashList),
+          ]),
+        ])));
   },
 };

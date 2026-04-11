@@ -472,6 +472,7 @@ trackList:
 
 flashList:
   underSide: "under {SIDE}:"
+  underOther: "other flashes:"
 
   item:
     _: "{FLASH}"

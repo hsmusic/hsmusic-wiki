@@ -85,9 +85,9 @@ export default {
     return {groupingGroups, groupedTracks, ungroupedTracks};
   },
 
-  relations: (relation, query, sprawl, tracks, contextTrack) => ({
+  relations: (relation, query, _sprawl, tracks, contextTrack) => ({
     flatList:
-      (empty(sprawl.divideTrackListsByGroups)
+      (empty(query.groupedTracks)
         ? relation('generateNearbyTrackList', tracks, contextTrack, [])
         : null),
 
