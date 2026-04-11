@@ -65,6 +65,8 @@ export default {
 
           html.tag('span', {class: 'watch-line'},
             language.$(capsule, 'watchOn', {
+              [language.onlyIfOptions]: ['links'],
+
               links:
                 language.formatUnitList(relations.watchLinks),
             }))),
