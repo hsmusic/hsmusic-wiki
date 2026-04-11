@@ -2,6 +2,7 @@ import {inspect} from 'node:util';
 
 import {colors} from '#cli';
 import {input, V} from '#composite';
+import {empty} from '#sugar';
 import Thing from '#thing';
 import {is, isDate, isStringNonEmpty, isURL, validateArrayItems}
   from '#validators';
@@ -13,7 +14,6 @@ import {
   exposeConstant,
   exposeUpdateValueOrContinue,
   exposeWhetherDependencyAvailable,
-  exitWithoutDependency,
 } from '#composite/control-flow';
 
 import {
@@ -66,32 +66,38 @@ export class MusicVideo extends Thing {
       constituteFrom('thing', V('date')),
     ],
 
-    url: [
-      exposeUpdateValueOrContinue({
-        validate: input.value(isURL),
-      }),
+    url: {
+      flags: {update: true, expose: true},
 
-      exitWithoutDependency('urls', V(null), V('empty')),
-
-      {
-        dependencies: ['urls'],
-        compute: ({urls}) => urls[0],
+      update: {
+        validate: isURL,
       },
-    ],
 
-    urls: [
-      exposeUpdateValueOrContinue({
-        validate: input.value(
-          validateArrayItems(isURL)),
-      }),
-
-      exitWithoutDependency('url', V([])),
-
-      {
-        dependencies: ['url'],
-        compute: ({url}) => [url],
+      expose: {
+        dependencies: ['_urls'],
+        transform: (url, {urls}) =>
+          (url          ? url
+         : !empty(urls) ? urls[0]
+                        : null),
       },
-    ],
+    },
+
+    urls: {
+      flags: {update: true, expose: true},
+
+      update: {
+        validate: validateArrayItems(isURL),
+      },
+
+      expose: {
+        dependencies: ['_url'],
+        transform: (urls, {url}) =>
+          (url && urls ? [url, ...urls]
+         : url         ? [url]
+         :        urls ? urls
+                       : []),
+      },
+    },
 
     coverArtFileExtension: fileExtension(V('jpg')),
     coverArtDimensions: dimensions(),
