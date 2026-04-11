@@ -3,7 +3,8 @@ import {inspect} from 'node:util';
 import {colors} from '#cli';
 import {input, V} from '#composite';
 import Thing from '#thing';
-import {is, isDate, isStringNonEmpty, isURL} from '#validators';
+import {is, isDate, isStringNonEmpty, isURL, validateArrayItems}
+  from '#validators';
 import {parseContributors, parseDate} from '#yaml';
 
 import {constituteFrom} from '#composite/wiki-data';
@@ -23,7 +24,6 @@ import {
   soupyFind,
   soupyReverse,
   thing,
-  urls,
 } from '#composite/wiki-properties';
 
 export class MusicVideo extends Thing {
@@ -79,7 +79,19 @@ export class MusicVideo extends Thing {
       },
     ],
 
-    urls: urls(),
+    urls: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(
+          validateArrayItems(isURL)),
+      }),
+
+      exitWithoutDependency('url', V([])),
+
+      {
+        dependencies: ['url'],
+        compute: ({url}) => [url],
+      },
+    ],
 
     coverArtFileExtension: fileExtension(V('jpg')),
     coverArtDimensions: dimensions(),
