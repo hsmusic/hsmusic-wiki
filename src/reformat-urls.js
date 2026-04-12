@@ -25,10 +25,81 @@ function https(namespace, domain) {
   ];
 }
 
+function trimQueryParameter(namespace, domain, parameter) {
+  return [
+    `${namespace}: trim ?${parameter} query parameter`,
+
+    re('gmi', [
+      '^(',
+        '- https://',
+        '(?:' + domain + ')',
+        '\/.*',
+      ')',
+
+      '[&?]' + parameter + '=',
+      '[^\n&?]+',
+    ]),
+
+    '$1',
+  ];
+}
+
+function trimTrailingSlash(namespace, domain) {
+  return [
+    `${namespace}: trim trailing slash`,
+
+    re('gmi', [
+      '^(',
+        '- https://',
+        '(?:' + domain + ')',
+        '\/.*',
+      ')',
+
+      '/',
+      '(?=[#?]|$)',
+    ]),
+
+    '$1',
+  ];
+}
+
 
 // Rules are evaluated top to bottom, in order,
 // so each rule can build off previous ones.
 const findreplace = [];
+
+// General
+
+findreplace.push([
+  `general: add slash to stand in for empty path`,
+  re('gmi', ['^(- [a-z]*://[^\n?#/]+)(?=[?#]|$)']),
+  '$1/',
+]);
+
+// Apple Music
+
+findreplace.push([
+  `apple music: trim country code`,
+  /^(- https:\/\/music.apple.com\/)[a-z][a-z]\//gmi,
+  '$1',
+]);
+
+// SoundCloud
+
+findreplace.push(trimTrailingSlash('soundcloud', 'soundcloud.com'));
+
+// Spotify
+
+findreplace.push(trimQueryParameter('spotify', 'open\.spotify\.com', 'si'));
+findreplace.push(trimQueryParameter('spotify', 'open\.spotify\.com', 'nd'));
+
+// Tumblr
+
+findreplace.push([
+  `tumblr: tumblr.com -> www.tumblr.com`,
+  /^- https:\/\/tumblr\.com\//gmi,
+  '- https://www.tumblr.com/',
+]);
 
 // Twitter
 
@@ -63,23 +134,7 @@ const youtubeDomains =
 
 findreplace.push(https('youtube', youtubeDomains));
 
-findreplace.push([
-  `youtube: trim ?si search parameter`,
-
-  re('gmi', [
-    '^(',
-      '- https://',
-      '(?:' + youtubeDomains + ')',
-      '\/.*',
-    ')',
-
-    '[&?]si=',
-    '[a-z0-9_-]+',
-    '$',
-  ]),
-
-  '$1',
-]);
+findreplace.push(trimQueryParameter('youtube', youtubeDomains, 'si'));
 
 findreplace.push([
   `youtube: youtu.be -> www.youtube.com/watch?v=___`,

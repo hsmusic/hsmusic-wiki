@@ -743,6 +743,9 @@ export function isCuratedURL(string) {
       `not ${colors.red(url.hostname)}`);
 
   switch (url.hostname) {
+    case 'tumblr.com':
+      throw useHostname('www.tumblr.com');
+
     case 'www.twitter.com':
     case 'x.com':
       throw useHostname('twitter.com');
@@ -768,10 +771,47 @@ export function isCuratedURL(string) {
     }
   };
 
+  const dropTrailingSlash = () => {
+    if (url.pathname.length >= 3 && url.pathname.endsWith('/')) {
+      throw new Error(
+        `Remove slash at end: ` +
+        url.pathname.slice(0, -1) +
+        colors.bright(colors.red('/')));
+    }
+  };
+
   switch (url.hostname) {
+    case 'soundcloud.com':
+      dropTrailingSlash();
+      break;
+
+    case 'open.spotify.com':
+      dropSearchParam('si', `tracking parameter`);
+      dropSearchParam('nd', `unnecessary parameter`);
+      break;
+
     case 'www.youtube.com':
       dropSearchParam('si', `tracking parameter`);
       break;
+  }
+
+  if (url.hostname === 'music.apple.com') {
+    const countryMatch =
+      url.pathname.match(/^\/[a-z][a-z]\//);
+
+    if (countryMatch) {
+      throw new Error(`Remove country code ${colors.red(countryMatch[0])}`);
+    }
+  }
+
+  if (url.pathname === '/' && string === url.origin + url.hash + url.search) {
+    if (url.hash) {
+      throw new Error(`Add slash before "#" hash`);
+    } else if (url.search) {
+      throw new Error(`Add slash before "?" query`);
+    } else {
+      throw new Error(`Add slash at end`);
+    }
   }
 
   return true;
