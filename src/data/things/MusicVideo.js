@@ -4,7 +4,7 @@ import {colors} from '#cli';
 import {input, V} from '#composite';
 import {empty} from '#sugar';
 import Thing from '#thing';
-import {is, isDate, isStringNonEmpty, isURL, validateArrayItems}
+import {is, isCuratedURL, isDate, isStringNonEmpty, validateArrayItems}
   from '#validators';
 import {parseContributors, parseDate} from '#yaml';
 
@@ -70,7 +70,7 @@ export class MusicVideo extends Thing {
       flags: {update: true, expose: true},
 
       update: {
-        validate: isURL,
+        validate: isCuratedURL,
       },
 
       expose: {
@@ -86,7 +86,7 @@ export class MusicVideo extends Thing {
       flags: {update: true, expose: true},
 
       update: {
-        validate: validateArrayItems(isURL),
+        validate: validateArrayItems(isCuratedURL),
       },
 
       expose: {

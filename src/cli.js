@@ -231,18 +231,29 @@ export function showHelpForOptions({
   options,
   indentWrap,
   sort = entries => entries,
+  silentIfNoOptions = false,
 }) {
-  if (heading) {
-    console.log(colors.bright(heading));
-  }
-
   const sortedOptions =
     sort(
       Object.entries(options)
         .map(([name, descriptor]) => ({name, descriptor})));
 
+  if (!sortedOptions.length && silentIfNoOptions) return;
+
+  if (heading) {
+    console.log(colors.bright(heading));
+  }
+
   if (!sortedOptions.length) {
-    console.log(`(No options available)`)
+    if (heading) {
+      console.log(``);
+      console.log(`  (No options available)`);
+      console.log(``);
+    } else {
+      console.log(`(No options available)`);
+    }
+
+    return;
   }
 
   let justInsertedPaddingLine = false;

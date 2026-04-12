@@ -4,47 +4,33 @@ import {logInfo} from '#cli';
 import {empty} from '#sugar';
 import thingConstructors from '#things';
 
-export const config = {
-  fileSizes: {
-    applicable: false,
-  },
-
-  languageReloading: {
-    applicable: false,
-  },
-
-  mediaValidation: {
-    applicable: false,
-  },
-
-  search: {
-    applicable: false,
-  },
-
-  thumbs: {
-    applicable: false,
-  },
-
-  webRoutes: {
-    applicable: false,
-  },
-
-  sort: {
-    applicable: false,
-  },
-};
-
-export function getCLIOptions() {
-  return {};
-}
-
-export async function go({wikiData, dataPath}) {
+export async function go({
+  wikiData,
+  dataPath,
+  tidyingOnly,
+}) {
   if (empty(wikiData.sortingRules)) {
-    logInfo`There aren't any sorting rules in for this wiki.`;
-    return true;
+    if (tidyingOnly) {
+      logInfo`There aren't any sorting rules in for this wiki.`;
+    }
+
+    return 'clean';
   }
 
   const {SortingRule} = thingConstructors;
+
+  if (!tidyingOnly) {
+    const results =
+      await Array.fromAsync(SortingRule.go({dataPath, wikiData}));
+
+    if (results.some(result => result.changed)) {
+      logInfo`Updated data files to satisfy sorting.`;
+      return 'updated';
+    } else {
+      logInfo`All sorting rules are satisfied - nice!`;
+      return 'clean';
+    }
+  }
 
   let numUpdated = 0;
   let numActive = 0;
@@ -56,7 +42,7 @@ export async function go({wikiData, dataPath}) {
 
     if (result.changed) {
       numUpdated++;
-      logInfo`Updating to satisfy ${niceMessage}.`;
+      logInfo`Updated to satisfy ${niceMessage}.`;
     } else {
       logInfo`Already good: ${niceMessage}`;
     }
@@ -64,13 +50,12 @@ export async function go({wikiData, dataPath}) {
 
   if (numUpdated > 1) {
     logInfo`Updated data files to satisfy ${numUpdated} sorting rules.`;
+    return 'updated';
   } else if (numUpdated === 1) {
     logInfo`Updated data files to satisfy ${1} sorting rule.`
-  } else if (numActive >= 1) {
-    logInfo`All sorting rules were already satisfied. Good to go!`;
+    return 'updated';
   } else {
-    logInfo`No sorting rules are currently active.`;
+    logInfo`All sorting rules were already satisfied. Good to go!`;
+    return 'clean';
   }
-
-  return true;
 }

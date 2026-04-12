@@ -22,6 +22,14 @@ export function setValidatorCreatorMeta(validator, creator, meta) {
   return validator;
 }
 
+// External configuration
+
+let disabledCuratedURLValidation = false;
+
+export function disableCuratedURLValidation() {
+  disabledCuratedURLValidation = true;
+}
+
 // Basic types (primitives)
 
 export function a(noun) {
@@ -715,6 +723,56 @@ export function isURL(string) {
 
   // This might, too.
   decodeURIComponent(url.pathname);
+
+  return true;
+}
+
+export function isCuratedURL(string) {
+  if (disabledCuratedURLValidation) {
+    return isURL(string);
+  }
+
+  // Do the same basic checks as in isURL.
+  // We'll need access to the URL object.
+  const url = new URL(string);
+  decodeURIComponent(url.pathname);
+
+  const useHostname = hostname =>
+    new Error(
+      `Use ${colors.green(hostname)}, ` +
+      `not ${colors.red(url.hostname)}`);
+
+  switch (url.hostname) {
+    case 'www.twitter.com':
+    case 'x.com':
+      throw useHostname('twitter.com');
+
+    case 'youtu.be':
+    case 'youtube.com':
+      throw useHostname('www.youtube.com');
+  }
+
+  const dropSearchParam = (param, message = null) => {
+    if (url.searchParams.has(param)) {
+      const index =
+        Array.from(url.searchParams)
+          .findIndex(entry => entry[0] === param);
+
+      const prefix = (index === 0 ? '?' : '&');
+
+      const value = url.searchParams.get(param);
+
+      throw new Error(
+        `Remove ${colors.red(`${prefix}${param}=${value}`)}` +
+        (message ? ` (${message})` : ''));
+    }
+  };
+
+  switch (url.hostname) {
+    case 'www.youtube.com':
+      dropSearchParam('si', `tracking parameter`);
+      break;
+  }
 
   return true;
 }

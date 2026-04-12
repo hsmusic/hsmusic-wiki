@@ -54,6 +54,7 @@ import {bindReverse} from '#reverse';
 import {writeSearchData} from '#search';
 import {sortByName} from '#sort';
 import thingConstructors from '#things';
+import {disableCuratedURLValidation} from '#validators';
 import {identifyAllWebRoutes} from '#web-routes';
 
 import {
@@ -80,6 +81,7 @@ import {
   empty,
   filterMultipleArrays,
   indentWrap as unboundIndentWrap,
+  stitchArrays,
   withEntries,
 } from '#sugar';
 
@@ -114,6 +116,7 @@ import {
 import FileSizePreloader from './file-size-preloader.js';
 import {listingSpec, listingTargetSpec} from './listing-spec.js';
 import * as buildModes from './write/build-modes/index.js';
+import * as tidyModes from './write/tidy-modes/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -131,6 +134,7 @@ const STATUS_NOT_APPLICABLE    = `not applicable`;
 const STATUS_STARTED_NOT_DONE  = `started but not yet done`;
 const STATUS_DONE_CLEAN        = `done without warnings`;
 const STATUS_FATAL_ERROR       = `fatal error`;
+const STATUS_INVALID_SIGNAL    = `invalid exit signal`;
 const STATUS_HAS_WARNINGS      = `has warnings`;
 
 const defaultStepStatus = {status: STATUS_NOT_STARTED, annotation: null};
@@ -199,10 +203,6 @@ async function main() {
       {...defaultStepStatus, name: `precache nearly all data`,
         for: ['build']},
 
-    sortWikiDataSourceFiles:
-      {...defaultStepStatus, name: `apply sorting rules to wiki data files`,
-        for: ['build']},
-
     checkWikiDataSourceFileSorting:
       {...defaultStepStatus, name: `check sorting rules against wiki data files`},
 
@@ -251,6 +251,14 @@ async function main() {
       {...defaultStepStatus, name: `identify web routes`,
         for: ['build']},
 
+    reformatCuratedURLs:
+      {...defaultStepStatus, name: `reformat curated URLs`,
+        for: ['build']},
+
+    sortWikiDataSourceFiles:
+      {...defaultStepStatus, name: `apply sorting rules to wiki data files`,
+        for: ['build']},
+
     performBuild:
       {...defaultStepStatus, name: `perform selected build mode`,
         for: ['build']},
@@ -272,32 +280,50 @@ async function main() {
 
   const defaultQueueSize = 500;
 
-  const buildModeFlagOptions = (
+  const buildModeFlagOptions =
     withEntries(buildModes, entries =>
       entries.map(([key, mode]) => [key, {
         help: mode.description,
         type: 'flag',
-      }])));
+      }]));
 
-  const selectedBuildModeFlags = Object.keys(
-    await parseOptions(process.argv.slice(2), {
-      [parseOptions.handleUnknown]: () => {},
-      ...buildModeFlagOptions,
-    }));
+  const selectedBuildModeFlags =
+    Object.keys(
+      await parseOptions(process.argv.slice(2), {
+        [parseOptions.handleUnknown]: () => {},
+        ...buildModeFlagOptions,
+      }));
 
-  let selectedBuildModeFlag;
-  let sortInAdditionToBuild = false;
+  const tidyModeFlagOptions =
+    withEntries(tidyModes, entries =>
+      entries.map(([key, mode]) => [key, {
+        help: mode.description,
+        type: 'flag',
+      }]));
 
-  // As an exception, --sort can be combined with another build mode.
-  if (selectedBuildModeFlags.length >= 2 && selectedBuildModeFlags.includes('sort')) {
-    sortInAdditionToBuild = true;
-    selectedBuildModeFlags.splice(selectedBuildModeFlags.indexOf('sort'), 1);
+  const selectedTidyModeFlags =
+    Object.keys(
+      await parseOptions(process.argv.slice(2), {
+        [parseOptions.handleUnknown]: () => {},
+        ...tidyModeFlagOptions,
+      }));
+
+  if (selectedTidyModeFlags.includes('format-urls')) {
+    Object.assign(stepStatusSummary.reformatCuratedURLs, {
+      status: STATUS_NOT_STARTED,
+      annotation: `--format-urls provided`,
+    });
+  } else {
+    Object.assign(stepStatusSummary.reformatCuratedURLs, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `--format-urls not provided`,
+    });
   }
 
-  if (sortInAdditionToBuild) {
+  if (selectedTidyModeFlags.includes('sort')) {
     Object.assign(stepStatusSummary.sortWikiDataSourceFiles, {
       status: STATUS_NOT_STARTED,
-      annotation: `--sort provided with another build mode`,
+      annotation: `--sort provided`,
     });
 
     Object.assign(stepStatusSummary.checkWikiDataSourceFileSorting, {
@@ -316,17 +342,15 @@ async function main() {
     });
   }
 
-  if (empty(selectedBuildModeFlags)) {
-    // No build mode selected. This is not a valid state for building the wiki,
-    // but we want to let access to --help, so we'll show a message about what
-    // to do later.
-    selectedBuildModeFlag = null;
-  } else if (selectedBuildModeFlags.length > 1) {
-    logError`Building multiple modes (${selectedBuildModeFlags.join(', ')}) at once not supported.`;
-    logError`Please specify one build mode.`;
-    return false;
-  } else {
-    selectedBuildModeFlag = selectedBuildModeFlags[0];
+  let selectedBuildModeFlag;
+  switch (selectedBuildModeFlags.length) {
+    case 0: selectedBuildModeFlag = null; break;
+    case 1: selectedBuildModeFlag = selectedBuildModeFlags[0]; break;
+    default: {
+      logError`Building multiple modes (${selectedBuildModeFlags.join(', ')}) at once not supported.`;
+      logError`Please specify one build mode.`;
+      return false;
+    }
   }
 
   const selectedBuildMode =
@@ -334,16 +358,25 @@ async function main() {
       ? buildModes[selectedBuildModeFlag]
       : null);
 
-  // This is about to get a whole lot more stuff put in it.
-  const wikiData = {
-    listingSpec,
-    listingTargetSpec,
-  };
+  const selectedTidyModes =
+    selectedTidyModeFlags
+      .map(flag => tidyModes[flag]);
 
-  const buildOptions =
-    (selectedBuildMode
-      ? selectedBuildMode.getCLIOptions()
-      : {});
+  const tidyingOnly =
+    !selectedBuildMode &&
+    !empty(selectedTidyModes);
+
+  const selectedBuildModeOptions =
+    selectedBuildMode?.getCLIOptions?.() ??
+    {};
+
+  const selectedTidyModeOptions =
+    selectedTidyModes.map(tidyMode =>
+      tidyMode.getCLIOptions?.() ??
+      {});
+
+  const selectedTidyModeOptionsFlat =
+    Object.fromEntries(selectedTidyModeOptions.flat());
 
   const commonOptions = {
     'help': {
@@ -449,6 +482,11 @@ async function main() {
 
     'refresh-online-thumbs': {
       help: `Downloads a fresh copy of the online file size cache, so changes there are immediately reflected`,
+      type: 'flag',
+    },
+
+    'skip-curated-url-validation': {
+      help: `Skips checking if URLs match a set of standardizing rules; only intended for use with old data`,
       type: 'flag',
     },
 
@@ -580,9 +618,11 @@ async function main() {
     // here, even though we won't be doing anything with them later.
     // (This is a bit of a hack.)
     ...buildModeFlagOptions,
+    ...tidyModeFlagOptions,
 
     ...commonOptions,
-    ...buildOptions,
+    ...selectedTidyModeOptionsFlat,
+    ...selectedBuildModeOptions,
   });
 
   shouldShowStepStatusSummary = cliOptions['show-step-summary'] ?? false;
@@ -599,7 +639,7 @@ async function main() {
       `and website content/structure ` +
       `from provided data, media, and language directories.\n` +
       `\n` +
-      `CLI options are divided into three groups:\n`));
+      `CLI options are divided into five groups:\n`));
 
     console.log(` 1) ` + indentWrap(
       `Common options: ` +
@@ -608,37 +648,63 @@ async function main() {
       {spaces: 4, bullet: true}));
 
     console.log(` 2) ` + indentWrap(
+      `Tidying mode selection: ` +
+      `One or more tidying mode may be selected, ` +
+      `and they adjust the contents of data files ` +
+      `to satisfy predefined or data-configured standardization rules`,
+      {spaces: 4, bullet: true}));
+
+    console.log(` 3) ` + indentWrap(
+      `Tidying mode options: ` +
+      `Each tidy mode may `))
+
+    console.log(` 4) ` + indentWrap(
       `Build mode selection: ` +
       `One build mode should be selected, ` +
       `and it decides the main set of behavior to use ` +
       `for presenting or interacting with site content`,
       {spaces: 4, bullet: true}));
 
-    console.log(` 3) ` + indentWrap(
-      `Build options: ` +
+    console.log(` 5) ` + indentWrap(
+      `Build mode options: ` +
       `Each build mode has a set of unique options ` +
       `which customize behavior for that build mode`,
       {spaces: 4, bullet: true}));
+
+    console.log(`All options may be specified in any order.`);
 
     console.log(``);
 
     showHelpForOptions({
       heading: `Common options`,
       options: commonOptions,
-      wrap,
     });
+
+    showHelpForOptions({
+      heading: `Tidying mode selection`,
+      options: tidyModeFlagOptions,
+    });
+
+    stitchArrays({
+      flag: selectedTidyModeFlags,
+      options: selectedTidyModeOptions,
+    }).forEach(({flag, options}) => {
+        showHelpForOptions({
+          heading: `Options for tidying mode --${flag}`,
+          options,
+          silentIfNoOptions: false,
+        });
+      });
 
     showHelpForOptions({
       heading: `Build mode selection`,
       options: buildModeFlagOptions,
-      wrap,
     });
 
     if (selectedBuildMode) {
       showHelpForOptions({
-        heading: `Build options for --${selectedBuildModeFlag}`,
-        options: buildOptions,
-        wrap,
+        heading: `Options for build mode --${selectedBuildModeFlag}`,
+        options: selectedBuildModeOptions,
       });
     } else {
       console.log(
@@ -702,6 +768,34 @@ async function main() {
       status: STATUS_NOT_APPLICABLE,
       annotation: `--no-build provided`,
     });
+  }
+
+  if (tidyingOnly) {
+    Object.assign(stepStatusSummary.performBuild, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `tidying modes provided`,
+    });
+
+    for (const key of [
+      'preloadFileSizes',
+      'watchLanguageFiles',
+      'verifyImagePaths',
+      'buildSearchIndex',
+      'generateThumbnails',
+      'identifyWebRoutes',
+      'checkWikiDataSourceFileSorting',
+    ]) {
+      Object.assign(stepStatusSummary[key], {
+        status: STATUS_NOT_APPLICABLE,
+        annotation: `tidying modes provided without build mode`,
+      });
+    }
+  }
+
+  if (cliOptions['skip-curated-url-validation']) {
+    logWarn`Won't check if any URLs match the curated URL rules this run`;
+    logWarn `(--skip-curated-url-validation passed).`;
+    disableCuratedURLValidation();
   }
 
   // Finish setting up defaults by combining information from all options.
@@ -957,6 +1051,10 @@ async function main() {
 
       // TODO: OK this is a little silly.
       if (stepStatusSummary.buildSearchIndex.annotation?.startsWith('N/A')) {
+        break decideBuildSearchIndex;
+      }
+
+      if (tidyingOnly) {
         break decideBuildSearchIndex;
       }
 
@@ -1478,6 +1576,12 @@ async function main() {
     timeStart: Date.now(),
   });
 
+  // This is about to get a whole lot more stuff put in it.
+  const wikiData = {
+    listingSpec,
+    listingTargetSpec,
+  };
+
   let yamlDataSteps;
   let yamlDocumentProcessingAggregate;
 
@@ -1993,40 +2097,7 @@ async function main() {
     });
   }
 
-  if (stepStatusSummary.sortWikiDataSourceFiles.status === STATUS_NOT_STARTED) {
-    Object.assign(stepStatusSummary.sortWikiDataSourceFiles, {
-      status: STATUS_STARTED_NOT_DONE,
-      timeStart: Date.now(),
-    });
-
-    const {SortingRule} = thingConstructors;
-    const results =
-      await Array.fromAsync(SortingRule.go({dataPath, wikiData}));
-
-    if (results.some(result => result.changed)) {
-      logInfo`Updated data files to satisfy sorting.`;
-      logInfo`Restarting automatically, since that's now needed!`;
-
-      Object.assign(stepStatusSummary.sortWikiDataSourceFiles, {
-        status: STATUS_DONE_CLEAN,
-        annotation: `changes cueing restart`,
-        timeEnd: Date.now(),
-        memory: process.memoryUsage(),
-      });
-
-      return 'restart';
-    } else {
-      logInfo`All sorting rules are satisfied. Nice!`;
-      paragraph = false;
-
-      Object.assign(stepStatusSummary.sortWikiDataSourceFiles, {
-        status: STATUS_DONE_CLEAN,
-        annotation: `no changes needed`,
-        timeEnd: Date.now(),
-        memory: process.memoryUsage(),
-      });
-    }
-  } else if (stepStatusSummary.checkWikiDataSourceFileSorting.status === STATUS_NOT_STARTED) {
+  if (stepStatusSummary.checkWikiDataSourceFileSorting.status === STATUS_NOT_STARTED) {
     Object.assign(stepStatusSummary.checkWikiDataSourceFileSorting, {
       status: STATUS_STARTED_NOT_DONE,
       timeStart: Date.now(),
@@ -3197,8 +3268,77 @@ async function main() {
 
   quickstat.reset();
 
+  let restartBeforeBuild = false;
+  const updatedTidyModes = [];
+
+  for (const [step, tidyMode] of [
+    ['reformatCuratedURLs', 'format-urls'],
+    ['sortWikiDataSourceFiles', 'sort'],
+  ]) {
+    if (stepStatusSummary[step].status !== STATUS_NOT_STARTED) {
+      continue;
+    }
+
+    Object.assign(stepStatusSummary[step], {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
+
+    const tidySignal =
+      await tidyModes[tidyMode].go({
+        wikiData,
+        dataPath,
+        tidyingOnly,
+      });
+
+    switch (tidySignal) {
+      case 'clean': {
+        Object.assign(stepStatusSummary[step], {
+          status: STATUS_DONE_CLEAN,
+          annotation: `no changes needed`,
+          timeEnd: Date.now(),
+          memory: process.memoryUsage(),
+        });
+
+        break;
+      }
+
+      case 'updated': {
+        Object.assign(stepStatusSummary[step], {
+          status: STATUS_DONE_CLEAN,
+          annotation: `changes cueing restart`,
+          timeEnd: Date.now(),
+          memory: process.memoryUsage(),
+        });
+
+        restartBeforeBuild = true;
+        updatedTidyModes.push(tidyMode);
+
+        break;
+      }
+
+      default: {
+        Object.assign(stepStatusSummary[step], {
+          status: STATUS_INVALID_SIGNAL,
+          annotation: `unknown: ${tidySignal}`,
+          timeEnd: Date.now(),
+          memory: process.memoryUsage(),
+        });
+
+        logError`Invalid exit signal for ${'--' + tidyMode}: ${tidySignal}`;
+        fileIssue();
+
+        return false;
+      }
+    }
+  }
+
   if (stepStatusSummary.performBuild.status === STATUS_NOT_APPLICABLE) {
     return true;
+  }
+
+  if (restartBeforeBuild) {
+    return 'restart';
   }
 
   const developersComment =
@@ -3347,15 +3487,15 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
           console.log('');
         }
 
-        if (numRestarts > 5) {
+        if (numRestarts > 2) {
           logError`A restart was cued, but we've restarted a bunch already.`;
           logError`Exiting because this is probably a bug!`;
           console.log('');
           break;
         } else {
           console.log('');
-          logInfo`A restart was cued. This is probably normal, and required`;
-          logInfo`to load updated data files. Restarting automatically now!`;
+          console.log(`A restart was cued. This is probably normal, and required`);
+          console.log(`to load updated data files. Restarting automatically now!`);
           console.log('');
           numRestarts++;
         }
@@ -3416,6 +3556,8 @@ function showStepStatusSummary() {
       .map(({status}) =>
         status === STATUS_HAS_WARNINGS ||
         status === STATUS_FATAL_ERROR ||
+        status === STATUS_INVALID_SIGNAL ||
+        status === STATUS_NOT_STARTED ||
         status === STATUS_STARTED_NOT_DONE);
 
   const anyStepsNotClean =
@@ -3470,7 +3612,12 @@ function showStepStatusSummary() {
 
     message += ` `;
     message += `${name}: `.padEnd(longestNameLength + 4, '.');
-    message += ` `;
+    if (stepsNotClean[index]) {
+      message += `! `;
+    } else {
+      message += `  `;
+    }
+
     message += status;
 
     if (annotation) {
@@ -3482,17 +3629,18 @@ function showStepStatusSummary() {
         console.error(colors.green(message));
         break;
 
-      case STATUS_NOT_STARTED:
       case STATUS_NOT_APPLICABLE:
         console.error(colors.dim(message));
         break;
 
       case STATUS_HAS_WARNINGS:
+      case STATUS_NOT_STARTED:
       case STATUS_STARTED_NOT_DONE:
         console.error(colors.yellow(message));
         break;
 
       case STATUS_FATAL_ERROR:
+      case STATUS_INVALID_SIGNAL:
         console.error(colors.red(message));
         break;
 
