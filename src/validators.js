@@ -710,7 +710,11 @@ export function isName(name) {
 export function isURL(string) {
   isStringNonEmpty(string);
 
-  new URL(string);
+  // This might error.
+  const url = new URL(string);
+
+  // This might, too.
+  decodeURIComponent(url.pathname);
 
   return true;
 }
