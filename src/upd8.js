@@ -1590,7 +1590,7 @@ async function main() {
       if (!paragraph) console.log('');
 
       console.error(error);
-      niceShowAggregate(error);
+      niceShowAggregate(error, {showTraces: true});
 
       logError`There was a JavaScript error ${stage}.`;
       fileIssue();
@@ -1869,7 +1869,7 @@ async function main() {
       }
     } catch (error) {
       if (!paragraph) console.log('');
-      niceShowAggregate(error);
+      niceShowAggregate(error, {showTraces: true});
       console.log('');
 
       logError`There was an error precaching internal data objects.`;
@@ -1960,7 +1960,7 @@ async function main() {
       });
     } catch (aggregate) {
       if (!paragraph) console.log('');
-      niceShowAggregate(aggregate);
+      niceShowAggregate(aggregate, {showTraces: true});
 
       logError`Failed to initialize artwork data connections properly.`;
       fileIssue();
@@ -2157,7 +2157,7 @@ async function main() {
 
     aggregate.close();
   } catch (error) {
-    niceShowAggregate(error);
+    niceShowAggregate(error, {showTraces: true});
     logError`Couldn't load internal default URL spec.`;
     logError`This is required to build the wiki, so stopping here.`;
     fileIssue();
@@ -2271,7 +2271,7 @@ async function main() {
   try {
     processURLSpecsAggregate.close();
   } catch (error) {
-    niceShowAggregate(error);
+    niceShowAggregate(error, {showTraces: true});
     logWarn`There were errors loading the optional URL specs you`;
     logWarn`selected using ${'--urls'}. Since they might misfunction,`;
     logWarn`debug the errors or remove the failing ones from ${'--urls'}.`;
@@ -2540,7 +2540,7 @@ async function main() {
     try {
       internalDefaultLanguage = await processLanguageFile(internalDefaultStringsFile);
     } catch (error) {
-      niceShowAggregate(error);
+      niceShowAggregate(error, {showTraces: true});
       errorLoadingInternalDefaultLanguage = true;
     }
   }
@@ -2692,7 +2692,7 @@ async function main() {
       for (const {status, value: language, reason: error} of results) {
         if (status === 'rejected') {
           errorLoadingCustomLanguages = true;
-          niceShowAggregate(error);
+          niceShowAggregate(error, {showTraces: true});
         } else {
           languages[language.code] = language;
         }
@@ -3182,7 +3182,7 @@ async function main() {
       });
     } catch (error) {
       if (!paragraph) console.log('');
-      niceShowAggregate(error);
+      niceShowAggregate(error, {showTraces: true});
 
       logError`There was an error preparing or writing search data.`;
       fileIssue();
@@ -3232,7 +3232,7 @@ async function main() {
       preparedWebRoutes = result;
     } catch (error) {
       if (!paragraph) console.log('');
-      niceShowAggregate(error);
+      niceShowAggregate(error, {showTraces: true});
 
       logError`There was an issue identifying web routes!`;
       fileIssue();

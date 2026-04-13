@@ -142,7 +142,7 @@ export async function go({
   const showError = (error) => {
     if (niceShowAggregate) {
       if (error.errors || error.cause) {
-        niceShowAggregate(error);
+        niceShowAggregate(error, {showTraces: true});
         return;
       }
     }
@@ -203,7 +203,7 @@ export async function go({
   try {
     pathAggregate.close();
   } catch (error) {
-    niceShowAggregate(error);
+    niceShowAggregate(error, {showTraces: true});
     logWarn`Failed to compute page paths for some targets.`;
     logWarn`This means some pages that normally exist will be 404s.`;
     fileIssue();

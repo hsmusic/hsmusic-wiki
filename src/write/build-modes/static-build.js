@@ -385,7 +385,7 @@ export async function go({
           ({pageHTML, oEmbedJSON} = html.resolve(topLevelResult));
         } catch (error) {
           logError`\rError generating page: ${pathname}`;
-          niceShowAggregate(error);
+          niceShowAggregate(error, {showTraces: true});
           errored = true;
           return;
         }
