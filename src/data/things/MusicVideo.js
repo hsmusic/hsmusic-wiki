@@ -75,7 +75,7 @@ export class MusicVideo extends Thing {
 
       expose: {
         dependencies: ['_urls'],
-        transform: (url, {urls}) =>
+        transform: (url, {'_urls': urls}) =>
           (url          ? url
          : !empty(urls) ? urls[0]
                         : null),
@@ -91,7 +91,7 @@ export class MusicVideo extends Thing {
 
       expose: {
         dependencies: ['_url'],
-        transform: (urls, {url}) =>
+        transform: (urls, {'_url': url}) =>
           (url && urls ? [url, ...urls]
          : url         ? [url]
          :        urls ? urls
