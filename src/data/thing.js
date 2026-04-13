@@ -67,14 +67,7 @@ export default class Thing extends CacheableObject {
       name = colors.yellow(`couldn't get name`);
     }
 
-    let reference;
-    try {
-      if (this.directory) {
-        reference = colors.blue(Thing.getReference(this));
-      }
-    } catch {
-      reference = colors.yellow(`couldn't get reference`);
-    }
+    let reference = Thing.inspectReference(this, {showConstructor: false});
 
     return (
       (name ? `${constructorName} ${name}` : `${constructorName}`) +
@@ -125,6 +118,64 @@ export default class Thing extends CacheableObject {
     }
 
     return `${thing.constructor[Thing.referenceType]}:${thing.directory}`;
+  }
+
+  static inspectReference(thing, {showConstructor = true} = {}) {
+    const referenceType =
+      thing.constructor[Thing.referenceType] ??
+      null;
+
+    const constructorPart =
+      (showConstructor
+        ? `${thing.constructor.name} `
+        : ``);
+
+    let errored = false;
+    const tryToGet = property => {
+      try {
+        return thing[property] ?? null;
+      } catch {
+        errored = true;
+        return null;
+      }
+    };
+
+    const directoryPart = this.inspectDirectory(thing);
+    const directoryErrored = directoryPart === null;
+
+    if (directoryPart && referenceType) {
+      return colors.blue(`${referenceType}:${directoryPart}`);
+    } else if (directoryPart) {
+      return constructorPart + `(${colors.blue(directoryPart)})`;
+    } else if (tryToGet('name')) {
+      return constructorPart + `(named ${inspect(thing.name)}`;
+    } else if (errored && directoryErrored) {
+      return constructorPart + `(${colors.yellow(`couldn't compute reference`)})`;
+    } else {
+      return constructorPart;
+    }
+  }
+
+  static inspectDirectory(thing) {
+    let errored = false;
+    const tryToGet = property => {
+      try {
+        return thing[property] ?? null;
+      } catch {
+        errored = true;
+        return null;
+      }
+    };
+
+    if (tryToGet('directory')) {
+      return thing.directory;
+    } else if (tryToGet('unqualifiedDirectory')) {
+      return `…${thing.unqualifiedDirectory}`;
+    } else if (errored) {
+      return null;
+    } else {
+      return '';
+    }
   }
 
   static extendDocumentSpec(thingClass, subspec) {

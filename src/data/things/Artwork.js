@@ -422,7 +422,7 @@ export class Artwork extends Thing {
 
         parts.push(` for ${inspect(this.thing, newOptions)}`);
       } else {
-        parts.push(` for ${colors.blue(Thing.getReference(this.thing))}`);
+        parts.push(` for ${Thing.inspectReference(this.thing)}`);
       }
     }
 

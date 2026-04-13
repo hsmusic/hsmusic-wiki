@@ -193,7 +193,7 @@ export class MusicVideo extends Thing {
 
         parts.push(` for ${inspect(this.thing, newOptions)}`);
       } else {
-        parts.push(` for ${colors.blue(Thing.getReference(this.thing))}`);
+        parts.push(` for ${colors.blue(Thing.inspectReference(this.thing))}`);
       }
     }
 

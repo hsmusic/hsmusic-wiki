@@ -314,8 +314,7 @@ export class Contribution extends Thing {
       }
 
       if (artist) {
-        artistRef =
-          colors.blue(Thing.getReference(artist));
+        artistRef = Thing.inspectReference(artist);
       }
     } else {
       artistRef =
@@ -326,7 +325,7 @@ export class Contribution extends Thing {
       accentParts.push(`by ${artistRef}`);
     }
 
-    if (this.thing) {
+    if (this.thing) toPart: {
       if (depth >= 0) {
         const newOptions = {
           ...options,
@@ -336,10 +335,13 @@ export class Contribution extends Thing {
               : options.depth - 1),
         };
 
-        accentParts.push(`to ${inspect(this.thing, newOptions)}`);
-      } else {
-        accentParts.push(`to ${colors.blue(Thing.getReference(this.thing))}`);
+        try {
+          accentParts.push(`to ${inspect(this.thing, newOptions)}`);
+          break toPart;
+        } catch {}
       }
+
+      accentParts.push(`to ${Thing.inspectReference(this.thing)}`);
     }
 
     if (!empty(accentParts)) {
