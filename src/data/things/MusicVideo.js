@@ -179,7 +179,15 @@ export class MusicVideo extends Thing {
   [inspect.custom](depth, options, inspect) {
     const parts = [];
 
-    parts.push(Thing.prototype[inspect.custom].apply(this));
+    parts.push(this.constructor.name);
+
+    if (this.title) {
+      parts.push(` ${colors.green(`"${this.title}"`)}`);
+    } else if (this.label) {
+      parts.push(` (${colors.green(`"${this.label}"`)})`);
+    } else if (this.unqualifiedDirectory !== 'music-video') {
+      parts.push(` (${colors.blue(this.unqualifiedDirectory)})`);
+    }
 
     if (this.thing) {
       if (depth >= 0) {
