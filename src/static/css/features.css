@@ -823,49 +823,6 @@
 }
 
 @layer interaction {
-  /* Wide or Medium layout - so, not thin/phone! */
-  @media (min-width: 601px) {
-    .cover-artwork,
-    .cover-artwork .image-container,
-    .cover-artwork .image-details {
-      transition-duration: 0.4s;
-
-      /* Here be spooky. This is an evil Firefox and Safari detection
-       * because those browsers both play nice and let transition-duration
-       * depend on an animated CSS variable. Chrome does not.
-       */
-      @supports (-moz-orient: inline) or (hanging-punctuation: first) {
-        transition-duration: calc(var(--deferred-non-mobile-switch) * 0.4s);
-      }
-
-      transition-timing-function: steps(6, start);
-    }
-
-    .cover-artwork {
-      transition-property: border-color;
-    }
-
-    .cover-artwork:not(:hover, :focus-within):not(:has(.reveal:not(.revealed))) {
-      border-color: var(--dim-color);
-    }
-
-    .cover-artwork .image-container {
-      transition-property: background-color;
-    }
-
-    .cover-artwork:not(:hover, :focus-within) .image-container {
-      background-color: var(--dark-color) !important;
-    }
-
-    .cover-artwork .image-details {
-      transition-property: opacity;
-    }
-
-    .cover-artwork:not(:hover, :focus-within) .image-details:not(.origin-details) {
-      opacity: 0.6;
-    }
-  }
-
   .music-video .image-link::after {
     content: "▶︎";
     background: #0008;
