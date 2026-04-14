@@ -27,7 +27,22 @@
 
 /* Layout - Wide or Medium */
 
+@property deferred-non-mobile-switch {
+  syntax: <number>;
+  initial-value: 0;
+}
+
+@keyframes defer-non-mobile-switch {
+  0%    { --deferred-non-mobile-switch: 0; }
+  99.9% { --deferred-non-mobile-switch: 0; }
+  100%  { --deferred-non-mobile-switch: 1; }
+}
+
 @media (min-width: 600px) {
+  :root {
+    animation: defer-non-mobile-switch 0.15s forwards;
+  }
+
   .content-sticky-heading-root {
     /* Safari doesn't always play nicely with position: sticky,
      * this seems to fix images sometimes displaying above the
