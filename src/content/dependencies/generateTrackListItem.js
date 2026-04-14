@@ -25,6 +25,9 @@ export default {
   }),
 
   data: (track, _contextContributions) => ({
+    date:
+      track.date,
+
     duration:
       track.duration ?? 0,
 
@@ -47,6 +50,11 @@ export default {
       default: false,
     },
 
+    showDate: {
+      validate: v => v.anyOf(v.isBoolean, v.isDate),
+      default: false,
+    },
+
     colorMode: {
       validate: v => v.is('none', 'track', 'line'),
       default: 'track',
@@ -62,48 +70,83 @@ export default {
         language.encapsulate(itemCapsule, workingCapsule => {
           const workingOptions = {};
 
+          const accent =
+            language.encapsulate(itemCapsule, 'accent', accentCapsule => {
+              let workingCapsule = accentCapsule;
+              let workingOptions = {};
+              let any = false;
+
+              if (slots.showDate) {
+                any = true;
+                workingCapsule += '.withDate';
+                workingOptions.date =
+                  language.$(accentCapsule, 'date', {
+                    date:
+                      (slots.showDate === true
+                        ? language.formatDate(data.date)
+                        : language.formatDate(slots.showDate)),
+                  });
+              }
+
+              if (slots.showDuration) {
+                any = true;
+                workingCapsule += '.withDuration';
+                workingOptions.duration =
+                  (data.trackHasDuration
+                    ? language.$(accentCapsule, 'duration', {
+                        duration:
+                          language.formatDuration(data.duration),
+                      })
+                    : relations.missingDuration);
+              }
+
+              if (any) {
+                return language.$(workingCapsule, workingOptions);
+              } else {
+                return html.blank();
+              }
+            });
+
+          if (!html.isBlank(accent)) {
+            workingCapsule += '.withAccent';
+            workingOptions.accent = accent;
+          }
+
           workingOptions.track =
             relations.trackLink
               .slot('color', slots.colorMode === 'track');
 
-          if (slots.showDuration) {
-            workingCapsule += '.withDuration';
-            workingOptions.duration =
-              (data.trackHasDuration
-                ? language.$(itemCapsule, 'withDuration.duration', {
-                    duration:
-                      language.formatDuration(data.duration),
-                  })
-                : relations.missingDuration);
-          }
+          const artists =
+            language.encapsulate(itemCapsule, 'artists', artistsCapsule => {
+              const chosenCredit =
+                (slots.showArtists === true
+                  ? relations.acontextualCredit
+               : slots.showArtists === 'auto'
+                  ? relations.contextualCredit
+                  : null);
 
-          const chosenCredit =
-            (slots.showArtists === true
-              ? relations.acontextualCredit
-           : slots.showArtists === 'auto'
-              ? relations.contextualCredit
-              : null);
+              if (!chosenCredit) {
+                return html.blank();
+              }
 
-          if (chosenCredit) {
-            const artistCapsule = language.encapsulate(itemCapsule, 'withArtists');
+              // This might still be blank, if the contextual credit is chosen
+              // and it matches its context credit.
+              return chosenCredit.slots({
+                normalStringKey:
+                  artistsCapsule + '.by',
 
-            chosenCredit.setSlots({
-              normalStringKey:
-                artistCapsule + '.by',
+                featuringStringKey:
+                  artistsCapsule + '.featuring',
 
-              featuringStringKey:
-                artistCapsule + '.featuring',
-
-              normalFeaturingStringKey:
-                artistCapsule + '.by.featuring',
+                normalFeaturingStringKey:
+                  artistsCapsule + '.by.featuring',
+              });
             });
 
-            if (!html.isBlank(chosenCredit)) {
-              workingCapsule += '.withArtists';
-              workingOptions.by =
-                html.tag('span', {class: 'by'},
-                  chosenCredit);
-            }
+          if (!html.isBlank(artists)) {
+            workingCapsule += '.withArtists';
+            workingOptions.artists =
+              html.tag('span', {class: 'by'}, artists);
           }
 
           return language.$(workingCapsule, workingOptions);

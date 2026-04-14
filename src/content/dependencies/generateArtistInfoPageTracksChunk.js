@@ -61,7 +61,7 @@ export default {
         .filter(contribs => countTowardTrackTotals(contribs) === false),
   }),
 
-  relations: (relation, query, artist, album, _trackContribLists) => ({
+  relations: (relation, query, artist, album, trackContribLists) => ({
     template:
       relation('generateArtistInfoPageChunk'),
 
@@ -82,13 +82,15 @@ export default {
       query.contribListsCountingTowardTotals.map(trackContribs =>
         relation('generateArtistInfoPageTracksChunkItem',
           artist,
-          trackContribs)),
+          trackContribs,
+          trackContribLists)),
 
     itemsNotCountingTowardTotals:
       query.contribListsNotCountingTowardTotals.map(trackContribs =>
         relation('generateArtistInfoPageTracksChunkItem',
           artist,
-          trackContribs)),
+          trackContribs,
+          trackContribLists)),
   }),
 
   data(artist, _query, album, trackContribLists) {
@@ -97,7 +99,10 @@ export default {
     const contribs =
       trackContribLists.flat();
 
-    data.dates =
+    data.albumDate =
+      album.date;
+
+    data.contribDates =
       contribs
         .map(contrib => contrib.date);
 
@@ -168,7 +173,9 @@ export default {
           return language.$(workingCapsule, workingOptions);
         }),
 
-      dates: data.dates,
+      date: data.albumDate,
+      dates: data.contribDates,
+
       duration: data.duration,
       durationApproximate: data.durationApproximate,
 

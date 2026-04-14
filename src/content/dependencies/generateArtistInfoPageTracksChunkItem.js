@@ -2,13 +2,18 @@ import {sortAlbumsTracksChronologically} from '#sort';
 import {empty} from '#sugar';
 
 export default {
-  query(artist, contribs) {
+  query(artist, contribs, chunkContribs) {
     const query = {};
 
-    // TODO: Very mysterious what to do if the set of contributions is,
-    // in total, associated with more than one thing. No design yet.
     query.track =
       contribs[0].thing;
+
+    query.date =
+      contribs[0].date;
+
+    query.anyItemsExpresslyDated =
+      chunkContribs.flat()
+        .some(contrib => +contrib.date !== +query.track.album.date);
 
     const creditedAsNormalArtist =
       contribs
@@ -112,6 +117,11 @@ export default {
   }),
 
   data: (query) => ({
+    date:
+      (query.anyItemsExpresslyDated
+        ? query.date
+        : null),
+
     duration:
       query.track.duration,
 
@@ -146,6 +156,7 @@ export default {
               relations.trackListItem.slots({
                 showArtists: 'auto',
                 showDuration: slots.showDuration,
+                showDate: data.date,
               })),
         }),
     }),

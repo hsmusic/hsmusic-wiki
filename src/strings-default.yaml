@@ -447,25 +447,35 @@ trackList:
   item:
     _: "{TRACK}"
 
-    withDuration:
-      _: >-
-        {DURATION} {TRACK}
+    withAccent: >-
+      {ACCENT} {TRACK}
 
-      duration:
-        _: "({DURATION})"
-        missing: "_:__"
-        missing.info: "no duration provided; treated as zero seconds long"
+    accent.withDate: >-
+      ({DATE})
 
-    withArtists:
-      _: >-
-        {TRACK} {BY}
+    accent.withDate.withDuration: >-
+      ({DURATION}; {DATE})
 
+    accent.withDuration: >-
+      ({DURATION})
+
+    accent.date: "{DATE}"
+
+    accent.duration:
+      _: "{DURATION}"
+      missing: "_:__"
+      missing.info: "no duration provided; treated as zero seconds long"
+
+    withArtists: >-
+      {TRACK} {ARTISTS}
+
+    artists:
       by: "by {ARTISTS}"
       featuring: "feat. {ARTISTS}"
       by.featuring: "by {ARTISTS} feat. {FEATURING}"
 
-    withDuration.withArtists: >-
-      {DURATION} {TRACK} {BY}
+    withAccent.withArtists: >-
+      {ACCENT} {TRACK} {ARTISTS}
 
     rerelease: >-
       {TRACK} (rerelease)

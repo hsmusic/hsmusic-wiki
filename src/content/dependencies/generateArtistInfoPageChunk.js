@@ -18,30 +18,30 @@ export default {
       mutable: false,
     },
 
-    dates: {
-      validate: v => v.sparseArrayOf(v.isDate),
-    },
+    // Container and items, respectively.
+    date: {validate: v => v.isDate},
+    dates: {validate: v => v.sparseArrayOf(v.isDate)},
 
     duration: {validate: v => v.isDuration},
     durationApproximate: {type: 'boolean'},
   },
 
   generate(slots, {html, language}) {
-    let earliestDate = null;
-    let latestDate = null;
-    let onlyDate = null;
+    let earliestItemDate = null;
+    let latestItemDate = null;
+    let onlyItemDate = null;
 
     if (!empty(slots.dates)) {
-      earliestDate =
-        slots.dates
-          .reduce((a, b) => a <= b ? a : b);
+      earliestItemDate = slots.dates[0];
+      latestItemDate = slots.dates[1];
 
-      latestDate =
-        slots.dates
-          .reduce((a, b) => a <= b ? b : a);
+      for (const date of slots.dates.slice(1)) {
+        if (date < earliestItemDate) earliestItemDate = date;
+        if (date > latestItemDate) latestItemDate = date;
+      }
 
-      if (+earliestDate === +latestDate) {
-        onlyDate = earliestDate;
+      if (+earliestItemDate === +latestItemDate) {
+        onlyItemDate = earliestItemDate;
       }
     }
 
@@ -51,9 +51,16 @@ export default {
         const options = {album: slots.link};
         const parts = ['artistPage.creditList.album'];
 
-        if (onlyDate) {
+        if (slots.date) {
           parts.push('withDate');
-          options.date = language.formatDate(onlyDate);
+          options.date = language.formatDate(slots.date);
+        } else if (onlyItemDate) {
+          parts.push('withDate');
+          options.date = language.formatDate(onlyItemDate);
+        } else if (earliestItemDate && latestItemDate) {
+          parts.push('withDateRange');
+          options.dateRange =
+            language.formatDateRange(earliestItemDate, latestItemDate);
         }
 
         if (slots.duration) {
@@ -72,13 +79,13 @@ export default {
         const options = {act: slots.link};
         const parts = ['artistPage.creditList.flashAct'];
 
-        if (onlyDate) {
+        if (onlyItemDate) {
           parts.push('withDate');
-          options.date = language.formatDate(onlyDate);
-        } else if (earliestDate && latestDate) {
+          options.date = language.formatDate(onlyItemDate);
+        } else if (earliestItemDate && latestItemDate) {
           parts.push('withDateRange');
           options.dateRange =
-            language.formatDateRange(earliestDate, latestDate);
+            language.formatDateRange(earliestItemDate, latestItemDate);
         }
 
         accentedLink = language.formatString(...parts, options);
