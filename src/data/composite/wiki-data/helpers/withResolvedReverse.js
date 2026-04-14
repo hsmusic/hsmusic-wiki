@@ -5,7 +5,7 @@ import {input, templateCompositeFrom} from '#composite';
 import inputWikiData from '../inputWikiData.js';
 
 export default templateCompositeFrom({
-  annotation: `withReverseReferenceList`,
+  annotation: `withResolvedReverse`,
 
   inputs: {
     data: inputWikiData({allowMixedTypes: true}),

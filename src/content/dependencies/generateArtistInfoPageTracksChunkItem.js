@@ -1,5 +1,6 @@
 import {sortAlbumsTracksChronologically} from '#sort';
 import {empty} from '#sugar';
+import {selectRepresentativeArtistContributorContribs} from '#wiki-data';
 
 export default {
   query(artist, contribs, chunkContribs) {
@@ -15,51 +16,8 @@ export default {
       chunkContribs.flat()
         .some(contrib => +contrib.date !== +query.track.album.date);
 
-    const creditedAsNormalArtist =
-      contribs
-        .some(contrib =>
-          contrib.thingProperty === 'artistContribs' &&
-         !contrib.isFeaturingCredit);
-
-    const creditedAsContributor =
-      contribs
-        .some(contrib => contrib.thingProperty === 'contributorContribs');
-
-    const annotatedContribs =
-      contribs
-        .filter(contrib => !empty(contrib.annotationParts));
-
-    const annotatedArtistContribs =
-      annotatedContribs
-        .filter(contrib => contrib.thingProperty === 'artistContribs');
-
-    const annotatedContributorContribs =
-      annotatedContribs
-        .filter(contrib => contrib.thingProperty === 'contributorContribs');
-
-    // Don't display annotations associated with crediting in the
-    // Contributors field if the artist is also credited as an Artist
-    // *and* the Artist-field contribution is non-annotated. This is
-    // so that we don't misrepresent the artist - the contributor
-    // annotation tends to be for "secondary" and performance roles.
-    // For example, this avoids crediting Marcy Nabors on Renewed
-    // Return seemingly only for "bass clarinet" when they're also
-    // the one who composed and arranged Renewed Return!
-    if (
-      creditedAsNormalArtist &&
-      creditedAsContributor &&
-      empty(annotatedArtistContribs)
-    ) {
-      query.displayedContributions = null;
-    } else if (
-      !empty(annotatedArtistContribs) ||
-      !empty(annotatedContributorContribs)
-    ) {
-      query.displayedContributions = [
-        ...annotatedArtistContribs,
-        ...annotatedContributorContribs,
-      ];
-    }
+    query.displayedContributions =
+      selectRepresentativeArtistContributorContribs(contribs);
 
     // It's kinda awkward to perform this chronological sort here,
     // per track, rather than just reusing the one that's done to

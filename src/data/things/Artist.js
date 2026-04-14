@@ -14,8 +14,10 @@ import {
 
 import {exitWithoutDependency, exposeConstant, exposeDependency}
   from '#composite/control-flow';
-import {withFilteredList, withPropertyFromList} from '#composite/data';
-import {withContributionListSums} from '#composite/wiki-data';
+import {withFilteredList, withMappedList, withPropertyFromList}
+  from '#composite/data';
+import {withContributionListSums, withReverseReferenceList}
+  from '#composite/wiki-data';
 
 import {
   constitutibleArtwork,
@@ -215,6 +217,33 @@ export class Artist extends Thing {
     musicVideoContributorContributions: reverseReferenceList({
       reverse: soupyReverse.input('musicVideoContributorContributionsBy'),
     }),
+
+    otherMusicVideoArtistContributionsToOwnAlbums: [
+      withReverseReferenceList({
+        reverse: soupyReverse.input('musicVideoArtistContributionsToAlbumsBy'),
+      }).outputs({
+        '#reverseReferenceList': '#allArtistContributions',
+      }),
+
+      {
+        dependencies: [input.myself()],
+        compute: (continuation, {
+          [input.myself()]: myself,
+        }) => continuation({
+          ['#isNotMyself']: artist => artist !== myself,
+        }),
+      },
+
+      withPropertyFromList('#allArtistContributions', V('artist')),
+
+      withMappedList('#allArtistContributions.artist', '#isNotMyself')
+        .outputs({'#mappedList': '#differentArtistFilter'}),
+
+      withFilteredList('#allArtistContributions', '#differentArtistFilter')
+        .outputs({'#filteredList': '#otherArtistContributions'}),
+
+      exposeDependency('#otherArtistContributions'),
+    ],
 
     totalDuration: [
       withPropertyFromList('musicContributions', V('thing')),

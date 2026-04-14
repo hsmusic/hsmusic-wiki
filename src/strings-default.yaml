@@ -1457,6 +1457,88 @@ artistPage:
 
       track: "{TRACK}"
 
+      track.musicVideo:
+        _: >-
+          {TRACK}
+
+        withLinks: >-
+          {TRACK}: {LINKS}
+
+        withTitle: >-
+          {TRACK} — {TITLE}
+
+        withTitle.withLinks: >-
+          {TRACK} — {TITLE}: {LINKS}
+
+        withLabel: >-
+          {TRACK} — {LABEL}
+
+        withLabel.withLinks: >-
+          {TRACK} — {LABEL}: {LINKS}
+
+        withCredit: >-
+          {TRACK}, {CREDIT}
+
+        withCredit.withLinks: >-
+          {TRACK}, {CREDIT}: {LINKS}
+
+        withCredit.withTitle: >-
+          {TRACK}, {TITLE} {CREDIT}
+
+        withCredit.withTitle.withLinks: >-
+          {TRACK}, {TITLE} {CREDIT}: {LINKS}
+
+        withCredit.withLabel: >-
+          {TRACK}, {LABEL} {CREDIT}
+
+        withCredit.withLabel.withLinks: >-
+          {TRACK}, {LABEL} {CREDIT}: {LINKS}
+
+        withDate: >-
+          ({DATE}) {TRACK}
+
+        withDate.withLinks: >-
+          ({DATE}) {TRACK}: {LINKS}
+
+        withDate.withTitle: >-
+          ({DATE}) {TRACK} — {TITLE}
+
+        withDate.withTitle.withLinks: >-
+          ({DATE}) {TRACK} — {TITLE}: {LINKS}
+
+        withDate.withLabel: >-
+          ({DATE}) {TRACK} — {LABEL}
+
+        withDate.withLabel.withLinks: >-
+          ({DATE}) {TRACK} — {LABEL}: {LINKS}
+
+        withDate.withCredit: >-
+          ({DATE}) {TRACK}, {CREDIT}
+
+        withDate.withCredit.withLinks: >-
+          ({DATE}) {TRACK}, {CREDIT}: {LINKS}
+
+        withDate.withCredit.withTitle: >-
+          ({DATE}) {TRACK}, {TITLE} {CREDIT}
+
+        withDate.withCredit.withTitle.withLinks: >-
+          ({DATE}) {TRACK}, {TITLE} {CREDIT}: {LINKS}
+
+        withDate.withCredit.withLabel: >-
+          ({DATE}) {TRACK}, {LABEL} {CREDIT}
+
+        withDate.withCredit.withLabel.withLinks: >-
+          ({DATE}) {TRACK}, {LABEL} {CREDIT}: {LINKS}
+
+        credit: >-
+          video by {ARTISTS}
+
+        credit.alongsideLabel: >-
+          by {ARTISTS}
+
+        credit.alongsideTitle: >-
+          by {ARTISTS}
+
       # album:
       #   The artist info page doesn't display if the artist is
       #   musically credited outright for the album as a whole,
@@ -1470,6 +1552,88 @@ artistPage:
         wallpaperArt: "(wallpaper art)"
         bannerArt: "(banner art)"
         commentary: "(album commentary)"
+
+        musicVideo:
+          _: >-
+            (album music video)
+
+          withLinks: >-
+            (album music video: {LINKS})
+
+          withTitle: >-
+            (for album: {TITLE})
+
+          withTitle.withLinks: >-
+            (for album: {TITLE} - {LINKS})
+
+          withLabel: >-
+            (for album: {LABEL})
+
+          withLabel.withLinks: >-
+            (for album: {LABEL} - {LINKS})
+
+          withCredit: >-
+            (album music video {CREDIT})
+
+          withCredit.withLinks: >-
+            (album music video {CREDIT} - {LINKS})
+
+          withCredit.withTitle: >-
+            (for album: {TITLE} {CREDIT})
+
+          withCredit.withTitle.withLinks: >-
+            (for album: {TITLE} {CREDIT} - {LINKS})
+
+          withCredit.withLabel: >-
+            (for album: {LABEL} {CREDIT})
+
+          withCredit.withLabel.withLinks: >-
+            (for album: {LABEL} {CREDIT} - {LINKS})
+
+          withDate: >-
+            ({DATE}: album music video)
+
+          withDate.withLinks: >-
+            ({DATE}, album music video: {LINKS})
+
+          withDate.withTitle: >-
+            ({DATE}, for album: {TITLE})
+
+          withDate.withTitle.withLinks: >-
+            ({DATE}, for album: {TITLE} - {LINKS})
+
+          withDate.withLabel: >-
+            ({DATE}, for album: {LABEL})
+
+          withDate.withLabel.withLinks: >-
+            ({DATE}, for album: {LABEL} - {LINKS})
+
+          withDate.withCredit: >-
+            ({DATE}: album music video {CREDIT})
+
+          withDate.withCredit.withLinks: >-
+            ({DATE}, album music video {CREDIT} - {LINKS})
+
+          withDate.withCredit.withTitle: >-
+            ({DATE}, for album: {TITLE} {CREDIT})
+
+          withDate.withCredit.withTitle.withLinks: >-
+            ({DATE}, for album: {TITLE} {CREDIT} - {LINKS})
+
+          withDate.withCredit.withLabel: >-
+            ({DATE}, for album: {LABEL} {CREDIT})
+
+          withDate.withCredit.withLabel.withLinks: >-
+            ({DATE}, for album: {LABEL} {CREDIT} - {LINKS})
+
+          credit: >-
+            by {ARTISTS}
+
+          credit.alongsideLabel: >-
+            by {ARTISTS}
+
+          credit.alongsideTitle: >-
+            by {ARTISTS}
 
       flash: "{FLASH}"
 
@@ -1500,6 +1664,7 @@ artistPage:
     title:
       music: "Contributed music to groups:"
       artworks: "Contributed artworks to groups:"
+      musicVideos: "Contributed to music videos in groups:"
       withSortButton: "{TITLE} ({SORT})"
 
       sorting:
@@ -1512,17 +1677,11 @@ artistPage:
       countDurationAccent: "({COUNT} — {DURATION})"
       durationCountAccent: "({DURATION} — {COUNT})"
 
-  trackList:
-    title: "Tracks"
-
-  artList:
-    title: "Artworks"
-
-  flashList:
-    title: "Flashes"
-
-  commentaryList:
-    title: "Commentary"
+  trackList.title: "Tracks"
+  artList.title: "Artworks"
+  musicVideoList.title: "Music Videos"
+  flashList.title: "Flashes"
+  commentaryList.title: "Commentary"
 
   # viewArtGallery:
   #   This is shown twice on the page - once at almost the very top

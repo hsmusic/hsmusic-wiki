@@ -167,6 +167,32 @@ export class MusicVideo extends Thing {
 
     musicVideoContributorContributionsBy:
       soupyReverse.contributionsBy('musicVideoData', 'contributorContribs'),
+
+    musicVideoArtistContributionsToAlbumsBy: {
+      bindTo: 'musicVideoData',
+
+      referencing: musicVideo => musicVideo.artistContribs,
+
+      *referenced(musicVideoContrib) {
+        const musicVideo = musicVideoContrib.thing;
+        const trackOrAlbum = musicVideo.thing;
+        if (trackOrAlbum.isTrack) {
+          const albumArtists =
+            trackOrAlbum.album.artistContribs
+              .map(albumContrib => albumContrib.artist);
+
+          for (const trackContrib of trackOrAlbum.artistContribs) {
+            if (albumArtists.includes(trackContrib.artist)) {
+              yield trackContrib.artist;
+            }
+          }
+        } else {
+          for (const albumContrib of trackOrAlbum.artistContribs) {
+            yield albumContrib.artist;
+          }
+        }
+      },
+    },
   };
 
   get path() {

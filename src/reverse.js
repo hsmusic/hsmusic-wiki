@@ -45,11 +45,12 @@ function reverseHelper(spec) {
 
     const interstitialReferencingThings =
       (spec.bindTo === 'wikiData'
-        ? spec.referencing(data)
-        : data.flatMap(thing => spec.referencing(thing)));
+        ? Array.from(spec.referencing(data))
+        : data.flatMap(thing => Array.from(spec.referencing(thing))));
 
     const referencedThings =
-      interstitialReferencingThings.map(thing => spec.referenced(thing));
+      interstitialReferencingThings
+        .map(thing => Array.from(spec.referenced(thing)));
 
     const referencingThings =
       (spec.tidy

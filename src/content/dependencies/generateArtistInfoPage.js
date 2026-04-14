@@ -14,6 +14,11 @@ export default {
       ...artist.trackCoverArtistContributions,
     ],
 
+    musicVideoContributions: [
+      ...artist.musicVideoArtistContributions,
+      ...artist.musicVideoContributorContributions,
+    ],
+
     // Banners and wallpapers don't show up in the artist gallery page, only
     // cover art.
     hasGallery:
@@ -78,6 +83,12 @@ export default {
       (query.hasGallery
         ? relation('linkArtistGallery', artist)
         : null),
+
+    musicVideosChunkedList:
+      relation('generateArtistInfoPageMusicVideosChunkedList', artist),
+
+    musicVideosGroupInfo:
+      relation('generateArtistGroupContributionsInfo', query.musicVideoContributions),
 
     flashesChunkedList:
       relation('generateArtistInfoPageFlashesChunkedList', artist),
@@ -216,6 +227,11 @@ export default {
                         {href: '#art'},
                         language.$(pageCapsule, 'artList.title')),
 
+                  !html.isBlank(relations.musicVideosChunkedList) &&
+                    html.tag('a',
+                      {href: '#music-videos'},
+                      language.$(pageCapsule, 'musicVideoList.title')),
+
                   !html.isBlank(relations.flashesChunkedList) &&
                     html.tag('a',
                       {href: '#flashes'},
@@ -323,6 +339,26 @@ export default {
 
               relations.editsForWikiArtworksChunkedList,
             ]),
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                tag: 'h2',
+                attributes: {id: 'music-videos'},
+                title: language.$(pageCapsule, 'musicVideoList.title'),
+              }),
+
+            relations.musicVideosChunkedList.slots({
+              groupInfo:
+                language.encapsulate(pageCapsule, 'groupContributions', capsule =>
+                  relations.musicVideosGroupInfo.slots({
+                    title: language.$(capsule, 'title.artworks'),
+                    showBothColumns: false,
+                    sort: 'count',
+                    countUnit: 'artworks',
+                  })),
+            }),
           ]),
 
           html.tags([

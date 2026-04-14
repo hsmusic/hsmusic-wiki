@@ -280,6 +280,55 @@ export function chunkArtistTrackContributions(contributions) {
         ])));
 }
 
+// Ditto. More shared logic for the artist page.
+export function selectRepresentativeArtistContributorContribs(contribs) {
+  const creditedAsNormalArtist =
+    contribs
+      .some(contrib =>
+        contrib.thingProperty === 'artistContribs' &&
+       !contrib.isFeaturingCredit);
+
+  const creditedAsContributor =
+    contribs
+      .some(contrib => contrib.thingProperty === 'contributorContribs');
+
+  const annotatedContribs =
+    contribs
+      .filter(contrib => !empty(contrib.annotationParts));
+
+  const annotatedArtistContribs =
+    annotatedContribs
+      .filter(contrib => contrib.thingProperty === 'artistContribs');
+
+  const annotatedContributorContribs =
+    annotatedContribs
+      .filter(contrib => contrib.thingProperty === 'contributorContribs');
+
+  // Don't display annotations associated with crediting in the
+  // Contributors field if the artist is also credited as an Artist
+  // *and* the Artist-field contribution is non-annotated. This is
+  // so that we don't misrepresent the artist - the contributor
+  // annotation tends to be for "secondary" and performance roles.
+  // For example, this avoids crediting Marcy Nabors on Renewed
+  // Return seemingly only for "bass clarinet" when they're also
+  // the one who composed and arranged Renewed Return!
+  if (
+    creditedAsNormalArtist &&
+    creditedAsContributor &&
+    empty(annotatedArtistContribs)
+  ) {
+    return null;
+  } else if (
+    !empty(annotatedArtistContribs) ||
+    !empty(annotatedContributorContribs)
+  ) {
+    return [
+      ...annotatedArtistContribs,
+      ...annotatedContributorContribs,
+    ];
+  }
+}
+
 // Big-ass homepage row functions
 
 export function getNewAdditions(numAlbums, {albumData}) {
