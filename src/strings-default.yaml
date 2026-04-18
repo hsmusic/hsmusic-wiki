@@ -1402,13 +1402,13 @@ artistPage:
         {ALBUM} ({DURATION})
 
       withDateRange: >-
-        {ALBUM} ({DATE_RANGE})
+        {ALBUM} (tracks {DATE_RANGE})
 
       withDate.withDuration: >-
         {ALBUM} ({DATE}; {DURATION})
 
       withDateRange.withDuration: >-
-        {ALBUM} ({DATE_RANGE}; {DURATION})
+        {ALBUM} (tracks {DATE_RANGE}; {DURATION})
 
     # flashAct:
     #   Flashes are chunked by flash act, though a single flash act
