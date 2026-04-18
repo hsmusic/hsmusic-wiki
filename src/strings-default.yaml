@@ -1381,8 +1381,12 @@ artistPage:
   creditList:
 
     # album:
-    #   Tracks are chunked by albums, as long as the tracks are all
-    #   of the same date (if applicable).
+    #   Tracks are chunked by albums, generally all tracks from an
+    #   album together in one chunk, but a album may be split into
+    #   multiple chunks if the tracks are individually dated and the
+    #   artist contributed to some other release between. Date ranges
+    #   are shown only if the tracks within a chunk vary in date AND
+    #   the album itself has no date.
 
     album:
       _: "{ALBUM}"
@@ -1391,9 +1395,20 @@ artistPage:
       credit:
         by: "by {ARTISTS}"
 
-      withDate: "{ALBUM} ({DATE})"
-      withDuration: "{ALBUM} ({DURATION})"
-      withDate.withDuration: "{ALBUM} ({DATE}; {DURATION})"
+      withDate: >-
+        {ALBUM} ({DATE})
+
+      withDuration: >-
+        {ALBUM} ({DURATION})
+
+      withDateRange: >-
+        {ALBUM} ({DATE_RANGE})
+
+      withDate.withDuration: >-
+        {ALBUM} ({DATE}; {DURATION})
+
+      withDateRange.withDuration: >-
+        {ALBUM} ({DATE_RANGE}; {DURATION})
 
     # flashAct:
     #   Flashes are chunked by flash act, though a single flash act
