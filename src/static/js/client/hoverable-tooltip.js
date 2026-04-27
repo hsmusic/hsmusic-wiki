@@ -6,7 +6,6 @@ import {
   cssProp,
   dispatchInternalEvent,
   getVisuallyContainingElement,
-  pointIsOverAnyOf,
 } from '../client-util.js';
 
 import {info as stickyHeadingInfo} from './sticky-heading.js';
@@ -387,11 +386,14 @@ function handleTooltipHoverableTouchEnded(hoverable, domEvent) {
   // Don't proceed if none of the (just-ended) touches ended over the
   // hoverable.
 
-  const pointIsOverThisHoverable = pointIsOverAnyOf([hoverable]);
-
-  const anyTouchEndedOverHoverable =
-    touches.some(({clientX, clientY}) =>
-      pointIsOverThisHoverable(clientX, clientY));
+  let anyTouchEndedOverHoverable = false;
+  for (const touch of touches) {
+    const point = WikiRect.fromPoint(touch.clientX, touch.clientY);
+    if (WikiRect.fromElementContaining(hoverable, point)) {
+      anyTouchEndedOverHoverable = true;
+      break;
+    }
+  }
 
   if (!anyTouchEndedOverHoverable) {
     return;
@@ -738,8 +740,12 @@ export function getTooltipFromHoverablePlacementOpportunityAreas(hoverable) {
   const baselineRects =
     getTooltipBaselineOpportunityAreas(tooltip);
 
+  const basicHoverableRect =
+    WikiRect.fromElementUnderMouse(hoverable) ??
+    WikiRect.fromRect(hoverable.getClientRects()[0]);
+
   const hoverableRect =
-    WikiRect.fromElementUnderMouse(hoverable).toExtended(5, 10);
+    basicHoverableRect.toExtended(5, 10);
 
   const tooltipRect =
     peekTooltipClientRect(tooltip);
@@ -1066,12 +1072,17 @@ export function addPageListeners() {
 
     if (empty(touches)) return;
 
-    const pointIsOverHoverableOrTooltip =
-      pointIsOverAnyOf(getHoverablesAndTooltips());
+    let anyTouchOverAnyHoverableOrTooltip = false;
+    for (const touch of touches) outer: {
+      const point = WikiRect.fromPoint(touch.clientX, touch.clientY);
 
-    const anyTouchOverAnyHoverableOrTooltip =
-      touches.some(({clientX, clientY}) =>
-        pointIsOverHoverableOrTooltip(clientX, clientY));
+      for (const element of getHoverablesAndTooltips()) {
+        if (WikiRect.fromElementContaining(element, point)) {
+          anyTouchOverAnyHoverableOrTooltip = true;
+          break outer;
+        }
+      }
+    }
 
     if (!anyTouchOverAnyHoverableOrTooltip) {
       hideCurrentlyShownTooltip();
@@ -1079,12 +1090,17 @@ export function addPageListeners() {
   });
 
   document.body.addEventListener('click', domEvent => {
-    const {clientX, clientY} = domEvent;
+    const point = WikiRect.fromPoint(domEvent.clientX, domEvent.clientY);
 
-    const pointIsOverHoverableOrTooltip =
-      pointIsOverAnyOf(getHoverablesAndTooltips());
+    let pointIsOverHoverableOrTooltip = false;
+    for (const element of getHoverablesAndTooltips()) {
+      if (WikiRect.fromElementContaining(element, point)) {
+        pointIsOverHoverableOrTooltip = true;
+        break;
+      }
+    }
 
-    if (!pointIsOverHoverableOrTooltip(clientX, clientY)) {
+    if (!pointIsOverHoverableOrTooltip) {
       // Hide with "intent to replace" - we aren't actually going to replace
       // the tooltip with a new one, but this intent indicates that it should
       // be hidden right away, instead of showing. What we're really replacing,

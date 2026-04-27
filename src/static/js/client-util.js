@@ -73,14 +73,6 @@ export function decodeEntities(string) {
   return textarea.value;
 }
 
-// Curry-style, so multiple points can more conveniently be tested at once.
-export function pointIsOverAnyOf(elements) {
-  return (clientX, clientY) => {
-    const element = document.elementFromPoint(clientX, clientY);
-    return elements.some(el => el.contains(element));
-  };
-}
-
 export function getVisuallyContainingElement(child) {
   let parent = child.parentElement;
 

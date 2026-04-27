@@ -16,7 +16,10 @@ export class WikiRect extends DOMRect {
 
   static fromMouse() {
     const {clientX, clientY} = liveMousePositionInfo.state;
+    return WikiRect.fromPoint(clientX, clientY);
+  }
 
+  static fromPoint(clientX, clientY) {
     return WikiRect.fromRect({
       x: clientX,
       y: clientY,
@@ -26,20 +29,15 @@ export class WikiRect extends DOMRect {
   }
 
   static fromElementUnderMouse(element) {
-    const mouseRect = WikiRect.fromMouse();
+    return WikiRect.fromElementContaining(element, WikiRect.fromMouse());
+  }
 
+  static fromElementContaining(element, innerRect) {
     const rects =
       Array.from(element.getClientRects())
         .map(rect => WikiRect.fromRect(rect));
 
-    const rectUnderMouse =
-      rects.find(rect => rect.contains(mouseRect));
-
-    if (rectUnderMouse) {
-      return rectUnderMouse;
-    } else {
-      return rects[0];
-    }
+    return rects.find(rect => rect.contains(innerRect));
   }
 
   static leftOf(origin, offset = 0) {
