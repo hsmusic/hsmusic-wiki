@@ -173,6 +173,13 @@ export function registerTooltipHoverableElement(hoverable, tooltip) {
 }
 
 function handleTooltipMouseEntered(tooltip) {
+  // NOTE: This function is NOT NATURALLY CALLED on iOS Safari.
+  // Elements generally don't receive mouse events there at all - hoverables
+  // are the exception (we have not identified exactly why). We do however
+  // mock calling this function. However, because we mock the event and do so
+  // without any special awareness, this function may be called multiple times
+  // in sequence, without the tooltip ever receiving a mouseleave event.
+
   const {state} = info;
 
   if (state.currentlyTransitioningHiddenTooltip) {
@@ -191,6 +198,9 @@ function handleTooltipMouseEntered(tooltip) {
 }
 
 function handleTooltipMouseLeft(tooltip) {
+  // NOTE: This function is NOT NATURALLY CALLED on iOS Safari.
+  // We don't mock it there, either.
+
   const {settings, state} = info;
 
   if (state.currentlyShownTooltip !== tooltip) return;
@@ -1054,10 +1064,14 @@ export function addPageListeners() {
     });
   });
 
-  const getHoverablesAndTooltips = () => [
-    ...Array.from(state.registeredHoverables.keys()),
-    ...Array.from(state.registeredTooltips.keys()),
-  ];
+  const getHoverables = () =>
+    Array.from(state.registeredHoverables.keys());
+
+  const getTooltips = () =>
+    Array.from(state.registeredTooltips.keys());
+
+  const getHoverablesAndTooltips = () =>
+    [...getHoverables(), ...getTooltips()];
 
   document.body.addEventListener('touchend', domEvent => {
     const touches = Array.from(domEvent.changedTouches);
@@ -1073,13 +1087,22 @@ export function addPageListeners() {
     if (empty(touches)) return;
 
     let anyTouchOverAnyHoverableOrTooltip = false;
-    for (const touch of touches) outer: {
+    for (const touch of touches) {
       const point = WikiRect.fromPoint(touch.clientX, touch.clientY);
 
-      for (const element of getHoverablesAndTooltips()) {
-        if (WikiRect.fromElementContaining(element, point)) {
+      for (const hoverable of getHoverables()) {
+        if (WikiRect.fromElementContaining(hoverable, point)) {
           anyTouchOverAnyHoverableOrTooltip = true;
-          break outer;
+        }
+      }
+
+      for (const tooltip of getTooltips()) {
+        if (WikiRect.fromElementContaining(tooltip, point)) {
+          anyTouchOverAnyHoverableOrTooltip = true;
+
+          setTimeout(() => {
+            handleTooltipMouseEntered(tooltip);
+          }, 200);
         }
       }
     }
