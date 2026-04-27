@@ -527,6 +527,7 @@ export class WikiRect extends DOMRect {
       width: this.width + 'px',
       height: this.height + 'px',
       pointerEvents: 'none',
+      zIndex: '9999999',
     });
 
     let i = 0;
