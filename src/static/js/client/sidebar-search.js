@@ -616,6 +616,10 @@ export function addPageListeners() {
     }
 
     if (domEvent.shiftKey && domEvent.code === 'Slash') {
+      if (domEvent.ctrlKey || domEvent.metaKey) {
+        return;
+      }
+
       domEvent.preventDefault();
       info.searchLabel.click();
     }
