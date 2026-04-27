@@ -338,7 +338,10 @@ function handleTooltipHoverableLostFocus(hoverable, domEvent) {
   // This will set the tooltipWasJustHidden flag, which is detected by a newly
   // focused hoverable, if applicable. Always specify intent to replace when
   // navigating via tab focus. (Check `handleTooltipLostFocus` for details.)
-  if (!currentlyShownTooltipHasFocus(domEvent.relatedTarget)) {
+  if (
+    domEvent.relatedTarget &&
+    !currentlyShownTooltipHasFocus(domEvent.relatedTarget)
+  ) {
     hideCurrentlyShownTooltip(true);
   }
 }
