@@ -347,8 +347,8 @@
 }
 
 @layer interaction {
-  .wiki-search-results-container::before,
-  .wiki-search-results-container::after {
+  .wiki-search-results-container.has-results::before,
+  .wiki-search-results-container.has-results::after {
     content: "";
     display: block;
     position: sticky;
@@ -356,17 +356,17 @@
     z-index: 1;
   }
 
-  .wiki-search-result:hover {
+  .wiki-search-results-container.has-results .wiki-search-result:hover {
     z-index: 2;
   }
 
   /* Shadow along top edge */
 
-  .wiki-search-results-container > :first-child {
+  .wiki-search-results-container.has-results > :first-child {
     margin-top: -4px;
   }
 
-  .wiki-search-results-container::before {
+  .wiki-search-results-container.has-results::before {
     height: 8px; top: -2px;
     background: linear-gradient(to bottom, black, black 50%, transparent);
     opacity: 0.4;
@@ -374,11 +374,11 @@
 
   /* Shadow along bottom edge */
 
-  .wiki-search-results-container > :last-child {
+  .wiki-search-results-container.has-results > :last-child {
     margin-bottom: -10px;
   }
 
-  .wiki-search-results-container::after {
+  .wiki-search-results-container.has-results::after {
     height: 16px; bottom: -2px;
     background: linear-gradient(to top, black, black 30%, transparent);
     opacity: 0.4;

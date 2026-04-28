@@ -939,6 +939,8 @@ function showSidebarSearchResults(results) {
   }
 
   if (shownAnyResults) {
+    info.results.classList.add('has-results');
+
     showContextControls();
 
     cssProp(info.endSearchRule, 'display', 'block');
@@ -946,6 +948,8 @@ function showSidebarSearchResults(results) {
 
     tidySidebarSearchColumn();
   } else {
+    info.results.classList.remove('has-results');
+
     const p = document.createElement('p');
     p.classList.add('wiki-search-no-results');
     p.appendChild(templateContent(info.noResultsString));
