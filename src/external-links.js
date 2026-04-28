@@ -701,7 +701,13 @@ export const externalLinkSpec = [
     match: {domain: 'youtube.com'},
 
     platform: 'youtube',
-    handle: {pathname: /^@([^/]+)\/?$/},
+
+    handle: {
+      pathname: /^@([^/]+)\/?$/,
+      transform: [
+        {command: 'decode-uri'},
+      ],
+    },
 
     icon: 'youtube',
   },
