@@ -218,6 +218,34 @@ export class Artist extends Thing {
       reverse: soupyReverse.input('musicVideoContributorContributionsBy'),
     }),
 
+    musicVideoContributions: [
+      {
+        dependencies: [
+          'musicVideoArtistContributions',
+          'musicVideoContributorContributions',
+        ],
+
+        compute: (continuation, {
+          musicVideoArtistContributions,
+          musicVideoContributorContributions,
+        }) => continuation({
+          ['#contributions']: [
+            ...musicVideoArtistContributions,
+            ...musicVideoContributorContributions,
+          ],
+        }),
+      },
+
+      {
+        dependencies: ['#contributions'],
+        compute: ({'#contributions': contributions}) =>
+          sortContributionsChronologically(
+            contributions,
+            sortAlbumsTracksChronologically,
+            {getThing: contrib => contrib.thing.thing}),
+      },
+    ],
+
     otherMusicVideoArtistContributionsToOwnAlbums: [
       withReverseReferenceList({
         reverse: soupyReverse.input('musicVideoArtistContributionsToAlbumsBy'),
