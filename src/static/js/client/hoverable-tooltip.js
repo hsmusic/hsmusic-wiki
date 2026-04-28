@@ -671,7 +671,22 @@ export function positionTooltipFromHoverableWithBrains(hoverable) {
   const {numBaselineRects, idealBaseline: baselineRect} = opportunities;
 
   if (baselineRect.contains(tooltipRect)) {
-    return;
+    // ...unless hovering over a rectangle besides the hoverable's first.
+    // An element has multiple rectangles if it's an inline element that
+    // has wrapped across to the next line.
+
+    const hoverableClientRects =
+      Array.from(hoverable.getClientRects())
+        .map(rect => WikiRect.fromRect(rect));
+
+    const mouseRect = WikiRect.fromMouse();
+
+    const hoverableClientRectIndex =
+      hoverableClientRects.findIndex(rect => rect.contains(mouseRect));
+
+    if (hoverableClientRectIndex <= 0) {
+      return;
+    }
   }
 
   const tryDirection = (dir1, dir2, i) => {
