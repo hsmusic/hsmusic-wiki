@@ -17,7 +17,15 @@ export const info = {
   state: {
     visible: false,
   },
+
+  session: {
+    visibleWhileNavigatingAlbum: {type: 'string'},
+  },
 };
+
+export function* bindSessionStorage() {
+  yield 'visibleWhileNavigatingAlbum';
+}
 
 export function getPageReferences() {
   info.box =
@@ -74,6 +82,33 @@ export function addInternalListeners() {
       }
     }
   });
+}
+
+export function mutatePageContent() {
+  const {session} = info;
+
+  if (!info.box) return;
+  if (!session.visibleWhileNavigatingAlbum) return;
+
+  const currentAlbum =
+    cssProp(document.body, '--album-directory');
+
+  if (session.visibleWhileNavigatingAlbum === currentAlbum) {
+    toggleAdditionalNamesBox();
+  }
+}
+
+export function initializeState() {
+  const {session} = info;
+
+  if (!session.visibleWhileNavigatingAlbum) return;
+
+  const currentAlbum =
+    cssProp(document.body, '--album-directory');
+
+  if (session.visibleWhileNavigatingAlbum !== currentAlbum) {
+    session.visibleWhileNavigatingAlbum = null;
+  }
 }
 
 export function addPageListeners() {
@@ -138,11 +173,17 @@ function handleAdditionalNamesBoxLinkClicked(domEvent) {
 }
 
 export function toggleAdditionalNamesBox() {
-  const {state} = info;
+  const {state, session} = info;
 
   state.visible = !state.visible;
+
   info.box.style.display =
     (state.visible
       ? 'block'
       : 'none');
+
+  session.visibleWhileNavigatingAlbum =
+    (state.visible
+      ? cssProp(document.body, '--album-directory')
+      : null);
 }
