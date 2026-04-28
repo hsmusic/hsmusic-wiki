@@ -897,7 +897,7 @@ export function getTooltipFromHoverablePlacementOpportunityAreas(hoverable) {
 
   const rightRightLeft =
     WikiRect.leftOf(
-      hoverableRect.left - neededHorizontalOverlap + tooltipRect.width);
+      hoverableRect.left + tooltipRect.width);
 
   const leftLeftRight =
     WikiRect.rightOf(
