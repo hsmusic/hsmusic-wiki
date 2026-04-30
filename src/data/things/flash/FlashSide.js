@@ -19,6 +19,7 @@ export class FlashSide extends Thing {
     listTerminology: contentString(),
 
     splitAbove: flag(V(false)),
+    isolateActs: flag(V(false)),
 
     acts: thingList(V(FlashAct)),
 
@@ -39,6 +40,7 @@ export class FlashSide extends Thing {
       'List Terminology': {property: 'listTerminology'},
 
       'Split Above': {property: 'splitAbove'},
+      'Isolate Acts': {property: 'isolateActs'},
     },
   };
 

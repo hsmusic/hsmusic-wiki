@@ -1,4 +1,5 @@
 import {input, V} from '#composite';
+import {atOffset} from '#sugar';
 import Thing from '#thing';
 import {anyOf, isColor, isDirectory, isNumber, isString}
   from '#validators';
@@ -138,6 +139,36 @@ export class Flash extends Thing {
       withPropertyFromObject('act', V('side')),
       exposeDependency('#act.side'),
     ],
+
+    previousFlash: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['this', 'act', 'side'],
+        compute: ({this: flash, act, side}) =>
+          (flash !== act.flashes.at(0)
+            ? atOffset(act.flashes, act.flashes.indexOf(flash), -1)
+         : side.isolateActs
+            ? null
+         : act.previousAct
+            ? act.previousAct.flashes.at(-1)
+            : null),
+      },
+    },
+
+    nextFlash: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['this', 'act', 'side'],
+        compute: ({this: flash, act, side}) =>
+          (flash !== act.flashes.at(-1)
+            ? atOffset(act.flashes, act.flashes.indexOf(flash), +1)
+         : side.isolateActs
+            ? null
+         : act.nextAct
+            ? act.nextAct.flashes.at(0)
+            : null),
+      },
+    },
   });
 
   static [Thing.getSerializeDescriptors] = ({

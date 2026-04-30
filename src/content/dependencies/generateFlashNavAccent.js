@@ -1,29 +1,5 @@
-import {atOffset} from '#sugar';
-
 export default {
-  sprawl: ({flashActData}) =>
-    ({flashActData}),
-
-  query(sprawl, flash) {
-    // Don't sort chronologically here. The previous/next buttons should match
-    // the order in the sidebar, by act rather than date.
-    const flashes =
-      sprawl.flashActData
-        .flatMap(act => act.flashes);
-
-    const index =
-      flashes.indexOf(flash);
-
-    const previousFlash =
-      atOffset(flashes, index, -1);
-
-    const nextFlash =
-      atOffset(flashes, index, +1);
-
-    return {previousFlash, nextFlash};
-  },
-
-  relations: (relation, query) => ({
+  relations: (relation, flash) => ({
     switcher:
       relation('generateInterpageDotSwitcher'),
 
@@ -34,13 +10,13 @@ export default {
       relation('generateNextLink'),
 
     previousFlashLink:
-      (query.previousFlash
-        ? relation('linkFlash', query.previousFlash)
+      (flash.previousFlash
+        ? relation('linkFlash', flash.previousFlash)
         : null),
 
     nextFlashLink:
-      (query.nextFlash
-        ? relation('linkFlash', query.nextFlash)
+      (flash.nextFlash
+        ? relation('linkFlash', flash.nextFlash)
         : null),
   }),
 

@@ -1814,7 +1814,7 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
       'wikiInfo',
     ]],
 
-    ['flashActData', [/* find, reverse */]],
+    ['flashActData', ['flashActData']],
 
     ['flashSideData', [/* find */]],
 

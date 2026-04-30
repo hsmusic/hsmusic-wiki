@@ -1,27 +1,5 @@
-import {atOffset} from '#sugar';
-
 export default {
-  sprawl: ({flashActData}) =>
-    ({flashActData}),
-
-  query(sprawl, flashAct) {
-    // Like with generateFlashNavAccent, don't sort chronologically here.
-    const flashActs =
-      sprawl.flashActData;
-
-    const index =
-      flashActs.indexOf(flashAct);
-
-    const previousFlashAct =
-      atOffset(flashActs, index, -1);
-
-    const nextFlashAct =
-      atOffset(flashActs, index, +1);
-
-    return {previousFlashAct, nextFlashAct};
-  },
-
-  relations: (relation, query) => ({
+  relations: (relation, flashAct) => ({
     switcher:
       relation('generateInterpageDotSwitcher'),
 
@@ -32,13 +10,13 @@ export default {
       relation('generateNextLink'),
 
     previousFlashActLink:
-      (query.previousFlashAct
-        ? relation('linkFlashAct', query.previousFlashAct)
+      (flashAct.previousAct
+        ? relation('linkFlashAct', flashAct.previousAct)
         : null),
 
     nextFlashActLink:
-      (query.nextFlashAct
-        ? relation('linkFlashAct', query.nextFlashAct)
+      (flashAct.nextAct
+        ? relation('linkFlashAct', flashAct.nextAct)
         : null),
   }),
 

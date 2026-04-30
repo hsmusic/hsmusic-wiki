@@ -1,4 +1,5 @@
 import {input, V} from '#composite';
+import {atOffset} from '#sugar';
 import Thing from '#thing';
 import {isColor, isContentString, isString} from '#validators';
 
@@ -19,7 +20,8 @@ import {
   soupyFind,
   soupyReverse,
   thing,
-  thingList
+  thingList,
+  wikiData,
 } from '#composite/wiki-properties';
 
 export class FlashAct extends Thing {
@@ -85,9 +87,113 @@ export class FlashAct extends Thing {
     find: soupyFind(),
     reverse: soupyReverse(),
 
+    // used for nearbyActs
+    flashActData: wikiData(V(FlashAct)),
+
     // Expose only
 
     isFlashAct: exposeConstant(V(true)),
+
+    previousAct: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['this', 'side', '_flashActData'],
+        compute({
+          ['this']: thisFlashAct,
+          ['side']: ownSide,
+          ['_flashActData']: flashActData,
+        }) {
+          const indexIn = array => array.indexOf(thisFlashAct);
+          const isFirstIn = array => indexIn(array) === 0;
+          const previousIn = array => atOffset(array, indexIn(array), -1);
+
+          if (isFirstIn(flashActData)) {
+            return null;
+          }
+
+          if (isFirstIn(ownSide.acts)) {
+            if (ownSide.isolateActs) {
+              return null;
+            } else {
+              const lastInPreviousSide = previousIn(flashActData);
+              if (lastInPreviousSide.side.isolateActs) {
+                return null;
+              } else {
+                return lastInPreviousSide;
+              }
+            }
+          }
+
+          return previousIn(ownSide.acts);
+        },
+      },
+    },
+
+    nextAct: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['this', 'side', '_flashActData'],
+        compute({
+          ['this']: thisFlashAct,
+          ['side']: ownSide,
+          ['_flashActData']: flashActData,
+        }) {
+          const indexIn = array => array.indexOf(thisFlashAct);
+          const isLastIn = array => indexIn(array) === array.length - 1;
+          const nextIn = array => atOffset(array, indexIn(array), +1);
+
+          if (isLastIn(flashActData)) {
+            return null;
+          }
+
+          if (isLastIn(ownSide.acts)) {
+            if (ownSide.isolateActs) {
+              return null;
+            } else {
+              const firstInNextSide = nextIn(flashActData);
+              if (firstInNextSide.side.isolateActs) {
+                return null;
+              } else {
+                return firstInNextSide;
+              }
+            }
+          }
+
+          return nextIn(ownSide.acts);
+        },
+      },
+    },
+
+    previousActs: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['previousAct'],
+        compute: ({previousAct}) =>
+          (previousAct
+            ? [...previousAct.previousActs, previousAct]
+            : []),
+      },
+    },
+
+    nextActs: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['nextAct'],
+        compute: ({nextAct}) =>
+          (nextAct
+            ? [nextAct, ...nextAct.nextActs]
+            : []),
+      },
+    },
+
+    nearbyActs: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['previousActs', 'nextActs', 'this'],
+        compute: ({previousActs, nextActs, this: thisAct}) =>
+          [...previousActs, thisAct, ...nextActs],
+      },
+    },
   });
 
   static [Thing.findSpecs] = {
