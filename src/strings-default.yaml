@@ -651,7 +651,7 @@ misc:
     bandcamp:
       _: "Bandcamp"
 
-      composerRelease: "Bandcamp (composer's release)"
+      artistRelease: "Bandcamp (artist's release)"
       officialRelease: "Bandcamp (official release)"
 
     bgreco:

@@ -33,7 +33,7 @@ export const externalLinkContexts = [
   'group',
   'track',
 
-  'composerRelease',
+  'artistRelease',
   'officialRelease',
 ];
 
@@ -262,10 +262,10 @@ export const externalLinkSpec = [
   {
     match: {
       domain: '.bandcamp.com',
-      context: 'composerRelease',
+      context: 'artistRelease',
     },
 
-    platform: 'bandcamp.composerRelease',
+    platform: 'bandcamp.artistRelease',
     handle: {domain: /^[^.]+/},
 
     icon: 'bandcamp',
