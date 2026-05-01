@@ -1,5 +1,5 @@
 import {isExternalLinkContext} from '#external-links';
-import {empty, stitchArrays, unique} from '#sugar';
+import {empty, unique} from '#sugar';
 
 function getReleaseContext(urlString, {
   _artistURLs,
@@ -13,14 +13,14 @@ function getReleaseContext(urlString, {
   const url = new URL(urlString);
 
   if (url.hostname === 'homestuck.bandcamp.com') {
-    return 'officialRelease';
+    return ['officialRelease'];
   }
 
   if (composerBandcampDomains.includes(url.hostname)) {
-    return 'composerRelease';
+    return ['composerRelease'];
   }
 
-  return null;
+  return [];
 }
 
 export default {
@@ -63,15 +63,16 @@ export default {
   },
 
   relations: (relation, query, _thing) => ({
-    links:
-      query.urls
-        .map(entry => relation('linkExternal', entry)),
+    externalLinksLineOrList:
+      relation('generateExternalLinksLineOrList', query.urls),
   }),
 
   data(query, thing) {
     const data = {};
 
     data.name = thing.name;
+
+    data.noLinks = empty(query.urls);
 
     const artistURLs =
       unique([
@@ -108,7 +109,7 @@ export default {
       presentAlbumReleaseContexts.length <= 1
     ) {
       releaseContexts =
-        query.urls.map(() => null);
+        query.urls.map(() => []);
     }
 
     data.releaseContexts = releaseContexts;
@@ -130,28 +131,15 @@ export default {
 
   generate: (data, relations, slots, {html, language}) =>
     language.encapsulate('releaseInfo.listenOn', capsule =>
-      (empty(relations.links) && slots.visibleWithoutLinks
+      (data.noLinks && slots.visibleWithoutLinks
         ? language.$(capsule, 'noLinks', {
             name:
               html.tag('i', data.name),
           })
 
-        : language.$('releaseInfo.listenOn', {
-            [language.onlyIfOptions]: ['links'],
-
-            links:
-              language.formatDisjunctionList(
-                stitchArrays({
-                  link: relations.links,
-                  releaseContext: data.releaseContexts,
-                }).map(({link, releaseContext}) =>
-                    link.slot('context', [
-                      ...
-                      (Array.isArray(slots.context)
-                        ? slots.context
-                        : [slots.context]),
-
-                      releaseContext,
-                    ]))),
+        : relations.externalLinksLineOrList.slots({
+            string: capsule,
+            context: slots.context,
+            contexts: data.releaseContexts,
           }))),
 };

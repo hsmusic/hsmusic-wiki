@@ -939,7 +939,7 @@ export function getExternalLinkStringOfStyleFromDescriptor(urlEntry, style, desc
 
     if (typeof descriptor.detail === 'string') {
       return language.$(prefix, descriptor.platform, descriptor.detail);
-    } else if (descriptor.detial.substring) {
+    } else if (descriptor.detail.substring) {
       const {substring, ...rest} = descriptor.detail;
 
       const opts =

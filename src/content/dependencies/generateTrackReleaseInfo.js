@@ -1,22 +1,21 @@
 import {compareArrays} from '#sugar';
 
 export default {
-  relations(relation, track) {
-    const relations = {};
+  relations: (relation, track) => ({
+    block:
+      relation('generateReleaseInfoBlock'),
 
-    relations.artistContributionsLine =
+    artistContributionsLine:
       relation('generateReleaseInfoContributionsLine',
         track.artistContribs,
-        track.artistText);
+        track.artistText),
 
-    relations.listenLine =
-      relation('generateReleaseInfoListenLine', track);
+    listenLineOrList:
+      relation('generateListenLineOrList', track),
 
-    relations.albumLink =
-      relation('linkAlbum', track.album);
-
-    return relations;
-  },
+    albumLink:
+      relation('linkAlbum', track.album),
+  }),
 
   data(track) {
     const data = {};
@@ -48,43 +47,38 @@ export default {
   generate: (data, relations, {html, language}) =>
     language.encapsulate('releaseInfo', capsule =>
       html.tags([
-        html.tag('p',
-          {[html.onlyIfContent]: true},
-          {[html.joinChildren]: html.tag('br')},
+        relations.block.slot('items', [
+          language.encapsulate(capsule, 'by', capsule => {
+            const withAlbum =
+              (data.showAlbum ? '.withAlbum' : '');
 
-          [
-            language.encapsulate(capsule, 'by', capsule => {
-              const withAlbum =
-                (data.showAlbum ? '.withAlbum' : '');
+            const albumOptions =
+              (data.showAlbum ? {album: relations.albumLink} : {});
 
-              const albumOptions =
-                (data.showAlbum ? {album: relations.albumLink} : {});
+            return relations.artistContributionsLine.slots({
+              stringKey: capsule + withAlbum,
+              featuringStringKey: capsule + '.featuring' + withAlbum,
 
-              return relations.artistContributionsLine.slots({
-                stringKey: capsule + withAlbum,
-                featuringStringKey: capsule + '.featuring' + withAlbum,
+              additionalStringOptions: albumOptions,
 
-                additionalStringOptions: albumOptions,
+              chronologyKind: 'track',
+            });
+          }),
 
-                chronologyKind: 'track',
-              });
-            }),
+          language.$(capsule, 'released', {
+            [language.onlyIfOptions]: ['date'],
+            date: language.formatDate(data.date),
+          }),
 
-            language.$(capsule, 'released', {
-              [language.onlyIfOptions]: ['date'],
-              date: language.formatDate(data.date),
-            }),
+          language.$(capsule, 'duration', {
+            [language.onlyIfOptions]: ['duration'],
+            duration: language.formatDuration(data.duration),
+          }),
+        ]),
 
-            language.$(capsule, 'duration', {
-              [language.onlyIfOptions]: ['duration'],
-              duration: language.formatDuration(data.duration),
-            }),
-          ]),
-
-        html.tag('p',
-          relations.listenLine.slots({
-            visibleWithoutLinks: true,
-            context: ['track'],
-          })),
+        relations.listenLineOrList.slots({
+          visibleWithoutLinks: true,
+          context: 'track',
+        }),
       ])),
 };

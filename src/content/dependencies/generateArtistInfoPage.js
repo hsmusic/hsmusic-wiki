@@ -60,9 +60,8 @@ export default {
       query.aliasLinkedGroups
         .map(({group}) => relation('linkGroup', group)),
 
-    visitLinks:
-      artist.urls
-        .map(entry => relation('linkExternal', entry)),
+    externalLinksLineOrList:
+      relation('generateExternalLinksLineOrList', artist.urls),
 
     tracksChunkedList:
       relation('generateArtistInfoPageTracksChunkedList', artist),
@@ -182,17 +181,11 @@ export default {
               }),
             ])),
 
-          html.tag('p',
-            {[html.onlyIfContent]: true},
-
-            language.$('releaseInfo.visitOn', {
-              [language.onlyIfOptions]: ['links'],
-
-              links:
-                language.formatDisjunctionList(
-                  relations.visitLinks
-                    .map(link => link.slot('context', 'artist'))),
-            })),
+          relations.externalLinksLineOrList.slots({
+            string: 'releaseInfo.visitOn',
+            maximumTotalEntriesInLine: 5,
+            maximumAnnotatedEntriesInLine: 3,
+          }),
 
           html.tag('p',
             {[html.onlyIfContent]: true},

@@ -370,14 +370,19 @@ releaseInfo:
     sizeWarning: >-
       (Heads up! If you're on a mobile plan, this is a large download.)
 
-  listenOn:
-    _: "Listen on {LINKS}."
-    noLinks: >-
-      This wiki doesn't have any listening links for {NAME}.
+  listenOn: "Listen on {LINKS}."
+  listenOn.title: "Listen on:"
+  listenOn.noLinks: >-
+    This wiki doesn't have any listening links for {NAME}.
 
   visitOn: "Visit on {LINKS}."
+  visitOn.title: "Visit on:"
+
   playOn: "Play on {LINKS}."
+  playOn.title: "Play on:"
+
   watchOn: "Watch on {LINKS}."
+  watchOn.title: "Watch on:"
 
   readCommentary:
     _: "Read {LINK}."
