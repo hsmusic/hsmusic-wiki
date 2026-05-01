@@ -5,7 +5,7 @@ function getReleaseContext(urlString, {
   _artistURLs,
   albumArtistURLs,
 }) {
-  const composerBandcampDomains =
+  const artistBandcampDomains =
     albumArtistURLs
       .filter(url => url.hostname.endsWith('.bandcamp.com'))
       .map(url => url.hostname);
@@ -16,8 +16,8 @@ function getReleaseContext(urlString, {
     return ['officialRelease'];
   }
 
-  if (composerBandcampDomains.includes(url.hostname)) {
-    return ['composerRelease'];
+  if (artistBandcampDomains.includes(url.hostname)) {
+    return ['artistRelease'];
   }
 
   return [];
