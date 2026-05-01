@@ -209,26 +209,32 @@ export function getAllTracks(albumData) {
 }
 
 export function getArtistNumContributions(artist) {
+  const keep = contrib => contrib.countInContributionTotals;
+
   return accumulateSum(
     [
       // Track artist and contributor contributions, to the same track,
       // only count for one.
       unique(
         artist.musicContributions
+          .filter(keep)
           .map(({thing: track}) => track)),
 
       // Music video artist and contributor contributions, to the same
       // music video, only count for one.
       unique(
         artist.musicVideoContributions
+          .filter(keep)
           .map(({thing: musicVideo}) => musicVideo)),
 
       // Contributions to multiple artworks belonging to the same thing count
       // as just as many individual contributions. This includes multiple
       // artworks for one track, cover and banner for one album, etc.
-      artist.artworkContributions,
+      artist.artworkContributions
+        .filter(keep),
 
-      artist.flashContributorContributions,
+      artist.flashContributorContributions
+        .filter(keep),
     ],
     ({length}) => length);
 }
