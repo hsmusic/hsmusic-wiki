@@ -817,6 +817,24 @@ export function isCuratedURL(string) {
   return true;
 }
 
+export const validateURLEntry = (isURL) =>
+  validateProperties({
+    url: isURL,
+    annotation: optional(isStringNonEmpty),
+  });
+
+export const isURLEntry =
+  validateURLEntry(isURL);
+
+export const isCuratedURLEntry =
+  validateURLEntry(isCuratedURL);
+
+export const isURLList =
+  validateArrayItems(isURLEntry);
+
+export const isCuratedURLList =
+  validateArrayItems(isCuratedURLEntry);
+
 export function validateReference(type) {
   return (ref) => {
     isStringNonEmpty(ref);

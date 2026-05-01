@@ -733,6 +733,26 @@ export function parseContributors(entries) {
   });
 }
 
+export function parseURLs(entries) {
+  return parseArrayEntries(entries, item => {
+    if (typeof item === 'object' && item['URL'])
+      return {
+        url: item['URL'],
+        annotation: item['Annotation'] ?? null,
+      };
+
+    if (typeof item !== 'string') return item;
+
+    const match = item.match(extractAccentRegex);
+    if (!match) return item;
+
+    return {
+      url: match.groups.main,
+      annotation: match.groups.accent,
+    };
+  });
+}
+
 export function parseAdditionalFiles(entries, {subdoc, AdditionalFile}) {
   return parseArrayEntries(entries, item => {
     if (typeof item !== 'object') return item;

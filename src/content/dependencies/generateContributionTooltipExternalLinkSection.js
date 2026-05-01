@@ -4,19 +4,21 @@ export default {
   relations: (relation, contribution) => ({
     icons:
       contribution.artist.urls
-        .map(url => relation('generateExternalIcon', url)),
+        .map(entry => relation('generateExternalIcon', entry.url)),
 
     handles:
       contribution.artist.urls
-        .map(url => relation('generateExternalHandle', url)),
+        .map(entry => relation('generateExternalHandle', entry.url)),
 
     platforms:
       contribution.artist.urls
-        .map(url => relation('generateExternalPlatform', url)),
+        .map(entry => relation('generateExternalPlatform', entry.url)),
   }),
 
   data: (contribution) => ({
-    urls: contribution.artist.urls,
+    urls:
+      contribution.artist.urls
+        .map(entry => entry.url),
   }),
 
   generate: (data, relations, {html, language}) =>

@@ -17,6 +17,7 @@ import {
   parseDimensions,
   parseMusicVideos,
   parseWallpaperParts,
+  parseURLs,
 } from '#yaml';
 
 import {withFlattenedList, withPropertyFromList} from '#composite/data';
@@ -651,7 +652,7 @@ export class Album extends Thing {
 
       'Color': {property: 'color'},
 
-      'URLs': {property: 'urls'},
+      'URLs': {property: 'urls', transform: parseURLs},
 
       // Artworks
       //  (Note - this YAML section is deliberately ordered differently

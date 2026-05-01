@@ -4,8 +4,6 @@
 
 import {isDate} from '#validators';
 
-// TODO: Not templateCompositeFrom.
-
 export default function() {
   return {
     flags: {update: true, expose: true},

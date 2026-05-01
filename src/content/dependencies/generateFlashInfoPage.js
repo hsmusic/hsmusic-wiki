@@ -42,7 +42,7 @@ export default {
 
     externalLinks:
       query.urls
-        .map(url => relation('linkExternal', url)),
+        .map(entry => relation('linkExternal', entry.url)),
 
     artworkColumn:
       relation('generateFlashArtworkColumn', flash),

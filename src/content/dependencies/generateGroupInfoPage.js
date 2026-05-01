@@ -51,7 +51,7 @@ export default {
 
     visitLinks:
       group.urls
-        .map(url => relation('linkExternal', url)),
+        .map(entry => relation('linkExternal', entry.url)),
 
     description:
       relation('transformContent', group.description),

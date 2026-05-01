@@ -35,6 +35,7 @@ import {
   parseDuration,
   parseLyrics,
   parseMusicVideos,
+  parseURLs,
 } from '#yaml';
 
 import {
@@ -1004,13 +1005,18 @@ export class Track extends Thing {
         transform: parseDuration,
       },
 
-      'Color': {property: 'color'},
+      'Color': {
+        property: 'color',
+      },
 
       'Needs Lyrics': {
         property: 'needsLyrics',
       },
 
-      'URLs': {property: 'urls'},
+      'URLs': {
+        property: 'urls',
+        transform: parseURLs,
+      },
 
       // Artworks
 

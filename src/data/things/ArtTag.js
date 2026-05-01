@@ -2,7 +2,8 @@ import {input, V} from '#composite';
 import Thing from '#thing';
 import {unique} from '#sugar';
 import {isName} from '#validators';
-import {parseAdditionalNames, parseAnnotatedReferences} from '#yaml';
+import {parseAdditionalNames, parseAnnotatedReferences, parseURLs}
+  from '#yaml';
 
 import {
   exitWithoutDependency,
@@ -170,7 +171,11 @@ export class ArtTag extends Thing {
       'Short Name': {property: 'nameShort'},
       'Directory': {property: 'directory'},
       'Description': {property: 'description'},
-      'Extra Reading URLs': {property: 'extraReadingURLs'},
+
+      'Extra Reading URLs': {
+        property: 'extraReadingURLs',
+        transform: parseURLs,
+      },
 
       'Additional Names': {
         property: 'additionalNames',

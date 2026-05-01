@@ -1,7 +1,7 @@
 import {input, V} from '#composite';
 import Thing from '#thing';
 import {isBoolean} from '#validators';
-import {parseAnnotatedReferences, parseSerieses} from '#yaml';
+import {parseAnnotatedReferences, parseSerieses, parseURLs} from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
 import {withUniqueReferencingThing} from '#composite/wiki-data';
@@ -176,7 +176,7 @@ export class Group extends Thing {
       },
 
       'Description': {property: 'description'},
-      'URLs': {property: 'urls'},
+      'URLs': {property: 'urls', transform: parseURLs},
 
       'Closely Linked Artists': {
         property: 'closelyLinkedArtists',

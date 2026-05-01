@@ -62,7 +62,7 @@ export default {
 
     visitLinks:
       artist.urls
-        .map(url => relation('linkExternal', url)),
+        .map(entry => relation('linkExternal', entry.url)),
 
     tracksChunkedList:
       relation('generateArtistInfoPageTracksChunkedList', artist),

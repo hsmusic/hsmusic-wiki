@@ -64,7 +64,8 @@ export default {
 
   relations: (relation, query, _thing) => ({
     links:
-      query.urls.map(url => relation('linkExternal', url)),
+      query.urls
+        .map(entry => relation('linkExternal', entry.url)),
   }),
 
   data(query, thing) {
@@ -76,13 +77,13 @@ export default {
       unique([
         ...query.artists.flatMap(artist => artist.urls),
         ...query.artistGroups.flatMap(group => group.urls),
-      ]).map(url => new URL(url));
+      ]).map(entry => new URL(entry.url));
 
     const albumArtistURLs =
       unique([
         ...query.albumArtists.flatMap(artist => artist.urls),
         ...query.albumArtistGroups.flatMap(group => group.urls),
-      ]).map(url => new URL(url));
+      ]).map(entry => new URL(entry.url));
 
     const boundGetReleaseContext = urlString =>
       getReleaseContext(urlString, {
@@ -91,10 +92,10 @@ export default {
       });
 
     let releaseContexts =
-      query.urls.map(boundGetReleaseContext);
+      query.urls.map(({url}) => boundGetReleaseContext(url));
 
     const albumReleaseContexts =
-      query.album.urls.map(boundGetReleaseContext);
+      query.album.urls.map(({url}) => boundGetReleaseContext(url));
 
     const presentReleaseContexts =
       unique(releaseContexts.filter(Boolean));

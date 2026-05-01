@@ -4,7 +4,7 @@ import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input, V} from '#composite';
 import Thing from '#thing';
-import {parseArtistAliases, parseArtwork} from '#yaml';
+import {parseArtistAliases, parseArtwork, parseURLs} from '#yaml';
 
 import {
   sortAlbumsTracksChronologically,
@@ -351,7 +351,7 @@ export class Artist extends Thing {
     fields: {
       'Artist': {property: 'name'},
       'Directory': {property: 'directory'},
-      'URLs': {property: 'urls'},
+      'URLs': {property: 'urls', transform: parseURLs},
       'Context Notes': {property: 'contextNotes'},
 
       // note: doesn't really work as an independent field yet

@@ -4,9 +4,16 @@ import {colors} from '#cli';
 import {input, V} from '#composite';
 import {empty} from '#sugar';
 import Thing from '#thing';
-import {is, isCuratedURL, isDate, isStringNonEmpty, validateArrayItems}
-  from '#validators';
-import {parseContributors, parseDate} from '#yaml';
+import {parseContributors, parseDate, parseURLs} from '#yaml';
+
+import {
+  is,
+  isCuratedURL,
+  isCuratedURLEntry,
+  isDate,
+  isStringNonEmpty,
+  validateArrayItems,
+} from '#validators';
 
 import {constituteFrom} from '#composite/wiki-data';
 
@@ -66,6 +73,7 @@ export class MusicVideo extends Thing {
       constituteFrom('thing', V('date')),
     ],
 
+    // This is a string, not a {url, annotation} entry.
     url: {
       flags: {update: true, expose: true},
 
@@ -77,7 +85,7 @@ export class MusicVideo extends Thing {
         dependencies: ['_urls'],
         transform: (url, {'_urls': urls}) =>
           (url          ? url
-         : !empty(urls) ? urls[0]
+         : !empty(urls) ? urls[0].url
                         : null),
       },
     },
@@ -86,14 +94,14 @@ export class MusicVideo extends Thing {
       flags: {update: true, expose: true},
 
       update: {
-        validate: validateArrayItems(isCuratedURL),
+        validate: validateArrayItems(isCuratedURLEntry),
       },
 
       expose: {
         dependencies: ['_url'],
         transform: (urls, {'_url': url}) =>
-          (url && urls ? [url, ...urls]
-         : url         ? [url]
+          (url && urls ? [{url}, ...urls]
+         : url         ? [{url}]
          :        urls ? urls
                        : []),
       },
@@ -142,8 +150,9 @@ export class MusicVideo extends Thing {
       'Label': {property: 'label'},
       'Directory': {property: 'unqualifiedDirectory'},
       'Date': {property: 'date', transform: parseDate},
-      'URL': {property: 'url'},
-      'URLs': {property: 'urls'},
+
+      'URL': {property: 'url'}, // Just a string, not an object
+      'URLs': {property: 'urls', transform: parseURLs},
 
       'Cover Art File Extension': {property: 'coverArtFileExtension'},
       'Cover Art Dimensions': {property: 'coverArtDimensions'},

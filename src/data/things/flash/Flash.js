@@ -12,6 +12,7 @@ import {
   parseCreditingSources,
   parseDate,
   parseDimensions,
+  parseURLs,
 } from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
@@ -216,7 +217,7 @@ export class Flash extends Thing {
       'Directory': {property: 'directory'},
       'Page': {property: 'page'},
       'Color': {property: 'color'},
-      'URLs': {property: 'urls'},
+      'URLs': {property: 'urls', transform: parseURLs},
 
       'Date': {
         property: 'date',
