@@ -684,7 +684,7 @@ export function parseArrayEntries(entries, mapFn) {
     return null;
   }
 
-  return entries.map(mapFn);
+  return nonNullEntries.map(mapFn);
 }
 
 export function parseContributors(entries) {
