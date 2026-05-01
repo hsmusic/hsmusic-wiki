@@ -39,7 +39,7 @@ export default {
 
     relations.externalLinks =
       group.urls
-        .map(entry => relation('linkExternal', entry.url));
+        .map(entry => relation('linkExternal', entry));
 
     if (group.descriptionShort) {
       relations.description =

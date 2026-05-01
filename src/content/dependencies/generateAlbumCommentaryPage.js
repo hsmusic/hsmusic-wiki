@@ -52,7 +52,7 @@ export default {
 
       relations.albumCommentaryListeningLinks =
         album.urls
-          .map(entry => relation('linkExternal', entry.url));
+          .map(entry => relation('linkExternal', entry));
 
       if (album.hasCoverArt) {
         relations.albumCommentaryCover =
@@ -75,7 +75,7 @@ export default {
     relations.trackCommentaryListeningLinks =
       query.tracksWithCommentary
         .map(track =>
-          track.urls.map(entry => relation('linkExternal', entry.url)));
+          track.urls.map(entry => relation('linkExternal', entry)));
 
     relations.trackCommentaryCovers =
       query.tracksWithCommentary

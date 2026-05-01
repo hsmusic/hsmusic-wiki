@@ -38,7 +38,7 @@ export default {
 
     externalLinks:
       query.musicVideo.urls
-        .map(entry => relation('linkExternal', entry.url)),
+        .map(entry => relation('linkExternal', entry)),
   }),
 
   data: (query, _artist, contribs) => ({

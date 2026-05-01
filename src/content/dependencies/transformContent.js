@@ -282,14 +282,14 @@ export default {
         nodes
           .filter(({type}) => type === 'external-link')
           .map(({data: {href}}) =>
-            relation('linkExternal', href)),
+            relation('linkExternal', {url: href})),
 
       externalLinksForTooltipNodes:
         nodes
           .filter(({type}) => type === 'tooltip')
           .filter(({data}) => data.link)
           .map(({data: {link: href}}) =>
-            relation('linkExternal', href)),
+            relation('linkExternal', {url: href})),
 
       images:
         nodes

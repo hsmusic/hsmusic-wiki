@@ -42,7 +42,7 @@ export default {
     if (!empty(artTag.extraReadingURLs)) {
       relations.extraReadingLinks =
         artTag.extraReadingURLs
-          .map(entry => relation('linkExternal', entry.url));
+          .map(entry => relation('linkExternal', entry));
     }
 
     if (!empty(artTag.directAncestorArtTags)) {

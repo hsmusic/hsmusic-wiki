@@ -50,7 +50,7 @@ export default {
 
     extraReadingLinks:
       artTag.extraReadingURLs
-        .map(entry => relation('linkExternal', entry.url)),
+        .map(entry => relation('linkExternal', entry)),
 
     relatedArtTagLinks:
       artTag.relatedArtTags

@@ -21,7 +21,7 @@ export default {
 
     watchLinks:
       musicVideo.urls
-        .map(entry => relation('linkExternal', entry.url)),
+        .map(entry => relation('linkExternal', entry)),
   }),
 
   data: (musicVideo, _thing) => ({

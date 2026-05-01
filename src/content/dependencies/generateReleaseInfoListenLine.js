@@ -65,7 +65,7 @@ export default {
   relations: (relation, query, _thing) => ({
     links:
       query.urls
-        .map(entry => relation('linkExternal', entry.url)),
+        .map(entry => relation('linkExternal', entry)),
   }),
 
   data(query, thing) {

@@ -1,7 +1,7 @@
 import {isExternalLinkContext} from '#external-links';
 
 export default {
-  data: (url) => ({url}),
+  data: (urlEntry) => ({urlEntry}),
 
   slots: {
     context: {
@@ -16,7 +16,7 @@ export default {
         html.tag('use', {
           href:
             to('staticMisc.icon',
-              language.formatExternalLink(data.url, {
+              language.formatExternalLink(data.urlEntry, {
                 style: 'icon-id',
                 context: slots.context,
               })),

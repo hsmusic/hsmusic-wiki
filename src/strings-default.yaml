@@ -676,19 +676,23 @@ misc:
   external:
     external: "External"
 
-    withDomain:
-      "{PLATFORM} ({DOMAIN})"
+    withUnusualDomain: >-
+      {PLATFORM} ({DOMAIN})
 
-    withHandle:
-      "{PLATFORM} ({HANDLE})"
+    withHandle: >-
+      {PLATFORM} ({HANDLE})
 
-    opensInNewTab:
-      _: "{LINK} ({ANNOTATION})"
-      annotation: "opens in new tab"
+    withAnnotation: >-
+      {LINK} ({ANNOTATION})
 
-    invalidURL:
-      _: "{LINK} ({ANNOTATION})"
-      annotation: "invalid URL"
+    withAutomaticAndCustomAnnotations: >-
+      {LINK} ({AUTOMATIC}, {CUSTOM})
+
+    opensInNewTab: "{PLATFORM} (opens in new tab)"
+    opensInNewTab.annotation: "opens in new tab"
+
+    invalidURL: "invalid URL"
+    invalidURL.annotation: "invalid URL"
 
     amazonMusic: "Amazon Music"
     appleMusic: "Apple Music"

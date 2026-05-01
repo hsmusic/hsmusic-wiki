@@ -733,10 +733,10 @@ function createEmptyResults() {
   return Object.fromEntries(externalLinkStyles.map(style => [style, null]));
 }
 
-export function getMatchingDescriptorsForExternalLink(url, descriptors, {
+export function getMatchingDescriptorsForExternalLink(urlEntry, descriptors, {
   context = 'generic',
 } = {}) {
-  const {domain, pathname, query} = urlParts(url);
+  const {domain, pathname, query} = urlParts(urlEntry.url);
 
   const compareDomain = string => {
     // A dot at the start of the descriptor's domain indicates
@@ -760,7 +760,7 @@ export function getMatchingDescriptorsForExternalLink(url, descriptors, {
   const compareQuery = regex => regex.test(query.slice(1));
 
   const compareExtractSpec = extract =>
-    extractPartFromExternalLink(url, extract, {mode: 'test'});
+    extractPartFromExternalLink(urlEntry, extract, {mode: 'test'});
 
   const contextArray =
     (Array.isArray(context)
@@ -813,12 +813,12 @@ export function getMatchingDescriptorsForExternalLink(url, descriptors, {
   return [...matchingDescriptors, fallbackDescriptor];
 }
 
-export function extractPartFromExternalLink(url, extract, {
+export function extractPartFromExternalLink(urlEntry, extract, {
   // Set to 'test' to just see if this would extract anything.
   // This disables running custom transformations.
   mode = 'extract',
 } = {}) {
-  const {domain, pathname, query} = urlParts(url);
+  const {domain, pathname, query} = urlParts(urlEntry.url);
 
   let regexen = [];
   let tests = [];
@@ -827,7 +827,7 @@ export function extractPartFromExternalLink(url, extract, {
 
   if (extract instanceof RegExp) {
     regexen.push(extract);
-    tests.push(url);
+    tests.push(urlEntry.url);
   } else {
     for (const [key, value] of Object.entries(extract)) {
       switch (key) {
@@ -862,7 +862,7 @@ export function extractPartFromExternalLink(url, extract, {
           continue;
 
         case 'url':
-          tests.push(url);
+          tests.push(urlEntry.url);
           break;
 
         case 'domain':
@@ -917,19 +917,19 @@ export function extractPartFromExternalLink(url, extract, {
   return value;
 }
 
-export function extractAllCustomPartsFromExternalLink(url, custom) {
+export function extractAllCustomPartsFromExternalLink(urlEntry, custom) {
   const customParts = {};
 
   // All or nothing: if one part doesn't match, all results are scrapped.
   for (const [key, value] of Object.entries(custom)) {
-    customParts[key] = extractPartFromExternalLink(url, value);
+    customParts[key] = extractPartFromExternalLink(urlEntry, value);
     if (!customParts[key]) return null;
   }
 
   return customParts;
 }
 
-export function getExternalLinkStringOfStyleFromDescriptor(url, style, descriptor, {language}) {
+export function getExternalLinkStringOfStyleFromDescriptor(urlEntry, style, descriptor, {language}) {
   const prefix = 'misc.external';
 
   function getDetail() {
@@ -939,46 +939,75 @@ export function getExternalLinkStringOfStyleFromDescriptor(url, style, descripto
 
     if (typeof descriptor.detail === 'string') {
       return language.$(prefix, descriptor.platform, descriptor.detail);
-    } else {
+    } else if (descriptor.detial.substring) {
       const {substring, ...rest} = descriptor.detail;
 
       const opts =
         withEntries(rest, entries => entries
           .map(([key, value]) => [
             key,
-            extractPartFromExternalLink(url, value),
+            extractPartFromExternalLink(urlEntry, value),
           ]));
 
       return language.$(prefix, descriptor.platform, substring, opts);
+    } else if (descriptor.detail.annotation) {
+      const annotation =
+        extractPartFromExternalLink(urlEntry, descriptor.detail.annotation);
+
+      if (urlEntry.annotation) {
+        return language.$(prefix, descriptor.platform, 'withAutomaticAndCustomAnnotations', {
+          automatic: annotation,
+          custom: urlEntry.annotation,
+        });
+      } else {
+        return language.$(prefix, descriptor.platform, 'withAnnotation', {
+          annotation,
+        });
+      }
     }
   }
 
   switch (style) {
     case 'platform': {
-      const platform = language.$(prefix, descriptor.platform);
-      const domain = urlParts(url).domain;
+      const platformName = language.$(prefix, descriptor.platform);
+      const domain = urlParts(urlEntry.url).domain;
 
+      let platformPart;
       if (descriptor === fallbackDescriptor) {
         // The fallback descriptor has a "platform" which is just
         // the word "External". This isn't really useful when you're
         // looking for platform info!
         if (domain) {
-          return language.sanitize(domain.replace(/^www\./, ''));
+          platformPart = language.sanitize(domain.replace(/^www\./, ''));
         } else {
-          return platform;
+          platformPart = platformName;
         }
       } else if (descriptor.detail) {
+        // getDetail handles the whole string, including annotation, so just
+        // return its result as-is.
         return getDetail();
       } else if (descriptor.unusualDomain && domain) {
-        return language.$(prefix, 'withDomain', {platform, domain});
+        platformPart = language.$(prefix, 'withUnusualDomain', {
+          platform: platformName,
+          domain,
+        });
       } else {
-        return platform;
+        platformPart = platformName;
+      }
+
+      if (urlEntry.annotation) {
+        return language.$(prefix, 'withAnnotation', {
+          link: platformPart,
+          annotation: language.sanitize(urlEntry.annotation),
+        });
+      } else {
+        return platformPart;
       }
     }
 
     case 'handle': {
       if (descriptor.handle) {
-        return extractPartFromExternalLink(url, descriptor.handle);
+        return extractPartFromExternalLink(urlEntry, descriptor.handle);
       } else {
         return null;
       }
@@ -1008,12 +1037,12 @@ export function couldDescriptorSupportStyle(descriptor, style) {
   }
 }
 
-export function getExternalLinkStringOfStyleFromDescriptors(url, style, descriptors, {
+export function getExternalLinkStringOfStyleFromDescriptors(urlEntry, style, descriptors, {
   language,
   context = 'generic',
 }) {
   const matchingDescriptors =
-    getMatchingDescriptorsForExternalLink(url, descriptors, {context});
+    getMatchingDescriptorsForExternalLink(urlEntry, descriptors, {context});
 
   const styleFilteredDescriptors =
     matchingDescriptors.filter(descriptor =>
@@ -1021,7 +1050,7 @@ export function getExternalLinkStringOfStyleFromDescriptors(url, style, descript
 
   for (const descriptor of styleFilteredDescriptors) {
     const descriptorResult =
-      getExternalLinkStringOfStyleFromDescriptor(url, style, descriptor, {language});
+      getExternalLinkStringOfStyleFromDescriptor(urlEntry, style, descriptor, {language});
 
     if (descriptorResult) {
       return descriptorResult;
@@ -1031,17 +1060,17 @@ export function getExternalLinkStringOfStyleFromDescriptors(url, style, descript
   return null;
 }
 
-export function getExternalLinkStringsFromDescriptor(url, descriptor, {language}) {
+export function getExternalLinkStringsFromDescriptor(urlEntry, descriptor, {language}) {
   return (
     Object.fromEntries(
       externalLinkStyles.map(style =>
         getExternalLinkStringOfStyleFromDescriptor(
-          url,
+          urlEntry,
           style,
           descriptor, {language}))));
 }
 
-export function getExternalLinkStringsFromDescriptors(url, descriptors, {
+export function getExternalLinkStringsFromDescriptors(urlEntry, descriptors, {
   language,
   context = 'generic',
 }) {
@@ -1049,11 +1078,11 @@ export function getExternalLinkStringsFromDescriptors(url, descriptors, {
   const remainingKeys = new Set(Object.keys(results));
 
   const matchingDescriptors =
-    getMatchingDescriptorsForExternalLink(url, descriptors, {context});
+    getMatchingDescriptorsForExternalLink(urlEntry, descriptors, {context});
 
   for (const descriptor of matchingDescriptors) {
     const descriptorResults =
-      getExternalLinkStringsFromDescriptor(url, descriptor, {language});
+      getExternalLinkStringsFromDescriptor(urlEntry, descriptor, {language});
 
     const descriptorKeys =
       new Set(

@@ -1,7 +1,7 @@
 import {isExternalLinkContext} from '#external-links';
 
 export default {
-  data: (url) => ({url}),
+  data: (urlEntry) => ({urlEntry}),
 
   slots: {
     context: {
@@ -11,7 +11,7 @@ export default {
   },
 
   generate: (data, slots, {language}) =>
-    language.formatExternalLink(data.url, {
+    language.formatExternalLink(data.urlEntry, {
       style: 'handle',
       context: slots.context,
     }),

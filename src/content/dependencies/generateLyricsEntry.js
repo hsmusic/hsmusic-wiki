@@ -13,7 +13,7 @@ export default {
 
     sourceLinks:
       entry.sourceURLs
-        .map(url => relation('linkExternal', url)),
+        .map(url => relation('linkExternal', {url})),
 
     originDetails:
       relation('transformContent', entry.originDetails),

@@ -9,8 +9,12 @@ export default {
       wikiInfo.canonicalMediaBase,
   }),
 
-  data: (sprawl, url) => ({
-    url,
+  data: (sprawl, urlEntry) => ({
+    url:
+      urlEntry.url,
+
+    annotation:
+      urlEntry.annotation,
 
     canonicalBase:
       sprawl.canonicalBase,
@@ -70,11 +74,9 @@ export default {
   },
 
   generate(data, slots, {html, language, to}) {
-    const {url} = data;
-
     let urlIsValid;
     try {
-      new URL(url);
+      new URL(data.url);
       urlIsValid = true;
     } catch {
       urlIsValid = false;
@@ -83,31 +85,39 @@ export default {
     let href;
     if (urlIsValid) {
       const {canonicalBase, canonicalMediaBase} = data;
-      const past = front => decodeURIComponent(url.slice(front.length));
-      if (canonicalMediaBase && url.startsWith(canonicalMediaBase)) {
+      const past = front => decodeURIComponent(data.url.slice(front.length));
+      if (canonicalMediaBase && data.url.startsWith(canonicalMediaBase)) {
         href = to('media.path', past(canonicalMediaBase));
-      } else if (canonicalBase && url.startsWith(canonicalBase)) {
+      } else if (canonicalBase && data.url.startsWith(canonicalBase)) {
         href = to('shared.path', past(canonicalBase));
       } else {
-        href = url;
+        href = data.url;
       }
     }
 
+    const urlEntry = {
+      url: href,
+      annotation: data.annotation,
+    };
+
     let formattedLink;
+    let formattedPlatform;
     if (urlIsValid) {
       formattedLink =
-        language.formatExternalLink(url, {
+        language.formatExternalLink(urlEntry, {
           style: slots.style,
           context: slots.context,
         });
 
+      formattedPlatform =
+        language.formatExternalLink(urlEntry, {
+          style: 'platform',
+          context: slots.context,
+        });
+
       // Fall back to platform if nothing matched the desired style.
-      if (html.isBlank(formattedLink) && slots.style !== 'platform') {
-        formattedLink =
-          language.formatExternalLink(url, {
-            style: 'platform',
-            context: slots.context,
-          });
+      if (html.isBlank(formattedLink)) {
+        formattedLink = formattedPlatform;
       }
     } else {
       formattedLink = null;
@@ -119,6 +129,10 @@ export default {
 
     let linkContent;
     if (urlIsValid) {
+      // For valid URLs, the annotation (if any) is already handled
+      // by formatExternalLink. It is not shown at all, in up-front
+      // presentation, if there is custom content.
+
       linkAttributes.set('href', href);
 
       if (html.isBlank(slots.content)) {
@@ -127,17 +141,25 @@ export default {
         linkContent = slots.content;
       }
     } else {
+      // For invalid URLs, there is no automatically formatted link,
+      // and the annotation (if any) is rolled into presentation below.
+      // However, it's still not shown if there is custom content.
+
       if (html.isBlank(slots.content)) {
-        linkContent =
-          html.tag('i',
-            language.$('misc.external.invalidURL.annotation'));
+        if (data.annotation) {
+          linkContent =
+            language.$('misc.external.withAnnotation', {
+              link: html.tag('i', language.$('misc.external.invalidURL.annotation')),
+              annotation: language.sanitize(data.annotation),
+            });
+        } else {
+          linkContent = html.tag('i', language.$('misc.external.invalidURL'));
+        }
       } else {
         linkContent =
-          language.$('misc.external.invalidURL', {
+          language.$('misc.external.withAnnotation', {
             link: slots.content,
-            annotation:
-              html.tag('i',
-                language.$('misc.external.invalidURL.annotation')),
+            annotation: html.tag('i', language.$('misc.external.invalidURL.annotation')),
           });
       }
     }
@@ -159,9 +181,7 @@ export default {
         } else {
           titleText =
             language.$('misc.external.opensInNewTab', {
-              link: formattedLink,
-              annotation:
-                language.$('misc.external.opensInNewTab.annotation'),
+              platform: formattedPlatform,
             });
         }
       } else if (!html.isBlank(slots.content)) {
