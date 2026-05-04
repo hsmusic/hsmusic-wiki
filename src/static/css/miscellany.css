@@ -144,6 +144,7 @@
 
   dl.division-list dt {
     font-size: 0.88em;
+    padding-left: 15px;
   }
 
   dl.division-list dd {
@@ -153,7 +154,7 @@
   dl.division-list dd + dt::before {
     content: "";
     display: block;
-    width: 220px;
+    width: 245px;
     border-bottom: 1px solid var(--dim-color);
     margin-bottom: 0.6em;
   }
