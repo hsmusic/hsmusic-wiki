@@ -1466,6 +1466,12 @@
     width: 100%;
   }
 
+  .content-image-container:last-child,
+  .content-video-container:last-child,
+  .content-audio-container:last-child {
+    margin-bottom: 1.15em;
+  }
+
   .content-audio-container .filename {
     color: white;
     font-family: monospace;
