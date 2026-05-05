@@ -441,6 +441,15 @@ export function promiseWithResolvers() {
   return obj;
 }
 
+export function errors(fn) {
+  try {
+    fn();
+    return false;
+  } catch {
+    return true;
+  }
+}
+
 // Stolen from here: https://stackoverflow.com/a/3561711
 //
 // There's a proposal for a native JS function like this, 8ut it's not even
