@@ -676,15 +676,16 @@
 
   #artwork-column .cover-artwork,
   #artwork-column .music-video {
-    --normal-shadow: 0 0 12px 12px #00000080;
+    --normal-shadow: -1px 4px 12px 9px #00000080;
 
     box-shadow:
       0 2px 14px -6px var(--primary-color),
       var(--normal-shadow);
   }
 
-  #artwork-column .cover-artwork:not(:first-child) {
-    --normal-shadow: 0 0 9px 9px #00000068;
+  #artwork-column .cover-artwork:not(:first-child),
+  #artwork-column .music-video:not(:first-child) {
+    --normal-shadow: -0.7px 3.3px 10px 8px #00000068;
   }
 
   #artwork-column .album-art-info {
@@ -2254,7 +2255,7 @@
   .content-sticky-heading-cover .cover-artwork {
     border-width: 1px;
     border-radius: 1.25px;
-    box-shadow: 0 0 2px 4px #00000052;
+    box-shadow: 0 1px 2px 4px #00000052;
   }
 
   .content-sticky-heading-container .image-inner-area {
