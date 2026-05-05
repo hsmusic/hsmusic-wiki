@@ -566,7 +566,8 @@
   }
 
   #artwork-column .album-art-info {
-    margin: 10px min(15px, 1vw) 18px;
+    width: 83.83%;
+    margin: 10px 4px 18px auto;
     z-index: 2;
   }
 
