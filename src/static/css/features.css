@@ -2254,7 +2254,7 @@
   .content-sticky-heading-cover .cover-artwork {
     border-width: 1px;
     border-radius: 1.25px;
-    box-shadow: none;
+    box-shadow: 0 0 2px 4px #00000052;
   }
 
   .content-sticky-heading-container .image-inner-area {
