@@ -1,3 +1,4 @@
+import {errors} from '#sugar';
 import {isExternalLinkContext, isExternalLinkStyle} from '#external-links';
 
 export default {
@@ -74,35 +75,17 @@ export default {
   },
 
   generate(data, slots, {html, language, to}) {
-    let urlIsValid;
-    try {
-      new URL(data.url);
-      urlIsValid = true;
-    } catch {
-      urlIsValid = false;
-    }
-
-    let href;
-    if (urlIsValid) {
-      const {canonicalBase, canonicalMediaBase} = data;
-      const past = front => decodeURIComponent(data.url.slice(front.length));
-      if (canonicalMediaBase && data.url.startsWith(canonicalMediaBase)) {
-        href = to('media.path', past(canonicalMediaBase));
-      } else if (canonicalBase && data.url.startsWith(canonicalBase)) {
-        href = to('shared.path', past(canonicalBase));
-      } else {
-        href = data.url;
-      }
-    }
-
-    const urlEntry = {
-      url: href,
-      annotation: data.annotation,
-    };
+    const urlIsValid =
+      !errors(() => new URL(data.url));
 
     let formattedLink;
     let formattedPlatform;
     if (urlIsValid) {
+      const urlEntry = {
+        url: data.url,
+        annotation: data.annotation,
+      };
+
       formattedLink =
         language.formatExternalLink(urlEntry, {
           style: slots.style,
@@ -121,6 +104,19 @@ export default {
       }
     } else {
       formattedLink = null;
+    }
+
+    let href;
+    if (urlIsValid) {
+      const {canonicalBase, canonicalMediaBase} = data;
+      const past = front => decodeURIComponent(data.url.slice(front.length));
+      if (canonicalMediaBase && data.url.startsWith(canonicalMediaBase)) {
+        href = to('media.path', past(canonicalMediaBase));
+      } else if (canonicalBase && data.url.startsWith(canonicalBase)) {
+        href = to('shared.path', past(canonicalBase));
+      } else {
+        href = data.url;
+      }
     }
 
     const linkAttributes = html.attributes({
