@@ -687,6 +687,10 @@
     --normal-shadow: 0 0 9px 9px #00000068;
   }
 
+  #artwork-column .album-art-info {
+    box-shadow: 0 0 9px 9px #00000068;
+  }
+
   .cover-artwork .image-details {
     border-top-color: var(--deep-color);
   }
