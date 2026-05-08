@@ -99,10 +99,10 @@ export default {
       query.album.urls.map(({url}) => boundGetReleaseContext(url));
 
     const presentReleaseContexts =
-      unique(releaseContexts.filter(Boolean));
+      unique(releaseContexts.filter(context => !empty(context)));
 
     const presentAlbumReleaseContexts =
-      unique(albumReleaseContexts.filter(Boolean));
+      unique(albumReleaseContexts.filter(context => !empty(context)));
 
     if (
       presentReleaseContexts.length <= 1 &&
