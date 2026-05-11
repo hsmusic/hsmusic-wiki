@@ -171,12 +171,12 @@ export class Album extends Thing {
 
     countTracksInArtistTotals: flag(V(true)),
 
-    showAlbumInTracksWithoutArtists: flag(V(false)),
-
-    hasTrackNumbers: flag(V(true)),
     isListedOnHomepage: flag(V(true)),
     isListedInGalleries: flag(V(true)),
 
+    hasTrackNumbers: flag(V(true)),
+    showAlbumInTracksWithoutArtists: flag(V(false)),
+    showArtistsInTrackList: flag(V(true)),
     hideDuration: flag(V(false)),
 
     // > Update & expose - General metadata
@@ -638,14 +638,12 @@ export class Album extends Thing {
 
       'Count Tracks In Artist Totals': {property: 'countTracksInArtistTotals'},
 
-      'Show Album In Tracks Without Artists': {
-        property: 'showAlbumInTracksWithoutArtists',
-      },
-
-      'Has Track Numbers': {property: 'hasTrackNumbers'},
       'Listed on Homepage': {property: 'isListedOnHomepage'},
       'Listed in Galleries': {property: 'isListedInGalleries'},
 
+      'Has Track Numbers': {property: 'hasTrackNumbers'},
+      'Show Album In Tracks Without Artists': {property: 'showAlbumInTracksWithoutArtists'},
+      'Show Artists In Track List': {property: 'showArtistsInTrackList'},
       'Hide Duration': {property: 'hideDuration'},
 
       // General metadata

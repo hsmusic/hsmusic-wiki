@@ -21,6 +21,8 @@ export default {
   }),
 
   data: (query, track, album) => ({
+    albumShowsTrackArtists: album.showArtistsInTrackList,
+
     trackHasDuration: query.trackHasDuration,
     sectionHasDuration: query.sectionHasDuration,
     albumHasDuration: query.albumHasDuration,
@@ -40,7 +42,11 @@ export default {
 
   generate: (data, relations, slots) =>
     relations.item.slots({
-      showArtists: 'auto',
+      showArtists:
+        (data.albumShowsTrackArtists
+          ? 'auto'
+          : false),
+
       showDetail: true,
 
       showDuration:
