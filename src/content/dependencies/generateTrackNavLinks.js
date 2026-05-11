@@ -11,8 +11,14 @@ export default {
     albumStyle:
       track.album.style,
 
+    showTrackSection:
+      track.album.showTrackSectionInNavBar,
+
     hasTrackNumbers:
       track.album.hasTrackNumbers,
+
+    trackSectionName:
+      track.trackSection.name,
 
     trackNumber:
       track.trackNumber,
@@ -38,6 +44,13 @@ export default {
             ? language.$(navCapsule, 'singleAccent')
             : null),
       },
+
+      data.showTrackSection &&
+        {
+          html:
+            relations.albumLink.clone()
+              .slot('content', language.sanitize(data.trackSectionName)),
+        },
 
       {
         html:

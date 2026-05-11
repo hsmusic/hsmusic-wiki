@@ -176,6 +176,7 @@ export class Album extends Thing {
 
     hasTrackNumbers: flag(V(true)),
     showAlbumInTracksWithoutArtists: flag(V(false)),
+    showTrackSectionInNavBar: flag(V(false)),
     showArtistsInTrackList: flag(V(true)),
     hideDuration: flag(V(false)),
 
@@ -643,6 +644,7 @@ export class Album extends Thing {
 
       'Has Track Numbers': {property: 'hasTrackNumbers'},
       'Show Album In Tracks Without Artists': {property: 'showAlbumInTracksWithoutArtists'},
+      'Show Section In Nav Bar': {property: 'showTrackSectionInNavBar'},
       'Show Artists In Track List': {property: 'showArtistsInTrackList'},
       'Hide Duration': {property: 'hideDuration'},
 
