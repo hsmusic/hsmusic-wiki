@@ -196,9 +196,14 @@ export function is(...values) {
     };
   }
 
+  const joiner =
+    (Array.from(values).some(v => typeof v === 'string' && v.includes(' '))
+      ? ', '
+      : ' ');
+
   const fn = (value) => {
     if (!values.has(value)) {
-      throw new TypeError(`Expected one of ${Array.from(values).join(' ')}, got ${value}`);
+      throw new TypeError(`Expected one of ${Array.from(values).join(joiner)}, got ${value}`);
     }
 
     return true;
