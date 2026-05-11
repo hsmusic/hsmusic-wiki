@@ -28,6 +28,9 @@ export default {
     date:
       track.date,
 
+    detail:
+      track.nameDetail,
+
     duration:
       track.duration ?? 0,
 
@@ -41,6 +44,11 @@ export default {
     showArtists: {
       validate: v => v.is(true, false, 'auto'),
       default: 'auto',
+    },
+
+    showDetail: {
+      type: 'boolean',
+      default: false,
     },
 
     // If true and the track doesn't have a duration, a missing-duration cue
@@ -115,6 +123,15 @@ export default {
           workingOptions.track =
             relations.trackLink
               .slot('color', slots.colorMode === 'track');
+
+          if (data.detail && slots.showDetail) {
+            workingCapsule += '.withDetail';
+            workingOptions.detailAccent =
+              html.tag('span', {class: 'name-detail'},
+                language.$(itemCapsule, 'withDetail', 'accent', {
+                  detail: language.sanitize(data.detail),
+                }));
+          }
 
           const artists =
             language.encapsulate(itemCapsule, 'artists', artistsCapsule => {

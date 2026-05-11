@@ -40,6 +40,10 @@ export default {
       trackSection.tracks
         .map(track => track.directory);
 
+    data.trackNameDetails =
+      trackSection.tracks
+        .map(track => track.nameDetail);
+
     data.tracksAreMissingCommentary =
       trackSection.tracks
         .map(track => empty(track.commentary));
@@ -83,11 +87,13 @@ export default {
       stitchArrays({
         trackLink: relations.trackLinks,
         directory: data.trackDirectories,
+        nameDetail: data.trackNameDetails,
         isCurrentTrack: data.tracksAreCurrentTrack,
         missingCommentary: data.tracksAreMissingCommentary,
       }).map(({
           trackLink,
           directory,
+          nameDetail,
           isCurrentTrack,
           missingCommentary,
         }) =>
@@ -100,18 +106,25 @@ export default {
             missingCommentary &&
               {class: 'no-commentary'},
 
-            language.$(capsule, 'item', {
-              track:
-                (slots.mode === 'commentary' && missingCommentary
-                  ? trackLink.slots({
-                      linkless: true,
-                    })
-               : slots.anchor
-                  ? trackLink.slots({
-                      anchor: true,
-                      hash: directory,
-                    })
-                  : trackLink),
+            language.encapsulate(capsule, 'item', workingCapsule => {
+              const workingOptions = {track: trackLink};
+
+              if (slots.mode === 'commentary' && missingCommentary) {
+                trackLink.setSlots({linkless: true});
+              } else if (slots.anchor) {
+                trackLink.setSlots({anchor: true, hash: directory});
+              }
+
+              if (nameDetail) {
+                workingCapsule += '.withDetail';
+                workingOptions.detailAccent =
+                  html.tag('span', {class: 'name-detail'},
+                    language.$(capsule, 'item.withDetail.accent', {
+                      detail: language.sanitize(nameDetail),
+                    }));
+              }
+
+              return language.$(workingCapsule, workingOptions);
             })));
 
     const list =

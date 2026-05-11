@@ -41,6 +41,7 @@ export default {
   generate: (data, relations, slots) =>
     relations.item.slots({
       showArtists: 'auto',
+      showDetail: true,
 
       showDuration:
         (slots.collapseDurationScope === 'track'

@@ -14,6 +14,11 @@ export default {
       mutable: false,
     },
 
+    detail: {
+      type: 'html',
+      mutable: false,
+    },
+
     showWikiNameInTitle: {
       validate: v => v.is(true, false, 'auto'),
       default: 'auto',
@@ -38,8 +43,17 @@ export default {
       // so we wrap the title in a tag and pass it off as good to go.
       workingOptions.title =
         html.tags([
-striptags(slots.title.toString()),
+          striptags(slots.title.toString()),
         ]);
+
+      if (!html.isBlank(slots.detail)) {
+        // Same shenanigans here, as far as wrapping striptags goes.
+        workingCapsule += '.withDetail';
+        workingOptions.detail =
+          html.tags([
+            striptags(slots.detail.toString()),
+          ]);
+      }
 
       if (!html.isBlank(slots.subtitle)) {
         // Same shenanigans here, as far as wrapping striptags goes.
@@ -52,10 +66,13 @@ striptags(slots.title.toString()),
 
       const showWikiName =
         (slots.showWikiNameInTitle === true
-? true
+          ? true
+
        : slots.showWikiNameInTitle === 'auto'
-? html.isBlank(slots.subtitle)
-: false);
+          ? html.isBlank(slots.subtitle) &&
+            html.isBlank(slots.detail)
+
+          : false);
 
       if (showWikiName) {
         workingCapsule += '.withWikiName';

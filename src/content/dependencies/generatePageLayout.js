@@ -62,6 +62,11 @@ export default {
       mutable: false,
     },
 
+    titleDetail: {
+      type: 'html',
+      mutable: false,
+    },
+
     showWikiNameInTitle: {
       validate: v => v.is(true, false, 'auto'),
       default: 'auto',
@@ -274,40 +279,73 @@ export default {
       }
     })();
 
-    const titleContentsHTML =
-      (html.isBlank(slots.title)
-        ? null
+    const headingNamePart =
+      (() => {
+        if (html.isBlank(slots.title)) {
+          return html.blank();
+        }
 
-     : (!html.isBlank(slots.additionalNames) &&
-        !html.resolve(slots.additionalNames, {slots: ['alwaysVisible']})
-          .getSlotValue('alwaysVisible'))
+        if (!html.isBlank(slots.additionalNames)) {
+          const box = html.resolve(slots.additionalNames, {slots: ['alwaysVisible']});
+          if (!box.getSlotValue('alwaysVisible')) {
+            return (
+              html.tag('a',
+                {href: '#additional-names-box'},
+                {title: language.$('misc.additionalNames.tooltip').toString()},
+                language.sanitize(slots.title))
+            );
+          }
+        }
 
-        ? html.tag('a', {
-            href: '#additional-names-box',
-            title: language.$('misc.additionalNames.tooltip').toString(),
-          }, language.sanitize(slots.title))
+        return language.sanitize(slots.title);
+      })();
 
-        : language.sanitize(slots.title));
+    const headingContents =
+      language.encapsulate('misc.pageHeading', capsule =>
+        language.encapsulate(capsule, workingCapsule => {
+          const workingOptions = {
+            [language.onlyIfOptions]: ['title'],
+          };
 
-    const titleHTML =
-      (html.isBlank(slots.title)
-        ? null
-     : slots.headingMode === 'sticky'
-        ? [
+          workingOptions.title = headingNamePart;
+
+          if (!html.isBlank(slots.titleDetail)) {
+            workingCapsule += '.withDetail';
+            workingOptions.detailAccent =
+              html.tag('span', {class: 'name-detail'},
+                language.$(capsule, 'withDetail.accent', {
+                  detail: slots.titleDetail,
+                }));
+          }
+
+          return language.$(workingCapsule, workingOptions);
+        }));
+
+    const headingHTML =
+      (() => {
+        if (html.isBlank(headingContents)) {
+          return html.blank();
+        }
+
+        if (slots.headingMode === 'sticky') {
+          return [
             relations.stickyHeadingContainer.slots({
-              title: titleContentsHTML,
+              title: headingContents,
               cover: primaryCover,
             }),
 
             relations.stickyHeadingContainer.clone().slots({
               rootAttributes: {inert: true},
             }),
-          ]
-        : html.tag('h1', titleContentsHTML));
+          ];
+        }
+
+        return html.tag('h1', headingContents);
+      })();
 
     // TODO: There could be neat interactions with the sticky heading here,
     // but for now subtitle is totally separate.
-    const subtitleHTML =
+    const subheadingHTML =
       (html.isBlank(slots.subtitle)
         ? null
         : html.tag('h2', {class: 'page-subtitle'},
@@ -327,11 +365,11 @@ export default {
       html.tag('main', {id: 'content'},
         {class: slots.mainClasses},
 
-        !html.isBlank(subtitleHTML) &&
+        !html.isBlank(subheadingHTML) &&
           {class: 'has-subtitle'},
 
         [
-          titleHTML,
+          headingHTML,
 
           html.tag('div', {id: 'artwork-column'},
             {[html.onlyIfContent]: true},
@@ -339,7 +377,7 @@ export default {
 
             slots.artworkColumnContent),
 
-          subtitleHTML,
+          subheadingHTML,
 
           slots.additionalNames,
 
@@ -632,6 +670,7 @@ export default {
 
     relations.titleText.setSlots({
       title: slots.title,
+      detail: slots.titleDetail,
       showWikiNameInTitle: slots.showWikiNameInTitle,
       subtitle: slots.subtitle,
     });

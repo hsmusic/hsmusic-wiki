@@ -476,6 +476,12 @@ trackList:
       missing: "_:__"
       missing.info: "no duration provided; treated as zero seconds long"
 
+    withDetail: >-
+      {TRACK} {DETAIL_ACCENT}
+
+    withDetail.accent: >-
+      ({DETAIL})
+
     withArtists: >-
       {TRACK} {ARTISTS}
 
@@ -484,8 +490,17 @@ trackList:
       featuring: "feat. {ARTISTS}"
       by.featuring: "by {ARTISTS} feat. {FEATURING}"
 
+    withAccent.withDetail: >-
+      {ACCENT} {TRACK} {DETAIL_ACCENT}
+
     withAccent.withArtists: >-
       {ACCENT} {TRACK} {ARTISTS}
+
+    withDetail.withArtists: >-
+      {TRACK} {DETAIL_ACCENT} {ARTISTS}
+
+    withAccent.withDetail.withArtists: >-
+      {ACCENT} {TRACK} {DETAIL_ACCENT} {ARTISTS}
 
     rerelease: >-
       {TRACK} (rerelease)
@@ -866,12 +881,15 @@ misc:
     rollingWindow: "Rolling Window"
 
   # pageTitle:
-  #   Title set under the page's <title> HTML element, which is
+  #   Text set under the page's <title> HTML element, which is
   #   displayed in the browser tab bar, bookmarks list, etc.
 
   pageTitle:
     _: >-
       {TITLE}
+
+    withDetail: >-
+      {TITLE} ({DETAIL})
 
     withSubtitle: >-
       {TITLE} - {SUBTITLE}
@@ -879,8 +897,30 @@ misc:
     withWikiName: >-
       {TITLE} | {WIKI_NAME}
 
+    withDetail.withSubtitle: >-
+      {TITLE} ({DETAIL}) - {SUBTITLE}
+
+    withDetail.withWikiName: >-
+      {TITLE} ({DETAIL}) | {WIKI_NAME}
+
     withSubtitle.withWikiName: >-
       {TITLE} - {SUBTITLE} | {WIKI_NAME}
+
+    withDetail.withSubtitle.withWikiName: >-
+      {TITLE} ({DETAIL}) - {SUBTITLE} | {WIKI_NAME}
+
+  # pageHeading:
+  #   Text set inside the page's <h1> HTML element, which is
+  #   displayed at the top of the content area.
+
+  pageHeading:
+    _: >-
+      {TITLE}
+
+    withDetail: >-
+      {TITLE} {DETAIL_ACCENT}
+
+    withDetail.accent: "({DETAIL})"
 
   # search:
   #   Strings to do with the search bar!
@@ -1194,6 +1234,8 @@ homepage:
 albumSidebar:
   trackList:
     item: "{TRACK}"
+    item.withDetail: "{TRACK} {DETAIL_ACCENT}"
+    item.withDetail.accent: "({DETAIL})"
 
     # fallbackSectionName:
     #   If an album's track list isn't sectioned, the track list here

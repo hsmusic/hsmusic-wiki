@@ -660,6 +660,14 @@
     margin-bottom: 3px;
   }
 
+  .sidebar li .name-detail {
+    opacity: 0.85;
+  }
+
+  .sidebar li.current .name-detail {
+    opacity: 1;
+  }
+
   .sidebar > details.current summary {
     font-weight: 800;
   }
@@ -787,6 +795,12 @@
 
   #content h1 {
     font-size: 1.5em;
+  }
+
+  #content h1 .name-detail {
+    opacity: 0.8;
+    margin-left: 0.5ch;
+    font-weight: inherit;
   }
 
   #content li {

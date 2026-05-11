@@ -143,6 +143,9 @@ export default {
     name:
       track.name,
 
+    nameDetail:
+      track.nameDetail,
+
     color:
       track.color,
 
@@ -166,6 +169,9 @@ export default {
           language.$(pageCapsule, 'title', {
             track: relations.name,
           }),
+
+        titleDetail:
+          language.sanitize(data.nameDetail),
 
         headingMode: 'sticky',
 

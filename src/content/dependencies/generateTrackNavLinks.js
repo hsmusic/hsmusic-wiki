@@ -16,6 +16,9 @@ export default {
 
     trackNumber:
       track.trackNumber,
+
+    nameDetail:
+      track.nameDetail,
   }),
 
   slots: {
@@ -54,17 +57,21 @@ export default {
           }),
 
         accent:
-          html.tag('a',
-            {[html.onlyIfContent]: true},
+          language.formatUnitList([
+            language.sanitize(data.nameDetail),
 
-            {href: ''},
-            {class: 'current'},
+            html.tag('a',
+              {[html.onlyIfContent]: true},
 
-            (slots.currentExtra === 'referenced-art'
-              ? language.$('referencedArtworksPage.subtitle')
-           : slots.currentExtra === 'referencing-art'
-              ? language.$('referencingArtworksPage.subtitle')
-              : null)),
+              {href: ''},
+              {class: 'current'},
+
+              (slots.currentExtra === 'referenced-art'
+                ? language.$('referencedArtworksPage.subtitle')
+             : slots.currentExtra === 'referencing-art'
+                ? language.$('referencingArtworksPage.subtitle')
+                : null)),
+          ]),
       },
     ]),
 };

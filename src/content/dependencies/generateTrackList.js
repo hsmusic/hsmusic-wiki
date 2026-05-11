@@ -11,6 +11,11 @@ export default {
       default: 'auto',
     },
 
+    showDetail: {
+      type: 'boolean',
+      default: true,
+    },
+
     showDuration: {
       type: 'boolean',
       default: false,
@@ -29,6 +34,7 @@ export default {
       relations.items.map(item =>
         item.slots({
           showArtists: slots.showArtists,
+          showDetail: slots.showDetail,
           showDuration: slots.showDuration,
           colorMode: slots.colorMode,
         }))),

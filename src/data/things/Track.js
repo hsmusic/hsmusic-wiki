@@ -144,6 +144,8 @@ export class Track extends Thing {
       exposeConstant(V('normal')),
     ],
 
+    nameDetail: simpleString(),
+
     directory: directory({
       suffix: 'directorySuffix',
     }),
@@ -944,6 +946,7 @@ export class Track extends Thing {
       'Track Text': {property: 'nameText'},
 
       'Name Style': {property: 'nameStyle'},
+      'Name Detail': {property: 'nameDetail'},
 
       'Directory': {property: 'directory'},
       'Suffix Directory': {property: 'suffixDirectoryFromAlbum'},

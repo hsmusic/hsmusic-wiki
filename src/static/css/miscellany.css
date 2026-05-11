@@ -69,6 +69,11 @@
     color: var(--primary-color);
   }
 
+  .name-detail {
+    display: inline-block;
+    font-weight: normal;
+  }
+
   .other-group-accent,
   .rerelease-line {
     opacity: 0.7;
