@@ -339,6 +339,8 @@ export class Track extends Thing {
       exposeDependency('#trackSection.countTracksInArtistTotals'),
     ],
 
+    showInReferenceLists: flag(V(true)),
+
     disableUniqueCoverArt: flag(V(false)),
     disableDate: flag(V(false)),
 
@@ -998,6 +1000,7 @@ export class Track extends Thing {
       // General configuration
 
       'Count In Artist Totals': {property: 'countInArtistTotals'},
+      'Show In Reference Lists': {property: 'showInReferenceLists'},
 
       'Has Cover Art': {
         property: 'disableUniqueCoverArt',
@@ -1286,14 +1289,24 @@ export class Track extends Thing {
     tracksWhichReference: {
       bindTo: 'trackData',
 
-      referencing: track => track.isMainRelease ? [track] : [],
+      referencing: track =>
+        (track.isMainRelease &&
+         track.showInReferenceLists
+          ? [track]
+          : []),
+
       referenced: track => track.referencedTracks,
     },
 
     tracksWhichSample: {
       bindTo: 'trackData',
 
-      referencing: track => track.isMainRelease ? [track] : [],
+      referencing: track =>
+        (track.isMainRelease &&
+         track.showInReferenceLists
+          ? [track]
+          : []),
+
       referenced: track => track.sampledTracks,
     },
 
