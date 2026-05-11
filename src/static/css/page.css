@@ -750,6 +750,21 @@
     border-bottom-right-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
   }
+
+  .track-release-sidebar-box.meta-album {
+    margin-top: 15px !important;
+    border-radius: 4px !important;
+    margin-left: 15px;
+    margin-right: 15px;
+  }
+
+  .track-release-sidebar-box.meta-album + .track-release-sidebar-box.meta-album {
+    margin-top: 5px !important;
+  }
+
+  .track-release-sidebar-box.meta-album + .conjoined-group-sidebar-box {
+    margin-top: 10px !important;
+  }
 }
 
 @layer print {

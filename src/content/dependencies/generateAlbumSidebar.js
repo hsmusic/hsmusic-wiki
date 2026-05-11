@@ -39,20 +39,39 @@ export default {
           Array.from(albumTrackMap.keys()),
           {getDate: album => albumTrackMap.get(album).date});
 
+      const metaLike =
+        (album.style === 'meta'
+          ? album => album.style === 'meta'
+          : album => album.style !== 'meta');
+
+      const metaUnlike =
+        (album.style === 'meta'
+          ? album => album.style !== 'meta'
+          : album => album.style === 'meta');
+
+      const metaReleaseAlbums =
+        allReleaseAlbums.filter(metaUnlike);
+
+      const regularReleaseAlbums =
+        allReleaseAlbums.filter(metaLike);
+
       const currentReleaseIndex =
-        allReleaseAlbums.indexOf(track.album);
+        regularReleaseAlbums.indexOf(track.album);
 
       const earlierReleaseAlbums =
-        allReleaseAlbums.slice(0, currentReleaseIndex);
+        regularReleaseAlbums.slice(0, currentReleaseIndex);
 
       const laterReleaseAlbums =
-        allReleaseAlbums.slice(currentReleaseIndex + 1);
+        regularReleaseAlbums.slice(currentReleaseIndex + 1);
 
       query.earlierReleaseTracks =
         earlierReleaseAlbums.map(album => albumTrackMap.get(album));
 
       query.laterReleaseTracks =
         laterReleaseAlbums.map(album => albumTrackMap.get(album));
+
+      query.metaReleaseTracks =
+        metaReleaseAlbums.map(album => albumTrackMap.get(album));
     }
 
     return query;
@@ -94,6 +113,13 @@ export default {
     laterTrackReleaseBoxes:
       (track
         ? query.laterReleaseTracks
+            .map(track =>
+              relation('generateTrackReleaseBox', track))
+        : null),
+
+    metaReleaseBoxes:
+      (track
+        ? query.metaReleaseTracks
             .map(track =>
               relation('generateTrackReleaseBox', track))
         : null),
@@ -183,6 +209,10 @@ export default {
 
         data.isTrackPage &&
           relations.laterTrackReleaseBoxes,
+
+        data.isTrackPage &&
+          relations.metaReleaseBoxes
+            .map(box => box.slot('meta', true)),
 
         data.isTrackPage &&
           groupBoxes,

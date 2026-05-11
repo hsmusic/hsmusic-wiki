@@ -290,20 +290,24 @@ releaseInfo:
   note: "Notes:"
 
   alsoReleased:
+    alsoReleased: "Also released"
+    released: "Released"
+    included: "Included"
+
     onAlbums: >-
-      Also released on {ALBUMS}.
+      {ALSO_RELEASED} on {ALBUMS}.
 
     asSingle: >-
-      Also released {SINGLE}.
+      {ALSO_RELEASED} {SINGLE}.
 
     onSingle: >-
-      Also released {SINGLE}.
+      {ALSO_RELEASED} {SINGLE}.
 
     onAlbums.asSingle: >-
-      Also released on {ALBUMS}, and {SINGLE}.
+      {ALSO_RELEASED} on {ALBUMS}, and {SINGLE}.
 
     onAlbums.onSingle: >-
-      Also released on {ALBUMS}, and {SINGLE}.
+      {ALSO_RELEASED} on {ALBUMS}, and {SINGLE}.
 
     asSingle.link: "as a single"
     onSingle.link: "on a single"

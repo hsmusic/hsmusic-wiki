@@ -1,22 +1,22 @@
 import {onlyItem, stitchArrays} from '#sugar';
 
 export default {
-  query(track) {
+  query(track, releases) {
     const query = {};
 
     query.singleSingle =
       onlyItem(
-        track.otherReleases.filter(track => track.album.style === 'single'));
+        releases.filter(track => track.album.style === 'single'));
 
     query.regularReleases =
       (query.singleSingle
-        ? track.otherReleases.filter(track => track !== query.singleSingle)
-        : track.otherReleases);
+        ? releases.filter(track => track !== query.singleSingle)
+        : releases);
 
     return query;
   },
 
-  relations: (relation, query, track) => ({
+  relations: (relation, query, track, _releases) => ({
     textWithTooltip:
       relation('generateTextWithTooltip'),
 
@@ -42,7 +42,10 @@ export default {
             otherTrack, track)),
   }),
 
-  data: (query, _track) => ({
+  data: (query, track, _releases) => ({
+    ownAlbumStyle:
+      track.album.style,
+
     albumNames:
       query.regularReleases
         .map(track => track.album.name),
@@ -57,10 +60,25 @@ export default {
         : null),
   }),
 
-  generate: (data, relations, {html, language}) =>
+  slots: {
+    meta: {type: 'boolean', default: false},
+  },
+
+  generate: (data, relations, slots, {html, language}) =>
     language.encapsulate('releaseInfo.alsoReleased', capsule =>
       language.encapsulate(capsule, workingCapsule => {
         const workingOptions = {};
+
+        if (slots.meta) {
+          workingOptions.alsoReleased =
+            language.$(capsule, 'included');
+        } else if (data.ownAlbumStyle === 'meta') {
+          workingOptions.alsoReleased =
+            language.$(capsule, 'released');
+        } else {
+          workingOptions.alsoReleased =
+            language.$(capsule, 'alsoReleased');
+        }
 
         let any = false;
 
@@ -88,7 +106,9 @@ export default {
                     }),
 
                   tooltip:
-                    trackTooltip,
+                    (slots.meta
+                      ? null
+                      : trackTooltip),
                 })));
 
         if (!html.isBlank(albumList)) {

@@ -88,8 +88,8 @@ export default {
     readCommentaryLine:
       relation('generateReadCommentaryLine', track),
 
-    otherReleasesLine:
-      relation('generateTrackInfoPageOtherReleasesLine', track),
+    otherReleasesLines:
+      relation('generateTrackInfoPageOtherReleasesLines', track),
 
     contributorContributionList:
       relation('generateContributionList', track.contributorContribs),
@@ -242,8 +242,10 @@ export default {
                   })),
             ])),
 
-          html.tag('p', {[html.onlyIfContent]: true},
-            relations.otherReleasesLine),
+          html.tag('p',
+            {[html.onlyIfContent]: true},
+            {[html.joinChildren]: html.tag('br')},
+            relations.otherReleasesLines),
 
           html.tags([
             relations.contentHeading.clone().slots({

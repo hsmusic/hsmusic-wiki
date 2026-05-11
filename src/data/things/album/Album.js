@@ -124,6 +124,7 @@ export class Album extends Thing {
         validate: input.value(is(...[
           'album',
           'single',
+          'meta',
         ])),
       }),
 
