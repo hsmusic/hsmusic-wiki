@@ -76,6 +76,9 @@ export default {
     contentHeading:
       relation('generateContentHeading'),
 
+    relationsContentHeading:
+      relation('generateRelationsContentHeading', 'track', track),
+
     name:
       relation('generateName', track),
 
@@ -237,11 +240,10 @@ export default {
             relations.otherReleasesLine),
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'contributors'},
-                title: language.$('releaseInfo.contributors'),
-              }),
+            relations.contentHeading.clone().slots({
+              attributes: {id: 'contributors'},
+              title: language.$('releaseInfo.contributors'),
+            }),
 
             relations.contributorContributionList.slots({
               chronologyKind: 'trackContribution',
@@ -249,99 +251,52 @@ export default {
           ]),
 
           html.tags([
-            language.encapsulate('releaseInfo.tracksReferenced', capsule =>
-              relations.contentHeading.clone()
-                .slots({
-                  attributes: {id: 'references'},
-
-                  title:
-                    language.$(capsule, {
-                      track:
-                        html.tag('i', data.name),
-                    }),
-
-                  stickyTitle:
-                    language.$(capsule, 'sticky'),
-                })),
+            relations.relationsContentHeading.clone().slots({
+              attributes: {id: 'references'},
+              string: 'releaseInfo.tracksReferenced',
+            }),
 
             relations.referencedTracksList,
           ]),
 
           html.tags([
-            language.encapsulate('releaseInfo.tracksSampled', capsule =>
-              relations.contentHeading.clone()
-                .slots({
-                  attributes: {id: 'samples'},
-
-                  title:
-                    language.$(capsule, {
-                      track:
-                        html.tag('i', data.name),
-                    }),
-
-                  stickyTitle:
-                    language.$(capsule, 'sticky'),
-                })),
+            relations.relationsContentHeading.clone().slots({
+              attributes: {id: 'samples'},
+              string: 'releaseInfo.tracksSampled',
+            }),
 
             relations.sampledTracksList,
           ]),
 
           language.encapsulate('releaseInfo.tracksThatReference', capsule =>
             html.tags([
-              relations.contentHeading.clone()
-                .slots({
-                  attributes: {id: 'referenced-by'},
+              relations.relationsContentHeading.clone().slots({
+                attributes: {id: 'referenced-by'},
+                string: capsule,
+              }),
 
-                  title:
-                    language.$(capsule, {
-                      track: html.tag('i', data.name),
-                    }),
-
-                  stickyTitle:
-                    language.$(capsule, 'sticky'),
-                }),
-
-              relations.referencedByTracksList
-                .slots({
-                  headingString: capsule,
-                }),
+              relations.referencedByTracksList.slots({
+                headingString: capsule,
+              }),
             ])),
 
           language.encapsulate('releaseInfo.tracksThatSample', capsule =>
             html.tags([
-              relations.contentHeading.clone()
-                .slots({
-                  attributes: {id: 'sampled-by'},
+              relations.relationsContentHeading.clone().slots({
+                attributes: {id: 'sampled-by'},
+                string: capsule,
+              }),
 
-                  title:
-                    language.$(capsule, {
-                      track: html.tag('i', data.name),
-                    }),
-
-                  stickyTitle:
-                    language.$(capsule, 'sticky'),
-                }),
-
-              relations.sampledByTracksList
-                .slots({
-                  headingString: capsule,
-                }),
+              relations.sampledByTracksList.slots({
+                headingString: capsule,
+              }),
             ])),
 
           html.tags([
-            language.encapsulate('releaseInfo.flashesThatFeature', capsule =>
-              relations.contentHeading.clone()
-                .slots({
-                  attributes: {id: 'featured-in'},
-
-                  title:
-                    language.$(capsule, {
-                      track: html.tag('i', data.name),
-                    }),
-
-                  stickyTitle:
-                    language.$(capsule, 'sticky'),
-                })),
+            relations.relationsContentHeading.clone().slots({
+              attributes: {id: 'featured-in'},
+              string: 'releaseInfo.flashesThatFeature',
+            }),
 
             relations.flashesThatFeatureList,
           ]),
@@ -368,31 +323,28 @@ export default {
           relations.lyricsSection,
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'sheet-music-files'},
-                title: language.$('releaseInfo.sheetMusicFiles.heading'),
-              }),
+            relations.contentHeading.clone().slots({
+              attributes: {id: 'sheet-music-files'},
+              title: language.$('releaseInfo.sheetMusicFiles.heading'),
+            }),
 
             relations.sheetMusicFilesList,
           ]),
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'midi-project-files'},
-                title: language.$('releaseInfo.midiProjectFiles.heading'),
-              }),
+            relations.contentHeading.clone().slots({
+              attributes: {id: 'midi-project-files'},
+              title: language.$('releaseInfo.midiProjectFiles.heading'),
+            }),
 
             relations.midiProjectFilesList,
           ]),
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'additional-files'},
-                title: language.$('releaseInfo.additionalFiles.heading'),
-              }),
+            relations.contentHeading.clone().slots({
+              attributes: {id: 'additional-files'},
+              title: language.$('releaseInfo.additionalFiles.heading'),
+            }),
 
             relations.additionalFilesList,
           ]),

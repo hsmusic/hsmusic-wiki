@@ -6,9 +6,10 @@ export default {
 
   data: (thing) => ({
     name:
-      (thing
-        ? thing.name
-        : null),
+      (thing ? thing.name : null),
+
+    nameStyle:
+      (thing ? thing.nameStyle : null),
   }),
 
   slots: {
@@ -32,33 +33,40 @@ export default {
       attributes: slots.attributes,
 
       title:
-        (() => {
+        language.encapsulate(slots.string, workingCapsule => {
           if (!slots.string) return html.blank();
 
-          const options = {};
+          const workingOptions = {};
 
           if (slots.summary) {
-            options.cue =
+            workingOptions.cue =
               html.tag('span', {class: 'cue'},
                 language.$(slots.string, 'cue'));
           }
 
-          if (data.name) {
-            options.thing = html.tag('i', data.name);
+          const name =
+            (data.nameStyle === 'utility'
+              ? null
+              : data.name);
+
+          if (name) {
+            workingOptions.thing = html.tag('i', name);
+          } else {
+            workingCapsule += '.withoutName';
           }
 
           if (slots.summary) {
             return html.tags([
               html.tag('span', {class: 'when-open'},
-                language.$(slots.string, options)),
+                language.$(workingCapsule, workingOptions)),
 
               html.tag('span', {class: 'when-collapsed'},
-                language.$(slots.string, 'collapsed', options)),
+                language.$(workingCapsule, 'collapsed', workingOptions)),
             ]);
           } else {
-            return language.$(slots.string, options);
+            return language.$(workingCapsule, workingOptions);
           }
-        })(),
+        }),
 
       stickyTitle:
         (slots.string

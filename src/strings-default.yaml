@@ -314,14 +314,17 @@ releaseInfo:
 
   tracksReferenced:
     _: "Tracks that {TRACK} references:"
+    withoutName: "Tracks that this one references:"
     sticky: "Tracks that this one references:"
 
   tracksSampled:
     _: "Tracks that {TRACK} samples:"
+    withoutName: "Tracks that this one samples:"
     sticky: "Tracks that this one samples:"
 
   tracksThatReference:
     _: "Tracks that reference {TRACK}:"
+    withoutName: "Tracks that reference this one:"
 
     sticky:
       _: "Tracks that reference this one:"
@@ -330,6 +333,7 @@ releaseInfo:
 
   tracksThatSample:
     _: "Tracks that sample {TRACK}:"
+    withoutName: "Tracks that sample this one:"
 
     sticky:
       _: "Tracks that sample this one:"
@@ -338,6 +342,7 @@ releaseInfo:
 
   flashesThatFeature:
     _: "Flashes that feature {TRACK}:"
+    withoutName: "Flashes taht feature this track:"
     sticky: "Flashes that feature this track:"
 
   referencesArtworks: "References {ARTWORKS}."
@@ -533,14 +538,17 @@ misc:
 
   artistCommentary:
     _: "Artist commentary for {THING}:"
+    withoutName: "Artist commentary:"
     sticky: "Artist commentary:"
 
     withWikiCommentary:
       _: "Artist and wiki commentary for {THING}:"
+      withoutName: "Artist and wiki commentary:"
       sticky: "Artist and wiki commentary:"
 
     onlyWikiCommentary:
       _: "Wiki commentary for {THING}:"
+      withoutName: "Wiki commentary:"
       sticky: "Wiki commentary:"
 
     entry:
@@ -652,7 +660,11 @@ misc:
 
   creditingSources:
     _: "{CUE} for {THING}:"
+    withoutName: "{CUE}:"
+
     collapsed: "{CUE} for {THING}…"
+    withoutName.collapsed: "{CUE}…"
+
     cue: "Crediting sources"
     sticky: "Crediting sources:"
 
@@ -919,7 +931,11 @@ misc:
 
   referencingSources:
     _: "{CUE} for {THING}:"
+    withoutName: "{CUE}:"
+
     collapsed: "{CUE} for {THING}…"
+    withoutName.collapsed: "{CUE}…"
+
     cue: "Referencing sources"
     sticky: "Referencing sources:"
 

@@ -133,6 +133,17 @@ export class Track extends Thing {
     name: name(V('Unnamed Track')),
     nameText: contentString(),
 
+    nameStyle: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(is(...[
+          'normal',
+          'utility',
+        ])),
+      }),
+
+      exposeConstant(V('normal')),
+    ],
+
     directory: directory({
       suffix: 'directorySuffix',
     }),
@@ -931,6 +942,9 @@ export class Track extends Thing {
 
       'Track': {property: 'name'},
       'Track Text': {property: 'nameText'},
+
+      'Name Style': {property: 'nameStyle'},
+
       'Directory': {property: 'directory'},
       'Suffix Directory': {property: 'suffixDirectoryFromAlbum'},
 
