@@ -25,6 +25,11 @@ export default {
       default: false,
     },
 
+    showDetail: {
+      type: 'boolean',
+      default: true,
+    },
+
     colorMode: {
       validate: v => v.is('none', 'track', 'line'),
       default: 'track',
@@ -39,6 +44,7 @@ export default {
         item.slots({
           showArtists: slots.showArtists,
           showDuration: slots.showDuration,
+          showDetail: slots.showDetail,
           colorMode: slots.colorMode,
         }))),
 };
