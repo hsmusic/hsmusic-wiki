@@ -18,7 +18,8 @@ export default {
 
   generate(data, relations, slots, {html, language}) {
     const namePart =
-      (data.nameStyle === 'utility'
+      (data.nameStyle === 'utility' ||
+       data.nameStyle === 'unofficial'
         ? null
         : html.tag('i', data.name));
 

@@ -278,6 +278,9 @@ releaseInfo:
   trackReleased: "Track released {DATE}."
   addedToWiki: "Added to wiki {DATE}."
 
+  unofficialName: >-
+    "{NAME}" is marked, on this wiki, as an unofficial name.
+
   duration: "Duration: {DURATION}."
 
   contributors: "Contributors:"

@@ -143,6 +143,9 @@ export default {
     name:
       track.name,
 
+    nameStyle:
+      track.nameStyle,
+
     nameDetail:
       track.nameDetail,
 
@@ -184,6 +187,13 @@ export default {
           relations.artworkColumn,
 
         mainContent: [
+          data.nameStyle === 'unofficial' &&
+            html.tag('p',
+              html.tag('i',
+                language.$('releaseInfo.unofficialName', {
+                  name: data.name,
+                }))),
+
           relations.releaseInfo,
 
           html.tag('p',

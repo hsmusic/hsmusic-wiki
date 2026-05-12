@@ -138,6 +138,7 @@ export class Track extends Thing {
         validate: input.value(is(...[
           'normal',
           'utility',
+          'unofficial',
         ])),
       }),
 

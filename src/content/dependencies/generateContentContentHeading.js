@@ -45,7 +45,8 @@ export default {
           }
 
           const name =
-            (data.nameStyle === 'utility'
+            (data.nameStyle === 'utility' ||
+             data.nameStyle === 'unofficial'
               ? null
               : data.name);
 
