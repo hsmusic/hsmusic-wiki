@@ -71,7 +71,9 @@ export default {
     const data = {};
 
     data.name = thing.name;
+    data.albumName = (thing.album ? thing.album.name : null);
 
+    data.excludingLinks = thing.excludingURLs;
     data.noLinks = empty(query.urls);
 
     const artistURLs =
@@ -130,16 +132,53 @@ export default {
   },
 
   generate: (data, relations, slots, {html, language}) =>
-    language.encapsulate('releaseInfo.listenOn', capsule =>
-      (data.noLinks && slots.visibleWithoutLinks
-        ? language.$(capsule, 'noLinks', {
-            name:
-              html.tag('i', data.name),
-          })
+    language.encapsulate('releaseInfo.listenOn', capsule => {
+      const trackPart =
+        html.tag('i', data.name);
 
-        : relations.externalLinksLineOrList.slots({
-            string: capsule,
-            context: slots.context,
-            contexts: data.releaseContexts,
-          }))),
+      const albumPart =
+        (data.albumName
+          ? html.tag('i', data.albumName)
+          : null);
+
+      if (data.excludingLinks) {
+        const exclude = (name, options) =>
+          (name
+            ? language.$(capsule, 'excludingLinks', name, options)
+            : language.$(capsule, 'excludingLinks', options));
+
+        switch (data.excludingLinks) {
+          case 'quietly':
+            return html.blank();
+
+          case 'not clearly public':
+            return exclude('notClearlyPublic', {
+              track: trackPart,
+            });
+
+          case 'paid bonus track':
+            return exclude('paidBonusTrack', {
+              track: trackPart,
+              album: albumPart,
+            });
+
+          default:
+            return exclude(null, {track: trackPart});
+        }
+      }
+
+      if (data.noLinks) {
+        if (slots.visibleWithoutLinks) {
+          return language.$(capsule, 'noLinks', {track: trackPart});
+        } else {
+          return html.blank();
+        }
+      }
+
+      return relations.externalLinksLineOrList.slots({
+        string: capsule,
+        context: slots.context,
+        contexts: data.releaseContexts,
+      });
+    }),
 };

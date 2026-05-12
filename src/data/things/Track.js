@@ -383,7 +383,31 @@ export class Track extends Thing {
       },
     ],
 
-    urls: urls(),
+    excludingURLs: {
+      flags: {update: true, expose: true},
+
+      update: {
+        validate:
+          is(...[
+            'quietly',
+            'generic',
+            'not clearly public',
+            'paid bonus track',
+          ]),
+      },
+    },
+
+    urls: [
+      {
+        dependencies: ['excludingURLs'],
+        compute: (continuation, {excludingURLs}) =>
+          (excludingURLs
+            ? continuation.exit([])
+            : continuation()),
+      },
+
+      urls(),
+    ],
 
     // > Update & expose - Artworks
 
@@ -1034,6 +1058,10 @@ export class Track extends Thing {
         property: 'needsLyrics',
       },
 
+      'Excluding URLs': {
+        property: 'excludingURLs',
+      },
+
       'URLs': {
         property: 'urls',
         transform: parseURLs,
@@ -1165,6 +1193,11 @@ export class Track extends Thing {
           'Cover Artists',
         ],
       },
+
+      {message: `Don't include URLs alongside Excluding URLs`, fields: [
+        'URLs',
+        'Excluding URLs',
+      ]},
     ],
   };
 

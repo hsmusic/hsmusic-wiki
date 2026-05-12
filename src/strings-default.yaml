@@ -384,8 +384,18 @@ releaseInfo:
 
   listenOn: "Listen on {LINKS}."
   listenOn.title: "Listen on:"
+
   listenOn.noLinks: >-
-    This wiki doesn't have any listening links for {NAME}.
+    This wiki doesn't have any listening links for {TRACK}.
+
+  listenOn.excludingLinks: >-
+    This wiki is excluding listening links for {TRACK}.
+
+  listenOn.excludingLinks.notClearlyPublic: >-
+    !! string pending - "not clearly public" {TRACK} !!
+
+  listenOn.excludingLinks.paidBonusTrack: >-
+    On {ALBUM}, the bonus track {TRACK} is only available with the album purchase, so this wiki is excluding listening links here.
 
   visitOn: "Visit on {LINKS}."
   visitOn.title: "Visit on:"
