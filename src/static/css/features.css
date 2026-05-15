@@ -1472,9 +1472,9 @@
     width: 100%;
   }
 
-  .content-image-container:last-child,
-  .content-video-container:last-child,
-  .content-audio-container:last-child {
+  .content-image-container:last-child:not(blockquote > *)
+  .content-video-container:last-child:not(blockquote > *),
+  .content-audio-container:last-child:not(blockquote > *) {
     margin-bottom: 1.15em;
   }
 

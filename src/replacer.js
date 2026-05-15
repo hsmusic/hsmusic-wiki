@@ -623,6 +623,8 @@ function postprocessHTMLTags(inputNodes, tagName, callback) {
 
         if (previousText.endsWith('\n')) {
           atStartOfLine = true;
+        } else if (previousText.match(/^(> )+/m)) {
+          atStartOfLine = true;
         } else if (previousText.length) {
           atStartOfLine = false;
         }
