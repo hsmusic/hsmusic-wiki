@@ -487,29 +487,7 @@ function performSearchAction({query, options}) {
 const interestingFieldCombinations = [
   ['primaryName'],
   ['additionalNames'],
-
-  ['primaryName', 'parentName', 'groups'],
-  ['primaryName', 'parentName'],
-  ['primaryName', 'groups', 'contributors'],
-  ['primaryName', 'groups', 'artTags'],
   ['primaryName', 'groups'],
-  ['additionalNames', 'groups'],
-  ['primaryName', 'contributors'],
-  ['primaryName', 'artTags'],
-  ['parentName', 'groups', 'artTags'],
-  ['parentName', 'artTags'],
-  ['groups', 'contributors'],
-  ['groups', 'artTags'],
-
-  // This prevents just matching *everything* tagged "john" if you
-  // only search "john", but it actually supports matching more than
-  // *two* tags at once: "john rose lowas" works! This is thanks to
-  // flexsearch matching multiple field values in a single query.
-  ['artTags', 'artTags'],
-
-  ['contributors', 'parentName'],
-  ['contributors', 'groups'],
-  ['primaryName', 'contributors'],
 ];
 
 function queryGenericIndex(query, options) {

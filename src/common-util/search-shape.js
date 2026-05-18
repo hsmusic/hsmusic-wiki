@@ -21,9 +21,7 @@ const searchShape = {
     index: [
       'primaryName',
       'parentName',
-      'artTags',
       'additionalNames',
-      'contributors',
       'groups',
     ].map(field => ({field, tokenize: 'forward'})),
 
@@ -34,9 +32,7 @@ const searchShape = {
     index: [
       'primaryName',
       'parentName',
-      'artTags',
       'additionalNames',
-      'contributors',
       'groups',
     ],
 

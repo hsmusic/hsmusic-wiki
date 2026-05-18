@@ -53,6 +53,31 @@ function prepareArtwork(artwork, thing, {
   return serializeSrc;
 }
 
+function determineAlbumGroups(album, opts) {
+  const dividingGroups =
+    opts.wikiInfo.divideTrackListsByGroups;
+
+  const artists =
+    album.artistContribs.map(contrib => contrib.artist);
+
+  const artistNames =
+    artists.map(artist => artist.name);
+
+  const groups = [];
+
+  for (const group of album.groups) {
+    const matchesGroupName = x => compareKebabCase(group.name, x);
+
+    if (!dividingGroups.includes(group))
+    if (artistNames.some(matchesGroupName))
+      continue;
+
+    groups.push(group);
+  }
+
+  return groups;
+}
+
 function determineArtistGroups(artist, opts) {
   const contributions = [
     artist.musicContributions,
@@ -228,16 +253,6 @@ function genericProcess(thing, opts) {
 
       : [thing.parentName]);
 
-  fields.artTags =
-    (Array.from(new Set(
-      (thing.isTrack
-        ? thing.trackArtworks.flatMap(artwork => artwork.artTags)
-     : thing.isAlbum
-        ? thing.coverArtworks.flatMap(artwork => artwork.artTags)
-        : []))))
-
-      .map(artTag => artTag.nameShort);
-
   fields.additionalNames =
     (thing.constructor.hasPropertyDescriptor('additionalNames')
       ? thing.additionalNames.map(entry => entry.name)
@@ -245,36 +260,14 @@ function genericProcess(thing, opts) {
       ? thing.artistAliases.map(alias => alias.name)
       : []);
 
-  const contribKeys = [
-    'artistContribs',
-    'contributorContribs',
-  ];
-
-  const contributions =
-    contribKeys
-      .flatMap(key => thing[key] ?? []);
-
-  fields.contributors =
-    contributions
-      .flatMap(({artist}) => [
-        artist.name,
-        ...artist.artistAliases.map(alias => alias.name),
-      ]);
-
   const groups =
-    (thing.isAlbum ? thing.groups
-   : thing.isTrack ? thing.album.groups
+    (thing.isAlbum ? determineAlbumGroups(thing, opts)
+   : thing.isTrack ? determineAlbumGroups(thing.album, opts)
    : thing.isArtist ? determineArtistGroups(thing, opts)
    : []);
 
-  const mainContributorNames =
-    contributions
-      .map(({artist}) => artist.name);
-
   fields.groups =
-    groups
-      .filter(group => !mainContributorNames.includes(group.name))
-      .map(group => group.name);
+    groups.map(group => group.name);
 
   return fields;
 }
