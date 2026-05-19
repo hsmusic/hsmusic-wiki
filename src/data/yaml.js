@@ -762,12 +762,19 @@ export function parseURLs(entries) {
 }
 
 export function parseExcludingURLs(value) {
-  if (typeof value !== 'string') {
-    return value;
+  if (typeof value === 'boolean') {
+    switch (value) {
+      case true: return 'generic';
+      case false: return false;
+      // False is for nullifying an inherited reason for exclusion.
+    }
   }
 
-  switch (value) {
-    case 'paid bonus tracks': return 'paid bonus track';
+  if (typeof value === 'string') {
+    switch (value) {
+      case 'paid bonus tracks': return 'paid bonus track';
+      default: return value;
+    }
   }
 
   return value;

@@ -6,6 +6,8 @@ import Thing from '#thing';
 import {parseDate, parseExcludingURLs} from '#yaml';
 
 import {
+  anyOf,
+  is,
   isBoolean,
   isColor,
   isDirectory,
@@ -121,7 +123,10 @@ export class TrackSection extends Thing {
 
     excludingTrackURLs: [
       exposeUpdateValueOrContinue({
-        validate: input.value(isExcludingURLsReason),
+        validate: input.value(
+          anyOf(
+            is(false),
+            isExcludingURLsReason)),
       }),
 
       withPropertyFromObject('album', V('excludingTrackURLs')),

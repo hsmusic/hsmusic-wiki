@@ -10,6 +10,7 @@ import Thing from '#thing';
 import {compareKebabCase} from '#wiki-data';
 
 import {
+  anyOf,
   is,
   isBoolean,
   isColor,
@@ -385,7 +386,10 @@ export class Track extends Thing {
 
     excludingURLs: [
       exposeUpdateValueOrContinue({
-        validate: input.value(isExcludingURLsReason),
+        validate: input.value(
+          anyOf(
+            is(false),
+            isExcludingURLsReason)),
       }),
 
       withPropertyFromObject('trackSection', V('excludingTrackURLs')),
@@ -1184,9 +1188,9 @@ export class Track extends Thing {
         ],
       },
 
-      {message: `Don't include URLs alongside Excluding URLs`, fields: [
+      {message: `Don't include URLs alongside Excluding URLs, unless Excluding URLs is false`, fields: [
         'URLs',
-        'Excluding URLs',
+        ['Excluding URLs', v => v !== false],
       ]},
     ],
   };
