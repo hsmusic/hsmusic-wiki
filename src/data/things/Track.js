@@ -356,10 +356,7 @@ export class Track extends Thing {
       }),
 
       withPropertyFromObject('trackSection', V('color')),
-      exposeDependencyOrContinue('#trackSection.color'),
-
-      withPropertyFromObject('album', V('color')),
-      exposeDependency('#album.color'),
+      exposeDependency('#trackSection.color'),
     ],
 
     needsLyrics: [
