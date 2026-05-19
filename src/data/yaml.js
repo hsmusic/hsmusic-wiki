@@ -761,6 +761,18 @@ export function parseURLs(entries) {
   });
 }
 
+export function parseExcludingURLs(value) {
+  if (typeof value !== 'string') {
+    return value;
+  }
+
+  switch (value) {
+    case 'paid bonus tracks': return 'paid bonus track';
+  }
+
+  return value;
+}
+
 export function parseAdditionalFiles(entries, {subdoc, AdditionalFile}) {
   return parseArrayEntries(entries, item => {
     if (typeof item !== 'object') return item;

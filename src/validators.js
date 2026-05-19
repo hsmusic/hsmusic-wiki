@@ -822,6 +822,8 @@ export function isCuratedURL(string) {
   return true;
 }
 
+// These are the only valid actual values, but parseExcludingURLs (in #yaml)
+// defines a mapping of alternative, equivalent values.
 export const isExcludingURLsReason =
   is(...[
     'quietly',

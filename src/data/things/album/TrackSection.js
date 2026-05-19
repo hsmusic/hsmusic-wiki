@@ -3,7 +3,7 @@ import {inspect} from 'node:util';
 import {colors} from '#cli';
 import {input, V} from '#composite';
 import Thing from '#thing';
-import {parseDate} from '#yaml';
+import {parseDate, parseExcludingURLs} from '#yaml';
 
 import {
   isBoolean,
@@ -212,7 +212,11 @@ export class TrackSection extends Thing {
       },
 
       'Count Tracks In Artist Totals': {property: 'countTracksInArtistTotals'},
-      'Excluding Track URLs': {property: 'excludingTrackURLs'},
+
+      'Excluding Track URLs': {
+        property: 'excludingTrackURLs',
+        transform: parseExcludingURLs,
+      },
 
       'Description': {property: 'description'},
     },

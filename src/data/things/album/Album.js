@@ -22,6 +22,7 @@ import {
   parseCreditingSources,
   parseDate,
   parseDimensions,
+  parseExcludingURLs,
   parseMusicVideos,
   parseWallpaperParts,
   parseURLs,
@@ -651,7 +652,11 @@ export class Album extends Thing {
       // General configuration
 
       'Count Tracks In Artist Totals': {property: 'countTracksInArtistTotals'},
-      'Excluding Track URLs': {property: 'excludingTrackURLs'},
+
+      'Excluding Track URLs': {
+        property: 'excludingTrackURLs',
+        transform: parseExcludingURLs,
+      },
 
       'Listed on Homepage': {property: 'isListedOnHomepage'},
       'Listed in Galleries': {property: 'isListedInGalleries'},

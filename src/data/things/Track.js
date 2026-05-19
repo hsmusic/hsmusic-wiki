@@ -31,12 +31,13 @@ import {
   parseCommentary,
   parseContributors,
   parseCreditingSources,
-  parseReferencingSources,
+  parseExcludingURLs,
   parseDate,
   parseDimensions,
   parseDuration,
   parseLyrics,
   parseMusicVideos,
+  parseReferencingSources,
   parseURLs,
 } from '#yaml';
 
@@ -1048,6 +1049,7 @@ export class Track extends Thing {
 
       'Excluding URLs': {
         property: 'excludingURLs',
+        transform: parseExcludingURLs,
       },
 
       'URLs': {
