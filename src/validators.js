@@ -822,6 +822,14 @@ export function isCuratedURL(string) {
   return true;
 }
 
+export const isExcludingURLsReason =
+  is(...[
+    'quietly',
+    'generic',
+    'not clearly public',
+    'paid bonus track',
+  ]);
+
 export const validateURLEntry = (isURL) =>
   validateProperties({
     url: isURL,

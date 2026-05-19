@@ -3,8 +3,15 @@ import {inspect} from 'node:util';
 import {colors} from '#cli';
 import {input, V} from '#composite';
 import Thing from '#thing';
-import {isBoolean, isColor, isDirectory, isNumber} from '#validators';
 import {parseDate} from '#yaml';
+
+import {
+  isBoolean,
+  isColor,
+  isDirectory,
+  isExcludingURLsReason,
+  isNumber,
+} from '#validators';
 
 import {withLengthOfList, withNearbyItemFromList, withPropertyFromObject}
   from '#composite/data';
@@ -112,6 +119,15 @@ export class TrackSection extends Thing {
       exposeDependency('#album.countTracksInArtistTotals'),
     ],
 
+    excludingTrackURLs: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isExcludingURLsReason),
+      }),
+
+      withPropertyFromObject('album', V('excludingTrackURLs')),
+      exposeDependency('#album.excludingTrackURLs'),
+    ],
+
     isDefaultTrackSection: flag(V(false)),
 
     description: contentString(),
@@ -196,6 +212,7 @@ export class TrackSection extends Thing {
       },
 
       'Count Tracks In Artist Totals': {property: 'countTracksInArtistTotals'},
+      'Excluding Track URLs': {property: 'excludingTrackURLs'},
 
       'Description': {property: 'description'},
     },

@@ -1,8 +1,15 @@
 import {input, V} from '#composite';
 import {empty} from '#sugar';
 import Thing from '#thing';
-import {is, isContributionList, isDate, isDirectory, isNumber}
-  from '#validators';
+
+import {
+  is,
+  isContributionList,
+  isDate,
+  isExcludingURLsReason,
+  isDirectory,
+  isNumber,
+} from '#validators';
 
 import {
   parseAdditionalFiles,
@@ -171,6 +178,11 @@ export class Album extends Thing {
     // > Update & expose - General configuration
 
     countTracksInArtistTotals: flag(V(true)),
+
+    excludingTrackURLs: {
+      flags: {update: true, expose: true},
+      update: {validate: isExcludingURLsReason},
+    },
 
     isListedOnHomepage: flag(V(true)),
     isListedInGalleries: flag(V(true)),
@@ -639,6 +651,7 @@ export class Album extends Thing {
       // General configuration
 
       'Count Tracks In Artist Totals': {property: 'countTracksInArtistTotals'},
+      'Excluding Track URLs': {property: 'excludingTrackURLs'},
 
       'Listed on Homepage': {property: 'isListedOnHomepage'},
       'Listed in Galleries': {property: 'isListedInGalleries'},

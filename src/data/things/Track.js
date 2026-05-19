@@ -16,6 +16,7 @@ import {
   isContentString,
   isContributionList,
   isDate,
+  isExcludingURLsReason,
   isFileExtension,
   validateReference,
 } from '#validators';
@@ -381,19 +382,14 @@ export class Track extends Thing {
       },
     ],
 
-    excludingURLs: {
-      flags: {update: true, expose: true},
+    excludingURLs: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isExcludingURLsReason),
+      }),
 
-      update: {
-        validate:
-          is(...[
-            'quietly',
-            'generic',
-            'not clearly public',
-            'paid bonus track',
-          ]),
-      },
-    },
+      withPropertyFromObject('trackSection', V('excludingTrackURLs')),
+      exposeDependency('#trackSection.excludingTrackURLs'),
+    ],
 
     urls: [
       {
