@@ -356,7 +356,7 @@ export const validateAllPropertyValues = (validator) =>
     [validateProperties.validateOtherKeys]: validator,
   });
 
-const illeaglInvisibleSpace = {
+const illegalInvisibleSpace = {
   action: 'delete',
 };
 
@@ -367,7 +367,7 @@ const illegalVisibleSpace = {
 };
 
 const illegalContentSpec = [
-  {illegal: '\u200b', annotation: `zero-width space`, ...illeaglInvisibleSpace},
+  {illegal: '\u200b', annotation: `zero-width space`, ...illegalInvisibleSpace},
   {illegal: '\u2005', annotation: `four-per-em space`, ...illegalVisibleSpace},
   {illegal: '\u205f', annotation: `medium mathematical space`, ...illegalVisibleSpace},
   {illegal: '\xa0', annotation: `non-breaking space`, ...illegalVisibleSpace},
