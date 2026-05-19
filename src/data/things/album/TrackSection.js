@@ -46,12 +46,8 @@ export class TrackSection extends Thing {
         validate: input.value(isDirectory),
       }),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('directorySuffix'),
-      }),
-
-      exposeDependency({dependency: '#album.directorySuffix'}),
+      withPropertyFromObject('album', V('directorySuffix')),
+      exposeDependency('#album.directorySuffix'),
     ],
 
     suffixTrackDirectories: [
@@ -59,12 +55,8 @@ export class TrackSection extends Thing {
         validate: input.value(isBoolean),
       }),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('suffixTrackDirectories'),
-      }),
-
-      exposeDependency({dependency: '#album.suffixTrackDirectories'}),
+      withPropertyFromObject('album', V('suffixTrackDirectories')),
+      exposeDependency('#album.suffixTrackDirectories'),
     ],
 
     color: [
@@ -72,12 +64,8 @@ export class TrackSection extends Thing {
         validate: input.value(isColor),
       }),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('color'),
-      }),
-
-      exposeDependency({dependency: '#album.color'}),
+      withPropertyFromObject('album', V('color')),
+      exposeDependency('#album.color'),
     ],
 
     hasTrackNumbers: [
@@ -120,12 +108,8 @@ export class TrackSection extends Thing {
         validate: input.value(isBoolean),
       }),
 
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('countTracksInArtistTotals'),
-      }),
-
-      exposeDependency({dependency: '#album.countTracksInArtistTotals'}),
+      withPropertyFromObject('album', V('countTracksInArtistTotals')),
+      exposeDependency('#album.countTracksInArtistTotals'),
     ],
 
     isDefaultTrackSection: flag(V(false)),
@@ -147,14 +131,8 @@ export class TrackSection extends Thing {
     ],
 
     directory: [
-      exitWithoutDependency({
-        dependency: 'album',
-      }),
-
-      withPropertyFromObject({
-        object: 'album',
-        property: input.value('directory'),
-      }),
+      exitWithoutDependency('album'),
+      withPropertyFromObject('album', V('directory')),
 
       {
         dependencies: ['#album.directory', 'unqualifiedDirectory'],
