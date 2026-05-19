@@ -621,6 +621,14 @@ export class SubdocAggregateError extends AggregateError {
   }
 }
 
+export function flipBoolean(value) {
+  if (typeof value === 'boolean') {
+    return !value;
+  } else {
+    return value;
+  }
+}
+
 export function parseDate(date) {
   return new Date(date);
 }

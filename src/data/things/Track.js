@@ -21,6 +21,7 @@ import {
 } from '#validators';
 
 import {
+  flipBoolean,
   parseAdditionalFiles,
   parseAdditionalNames,
   parseAlwaysReferenceByDirectory,
@@ -1029,18 +1030,12 @@ export class Track extends Thing {
 
       'Has Cover Art': {
         property: 'disableUniqueCoverArt',
-        transform: value =>
-          (typeof value === 'boolean'
-            ? !value
-            : value),
+        transform: flipBoolean,
       },
 
       'Has Date': {
         property: 'disableDate',
-        transform: value =>
-          (typeof value === 'boolean'
-            ? !value
-            : value),
+        transform: flipBoolean,
       },
 
       // General metadata
