@@ -503,9 +503,9 @@
     text-decoration: none !important;
   }
 
-  summary > span:hover:has(a:hover) a,
-  summary > span:hover:has(a.nested-hover) a,
-  summary.has-nested-hover > span a {
+  summary > span:hover:has(a:hover) a:hover,
+  summary > span:hover:has(a.nested-hover) a:hover,
+  summary.has-nested-hover > span a:hover {
     text-decoration: underline !important;
   }
 

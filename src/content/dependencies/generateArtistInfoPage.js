@@ -92,6 +92,15 @@ export default {
     flashesChunkedList:
       relation('generateArtistInfoPageFlashesChunkedList', artist),
 
+    sheetMusicFilesChunkedList:
+      relation('generateArtistInfoPageSheetMusicFilesChunkedList', artist),
+
+    midiProjectFilesChunkedList:
+      relation('generateArtistInfoPageMidiProjectFilesChunkedList', artist),
+
+    miscellaneousAdditionalFilesChunkedList:
+      relation('generateArtistInfoPageMiscellaneousAdditionalFilesChunkedList', artist),
+
     commentaryChunkedList:
       relation('generateArtistInfoPageCommentaryChunkedList', artist, false),
 
@@ -225,6 +234,21 @@ export default {
                       {href: '#music-videos'},
                       language.$(pageCapsule, 'musicVideoList.title')),
 
+                  !html.isBlank(relations.sheetMusicFilesChunkedList) &&
+                    html.tag('a',
+                      {href: '#sheet-music-files'},
+                      language.$(pageCapsule, 'sheetMusicFileList.title')),
+
+                  !html.isBlank(relations.midiProjectFilesChunkedList) &&
+                    html.tag('a',
+                      {href: '#midi-project-files'},
+                      language.$(pageCapsule, 'midiProjectFileList.title')),
+
+                  !html.isBlank(relations.miscellaneousAdditionalFilesChunkedList) &&
+                    html.tag('a',
+                      {href: '#additional-files'},
+                      language.$(pageCapsule, 'miscellaneousAdditionalFileList.title')),
+
                   !html.isBlank(relations.flashesChunkedList) &&
                     html.tag('a',
                       {href: '#flashes'},
@@ -352,6 +376,39 @@ export default {
                     countUnit: 'artworks',
                   })),
             }),
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                tag: 'h2',
+                attributes: {id: 'sheet-music-files'},
+                title: language.$(pageCapsule, 'sheetMusicFileList.title'),
+              }),
+
+            relations.sheetMusicFilesChunkedList,
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                tag: 'h2',
+                attributes: {id: 'midi-project-files'},
+                title: language.$(pageCapsule, 'midiProjectFileList.title'),
+              }),
+
+            relations.midiProjectFilesChunkedList,
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                tag: 'h2',
+                attributes: {id: 'additional-files'},
+                title: language.$(pageCapsule, 'miscellaneousAdditionalFileList.title'),
+              }),
+
+            relations.miscellaneousAdditionalFilesChunkedList,
           ]),
 
           html.tags([

@@ -125,6 +125,7 @@ media:
   - *genericPaths
 
   - albumAdditionalFile: 'album-additional/<>/<>'
+    albumAdditionalFileInFolder: 'album-additional/<>/<>/<>'
     albumBanner: 'album-art/<>/banner.<>'
     albumCover: 'album-art/<>/cover.<>'
     albumWallpaper: 'album-art/<>/bg.<>'

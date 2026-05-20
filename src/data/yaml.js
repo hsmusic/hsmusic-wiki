@@ -780,12 +780,24 @@ export function parseExcludingURLs(value) {
   return value;
 }
 
-export function parseAdditionalFiles(entries, {subdoc, AdditionalFile}) {
+export function parseAdditionalFilesEntries(thingClass, entries, {subdoc}) {
   return parseArrayEntries(entries, item => {
     if (typeof item !== 'object') return item;
 
-    return subdoc(AdditionalFile, item, {bindInto: 'thing'});
+    return subdoc(thingClass, item, {bindInto: 'thing'});
   });
+}
+
+export function parseAdditionalFiles(entries, {subdoc, MiscellaneousAdditionalFile}) {
+  return parseAdditionalFilesEntries(MiscellaneousAdditionalFile, entries, {subdoc});
+}
+
+export function parseMidiProjectFiles(entries, {subdoc, MidiProjectFile}) {
+  return parseAdditionalFilesEntries(MidiProjectFile, entries, {subdoc});
+}
+
+export function parseSheetMusicFiles(entries, {subdoc, SheetMusicFile}) {
+  return parseAdditionalFilesEntries(SheetMusicFile, entries, {subdoc});
 }
 
 export function parseAdditionalNames(entries, {subdoc, AdditionalName}) {
@@ -1873,11 +1885,17 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
 
     ['lyricsData', [/* find */]],
 
+    ['midiProjectFileData', [/* find */]],
+
+    ['miscellaneousAdditionalFileData', [/* find */]],
+
     ['musicVideoData', [/* find */]],
 
     ['referencingSourceData', [/* find */]],
 
     ['seriesData', [/* find */]],
+
+    ['sheetMusicFileData', [/* find */]],
 
     ['trackData', [
       'artworkData',

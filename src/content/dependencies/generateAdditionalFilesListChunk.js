@@ -8,6 +8,9 @@ export default {
     links:
       file.filenames
         .map(filename => relation('linkAdditionalFile', file, filename)),
+
+    artistCredit:
+      relation('generateArtistCredit', file.artistContribs, []),
   }),
 
   data: (file) => ({
@@ -19,6 +22,11 @@ export default {
   }),
 
   slots: {
+    string: {
+      type: 'string',
+      default: 'miscellaneousAdditionalFiles',
+    },
+
     showFileSizes: {
       type: 'boolean',
     },
@@ -34,9 +42,29 @@ export default {
           [
             html.tag('summary',
               html.tag('span',
-                language.$(capsule, 'entry', {
-                  title:
-                    html.tag('b', data.title),
+                language.encapsulate(capsule, 'entry', workingCapsule => {
+                  const workingOptions = {};
+                  const entryCapsule = workingCapsule;
+
+                  const titlePart =
+                    (data.title
+                      ? language.sanitize(data.title)
+                      : language.$('releaseInfo', slots.string, 'entry.placeholderTitle'));
+
+                  workingOptions.title =
+                    html.tag('b', titlePart);
+
+                  relations.artistCredit.setSlots({
+                    normalStringKey:
+                      entryCapsule + '.credit',
+                  });
+
+                  if (!html.isBlank(relations.artistCredit)) {
+                    workingCapsule += '.withCredit';
+                    workingOptions.credit = relations.artistCredit;
+                  }
+
+                  return language.$(workingCapsule, workingOptions);
                 }))),
 
             html.tag('ul', [

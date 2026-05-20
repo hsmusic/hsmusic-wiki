@@ -235,6 +235,15 @@ export function getArtistNumContributions(artist) {
 
       artist.flashContributorContributions
         .filter(keep),
+
+      artist.miscellaneousAdditionalFileArtistContributions
+        .filter(keep),
+
+      artist.sheetMusicFileArtistContributions
+        .filter(keep),
+
+      artist.midiProjectFileArtistContributions
+        .filter(keep),
     ],
     ({length}) => length);
 }

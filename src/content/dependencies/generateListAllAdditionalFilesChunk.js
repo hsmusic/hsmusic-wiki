@@ -6,6 +6,11 @@ export default {
       additionalFiles
         .map(file => file.filenames
           .map(filename => relation('linkAdditionalFile', file, filename))),
+
+    artistCredits:
+      additionalFiles
+        .map(file =>
+          relation('generateArtistCredit', file.artistContribs, [])),
   }),
 
   data: (additionalFiles) => ({
@@ -42,55 +47,76 @@ export default {
 
             stitchArrays({
               title: data.titles,
+              artistCredit: relations.artistCredits,
               links: relations.links,
               filenames: data.filenames,
             }).map(({
                 title,
+                artistCredit,
                 links,
                 filenames,
               }) =>
-                language.encapsulate(pageCapsule, 'file', capsule =>
-                  (links.length === 1
-                    ? html.tag('li',
-                        links[0].slots({
-                          content:
-                            language.$(capsule, {
-                              title: title,
-                            }),
-                        }))
+                language.encapsulate(pageCapsule, 'file', capsule => {
+                  const titleLine =
+                    language.encapsulate(capsule, workingCapsule => {
+                      const workingOptions = {};
 
-                 : links.length === 0
-                    ? html.tag('li',
-                        language.$(capsule, 'withNoFiles', {
-                          title: title,
-                        }))
+                      const titlePart =
+                        (title
+                          ? language.sanitize(title)
+                          : language.$(capsule, 'placeholderTitle'));
 
-                    : html.tag('li', {class: 'has-details'},
-                        html.tag('details', [
-                          html.tag('summary',
-                            html.tag('span',
-                              language.$(capsule, 'withMultipleFiles', {
-                                title:
-                                  html.tag('b', title),
+                      workingOptions.title =
+                        (links.length <= 1
+                          ? links[0].slot('content', titlePart)
+                          : html.tag('b', titlePart));
 
-                                files:
-                                  language.countAdditionalFiles(
-                                    links.length,
-                                    {unit: true}),
-                              }))),
+                      artistCredit.setSlots({
+                        normalStringKey: capsule + '.credit',
+                      });
 
-                          html.tag('ul',
-                            stitchArrays({
-                              link: links,
-                              filename: filenames,
-                            }).map(({link, filename}) =>
-                                html.tag('li',
-                                  link.slots({
-                                    content:
-                                      language.$(capsule, {
-                                        title: filename,
-                                      }),
-                                  })))),
-                        ]))))))),
+                      if (!html.isBlank(artistCredit)) {
+                        workingCapsule += '.withCredit';
+                        workingOptions.credit = artistCredit;
+                      }
+
+                      if (links.length === 0) {
+                        workingCapsule += '.withNoFiles';
+                      } else if (links.length >= 2) {
+                        workingCapsule += '.withMultipleFiles';
+                        workingOptions.files =
+                          language.countFiles(links.length, {unit: true});
+                      }
+
+                      return language.$(workingCapsule, workingOptions);
+                    });
+
+                  if (links.length <= 1) {
+                    return html.tag('li', titleLine);
+                  }
+
+                  const summary =
+                    html.tag('summary',
+                      html.tag('span', titleLine));
+
+                  const list =
+                    html.tag('ul',
+                      stitchArrays({
+                        link: links,
+                        filename: filenames,
+                      }).map(({link, filename}) =>
+                          html.tag('li',
+                            link.slots({
+                              content:
+                                language.$(capsule, {
+                                  title: filename,
+                                }),
+                            }))));
+
+                    return (
+                      html.tag('li', {class: 'has-details'},
+                        html.tag('details', [summary, list]))
+                    );
+                  })))),
       ])),
 };

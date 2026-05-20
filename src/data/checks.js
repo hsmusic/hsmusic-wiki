@@ -248,6 +248,10 @@ export function filterReferenceErrors(wikiData, {
   find,
   bindFind,
 }) {
+  const additionalFileShape = {
+    artistContribs: '_contrib',
+  };
+
   const referenceSpec = [
     ['albumData', {
       artistContribs: '_contrib',
@@ -295,6 +299,9 @@ export function filterReferenceErrors(wikiData, {
       featuredTracks: 'track',
     }],
 
+    ['midiProjectFileData', additionalFileShape],
+    ['miscellaneousAdditionalFileData', additionalFileShape],
+
     ['musicVideoData', {
       artistContribs: '_contrib',
       contributorContribs: '_contrib',
@@ -303,6 +310,8 @@ export function filterReferenceErrors(wikiData, {
     ['seriesData', {
       albums: 'album',
     }],
+
+    ['sheetMusicFileData', additionalFileShape],
 
     ['trackData', {
       artistContribs: '_contrib',

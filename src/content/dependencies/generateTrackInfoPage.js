@@ -122,7 +122,7 @@ export default {
     midiProjectFilesList:
       relation('generateAdditionalFilesList', track.midiProjectFiles),
 
-    additionalFilesList:
+    miscellaneousAdditionalFilesList:
       relation('generateAdditionalFilesList', track.additionalFiles),
 
     artistCommentarySection:
@@ -219,12 +219,12 @@ export default {
                         language.$(capsule, 'link')),
                   })),
 
-              !html.isBlank(relations.additionalFilesList) &&
-                language.encapsulate(capsule, 'additionalFiles.shortcut', capsule =>
+              !html.isBlank(relations.miscellaneousAdditionalFilesList) &&
+                language.encapsulate(capsule, 'miscellaneousAdditionalFiles.shortcut', capsule =>
                   language.$(capsule, {
                     link:
                       html.tag('a',
-                        {href: '#midi-project-files'},
+                        {href: '#additional-files'},
                         language.$(capsule, 'link')),
                   })),
 
@@ -346,7 +346,9 @@ export default {
               title: language.$('releaseInfo.sheetMusicFiles.heading'),
             }),
 
-            relations.sheetMusicFilesList,
+            relations.sheetMusicFilesList.slots({
+              string: 'sheetMusicFiles',
+            }),
           ]),
 
           html.tags([
@@ -355,16 +357,20 @@ export default {
               title: language.$('releaseInfo.midiProjectFiles.heading'),
             }),
 
-            relations.midiProjectFilesList,
+            relations.midiProjectFilesList.slots({
+              string: 'midiProjectFiles',
+            }),
           ]),
 
           html.tags([
             relations.contentHeading.clone().slots({
               attributes: {id: 'additional-files'},
-              title: language.$('releaseInfo.additionalFiles.heading'),
+              title: language.$('releaseInfo.miscellaneousAdditionalFiles.heading'),
             }),
 
-            relations.additionalFilesList,
+            relations.miscellaneousAdditionalFilesList.slots({
+              string: 'miscellaneousAdditionalFiles',
+            }),
           ]),
 
           relations.artistCommentarySection,

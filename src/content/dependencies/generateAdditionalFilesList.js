@@ -6,6 +6,7 @@ export default {
   }),
 
   slots: {
+    string: {type: 'string', default: 'miscellaneousAdditionalFiles'},
     showFileSizes: {type: 'boolean', default: true},
   },
 
@@ -14,6 +15,7 @@ export default {
       {[html.onlyIfContent]: true},
 
       relations.chunks.map(chunk => chunk.slots({
+        string: slots.string,
         showFileSizes: slots.showFileSizes,
       }))),
 };

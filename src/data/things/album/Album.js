@@ -852,12 +852,21 @@ export class Album extends Thing {
     ],
   };
 
-  getOwnAdditionalFilePath(_file, filename) {
-    return [
-      'media.albumAdditionalFile',
-      this.directory,
-      filename,
-    ];
+  getOwnAdditionalFilePath(file, filename) {
+    if (file.folder) {
+      return [
+        'media.albumAdditionalFileInFolder',
+        this.directory,
+        file.folder,
+        filename,
+      ];
+    } else {
+      return [
+        'media.albumAdditionalFile',
+        this.directory,
+        filename,
+      ];
+    }
   }
 
   getOwnArtworkPath(artwork) {

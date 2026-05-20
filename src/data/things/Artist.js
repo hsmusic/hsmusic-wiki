@@ -273,6 +273,18 @@ export class Artist extends Thing {
       exposeDependency('#otherArtistContributions'),
     ],
 
+    miscellaneousAdditionalFileArtistContributions: reverseReferenceList({
+      reverse: soupyReverse.input('miscellaneousAdditionalFileArtistContributionsBy'),
+    }),
+
+    sheetMusicFileArtistContributions: reverseReferenceList({
+      reverse: soupyReverse.input('sheetMusicFileArtistContributionsBy'),
+    }),
+
+    midiProjectFileArtistContributions: reverseReferenceList({
+      reverse: soupyReverse.input('midiProjectFileArtistContributionsBy'),
+    }),
+
     totalDuration: [
       withPropertyFromList('musicContributions', V('thing')),
       withPropertyFromList('#musicContributions.thing', V('isMainRelease')),

@@ -955,6 +955,7 @@ export class Language extends Thing {
 const countHelper = (stringKey, optionName = stringKey) =>
   function(value, {
     unit = false,
+    unitOnly = false,
     blankIfZero = false,
   } = {}) {
     // Null or undefined value is blank content.
@@ -967,22 +968,30 @@ const countHelper = (stringKey, optionName = stringKey) =>
       return html.blank();
     }
 
-    return this.formatString(
-      unit
+    const string =
+      (unitOnly
+        ? `count.${stringKey}.unitOnly.` + this.getUnitForm(value)
+     : unit
         ? `count.${stringKey}.withUnit.` + this.getUnitForm(value)
-        : `count.${stringKey}`,
-      {[optionName]: this.formatNumber(value)});
+        : `count.${stringKey}`);
+
+    const options =
+      (unitOnly
+        ? {}
+        : {[optionName]: this.formatNumber(value)});
+
+    return this.formatString(string, options);
   };
 
 // TODO: These are hard-coded. Is there a better way?
 Object.assign(Language.prototype, {
-  countAdditionalFiles: countHelper('additionalFiles', 'files'),
   countAlbums: countHelper('albums'),
   countArtTags: countHelper('artTags', 'tags'),
   countArtworks: countHelper('artworks'),
   countCommentaryEntries: countHelper('commentaryEntries', 'entries'),
   countContributions: countHelper('contributions'),
   countDays: countHelper('days'),
+  countFiles: countHelper('files'),
   countFlashes: countHelper('flashes'),
   countMonths: countHelper('months'),
   countTimesFeatured: countHelper('timesFeatured'),

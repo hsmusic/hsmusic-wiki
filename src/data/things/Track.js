@@ -37,8 +37,10 @@ import {
   parseDimensions,
   parseDuration,
   parseLyrics,
+  parseMidiProjectFiles,
   parseMusicVideos,
   parseReferencingSources,
+  parseSheetMusicFiles,
   parseURLs,
 } from '#yaml';
 
@@ -1123,12 +1125,12 @@ export class Track extends Thing {
 
       'Sheet Music Files': {
         property: 'sheetMusicFiles',
-        transform: parseAdditionalFiles,
+        transform: parseSheetMusicFiles,
       },
 
       'MIDI Project Files': {
         property: 'midiProjectFiles',
-        transform: parseAdditionalFiles,
+        transform: parseMidiProjectFiles,
       },
 
       // Content entries
@@ -1369,14 +1371,10 @@ export class Track extends Thing {
     },
   };
 
-  getOwnAdditionalFilePath(_file, filename) {
+  getOwnAdditionalFilePath(file, filename) {
     if (!this.album) return null;
 
-    return [
-      'media.albumAdditionalFile',
-      this.album.directory,
-      filename,
-    ];
+    return this.album.getOwnAdditionalFilePath(file, filename);
   }
 
   getOwnArtworkPath(artwork) {
