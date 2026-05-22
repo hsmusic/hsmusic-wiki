@@ -106,10 +106,10 @@ export default {
 
             language.encapsulate('releaseInfo', capsule => [
               !html.isBlank(relations.additionalFilesList) &&
-                language.$(capsule, 'additionalFiles.shortcut', {
+                language.$(capsule, 'miscellaneousAdditionalFiles.shortcut', {
                   link: html.tag('a',
                     {href: '#additional-files'},
-                    language.$(capsule, 'additionalFiles.shortcut.link')),
+                    language.$(capsule, 'miscellaneousAdditionalFiles.shortcut.link')),
                 }),
 
               (relations.galleryLink && relations.commentaryLink
@@ -169,16 +169,14 @@ export default {
           !html.isBlank(relations.artistCommentaryEntries) &&
             html.tag('hr', {class: 'main-separator'}),
 
-          language.encapsulate('releaseInfo.additionalFiles', capsule =>
-            html.tags([
-              relations.contentHeading.clone()
-                .slots({
-                  attributes: {id: 'additional-files'},
-                  title: language.$(capsule, 'heading'),
-                }),
+          html.tags([
+            relations.contentHeading.clone().slots({
+              attributes: {id: 'additional-files'},
+              title: language.$('releaseInfo.miscellaneousAdditionalFiles.heading'),
+            }),
 
-              relations.additionalFilesList,
-            ])),
+            relations.additionalFilesList,
+          ]),
 
           html.tags([
             relations.commentaryContentHeading,
