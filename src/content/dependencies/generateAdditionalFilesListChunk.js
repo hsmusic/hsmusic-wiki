@@ -1,7 +1,23 @@
-import {stitchArrays} from '#sugar';
+import {compareArrays, stitchArrays} from '#sugar';
 
 export default {
-  relations: (relation, file) => ({
+  query: (file) => ({
+    contextContribs:
+      ((file.thing.isTrack &&
+        compareArrays(
+          file.thing.artistContribs.map(contrib => contrib.artist),
+          file.thing.album.artistContribs.map(contrib => contrib.artist),
+          {checkOrder: false}))
+
+        ? file.thing.artistContribs
+
+     : file.thing.isAlbum
+        ? file.thing.artistContribs
+
+        : []),
+  }),
+
+  relations: (relation, query, file) => ({
     description:
       relation('transformContent', file.description),
 
@@ -10,10 +26,10 @@ export default {
         .map(filename => relation('linkAdditionalFile', file, filename)),
 
     artistCredit:
-      relation('generateArtistCredit', file.artistContribs, []),
+      relation('generateArtistCredit', file.artistContribs, query.contextContribs),
   }),
 
-  data: (file) => ({
+  data: (_query, file) => ({
     title:
       file.title,
 
