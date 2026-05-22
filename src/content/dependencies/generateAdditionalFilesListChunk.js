@@ -1,21 +1,46 @@
 import {compareArrays, stitchArrays} from '#sugar';
 
 export default {
-  query: (file) => ({
-    contextContribs:
-      ((file.thing.isTrack &&
-        compareArrays(
-          file.thing.artistContribs.map(contrib => contrib.artist),
-          file.thing.album.artistContribs.map(contrib => contrib.artist),
-          {checkOrder: false}))
+  query(file) {
+    const query = {};
 
-        ? file.thing.artistContribs
-
+    const album =
+      (file.thing.isTrack
+        ? file.thing.album
      : file.thing.isAlbum
-        ? file.thing.artistContribs
+        ? file.thing
+        : []);
 
-        : []),
-  }),
+    // Consider all presented additional file lists, not just ones
+    // of the same type as this chunk/list.
+    const nearbyAdditionalFiles =
+      (album
+        ? [...album.additionalFiles,
+           ...album.tracks.flatMap(track => [
+              ...track.additionalFiles,
+              ...track.sheetMusicFiles,
+              ...track.midiProjectFiles,
+            ])]
+        : []);
+
+    const contribsMatch = (a, b) =>
+      compareArrays(
+        a.artistContribs.map(contrib => contrib.artist),
+        b.artistContribs.map(contrib => contrib.artist),
+        {checkOrder: false});
+
+    if (
+      nearbyAdditionalFiles.every(x => contribsMatch(x, file)) &&
+      nearbyAdditionalFiles.every(x => contribsMatch(x, x.thing)) &&
+      nearbyAdditionalFiles.every(x => contribsMatch(x, album))
+    ) {
+      query.contextContribs = file.thing.artistContribs;
+    } else {
+      query.contextContribs = [];
+    }
+
+    return query;
+  },
 
   relations: (relation, query, file) => ({
     description:
