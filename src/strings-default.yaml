@@ -48,14 +48,6 @@ count:
       many: ""
       other: "{ALBUMS} albums"
 
-    unitOnly:
-      zero: ""
-      one: "album"
-      two: ""
-      few: ""
-      many: ""
-      other: "albums"
-
   artTags:
     _: "{TAGS}"
 
@@ -66,14 +58,6 @@ count:
       few: ""
       many: ""
       other: "{TAGS} tags"
-
-    unitOnly:
-      zero: ""
-      one: "tag"
-      two: ""
-      few: ""
-      many: ""
-      other: "tags"
 
   artworks:
     _: "{ARTWORKS}"
@@ -86,14 +70,6 @@ count:
       many: ""
       other: "{ARTWORKS} artworks"
 
-    unitOnly:
-      zero: ""
-      one: "artwork"
-      two: ""
-      few: ""
-      many: ""
-      other: "artworks"
-
   commentaryEntries:
     _: "{ENTRIES}"
 
@@ -104,14 +80,6 @@ count:
       few: ""
       many: ""
       other: "{ENTRIES} entries"
-
-    unitOnly:
-      zero: ""
-      one: "entry"
-      two: ""
-      few: ""
-      many: ""
-      other: "entries"
 
   contributions:
     _: "{CONTRIBUTIONS}"
@@ -124,14 +92,6 @@ count:
       many: ""
       other: "{CONTRIBUTIONS} contributions"
 
-    unitOnly:
-      zero: ""
-      one: "contribution"
-      two: ""
-      few: ""
-      many: ""
-      other: "contributions"
-
   files:
     _: "{FILES}"
 
@@ -142,14 +102,6 @@ count:
       few: ""
       many: ""
       other: "{FILES} files"
-
-    unitOnly:
-      zero: ""
-      one: "file"
-      two: ""
-      few: ""
-      many: ""
-      other: "files"
 
   flashes:
     _: "{FLASHES}"
@@ -162,14 +114,6 @@ count:
       many: ""
       other: "{FLASHES} flashes"
 
-    unitOnly:
-      zero: ""
-      one: "flash"
-      two: ""
-      few: ""
-      many: ""
-      other: "flashes"
-
   tracks:
     _: "{TRACKS}"
 
@@ -180,14 +124,6 @@ count:
       few: ""
       many: ""
       other: "{TRACKS} tracks"
-
-    unitOnly:
-      zero: ""
-      one: "track"
-      two: ""
-      few: ""
-      many: ""
-      other: "tracks"
 
   # Count more abstract stuff
 
@@ -202,14 +138,6 @@ count:
       many: ""
       other: "{DAYS} days"
 
-    unitOnly:
-      zero: ""
-      one: "day"
-      two: ""
-      few: ""
-      many: ""
-      other: "days"
-
   months:
     _: "{MONTHS}"
 
@@ -220,14 +148,6 @@ count:
       few: ""
       many: ""
       other: "{MONTHS} months"
-
-    unitOnly:
-      zero: ""
-      one: "month"
-      two: ""
-      few: ""
-      many: ""
-      other: "months"
 
   timesFeatured:
     _: "{TIMES_FEATURED}"
@@ -240,14 +160,6 @@ count:
       many: ""
       other: "featured {TIMES_FEATURED} times"
 
-    unitOnly:
-      zero: ""
-      one: "time featured"
-      two: ""
-      few: ""
-      many: ""
-      other: "times featured"
-
   timesReferenced:
     _: "{TIMES_REFERENCED}"
 
@@ -258,14 +170,6 @@ count:
       few: ""
       many: ""
       other: "{TIMES_REFERENCED} times referenced"
-
-    unitOnly:
-      zero: ""
-      one: "time referenced"
-      two: ""
-      few: ""
-      many: ""
-      other: "times referenced"
 
   timesUsed:
     _: "{TIMES_USED}"
@@ -278,14 +182,6 @@ count:
       many: ""
       other: "used {TIMES_USED} times"
 
-    unitOnly:
-      zero: ""
-      one: "time used"
-      two: ""
-      few: ""
-      many: ""
-      other: "times used"
-
   weeks:
     _: "{WEEKS}"
 
@@ -296,14 +192,6 @@ count:
       few: ""
       many: ""
       other: "{WEEKS} weeks"
-
-    unitOnly:
-      zero: ""
-      one: "week"
-      two: ""
-      few: ""
-      many: ""
-      other: "weeks"
 
   words:
     _: "{WORDS}"
@@ -317,14 +205,6 @@ count:
       many: ""
       other: "{WORDS} words"
 
-    unitOnly:
-      zero: ""
-      one: "word"
-      two: ""
-      few: ""
-      many: ""
-      other: "words"
-
   years:
     _: "{YEARS}"
 
@@ -335,14 +215,6 @@ count:
       few: ""
       many: ""
       other: "{YEARS} years"
-
-    unitOnly:
-      zero: ""
-      one: "year"
-      two: ""
-      few: ""
-      many: ""
-      other: "years"
 
   # Numerical things that aren't exactly counting, per se
 

@@ -955,7 +955,6 @@ export class Language extends Thing {
 const countHelper = (stringKey, optionName = stringKey) =>
   function(value, {
     unit = false,
-    unitOnly = false,
     blankIfZero = false,
   } = {}) {
     // Null or undefined value is blank content.
@@ -969,16 +968,11 @@ const countHelper = (stringKey, optionName = stringKey) =>
     }
 
     const string =
-      (unitOnly
-        ? `count.${stringKey}.unitOnly.` + this.getUnitForm(value)
-     : unit
+      (unit
         ? `count.${stringKey}.withUnit.` + this.getUnitForm(value)
         : `count.${stringKey}`);
 
-    const options =
-      (unitOnly
-        ? {}
-        : {[optionName]: this.formatNumber(value)});
+    const options = {[optionName]: this.formatNumber(value)};
 
     return this.formatString(string, options);
   };
