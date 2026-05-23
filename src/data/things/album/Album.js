@@ -77,7 +77,6 @@ export class Album extends Thing {
   ];
 
   static [Thing.getPropertyDescriptors] = ({
-    AdditionalFile,
     AdditionalName,
     AlbumArtistContribution,
     AlbumBannerArtistContribution,
@@ -87,6 +86,7 @@ export class Album extends Thing {
     CommentaryEntry,
     CreditingSourcesEntry,
     Group,
+    MiscellaneousAdditionalFile,
     MusicVideo,
     TrackArtistContribution,
     TrackSection,
@@ -394,7 +394,7 @@ export class Album extends Thing {
 
     // > Update & expose - Additional files
 
-    additionalFiles: thingList(V(AdditionalFile)),
+    additionalFiles: thingList(V(MiscellaneousAdditionalFile)),
 
     // > Update only
 

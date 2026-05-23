@@ -115,7 +115,6 @@ export class Track extends Thing {
   ];
 
   static [Thing.getPropertyDescriptors] = ({
-    AdditionalFile,
     AdditionalName,
     Album,
     ArtTag,
@@ -123,8 +122,11 @@ export class Track extends Thing {
     CommentaryEntry,
     CreditingSourcesEntry,
     LyricsEntry,
+    MidiProjectFile,
+    MiscellaneousAdditionalFile,
     MusicVideo,
     ReferencingSourcesEntry,
+    SheetMusicFile,
     TrackArtistContribution,
     TrackSection,
     WikiInfo,
@@ -555,9 +557,9 @@ export class Track extends Thing {
 
     // > Update & expose - Additional files
 
-    additionalFiles: thingList(V(AdditionalFile)),
-    sheetMusicFiles: thingList(V(AdditionalFile)),
-    midiProjectFiles: thingList(V(AdditionalFile)),
+    additionalFiles: thingList(V(MiscellaneousAdditionalFile)),
+    sheetMusicFiles: thingList(V(SheetMusicFile)),
+    midiProjectFiles: thingList(V(MidiProjectFile)),
 
     // > Update & expose - Content entries
 
