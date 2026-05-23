@@ -1,7 +1,7 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  relations: (relation, query, file) => ({
+  relations: (relation, file) => ({
     description:
       relation('transformContent', file.description),
 
@@ -13,7 +13,7 @@ export default {
       relation('generateArtistCredit', file.artistContribs, []),
   }),
 
-  data: (_query, file) => ({
+  data: (file) => ({
     title:
       file.title,
 
