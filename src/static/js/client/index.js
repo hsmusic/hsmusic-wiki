@@ -22,7 +22,6 @@ import * as revealAllGridControlModule from './reveal-all-grid-control.js';
 import * as scriptedLinkModule from './scripted-link.js';
 import * as sidebarSearchModule from './sidebar-search.js';
 import * as stickyHeadingModule from './sticky-heading.js';
-import * as summaryNestedLinkModule from './summary-nested-link.js';
 import * as textWithTooltipModule from './text-with-tooltip.js';
 import * as wikiSearchModule from './wiki-search.js';
 
@@ -49,7 +48,6 @@ export const modules = [
   scriptedLinkModule,
   sidebarSearchModule,
   stickyHeadingModule,
-  summaryNestedLinkModule,
   textWithTooltipModule,
   wikiSearchModule,
 ];

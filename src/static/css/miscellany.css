@@ -487,26 +487,18 @@
 }
 
 @layer interaction {
-  summary > span:hover {
+  summary > span:hover:not(:has(.has-visible-tooltip, .hoverable:hover)) {
     cursor: pointer;
     text-decoration: underline;
     text-decoration-color: var(--primary-color);
-  }
 
-  summary > span:hover a {
-    text-decoration: none !important;
-  }
+    a:not(:hover) {
+      text-decoration: none !important;
+    }
 
-  summary > span:hover:has(a:hover),
-  summary > span:hover:has(a.nested-hover),
-  summary.has-nested-hover > span {
-    text-decoration: none !important;
-  }
-
-  summary > span:hover:has(a:hover) a:hover,
-  summary > span:hover:has(a.nested-hover) a:hover,
-  summary.has-nested-hover > span a:hover {
-    text-decoration: underline !important;
+    &:has(a:hover) {
+      text-decoration: none !important;
+    }
   }
 
   summary.underline-white > span:hover {
