@@ -3,7 +3,15 @@ function getName(thing) {
     return null;
   }
 
-  if (thing.isArtwork || thing.isMusicVideo) {
+  if (thing.isAdditionalFile) {
+    return thing.thing.name;
+  }
+
+  if (thing.isArtwork) {
+    return thing.thing.name;
+  }
+
+  if (thing.isMusicVideo) {
     return thing.thing.name;
   }
 

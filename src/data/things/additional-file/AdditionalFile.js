@@ -6,8 +6,9 @@ import Thing from '#thing';
 import {isString, validateArrayItems} from '#validators';
 import {parseContributors} from '#yaml';
 
-import {exposeConstant, exposeUpdateValueOrContinue}
+import {exposeConstant, exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
+import {withPropertyFromObject} from '#composite/data';
 import {contributionList, contentString, simpleString, soupyFind, thing}
   from '#composite/wiki-properties';
 
@@ -46,13 +47,10 @@ export class AdditionalFile extends Thing {
 
     isAdditionalFile: exposeConstant(V(true)),
 
-    // The date property is generally expected by contributions.
-    // Additional files don't actually support dates, but provide a null
-    // value for convenience.
-    date: {
-      flags: {expose: true},
-      expose: {compute: () => null},
-    },
+    date: [
+      withPropertyFromObject('thing', V('date')),
+      exposeDependency('#thing.date'),
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {

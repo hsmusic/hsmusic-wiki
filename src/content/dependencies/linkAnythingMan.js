@@ -11,6 +11,8 @@ export default {
         ? relation('linkTrack', thing)
      : thing.isMusicVideo
         ? relation('linkAnythingMan', thing.thing)
+     : thing.isAdditionalFile
+        ? relation('linkAnythingMan', thing.thing)
         : null),
   }),
 

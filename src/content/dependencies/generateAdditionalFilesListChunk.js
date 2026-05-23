@@ -98,6 +98,14 @@ export default {
                   relations.artistCredit.setSlots({
                     normalStringKey:
                       entryCapsule + '.credit',
+
+                    showAnnotation: true,
+                    showExternalLinks: true,
+                    showChronology: true,
+
+                    chronologyKind:
+                      // Sorry, lol
+                      slots.string.replace(/s$/, ''),
                   });
 
                   if (!html.isBlank(relations.artistCredit)) {
