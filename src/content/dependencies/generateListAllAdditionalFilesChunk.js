@@ -114,7 +114,7 @@ export default {
                             }))));
 
                     return (
-                      html.tag('li', {class: 'has-details'},
+                      html.tag('li',
                         html.tag('details', [summary, list]))
                     );
                   })))),

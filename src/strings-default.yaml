@@ -1797,66 +1797,69 @@ artistPage:
 
       track.miscellaneousAdditionalFile:
         _: >-
-          {TRACK}
-
-        withTitle: >-
-          {TRACK} — {TITLE}
+          {TITLE}: {TRACK}
 
         withCredit: >-
-          {TRACK}: {CREDIT}
+          {TITLE} ({CREDIT}): {TRACK}
 
-        withCredit.withTitle: >-
-          {TRACK}: {TITLE} {CREDIT}
+        withMultipleFiles: >-
+          {TITLE}: {TRACK} ({FILES})
 
-        credit: >-
-          files by {ARTISTS}
+        withNoFiles: >-
+          {TITLE}: {TRACK} (no files)
 
-        credit.standaloneWithFiles: >-
-          {FILES} by {ARTISTS}
+        withCredit.withMultipleFiles: >-
+          {TITLE} ({CREDIT}): {TRACK} ({FILES})
 
-        credit.alongsideTitle: >-
-          by {ARTISTS}
+        withCredit.withNoFiles: >-
+          {TITLE} ({CREDIT}): {TRACK} (no files)
+
+        placeholderTitle: "Additional file"
+        credit: "by {ARTISTS}"
 
       track.sheetMusicFile:
         _: >-
-          {TRACK}
-
-        withTitle: >-
-          {TRACK} — {TITLE}
+          {TITLE}: {TRACK}
 
         withCredit: >-
-          {TRACK}: {CREDIT}
+          {TITLE} ({CREDIT}): {TRACK}
 
-        withCredit.withTitle: >-
-          {TRACK}: {TITLE} {CREDIT}
+        withMultipleFiles: >-
+          {TITLE}: {TRACK} ({FILES})
 
-        credit: >-
-          sheet music by {ARTISTS}
+        withNoFiles: >-
+          {TITLE}: {TRACK} (no files)
 
-        credit.alongsideTitle: >-
-          by {ARTISTS}
+        withCredit.withMultipleFiles: >-
+          {TITLE} ({CREDIT}): {TRACK} ({FILES})
+
+        withCredit.withNoFiles: >-
+          {TITLE} ({CREDIT}): {TRACK} (no files)
+
+        placeholderTitle: "Sheet music"
+        credit: "by {ARTISTS}"
 
       track.midiProjectFile:
         _: >-
-          {TRACK}
-
-        withTitle: >-
-          {TRACK} — {TITLE}
+          {TITLE}: {TRACK}
 
         withCredit: >-
-          {TRACK}: {CREDIT}
+          {TITLE} ({CREDIT}): {TRACK}
 
-        withCredit.withTitle: >-
-          {TRACK}: {TITLE} {CREDIT}
+        withMultipleFiles: >-
+          {TITLE}: {TRACK} ({FILES})
 
-        credit: >-
-          files by {ARTISTS}
+        withNoFiles: >-
+          {TITLE}: {TRACK} (no files)
 
-        credit.standaloneWithFiles: >-
-          {FILES} by {ARTISTS}
+        withCredit.withMultipleFiles: >-
+          {TITLE} ({CREDIT}): {TRACK} ({FILES})
 
-        credit.alongsideTitle: >-
-          by {ARTISTS}
+        withCredit.withNoFiles: >-
+          {TITLE} ({CREDIT}): {TRACK} (no files)
+
+        placeholderTitle: "MIDI or project music"
+        credit: "by {ARTISTS}"
 
       # album:
       #   The artist info page doesn't display if the artist is

@@ -103,8 +103,7 @@
     line-height: 1.1;
   }
 
-  /* "has-details" means a "has a <details> element" here. */
-  ul > li.has-details {
+  ul > li:has(> details) {
     list-style-type: none;
     margin-left: -17px;
   }

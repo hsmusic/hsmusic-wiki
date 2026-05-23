@@ -1,3 +1,5 @@
+import {stitchArrays} from '#sugar';
+
 export default {
   query(_artist, contribs) {
     const query = {};
@@ -27,6 +29,11 @@ export default {
       relation('generateArtistCredit',
         query.additionalFile.artistContribs,
         [artist.mockSimpleContribution]),
+
+    fileLinks:
+      query.additionalFile.filenames
+        .map(filename =>
+          relation('linkAdditionalFile', query.additionalFile, filename)),
   }),
 
   data: (query, _artist, contribs) => ({
@@ -38,8 +45,8 @@ export default {
     title:
       query.additionalFile.title,
 
-    files:
-      query.additionalFile.filenames.length,
+    filenames:
+      query.additionalFile.filenames,
 
     contribAnnotationParts:
       contribs.flatMap(contrib => contrib.annotationParts),
@@ -57,59 +64,75 @@ export default {
     },
   },
 
-  generate: (data, relations, slots, {html, language}) =>
-    relations.template.slots({
+  generate(data, relations, slots, {html, language}) {
+    const numFiles = data.filenames.length;
+    const capsule =
+      language.encapsulate(
+        'artistPage.creditList.entry', data.for, slots.string);
+
+    relations.template.setSlots({
       annotation:
-        (data.contribAnnotationParts
-          ? language.formatUnitList(data.contribAnnotationParts)
-          : html.blank()),
+        language.formatUnitList(data.contribAnnotationParts),
+    });
 
-      content:
-        language.encapsulate('artistPage.creditList.entry', entryCapsule => {
-          let workingCapsule = entryCapsule;
-          let workingOptions = {};
+    const titleLine =
+      language.encapsulate(capsule, workingCapsule => {
+        const workingOptions = {};
 
-          workingCapsule += '.' + data.for + '.' + slots.string;
+        const titlePart =
+          (data.title
+            ? language.sanitize(data.title)
+            : language.$(capsule, 'placeholderTitle'));
 
-          const additionalFileCapsule = workingCapsule;
+        workingOptions.title =
+          (numFiles <= 1
+            ? relations.fileLinks[0].slot('content', titlePart)
+            : html.tag('b', titlePart));
 
-          if (data.for === 'track') {
-            workingOptions.track =
-              relations.trackLink;
-          }
+        if (data.for === 'track') {
+          workingOptions.track = relations.trackLink;
+        }
 
-          if (data.title) {
-            relations.artistCredit.setSlots({
-              normalStringKey:
-                additionalFileCapsule + '.credit.alongsideTitle',
-            });
-          } else if (data.files && !slots.disableStandaloneWithFiles) {
-            relations.artistCredit.setSlots({
-              normalStringKey:
-                additionalFileCapsule + '.credit.standaloneWithFiles',
+        relations.artistCredit.setSlots({
+          normalStringKey: capsule + '.credit',
+        });
 
-              additionalStringOptions: {
-                files: language.countFiles(data.files, {unitOnly: true}),
-              },
-            });
-          } else {
-            relations.artistCredit.setSlots({
-              normalStringKey:
-                additionalFileCapsule + '.credit',
-            });
-          }
+        if (!html.isBlank(relations.artistCredit)) {
+          workingCapsule += '.withCredit';
+          workingOptions.credit = relations.artistCredit;
+        }
 
-          if (!html.isBlank(relations.artistCredit)) {
-            workingCapsule += '.withCredit';
-            workingOptions.credit = relations.artistCredit;
-          }
+        if (numFiles === 0) {
+          workingCapsule += '.withNoFiles';
+        } else if (numFiles >= 2) {
+          workingCapsule += '.withMultipleFiles';
+          workingOptions.files =
+            language.countFiles(numFiles, {unit: true});
+        }
 
-          if (data.title) {
-            workingCapsule += '.withTitle';
-            workingOptions.title = language.sanitize(data.title);
-          }
+        return language.$(workingCapsule, workingOptions);
+      });
 
-          return language.$(workingCapsule, workingOptions);
-        }),
-    }),
+    if (relations.fileLinks.length <= 1) {
+      relations.template.setSlot('content', titleLine);
+    } else {
+      const summary =
+        html.tag('summary',
+          html.tag('span', titleLine));
+
+      const list =
+        html.tag('ul',
+          stitchArrays({
+            link: relations.fileLinks,
+            filename: data.filenames,
+          }).map(({link, filename}) =>
+              html.tag('li',
+                link.slot('content', language.sanitize(filename)))));
+
+      const details = html.tag('details', [summary, list]);
+      relations.template.setSlot('content', details);
+    }
+
+    return relations.template;
+  },
 };
