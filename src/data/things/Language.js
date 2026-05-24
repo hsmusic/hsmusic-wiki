@@ -803,11 +803,16 @@ export class Language extends Thing {
   }
 
   #formatListHelper(array, processFn) {
+    // Empty lists, null, and undefined are blank content.
+    if (empty(array) || array === null || array === undefined) {
+      return html.blank();
+    }
+
     // Blank items aren't for display.
     array = array.filter(item => !html.isBlank(item));
 
-    // Empty lists, null, and undefined are blank content.
-    if (empty(array) || array === null || array === undefined) {
+    // Empty lists are blank content.  (2, The Sequel)
+    if (empty(array)) {
       return html.blank();
     }
 
