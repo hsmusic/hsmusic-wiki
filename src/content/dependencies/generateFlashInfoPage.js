@@ -20,7 +20,10 @@ export default {
     query.urls = [];
 
     if (flash.page) {
-      query.urls.push(`https://homestuck.com/story/${flash.page}`);
+      query.urls.push({
+        url: `https://homestuck.com/story/${flash.page}`,
+        annotation: null,
+      });
     }
 
     if (!empty(flash.urls)) {
