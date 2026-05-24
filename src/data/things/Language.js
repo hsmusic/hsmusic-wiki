@@ -732,31 +732,49 @@ export class Language extends Thing {
       : duration;
   }
 
-  formatExternalLink(url, {
+  formatExternalLink(urlEntry, {
     style = 'platform',
     context = 'generic',
   } = {}) {
     // Null or undefined url is blank content.
-    if (url === null || url === undefined) {
+    if (urlEntry === null || urlEntry === undefined) {
       return html.blank();
+    }
+
+    // String means we're probably receiving a URL, not a URL entry.
+    // Just fill in blanks like from a mock/dummy entry.
+    if (typeof urlEntry === 'string') {
+      return this.formatExternalLink(
+        {
+          url: urlEntry,
+          annotation: null,
+        },
+        {style, context});
     }
 
     isExternalLinkContext(context);
 
     if (style === 'all') {
-      return getExternalLinkStringsFromDescriptors(url, externalLinkSpec, {
-        language: this,
-        context,
-      });
+      return getExternalLinkStringsFromDescriptors(
+        urlEntry,
+        externalLinkSpec,
+        {
+          language: this,
+          context,
+        });
     }
 
     isExternalLinkStyle(style);
 
     const result =
-      getExternalLinkStringOfStyleFromDescriptors(url, style, externalLinkSpec, {
-        language: this,
-        context,
-      });
+      getExternalLinkStringOfStyleFromDescriptors(
+        urlEntry,
+        style,
+        externalLinkSpec,
+        {
+          language: this,
+          context,
+        });
 
     // It's possible for there to not actually be any string available for the
     // given URL, style, and context, and we want this to be detectable via

@@ -465,13 +465,10 @@ export default {
                     {title:
                       language.encapsulate('misc.external.opensInNewTab', capsule =>
                         language.$(capsule, {
-                          link:
+                          platform:
                             language.formatExternalLink(link, {
                               style: 'platform',
                             }),
-
-                          annotation:
-                            language.$(capsule, 'annotation'),
                         }).toString())},
 
                     content);
