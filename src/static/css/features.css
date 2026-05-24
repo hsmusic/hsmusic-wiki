@@ -2272,7 +2272,7 @@
 
     box-shadow:
       0 2px 2px -1px #00000060,
-      0 4px 12px -4px #00000090;
+      0 8px 18px -5px #000000b0;
 
     -webkit-backdrop-filter: blur(4px);
             backdrop-filter: blur(4px);
