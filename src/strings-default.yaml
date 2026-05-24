@@ -365,7 +365,7 @@ releaseInfo:
 
   flashesThatFeature:
     _: "Flashes that feature {TRACK}:"
-    withoutName: "Flashes taht feature this track:"
+    withoutName: "Flashes that feature this track:"
     sticky: "Flashes that feature this track:"
 
   referencesArtworks: "References {ARTWORKS}."
@@ -408,7 +408,7 @@ releaseInfo:
     This wiki is excluding listening links for {TRACK}.
 
   listenOn.excludingLinks.notClearlyPublic: >-
-    !! string pending - "not clearly public" {TRACK} !!
+    This wiki is excluding listening links here, since it's not clear {TRACK} has been shared publicly.
 
   listenOn.excludingLinks.paidBonusTrack: >-
     On {ALBUM}, the bonus track {TRACK} is only available with the album purchase, so this wiki is excluding listening links here.
