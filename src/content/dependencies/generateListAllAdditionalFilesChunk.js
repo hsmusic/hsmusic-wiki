@@ -67,9 +67,9 @@ export default {
                           : language.$(capsule, 'placeholderTitle'));
 
                       workingOptions.title =
-                        (links.length <= 1
-                          ? links[0].slot('content', titlePart)
-                          : html.tag('b', titlePart));
+                        (links.length === 0 ? titlePart
+                       : links.length === 1 ? links[0].slot('content', titlePart)
+                                            : html.tag('b', titlePart));
 
                       artistCredit.setSlots({
                         normalStringKey: capsule + '.credit',
