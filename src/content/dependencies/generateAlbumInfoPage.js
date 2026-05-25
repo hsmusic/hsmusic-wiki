@@ -73,6 +73,9 @@ export default {
     name:
       album.name,
 
+    style:
+      album.style,
+
     color:
       album.color,
 
@@ -166,6 +169,8 @@ export default {
               date: language.formatDate(data.dateAddedToWiki),
             })),
 
+          data.style !== 'in-game vgm' &&
+          data.style !== 'meta' &&
           !html.isBlank(relations.artistCommentaryEntries) &&
             html.tag('hr', {class: 'main-separator'}),
 

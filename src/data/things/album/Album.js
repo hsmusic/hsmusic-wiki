@@ -4,6 +4,7 @@ import Thing from '#thing';
 
 import {
   is,
+  isBoolean,
   isContributionList,
   isDate,
   isExcludingURLsReason,
@@ -133,6 +134,7 @@ export class Album extends Thing {
           'album',
           'single',
           'meta',
+          'in-game vgm',
         ])),
       }),
 
@@ -188,7 +190,20 @@ export class Album extends Thing {
     isListedOnHomepage: flag(V(true)),
     isListedInGalleries: flag(V(true)),
 
-    hasTrackNumbers: flag(V(true)),
+    hasTrackNumbers: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      {
+        dependencies: ['style'],
+        compute: ({style}) =>
+          (style === 'in-game vgm'
+            ? false
+            : true),
+      },
+    ],
+
     showAlbumInTracksWithoutArtists: flag(V(false)),
     showTrackSectionInNavBar: flag(V(false)),
     showArtistsInTrackList: flag(V(true)),
