@@ -47,7 +47,7 @@ export default {
           ? 'auto'
           : false),
 
-      showDetail: true,
+      showDetail: 'from within album',
 
       showDuration:
         (slots.collapseDurationScope === 'track'

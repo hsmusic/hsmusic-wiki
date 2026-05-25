@@ -147,7 +147,7 @@ export default {
       track.nameStyle,
 
     nameDetail:
-      track.nameDetail,
+      track.nameDetailAcrossWiki,
 
     color:
       track.color,

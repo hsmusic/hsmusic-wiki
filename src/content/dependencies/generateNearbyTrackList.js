@@ -1,3 +1,5 @@
+import {stitchArrays} from '#sugar';
+
 export default {
   query: (tracks, contextTrack, _contextContributions) => ({
     presentedTracks:
@@ -12,6 +14,12 @@ export default {
     items:
       query.presentedTracks
         .map(track => relation('generateTrackListItem', track, contextContributions)),
+  }),
+
+  data: (query, _tracks, contextTrack, _contextContributions) => ({
+    presentedTracksMatchContextRelease:
+      query.presentedTracks
+        .map(track => track.album === contextTrack.album),
   }),
 
   slots: {
@@ -36,15 +44,25 @@ export default {
     },
   },
 
-  generate: (relations, slots, {html}) =>
+  generate: (data, relations, slots, {html}) =>
     html.tag('ul',
       {[html.onlyIfContent]: true},
 
-      relations.items.map(item =>
+      stitchArrays({
+        item: relations.items,
+        releasesMatch: data.presentedTracksMatchContextRelease,
+      }).map(({item, releasesMatch}) =>
         item.slots({
           showArtists: slots.showArtists,
           showDuration: slots.showDuration,
-          showDetail: slots.showDetail,
+
+          showDetail:
+            (slots.showDetail && releasesMatch
+              ? 'from within album'
+          : slots.showDetail
+              ? 'from across wiki'
+              : false),
+
           colorMode: slots.colorMode,
         }))),
 };

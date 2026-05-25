@@ -7,7 +7,7 @@ import find, {keyRefRegex} from '#find';
 import {onlyItem} from '#sugar';
 import {sortByDate, sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
-import {compareKebabCase} from '#wiki-data';
+import {compareKebabCase, getKebabCase} from '#wiki-data';
 
 import {
   anyOf,
@@ -19,6 +19,7 @@ import {
   isDate,
   isExcludingURLsReason,
   isFileExtension,
+  isString,
   validateReference,
 } from '#validators';
 
@@ -153,13 +154,11 @@ export class Track extends Thing {
       exposeConstant(V('normal')),
     ],
 
-    nameDetail: simpleString(),
-
     directory: directory({
       suffix: 'directorySuffix',
     }),
 
-    suffixDirectoryFromAlbum: [
+    suffixDirectory: [
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
       }),
@@ -580,6 +579,16 @@ export class Track extends Thing {
 
     // > Update only
 
+    nameDetail: {
+      flags: {update: true},
+      update: {
+        validate:
+          anyOf(
+            is('album'),
+            isString),
+      },
+    },
+
     find: soupyFind(),
     reverse: soupyReverse(),
 
@@ -593,16 +602,101 @@ export class Track extends Thing {
 
     isTrack: exposeConstant(V(true)),
 
+    nameForReferencingAcrossWiki: [
+      // When referencing without any particular context,
+      // all referenceByDirectory values except for 'normally'
+      // count against referencing by name.
+      {
+        dependencies: ['referenceByDirectory'],
+        compute: (continuation, {referenceByDirectory}) =>
+          (referenceByDirectory !== 'normally'
+            ? continuation.exit(null)
+            : continuation()),
+      },
+
+      {
+        dependencies: ['name', 'nameDetailAcrossWiki'],
+        compute: (continuation, {name, nameDetailAcrossWiki}) =>
+          (nameDetailAcrossWiki
+            ? continuation.exit(`${name} (${nameDetailAcrossWiki})`)
+            : continuation()),
+      },
+
+      exposeDependency('name'),
+    ],
+
     commentatorArtists: commentatorArtists(),
 
     directorySuffix: [
-      exitWithoutDependency('suffixDirectoryFromAlbum', {
-        value: input.value(null),
-        mode: input.value('falsy'),
-      }),
-
       withPropertyFromObject('trackSection', V('directorySuffix')),
-      exposeDependency('#trackSection.directorySuffix'),
+
+      {
+        dependencies: [
+          '_suffixDirectory',
+           'suffixDirectory',
+          '#trackSection.directorySuffix',
+        ],
+
+        compute(continuation, {
+          ['_suffixDirectory']: suffixDirectoryUpdateValue,
+          [ 'suffixDirectory']: suffixDirectoryComputedValue,
+          ['#trackSection.directorySuffix']: directorySuffixFromAlbum,
+        }) {
+          // If directly set to true or inheriting true...
+          if (suffixDirectoryComputedValue === true) {
+            return directorySuffixFromAlbum;
+          }
+
+          // If directly set to false...
+          if (suffixDirectoryUpdateValue === false) {
+            return null;
+          }
+
+          // If inheriting false or defaulting to false...
+          return continuation();
+        },
+      },
+
+      // Don't follow any "automatic" directory suffix logic if the track's
+      // entire directory is set outright.
+      {
+        dependencies: ['_directory'],
+        compute(continuation, {
+          ['_directory']: directoryUpdateValue,
+        }) {
+          if (directoryUpdateValue) {
+            return null;
+          }
+
+          return continuation();
+        },
+      },
+
+      {
+        dependencies: [
+          '_nameDetail',
+           'nameDetailAcrossWiki',
+          '#trackSection.directorySuffix',
+        ],
+
+        compute(continuation, {
+          ['_nameDetail']: nameDetail,
+          [ 'nameDetailAcrossWiki']: nameDetailAcrossWiki,
+          ['#trackSection.directorySuffix']: directorySuffixFromAlbum,
+        }) {
+          if (nameDetail === 'album') {
+            return directorySuffixFromAlbum;
+          }
+
+          if (nameDetailAcrossWiki) {
+            return getKebabCase(nameDetailAcrossWiki);
+          }
+
+          return continuation();
+        },
+      },
+
+      exposeConstant(V(null)),
     ],
 
     date: [
@@ -636,6 +730,33 @@ export class Track extends Thing {
           ['#trackSection.startCountingFrom']: startCountingFrom,
           ['#index']: index,
         }) => startCountingFrom + index,
+      },
+    ],
+
+    nameDetailWithinAlbum: [
+      {
+        dependencies: ['_nameDetail'],
+        compute: ({
+          ['_nameDetail']: nameDetail,
+        }) =>
+          (nameDetail === 'album'
+            ? null
+            : nameDetail),
+      },
+    ],
+
+    nameDetailAcrossWiki: [
+      withPropertyFromObject('album', V('name')),
+
+      {
+        dependencies: ['_nameDetail', '#album.name'],
+        compute: ({
+          ['_nameDetail']: nameDetail,
+          ['#album.name']: albumName,
+        }) =>
+          (nameDetail === 'album'
+            ? albumName
+            : nameDetail),
       },
     ],
 
@@ -979,7 +1100,7 @@ export class Track extends Thing {
       'Name Detail': {property: 'nameDetail'},
 
       'Directory': {property: 'directory'},
-      'Suffix Directory': {property: 'suffixDirectoryFromAlbum'},
+      'Suffix Directory': {property: 'suffixDirectory'},
 
       'Reference By Directory': {property: 'referenceByDirectory'},
 
@@ -1205,11 +1326,9 @@ export class Track extends Thing {
 
       bindTo: 'trackData',
 
-      // When referencing without any particular context, all values
-      // except for 'normally' count against referencing by name.
       getMatchableNames: track =>
-        (track.referenceByDirectory === 'normally'
-          ? [track.name]
+        (track.nameForReferencingAcrossWiki
+          ? [track.nameForReferencingAcrossWiki]
           : []),
     },
 
@@ -1220,10 +1339,9 @@ export class Track extends Thing {
       include: track =>
         !CacheableObject.getUpdateValue(track, 'mainRelease'),
 
-      // This is an acontextual reference.
       getMatchableNames: track =>
-        (track.referenceByDirectory === 'normally'
-          ? [track.name]
+        (track.nameForReferencingAcrossWiki
+          ? [track.nameForReferencingAcrossWiki]
           : []),
     },
 

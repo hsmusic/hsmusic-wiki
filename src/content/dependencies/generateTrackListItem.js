@@ -28,8 +28,11 @@ export default {
     date:
       track.date,
 
-    detail:
-      track.nameDetail,
+    nameDetailWithinAlbum:
+      track.nameDetailWithinAlbum,
+
+    nameDetailAcrossWiki:
+      track.nameDetailAcrossWiki,
 
     duration:
       track.duration ?? 0,
@@ -47,7 +50,7 @@ export default {
     },
 
     showDetail: {
-      type: 'boolean',
+      validate: v => v.is('from across wiki', 'from within album', false),
       default: false,
     },
 
@@ -124,12 +127,19 @@ export default {
             relations.trackLink
               .slot('color', slots.colorMode === 'track');
 
-          if (data.detail && slots.showDetail) {
+          const nameDetail =
+            (slots.showDetail === 'from within album'
+              ? data.nameDetailWithinAlbum
+           : slots.showDetail
+              ? data.nameDetailAcrossWiki
+              : null);
+
+          if (nameDetail) {
             workingCapsule += '.withDetail';
             workingOptions.detailAccent =
               html.tag('span', {class: 'name-detail'},
                 language.$(itemCapsule, 'withDetail', 'accent', {
-                  detail: language.sanitize(data.detail),
+                  detail: language.sanitize(nameDetail),
                 }));
           }
 

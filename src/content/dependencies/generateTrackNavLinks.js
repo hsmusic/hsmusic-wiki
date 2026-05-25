@@ -24,7 +24,7 @@ export default {
       track.trackNumber,
 
     nameDetail:
-      track.nameDetail,
+      track.nameDetailWithinAlbum,
   }),
 
   slots: {
