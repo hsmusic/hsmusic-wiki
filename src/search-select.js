@@ -181,18 +181,6 @@ function genericSelect(wikiData) {
     things.sort((a, b) => getGroupRank(a) - getGroupRank(b));
 
   return [
-    sortByGroupRank(wikiData.albumData.slice()),
-
-    wikiData.artTagData
-      .filter(artTag => !artTag.isContentWarning),
-
-    wikiData.artistData
-      .filter(artist => !artist.isAlias),
-
-    wikiData.flashData,
-
-    wikiData.groupData,
-
     sortByGroupRank(
       wikiData.trackData
         .filter(track =>
@@ -200,6 +188,18 @@ function genericSelect(wikiData) {
           !compareKebabCase(
             track.name,
             track.mainReleaseTrack.name))),
+
+    sortByGroupRank(wikiData.albumData.slice()),
+
+    wikiData.artistData
+      .filter(artist => !artist.isAlias),
+
+    wikiData.groupData,
+
+    wikiData.flashData,
+
+    wikiData.artTagData
+      .filter(artTag => !artTag.isContentWarning),
   ].flat();
 }
 
