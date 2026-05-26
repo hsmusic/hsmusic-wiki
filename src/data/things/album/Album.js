@@ -227,6 +227,11 @@ export class Album extends Thing {
         .call(this, 'Cover Artwork'),
     ],
 
+    hasCoverArt: hasArtwork({
+      contribs: '_coverArtistContribs',
+      artworks: '_coverArtworks',
+    }),
+
     coverArtistContribs: contributionList({
       date: 'coverArtDate',
       artistProperty: input.value('albumCoverArtistContributions'),
@@ -315,6 +320,11 @@ export class Album extends Thing {
         .call(this, 'Wallpaper Artwork'),
     ],
 
+    hasWallpaperArt: hasArtwork({
+      contribs: '_wallpaperArtistContribs',
+      artwork: '_wallpaperArtwork',
+    }),
+
     wallpaperArtistContribs: contributionList({
       class: input.value(AlbumWallpaperArtistContribution),
       date: 'coverArtDate',
@@ -357,6 +367,11 @@ export class Album extends Thing {
       constitutibleArtwork.fromYAMLFieldSpec
         .call(this, 'Banner Artwork'),
     ],
+
+    hasBannerArt: hasArtwork({
+      contribs: '_bannerArtistContribs',
+      artwork: '_bannerArtwork',
+    }),
 
     bannerArtistContribs: contributionList({
       class: input.value(AlbumBannerArtistContribution),
@@ -427,21 +442,6 @@ export class Album extends Thing {
     isAlbum: exposeConstant(V(true)),
 
     commentatorArtists: commentatorArtists(),
-
-    hasCoverArt: hasArtwork({
-      contribs: '_coverArtistContribs',
-      artworks: '_coverArtworks',
-    }),
-
-    hasWallpaperArt: hasArtwork({
-      contribs: '_wallpaperArtistContribs',
-      artwork: '_wallpaperArtwork',
-    }),
-
-    hasBannerArt: hasArtwork({
-      contribs: '_bannerArtistContribs',
-      artwork: '_bannerArtwork',
-    }),
 
     tracks: [
       exitWithoutDependency('trackSections', V([])),
@@ -737,6 +737,8 @@ export class Album extends Thing {
           }),
       },
 
+      'Has Cover Art': {property: 'hasCoverArt'},
+
       'Cover Artists': {
         property: 'coverArtistContribs',
         transform: parseContributors,
@@ -767,6 +769,8 @@ export class Album extends Thing {
         transform: parseDimensions,
       },
 
+      'Has Wallpaper Art': {property: 'hasWallpaperArt'},
+
       'Wallpaper Artists': {
         property: 'wallpaperArtistContribs',
         transform: parseContributors,
@@ -778,6 +782,8 @@ export class Album extends Thing {
         property: 'wallpaperParts',
         transform: parseWallpaperParts,
       },
+
+      'Has Banner Art': {property: 'hasBannerArt'},
 
       'Banner Artists': {
         property: 'bannerArtistContribs',

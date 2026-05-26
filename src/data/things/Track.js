@@ -4,7 +4,7 @@ import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input, V} from '#composite';
 import find, {keyRefRegex} from '#find';
-import {onlyItem} from '#sugar';
+import {empty, onlyItem} from '#sugar';
 import {sortByDate, sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
 import {compareKebabCase, getKebabCase} from '#wiki-data';
@@ -349,7 +349,56 @@ export class Track extends Thing {
 
     showInReferenceLists: flag(V(true)),
 
-    disableUniqueCoverArt: flag(V(false)),
+    // This property doesn't resolve any references, i.e. doesn't interact
+    // with find/reverse, so it's safe to depend on when constituting artworks
+    // (or elsewhere while loading data).
+    hasUniqueCoverArt: {
+      flags: {update: true, expose: true},
+
+      update: {validate: isBoolean},
+
+      expose: {
+        dependencies: [
+           'album',
+          '_trackArtworks',
+          '_coverArtistContribs',
+        ],
+
+        transform(hasUniqueCoverArtUpdateValue, {
+          [ 'album']: album,
+          ['_trackArtworks']: trackArtworksUpdateValue,
+          ['_coverArtistContribs']: coverArtistContribsUpdateValue,
+        }) {
+          if (hasUniqueCoverArtUpdateValue === true) {
+            return true;
+          }
+
+          if (hasUniqueCoverArtUpdateValue === false) {
+            return false;
+          }
+
+          if (!empty(trackArtworksUpdateValue)) {
+            return true;
+          }
+
+          if (!empty(coverArtistContribsUpdateValue)) {
+            return true;
+          }
+
+          if (album) {
+            const trackCoverArtistContribsUpdateValue =
+              CacheableObject.getUpdateValue(album, 'trackCoverArtistContribs');
+
+            if (!empty(trackCoverArtistContribsUpdateValue)) {
+              return true;
+            }
+          }
+
+          return false;
+        },
+      },
+    },
+
     disableDate: flag(V(false)),
 
     // > Update & expose - General metadata
@@ -760,84 +809,6 @@ export class Track extends Thing {
       },
     ],
 
-    // Whether or not the track has "unique" cover artwork - a cover which is
-    // specifically associated with this track in particular, rather than with
-    // the track's album as a whole. This is typically used to select between
-    // displaying the track artwork and a fallback, such as the album artwork
-    // or a placeholder. (This property is named hasUniqueCoverArt instead of
-    // the usual hasCoverArt to emphasize that it does not inherit from the
-    // album.)
-    //
-    // hasUniqueCoverArt is based only around the presence of *specified*
-    // cover artist contributions, not whether the references to artists on those
-    // contributions actually resolve to anything. It completely evades interacting
-    // with find/replace.
-    hasUniqueCoverArt: [
-      {
-        dependencies: ['disableUniqueCoverArt'],
-        compute: (continuation, {disableUniqueCoverArt}) =>
-          (disableUniqueCoverArt
-            ? false
-            : continuation()),
-      },
-
-      withResultOfAvailabilityCheck({
-        from: '_coverArtistContribs',
-        mode: input.value('empty'),
-      }),
-
-      {
-        dependencies: ['#availability'],
-        compute: (continuation, {
-          ['#availability']: availability,
-        }) =>
-          (availability
-            ? true
-            : continuation()),
-      },
-
-      withPropertyFromObject('album', {
-        property: input.value('trackCoverArtistContribs'),
-        internal: input.value(true),
-      }),
-
-      withResultOfAvailabilityCheck({
-        from: '#album.trackCoverArtistContribs',
-        mode: input.value('empty'),
-      }),
-
-      {
-        dependencies: ['#availability'],
-        compute: (continuation, {
-          ['#availability']: availability,
-        }) =>
-          (availability
-            ? true
-            : continuation()),
-      },
-
-      exitWithoutDependency('_trackArtworks', {
-        value: input.value(false),
-        mode: input.value('empty'),
-      }),
-
-      withPropertyFromList('_trackArtworks', {
-        property: input.value('artistContribs'),
-        internal: input.value(true),
-      }),
-
-      // Since we're getting the update value for each artwork's artistContribs,
-      // it may not be set at all, and in that case won't be exposing as [].
-      fillMissingListItems('#trackArtworks.artistContribs', V([])),
-
-      withFlattenedList('#trackArtworks.artistContribs'),
-
-      exposeWhetherDependencyAvailable({
-        dependency: '#flattenedList',
-        mode: input.value('empty'),
-      }),
-    ],
-
     isMainRelease:
       exposeWhetherDependencyAvailable({
         dependency: 'mainReleaseTrack',
@@ -1151,15 +1122,8 @@ export class Track extends Thing {
       'Count In Artist Totals': {property: 'countInArtistTotals'},
       'Show In Reference Lists': {property: 'showInReferenceLists'},
 
-      'Has Cover Art': {
-        property: 'disableUniqueCoverArt',
-        transform: flipBoolean,
-      },
-
-      'Has Date': {
-        property: 'disableDate',
-        transform: flipBoolean,
-      },
+      'Has Cover Art': {property: 'hasUniqueCoverArt'},
+      'Has Date': {property: 'disableDate', transform: flipBoolean},
 
       // General metadata
 
