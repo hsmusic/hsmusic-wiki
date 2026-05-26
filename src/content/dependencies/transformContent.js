@@ -3,6 +3,7 @@ import {basename} from 'node:path';
 import {logWarn} from '#cli';
 import {bindFind} from '#find';
 import {replacerSpec, parseContentNodes} from '#replacer';
+import {errors} from '#sugar';
 
 import {Marked} from 'marked';
 import striptags from 'striptags';
@@ -625,28 +626,12 @@ export default {
             if (hash) link.setSlot('hash', hash);
 
             // TODO: This is obviously hacky.
-            let hasPreferShortNameSlot;
-            try {
-              link.getSlotDescription('preferShortName');
-              hasPreferShortNameSlot = true;
-            } catch {
-              hasPreferShortNameSlot = false;
-            }
-
-            if (hasPreferShortNameSlot) {
+            if (!errors(() => link.getSlotDescription('preferShortName'))) {
               link.setSlot('preferShortName', slots.preferShortLinkNames);
             }
 
             // TODO: The same, the same.
-            let hasTooltipStyleSlot;
-            try {
-              link.getSlotDescription('tooltipStyle');
-              hasTooltipStyleSlot = true;
-            } catch {
-              hasTooltipStyleSlot = false;
-            }
-
-            if (hasTooltipStyleSlot) {
+            if (!errors(() => link.getSlotDescription('tooltipStyle'))) {
               link.setSlot('tooltipStyle', 'none');
             }
 

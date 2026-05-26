@@ -880,6 +880,12 @@ misc:
 
   missingLinkContent: "(Missing link content)"
 
+  linkWithNameDetail:
+    insideLink: "{NAME} ({DETAIL})"
+
+    withAccent: "{LINK} {ACCENT}"
+    accent: "({DETAIL})"
+
   # navAccent:
   #   Accent shown in the nav bar for navigating to pages that are
   #   related to the current one.

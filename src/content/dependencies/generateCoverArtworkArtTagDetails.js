@@ -67,5 +67,8 @@ export default {
               preferShortName: data.preferShortName,
             }).map(({artTagLink, preferShortName}) =>
                 html.tag('li',
-                  artTagLink.slot('preferShortName', preferShortName)))))),
+                  artTagLink.slots({
+                    preferShortName,
+                    showTooltip: 'wiki',
+                  })))))),
 };

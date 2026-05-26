@@ -100,6 +100,8 @@ export class Album extends Thing {
     // > Update & expose - Identifying metadata
 
     name: name(V('Unnamed Album')),
+    nameDetail: simpleString(),
+
     directory: directory(),
 
     directorySuffix: [
@@ -609,9 +611,12 @@ export class Album extends Thing {
       // Identifying metadata
 
       'Album': {property: 'name'},
+      'Name Detail': {property: 'nameDetail'},
+
       'Directory': {property: 'directory'},
       'Directory Suffix': {property: 'directorySuffix'},
       'Suffix Track Directories': {property: 'suffixTrackDirectories'},
+
       'Always Reference By Directory': {property: 'alwaysReferenceByDirectory'},
 
       'Reference Tracks By Directory': {property: 'referenceTracksByDirectory'},

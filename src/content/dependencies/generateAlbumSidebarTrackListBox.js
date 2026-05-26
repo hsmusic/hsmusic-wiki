@@ -17,7 +17,9 @@ export default {
 
       content: [
         html.tag('h1', {[html.onlyIfSiblings]: true},
-          relations.albumLink),
+          relations.albumLink.slots({
+            showNameDetail: 'inside',
+          })),
 
         relations.trackSections,
       ],

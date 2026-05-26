@@ -99,7 +99,9 @@ export default {
               language.$(boxCapsule, 'next', {
                 [language.onlyIfOptions]: ['album'],
 
-                album: relations.nextAlbumLink,
+                album:
+                  relations.nextAlbumLink
+                    ?.slot('showNameDetail', 'accent'),
               })),
 
           slots.mode === 'album' &&
@@ -109,7 +111,9 @@ export default {
               language.$(boxCapsule, 'previous', {
                 [language.onlyIfOptions]: ['album'],
 
-                album: relations.previousAlbumLink,
+                album:
+                  relations.previousAlbumLink
+                    ?.slot('showNameDetail', 'accent'),
               })),
         ],
       })),

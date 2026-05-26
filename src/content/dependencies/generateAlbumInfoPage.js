@@ -73,6 +73,9 @@ export default {
     name:
       album.name,
 
+    nameDetail:
+      album.nameDetail,
+
     style:
       album.style,
 
@@ -90,6 +93,9 @@ export default {
           language.$(pageCapsule, 'title', {
             album: data.name,
           }),
+
+        titleDetail:
+          language.sanitize(data.nameDetail),
 
         color: data.color,
         headingMode: 'sticky',

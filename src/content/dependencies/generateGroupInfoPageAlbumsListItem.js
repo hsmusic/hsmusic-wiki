@@ -57,7 +57,10 @@ export default {
           const workingOptions = {};
 
           workingOptions.album =
-            relations.albumLink.slot('color', false);
+            relations.albumLink.slots({
+              showNameDetail: 'accent',
+              color: false,
+            });
 
           const yearCapsule = language.encapsulate(itemCapsule, 'withYear');
 

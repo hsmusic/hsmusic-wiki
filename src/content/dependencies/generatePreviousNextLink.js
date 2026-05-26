@@ -44,13 +44,14 @@ export default {
 
     return html.resolve(slots.link, {
       slots: {
-        tooltipStyle: 'browser',
-        color: false,
         attributes,
+
+        showTooltip: 'browser',
+        color: false,
 
         content:
           language.$('misc.nav', slots.direction),
-      }
+      },
     });
   },
 };
