@@ -1,6 +1,7 @@
 import {input, V} from '#composite';
 import {empty} from '#sugar';
 import Thing from '#thing';
+import {getKebabCase} from '#wiki-data';
 
 import {
   is,
@@ -10,6 +11,7 @@ import {
   isExcludingURLsReason,
   isDirectory,
   isNumber,
+  isString,
 } from '#validators';
 
 import {
@@ -102,14 +104,37 @@ export class Album extends Thing {
     name: name(V('Unnamed Album')),
     nameDetail: simpleString(),
 
+    nameDetailForTracks: {
+      flags: {update: true, expose: true},
+
+      update: {validate: isString},
+
+      expose: {
+        dependencies: ['name', 'nameDetail'],
+        transform: (value, {name, nameDetail}) =>
+          (value
+            ? value
+         : nameDetail
+            ? `${name}, ${nameDetail}`
+            : name),
+      },
+    },
+
     directory: directory(),
 
+    // note: this is currently strictly "directory suffix for tracks"
     directorySuffix: [
       exposeUpdateValueOrContinue({
         validate: input.value(isDirectory),
       }),
 
-      exposeDependency('directory'),
+      {
+        dependencies: ['directory', 'name', 'nameDetailForTracks'],
+        compute: ({directory, name, nameDetailForTracks}) =>
+          (nameDetailForTracks === name
+            ? directory
+            : getKebabCase(nameDetailForTracks)),
+      },
     ],
 
     alwaysReferenceByDirectory: flag(V(false)),
@@ -612,6 +637,7 @@ export class Album extends Thing {
 
       'Album': {property: 'name'},
       'Name Detail': {property: 'nameDetail'},
+      'Name Detail For Tracks': {property: 'nameDetailForTracks'},
 
       'Directory': {property: 'directory'},
       'Directory Suffix': {property: 'directorySuffix'},

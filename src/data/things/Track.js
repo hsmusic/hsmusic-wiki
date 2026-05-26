@@ -795,16 +795,16 @@ export class Track extends Thing {
     ],
 
     nameDetailAcrossWiki: [
-      withPropertyFromObject('album', V('name')),
+      withPropertyFromObject('album', V('nameDetailForTracks')),
 
       {
-        dependencies: ['_nameDetail', '#album.name'],
+        dependencies: ['_nameDetail', '#album.nameDetailForTracks'],
         compute: ({
           ['_nameDetail']: nameDetail,
-          ['#album.name']: albumName,
+          ['#album.nameDetailForTracks']: nameDetailFromAlbum,
         }) =>
           (nameDetail === 'album'
-            ? albumName
+            ? nameDetailFromAlbum
             : nameDetail),
       },
     ],
