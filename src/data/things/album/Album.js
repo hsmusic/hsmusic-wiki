@@ -922,53 +922,54 @@ export class Album extends Thing {
   }
 
   getOwnArtworkPath(artwork) {
+    const ext = artwork.fileExtension;
+
     if (artwork === this.bannerArtwork) {
-      return [
-        'media.albumBanner',
-        this.directory,
-        artwork.fileExtension,
-      ];
+      return this.getAlbumArtPath(`banner.${ext}`);
     }
 
     if (artwork === this.wallpaperArtwork) {
-      if (!empty(this.wallpaperParts)) {
+      if (empty(this.wallpaperParts)) {
+        return this.getAlbumArtPath(`bg.${ext}`);
+      } else {
         return null;
       }
-
-      return [
-        'media.albumWallpaper',
-        this.directory,
-        artwork.fileExtension,
-      ];
     }
 
-    // TODO: using trackCover here is obviously, badly wrong
-    // but we ought to refactor banners and wallpapers similarly
-    // (i.e. depend on those intrinsic artwork paths rather than
-    // accessing media.{albumBanner,albumWallpaper} from content
-    // or other code directly)
-    return [
-      'media.trackCover',
-      this.directory,
-
+    const basename =
       (artwork.unqualifiedDirectory
         ? 'cover-' + artwork.unqualifiedDirectory
-        : 'cover'),
+        : 'cover');
 
-      artwork.fileExtension,
-    ];
+    return this.getAlbumArtPath(`${basename}.${ext}`);
+  }
+
+  getWallpaperPartPath(part) {
+    return this.getAlbumArtPath(part.asset);
   }
 
   getOwnMusicVideoCoverPath(musicVideo) {
-    // Lala, same shenanigan as above, this is media.trackCover
-    // where it shouldn't be.
+    const filename =
+      musicVideo.unqualifiedDirectory +
+      `.${musicVideo.coverArtFileExtension}`;
 
-    return [
-      'media.trackCover',
-      this.directory,
-      musicVideo.unqualifiedDirectory,
-      musicVideo.coverArtFileExtension,
-    ];
+    return this.getAlbumArtPath(filename);
+  }
+
+  getAlbumArtPath(filename) {
+    const key = this.#getArtworkPathKey();
+    const front = [key, this.directory];
+    return [...front, filename];
+  }
+
+  #getArtworkPathKey(artwork) {
+    switch (this.style) {
+      case 'in-game vgm':
+        return 'media.vgmAlbumArt';
+
+      default:
+        return 'media.albumArt';
+    }
   }
 
   // As of writing, albums don't even have a `duration` property...

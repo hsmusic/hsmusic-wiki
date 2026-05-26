@@ -126,16 +126,15 @@ media:
 
   - albumAdditionalFile: 'album-additional/<>/<>'
     albumAdditionalFileInFolder: 'album-additional/<>/<>/<>'
-    albumBanner: 'album-art/<>/banner.<>'
-    albumCover: 'album-art/<>/cover.<>'
-    albumWallpaper: 'album-art/<>/bg.<>'
-    albumWallpaperPart: 'album-art/<>/<>'
+    albumArt: 'album-art/<>/<>'
 
     artistAvatar: 'artist-avatar/<>.<>'
 
     flashArt: 'flash-art/<>.<>'
 
-    trackCover: 'album-art/<>/<>.<>'
+    vgmAlbumAdditionalFile: 'vgm-album-additional/<>/<>'
+    vgmAlbumAdditionalFileInFolder: 'vgm-album-additional/<>/<>/<>'
+    vgmAlbumArt: 'vgm-album-art/<>/<>'
 
 thumb:
   prefix: 'thumb/'

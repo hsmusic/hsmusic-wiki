@@ -177,7 +177,7 @@ export function filterAlbumsByCommentary(albums) {
 export function getAlbumCover(album, {to}) {
   // Some albums don't have art! This function returns null in that case.
   if (album.hasCoverArt) {
-    return to('media.albumCover', album.directory, album.coverArtFileExtension);
+    return to(...album.coverArtworks[0].path);
   } else {
     return null;
   }
@@ -274,7 +274,7 @@ export function getTrackCover(track, {to}) {
   if (!track.hasUniqueCoverArt) {
     return getAlbumCover(track.album, {to});
   } else {
-    return to('media.trackCover', track.album.directory, track.directory, track.coverArtFileExtension);
+    return to(...track.trackArtworks[0].path);
   }
 }
 

@@ -1464,16 +1464,13 @@ export class Track extends Thing {
   getOwnArtworkPath(artwork) {
     if (!this.album) return null;
 
-    return [
-      'media.trackCover',
-      this.album.directory,
-
+    const ext = artwork.fileExtension;
+    const basename =
       (artwork.unqualifiedDirectory
         ? this.directory + '-' + artwork.unqualifiedDirectory
-        : this.directory),
+        : this.directory);
 
-      artwork.fileExtension,
-    ];
+    return this.album.getAlbumArtPath(`${basename}.${ext}`);
   }
 
   getOwnMusicVideoCoverPath(musicVideo) {
@@ -1489,12 +1486,12 @@ export class Track extends Thing {
         ? ''
         : this.directory + '-');
 
-    return [
-      'media.trackCover',
-      this.album.directory,
-      trackPrefix + musicVideo.unqualifiedDirectory,
-      musicVideo.coverArtFileExtension,
-    ];
+    const filename =
+      trackPrefix +
+      musicVideo.unqualifiedDirectory +
+      `.${musicVideo.coverArtFileExtension}`;
+
+    return this.album.getAlbumArtPath(filename);
   }
 
   countOwnContributionInContributionTotals(_contrib) {
