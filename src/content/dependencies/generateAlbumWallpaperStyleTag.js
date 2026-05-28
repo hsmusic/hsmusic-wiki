@@ -11,7 +11,9 @@ export default {
       album.wallpaperBrightness,
 
     singleWallpaperPath:
-      album.wallpaperArtwork.path,
+      (album.wallpaperArtwork
+        ? album.wallpaperArtwork.path
+        : null),
 
     singleWallpaperStyle:
       album.wallpaperStyle,
