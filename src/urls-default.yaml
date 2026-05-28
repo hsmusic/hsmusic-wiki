@@ -138,9 +138,9 @@ media:
 
     flashArt: 'flash-art/<>.<>'
 
-    vgmAlbumAdditionalFile: 'vgm-album-additional/<>/<>'
-    vgmAlbumAdditionalFileInFolder: 'vgm-album-additional/<>/<>/<>'
-    vgmAlbumArt: 'vgm-album-art/<>/<>'
+    vgmAlbumAdditionalFile: 'album-additional/vgm/<>/<>'
+    vgmAlbumAdditionalFileInFolder: 'album-additional/vgm/<>/<>/<>'
+    vgmAlbumArt: 'album-art/vgm/<>/<>'
 
 thumb:
   prefix: 'thumb/'
