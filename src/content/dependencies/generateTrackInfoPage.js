@@ -393,7 +393,8 @@ export default {
                 {auto: 'home'},
                 {
                   html: relations.albumNavLink,
-                  accent: language.$(pageCapsule, 'nav.singleAccent'),
+                  accent:
+                    language.$(pageCapsule, 'nav.albumAccent.type.single'),
                 },
               ]
             : html.resolve(relations.navLinks)),
