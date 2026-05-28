@@ -122,8 +122,7 @@ export class Album extends Thing {
 
     directory: directory(),
 
-    // note: this is currently strictly "directory suffix for tracks"
-    directorySuffix: [
+    directorySuffixForTracks: [
       exposeUpdateValueOrContinue({
         validate: input.value(isDirectory),
       }),
@@ -136,6 +135,8 @@ export class Album extends Thing {
             : getKebabCase(nameDetailForTracks)),
       },
     ],
+
+    suffixTrackDirectoriesByDefault: flag(V(false)),
 
     alwaysReferenceByDirectory: flag(V(false)),
 
@@ -152,8 +153,6 @@ export class Album extends Thing {
 
       exposeConstant(V('normally')),
     ],
-
-    suffixTrackDirectories: flag(V(false)),
 
     style: [
       exposeUpdateValueOrContinue({
@@ -640,8 +639,8 @@ export class Album extends Thing {
       'Name Detail For Tracks': {property: 'nameDetailForTracks'},
 
       'Directory': {property: 'directory'},
-      'Directory Suffix': {property: 'directorySuffix'},
-      'Suffix Track Directories': {property: 'suffixTrackDirectories'},
+      'Directory Suffix': {property: 'directorySuffixForTracks'},
+      'Suffix Track Directories': {property: 'suffixTrackDirectoriesByDefault'},
 
       'Always Reference By Directory': {property: 'alwaysReferenceByDirectory'},
 

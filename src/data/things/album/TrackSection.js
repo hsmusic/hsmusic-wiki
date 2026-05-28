@@ -50,22 +50,22 @@ export class TrackSection extends Thing {
 
     unqualifiedDirectory: directory(),
 
-    directorySuffix: [
+    directorySuffixForTracks: [
       exposeUpdateValueOrContinue({
         validate: input.value(isDirectory),
       }),
 
-      withPropertyFromObject('album', V('directorySuffix')),
-      exposeDependency('#album.directorySuffix'),
+      withPropertyFromObject('album', V('directorySuffixForTracks')),
+      exposeDependency('#album.directorySuffixForTracks'),
     ],
 
-    suffixTrackDirectories: [
+    suffixTrackDirectoriesByDefault: [
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
       }),
 
-      withPropertyFromObject('album', V('suffixTrackDirectories')),
-      exposeDependency('#album.suffixTrackDirectories'),
+      withPropertyFromObject('album', V('suffixTrackDirectoriesByDefault')),
+      exposeDependency('#album.suffixTrackDirectoriesByDefault'),
     ],
 
     color: [
@@ -204,8 +204,8 @@ export class TrackSection extends Thing {
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Section': {property: 'name'},
-      'Directory Suffix': {property: 'directorySuffix'},
-      'Suffix Track Directories': {property: 'suffixTrackDirectories'},
+      'Directory Suffix': {property: 'directorySuffixForTracks'},
+      'Suffix Track Directories': {property: 'suffixTrackDirectoriesByDefault'},
 
       'Color': {property: 'color'},
       'Has Track Numbers': {property: 'hasTrackNumbers'},

@@ -7,7 +7,7 @@ import find, {keyRefRegex} from '#find';
 import {empty, onlyItem} from '#sugar';
 import {sortByDate, sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
-import {compareKebabCase, getKebabCase} from '#wiki-data';
+import {compareKebabCase} from '#wiki-data';
 
 import {
   anyOf,
@@ -17,9 +17,11 @@ import {
   isContentString,
   isContributionList,
   isDate,
+  isDirectory,
   isExcludingURLsReason,
   isFileExtension,
   isString,
+  strictArrayOf,
   validateReference,
 } from '#validators';
 
@@ -69,6 +71,7 @@ import {
 } from '#composite/data';
 
 import {
+  withDirectory,
   withRecontextualizedContributionList,
   withRedatedContributionList,
   withResolvedContribs,
@@ -100,6 +103,7 @@ import {
 import {
   inheritContributionListFromMainRelease,
   inheritFromMainRelease,
+  withDirectorySuffixes,
 } from '#composite/things/track';
 
 export class Track extends Thing {
@@ -155,16 +159,26 @@ export class Track extends Thing {
     ],
 
     directory: directory({
-      suffix: 'directorySuffix',
+      suffix: 'suffixDirectory',
     }),
 
     suffixDirectory: [
-      exposeUpdateValueOrContinue({
-        validate: input.value(isBoolean),
+      withDirectorySuffixes({
+        from:
+          input.updateValue({
+            validate:
+              anyOf(
+                isBoolean,
+                is('album'),
+                isDirectory,
+                strictArrayOf(
+                  anyOf(
+                    is('album'),
+                    isDirectory))),
+          }),
       }),
 
-      withPropertyFromObject('trackSection', V('suffixTrackDirectories')),
-      exposeDependency('#trackSection.suffixTrackDirectories'),
+      exposeDependency('#directorySuffix'),
     ],
 
     referenceByDirectory: [
@@ -674,79 +688,24 @@ export class Track extends Thing {
       exposeDependency('name'),
     ],
 
-    commentatorArtists: commentatorArtists(),
+    directoryWithinAlbum: [
+      withDirectorySuffixes(),
 
-    directorySuffix: [
-      withPropertyFromObject('trackSection', V('directorySuffix')),
+      withDirectory({
+        directory: '_directory',
+        name: 'name',
+        suffix: '#directorySuffixWithinAlbum',
+      }),
 
-      {
-        dependencies: [
-          '_suffixDirectory',
-           'suffixDirectory',
-          '#trackSection.directorySuffix',
-        ],
-
-        compute(continuation, {
-          ['_suffixDirectory']: suffixDirectoryUpdateValue,
-          [ 'suffixDirectory']: suffixDirectoryComputedValue,
-          ['#trackSection.directorySuffix']: directorySuffixFromAlbum,
-        }) {
-          // If directly set to true or inheriting true...
-          if (suffixDirectoryComputedValue === true) {
-            return directorySuffixFromAlbum;
-          }
-
-          // If directly set to false...
-          if (suffixDirectoryUpdateValue === false) {
-            return null;
-          }
-
-          // If inheriting false or defaulting to false...
-          return continuation();
-        },
-      },
-
-      // Don't follow any "automatic" directory suffix logic if the track's
-      // entire directory is set outright.
-      {
-        dependencies: ['_directory'],
-        compute(continuation, {
-          ['_directory']: directoryUpdateValue,
-        }) {
-          if (directoryUpdateValue) {
-            return null;
-          }
-
-          return continuation();
-        },
-      },
-
-      {
-        dependencies: [
-          '_nameDetail',
-           'nameDetailAcrossWiki',
-          '#trackSection.directorySuffix',
-        ],
-
-        compute(continuation, {
-          ['_nameDetail']: nameDetail,
-          [ 'nameDetailAcrossWiki']: nameDetailAcrossWiki,
-          ['#trackSection.directorySuffix']: directorySuffixFromAlbum,
-        }) {
-          if (nameDetail === 'album') {
-            return directorySuffixFromAlbum;
-          }
-
-          if (nameDetailAcrossWiki) {
-            return getKebabCase(nameDetailAcrossWiki);
-          }
-
-          return continuation();
-        },
-      },
-
-      exposeConstant(V(null)),
+      exposeDependency('#directory'),
     ],
+
+    suffixDirectoryWithinAlbum: [
+      withDirectorySuffixes(),
+      exposeDependency('#directorySuffixWithinAlbum'),
+    ],
+
+    commentatorArtists: commentatorArtists(),
 
     date: [
       {
@@ -1467,8 +1426,8 @@ export class Track extends Thing {
     const ext = artwork.fileExtension;
     const basename =
       (artwork.unqualifiedDirectory
-        ? this.directory + '-' + artwork.unqualifiedDirectory
-        : this.directory);
+        ? this.directoryWithinAlbum + '-' + artwork.unqualifiedDirectory
+        : this.directoryWithinAlbum);
 
     return this.album.getAlbumArtPath(`${basename}.${ext}`);
   }
@@ -1484,7 +1443,7 @@ export class Track extends Thing {
     const trackPrefix =
       (isSingleFirstTrack
         ? ''
-        : this.directory + '-');
+        : this.directoryWithinAlbum + '-');
 
     const filename =
       trackPrefix +
