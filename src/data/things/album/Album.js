@@ -4,6 +4,7 @@ import Thing from '#thing';
 import {getKebabCase} from '#wiki-data';
 
 import {
+  anyOf,
   is,
   isBoolean,
   isContributionList,
@@ -138,9 +139,38 @@ export class Album extends Thing {
               return true;
             },
           }),
+
+        suffix: 'suffixDirectory',
       }),
 
       exposeDependency('#directory'),
+    ],
+
+    suffixDirectory: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(
+          anyOf(is(false), isDirectory)),
+      }),
+
+      {
+        transform: (value, continuation) =>
+          (value === false
+            ? null
+            : continuation()),
+      },
+
+      {
+        dependencies: ['nameDetail'],
+        compute(continuation, {nameDetail}) {
+          if (nameDetail) {
+            return getKebabCase(nameDetail);
+          }
+
+          return continuation();
+        },
+      },
+
+      exposeConstant(V(null)),
     ],
 
     directorySuffixForTracks: [
@@ -660,6 +690,8 @@ export class Album extends Thing {
       'Name Detail For Tracks': {property: 'nameDetailForTracks'},
 
       'Directory': {property: 'directory'},
+      'Suffix Own Directory': {property: 'suffixDirectory'},
+
       'Directory Suffix': {property: 'directorySuffixForTracks'},
       'Suffix Track Directories': {property: 'suffixTrackDirectoriesByDefault'},
 
