@@ -7,17 +7,22 @@ export function targets({wikiData}) {
 }
 
 export function pathsForTarget(album) {
+  const keyPrefix =
+    (album.style === 'in-game vgm'
+      ? 'vgmAlbum'
+      : 'album');
+
   return [
     (album.style === 'single'
       ? {
           type: 'redirect',
-          fromPath: ['album', album.directory],
+          fromPath: [keyPrefix, album.directory],
           toPath: ['track', album.tracks[0].directory],
           title: album.name,
         }
       : {
           type: 'page',
-          path: ['album', album.directory],
+          path: [keyPrefix, album.directory],
 
           contentFunction: {
             name: 'generateAlbumInfoPage',
@@ -27,7 +32,7 @@ export function pathsForTarget(album) {
 
     {
       type: 'page',
-      path: ['albumGallery', album.directory],
+      path: [keyPrefix + 'Gallery', album.directory],
 
       contentFunction: {
         name: 'generateAlbumGalleryPage',
@@ -37,7 +42,7 @@ export function pathsForTarget(album) {
 
     {
       type: 'page',
-      path: ['albumCommentary', album.directory],
+      path: [keyPrefix + 'Commentary', album.directory],
 
       contentFunction: {
         name: 'generateAlbumCommentaryPage',
@@ -47,7 +52,7 @@ export function pathsForTarget(album) {
 
     {
       type: 'page',
-      path: ['albumReferencedArtworks', album.directory],
+      path: [keyPrefix + 'ReferencedArtworks', album.directory],
 
       condition: () =>
         album.hasCoverArt &&
@@ -61,7 +66,7 @@ export function pathsForTarget(album) {
 
     {
       type: 'page',
-      path: ['albumReferencingArtworks', album.directory],
+      path: [keyPrefix + 'ReferencingArtworks', album.directory],
 
       condition: () =>
         album.hasCoverArt &&

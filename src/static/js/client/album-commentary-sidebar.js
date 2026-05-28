@@ -23,7 +23,10 @@ export const info = {
 };
 
 export function getPageReferences() {
-  if (document.documentElement.dataset.urlKey !== 'localized.albumCommentary') {
+  if (
+    document.documentElement.dataset.urlKey !== 'localized.albumCommentary' &&
+    document.documentElement.dataset.urlKey !== 'localized.vgmAlbumCommentary'
+  ) {
     return;
   }
 

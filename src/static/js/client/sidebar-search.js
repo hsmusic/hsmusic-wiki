@@ -16,6 +16,7 @@ import {
   openFlash,
   openGroup,
   openTrack,
+  openVGMAlbum,
   rebase,
   templateContent,
 } from '../client-util.js';
@@ -1109,7 +1110,9 @@ function generateSidebarSearchResult(result, results) {
   switch (result.referenceType) {
     case 'album': {
       preparedSlots.href =
-        openAlbum(result.directory);
+        (result.data.classification === 'in-game vgm'
+          ? openVGMAlbum(result.directory)
+          : openAlbum(result.directory));
 
       preparedSlots.kindString =
         (result.data.classification === 'single'

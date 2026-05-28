@@ -18,7 +18,7 @@ export default {
 
   generate(data, relations, {pagePath}) {
     if (
-      pagePath[0] === 'albumCommentary' &&
+      pagePath[0].match(/albumCommentary$/i) &&
       pagePath[1] === data.albumDirectory &&
       data.trackHasCommentary
     ) {

@@ -19,6 +19,8 @@ export default {
     data.trackDirectory = track.directory;
     data.albumDirectory = album.directory;
 
+    data.albumStyle = album.style;
+
     data.hasImage = track.hasUniqueCoverArt || album.hasCoverArt;
 
     if (track.hasUniqueCoverArt) {
@@ -47,7 +49,9 @@ export default {
           }),
 
         headingLink:
-          absoluteTo('localized.album', data.albumDirectory),
+          (data.albumStyle === 'in-game vgm'
+            ? absoluteTo('localized.vgmAlbum', data.albumDirectory)
+            : absoluteTo('localized.album', data.albumDirectory)),
 
         imagePath:
           (data.hasImage

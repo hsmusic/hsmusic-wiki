@@ -3,6 +3,8 @@ export default {
     link:
       (album.style === 'single'
         ? relation('linkTrack', album.tracks[0])
+     : album.style === 'in-game vgm'
+        ? relation('linkThing', 'localized.vgmAlbum', album)
         : relation('linkThing', 'localized.album', album)),
   }),
 
