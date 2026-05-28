@@ -68,11 +68,11 @@ localized:
     trackReferencedArtworks: 'track/<>/referenced-art/'
     trackReferencingArtworks: 'track/<>/referencing-art/'
 
-    vgmAlbum: 'vgm-album/<>/'
-    vgmAlbumCommentary: 'commentary/vgm-album/<>/'
-    vgmAlbumGallery: 'vgm-album/<>/gallery/'
-    vgmAlbumReferencedArtworks: 'vgm-album/<>/referenced-art/'
-    vgmAlbumReferencingArtworks: 'vgm-album/<>/referencing-art/'
+    vgmAlbum: 'album/vgm/<>/'
+    vgmAlbumCommentary: 'commentary/album/vgm/<>/'
+    vgmAlbumGallery: 'album/vgm/<>/gallery/'
+    vgmAlbumReferencedArtworks: 'album/vgm/<>/referenced-art/'
+    vgmAlbumReferencingArtworks: 'album/vgm/<>/referencing-art/'
 
 # This gets automatically switched in place when working from
 # a baseDirectory, so it should never be referenced manually.

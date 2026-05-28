@@ -103,7 +103,7 @@ export const openArtist = d => rebase(`artist/${d}/`);
 export const openFlash = d => rebase(`flash/${d}/`);
 export const openGroup = d => rebase(`group/${d}/`);
 export const openTrack = d => rebase(`track/${d}/`);
-export const openVGMAlbum = d => rebase(`vgm-album/${d}/`);
+export const openVGMAlbum = d => rebase(`album/vgm/${d}/`);
 
 // TODO: This should also use urlSpec.
 

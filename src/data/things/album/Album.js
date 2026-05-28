@@ -32,8 +32,6 @@ import {
 } from '#yaml';
 
 import {withFlattenedList, withPropertyFromList} from '#composite/data';
-import {withRecontextualizedContributionList, withResolvedContribs}
-  from '#composite/wiki-data';
 
 import {
   exitWithoutDependency,
@@ -44,6 +42,12 @@ import {
 } from '#composite/control-flow';
 
 import {
+  withDirectory,
+  withRecontextualizedContributionList,
+  withResolvedContribs,
+} from '#composite/wiki-data';
+
+import {
   color,
   commentatorArtists,
   constitutibleArtwork,
@@ -51,7 +55,6 @@ import {
   contentString,
   contributionList,
   dimensions,
-  directory,
   fileExtension,
   flag,
   hasArtwork,
@@ -120,7 +123,25 @@ export class Album extends Thing {
       },
     },
 
-    directory: directory(),
+    directory: [
+      withDirectory({
+        directory:
+          input.updateValue({
+            validate(value) {
+              isDirectory(value);
+
+              if (value === 'vgm') {
+                throw new Error(
+                  `"vgm" is a reserved directory and can't be used albums`);
+              }
+
+              return true;
+            },
+          }),
+      }),
+
+      exposeDependency('#directory'),
+    ],
 
     directorySuffixForTracks: [
       exposeUpdateValueOrContinue({
