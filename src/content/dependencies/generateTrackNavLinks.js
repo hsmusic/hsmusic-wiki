@@ -3,14 +3,14 @@ export default {
     albumLink:
       relation('linkAlbum', track.album),
 
+    albumLinkNavAccent:
+      relation('generateAlbumLinkNavAccent', track.album),
+
     trackLink:
       relation('linkTrack', track),
   }),
 
   data: (track) => ({
-    albumStyle:
-      track.album.style,
-
     showTrackSection:
       track.album.showTrackSectionInNavBar,
 
@@ -39,10 +39,7 @@ export default {
 
       {
         html: relations.albumLink.slot('color', false),
-        accent:
-          (data.albumStyle === 'single'
-            ? language.$(navCapsule, 'singleAccent')
-            : null),
+        accent: relations.albumLinkNavAccent.slot('navString', navCapsule),
       },
 
       data.showTrackSection &&

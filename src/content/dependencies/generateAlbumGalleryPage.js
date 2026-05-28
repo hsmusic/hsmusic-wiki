@@ -34,11 +34,8 @@ export default {
     albumStyleTags:
       relation('generateAlbumStyleTags', album, null),
 
-    albumLink:
-      relation('linkAlbum', album),
-
-    albumNavAccent:
-      relation('generateAlbumNavAccent', album, null),
+    albumNavLinks:
+      relation('generateAlbumNavLinks', album),
 
     secondaryNav:
       relation('generateAlbumSecondaryNav', album),
@@ -132,20 +129,13 @@ export default {
         ],
 
         navLinkStyle: 'hierarchical',
-        navLinks: [
-          {auto: 'home'},
-          {
-            html:
-              relations.albumLink
-                .slot('attributes', {class: 'current'}),
-            accent:
-              relations.albumNavAccent.slots({
-                showTrackNavigation: false,
-                showExtraLinks: true,
-                currentExtra: 'gallery',
-              }),
-          },
-        ],
+        navLinks:
+          html.resolve(
+            relations.albumNavLinks.slots({
+              showTrackNavigation: false,
+              showExtraLinks: true,
+              currentExtra: 'gallery',
+            })),
 
         secondaryNav: relations.secondaryNav,
       })),

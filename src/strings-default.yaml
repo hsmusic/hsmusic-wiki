@@ -1365,6 +1365,22 @@ albumPage:
 
     backToAlbum: "Return to album page"
 
+    albumAccent:
+      withNameDetail: >-
+        {NAME_DETAIL}
+
+      withType: >-
+        {TYPE}
+
+      withNameDetail.withType: >-
+        {TYPE}: {NAME_DETAIL}
+
+      type.single: "single" # This string should probably never appear, but...
+      type.vgm: "in-game vgm"
+
+      withLinks: >-
+        {ACCENT} - {LINKS}
+
     randomTrack: "Random Track"
     gallery: "Gallery"
     commentary: "Commentary"
@@ -3110,7 +3126,18 @@ trackPage:
 
     backToTrack: "Return to track page"
 
-    singleAccent: "single"
+    albumAccent:
+      withNameDetail: >-
+        {NAME_DETAIL}
+
+      withType: >-
+        {TYPE}
+
+      withNameDetail.withType: >-
+        {TYPE}: {NAME_DETAIL}
+
+      type.single: "single"
+      type.vgm: "vgm"
 
     track:
       _: "{TRACK}"

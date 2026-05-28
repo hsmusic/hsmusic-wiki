@@ -11,8 +11,8 @@ export default {
     socialEmbed:
       relation('generateAlbumSocialEmbed', album),
 
-    albumNavAccent:
-      relation('generateAlbumNavAccent', album, null),
+    albumNavLinks:
+      relation('generateAlbumNavLinks', album),
 
     secondaryNav:
       relation('generateAlbumSecondaryNav', album),
@@ -201,17 +201,12 @@ export default {
         ],
 
         navLinkStyle: 'hierarchical',
-        navLinks: [
-          {auto: 'home'},
-          {
-            auto: 'current',
-            accent:
-              relations.albumNavAccent.slots({
-                showTrackNavigation: true,
-                showExtraLinks: true,
-              }),
-          },
-        ],
+        navLinks:
+          html.resolve(
+            relations.albumNavLinks.slots({
+              showTrackNavigation: true,
+              showExtraLinks: true,
+            })),
 
         banner: relations.banner ?? null,
         bannerPosition: 'top',

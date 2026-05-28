@@ -51,8 +51,8 @@ export default {
     albumNavLink:
       relation('linkAlbum', track.album),
 
-    albumNavAccent:
-      relation('generateAlbumNavAccent', track.album, track),
+    albumNavSwitcher:
+      relation('generateAlbumNavSwitcher', track.album, track),
 
     secondaryNav:
       relation('generateAlbumSecondaryNav', track.album),
@@ -401,7 +401,7 @@ export default {
         navBottomRowContent:
           (data.singleTrackSingle
             ? null
-            : relations.albumNavAccent.slots({
+            : relations.albumNavSwitcher.slots({
                 showTrackNavigation: true,
                 showExtraLinks: false,
               })),

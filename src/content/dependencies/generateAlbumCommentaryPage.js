@@ -31,11 +31,8 @@ export default {
     relations.albumStyleTags =
       relation('generateAlbumStyleTags', album, null);
 
-    relations.albumLink =
-      relation('linkAlbum', album);
-
-    relations.albumNavAccent =
-      relation('generateAlbumNavAccent', album, null);
+    relations.albumNavLinks =
+      relation('generateAlbumNavLinks', album);
 
     relations.totals =
       relation('getContentEntryTotals',
@@ -263,21 +260,13 @@ export default {
         ],
 
         navLinkStyle: 'hierarchical',
-        navLinks: [
-          {auto: 'home'},
-          {
-            html:
-              relations.albumLink
-                .slot('attributes', {class: 'current'}),
-
-            accent:
-              relations.albumNavAccent.slots({
-                showTrackNavigation: false,
-                showExtraLinks: true,
-                currentExtra: 'commentary',
-              }),
-          },
-        ],
+        navLinks:
+          html.resolve(
+            relations.albumNavLinks.slots({
+              showTrackNavigation: false,
+              showExtraLinks: true,
+              currentExtra: 'commentary',
+            })),
 
         secondaryNav:
           relations.secondaryNav.slots({
