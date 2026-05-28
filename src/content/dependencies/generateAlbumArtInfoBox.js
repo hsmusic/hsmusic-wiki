@@ -29,7 +29,7 @@ export default {
     wallpaperPartPaths:
       album.wallpaperParts
         .filter(part => part.asset)
-        .map(part => ['media.albumWallpaperPart', album.directory, part.asset]),
+        .map(part => album.getWallpaperPartPath(part)),
 
     bannerImagePath:
       (album.bannerArtwork

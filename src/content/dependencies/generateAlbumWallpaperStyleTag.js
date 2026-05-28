@@ -11,7 +11,7 @@ export default {
       album.wallpaperBrightness,
 
     singleWallpaperPath:
-      ['media.albumWallpaper', album.directory, album.wallpaperFileExtension],
+      album.wallpaperArtwork.path,
 
     singleWallpaperStyle:
       album.wallpaperStyle,
@@ -19,7 +19,7 @@ export default {
     wallpaperPartPaths:
       album.wallpaperParts.map(part =>
         (part.asset
-          ? ['media.albumWallpaperPart', album.directory, part.asset]
+          ? album.getWallpaperPartPath(part)
           : null)),
 
     wallpaperPartStyles:
