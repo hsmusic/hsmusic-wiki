@@ -85,6 +85,7 @@ export const info = {
   groupResultKindString: null,
   singleResultKindString: null,
   tagResultKindString: null,
+  vgmAlbumResultKindString: null,
 
   groupResultDisambiguatorString: null,
   flashResultDisambiguatorString: null,
@@ -242,6 +243,9 @@ export function getPageReferences() {
 
   info.tagResultKindString =
     findString('tag-result-kind');
+
+  info.vgmAlbumResultKindString =
+    findString('vgm-album-result-kind');
 
   info.groupResultDisambiguatorString =
     findString('group-result-disambiguator');
@@ -1117,6 +1121,8 @@ function generateSidebarSearchResult(result, results) {
       preparedSlots.kindString =
         (result.data.classification === 'single'
           ? info.singleResultKindString
+       : result.data.classification === 'in-game vgm'
+          ? info.vgmAlbumResultKindString
           : info.albumResultKindString);
 
       break;

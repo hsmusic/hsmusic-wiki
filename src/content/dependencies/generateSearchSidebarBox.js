@@ -64,6 +64,9 @@ export default {
 
             html.tag('template', {class: 'wiki-search-tag-result-kind-string'},
               language.$(capsule, 'artTag')),
+
+            html.tag('template', {class: 'wiki-search-vgm-album-result-kind-string'},
+              language.$(capsule, 'vgmAlbum')),
           ]),
 
           language.encapsulate(capsule, 'resultDisambiguator', capsule => [

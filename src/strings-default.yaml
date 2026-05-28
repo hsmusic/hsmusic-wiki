@@ -1006,6 +1006,7 @@ misc:
       flash: "(flash)"
       group: "(group)"
       single: "(single)"
+      vgmAlbum: "(in-game vgm)"
 
     resultDisambiguator:
       group: "({CATEGORY})"
