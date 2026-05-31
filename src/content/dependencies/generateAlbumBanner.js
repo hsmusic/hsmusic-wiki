@@ -19,8 +19,8 @@ export default {
     }
 
     return {
-      path: ['media.albumBanner', album.directory, album.bannerFileExtension],
-      dimensions: album.bannerDimensions,
+      path: album.bannerArtwork.path,
+      dimensions: album.bannerArtwork.dimensions,
     };
   },
 
