@@ -754,11 +754,8 @@
     margin-bottom: 2px;
   }
 
-  p.image-details.origin-details .origin-details-line {
-    display: block;
-    margin-top: 0.25em;
-  }
-
+  p.image-details.origin-details .origin-details-line,
+  p.image-details.origin-details .file-notes-line,
   p.image-details.origin-details .filename-line {
     display: block;
     margin-top: 0.25em;

@@ -18,6 +18,9 @@ export default {
     originDetails:
       relation('transformContent', artwork.originDetails),
 
+    fileNotes:
+      relation('transformContent', artwork.fileNotes),
+
     albumLink:
       (artwork.thing.isAlbum
         ? relation('linkAlbum', artwork.thing)
@@ -146,6 +149,15 @@ export default {
                 absorbPunctuationFollowingExternalLinks: false,
               }));
 
+          const fileNotesLine =
+            html.tag('span', {class: 'file-notes-line'},
+              {[html.onlyIfContent]: true},
+
+              relations.fileNotes.slots({
+                mode: 'inline',
+                absorbPunctuationFollowingExternalLinks: false,
+              }));
+
           const filenameLine =
             html.tag('span', {class: 'filename-line'},
               {[html.onlyIfContent]: true},
@@ -165,6 +177,7 @@ export default {
             ], {[html.joinChildren]: html.tag('br')}),
 
             originDetailsLine,
+            fileNotesLine,
             filenameLine,
           ];
         })())),
