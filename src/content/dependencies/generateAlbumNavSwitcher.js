@@ -58,7 +58,8 @@ export default {
       albumHasSubstantialCommentaryPage(album),
 
     galleryIsStub:
-      album.tracks.every(t => !t.hasUniqueCoverArt),
+      album.tracks.every(t => !t.hasUniqueCoverArt) &&
+      album.coverArtworks.length <= 1,
 
     isTrackPage:
       !!track,

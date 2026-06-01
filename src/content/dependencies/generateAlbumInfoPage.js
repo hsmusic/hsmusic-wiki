@@ -38,7 +38,8 @@ export default {
       relation('generateAlbumReleaseInfo', album),
 
     galleryLink:
-      (album.tracks.some(t => t.hasUniqueCoverArt)
+      (album.tracks.some(t => t.hasUniqueCoverArt) ||
+       album.coverArtworks.length >= 2
         ? relation('linkAlbumGallery', album)
         : null),
 
