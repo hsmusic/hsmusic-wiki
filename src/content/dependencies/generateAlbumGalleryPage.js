@@ -10,7 +10,13 @@ export default {
         .map(track => track.trackArtworks
           .map(artwork => artwork.label));
 
-    const recurranceThreshold = 2;
+    const numTracksWithArtworks =
+      album.tracks
+        .filter(track => track.hasUniqueCoverArt)
+        .length;
+
+    const recurranceThreshold =
+      Math.max(2, Math.floor(numTracksWithArtworks / 10));
 
     // This list may include null, if some artworks are not labelled!
     // That's expected.
