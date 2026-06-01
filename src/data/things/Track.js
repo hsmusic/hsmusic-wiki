@@ -1453,28 +1453,63 @@ export class Track extends Thing {
     return this.album.getAlbumArtPath(filename);
   }
 
-  countOwnContributionInContributionTotals(_contrib) {
+  countOwnContributionInContributionTotals(contrib) {
     if (!this.countInArtistTotals) {
       return false;
     }
 
     if (this.isSecondaryRelease) {
-      return false;
+      const correspondingContrib =
+        this.getCorrespondingMainReleaseContrib(contrib);
+
+      if (correspondingContrib) {
+        return false;
+      }
     }
 
     return true;
   }
 
-  countOwnContributionInDurationTotals(_contrib) {
+  countOwnContributionInDurationTotals(contrib) {
     if (!this.countInArtistTotals) {
       return false;
     }
 
     if (this.isSecondaryRelease) {
-      return false;
+      const correspondingContrib =
+        this.getCorrespondingMainReleaseContrib(contrib);
+
+      if (correspondingContrib) {
+        return false;
+      }
     }
 
     return true;
+  }
+
+  getCorrespondingMainReleaseContrib(contrib) {
+    if (!this.isSecondaryRelease) return null;
+
+    const filterMatchingContrib = c =>
+      c.artist === contrib.artist &&
+      c.annotation === contrib.annotation;
+
+    const myList =
+      this[contrib.thingProperty]
+        .filter(filterMatchingContrib);
+
+    const mainList =
+      this.mainReleaseTrack[contrib.thingProperty]
+        .filter(filterMatchingContrib);
+
+    const index = myList.indexOf(contrib);
+
+    if (index === -1) {
+      const key = contrib.thingProperty;
+      throw new Error(`Couldn't find contribution in track's own ${key}`);
+    }
+
+    return mainList.at(index) ?? null;
   }
 
   [inspect.custom](depth) {
