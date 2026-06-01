@@ -635,6 +635,11 @@ export default {
               link.setSlot('tooltipStyle', 'none');
             }
 
+            // TODO: The same, the same.
+            if (!errors(() => link.getSlotDescription('showNameDetail'))) {
+              link.setSlot('showNameDetail', 'inside');
+            }
+
             let doTheAbsorbyThing = false;
 
             // TODO: This is just silly.

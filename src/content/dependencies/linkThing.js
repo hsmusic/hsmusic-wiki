@@ -19,8 +19,12 @@ export default {
   data: (pathKey, thing) => ({
     name: thing.name,
     nameShort: thing.nameShort ?? thing.shortName,
-    nameDetail: thing.nameDetail,
     nameText: thing.nameText,
+
+    nameDetail:
+      thing.nameDetail ??
+      thing.nameDetailAcrossWiki ??
+      null,
 
     path:
       (pathKey
