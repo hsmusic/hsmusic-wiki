@@ -51,7 +51,14 @@ export class ThingSortingRule extends SortingRule {
           continue;
         }
 
-        if (lc.endsWith('name')) {
+        if (lc === 'name') {
+          sortByName(sortable, {
+            getName: thing =>
+              thing.nameForSorting ??
+              thing.name,
+          });
+          continue;
+        } else if (lc.endsWith('name')) {
           sortByName(sortable, {getName: get});
           continue;
         }

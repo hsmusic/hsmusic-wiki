@@ -40,10 +40,14 @@ export function normalizeName(s) {
   // punctuation, with a single typical space, then trim the ends.
   s = s
     .replace(
-      /[\p{Separator}\p{Dash_Punctuation}\p{Connector_Punctuation}]+/gu,
+      /[/\p{Separator}\p{Dash_Punctuation}\p{Connector_Punctuation}]+/gu,
       ' '
     )
     .trim();
+
+  // Zero-prefix sequences of digits (bounded by only select characters),
+  // so lesser-value numbers precede greater.
+  s = s.replace(/(?<=[ ({\[<]|^)\d+(?=[ )}\]>]|$)/g, match => match.padStart(5, '0'));
 
   // Discard anything that isn't a letter, number, space, or apostrophe.
   s = s.replace(/[^\p{Letter}\p{Number} ']/gu, '').trim();

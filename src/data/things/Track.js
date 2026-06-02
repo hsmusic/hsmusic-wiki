@@ -677,6 +677,10 @@ export class Track extends Thing {
             : continuation()),
       },
 
+      exposeDependency('nameForSorting'),
+    ],
+
+    nameForSorting: [
       {
         dependencies: ['name', 'nameDetailAcrossWiki'],
         compute: (continuation, {name, nameDetailAcrossWiki}) =>
