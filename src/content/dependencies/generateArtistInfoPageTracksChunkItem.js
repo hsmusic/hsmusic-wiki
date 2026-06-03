@@ -53,9 +53,6 @@ export default {
     template:
       relation('generateArtistInfoPageChunkItem'),
 
-    trackLink:
-      relation('linkTrack', query.track),
-
     trackListItem:
       relation('generateTrackListItem',
         query.track,
@@ -113,6 +110,7 @@ export default {
             html.inside(
               relations.trackListItem.slots({
                 showArtists: 'auto',
+                showDetail: 'from across wiki',
                 showDuration: slots.showDuration,
                 showDate: data.date,
               })),
