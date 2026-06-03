@@ -34,8 +34,13 @@ export default {
       relations.items.map(item =>
         item.slots({
           showArtists: slots.showArtists,
-          showDetail: slots.showDetail,
           showDuration: slots.showDuration,
+
+          showDetail:
+            (slots.showDetail
+              ? 'from across wiki'
+              : false),
+
           colorMode: slots.colorMode,
         }))),
 };
