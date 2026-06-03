@@ -21,7 +21,11 @@ export default {
   generate: (data, relations, {html}) =>
     relations.template.slots({
       mode: 'flash',
-      link: relations.flashActLink,
+
+      link:
+        relations.flashActLink
+          .slot('showNameDetail', 'accent'),
+
       dates: data.dates,
 
       list:

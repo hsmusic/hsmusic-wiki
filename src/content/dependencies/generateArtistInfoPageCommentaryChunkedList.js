@@ -284,7 +284,8 @@ export default {
             }
 
             chunk.setSlots({
-              link: chunkLink,
+              link:
+                chunkLink.slot('showNameDetail', 'accent'),
 
               list:
                 html.tag('ul',

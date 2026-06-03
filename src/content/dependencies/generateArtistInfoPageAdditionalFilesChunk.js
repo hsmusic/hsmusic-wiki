@@ -28,7 +28,10 @@ export default {
   generate: (relations, slots, {html}) =>
     relations.template.slots({
       mode: 'album',
-      link: relations.albumLink,
+
+      link:
+        relations.albumLink
+          .slot('showNameDetail', 'accent'),
 
       list:
         html.tag('ul',

@@ -35,6 +35,8 @@ export default {
           const creditCapsule = workingCapsule + '.credit';
           const workingOptions = {album: relations.albumLink};
 
+          relations.albumLink.setSlot('showNameDetail', 'accent');
+
           relations.albumArtistCredit.setSlots({
             normalStringKey: creditCapsule + '.by',
           });

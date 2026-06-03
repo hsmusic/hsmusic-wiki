@@ -28,7 +28,9 @@ export default {
   generate: (data, relations, slots, {html}) =>
     relations.template.slots({
       mode: 'album',
-      link: relations.albumLink,
+      link:
+        relations.albumLink
+          .slot('showNameDetail', 'accent'),
 
       dates:
         (slots.filterEditsForWiki
