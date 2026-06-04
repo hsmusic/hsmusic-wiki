@@ -15,9 +15,8 @@ export default {
   data(album) {
     const data = {};
 
-    if (album.date) {
-      data.date = album.date;
-    }
+    data.date = album.date;
+    data.dateStyle = album.dateStyle;
 
     if (album.coverArtDate && +album.coverArtDate !== +album.date) {
       data.coverArtDate = album.coverArtDate;
@@ -51,10 +50,15 @@ export default {
             chronologyKind: 'album',
           }),
 
-          language.$(capsule, 'released', {
-            [language.onlyIfOptions]: ['date'],
-            date: language.formatDate(data.date),
-          }),
+          (data.dateStyle === 'released'
+            ? language.$(capsule, 'released', {
+                date: language.formatDate(data.date),
+              })
+         : data.dateStyle === 'posted'
+            ? language.$(capsule, 'posted', {
+                date: language.formatDate(data.date),
+              })
+            : html.blank()),
 
           language.$(capsule, 'duration', {
             [language.onlyIfOptions]: ['duration'],
