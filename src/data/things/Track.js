@@ -282,6 +282,7 @@ export class Track extends Thing {
     additionalNames: thingList(V(AdditionalName)),
 
     dateFirstReleased: simpleDate(),
+    datePosted: simpleDate(),
 
     // > Update & expose - Credits and contributors
 
@@ -721,9 +722,28 @@ export class Track extends Thing {
       },
 
       exposeDependencyOrContinue('dateFirstReleased'),
+      exposeDependencyOrContinue('datePosted'),
 
       withPropertyFromObject('album', V('date')),
       exposeDependency('#album.date'),
+    ],
+
+    dateStyle: [
+      exitWithoutDependency('date'),
+
+      {
+        dependencies: ['_dateFirstReleased', '_datePosted'],
+        compute: (continuation, {
+          ['_dateFirstReleased']: dateFirstReleased,
+          ['_datePosted']: datePosted,
+        }) =>
+          (dateFirstReleased ? 'released'
+         : datePosted        ? 'posted'
+                             : continuation()),
+      },
+
+      withPropertyFromObject('album', V('dateStyle')),
+      exposeDependency('#album.dateStyle'),
     ],
 
     trackNumber: [
@@ -1060,10 +1080,8 @@ export class Track extends Thing {
         transform: parseAdditionalNames,
       },
 
-      'Date First Released': {
-        property: 'dateFirstReleased',
-        transform: parseDate,
-      },
+      'Date First Released': {property: 'dateFirstReleased', transform: parseDate},
+      'Date Posted': {property: 'datePosted', transform: parseDate},
 
       // Credits and contributors
 
@@ -1239,6 +1257,11 @@ export class Track extends Thing {
           'Cover Artists',
         ],
       },
+
+      {message: `Only one unique date per track is supported`, fields: [
+        'Date First Released',
+        'Date Posted',
+      ]},
 
       {message: `Don't include URLs alongside Excluding URLs, unless Excluding URLs is false`, fields: [
         'URLs',

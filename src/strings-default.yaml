@@ -292,6 +292,11 @@ releaseInfo:
   released: "Released {DATE}."
   albumReleased: "Album released {DATE}."
   trackReleased: "Track released {DATE}."
+
+  posted: "Posted {DATE}."
+  albumPosted: "Album posted {DATE}."
+  trackPosted: "Track posted {DATE}."
+
   addedToWiki: "Added to wiki {DATE}."
 
   unofficialName: >-
@@ -1394,13 +1399,38 @@ albumPage:
     #   string, ex. "63 tracks".
 
     body:
-      withDuration: "{DURATION}."
-      withTracks: "{TRACKS}."
-      withReleaseDate: Released {DATE}.
-      withDuration.withTracks: "{DURATION}, {TRACKS}."
-      withDuration.withReleaseDate: "{DURATION}. Released {DATE}."
-      withTracks.withReleaseDate: "{TRACKS}. Released {DATE}."
-      withDuration.withTracks.withReleaseDate: "{DURATION}, {TRACKS}. Released {DATE}."
+      withDuration: >-
+        {DURATION}.
+
+      withTracks: >-
+        {TRACKS}.
+
+      withDateReleased: >-
+        Released {DATE}.
+
+      withDatePosted: >-
+        Posted {DATE}.
+
+      withDuration.withTracks: >-
+        {DURATION}, {TRACKS}.
+
+      withDuration.withDateReleased: >-
+        {DURATION}. Released {DATE}.
+
+      withDuration.withDatePosted: >-
+        {DURATION}. Posted {DATE}.
+
+      withTracks.withDateReleased: >-
+        {TRACKS}. Released {DATE}.
+
+      withTracks.withDatePosted: >-
+        {DURATION}. Posted {DATE}.
+
+      withDuration.withTracks.withDateReleased: >-
+        {DURATION}, {TRACKS}. Released {DATE}.
+
+      withDuration.withTracks.withDatePosted: >-
+        {DURATION}, {TRACKS}. Posted {DATE}.
 
 #
 # albumGalleryPage:
@@ -1421,11 +1451,17 @@ albumGalleryPage:
   statsLine: >-
     {TRACKS} totaling {DURATION}.
 
-  statsLine.withDate: >-
+  statsLine.withDateReleased: >-
     {TRACKS} totaling {DURATION}. Released {DATE}.
 
-  statsLine.withDate.noDuration: >-
+  statsLine.withDatePosted: >-
+    {TRACKS} totaling {DURATION}. Posted {DATE}.
+
+  statsLine.withDateReleased.noDuration: >-
     Released {DATE}.
+
+  statsLine.withDatePosted.noDuration: >-
+    Posted {DATE}.
 
   # coverArtistsLine:
   #   This is displayed if every track (which has artwork at all)

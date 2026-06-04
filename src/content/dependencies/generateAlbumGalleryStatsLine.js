@@ -5,6 +5,9 @@ export default {
     date:
       album.date,
 
+    dateStyle:
+      album.dateStyle,
+
     hideDuration:
       album.hideDuration,
 
@@ -40,8 +43,13 @@ export default {
               language.formatDuration(data.duration, {unit: true}));
         }
 
-        if (data.date) {
-          workingCapsule += '.withDate';
+        if (data.dateStyle === 'released') {
+          workingCapsule += '.withDateReleased';
+          workingOptions.date =
+            html.tag('b',
+              language.formatDate(data.date));
+        } else if (data.dateStyle === 'posted') {
+          workingCapsule += '.withDatePosted';
           workingOptions.date =
             html.tag('b',
               language.formatDate(data.date));

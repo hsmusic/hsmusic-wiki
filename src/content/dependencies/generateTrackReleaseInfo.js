@@ -22,6 +22,7 @@ export default {
 
     data.name = track.name;
     data.date = track.date;
+    data.dateStyle = track.dateStyle;
     data.duration = track.duration;
 
     const {album} = track;
@@ -65,10 +66,15 @@ export default {
             });
           }),
 
-          language.$(capsule, 'released', {
-            [language.onlyIfOptions]: ['date'],
-            date: language.formatDate(data.date),
-          }),
+          (data.dateStyle === 'released'
+            ? language.$(capsule, 'released', {
+                date: language.formatDate(data.date),
+              })
+         : data.dateStyle === 'posted'
+            ? language.$(capsule, 'posted', {
+                date: language.formatDate(data.date),
+              })
+            : html.blank()),
 
           language.$(capsule, 'duration', {
             [language.onlyIfOptions]: ['duration'],

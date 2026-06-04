@@ -96,10 +96,18 @@ export default {
     data.name = album.name;
     data.color = album.color;
     data.date = album.date;
+    data.dateStyle = album.dateStyle;
 
     data.trackCommentaryTrackDates =
       query.tracksWithCommentary
-        .map(track => track.dateFirstReleased);
+        .map(track =>
+          (+track.date !== +album.date
+            ? track.date
+            : null));
+
+    data.trackCommentaryTrackDateStyles =
+      query.tracksWithCommentary
+        .map(track => track.dateStyle);
 
     data.trackCommentaryDirectories =
       query.tracksWithCommentary
@@ -136,10 +144,21 @@ export default {
             [
               data.date &&
               relations.totals.entryCount >= 1 &&
-                language.$('releaseInfo.albumReleased', {
-                  date:
-                    html.tag('b',
-                      language.formatDate(data.date)),
+                language.encapsulate('releaseInfo', workingCapsule => {
+                  const workingOptions = {};
+
+                  workingOptions.date =
+                    html.tag('b', language.formatDate(data.date));
+
+                  if (data.dateStyle === 'released') {
+                    workingCapsule += '.albumReleased';
+                  } else if (data.dateStyle === 'posted') {
+                    workingCapsule += '.albumPosted';
+                  } else {
+                    return html.blank();
+                  }
+
+                  return language.$(workingCapsule, workingOptions);
                 }),
 
               language.encapsulate(pageCapsule, 'infoLine', workingCapsule => {
@@ -211,6 +230,7 @@ export default {
             entries: relations.trackCommentaryEntries,
             color: data.trackCommentaryColors,
             trackDate: data.trackCommentaryTrackDates,
+            trackDateStyle: data.trackCommentaryTrackDateStyles,
           }).map(({
               heading,
               link,
@@ -220,6 +240,7 @@ export default {
               entries,
               color,
               trackDate,
+              trackDateStyle,
             }) =>
               language.encapsulate(pageCapsule, 'entry', entryCapsule => [
                 language.encapsulate(entryCapsule, 'title.trackCommentary', titleCapsule =>
@@ -243,20 +264,37 @@ export default {
                       }),
                   })),
 
-              cover?.slots({
-                mode: 'commentary',
-                color: true,
-              }),
+                cover?.slots({
+                  mode: 'commentary',
+                  color: true,
+                }),
 
-              trackDate &&
-              trackDate !== data.date &&
                 html.tag('p', {class: 'track-info'},
-                  language.$('releaseInfo.trackReleased', {
-                    date: language.formatDate(trackDate),
+                  {[html.onlyIfContent]: true},
+
+                  language.encapsulate('releaseInfo', workingCapsule => {
+                    const workingOptions = {};
+
+                    if (!trackDate) {
+                      return html.blank();
+                    }
+
+                    workingOptions.date =
+                      language.formatDate(trackDate);
+
+                    if (trackDateStyle === 'released') {
+                      workingCapsule += '.trackReleased';
+                    } else if (trackDateStyle === 'posted') {
+                      workingCapsule += '.trackPosted';
+                    } else {
+                      return html.blank();
+                    }
+
+                    return language.$(workingCapsule, workingOptions);
                   })),
 
-              entries.map(entry => entry.slot('color', color)),
-            ])),
+                entries.map(entry => entry.slot('color', color)),
+              ])),
         ],
 
         navLinkStyle: 'hierarchical',

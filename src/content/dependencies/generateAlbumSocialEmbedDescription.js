@@ -10,6 +10,9 @@ export default {
 
     date:
       album.date,
+
+    dateStyle:
+      album.dateStyle,
   }),
 
   generate: (data, {language}) =>
@@ -28,8 +31,12 @@ export default {
           language.countTracks(data.tracks, {unit: true});
       }
 
-      if (data.date) {
-        workingCapsule += '.withReleaseDate';
+      if (data.dateStyle === 'released') {
+        workingCapsule += '.withDateReleased';
+        workingOptions.date =
+          language.formatDate(data.date);
+      } else if (data.dateStyle === 'posted') {
+        workingCapsule += '.withDatePosted';
         workingOptions.date =
           language.formatDate(data.date);
       }

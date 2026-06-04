@@ -223,7 +223,8 @@ export class Album extends Thing {
 
     additionalNames: thingList(V(AdditionalName)),
 
-    date: simpleDate(),
+    dateReleased: simpleDate(),
+    datePosted: simpleDate(),
     dateAddedToWiki: simpleDate(),
 
     // > Update & expose - Credits and contributors
@@ -527,6 +528,27 @@ export class Album extends Thing {
       withFlattenedList('#trackSections.tracks'),
       exposeDependency('#flattenedList'),
     ],
+
+    date: [
+      exposeDependencyOrContinue('dateReleased'),
+      exposeDependencyOrContinue('datePosted'),
+      exposeConstant(V(null)),
+    ],
+
+    dateStyle: [
+      exitWithoutDependency('date'),
+
+      {
+        dependencies: ['_dateReleased', '_datePosted'],
+        compute: ({
+          ['_dateReleased']: dateReleased,
+          ['_datePosted']: datePosted,
+        }) =>
+          (dateReleased ? 'released'
+         : datePosted   ? 'posted'
+                        : null),
+      },
+    ]
   });
 
   static [Thing.getSerializeDescriptors] = ({
@@ -721,15 +743,9 @@ export class Album extends Thing {
         transform: parseAdditionalNames,
       },
 
-      'Date': {
-        property: 'date',
-        transform: parseDate,
-      },
-
-      'Date Added': {
-        property: 'dateAddedToWiki',
-        transform: parseDate,
-      },
+      'Date': {property: 'dateReleased', transform: parseDate},
+      'Date Posted': {property: 'datePosted', transform: parseDate},
+      'Date Added': {property: 'dateAddedToWiki', transform: parseDate},
 
       // Credits and contributors
 
