@@ -5,14 +5,16 @@ export default {
 query: (track, artist) => ({
   rereleases:
     sortAlbumsTracksChronologically(
-      track.otherReleases.filter(track => {
-        const contribs = [
-          ...track.artistContribs,
-          ...track.contributorContribs,
-        ];
+      track.otherReleases
+        .filter(track => track.album.style !== 'meta')
+        .filter(track => {
+          const contribs = [
+            ...track.artistContribs,
+            ...track.contributorContribs,
+          ];
 
-        return contribs.some(contrib => contrib.artist === artist);
-      })),
+          return contribs.some(contrib => contrib.artist === artist);
+        })),
 }),
 
   relations: (relation, query, track, artist) => ({
@@ -30,14 +32,11 @@ query: (track, artist) => ({
 
   data: (query, track) => ({
     firstReleaseDate:
-      track.dateFirstReleased ??
-      track.album.date,
+      track.date,
 
     rereleaseDates:
       query.rereleases
-        .map(rerelease =>
-          rerelease.dateFirstReleased ??
-          rerelease.album.date),
+        .map(rerelease => rerelease.date),
   }),
 
   generate: (data, relations, {html, language}) =>

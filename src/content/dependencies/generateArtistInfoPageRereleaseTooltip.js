@@ -4,8 +4,12 @@ export default {
   query(track, artist) {
     const query = {};
 
+    const regularReleases =
+      track.allReleases
+        .filter(track => track.album.style !== 'meta');
+
     query.firstRelease =
-      sortAlbumsTracksChronologically(track.allReleases)[0];
+      sortAlbumsTracksChronologically(regularReleases)[0];
 
     const contribs = [
       ...query.firstRelease.artistContribs,
@@ -36,12 +40,10 @@ export default {
       artist.name,
 
     rereleaseDate:
-      track.dateFirstReleased ??
-      track.album.date,
+      track.date,
 
     firstReleaseDate:
-      query.firstRelease.dateFirstReleased ??
-      query.firstRelease.album.date,
+      query.firstRelease.date,
 
     creditedOnFirstRelease:
       query.creditedOnFirstRelease,

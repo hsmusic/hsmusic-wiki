@@ -19,6 +19,10 @@ export default {
     query.displayedContributions =
       selectRepresentativeArtistContributorContribs(contribs);
 
+    const regularReleases =
+      query.track.allReleases
+        .filter(track => track.album.style !== 'meta');
+
     // It's kinda awkward to perform this chronological sort here,
     // per track, rather than just reusing the one that's done to
     // sort all the items on the page altogether... but then, the
@@ -27,14 +31,16 @@ export default {
     // this is according to the dates of the tracks. Those can be
     // different - and it's the latter that determines whether the
     // track is a rerelease!
-    const allReleasesChronologically =
-      sortAlbumsTracksChronologically(query.track.allReleases);
+    const regularReleasesChronologically =
+      sortAlbumsTracksChronologically(regularReleases);
 
     query.isFirstRelease =
-      allReleasesChronologically[0] === query.track;
+      regularReleases.includes(query.track) &&
+      regularReleasesChronologically[0] === query.track;
 
     query.isLaterRelease =
-      allReleasesChronologically[0] !== query.track;
+      regularReleases.includes(query.track) &&
+      regularReleasesChronologically[0] !== query.track;
 
     query.hasOtherCreditedReleases =
       query.track.otherReleases.some(track => {
