@@ -519,6 +519,30 @@ export class Album extends Thing {
 
     isAlbum: exposeConstant(V(true)),
 
+    nameForReferencingAcrossWiki: [
+      {
+        dependencies: ['alwaysReferenceByDirectory'],
+        compute: (continuation, {alwaysReferenceByDirectory}) =>
+          (alwaysReferenceByDirectory
+            ? continuation.exit(null)
+            : continuation()),
+      },
+
+      exposeDependency('nameForSorting'),
+    ],
+
+    nameForSorting: [
+      {
+        dependencies: ['name', 'nameDetail'],
+        compute: (continuation, {name, nameDetail}) =>
+          (nameDetail
+            ? continuation.exit(`${name} (${nameDetail})`)
+            : continuation()),
+      },
+
+      exposeDependency('name'),
+    ],
+
     commentatorArtists: commentatorArtists(),
 
     tracks: [
