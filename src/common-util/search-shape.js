@@ -8,6 +8,7 @@
 
 const baselineStore = [
   'primaryName',
+  'nameDetail',
   'disambiguators',
   'classification',
   'artwork',
@@ -20,6 +21,7 @@ const searchShape = {
   generic: {
     index: [
       'primaryName',
+      'nameDetail',
       'parentName',
       'additionalNames',
       'groups',
@@ -31,6 +33,7 @@ const searchShape = {
   verbatim: {
     index: [
       'primaryName',
+      'nameDetail',
       'parentName',
       'additionalNames',
       'groups',

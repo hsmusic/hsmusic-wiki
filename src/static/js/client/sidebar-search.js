@@ -1261,11 +1261,19 @@ function generateSidebarSearchResult(result, results) {
 }
 
 function getSearchResultName(result) {
-  return (
+  const name =
     result.data.name ??
-    result.data.primaryName ??
-    null
-  );
+    result.data.primaryName;
+
+  if (!name) {
+    return null;
+  }
+
+  if (result.data.nameDetail) {
+    return `${name} (${result.data.nameDetail})`;
+  }
+
+  return name;
 }
 
 function getSearchResultImageSource(result) {

@@ -146,6 +146,10 @@ function baselineProcess(thing, _opts) {
   fields.primaryName =
     thing.name;
 
+  fields.nameDetail =
+    thing.nameDetailAcrossWiki ??
+    thing.nameDetail;
+
   fields.artwork =
     null;
 
