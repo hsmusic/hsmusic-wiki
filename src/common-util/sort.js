@@ -90,9 +90,10 @@ export function normalizeName(s) {
 // sortByDirectory will handle the rest, given all directories are unique
 // except when album and track directories overlap with each other.
 export function sortByDirectory(data, {
-  getDirectory = object => object.directory,
+  getDirectory = nativeGetDirectory,
 } = {}) {
-  const directories = data.map(getDirectory);
+  const directories =
+    data.map(thing => getDirectory(thing, nativeGetDirectory));
 
   sortMultipleArrays(data, directories,
     (a, b, directoryA, directoryB) =>
@@ -101,11 +102,18 @@ export function sortByDirectory(data, {
   return data;
 }
 
+export function nativeGetDirectory(thing, _nativeGetDirectory) {
+  return thing.directory;
+}
+
 export function sortByName(data, {
-  getName = object => object.name,
+  getName = nativeGetName,
 } = {}) {
-  const names = data.map(getName);
-  const normalizedNames = names.map(normalizeName);
+  const names =
+    data.map(thing => getName(thing, nativeGetName));
+
+  const normalizedNames =
+    names.map(normalizeName);
 
   sortMultipleArrays(data, normalizedNames, names,
     (
@@ -121,6 +129,13 @@ export function sortByName(data, {
   return data;
 }
 
+export function nativeGetName(thing, _nativeGetName) {
+  return (
+    thing.nameForSorting ??
+    thing.name
+  );
+}
+
 export function compareNormalizedNames(
   normalizedA, normalizedB,
   nonNormalizedA, nonNormalizedB,
@@ -133,16 +148,21 @@ export function compareNormalizedNames(
 }
 
 export function sortByDate(data, {
-  getDate = object => object.date,
+  getDate = nativeGetDate,
   latestFirst = false,
 } = {}) {
-  const dates = data.map(getDate);
+  const dates =
+    data.map(thing => getDate(thing, nativeGetDate));
 
   sortMultipleArrays(data, dates,
     (a, b, dateA, dateB) =>
       compareDates(dateA, dateB, {latestFirst}));
 
   return data;
+}
+
+export function nativeGetDate(thing) {
+  return thing.date;
 }
 
 export function compareDates(a, b, {
@@ -287,8 +307,8 @@ export function sortByConditions(data, conditions) {
 //  * directory (or override getDirectory)
 //  * name (or override getName)
 export function sortAlphabetically(data, {
-  getDirectory,
-  getName,
+  getDirectory = undefined,
+  getName = undefined,
 } = {}) {
   sortByDirectory(data, {getDirectory});
   sortByName(data, {getName});
@@ -301,9 +321,9 @@ export function sortAlphabetically(data, {
 //  * date (or override getDate)
 export function sortChronologically(data, {
   latestFirst = false,
-  getDirectory,
-  getName,
-  getDate,
+  getDirectory = undefined,
+  getName = undefined,
+  getDate = undefined,
 } = {}) {
   sortAlphabetically(data, {getDirectory, getName});
   sortByDate(data, {latestFirst, getDate});
@@ -373,16 +393,23 @@ export function prepareAndSort(sources, prepareForSort, sortFunction) {
 //
 // This function also works for data lists which contain only tracks.
 export function sortAlbumsTracksChronologically(data, {
+  getDate = undefined,
   latestFirst = false,
-  getDate,
 } = {}) {
   // Sort albums before tracks...
   sortByConditions(data, [t => t.isAlbum]);
 
   // Put albums alphabetically, and group with them...
   sortAlphabetically(data, {
-    getDirectory: t => t.isTrack ? t.album.directory : t.directory,
-    getName: t => t.isTrack ? t.album.name : t.name,
+    getDirectory: (thing, nativeGetDirectory) =>
+      (thing.isTrack
+        ? nativeGetDirectory(thing.album)
+        : nativeGetDirectory(thing)),
+
+    getName: (thing, nativeGetName) =>
+      (thing.isTrack
+        ? nativeGetName(thing.album)
+        : nativeGetName(thing)),
   });
 
   // Sort tracks by position in album...
@@ -414,13 +441,16 @@ export function sortArtworksChronologically(data, {
 }
 
 export function sortFlashesChronologically(data, {
+  getDate = undefined,
   latestFirst = false,
-  getDate,
 } = {}) {
   // Group flashes by act...
   sortAlphabetically(data, {
-    getName: flash => flash.act.name,
-    getDirectory: flash => flash.act.directory,
+    getName: (flash, nativeGetName) =>
+      nativeGetName(flash.act),
+
+    getDirectory: (flash, nativeGetDirectory) =>
+      nativeGetDirectory(flash.act),
   });
 
   // Sort flashes by position in act...
@@ -436,8 +466,8 @@ export function sortFlashesChronologically(data, {
 }
 
 export function sortContributionsChronologically(data, sortThings, {
+  getThing = nativeGetContributionThing,
   latestFirst = false,
-  getThing = contrib => contrib.thing,
 } = {}) {
   // Contributions only have one date property (which is provided when
   // the contribution is created). They're sorted by this most primarily,
@@ -446,7 +476,7 @@ export function sortContributionsChronologically(data, sortThings, {
   const entries =
     data.map(contrib => ({
       entry: contrib,
-      thing: getThing(contrib),
+      thing: getThing(contrib, nativeGetContributionThing),
     }));
 
   sortEntryThingPairs(
@@ -466,4 +496,8 @@ export function sortContributionsChronologically(data, sortThings, {
   data.splice(0, data.length, ...contribs);
 
   return data;
+}
+
+export function nativeGetContributionThing(contrib, _nativeGetContributionThing) {
+  return contrib.thing;
 }

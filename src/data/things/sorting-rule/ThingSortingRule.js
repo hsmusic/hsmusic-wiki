@@ -41,22 +41,24 @@ export class ThingSortingRule extends SortingRule {
         const get = thing => thing[property];
         const lc = property.toLowerCase();
 
-        if (lc.endsWith('date')) {
+        if (lc === 'date') {
+          sortByDate(sortable);
+          continue;
+        } else if (lc.endsWith('date')) {
           sortByDate(sortable, {getDate: get});
           continue;
         }
 
-        if (lc.endsWith('directory')) {
+        if (lc === 'directory') {
+          sortByDirectory(sortable);
+          continue;
+        } else if (lc.endsWith('directory')) {
           sortByDirectory(sortable, {getDirectory: get});
           continue;
         }
 
         if (lc === 'name') {
-          sortByName(sortable, {
-            getName: thing =>
-              thing.nameForSorting ??
-              thing.name,
-          });
+          sortByName(sortable);
           continue;
         } else if (lc.endsWith('name')) {
           sortByName(sortable, {getName: get});
