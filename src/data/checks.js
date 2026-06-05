@@ -273,6 +273,8 @@ export function filterReferenceErrors(wikiData, {
 
     ['artworkData', {
       referencedArtworks: '_artwork',
+      artistContribs: '_contrib',
+      artTags: 'artTag',
     }],
 
     ['flashData', {
