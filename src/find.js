@@ -207,18 +207,7 @@ export function prepareMatchByName(mode, fuzz, {byName, multipleNameMatches}) {
     const match = byName[normalizedName];
 
     if (match) {
-      if (
-        !fuzz?.capitalization &&
-        name !== match.name &&
-        name.toLowerCase === match.name.toLowerCase()
-      ) {
-        return oopsNameCapitalizationMismatch(mode, {
-          matchingName: name,
-          matchedName: match.name,
-        });
-      } else {
-        return match.thing;
-      }
+      return match.thing;
     } else if (multipleNameMatches[normalizedName]) {
       return oopsMultipleNameMatches(mode, {
         name,
@@ -299,21 +288,23 @@ function findHelper({
   // hasn't changed!
   const cache = new WeakMap();
 
-  return (fullRef, data, {
-    // The mode argument here may be 'warn', 'error', or 'quiet'. 'error' throws
-    // errors for null matches (with details about the error), while 'warn' and
-    // 'quiet' both return null, with 'warn' logging details directly to the
-    // console.
-    mode = 'warn',
-
-    from = null,
-
-    fuzz = {
-      capitalization: false,
-      kebab: false,
-    },
-  } = {}) => {
+  const entry = (fullRef, data, opts = {}) => {
     if (!fullRef) return null;
+
+    const {
+      // The mode argument here may be 'warn', 'error', or 'quiet'. 'error' throws
+      // errors for null matches (with details about the error), while 'warn' and
+      // 'quiet' both return null, with 'warn' logging details directly to the
+      // console.
+      mode = 'warn',
+
+      from = null,
+
+      fuzz = {
+        capitalization: false,
+        kebab: false,
+      },
+    } = opts;
 
     if (typeof fullRef !== 'string') {
       throw new TypeError(`Expected a string, got ${typeAppearance(fullRef)}`);
@@ -362,20 +353,63 @@ function findHelper({
 
     const {byDirectory, byName, multipleNameMatches} = fuzzSubcache;
 
-    return matchHelper(fullRef, mode, {
-      matchByDirectory:
-        prepareMatchByDirectory(mode, {
-          referenceTypes,
-          byDirectory,
-        }),
+    let match, matchError;
+    try {
+      match =
+        matchHelper(fullRef, mode, {
+          matchByDirectory:
+            prepareMatchByDirectory(mode, {
+              referenceTypes,
+              byDirectory,
+            }),
 
-      matchByName:
-        prepareMatchByName(mode, fuzz, {
-          byName,
-          multipleNameMatches,
-        }),
-    });
+          matchByName:
+            prepareMatchByName(mode, fuzz, {
+              byName,
+              multipleNameMatches,
+            }),
+        });
+    } catch (caughtError) {
+      match = null;
+      matchError = caughtError;
+    }
+
+    if (match) {
+      return match;
+    }
+
+    if (!fuzz?.capitalization && !fullRef.match(keyRefRegex)?.groups.key) {
+      let miscapitalizedMatch;
+
+      try {
+        miscapitalizedMatch =
+          entry(fullRef, data, {
+            ...opts,
+            fuzz: {
+              ...fuzz ?? {},
+              capitalization: true,
+            },
+          });
+      } catch {
+        miscapitalizedMatch = null;
+      }
+
+      if (miscapitalizedMatch) {
+        return oopsNameCapitalizationMismatch(mode, {
+          matchingName: fullRef,
+          matchedName: miscapitalizedMatch.name,
+        });
+      }
+    }
+
+    if (matchError) {
+      throw matchError;
+    } else {
+      return null;
+    }
   };
+
+  return entry;
 }
 
 const hardcodedFindSpecs = {
