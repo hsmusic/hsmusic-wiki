@@ -4,6 +4,7 @@ import {inspect as nodeInspect} from 'node:util';
 import {colors, ENABLE_COLOR} from '#cli';
 
 import CacheableObject from '#cacheable-object';
+import {nativeGetMatchableDirectories} from '#find';
 import {replacerSpec, parseContentNodes} from '#replacer';
 import {compareArrays, cut, cutStart, empty, getNestedProp, iterateMultiline}
   from '#sugar';
@@ -56,7 +57,7 @@ export function reportDirectoryErrors(wikiData, {
 
       const directories =
         (findSpec.getMatchableDirectories
-          ? findSpec.getMatchableDirectories(thing)
+          ? findSpec.getMatchableDirectories(thing, nativeGetMatchableDirectories)
           : [thing.directory]);
 
       for (const directory of directories) {

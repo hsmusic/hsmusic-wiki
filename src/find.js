@@ -58,13 +58,25 @@ export function fuzzName(name, fuzz = {}) {
   return name;
 }
 
+export function nativeGetMatchableNames(thing, _nativeGetMatchableNames) {
+  if (thing.nameForReferencingAcrossWiki === null) {
+    return [];
+  }
+
+  if (thing.nameForReferencingAcrossWiki) {
+    return [thing.nameForReferencingAcrossWiki];
+  }
+
+  if (thing.name) {
+    return [thing.name];
+  }
+
+  return [];
+}
+
 export function processAvailableMatchesByName(data, fuzz, {
   include = _thing => true,
-
-  getMatchableNames = thing =>
-    (thing.constructor.hasPropertyDescriptor('name')
-      ? [thing.name]
-      : []),
+  getMatchableNames = nativeGetMatchableNames,
 
   results = Object.create(null),
   multipleNameMatches = Object.create(null),
@@ -72,7 +84,7 @@ export function processAvailableMatchesByName(data, fuzz, {
   for (const thing of data) {
     if (!include(thing)) continue;
 
-    for (const name of getMatchableNames(thing)) {
+    for (const name of getMatchableNames(thing, nativeGetMatchableNames)) {
       if (typeof name !== 'string') {
         logWarn`Unexpected ${typeAppearance(name)} returned in names for ${inspect(thing)}`;
         continue;
@@ -99,20 +111,24 @@ export function processAvailableMatchesByName(data, fuzz, {
   return {results, multipleNameMatches};
 }
 
+export function nativeGetMatchableDirectories(thing, _nativeGetMatchableDirectories) {
+  if (thing.directory) {
+    return [thing.directory];
+  } else {
+    return [];
+  }
+}
+
 export function processAvailableMatchesByDirectory(data, {
   include = _thing => true,
-
-  getMatchableDirectories = thing =>
-    (thing.constructor.hasPropertyDescriptor('directory')
-      ? [thing.directory]
-      : [null]),
+  getMatchableDirectories = nativeGetMatchableDirectories,
 
   results = Object.create(null),
 }) {
   for (const thing of data) {
     if (!include(thing, thingConstructors)) continue;
 
-    for (const directory of getMatchableDirectories(thing)) {
+    for (const directory of getMatchableDirectories(thing, nativeGetMatchableDirectories)) {
       if (typeof directory !== 'string') {
         logWarn`Unexpected ${typeAppearance(directory)} returned in directories for ${inspect(thing)}`;
         continue;

@@ -1273,13 +1273,7 @@ export class Track extends Thing {
   static [Thing.findSpecs] = {
     track: {
       referenceTypes: ['track'],
-
       bindTo: 'trackData',
-
-      getMatchableNames: track =>
-        (track.nameForReferencingAcrossWiki
-          ? [track.nameForReferencingAcrossWiki]
-          : []),
     },
 
     trackMainReleasesOnly: {
@@ -1288,11 +1282,6 @@ export class Track extends Thing {
 
       include: track =>
         !CacheableObject.getUpdateValue(track, 'mainRelease'),
-
-      getMatchableNames: track =>
-        (track.nameForReferencingAcrossWiki
-          ? [track.nameForReferencingAcrossWiki]
-          : []),
     },
 
     trackReference: {
@@ -1350,12 +1339,6 @@ export class Track extends Thing {
 
       include: track =>
         track.hasUniqueCoverArt,
-
-      // This is an acontextual reference.
-      getMatchableNames: track =>
-        (track.referenceByDirectory === 'normally'
-          ? [track.name]
-          : []),
     },
 
     trackPrimaryArtwork: {
@@ -1374,14 +1357,11 @@ export class Track extends Thing {
         artwork.thing.isTrack &&
         artwork === artwork.thing.trackArtworks[0],
 
-      // This is an acontextual reference.
-      getMatchableNames: ({thing: track}) =>
-        (track.referenceByDirectory === 'normally'
-          ? [track.name]
-          : []),
+      getMatchableNames: (artwork, nativeGetMatchableNames) =>
+        nativeGetMatchableNames(artwork.thing),
 
-      getMatchableDirectories: ({thing: track}) =>
-        [track.directory],
+      getMatchableDirectories: (artwork, nativeGetMatchableDirectory) =>
+        nativeGetMatchableDirectory(artwork.thing),
     },
   };
 
