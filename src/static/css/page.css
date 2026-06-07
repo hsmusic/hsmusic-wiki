@@ -810,12 +810,15 @@
 
   #content h1 {
     font-size: 1.5em;
-  }
 
-  #content h1 .name-detail {
-    opacity: 0.8;
-    margin-left: 0.5ch;
-    font-weight: inherit;
+    .title-part:has(+ .name-detail) {
+      margin-right: 0.5ch;
+    }
+
+    .name-detail {
+      opacity: 0.8;
+      font-weight: inherit;
+    }
   }
 
   #content li {

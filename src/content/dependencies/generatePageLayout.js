@@ -307,15 +307,18 @@ export default {
             [language.onlyIfOptions]: ['title'],
           };
 
-          workingOptions.title = headingNamePart;
+          workingOptions.title =
+            html.tag('span', {class: 'title-part'},
+              headingNamePart);
 
           if (!html.isBlank(slots.titleDetail)) {
             workingCapsule += '.withDetail';
             workingOptions.detailAccent =
               html.tag('span', {class: 'name-detail'},
-                language.$(capsule, 'withDetail.accent', {
-                  detail: slots.titleDetail,
-                }));
+                html.metatag('chunkwrap', {split: ':'},
+                  language.$(capsule, 'withDetail.accent', {
+                    detail: slots.titleDetail,
+                  })));
           }
 
           return language.$(workingCapsule, workingOptions);
