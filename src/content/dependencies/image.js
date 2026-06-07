@@ -19,11 +19,6 @@ export default {
             .filter(artTag => artTag.isContentWarning)
             .map(artTag => artTag.name)
         : null),
-
-    dimensions:
-      (artwork
-        ? artwork.dimensions
-        : null),
   }),
 
   slots: {
@@ -33,7 +28,6 @@ export default {
 
     reveal: {type: 'boolean', default: true},
     lazy: {type: 'boolean', default: false},
-    square: {type: 'boolean', default: false},
 
     link: {
       validate: v => v.anyOf(v.isBoolean, v.isString),
@@ -72,14 +66,14 @@ export default {
       mutable: false,
     },
 
+    dimensions: {
+      validate: v => v.isDimensions,
+    },
+
     // These will also be used from the artwork if not specified as slots.
 
     warnings: {
       validate: v => v.looseArrayOf(v.isString),
-    },
-
-    dimensions: {
-      validate: v => v.isDimensions,
     },
   },
 
@@ -123,7 +117,7 @@ export default {
       (typeof slots.link === 'string' || slots.link);
 
     const warnings = slots.warnings ?? data.warnings;
-    const dimensions = slots.dimensions ?? data.dimensions;
+    const dimensions = slots.dimensions;
 
     const willReveal =
       slots.reveal &&
@@ -352,16 +346,10 @@ export default {
 
       wrapped =
         html.tag('div', {class: 'image-outer-area'},
-          slots.square &&
-            {class: 'square-content'},
-
           wrapped);
 
       wrapped =
         html.tag('div', {class: 'image-container'},
-          slots.square &&
-            {class: 'square'},
-
           typeof slots.link === 'string' &&
             {class: 'no-image-preview'},
 

@@ -6,7 +6,6 @@ import * as artTagGalleryFilterModule from './art-tag-gallery-filter.js';
 import * as artTagNetworkModule from './art-tag-network.js';
 import * as artistExternalLinkTooltipModule from './artist-external-link-tooltip.js';
 import * as artistRollingWindowModule from './artist-rolling-window.js';
-import * as cssCompatibilityAssistantModule from './css-compatibility-assistant.js';
 import * as datetimestampTooltipModule from './datetimestamp-tooltip.js';
 import * as draggedLinkModule from './dragged-link.js';
 import * as expandableGridSectionModule from './expandable-grid-section.js';
@@ -32,7 +31,6 @@ export const modules = [
   artTagNetworkModule,
   artistExternalLinkTooltipModule,
   artistRollingWindowModule,
-  cssCompatibilityAssistantModule,
   datetimestampTooltipModule,
   draggedLinkModule,
   expandableGridSectionModule,

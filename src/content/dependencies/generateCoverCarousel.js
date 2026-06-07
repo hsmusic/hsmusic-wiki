@@ -38,7 +38,6 @@ export default {
                   content:
                     image.slots({
                       thumb: 'small',
-                      square: true,
                       lazy:
                         (typeof slots.lazy === 'number'
                           ? index >= slots.lazy

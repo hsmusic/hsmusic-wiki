@@ -31,9 +31,6 @@ export default {
     color:
       artwork.thing.color ?? null,
 
-    dimensions:
-      artwork.dimensions,
-
     style:
       artwork.style,
   }),
@@ -74,17 +71,6 @@ export default {
     image.setSlot('imgAttributes', imgAttributes);
 
     image.setSlot('alt', slots.alt);
-
-    const square =
-      (data.dimensions
-        ? data.dimensions[0] === data.dimensions[1]
-        : true);
-
-    if (square) {
-      image.setSlot('square', true);
-    } else {
-      image.setSlot('dimensions', data.dimensions);
-    }
 
     const attributes = html.attributes();
 

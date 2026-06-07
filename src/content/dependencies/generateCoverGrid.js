@@ -143,7 +143,6 @@ export default {
 
                 image.slots({
                   thumb: 'medium',
-                  square: true,
                   lazy:
                     (typeof slots.lazy === 'number'
                       ? index >= slots.lazy
