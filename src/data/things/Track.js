@@ -301,10 +301,15 @@ export class Track extends Thing {
         validate: input.value(isContentString),
       }),
 
-      exposeDependencyOrContinue('_artistText'),
+      exposeDependency('artistText'),
+    ],
 
-      withPropertyFromObject('album', V('trackArtistText')),
-      exposeDependency('#album.trackArtistText'),
+    artistTextOnOwnPage: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isContentString),
+      }),
+
+      exposeDependency('artistText'),
     ],
 
     artistContribs: [
@@ -1088,6 +1093,7 @@ export class Track extends Thing {
 
       'Artist Text': {property: 'artistText'},
       'Artist Text In Lists': {property: 'artistTextInLists'},
+      'Artist Text On Own Page': {property: 'artistTextOnOwnPage'},
 
       'Artists': {
         property: 'artistContribs',

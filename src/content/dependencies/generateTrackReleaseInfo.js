@@ -8,7 +8,7 @@ export default {
     artistContributionsLine:
       relation('generateReleaseInfoContributionsLine',
         track.artistContribs,
-        track.artistText),
+        track.artistTextOnOwnPage),
 
     listenLineOrList:
       relation('generateListenLineOrList', track),
