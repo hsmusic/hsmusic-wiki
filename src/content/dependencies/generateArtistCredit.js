@@ -65,7 +65,10 @@ export default {
       relation('transformContent', formatText),
   }),
 
-  data: (query, _creditContributions, _contextContributions, _formatText) => ({
+  data: (query, _creditContributions, _contextContributions, formatText) => ({
+    blank:
+      formatText === 'none',
+
     normalContributionArtistsDifferFromContext:
       query.normalContributionArtistsDifferFromContext,
 
@@ -111,6 +114,7 @@ export default {
 
   generate(data, relations, slots, {html, language}) {
     if (!slots.normalStringKey) return html.blank();
+    if (data.blank) return html.blank();
 
     const effectivelyDiffers =
       (slots.showAnnotation && data.normalContributionAnnotationsDifferFromContext) ||
