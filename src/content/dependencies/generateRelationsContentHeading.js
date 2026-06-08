@@ -19,7 +19,8 @@ export default {
   generate(data, relations, slots, {html, language}) {
     const namePart =
       (data.nameStyle === 'utility' ||
-       data.nameStyle === 'unofficial'
+       data.nameStyle === 'unofficial' ||
+       data.nameStyle === 'unofficial localization'
         ? null
         : html.tag('i', data.name));
 

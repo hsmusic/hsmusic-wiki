@@ -194,6 +194,13 @@ export default {
                   name: data.name,
                 }))),
 
+          data.nameStyle === 'unofficial localization' &&
+            html.tag('p',
+              html.tag('i',
+                language.$('releaseInfo.unofficialLocalization', {
+                  name: data.name,
+                }))),
+
           relations.releaseInfo,
 
           html.tag('p',

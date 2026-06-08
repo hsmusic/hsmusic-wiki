@@ -152,6 +152,7 @@ export class Track extends Thing {
           'normal',
           'utility',
           'unofficial',
+          'unofficial localization',
         ])),
       }),
 

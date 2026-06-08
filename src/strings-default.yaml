@@ -302,6 +302,9 @@ releaseInfo:
   unofficialName: >-
     "{NAME}" is marked, on this wiki, as an unofficial name.
 
+  unofficialLocalization: >-
+    "{NAME}" is marked, on this wiki, as an unofficial localization.
+
   duration: "Duration: {DURATION}."
 
   contributors: "Contributors:"

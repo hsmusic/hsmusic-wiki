@@ -46,7 +46,8 @@ export default {
 
           const name =
             (data.nameStyle === 'utility' ||
-             data.nameStyle === 'unofficial'
+             data.nameStyle === 'unofficial' ||
+             data.nameStyle === 'unofficial localization'
               ? null
               : data.name);
 
