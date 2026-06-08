@@ -340,6 +340,8 @@ export class Track extends Thing {
       exposeDependency('#album.trackArtistContribs'),
     ],
 
+    contributorText: contentString(),
+
     contributorContribs: [
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
@@ -1099,6 +1101,8 @@ export class Track extends Thing {
         property: 'artistContribs',
         transform: parseContributors,
       },
+
+      'Contributor Text': {property: 'contributorText'},
 
       'Contributors': {
         property: 'contributorContribs',

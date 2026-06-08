@@ -163,17 +163,12 @@ export default {
             relations.featuredTracksList,
           ]),
 
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'contributors'},
-                title: language.$('releaseInfo.contributors'),
-              }),
+          relations.contributorContributionList.slots({
+            attributes: {id: 'contributors'},
+            title: language.$('releaseInfo.contributors'),
 
-            relations.contributorContributionList.slots({
-              chronologyKind: 'flash',
-            }),
-          ]),
+            chronologyKind: 'flash',
+          }),
 
           html.tags([
             relations.commentaryContentHeading,

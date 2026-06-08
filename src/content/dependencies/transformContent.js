@@ -302,7 +302,14 @@ export default {
 
   slots: {
     mode: {
-      validate: v => v.is('inline', 'multiline', 'lyrics', 'single-link'),
+      validate: v => v.is(...[
+        'inline',
+        'multiline',
+        'lyrics',
+        'contributors',
+        'single-link',
+      ]),
+
       default: 'multiline',
     },
 
@@ -932,8 +939,10 @@ export default {
     // differently. Instead of having each line get its own paragraph,
     // "adjacent" lines are joined together (with blank lines separating
     // each verse/paragraph).
+    //
+    // Also this formatting goes for contributors mode too.
 
-    if (slots.mode === 'lyrics') {
+    if (slots.mode === 'lyrics' || slots.mode === 'contributors') {
       // If it looks like old data, using <br> instead of bunched together
       // lines... then oh god... just use transformMultiline. Perishes.
       if (

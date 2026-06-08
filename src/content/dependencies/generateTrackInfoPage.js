@@ -92,7 +92,9 @@ export default {
       relation('generateTrackInfoPageOtherReleasesLines', track),
 
     contributorContributionList:
-      relation('generateContributionList', track.contributorContribs),
+      relation('generateContributionList',
+        track.contributorContribs,
+        track.contributorText),
 
     referencedTracksList:
       relation('generateReferencedTracksList', track),
@@ -264,16 +266,12 @@ export default {
             {[html.joinChildren]: html.tag('br')},
             relations.otherReleasesLines),
 
-          html.tags([
-            relations.contentHeading.clone().slots({
-              attributes: {id: 'contributors'},
-              title: language.$('releaseInfo.contributors'),
-            }),
+          relations.contributorContributionList.slots({
+            attributes: {id: 'contributors'},
+            title: language.$('releaseInfo.contributors'),
 
-            relations.contributorContributionList.slots({
-              chronologyKind: 'trackContribution',
-            }),
-          ]),
+            chronologyKind: 'trackContribution',
+          }),
 
           html.tags([
             relations.relationsContentHeading.clone().slots({
