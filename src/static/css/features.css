@@ -734,6 +734,19 @@
   .image-details:last-child {
     margin-bottom: 2px;
   }
+
+  /* Should only appear as an error message / placeholder,
+   * "This image file is missing"
+   */
+  .cover-artwork .image-container:not(:has(img)) {
+    .image-inner-area, .image-text-area {
+      position: static;
+    }
+
+    .image-text-area {
+      aspect-ratio: 1 / 1;
+    }
+  }
 }
 
 @layer print {
