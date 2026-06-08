@@ -285,7 +285,20 @@ export class Album extends Thing {
     showAlbumInTracksWithoutArtists: flag(V(false)),
     showTrackSectionInNavBar: flag(V(false)),
     showArtistsInTrackList: flag(V(true)),
-    hideDuration: flag(V(false)),
+
+    hideDuration: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      {
+        dependencies: ['style'],
+        compute: ({style}) =>
+          (style === 'in-game vgm'
+            ? true
+            : false),
+      },
+    ],
 
     // > Update & expose - General metadata
 
