@@ -1243,32 +1243,26 @@
   .group-contributions-table {
     margin-left: 40px;
     border-collapse: collapse;
-  }
 
-  .group-contributions-table td {
-    padding: 0 0 4px 0;
-  }
+    margin-bottom: 1em;
 
-  .group-contributions-table .group-contributions-link-cell {
-    display: list-item;
-  }
+    tr.split td { border-top: 2px solid #fff2; }
 
-  .group-contributions-table .group-contributions-metrics-cell {
-    padding-left: 1.5ch;
-    white-space: nowrap;
-    text-align: right;
-  }
-}
+    tr:has(+ .split) td { padding-bottom: 4px; }
+    tr.split td         { padding-top: 4px; }
 
-@layer interaction {
-  .group-contributions-sorted-by-count:not(.visible),
-  .group-contributions-sorted-by-duration:not(.visible) {
-    display: none;
-  }
+    td {
+      padding: 0 0 4px 0;
+    }
 
-  .group-contributions-sort-button {
-    text-decoration: underline;
-    text-decoration-style: dotted;
+    td:not(:last-child),
+    th:not(:last-child) {
+      padding-right: 1.5ch;
+    }
+
+    td.group { padding-left: 3ch; }
+    td.count { text-align: center; }
+    td.duration { text-align: right; }
   }
 }
 

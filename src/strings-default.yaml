@@ -1940,20 +1940,15 @@ artistPage:
 
   groupContributions:
     title:
-      music: "Contributed music to groups:"
-      artworks: "Contributed artworks to groups:"
-      musicVideos: "Contributed to music videos in groups:"
-      withSortButton: "{TITLE} ({SORT})"
+      tracks: "Contributed music to group…"
+      artworks: "Contributed art to group…"
+      musicVideos: "Contributed to music videos in group…"
 
-      sorting:
-        count: "Sorting by count."
-        duration: "Sorting by duration."
-
-    item:
-      countAccent: "({COUNT})"
-      durationAccent: "({DURATION})"
-      countDurationAccent: "({COUNT} — {DURATION})"
-      durationCountAccent: "({DURATION} — {COUNT})"
+    column:
+      count.tracks: "Tracks"
+      count.artworks: "Artworks"
+      count.musicVideos: "Music Videos"
+      duration: "Duration"
 
   trackList.title: "Tracks"
   artList.title: "Artworks"

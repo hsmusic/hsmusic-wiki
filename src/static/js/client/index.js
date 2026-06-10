@@ -1,5 +1,3 @@
-import '../group-contributions-table.js';
-
 import * as additionalNamesBoxModule from './additional-names-box.js';
 import * as albumCommentarySidebarModule from './album-commentary-sidebar.js';
 import * as artTagGalleryFilterModule from './art-tag-gallery-filter.js';

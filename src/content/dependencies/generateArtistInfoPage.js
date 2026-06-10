@@ -285,25 +285,7 @@ export default {
 
             relations.tracksChunkedList.slots({
               groupInfo:
-                language.encapsulate(pageCapsule, 'groupContributions', capsule => [
-                  relations.tracksGroupInfo.clone()
-                    .slots({
-                      title: language.$(capsule, 'title.music'),
-                      showSortButton: true,
-                      sort: 'count',
-                      countUnit: 'tracks',
-                      visible: true,
-                    }),
-
-                  relations.tracksGroupInfo.clone()
-                    .slots({
-                      title: language.$(capsule, 'title.music'),
-                      showSortButton: true,
-                      sort: 'duration',
-                      countUnit: 'tracks',
-                      visible: false,
-                    }),
-                ]),
+                relations.tracksGroupInfo.slot('string', 'tracks'),
             }),
           ]),
 
@@ -328,18 +310,10 @@ export default {
                     }),
                 }))),
 
-            relations.artworksChunkedList
-              .slots({
-                groupInfo:
-                  language.encapsulate(pageCapsule, 'groupContributions', capsule =>
-                    relations.artworksGroupInfo
-                      .slots({
-                        title: language.$(capsule, 'title.artworks'),
-                        showBothColumns: false,
-                        sort: 'count',
-                        countUnit: 'artworks',
-                      })),
-              }),
+            relations.artworksChunkedList.slots({
+              groupInfo:
+                relations.artworksGroupInfo.slot('string', 'artworks'),
+            }),
 
             html.tags([
               language.encapsulate(pageCapsule, 'wikiEditArtworks', capsule =>
@@ -368,13 +342,7 @@ export default {
 
             relations.musicVideosChunkedList.slots({
               groupInfo:
-                language.encapsulate(pageCapsule, 'groupContributions', capsule =>
-                  relations.musicVideosGroupInfo.slots({
-                    title: language.$(capsule, 'title.artworks'),
-                    showBothColumns: false,
-                    sort: 'count',
-                    countUnit: 'artworks',
-                  })),
+                relations.musicVideosGroupInfo.slot('string', 'musicVideos'),
             }),
           ]),
 

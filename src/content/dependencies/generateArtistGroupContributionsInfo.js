@@ -1,4 +1,4 @@
-import {accumulateSum, empty, stitchArrays, withEntries} from '#sugar';
+import {accumulateSum, stitchArrays, withEntries} from '#sugar';
 
 export default {
   sprawl: ({groupCategoryData}) => ({
@@ -45,196 +45,94 @@ export default {
           ([group, things]) =>
           ([group, accumulateSum(things, thing => thing.duration)])))
 
-    const groupsSortedByCount =
-      allGroupsOrdered
-        .filter(group => groupToTotalContributions.get(group) > 0)
-        .sort((a, b) =>
-          (groupToTotalContributions.get(b)
-         - groupToTotalContributions.get(a)));
-
-    const groupsSortedByDuration =
-      allGroupsOrdered
-        .filter(group => groupToTotalDuration.get(group) > 0)
-        .sort((a, b) =>
-          (groupToTotalDuration.get(b)
-         - groupToTotalDuration.get(a)));
-
-    const groupCountsSortedByCount =
-      groupsSortedByCount
-        .map(group => groupToTotalContributions.get(group));
-
-    const groupDurationsSortedByCount =
-      groupsSortedByCount
-        .map(group => groupToTotalDuration.get(group));
-
-    const groupDurationsApproximateSortedByCount =
-      groupsSortedByCount
-        .map(group => groupToThingsCountedForDuration.get(group).size > 1);
-
-    const groupCountsSortedByDuration =
-      groupsSortedByDuration
-        .map(group => groupToTotalContributions.get(group));
-
-    const groupDurationsSortedByDuration =
-      groupsSortedByDuration
-        .map(group => groupToTotalDuration.get(group));
-
-    const groupDurationsApproximateSortedByDuration =
-      groupsSortedByDuration
-        .map(group => groupToThingsCountedForDuration.get(group).size > 1);
-
     return {
-      groupsSortedByCount,
-      groupsSortedByDuration,
+      groups:
+        allGroupsOrdered,
 
-      groupCountsSortedByCount,
-      groupDurationsSortedByCount,
-      groupDurationsApproximateSortedByCount,
+      groupCounts:
+        allGroupsOrdered
+          .map(group => groupToTotalContributions.get(group)),
 
-      groupCountsSortedByDuration,
-      groupDurationsSortedByDuration,
-      groupDurationsApproximateSortedByDuration,
+      groupDurations:
+        allGroupsOrdered
+          .map(group => groupToTotalDuration.get(group)),
     };
   },
 
   relations: (relation, query) => ({
-    groupLinksSortedByCount:
-      query.groupsSortedByCount
-        .map(group => relation('linkGroup', group)),
-
-    groupLinksSortedByDuration:
-      query.groupsSortedByDuration
+    groupLinks:
+      query.groups
         .map(group => relation('linkGroup', group)),
   }),
 
   data: (query) => ({
-    groupCountsSortedByCount:
-      query.groupCountsSortedByCount,
+    hasCountColumn:
+      true,
 
-    groupDurationsSortedByCount:
-      query.groupDurationsSortedByCount,
+    hasDurationColumn:
+      query.groupDurations.some(Boolean),
 
-    groupDurationsApproximateSortedByCount:
-      query.groupDurationsApproximateSortedByCount,
+    groupsChangeCategory:
+      query.groups
+        .map((group, index, groups) =>
+          index >= 1 &&
+          (group.category !==
+           groups[index - 1].category)),
 
-    groupCountsSortedByDuration:
-      query.groupCountsSortedByDuration,
+    groupCounts:
+      query.groupCounts,
 
-    groupDurationsSortedByDuration:
-      query.groupDurationsSortedByDuration,
-
-    groupDurationsApproximateSortedByDuration:
-      query.groupDurationsApproximateSortedByDuration,
+    groupDurations:
+      query.groupDurations,
   }),
 
   slots: {
-    title: {
-      type: 'html',
-      mutable: false,
-    },
-
-    showBothColumns: {type: 'boolean'},
-    showSortButton: {type: 'boolean'},
-    visible: {type: 'boolean', default: true},
-
-    sort: {validate: v => v.is('count', 'duration')},
-    countUnit: {validate: v => v.is('tracks', 'artworks')},
+    string: {type: 'string'},
   },
 
   generate: (data, relations, slots, {html, language}) =>
-    language.encapsulate('artistPage.groupContributions', capsule => {
-      if (slots.sort === 'count' && empty(relations.groupLinksSortedByCount)) {
-        return html.blank();
-      } else if (slots.sort === 'duration' && empty(relations.groupLinksSortedByDuration)) {
-        return html.blank();
-      }
+    language.encapsulate('artistPage.groupContributions', capsule =>
+      html.tag('table', {class: 'group-contributions-table'},
+        {[html.onlyIfContent]: true},
 
-      const getCounts = counts =>
-        counts.map(count => {
-          switch (slots.countUnit) {
-            case 'tracks': return language.countTracks(count, {unit: true});
-            case 'artworks': return language.countArtworks(count, {unit: true});
-          }
-        });
+        [
+          html.tag('thead',
+            {[html.onlyIfSiblings]: true},
 
-      // We aren't displaying the "~" approximate symbol here for now.
-      // The general notion that these sums aren't going to be 100% accurate
-      // is made clear by the "XYZ has contributed ~1:23:45 hours of music..."
-      // line that's always displayed above this table.
-      const getDurations = (durations, approximate) =>
-        stitchArrays({
-          duration: durations,
-          approximate: approximate,
-        }).map(({duration}) => language.formatDuration(duration));
+            html.tag('tr', [
+              html.tag('th',
+                language.$(capsule, 'title', slots.string)),
 
-      const topLevelClasses = [
-        'group-contributions-sorted-by-' + slots.sort,
-        slots.visible && 'visible',
-      ];
+              data.hasCountColumn &&
+                html.tag('th',
+                  language.$(capsule, 'column.count', slots.string)),
 
-      // TODO: It feels pretty awkward that this component is the only one that
-      // has enough knowledge to decide if the sort button is even applicable...
-      const switchingSortPossible =
-        !empty(relations.groupLinksSortedByCount) &&
-        !empty(relations.groupLinksSortedByDuration);
+              data.hasDurationColumn &&
+                html.tag('th',
+                  language.$(capsule, 'column.duration')),
+            ])),
 
-      return html.tags([
-        html.tag('dt', {class: topLevelClasses},
-          language.encapsulate(capsule, 'title', capsule =>
-            (switchingSortPossible && slots.showSortButton
-              ? language.$(capsule, 'withSortButton', {
-                  title: slots.title,
-                  sort:
-                    html.tag('a', {class: 'group-contributions-sort-button'},
-                      {href: '#'},
+          html.tag('tbody',
+            {[html.onlyIfContent]: true},
 
-                      (slots.sort === 'count'
-                        ? language.$(capsule, 'sorting.count')
-                        : language.$(capsule, 'sorting.duration'))),
-                })
-              : slots.title))),
+            stitchArrays({
+              link: relations.groupLinks,
+              changesCategory: data.groupsChangeCategory,
+              count: data.groupCounts,
+              duration: data.groupDurations,
+            }).map(({link, changesCategory, count, duration}) =>
+                html.tag('tr', changesCategory && {class: 'split'}, [
+                  html.tag('td', {class: 'group'},
+                    link),
 
-        html.tag('dd', {class: topLevelClasses},
-          html.tag('table', {class: 'group-contributions-table'},
-            (stitchArrays(
-              (slots.sort === 'count'
-                ? {
-                    group: relations.groupLinksSortedByCount,
-                    count: getCounts(data.groupCountsSortedByCount),
-                    duration:
-                      getDurations(
-                        data.groupDurationsSortedByCount,
-                        data.groupDurationsApproximateSortedByCount),
-                  }
-                : {
-                    group: relations.groupLinksSortedByDuration,
-                    count: getCounts(data.groupCountsSortedByDuration),
-                    duration:
-                      getDurations(
-                        data.groupDurationsSortedByDuration,
-                        data.groupDurationsApproximateSortedByDuration),
-                  })
-            )).map(({group, count, duration}) =>
-                language.encapsulate(capsule, 'item', capsule =>
-                  html.tag('tr', [
-                    html.tag('td', {class: 'group-contributions-link-cell'},
-                      html.tag('span', group)),
+                  data.hasCountColumn &&
+                    html.tag('td', {class: 'count'},
+                      count),
 
-                    html.tag('td', {class: 'group-contributions-metrics-cell'},
-                      (slots.sort === 'count'
-                          // When sorting by count, duration details aren't necessarily
-                          // available for all items.
-                        ? (slots.showBothColumns && duration
-                            ? language.$(capsule, 'countDurationAccent', {count, duration})
-                            : language.$(capsule, 'countAccent', {count}))
-
-                          // Count details are always available, since they're just the
-                          // number of contributions directly. And duration details are
-                          // guaranteed for every item when sorting by duration.
-                        : (slots.showBothColumns
-                            ? language.$(capsule, 'durationCountAccent', {duration, count})
-                            : language.$(capsule, 'durationAccent', {duration})))),
-                  ]))))),
-      ]);
-    }),
+                  data.hasDurationColumn &&
+                    html.tag('td', {class: 'duration'},
+                      language.formatDuration(duration)),
+                ]),
+              )),
+        ])),
 };
