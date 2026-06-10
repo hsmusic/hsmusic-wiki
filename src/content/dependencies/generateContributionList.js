@@ -38,6 +38,7 @@ export default {
 
     return html.tags([
       html.tag('p',
+        {[html.onlyIfSiblings]: true},
         slots.attributes,
         slots.title),
 
