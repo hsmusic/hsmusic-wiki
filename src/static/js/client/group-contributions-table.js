@@ -13,6 +13,9 @@ export const info = {
   chunkDTs: null,
   chunkDDs: null,
   chunkGroupDirectories: null,
+
+  filterNotices: null,
+  filterNoticeClearLinks: null,
 };
 
 export function getPageReferences() {
@@ -38,19 +41,29 @@ export function getPageReferences() {
 
   info.chunkDTs =
     info.lists
-      .map(list => Array.from(list.querySelectorAll('dt')));
+      .map(list => Array.from(list.querySelectorAll('dt')))
+      .map(dts => dts
+        .filter(dt => !dt.classList.contains('filter-notice')));
 
   info.chunkDDs =
     info.chunkDTs
       .map(dts => dts
         .map(dt => dt.nextElementSibling)
-        .map(el => el.tagName === 'DD' ? el : null));
+        .map(el => el?.tagName === 'DD' ? el : null));
 
   info.chunkGroupDirectories =
     info.chunkDTs
       .map(dts => dts
         .map(dt => dt.dataset.groups)
         .map(string => string ? string.split(' ') : []));
+
+  info.filterNotices =
+    info.lists
+      .map(list => list.querySelector('.filter-notice'));
+
+  info.filterNoticeClearLinks =
+    info.filterNotices
+      .map(notice => notice.querySelector('a'));
 }
 
 export function addPageListeners() {
@@ -67,6 +80,16 @@ export function addPageListeners() {
         });
       });
     });
+
+  stitchArrays({
+    table: info.tables,
+    clearLink: info.filterNoticeClearLinks,
+  }).forEach(({table, clearLink}) => {
+      clearLink.addEventListener('click', domEvent => {
+        domEvent.preventDefault();
+        handleClearLinkClicked(table);
+      });
+    });
 }
 
 function handleGroupLinkClicked(table, groupLink) {
@@ -79,6 +102,16 @@ function handleGroupLinkClicked(table, groupLink) {
     if (link !== groupLink) {
       link.classList.remove('selected');
     }
+  }
+
+  updateVisibleChunks(table);
+}
+
+function handleClearLinkClicked(table) {
+  const i = info.tables.indexOf(table);
+
+  for (const link of info.groupLinks[i]) {
+    link.classList.remove('selected');
   }
 
   updateVisibleChunks(table);
@@ -120,4 +153,11 @@ function updateVisibleChunks(table) {
         cssProp(chunkDD, 'display', null);
       }
     });
+
+  const filterNotice = info.filterNotices[i];
+  if (selectedGroupDirectories.length >= 1) {
+    cssProp(filterNotice, 'display', null);
+  } else {
+    cssProp(filterNotice, 'display', 'none');
+  }
 }

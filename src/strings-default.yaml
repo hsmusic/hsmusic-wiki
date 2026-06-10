@@ -1950,6 +1950,9 @@ artistPage:
       count.musicVideos: "Music Videos"
       duration: "Duration"
 
+  filterNotice: "(The list above is filtered. {CLEAR})"
+  filterNotice.clear: "Click to stop filtering."
+
   trackList.title: "Tracks"
   artList.title: "Artworks"
   musicVideoList.title: "Music Videos"

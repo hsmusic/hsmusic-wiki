@@ -1301,6 +1301,11 @@
       background: var(--primary-color);
     }
   }
+
+  .group-contributions-table ~ .filter-notice a {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
 }
 
 /* Image and media containers */
