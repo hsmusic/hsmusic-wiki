@@ -1,6 +1,13 @@
 import {empty} from '#sugar';
 
 export default {
+  data: (thing) => ({
+    groupDirectories:
+      (thing && thing.groups
+        ? thing.groups.map(group => group.directory)
+        : null),
+  }),
+
   slots: {
     mode: {
       validate: v => v.is('flash', 'album'),
@@ -26,7 +33,7 @@ export default {
     durationApproximate: {type: 'boolean'},
   },
 
-  generate(slots, {html, language}) {
+  generate(data, slots, {html, language}) {
     let earliestItemDate = null;
     let latestItemDate = null;
     let onlyItemDate = null;
@@ -96,6 +103,10 @@ export default {
     return html.tags([
       html.tag('dt',
         slots.id && {id: slots.id},
+
+        data.groupDirectories &&
+          {'data-groups': data.groupDirectories.join(' ')},
+
         accentedLink),
 
       html.tag('dd', slots.list),

@@ -1,7 +1,7 @@
 export default {
   relations: (relation, flashAct, contribs) => ({
     template:
-      relation('generateArtistInfoPageChunk'),
+      relation('generateArtistInfoPageChunk', flashAct),
 
     flashActLink:
       relation('linkFlashAct', flashAct),

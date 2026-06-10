@@ -66,6 +66,10 @@ export default {
   }),
 
   data: (query) => ({
+    groupDirectories:
+      query.groups
+        .map(group => group.directory),
+
     hasCountColumn:
       true,
 
@@ -117,13 +121,16 @@ export default {
 
             stitchArrays({
               link: relations.groupLinks,
+              directory: data.groupDirectories,
               changesCategory: data.groupsChangeCategory,
               count: data.groupCounts,
               duration: data.groupDurations,
-            }).map(({link, changesCategory, count, duration}) =>
+            }).map(({link, directory, changesCategory, count, duration}) =>
                 html.tag('tr', changesCategory && {class: 'split'}, [
                   html.tag('td', {class: 'group'},
-                    link),
+                    link.slots({
+                      attributes: {'data-directory': directory},
+                    })),
 
                   data.hasCountColumn &&
                     html.tag('td', {class: 'count'},

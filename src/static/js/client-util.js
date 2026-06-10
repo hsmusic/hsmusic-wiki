@@ -16,8 +16,14 @@ export function rebase(href, rebaseKey = 'rebaseLocalized') {
 
 export function cssProp(el, ...args) {
   if (typeof args[0] === 'string' && args.length === 1) {
-    return getComputedStyle(el).getPropertyValue(args[0]).trim();
+    if (el) {
+      return getComputedStyle(el).getPropertyValue(args[0]).trim();
+    } else {
+      return '';
+    }
   }
+
+  if (!el) return;
 
   if (typeof args[0] === 'string' && args.length === 2) {
     if (args[1] === null) {

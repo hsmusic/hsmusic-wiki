@@ -1260,9 +1260,46 @@
       padding-right: 1.5ch;
     }
 
+    th:nth-child(1) { text-align: left; }
     td.group { padding-left: 3ch; }
     td.count { text-align: center; }
     td.duration { text-align: right; }
+  }
+}
+
+@layer interaction {
+  .group-contributions-table {
+    .group a {
+      position: relative;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+    }
+  }
+
+  .group-contributions-table:has(.group a.selected) {
+    tr:has(.group a:not(.selected)) {
+      td { opacity: 0.65; }
+      td.group { opacity: 0.8; }
+    }
+
+    .group a.selected {
+      text-decoration-style: solid;
+    }
+
+    .group a.selected::before {
+      content: "";
+
+      position: absolute;
+      display: inline-block;
+      top: 50%; transform: translateY(-50%);
+      left: -1.75ch;
+
+      width: 0.4em;
+      height: 0.4em;
+      border-radius: 100000cm;
+
+      background: var(--primary-color);
+    }
   }
 }
 

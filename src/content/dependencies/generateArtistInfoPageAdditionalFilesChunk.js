@@ -1,7 +1,7 @@
 export default {
   relations: (relation, artist, album, contribs) => ({
     template:
-      relation('generateArtistInfoPageChunk'),
+      relation('generateArtistInfoPageChunk', album),
 
     albumLink:
       relation('linkAlbum', album),
