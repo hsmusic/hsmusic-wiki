@@ -13,6 +13,7 @@ import {
   isDirectory,
   isExcludingURLsReason,
   isNumber,
+  isString,
 } from '#validators';
 
 import {withLengthOfList, withNearbyItemFromList, withPropertyFromObject}
@@ -48,6 +49,22 @@ export class TrackSection extends Thing {
 
     name: name(V('Unnamed Track Section')),
 
+    // Track sections don't have a Name Detail themselves, but they do provide
+    // a value which tracks can reference via 'Name Detail: section'.
+    nameDetailForTracks: {
+      flags: {update: true, expose: true},
+
+      update: {validate: isString},
+
+      expose: {
+        dependencies: ['name'],
+        transform: (value, {name}) =>
+          (value
+            ? value
+            : name),
+      },
+    },
+
     unqualifiedDirectory: directory(),
 
     directorySuffixForTracks: [
@@ -55,18 +72,25 @@ export class TrackSection extends Thing {
         validate: input.value(isDirectory),
       }),
 
-      withPropertyFromObject('album', V('directorySuffixForTracks')),
-      exposeDependency('#album.directorySuffixForTracks'),
+      {
+        dependencies: ['unqualifiedDirectory', 'name', 'nameDetailForTracks'],
+        compute: ({unqualifiedDirectory, name, nameDetailForTracks}) =>
+          (nameDetailForTracks === name
+            ? unqualifiedDirectory
+            : getKebabCase(nameDetailForTracks)),
+      },
     ],
 
-    suffixTrackDirectoriesByDefault: [
-      exposeUpdateValueOrContinue({
-        validate: input.value(isBoolean),
-      }),
-
-      withPropertyFromObject('album', V('suffixTrackDirectoriesByDefault')),
-      exposeDependency('#album.suffixTrackDirectoriesByDefault'),
-    ],
+    // Not quite a flag, because it supports (and defaults to) null.
+    // The value false means to explicitly ignore that the album is
+    // providing Suffix Track Directories: true. The value true means
+    // to use the TRACK SECTION's own directory suffix. The value null
+    // defers to the album's suffixTrackDirectoriesByDefault, which is
+    // simply true or false.
+    suffixTrackDirectoriesByDefault: {
+      flags: {expose: true, update: true},
+      update: {validate: isBoolean},
+    },
 
     color: [
       exposeUpdateValueOrContinue({
@@ -204,6 +228,8 @@ export class TrackSection extends Thing {
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Section': {property: 'name'},
+      'Name Detail For Tracks': {property: 'nameDetailForTracks'},
+
       'Directory Suffix': {property: 'directorySuffixForTracks'},
       'Suffix Track Directories': {property: 'suffixTrackDirectoriesByDefault'},
 

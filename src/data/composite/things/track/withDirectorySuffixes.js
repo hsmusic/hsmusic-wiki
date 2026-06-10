@@ -22,13 +22,23 @@ export default templateCompositeFrom({
       properties: input.value([
         'suffixTrackDirectoriesByDefault',
         'directorySuffixForTracks',
+        'nameDetailForTracks',
+      ]),
+    }),
+
+    withPropertiesFromObject({
+      object: 'album',
+      properties: input.value([
+        'suffixTrackDirectoriesByDefault',
+        'directorySuffixForTracks',
+        'nameDetailForTracks',
       ]),
     }),
 
     {
       dependencies: [
         input('from'),
-        '#trackSection.suffixTrackDirectoriesByDefault',
+        '#album.directorySuffixForTracks',
         '#trackSection.directorySuffixForTracks',
       ],
 
@@ -36,22 +46,31 @@ export default templateCompositeFrom({
         [input('from')]:
           suffixDirectory,
 
-        ['#trackSection.suffixTrackDirectoriesByDefault']:
-          suffixTrackDirectoriesByDefault,
+        ['#album.directorySuffixForTracks']:
+          albumDirectorySuffixForTracks,
 
         ['#trackSection.directorySuffixForTracks']:
-          directorySuffixForTracks,
+          trackSectionDirectorySuffixForTracks,
       }) {
         // All conditions in this chunk process explicitly set values for
-        // the actual update value - that is, everything EXCEPT true or null,
-        // which both pass through to conditional "defaults".
-        // (True and null aren't quite equal, but the difference only matters
-        //  at the very end.)
+        // the actual update value - that is, everything EXCEPT null,
+        // which passes through to conditional "defaults".
 
+        // Note that 'Suffix Directory: true' is literally equivalent to
+        // suffixDirectory = 'album', via yaml transformation.
         if (suffixDirectory === 'album') {
           return continuation.raiseOutput({
-            ['#directorySuffix']: directorySuffixForTracks,
+            ['#directorySuffix']: albumDirectorySuffixForTracks,
             ['#directorySuffixWithinAlbum']: null,
+          });
+        }
+
+        if (suffixDirectory === 'section') {
+          // Bear in mind the directory is suffixed within the album.
+          // This is repeated in following steps, too.
+          return continuation.raiseOutput({
+            ['#directorySuffix']: trackSectionDirectorySuffixForTracks,
+            ['#directorySuffixWithinAlbum']: trackSectionDirectorySuffixForTracks,
           });
         }
 
@@ -74,7 +93,9 @@ export default templateCompositeFrom({
             suffixDirectory
               .map(item =>
                 (item === 'album'
-                  ? directorySuffixForTracks
+                  ? albumDirectorySuffixForTracks
+               : item === 'section'
+                  ? trackSectionDirectorySuffixForTracks
                   : item));
 
           const parts2 =
@@ -82,6 +103,8 @@ export default templateCompositeFrom({
               .map(item =>
                 (item === 'album'
                   ? null
+               : item === 'section'
+                  ? trackSectionDirectorySuffixForTracks
                   : item))
               .filter(Boolean);
 
@@ -91,27 +114,53 @@ export default templateCompositeFrom({
           });
         }
 
-        // It's true or null - just continue.
+        // It's null - just continue.
         return continuation();
       },
     },
 
     {
+      // Neither of the track section fields inherit from the album.
+      // Importantly, trackSection.suffixTrackDirectoriesByDefault can be null
+      // OR false at the same time as album.suffixTrackDirectoriesByDefault
+      // is true, and those carry different meanings.
       dependencies: [
         '#trackSection.suffixTrackDirectoriesByDefault',
         '#trackSection.directorySuffixForTracks',
+        '#album.suffixTrackDirectoriesByDefault',
+        '#album.directorySuffixForTracks',
       ],
 
       compute(continuation, {
         ['#trackSection.suffixTrackDirectoriesByDefault']:
-          suffixTrackDirectoriesByDefault,
+          trackSectionSuffixTrackDirectoriesByDefault,
 
         ['#trackSection.directorySuffixForTracks']:
-          directorySuffixForTracks,
+          trackSectionDirectorySuffixForTracks,
+
+        ['#album.suffixTrackDirectoriesByDefault']:
+          albumSuffixTrackDirectoriesByDefault,
+
+        ['#album.directorySuffixForTracks']:
+          albumDirectorySuffixForTracks,
       }) {
-        if (suffixTrackDirectoriesByDefault === true) {
+        if (trackSectionSuffixTrackDirectoriesByDefault === true) {
           return continuation.raiseOutput({
-            ['#directorySuffix']: directorySuffixForTracks,
+            ['#directorySuffix']: trackSectionDirectorySuffixForTracks,
+            ['#directorySuffixWithinAlbum']: trackSectionDirectorySuffixForTracks,
+          });
+        }
+
+        if (trackSectionSuffixTrackDirectoriesByDefault === false) {
+          // Just proceed. Other logic may independently provide a suffix,
+          // but this false ensures that track ignores whether the *album*
+          // provides Suffix Track Directories: true.
+          return continuation();
+        }
+
+        if (albumSuffixTrackDirectoriesByDefault === true) {
+          return continuation.raiseOutput({
+            ['#directorySuffix']: albumDirectorySuffixForTracks,
             ['#directorySuffixWithinAlbum']: null,
           });
         }
@@ -141,29 +190,47 @@ export default templateCompositeFrom({
     },
 
     {
+      // The logic path in this section is ONLY decided based on the track's
+      // actually-set Name Detail, and inheritence is not a factor at all.
       dependencies: [
         '_nameDetail',
-         'nameDetailAcrossWiki',
-
+        '#album.nameDetailForTracks',
+        '#album.directorySuffixForTracks',
+        '#trackSection.nameDetailForTracks',
         '#trackSection.directorySuffixForTracks',
       ],
 
       compute(continuation, {
         ['_nameDetail']: nameDetail,
-        [ 'nameDetailAcrossWiki']: nameDetailAcrossWiki,
+
+        ['#album.nameDetailForTracks']:
+          albumNameDetailForTracks,
+
+        ['#album.directorySuffixForTracks']:
+          albumDirectorySuffixForTracks,
+
+        ['#trackSection.nameDetailForTracks']:
+          trackSectionNameDetailForTracks,
 
         ['#trackSection.directorySuffixForTracks']:
-          directorySuffixForTracks,
+          trackSectionDirectorySuffixForTracks,
       }) {
+        if (nameDetail === 'section') {
+          return continuation.raiseOutput({
+            ['#directorySuffix']: trackSectionDirectorySuffixForTracks,
+            ['#directorySuffixWithinAlbum']: trackSectionDirectorySuffixForTracks,
+          })
+        }
+
         if (nameDetail === 'album') {
           return continuation.raiseOutput({
-            ['#directorySuffix']: directorySuffixForTracks,
-            ['#directorySuffixWithinAlbum']: directorySuffixForTracks,
+            ['#directorySuffix']: albumDirectorySuffixForTracks,
+            ['#directorySuffixWithinAlbum']: null,
           });
         }
 
-        if (nameDetailAcrossWiki) {
-          const kebab = getKebabCase(nameDetailAcrossWiki);
+        if (nameDetail) {
+          const kebab = getKebabCase(nameDetail);
 
           return continuation.raiseOutput({
             ['#directorySuffix']: kebab,

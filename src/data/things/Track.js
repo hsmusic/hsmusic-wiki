@@ -169,12 +169,12 @@ export class Track extends Thing {
           input.updateValue({
             validate:
               anyOf(
-                isBoolean,
-                is('album'),
+                is(false),
+                is('album', 'section'),
                 isDirectory,
                 strictArrayOf(
                   anyOf(
-                    is('album'),
+                    is('album', 'section'),
                     isDirectory))),
           }),
       }),
@@ -781,21 +781,37 @@ export class Track extends Thing {
         }) =>
           (nameDetail === 'album'
             ? null
+         : nameDetail === 'section'
+            ? null
             : nameDetail),
       },
     ],
 
     nameDetailAcrossWiki: [
       withPropertyFromObject('album', V('nameDetailForTracks')),
+      withPropertyFromObject('trackSection', V('nameDetailForTracks')),
 
       {
-        dependencies: ['_nameDetail', '#album.nameDetailForTracks'],
+        dependencies: [
+          '_nameDetail',
+          '#album.nameDetailForTracks',
+          '#trackSection.nameDetailForTracks',
+        ],
+
         compute: ({
-          ['_nameDetail']: nameDetail,
-          ['#album.nameDetailForTracks']: nameDetailFromAlbum,
+          ['_nameDetail']:
+            nameDetail,
+
+          ['#album.nameDetailForTracks']:
+            albumNameDetailForTracks,
+
+          ['#trackSection.nameDetailForTracks']:
+            trackSectionNameDetailForTracks,
         }) =>
           (nameDetail === 'album'
-            ? nameDetailFromAlbum
+            ? albumNameDetailForTracks
+         : nameDetail === 'section'
+            ? trackSectionNameDetailForTracks
             : nameDetail),
       },
     ],
@@ -1062,7 +1078,14 @@ export class Track extends Thing {
       'Name Detail': {property: 'nameDetail'},
 
       'Directory': {property: 'directory'},
-      'Suffix Directory': {property: 'suffixDirectory'},
+
+      'Suffix Directory': {
+        property: 'suffixDirectory',
+        transform: value =>
+          (value === true
+            ? 'album'
+            : value),
+      },
 
       'Reference By Directory': {property: 'referenceByDirectory'},
 
