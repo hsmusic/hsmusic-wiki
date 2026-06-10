@@ -121,6 +121,26 @@ export default templateCompositeFrom({
     },
 
     {
+      dependencies: [input('from'), '_directory'],
+      compute(continuation, {
+        [input('from')]: suffixDirectory,
+        ['_directory']: directory,
+      }) {
+        // If Suffix Directory is not set and Directory IS set, then
+        // no following logic should automatically provide a directory suffix
+        // (which otherwise would be tacked onto the data-given Directory).
+        if (suffixDirectory === null && directory !== null) {
+          return continuation.raiseOutput({
+            ['#directorySuffix']: null,
+            ['#directorySuffixWithinAlbum']: null,
+          });
+        }
+
+        return continuation();
+      },
+    },
+
+    {
       dependencies: [
         '_nameDetail',
          'nameDetailAcrossWiki',
