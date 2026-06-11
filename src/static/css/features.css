@@ -2,7 +2,7 @@
 
 @layer layout {
   .additional-files-list {
-    padding-left: 0;
+    padding-left: 18px;
   }
 
   .additional-files-list > li {
@@ -10,9 +10,6 @@
   }
 
   .additional-files-list summary {
-    /* Sorry, Safari!
-     * https://bugs.webkit.org/show_bug.cgi?id=157323
-     */
     list-style-position: outside;
     margin-left: 40px;
   }
@@ -21,6 +18,7 @@
     margin-left: 40px;
     margin-top: 2px;
     margin-bottom: 10px;
+    padding-left: 30px;
   }
 
   .additional-files-list .entry-description {
