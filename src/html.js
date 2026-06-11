@@ -783,10 +783,7 @@ export class Tag {
         ? this.#getAttributeRaw('split')
         : null);
 
-    let seenChunkwrapSplitter =
-      (this.chunkwrap
-        ? false
-        : null);
+    let insideOpenChunkwrapChunk = false;
 
     const contentItems =
       (this.chunkwrap
@@ -800,6 +797,10 @@ export class Tag {
       getItemContent: item => item.toString(),
 
       appendItemContent(content, itemContent, item) {
+        // We can only place our own chunkwrap splits within text content -
+        // we can't open a span and then close that span inside a tag that's
+        // CONTAINED inside the very same span. So check for splits in text,
+        // not in tags.
         const chunkwrapChunks =
           (typeof item === 'string' && chunkwrapSplitter
             ? Array.from(getChunkwrapChunks(itemContent, chunkwrapSplitter))
@@ -810,16 +811,28 @@ export class Tag {
             ? chunkwrapChunks.length > 1
             : null);
 
+        // However, we can detect chunkwraps contained *within* non-text
+        // content, and adapt accordingly - by closing the current chunk and
+        // "deferring" to the chunks contained within this item.
+        const itemIncludesItsOwnChunkwrap =
+          typeof item !== 'string' &&
+          chunkwrapSplitter &&
+          itemContent.includes('<span class="chunkwrap"');
+
         if (content) {
-          if (itemIncludesChunkwrapSplit && !seenChunkwrapSplitter) {
+          if (
+            itemIncludesChunkwrapSplit && !insideOpenChunkwrapChunk ||
+            itemIncludesItsOwnChunkwrap && !insideOpenChunkwrapChunk ||
+          ) {
             // The first time we see a chunkwrap splitter, backtrack and wrap
             // the content *so far* in a chunk. This will be treated just like
             // any other open chunkwrap, and closed after the first chunk of
             // this item! (That means the existing content is part of the same
             // chunk as the first chunk included in this content, which makes
-            // sense, because that first chink is really just more text that
+            // sense, because that first chunk is really just more text that
             // precedes the first split.)
             content = `<span class="chunkwrap">` + content;
+            insideOpenChunkwrapChunk = true;
           }
 
           content += joiner;
@@ -830,10 +843,7 @@ export class Tag {
           // enter a chunkwrap wrapper *now*, so the first chunk of this
           // item will be properly wrapped.
           content = `<span class="chunkwrap">`;
-        }
-
-        if (itemIncludesChunkwrapSplit) {
-          seenChunkwrapSplitter = true;
+          insideOpenChunkwrapChunk = true;
         }
 
         // Blockwraps only apply if they actually contain some content whose
@@ -846,7 +856,36 @@ export class Tag {
           blockwrapClosers += `</span>`;
         }
 
-        if (itemIncludesChunkwrapSplit) {
+        if (itemIncludesItsOwnChunkwrap) {
+          const trailingWhitespace = content.match(/\s*$/);
+          if (trailingWhitespace) {
+            content = content.slice(0, -trailingWhitespace.length);
+          }
+
+          if (insideOpenChunkwrapChunk) {
+            content += '</span>';
+          }
+
+          content += trailingWhitespace;
+          content += itemContent;
+
+          // Instate a new EVIL chunkwrap: it's not a chunkwrap chunk at all,
+          // because it's treated as display: inline, but will be closed the
+          // same as <span class="chunkwrap">, and can be detected in CSS.
+          content += `<span class="chunkwrap chunkwrapnt">`;
+          insideOpenChunkwrapChunk = true;
+
+          /* Bonus commentary re: above -
+           * An item that item includes its own chunkwrap purposely causes
+           * its last chunk to "grab" onto the following text out here.
+           * The in-between stuff (up to the chunk we start next - if any)
+           * isn't wrapped within a [display: inline-block] chunk at all,
+           * instead splitting by natural language rules... which probably
+           * isn't the right call, but it *is* the current approach without
+           * introducing new external-attribute logic to handle real world
+           * cases that just haven't come up yet. :pray:
+           */
+        } else if (itemIncludesChunkwrapSplit) {
           for (const [index, {chunk, following}] of chunkwrapChunks.entries()) {
             if (index === 0) {
               // The first chunk isn't actually a chunk all on its own, it's
@@ -878,11 +917,11 @@ export class Tag {
               }
             }
           }
-
-          return content;
+        } else {
+          content += itemContent;
         }
 
-        return content += itemContent;
+        return content;
       },
     });
 
@@ -891,7 +930,7 @@ export class Tag {
     }
 
     if (chunkwrapSplitter) {
-      if (seenChunkwrapSplitter) {
+      if (insideOpenChunkwrapChunk) {
         content += '</span>';
       } else {
         // Since chunkwraps take responsibility for wrapping *away* from the
