@@ -12,7 +12,9 @@ export default {
 
   data: (track) => ({
     showTrackSection:
-      track.album.showTrackSectionInNavBar,
+      track.album.showTrackSectionInNavBar &&
+      (track.album.trackSections.length >= 2 ||
+       !track.trackSection.isDefaultTrackSection),
 
     hasTrackNumbers:
       track.album.hasTrackNumbers,
