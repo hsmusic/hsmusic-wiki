@@ -839,10 +839,39 @@ export const validateURLEntry = (isURL) =>
   });
 
 export const isURLEntry =
-  validateURLEntry(isURL);
+  validateProperties({
+    url: isURL,
+    annotation: optional(isStringNonEmpty),
+  });
 
 export const isCuratedURLEntry =
-  validateURLEntry(isCuratedURL);
+  (() => {
+    const commonProperties = {
+      annotation: optional(isStringNonEmpty),
+    };
+
+    const pickyValidator =
+      validateProperties({
+        url: isCuratedURL,
+        ...commonProperties,
+        bypassValidation: optional(is(false)),
+      });
+
+    const niceysValidator =
+      validateProperties({
+        url: isURL,
+        ...commonProperties,
+        bypassValidation: is(true),
+      });
+
+    return value => {
+      if (typeof value === 'object' && value.bypassValidation) {
+        return niceysValidator(value);
+      } else {
+        return pickyValidator(value);
+      }
+    };
+  })();
 
 export const isURLList =
   validateArrayItems(isURLEntry);

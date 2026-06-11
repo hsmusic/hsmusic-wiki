@@ -751,12 +751,22 @@ export function parseURLs(entries) {
 
     if (typeof item !== 'string') return item;
 
-    const match = item.match(extractAccentRegex);
+    let bypassValidation, restOfItem;
+    if (item.endsWith(' (URL OK!!)')) {
+      bypassValidation = true;
+      restOfItem = item.slice(0, -' (URL OK!!)'.length);
+    } else {
+      bypassValidation = false;
+      restOfItem = item;
+    }
+
+    const match = restOfItem.match(extractAccentRegex);
     if (!match) return item;
 
     return {
       url: match.groups.main,
       annotation: match.groups.accent,
+      bypassValidation,
     };
   });
 }
