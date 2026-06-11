@@ -698,6 +698,12 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'music.youtube.com'},
+    platform: 'youtubeMusic',
+    icon: 'youtube',
+  },
+
+  {
     match: {domain: 'youtube.com'},
 
     platform: 'youtube',

@@ -857,6 +857,8 @@ misc:
       playlist: "YouTube (playlist)"
       fullAlbum: "YouTube (full album)"
 
+    youtubeMusic: "YouTube Music"
+
   flashActWithTitle: "{ACT}: {TITLE}"
 
   # lyrics:
