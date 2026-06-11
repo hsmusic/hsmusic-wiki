@@ -19,6 +19,7 @@
     margin-top: 2px;
     margin-bottom: 10px;
     padding-left: 30px;
+    list-style-type: disc;
   }
 
   .additional-files-list .entry-description {
