@@ -152,6 +152,14 @@ export const blockwrap = Symbol();
 // considered wrappable units, not the entire element!
 export const chunkwrap = Symbol();
 
+// Don't pass this directly, use html.metatag('breakout') instead.
+// Causes *contained* content to be excluded from any *containing* metatag
+// to do with special line breaking, i.e. blockwrap or chunkwrap, regardless
+// the hierarchical distance. Practically, that means momentarily concluding
+// the containing metatag's behavior wherever it operates, then starting more
+// or less anew, so the metatag still applies to any following content.
+export const breakout = Symbol();
+
 // Don't pass this directly, use html.metatag('imaginary-sibling') instead.
 // A tag without any content, which is completely ignored when serializing,
 // but makes siblings with [onlyIfSiblings] feel less shy and show up on
@@ -390,6 +398,9 @@ export function metatag(identifier, ...args) {
 
     case 'chunkwrap':
       return new Tag(null, {[chunkwrap]: true, ...opts}, content);
+
+    case 'breakout':
+      return new Tag(null, {[breakout]: true}, content);
 
     case 'imaginary-sibling':
       return new Tag(null, {[imaginarySibling]: true}, content);
@@ -691,6 +702,14 @@ export class Tag {
     return this.#getAttributeFlag(chunkwrap);
   }
 
+  get breakout() {
+    return this.#getAttributeFlag(breakout);
+  }
+
+  set breakout(value) {
+    this.#setAttributeFlag(breakout, value);
+  }
+
   set imaginarySibling(value) {
     this.#setAttributeFlag(imaginarySibling, value);
 
@@ -819,10 +838,15 @@ export class Tag {
           chunkwrapSplitter &&
           itemContent.includes('<span class="chunkwrap"');
 
+        const itemIncludesBreakout =
+          typeof item !== 'string' &&
+          itemContent.includes(`<span class="breakout"`);
+
         if (content) {
           if (
             itemIncludesChunkwrapSplit && !insideOpenChunkwrapChunk ||
             itemIncludesItsOwnChunkwrap && !insideOpenChunkwrapChunk ||
+            itemIncludesBreakout && chunkwrapSplitter && !insideOpenChunkwrapChunk
           ) {
             // The first time we see a chunkwrap splitter, backtrack and wrap
             // the content *so far* in a chunk. This will be treated just like
@@ -856,7 +880,7 @@ export class Tag {
           blockwrapClosers += `</span>`;
         }
 
-        if (itemIncludesItsOwnChunkwrap) {
+        if (itemIncludesItsOwnChunkwrap || itemIncludesBreakout) {
           const trailingWhitespace = content.match(/\s*$/);
           if (trailingWhitespace) {
             content = content.slice(0, -trailingWhitespace.length);
@@ -864,16 +888,21 @@ export class Tag {
 
           if (insideOpenChunkwrapChunk) {
             content += '</span>';
+          } else if (blockwrapClosers) {
+            content += blockwrapClosers;
+            blockwrapClosers = '';
           }
 
           content += trailingWhitespace;
           content += itemContent;
 
-          // Instate a new EVIL chunkwrap: it's not a chunkwrap chunk at all,
-          // because it's treated as display: inline, but will be closed the
-          // same as <span class="chunkwrap">, and can be detected in CSS.
-          content += `<span class="chunkwrap chunkwrapnt">`;
-          insideOpenChunkwrapChunk = true;
+          if (chunkwrapSplitter) {
+            // Instate a new EVIL chunkwrap: it's not a chunkwrap chunk at all,
+            // because it's treated as display: inline, but will be closed the
+            // same as <span class="chunkwrap">, and can be detected in CSS.
+            content += `<span class="chunkwrap chunkwrapnt">`;
+            insideOpenChunkwrapChunk = true;
+          }
 
           /* Bonus commentary re: above -
            * An item that item includes its own chunkwrap purposely causes
@@ -939,6 +968,8 @@ export class Tag {
         // been seen at all, just wrap everything in one now.
         content = `<span class="chunkwrap">${content}</span>`;
       }
+    } else if (this.breakout) {
+      content = `<span class="breakout">${content}</span>`;
     }
 
     content += blockwrapClosers;
