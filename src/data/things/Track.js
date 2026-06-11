@@ -1265,20 +1265,38 @@ export class Track extends Thing {
     },
 
     invalidFieldCombinations: [
-      {message: `Secondary releases never count in artist totals`, fields: [
-        'Main Release',
-        'Count In Artist Totals',
-      ]},
+      {
+        message: `Secondary releases never count in artist totals`,
 
-      {message: `Secondary releases inherit references from the main one`, fields: [
-        'Main Release',
-        'Referenced Tracks',
-      ]},
+        fields: [
+          'Main Release',
+          'Count In Artist Totals',
+        ],
 
-      {message: `Secondary releases inherit samples from the main one`, fields: [
-        'Main Release',
-        'Sampled Tracks',
-      ]},
+        drop: ['Count In Artist Totals'],
+      },
+
+      {
+        message: `Secondary releases inherit references from the main one`,
+
+        fields: [
+          'Main Release',
+          'Referenced Tracks',
+        ],
+
+        drop: ['Referenced Tracks'],
+      },
+
+      {
+        message: `Secondary releases inherit samples from the main one`,
+
+        fields: [
+          'Main Release',
+          'Sampled Tracks',
+        ],
+
+        drop: ['Sampled Tracks'],
+      },
 
       {
         message: ({'Has Cover Art': hasCoverArt}) =>
@@ -1290,6 +1308,9 @@ export class Track extends Thing {
           'Has Cover Art',
           'Cover Artists',
         ],
+
+        // We ball - data code handles this as it might.
+        drop: [],
       },
 
       {message: `Only one unique date per track is supported`, fields: [
@@ -1297,10 +1318,16 @@ export class Track extends Thing {
         'Date Posted',
       ]},
 
-      {message: `Don't include URLs alongside Excluding URLs, unless Excluding URLs is false`, fields: [
-        'URLs',
-        ['Excluding URLs', v => v !== false],
-      ]},
+      {
+        message: `Don't include URLs alongside Excluding URLs, unless Excluding URLs is false`,
+
+        fields: [
+          'URLs',
+          ['Excluding URLs', v => v !== false],
+        ],
+
+        drop: ['URLs'],
+      },
     ],
   };
 

@@ -163,10 +163,15 @@ export class MusicVideo extends Thing {
     },
 
     invalidFieldCombinations: [
-      {message: `Specify all URLs on "URLs" field, if specifying multiple`, fields: [
-        'URL',
-        'URLs',
-      ]},
+      {
+        message: `Specify all URLs on "URLs" field, if specifying multiple`, fields: [
+          'URL',
+          'URLs',
+        ],
+
+        // Leave it to data processing.
+        drop: [],
+      },
     ],
   };
 

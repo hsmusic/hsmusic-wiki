@@ -1010,30 +1010,54 @@ export class Album extends Thing {
     },
 
     invalidFieldCombinations: [
-      {message: `Move commentary on singles to the track`, fields: [
-        ['Style', 'single'],
-        'Commentary',
-      ]},
+      {
+        message: `Move commentary on singles to the track`,
 
-      {message: `Move crediting sources on singles to the track`, fields: [
-        ['Style', 'single'],
-        'Crediting Sources',
-      ]},
+        fields: [
+          ['Style', 'single'],
+          'Commentary',
+        ],
 
-      {message: `Move additional names on singles to the track`, fields: [
-        ['Style', 'single'],
-        'Additional Names',
-      ]},
+        drop: ['Commentary'],
+      },
+
+      {
+        message: `Move crediting sources on singles to the track`,
+
+        fields: [
+          ['Style', 'single'],
+          'Crediting Sources',
+        ],
+
+        drop: ['Crediting Sources'],
+      },
+
+      {
+        message: `Move additional names on singles to the track`,
+
+        fields: [
+          ['Style', 'single'],
+          'Additional Names',
+        ],
+
+        drop: ['Additional Names'],
+      },
 
       {message: `Specify one wallpaper style or multiple wallpaper parts, not both`, fields: [
         'Wallpaper Parts',
         'Wallpaper Style',
       ]},
 
-      {message: `Wallpaper file extensions are specified on asset, per part`, fields: [
-        'Wallpaper Parts',
-        'Wallpaper File Extension',
-      ]},
+      {
+        message: `Wallpaper file extensions are specified on asset, per part`,
+
+        fields: [
+          'Wallpaper Parts',
+          'Wallpaper File Extension',
+        ],
+
+        drop: ['Wallpaper File Extension'],
+      },
 
       {
         message: `Albums of style 'in-game vgm' have cover art by default`,
