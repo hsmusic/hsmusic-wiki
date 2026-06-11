@@ -133,6 +133,10 @@ export default {
 
       if (html.isBlank(slots.content)) {
         linkContent = formattedLink;
+      } else if (slots.fromContent) {
+        linkContent =
+          html.metatag('breakout',
+            slots.content);
       } else {
         linkContent = slots.content;
       }
