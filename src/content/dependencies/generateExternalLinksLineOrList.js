@@ -78,10 +78,11 @@ export default {
     switch (style) {
       case 'line': return (
         html.tag('p',
-          language.$(slots.string, {
-            links:
-              language.formatDisjunctionList(externalLinks),
-          }))
+          html.metatag('chunkwrap', {split: /,/},
+            language.$(slots.string, {
+              links:
+                language.formatDisjunctionList(externalLinks),
+            })))
       );
 
       case 'list': return (
