@@ -21,6 +21,11 @@ export default templateCompositeFrom({
       validate: strictArrayOf(isThing),
       defaultValue: null,
     }),
+
+    default: input({
+      validate: isBoolean,
+      defaultValue: false,
+    }),
   },
 
   update: {
@@ -49,12 +54,14 @@ export default templateCompositeFrom({
         input('contribs'),
         input('artwork'),
         input('artworks'),
+        input('default'),
       ],
 
       compute({
         [input('contribs')]: contribs,
         [input('artwork')]: artwork,
         [input('artworks')]: artworks,
+        [input('default')]: defaultValue,
       }) {
         if (!empty(contribs)) {
           return true;
@@ -68,7 +75,7 @@ export default templateCompositeFrom({
           return true;
         }
 
-        return false;
+        return defaultValue;
       },
     },
   ],

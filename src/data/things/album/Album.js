@@ -332,10 +332,24 @@ export class Album extends Thing {
         .call(this, 'Cover Artwork'),
     ],
 
-    hasCoverArt: hasArtwork({
-      contribs: '_coverArtistContribs',
-      artworks: '_coverArtworks',
-    }),
+    hasCoverArt: [
+      {
+        dependencies: ['style'],
+        compute: (continuation, {style}) =>
+          continuation({
+            ['#default']:
+              (style === 'in-game vgm'
+                ? true
+                : false),
+          }),
+      },
+
+      hasArtwork({
+        contribs: '_coverArtistContribs',
+        artworks: '_coverArtworks',
+        default: '#default',
+      }),
+    ],
 
     coverArtistContribs: contributionList({
       date: 'coverArtDate',
@@ -1020,6 +1034,17 @@ export class Album extends Thing {
         'Wallpaper Parts',
         'Wallpaper File Extension',
       ]},
+
+      {
+        message: `Albums of style 'in-game vgm' have cover art by default`,
+
+        fields: [
+          ['Has Cover Art', true],
+          ['Style', 'in-game vgm'],
+        ],
+
+        drop: ['Has Cover Art'],
+      },
     ],
   };
 
