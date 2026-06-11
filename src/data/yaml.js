@@ -229,7 +229,7 @@ function makeProcessDocument(thingConstructor, {
 
     const fieldCombinationErrors = [];
 
-    for (const {message, fields: fieldsSpec} of invalidFieldCombinations) {
+    for (const {message, fields: fieldsSpec, drop} of invalidFieldCombinations) {
       const fieldsPresent =
         fieldsSpec.flatMap(fieldSpec => {
           if (Array.isArray(fieldSpec)) {
@@ -259,7 +259,12 @@ function makeProcessDocument(thingConstructor, {
             fieldsSpec,
             message));
 
-        for (const field of Object.keys(filteredDocument)) {
+        const dropFields =
+          (drop
+            ? Object.keys(filteredDocument).filter(key => drop.includes(key))
+            : Object.keys(filteredDocument));
+
+        for (const field of dropFields) {
           skippedFields.add(field);
         }
       }
