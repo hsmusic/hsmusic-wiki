@@ -881,7 +881,7 @@ export class Tag {
         }
 
         if (itemIncludesItsOwnChunkwrap || itemIncludesBreakout) {
-          const trailingWhitespace = content.match(/\s*$/);
+          const trailingWhitespace = content.match(/\s*$/)?.[0];
           if (trailingWhitespace) {
             content = content.slice(0, -trailingWhitespace.length);
           }
