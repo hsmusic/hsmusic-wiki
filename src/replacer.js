@@ -725,6 +725,7 @@ export function postprocessImages(inputNodes) {
       if (attributes.get('height')) node.height = parseInt(attributes.get('height'));
       if (attributes.get('align')) node.align = attributes.get('align');
       if (attributes.get('pixelate')) node.pixelate = true;
+      if (attributes.get('banish-thumbs')) node.banishThumbs = true;
 
       if (attributes.get('warning')) {
         node.warnings =

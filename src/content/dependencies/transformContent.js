@@ -445,6 +445,7 @@ export default {
               height,
               align,
               pixelate,
+              banishThumbs,
             } = node;
 
             if (node.inline) {
@@ -496,7 +497,11 @@ export default {
 
               link: link ?? true,
               warnings: warnings ?? null,
-              thumb: slots.thumb,
+
+              thumb:
+                (banishThumbs
+                  ? null
+                  : slots.thumb),
             });
 
             if (width || height) {
