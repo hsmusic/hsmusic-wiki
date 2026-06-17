@@ -1342,6 +1342,41 @@
     max-width: 100%;
   }
 
+  figure:has(.image-container, .content-video-container) {
+    width: fit-content;
+
+    margin: 1.5em auto;
+
+    display: grid;
+    figcaption { grid-column: 1 / -1; }
+    &.two-columns { grid-template-columns: repeat(2, auto); }
+    &.three-columns { grid-template-columns: repeat(3, auto); }
+
+    align-items: end;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px;
+
+    .image-outer-area {
+      padding: 0;
+    }
+
+    figcaption {
+      margin: 1px -5px -5px -5px;
+      padding: 3px 12px 5px 12px;
+    }
+
+    .content-image-container,
+    .content-video-container {
+      margin: 0;
+    }
+
+    .content-image-container {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
   .image-text-area {
     position: absolute;
     top: 0;
@@ -1438,6 +1473,27 @@
     border: 2px solid var(--primary-color);
     border-radius: 2.5px 2.5px 3px 3px;
     padding: 5px;
+  }
+
+  figure:has(.image-container, .content-video-container) {
+    overflow: hidden;
+
+    background-color: var(--deep-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 0 0 6px 6px;
+
+    .image-container,
+    .content-image-container,
+    .content-video-container {
+      border: none;
+    }
+
+    figcaption {
+      font-style: oblique;
+      text-align: center;
+      background: black;
+      border-top: 1px dashed var(--deep-color);
+    }
   }
 
   .image-text-area {
