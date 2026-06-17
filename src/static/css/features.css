@@ -365,6 +365,11 @@
     padding-left: calc(5px + 1.25ch);
     padding-right: 1ch;
     padding-bottom: 0.2em;
+
+    .content-entry-heading-text:has(.content-entry-artists a:nth-of-type(n + 3)) .content-entry-accent {
+      display: inline-block;
+      text-indent: 0;
+    }
   }
 
   .content-entry-heading-inner-box {
