@@ -211,14 +211,12 @@ function updateImageOverlayColors(details) {
     cssProp(info.container, {
       '--primary-color': colors.primary,
       '--deep-color': colors.deep,
-      '--deep-ghost-color': colors.deepGhost,
       '--bg-black-color': colors.bgBlack,
     });
   } else {
     cssProp(info.container, {
       '--primary-color': null,
       '--deep-color': null,
-      '--deep-ghost-color': null,
       '--bg-black-color': null,
     });
   }
