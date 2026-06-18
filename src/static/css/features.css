@@ -1351,6 +1351,7 @@
     figcaption { grid-column: 1 / -1; }
     &.two-columns { grid-template-columns: repeat(2, auto); }
     &.three-columns { grid-template-columns: repeat(3, auto); }
+    &.four-columns { grid-template-columns: repeat(4, auto); }
 
     align-items: end;
     justify-content: center;
