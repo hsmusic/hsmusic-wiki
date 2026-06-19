@@ -26,7 +26,9 @@ export default {
       track.trackNumber,
 
     nameDetail:
-      track.nameDetailWithinAlbum,
+      (track.album.style === 'meta'
+        ? track.nameDetailWithinAlbum
+        : null),
   }),
 
   slots: {

@@ -116,7 +116,7 @@ export default {
             html.inside(
               relations.trackListItem.slots({
                 showArtists: 'auto',
-                showDetail: 'from across wiki',
+                showNameDetail: 'from within album',
                 showDuration: slots.showDuration,
                 showDate: data.date,
               })),

@@ -33,7 +33,7 @@ export default {
       default: false,
     },
 
-    showDetail: {
+    showNameDetail: {
       type: 'boolean',
       default: true,
     },
@@ -56,10 +56,10 @@ export default {
           showArtists: slots.showArtists,
           showDuration: slots.showDuration,
 
-          showDetail:
-            (slots.showDetail && releasesMatch
+          showNameDetail:
+            (slots.showNameDetail && releasesMatch
               ? 'from within album'
-          : slots.showDetail
+          : slots.showNameDetail
               ? 'from across wiki'
               : false),
 

@@ -28,6 +28,9 @@ export default {
     date:
       track.date,
 
+    nameDetailWithinSection:
+      track.nameDetailWithinSection,
+
     nameDetailWithinAlbum:
       track.nameDetailWithinAlbum,
 
@@ -49,8 +52,14 @@ export default {
       default: 'auto',
     },
 
-    showDetail: {
-      validate: v => v.is('from across wiki', 'from within album', false),
+    showNameDetail: {
+      validate: v => v.is(...[
+        'from within section',
+        'from within album',
+        'from across wiki',
+        false,
+      ]),
+
       default: false,
     },
 
@@ -128,9 +137,11 @@ export default {
               .slot('color', slots.colorMode === 'track');
 
           const nameDetail =
-            (slots.showDetail === 'from within album'
+            (slots.showNameDetail === 'from within section'
+              ? data.nameDetailWithinSection
+           : slots.showNameDetail === 'from within album'
               ? data.nameDetailWithinAlbum
-           : slots.showDetail
+           : slots.showNameDetail
               ? data.nameDetailAcrossWiki
               : null);
 

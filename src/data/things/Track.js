@@ -773,7 +773,7 @@ export class Track extends Thing {
       },
     ],
 
-    nameDetailWithinAlbum: [
+    nameDetailWithinSection: [
       {
         dependencies: ['_nameDetail'],
         compute: ({
@@ -783,6 +783,29 @@ export class Track extends Thing {
             ? null
          : nameDetail === 'section'
             ? null
+            : nameDetail),
+      },
+    ],
+
+    nameDetailWithinAlbum: [
+      withPropertyFromObject('trackSection', V('nameDetailForTracks')),
+
+      {
+        dependencies: [
+          '_nameDetail',
+          '#trackSection.nameDetailForTracks',
+        ],
+
+        compute: ({
+          ['_nameDetail']: nameDetail,
+
+          ['#trackSection.nameDetailForTracks']:
+            trackSectionNameDetailForTracks,
+        }) =>
+          (nameDetail === 'album'
+            ? null
+         : nameDetail === 'section'
+            ? trackSectionNameDetailForTracks
             : nameDetail),
       },
     ],

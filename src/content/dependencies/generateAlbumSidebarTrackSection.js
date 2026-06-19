@@ -42,7 +42,10 @@ export default {
 
     data.trackNameDetails =
       trackSection.tracks
-        .map(track => track.nameDetailWithinAlbum);
+        .map(track =>
+          (album.style === 'meta'
+            ? track.nameDetailWithinAlbum
+            : null));
 
     data.tracksAreMissingCommentary =
       trackSection.tracks

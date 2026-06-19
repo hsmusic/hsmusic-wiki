@@ -149,7 +149,9 @@ export default {
       track.nameStyle,
 
     nameDetail:
-      track.nameDetailAcrossWiki,
+      (track.album.style === 'meta'
+        ? track.nameDetailWithinAlbum
+        : null),
 
     color:
       track.color,

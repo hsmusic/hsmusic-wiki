@@ -21,6 +21,7 @@ export default {
   }),
 
   data: (query, track, album) => ({
+    albumStyle: album.style,
     albumShowsTrackArtists: album.showArtistsInTrackList,
 
     trackHasDuration: query.trackHasDuration,
@@ -47,7 +48,10 @@ export default {
           ? 'auto'
           : false),
 
-      showDetail: 'from within album',
+      showNameDetail:
+        (data.albumStyle === 'meta'
+          ? 'from within section'
+          : false),
 
       showDuration:
         (slots.collapseDurationScope === 'track'
