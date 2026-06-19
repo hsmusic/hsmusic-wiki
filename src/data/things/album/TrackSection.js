@@ -3,6 +3,7 @@ import {inspect} from 'node:util';
 import {colors} from '#cli';
 import {input, V} from '#composite';
 import Thing from '#thing';
+import {getKebabCase} from '#wiki-data';
 import {parseDate, parseExcludingURLs} from '#yaml';
 
 import {
