@@ -361,6 +361,9 @@ export class Track extends Thing {
 
     // > Update & expose - General configuration
 
+    // This matters to total-counting, but doesn't directly figure in - it's
+    // part of methods countOwnContributionIn{Contribution,Duration}Totals,
+    // accessed in turn by Contribution.countIn{Contribution,Duration}Totals.
     countInArtistTotals: [
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
