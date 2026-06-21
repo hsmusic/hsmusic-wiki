@@ -124,7 +124,7 @@ export default {
     });
 
     let linkContent;
-    if (urlIsValid) {
+    if (urlIsValid) validContent: {
       // For valid URLs, the annotation (if any) is already handled
       // by formatExternalLink. It is not shown at all, in up-front
       // presentation, if there is custom content.
@@ -133,14 +133,24 @@ export default {
 
       if (html.isBlank(slots.content)) {
         linkContent = formattedLink;
-      } else if (slots.fromContent) {
-        linkContent =
-          html.metatag('breakout',
-            slots.content);
-      } else {
-        linkContent = slots.content;
+        break validContent;
       }
-    } else {
+
+      if (slots.fromContent) {
+        const text =
+          html.resolve(slots.content, {type: 'plain'});
+
+        if (text.split(' ').length >= 4 || text.length >= 24) {
+          linkContent =
+            html.metatag('breakout',
+              slots.content);
+
+          break validContent;
+        }
+      }
+
+      linkContent = slots.content;
+    } else invalidContent: {
       // For invalid URLs, there is no automatically formatted link,
       // and the annotation (if any) is rolled into presentation below.
       // However, it's still not shown if there is custom content.
@@ -152,16 +162,18 @@ export default {
               link: html.tag('i', language.$('misc.external.invalidURL.annotation')),
               annotation: language.sanitize(data.annotation),
             });
+          break invalidContent;
         } else {
           linkContent = html.tag('i', language.$('misc.external.invalidURL'));
+          break invalidContent;
         }
-      } else {
-        linkContent =
-          language.$('misc.external.withAnnotation', {
-            link: slots.content,
-            annotation: html.tag('i', language.$('misc.external.invalidURL.annotation')),
-          });
       }
+
+      linkContent =
+        language.$('misc.external.withAnnotation', {
+          link: slots.content,
+          annotation: html.tag('i', language.$('misc.external.invalidURL.annotation')),
+        });
     }
 
     if (slots.fromContent) {
