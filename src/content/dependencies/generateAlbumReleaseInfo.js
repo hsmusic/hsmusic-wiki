@@ -8,12 +8,17 @@ export default {
     artistContributionsLine:
       relation('generateReleaseInfoContributionsLine', album.artistContribs),
 
+    trackArtistContributionsLine:
+      relation('generateReleaseInfoContributionsLine', album.trackArtistContribs),
+
     listenLineOrList:
       relation('generateListenLineOrList', album),
   }),
 
   data(album) {
     const data = {};
+
+    data.albumStyle = album.style;
 
     data.date = album.date;
     data.dateStyle = album.dateStyle;
@@ -49,6 +54,13 @@ export default {
             featuringStringKey: capsule + '.by.featuring',
             chronologyKind: 'album',
           }),
+
+          data.albumStyle === 'in-game vgm' &&
+            relations.trackArtistContributionsLine.slots({
+              stringKey: capsule + '.musicBy',
+              featuringStringKey: capsule + '.musicBy.featuring',
+              chronologyKind: null,
+            }),
 
           (data.dateStyle === 'released'
             ? language.$(capsule, 'released', {

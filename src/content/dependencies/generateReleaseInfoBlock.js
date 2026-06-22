@@ -31,7 +31,7 @@ export default {
         continue;
       }
 
-      if (html.isBlank(item)) {
+      if (html.isBlank(item) || !item) {
         continue;
       }
 

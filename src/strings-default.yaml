@@ -290,6 +290,11 @@ releaseInfo:
 
   from: "From {ALBUM}."
 
+  musicBy: >-
+    Music by {ARTISTS}.
+  musicBy.featuring: >-
+    Music by {ARTISTS}, featuring {FEATURING}.
+
   wallpaperArtBy: "Wallpaper by {ARTISTS}"
   bannerArtBy: "Banner by {ARTISTS}"
 
