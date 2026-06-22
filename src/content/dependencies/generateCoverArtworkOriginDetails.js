@@ -40,6 +40,10 @@ export default {
     forAlbum:
       artwork.thing.isAlbum,
 
+    forVGMStyleAlbum:
+      artwork.thing.isAlbum &&
+      artwork.thing.style === 'in-game vgm',
+
     forSingleStyleAlbum:
       artwork.thing.isAlbum &&
       artwork.thing.style === 'single',
@@ -88,6 +92,7 @@ export default {
           const trackArtFromAlbum =
             pagePath[0] === 'track' &&
             data.forAlbum &&
+            !data.forVGMStyleAlbum &&
             !data.forSingleStyleAlbum &&
               language.$(capsule, 'trackArtFromAlbum', {
                 album:
