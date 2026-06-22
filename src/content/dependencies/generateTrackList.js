@@ -11,7 +11,7 @@ export default {
       default: 'auto',
     },
 
-    showDetail: {
+    showNameDetail: {
       type: 'boolean',
       default: true,
     },
@@ -36,8 +36,8 @@ export default {
           showArtists: slots.showArtists,
           showDuration: slots.showDuration,
 
-          showDetail:
-            (slots.showDetail
+          showNameDetail:
+            (slots.showNameDetail
               ? 'from across wiki'
               : false),
 
