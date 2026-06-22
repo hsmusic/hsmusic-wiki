@@ -282,6 +282,20 @@ export class Album extends Thing {
       },
     ],
 
+    showAlbumInAllTracks: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      {
+        dependencies: ['style'],
+        compute: ({style}) =>
+          (style === 'in-game vgm'
+            ? true
+            : false),
+      },
+    ],
+
     showAlbumInTracksWithoutArtists: flag(V(false)),
 
     showTrackSectionInNavBar: [
@@ -841,6 +855,7 @@ export class Album extends Thing {
       'Listed in Galleries': {property: 'isListedInGalleries'},
 
       'Has Track Numbers': {property: 'hasTrackNumbers'},
+      'Show Album In All Tracks': {property: 'showAlbumInAllTracks'},
       'Show Album In Tracks Without Artists': {property: 'showAlbumInTracksWithoutArtists'},
       'Show Section In Nav Bar': {property: 'showTrackSectionInNavBar'},
       'Show Artists In Track List': {property: 'showArtistsInTrackList'},

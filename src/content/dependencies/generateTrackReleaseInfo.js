@@ -15,31 +15,57 @@ export default {
 
     albumLink:
       relation('linkAlbum', track.album),
+
+    datetimestamp:
+      relation('generateAbsoluteDatetimestamp', track.date),
   }),
 
   data(track) {
     const data = {};
-
-    data.name = track.name;
-    data.date = track.date;
-    data.dateStyle = track.dateStyle;
-    data.duration = track.duration;
-
     const {album} = track;
 
-    data.showAlbum =
-      album.showAlbumInTracksWithoutArtists &&
-      track.artistContribs.every(({annotation}) => !annotation) &&
-      compareArrays(
-        track.artistContribs.map(({artist}) => artist),
-        album.artistContribs.map(({artist}) => artist),
-        {checkOrder: true});
+    data.name = track.name;
 
-    if (
-      track.hasUniqueCoverArt &&
-      +track.coverArtDate !== +track.date
-    ) {
-      data.coverArtDate = track.coverArtDate;
+    data.date = track.date;
+
+    data.albumStyle = album.style;
+
+    data.dateFrom =
+      (track.date && album.date && +track.date === +album.date
+        ? 'album'
+     : track.date
+        ? 'track'
+        : null);
+
+    data.dateStyle =
+      (data.dateFrom === 'track'
+        ? track.dateStyle
+     : data.dateFrom === 'album'
+        ? album.dateStyle
+        : null);
+
+    data.duration = track.duration;
+
+    if (album.showAlbumInAllTracks) {
+      if (+data.date === +album.date) {
+        data.showAlbum = 'date';
+      } else {
+        data.showAlbum = 'last';
+      }
+    } else if (album.showAlbumInTracksWithoutArtists) {
+      if (
+        track.artistContribs.every(({annotation}) => !annotation) &&
+        compareArrays(
+          track.artistContribs.map(({artist}) => artist),
+          album.artistContribs.map(({artist}) => artist),
+          {checkOrder: true})
+      ) {
+        data.showAlbum = 'front';
+      } else {
+        data.showAlbum = false;
+      }
+    } else {
+      data.showAlbum = false;
     }
 
     return data;
@@ -51,10 +77,14 @@ export default {
         relations.block.slot('items', [
           language.encapsulate(capsule, 'by', capsule => {
             const withAlbum =
-              (data.showAlbum ? '.withAlbum' : '');
+              (data.showAlbum === 'front'
+                ? '.withAlbum'
+             : data.showAlbum === 'last'
+                ? '.withAlbum.albumLast'
+                : '');
 
             const albumOptions =
-              (data.showAlbum ? {album: relations.albumLink} : {});
+              (withAlbum ? {album: relations.albumLink} : {});
 
             return relations.artistContributionsLine.slots({
               stringKey: capsule + withAlbum,
@@ -66,15 +96,35 @@ export default {
             });
           }),
 
-          (data.dateStyle === 'released'
-            ? language.$(capsule, 'released', {
-                date: language.formatDate(data.date),
-              })
-         : data.dateStyle === 'posted'
-            ? language.$(capsule, 'posted', {
-                date: language.formatDate(data.date),
-              })
-            : html.blank()),
+          language.encapsulate(capsule, workingCapsule => {
+            const workingOptions = {};
+
+            if (data.dateStyle === 'released') {
+              if (
+                data.showAlbum === 'date' &&
+                data.albumStyle === 'in-game vgm'
+              ) {
+                workingCapsule += '.released.vgm';
+                workingOptions.date =
+                  relations.datetimestamp.slot('style', 'year');
+              } else {
+                workingCapsule += '.released';
+                workingOptions.date = language.formatDate(data.date);
+              }
+            } else if (data.dateStyle === 'posted') {
+              workingCapsule += '.posted';
+              workingOptions.date = language.formatDate(data.date);
+            } else {
+              return html.blank();
+            }
+
+            if (data.showAlbum === 'date') {
+              workingCapsule += '.withAlbum';
+              workingOptions.album = relations.albumLink;
+            }
+
+            return language.$(workingCapsule, workingOptions);
+          }),
 
           language.$(capsule, 'duration', {
             [language.onlyIfOptions]: ['duration'],
