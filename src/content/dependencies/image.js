@@ -115,7 +115,15 @@ export default {
     const originalDimensions =
       (isMissingImageFile
         ? null
-        : getDimensionsOfImagePath(mediaSrc));
+        : (() => {
+            // This errors for images which exist but don't have thumbnails
+            // generated yet. AWKWARD.....
+            try {
+              return getDimensionsOfImagePath(mediaSrc)
+            } catch {
+              return null;
+            }
+          })());
 
     const willLink =
       !isMissingImageFile &&
