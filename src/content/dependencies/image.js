@@ -112,12 +112,17 @@ export default {
     const isMissingImageFile =
       missingImagePaths.includes(mediaSrc);
 
+    const originalDimensions =
+      (isMissingImageFile
+        ? null
+        : getDimensionsOfImagePath(mediaSrc));
+
     const willLink =
       !isMissingImageFile &&
       (typeof slots.link === 'string' || slots.link);
 
     const warnings = slots.warnings ?? data.warnings;
-    const dimensions = slots.dimensions;
+    const dimensions = slots.dimensions ?? originalDimensions;
 
     const willReveal =
       slots.reveal &&
@@ -184,7 +189,6 @@ export default {
     // so it won't be set if thumbnails aren't available.
     let revealSrc = null;
 
-    let originalDimensions;
     let availableThumbs;
     let selectedThumbtack;
 
@@ -205,7 +209,6 @@ export default {
           getThumbSrc(getThumbnailEqualOrSmaller('mini', mediaSrc));
       }
 
-      originalDimensions = getDimensionsOfImagePath(mediaSrc);
       availableThumbs = getThumbnailsAvailableForDimensions(originalDimensions);
 
       const fileSize =
