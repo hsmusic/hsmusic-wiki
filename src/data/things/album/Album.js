@@ -328,6 +328,14 @@ export class Album extends Thing {
       },
     ],
 
+    hideTrackSectionDurations: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      exposeDependency('hideDuration'),
+    ],
+
     // > Update & expose - General metadata
 
     color: color(),
@@ -860,6 +868,7 @@ export class Album extends Thing {
       'Show Section In Nav Bar': {property: 'showTrackSectionInNavBar'},
       'Show Artists In Track List': {property: 'showArtistsInTrackList'},
       'Hide Duration': {property: 'hideDuration'},
+      'Hide Track Section Durations': {property: 'hideTrackSectionDurations'},
 
       // General metadata
 

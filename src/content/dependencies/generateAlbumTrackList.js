@@ -87,7 +87,9 @@ export default {
         data.trackSectionDurations =
           album.trackSections
             .map(section =>
-              accumulateSum(section.tracks, track => track.duration));
+              (section.hideDuration
+                ? null
+                : accumulateSum(section.tracks, track => track.duration)));
 
         data.trackSectionDurationsApproximate =
           album.trackSections
@@ -159,7 +161,7 @@ export default {
                     language.encapsulate(capsule, capsule => {
                       const options = {section: name};
 
-                      if (duration !== 0) {
+                      if (duration) {
                         capsule += '.withDuration';
                         options.duration =
                           language.formatDuration(duration, {
