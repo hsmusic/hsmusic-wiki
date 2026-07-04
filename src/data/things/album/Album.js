@@ -324,6 +324,8 @@ export class Album extends Thing {
         compute: ({style}) =>
           (style === 'in-game vgm'
             ? true
+         : style === 'meta'
+            ? true
             : false),
       },
     ],
