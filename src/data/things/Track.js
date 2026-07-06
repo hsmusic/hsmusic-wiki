@@ -659,7 +659,7 @@ export class Track extends Thing {
       update: {
         validate:
           anyOf(
-            is('album'),
+            is('album', 'section'),
             isString),
       },
     },
@@ -841,6 +841,16 @@ export class Track extends Thing {
             : nameDetail),
       },
     ],
+
+    nameDetailIsFromDetail: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['_nameDetail'],
+        compute: ({['_nameDetail']: nameDetail}) =>
+          nameDetail === 'album' ||
+          nameDetail === 'section',
+      },
+    },
 
     isMainRelease:
       exposeWhetherDependencyAvailable({

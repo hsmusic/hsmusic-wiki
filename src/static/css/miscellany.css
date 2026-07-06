@@ -58,6 +58,16 @@
     font-style: normal;
   }
 
+  .main-content-container > :is(ul, dl) {
+    li:has(.name-detail) {
+      padding-right: clamp(40px, 6vw, 60px);
+      .by { display: inline-block; }
+
+      .name-detail:not(.from-detail) { opacity: 0.85; }
+      .name-detail.from-detail { opacity: 0.7; font-size: 0.9em; }
+    }
+  }
+
   .other-group-accent,
   .rerelease-line {
     opacity: 0.7;

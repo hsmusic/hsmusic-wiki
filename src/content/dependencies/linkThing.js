@@ -26,6 +26,10 @@ export default {
       thing.nameDetailAcrossWiki ??
       null,
 
+    nameDetailIsFromDetail:
+      thing.nameDetailIsFromDetail ??
+      false,
+
     path:
       (pathKey
         ? [pathKey, thing.directory]
@@ -193,6 +197,9 @@ export default {
 
             accent:
               html.tag('span', {class: 'name-detail'},
+                data.nameDetailIsFromDetail &&
+                  {class: 'from-detail'},
+
                 language.$(nameDetailCapsule, 'accent', {
                   detail: data.nameDetail,
                 })),
