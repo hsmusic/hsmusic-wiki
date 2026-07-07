@@ -66,19 +66,15 @@ export class TrackSection extends Thing {
       },
     },
 
-    unqualifiedDirectory: directory(),
-
     directorySuffixForTracks: [
       exposeUpdateValueOrContinue({
         validate: input.value(isDirectory),
       }),
 
       {
-        dependencies: ['unqualifiedDirectory', 'name', 'nameDetailForTracks'],
-        compute: ({unqualifiedDirectory, name, nameDetailForTracks}) =>
-          (nameDetailForTracks === name
-            ? unqualifiedDirectory
-            : getKebabCase(nameDetailForTracks)),
+        dependencies: ['nameDetailForTracks'],
+        compute: ({nameDetailForTracks}) =>
+          getKebabCase(nameDetailForTracks),
       },
     ],
 
@@ -185,20 +181,6 @@ export class TrackSection extends Thing {
       }),
     ],
 
-    directory: [
-      exitWithoutDependency('album'),
-      withPropertyFromObject('album', V('directory')),
-
-      {
-        dependencies: ['#album.directory', 'unqualifiedDirectory'],
-        compute: ({
-          ['#album.directory']: albumDirectory,
-          ['unqualifiedDirectory']: unqualifiedDirectory,
-        }) =>
-          albumDirectory + '/' + unqualifiedDirectory,
-      },
-    ],
-
     continueCountingFrom: [
       withPropertyFromObject('album', V('hasTrackNumbers')),
       exitWithoutDependency('#album.hasTrackNumbers', V(null), V('falsy')),
@@ -220,20 +202,6 @@ export class TrackSection extends Thing {
       },
     ],
   });
-
-  static [Thing.findSpecs] = {
-    trackSection: {
-      referenceTypes: ['track-section'],
-      bindTo: 'trackSectionData',
-    },
-
-    unqualifiedTrackSection: {
-      referenceTypes: ['unqualified-track-section'],
-
-      getMatchableDirectories: trackSection =>
-        [trackSection.unqualifiedDirectory],
-    },
-  };
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
