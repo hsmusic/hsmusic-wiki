@@ -238,7 +238,7 @@ export default {
     if (slots.chunkwrap) {
       // TODO: This is obviously evil.
       return (
-        html.metatag('chunkwrap', {split: /,| (?=and)/},
+        html.metatag('chunkwrap', {split: language.splitConjunctionList},
           html.resolve(content)));
     } else {
       return content;

@@ -78,7 +78,7 @@ export default {
     switch (style) {
       case 'line': return (
         html.tag('p',
-          html.metatag('chunkwrap', {split: /,/},
+          html.metatag('chunkwrap', {split: language.splitDisjunctionList},
             language.$(slots.string, {
               links:
                 language.formatDisjunctionList(externalLinks),

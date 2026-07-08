@@ -23,6 +23,14 @@ import {flag, name} from '#composite/wiki-properties';
 const languageOptionRegex = /{(?<name>[A-Z0-9_]+)}/g;
 
 export class Language extends Thing {
+  static {
+    // TODO: Don't hard-code these. Oh, you know...
+    Object.assign(this.prototype, {
+      splitDisjunctionList: /,| (?=hoặc)/,
+      splitConjunctionList: /,| (?=and)/,
+    });
+  }
+
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
