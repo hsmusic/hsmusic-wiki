@@ -3,10 +3,18 @@ import * as path from 'node:path';
 import {traverse} from '#node-utils';
 import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {empty} from '#sugar';
+import Thing from '#thing';
 
 export default ({
   documentModes: {headerAndEntries},
-  thingConstructors: {Album, Track, TrackSection},
+  thingConstructors: {
+    Album,
+    Track,
+    TrackSection,
+
+    AsideTrackSection,
+    CloseAsideTrackSection,
+  },
 }) => ({
   title: `Process album files`,
 
@@ -21,6 +29,10 @@ export default ({
   entryDocumentThing: document =>
     ('Section' in document
       ? TrackSection
+   : 'Aside Section' in document
+      ? AsideTrackSection
+   : 'Close Aside Section' in document
+      ? CloseAsideTrackSection
       : Track),
 
   connect({header: album, entries}) {
@@ -28,6 +40,8 @@ export default ({
 
     let currentTrackSection = new TrackSection();
     let currentTrackSectionTracks = [];
+
+    let latestNonAsideTrackSection = currentTrackSection;
 
     Object.assign(currentTrackSection, {
       name: `Default Track Section`,
@@ -53,6 +67,28 @@ export default ({
         closeCurrentTrackSection();
         currentTrackSection = entry;
         currentTrackSectionTracks = [];
+
+        if (entry.style !== 'aside') {
+          latestNonAsideTrackSection = entry;
+        }
+
+        continue;
+      }
+
+      if (entry instanceof CloseAsideTrackSection) {
+        if (currentTrackSection.style !== 'aside') {
+          throw new Error(`Current track section "${currentTrackSection.name}" is not an aside`);
+        }
+
+        if (entry.name !== currentTrackSection.name) {
+          throw new Error(`Expected "Close Aside Section: ${currentTrackSection.name}", got "${entry.name}"`);
+        }
+
+        closeCurrentTrackSection();
+        currentTrackSection = Thing.clone(latestNonAsideTrackSection);
+        currentTrackSection.tracks = [];
+        currentTrackSectionTracks = [];
+
         continue;
       }
 

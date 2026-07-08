@@ -82,7 +82,14 @@ export default {
       case 'trackSections':
         data.trackSectionNames =
           album.trackSections
-            .map(section => section.name);
+            .map(section =>
+              (section.isDefaultTrackSection
+                ? null
+                : section.name));
+
+        data.trackSectionStyles =
+          album.trackSections
+            .map(section => section.style);
 
         data.trackSectionDurations =
           album.trackSections
@@ -138,6 +145,7 @@ export default {
             items: relations.trackSectionItems,
 
             name: data.trackSectionNames,
+            style: data.trackSectionStyles,
             duration: data.trackSectionDurations,
             durationApproximate: data.trackSectionDurationsApproximate,
             hasTrackNumbers: data.trackSectionsHaveTrackNumbers,
@@ -148,6 +156,7 @@ export default {
               items,
 
               name,
+              style,
               duration,
               durationApproximate,
               hasTrackNumbers,
@@ -157,37 +166,54 @@ export default {
                 heading.slots({
                   tag: 'dt',
 
+                  attributes: [
+                    style === 'aside' &&
+                      {class: 'aside'},
+                  ],
+
                   title:
-                    language.encapsulate(capsule, capsule => {
-                      const options = {section: name};
+                    language.encapsulate(capsule, workingCapsule => {
+                      const workingOptions = {
+                        [language.onlyIfOptions]: ['section'],
+                        section: name,
+                      };
+
+                      if (html.isBlank(name)) {
+                        return html.blank();
+                      }
 
                       if (duration) {
-                        capsule += '.withDuration';
-                        options.duration =
+                        workingCapsule += '.withDuration';
+                        workingOptions.duration =
                           language.formatDuration(duration, {
                             approximate: durationApproximate,
                           });
                       }
 
-                      return language.$(capsule, options);
+                      return language.$(workingCapsule, workingOptions);
                     }),
 
                   stickyTitle:
                     language.$(capsule, 'sticky', {
+                      [language.onlyIfOptions]: ['section'],
                       section: name,
                     }),
                 })),
 
-              html.tag('dd', [
-                html.tag('blockquote',
-                  {[html.onlyIfContent]: true},
-                  description),
+              html.tag('dd',
+                style === 'aside' &&
+                  {class: 'aside'},
 
-                (hasTrackNumbers
-                  ? html.tag('ol', {start: startCountingFrom},
-                      slotItems(items))
-                  : html.tag('ul', slotItems(items))),
-              ]),
+                [
+                  html.tag('blockquote',
+                    {[html.onlyIfContent]: true},
+                    description),
+
+                  (hasTrackNumbers
+                    ? html.tag('ol', {start: startCountingFrom},
+                        slotItems(items))
+                    : html.tag('ul', slotItems(items))),
+                ]),
             ]));
 
       case 'tracks':

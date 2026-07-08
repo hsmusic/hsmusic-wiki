@@ -50,6 +50,12 @@ export class TrackSection extends Thing {
 
     name: name(V('Unnamed Track Section')),
 
+    style: {
+      flags: {update: true, expose: true},
+      update: {validate: is('section', 'aside')},
+      expose: {transform: value => value ?? 'section'},
+    },
+
     // Track sections don't have a Name Detail themselves, but they do provide
     // a value which tracks can reference via 'Name Detail: section'.
     nameDetailForTracks: {
@@ -146,6 +152,14 @@ export class TrackSection extends Thing {
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
       }),
+
+      {
+        dependencies: ['style'],
+        compute: (continuation, {style}) =>
+          (style === 'aside'
+            ? true
+            : continuation()),
+      },
 
       withPropertyFromObject('album', V('hideTrackSectionDurations')),
       exposeDependency('#album.hideTrackSectionDurations'),

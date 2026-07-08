@@ -582,6 +582,19 @@
     margin-left: 0;
   }
 
+  .album-group-list dt.aside {
+    margin-left: -5px;
+  }
+
+  .album-group-list dd.aside {
+    border-left: 1px dashed;
+    margin-left: 3px;
+  }
+
+  .album-group-list dd.aside :is(ul, ol) {
+    padding-left: 36px;
+  }
+
   .album-group-list li {
     padding-left: 1.5ch;
     text-indent: -1.5ch;
