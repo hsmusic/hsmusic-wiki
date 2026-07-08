@@ -42,6 +42,5 @@ export default {
       {[html.onlyIfContent]: true},
 
       relations.items
-        .map(item =>
-          item.slot('accentMode', 'groups'))),
+        .map(item => item.slot('detail', 'auto'))),
 };

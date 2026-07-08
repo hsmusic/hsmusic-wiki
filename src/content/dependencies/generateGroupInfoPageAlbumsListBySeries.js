@@ -87,7 +87,7 @@ export default {
                     showArtists: itemsShowArtists,
                   }).map(({item, showArtists}) =>
                       item.slots({
-                        accentMode:
+                        detail:
                           (showArtists ? 'artists' : null),
                       }))),
               ]),

@@ -3,51 +3,48 @@ import {empty} from '#sugar';
 export default {
   query(album, group) {
     if (album.groups.length > 1) {
-      const contextGroup = group;
-
-      const candidateGroupCategory =
-        album.groups
-          .filter(group => !group.excludeFromGalleryTabs)
-          .find(group => group.category !== contextGroup.category)
-          ?.category ??
-        null;
+      const currentCategory = group.category;
 
       const candidateGroups =
         album.groups
-          .filter(group => !group.excludeFromGalleryTabs)
-          .filter(group => group.category === candidateGroupCategory);
+          .filter(group => !group.excludeFromOtherGroupAlbumSummaries);
 
-      if (!empty(candidateGroups)) {
-        return {
-          mode: 'groups',
-          notedGroups: candidateGroups,
-        };
+      const categoriesToGroups =
+        Map.groupBy(candidateGroups, group => group.category);
+
+      for (const [category, groups] of categoriesToGroups) {
+        if (category === currentCategory) {
+          continue;
+        }
+
+        if (empty(groups)) {
+          continue;
+        }
+
+        return {mode: 'groups', groups};
       }
     }
 
     if (!empty(album.artistContribs)) {
-      if (
-        album.artistContribs.length === 1 &&
-        !empty(group.closelyLinkedArtists) &&
-        (album.artistContribs[0].artist.name ===
-         group.closelyLinkedArtists[0].artist.name)
-      ) {
-        return {mode: null};
-      }
-
-      return {
-        mode: 'artists',
-        notedArtistContribs: album.artistContribs,
+      if (album.artistContribs.length >= 2) {
+        return {mode: 'artists'};
       };
+
+      const onlyAlbumArtist = album.artistContribs[0].artist;
+      const firstGroupArtist = group.closelyLinkedArtists[0]?.artist;
+
+      if (!firstGroupArtist || onlyAlbumArtist !== firstGroupArtist) {
+        return {mode: 'artists'};
+      }
     }
 
-    return {mode: null};;
+    return {mode: null};
   },
 
-  relations: (relation, query, _album, _group) => ({
+  relations: (relation, query, album, _group) => ({
     artistCredit:
       (query.mode === 'artists'
-        ? relation('generateArtistCredit', query.notedArtistContribs, [])
+        ? relation('generateArtistCredit', album.artistContribs, [])
         : null),
   }),
 
@@ -56,7 +53,7 @@ export default {
 
     groupNames:
       (query.mode === 'groups'
-        ? query.notedGroups.map(group => group.name)
+        ? query.groups.map(group => group.name)
         : null),
   }),
 

@@ -46,13 +46,13 @@ export class Group extends Thing {
       exposeConstant(V(false)),
     ],
 
-    excludeFromGalleryTabs: [
+    excludeFromOtherGroupAlbumSummaries: [
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
       }),
 
-      withPropertyFromObject('category', V('excludeGroupsFromGalleryTabs')),
-      exposeDependencyOrContinue('#category.excludeGroupsFromGalleryTabs'),
+      withPropertyFromObject('category', V('excludeGroupsFromOtherGroupAlbumSummaries')),
+      exposeDependencyOrContinue('#category.excludeGroupsFromOtherGroupAlbumSummaries'),
 
       exposeConstant(V(false)),
     ],
@@ -167,8 +167,8 @@ export class Group extends Thing {
         property: 'useForDividingReferenceLists',
       },
 
-      'Exclude From Gallery Tabs': {
-        property: 'excludeFromGalleryTabs',
+      'Exclude From Other Group Album Summaries': {
+        property: 'excludeFromOtherGroupAlbumSummaries',
       },
 
       'Divide Albums By Style': {

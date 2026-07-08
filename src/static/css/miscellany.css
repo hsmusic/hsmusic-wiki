@@ -68,25 +68,21 @@
     }
   }
 
-  .other-group-accent,
   .rerelease-line {
     opacity: 0.7;
     font-style: oblique;
   }
 
-  .other-group-accent {
-    white-space: nowrap;
-  }
-
-  .other-group-accent a {
-    color: var(--page-primary-color);
-  }
-
-  dt .by, li .by {
+  :is(dt, li) .by {
     font-style: oblique;
   }
 
-  dt .by a, li .by a {
+  :is(dt, li) .by a {
+    display: inline-block;
+  }
+
+  :is(dt, li) .other-group-accent a {
+    color: var(--page-primary-color);
     display: inline-block;
   }
 
