@@ -124,7 +124,7 @@
     border-color: var(--page-border-color);
 
     box-shadow:
-      0 0 40px #0008,
+      0 0 40px rgba(0, 0, 0, calc(0.5 - (var(--box-opacity) - 0.6) / 0.55)),
       0 20px 15px -4px #0002,
       0 6px 15px -3px #2221,
       0 4px 6px 2px #1113,
