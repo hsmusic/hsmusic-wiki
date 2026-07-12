@@ -568,7 +568,16 @@ export function filterReferenceErrors(wikiData, {
                 break;
 
               default:
+                if (findFnKey.startsWith('_')) {
+                  throw new Error(`Unknown specially handled find function "${findFnKey}"`);
+                }
+
                 findFn = boundFind[findFnKey];
+
+                if (!findFn) {
+                  throw new Error(`Unknown find function "${findFnKey}"`);
+                }
+
                 break;
             }
 

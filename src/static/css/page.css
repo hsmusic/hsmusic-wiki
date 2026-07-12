@@ -550,6 +550,10 @@
     font-size: 1.25em;
   }
 
+  .sidebar h1 a {
+    word-break: break-word;
+  }
+
   .sidebar h2 {
     font-size: 1.1em;
     margin: 0;

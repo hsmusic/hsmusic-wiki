@@ -121,6 +121,10 @@ export function bind(wikiData, opts1, {
         ? wikiData
         : wikiData[spec.bindTo]);
 
+    if (!data) {
+      throw new Error(`Couldn't find data for ${key}, bindTo: ${spec.bindTo}`);
+    }
+
     bound[key] =
       (opts1
         ? (ref, opts2) =>

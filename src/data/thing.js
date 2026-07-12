@@ -67,7 +67,11 @@ export default class Thing extends CacheableObject {
       name = colors.yellow(`couldn't get name`);
     }
 
-    let reference = Thing.inspectReference(this, {showConstructor: false});
+    let reference =
+      Thing.inspectReference(this, {
+        showConstructor: false,
+        showName: false,
+      });
 
     return (
       (name ? `${constructorName} ${name}` : `${constructorName}`) +
@@ -120,7 +124,10 @@ export default class Thing extends CacheableObject {
     return `${thing.constructor[Thing.referenceType]}:${thing.directory}`;
   }
 
-  static inspectReference(thing, {showConstructor = true} = {}) {
+  static inspectReference(thing, {
+    showConstructor = true,
+    showName = true,
+  } = {}) {
     const referenceType =
       thing.constructor[Thing.referenceType] ??
       null;
@@ -145,12 +152,12 @@ export default class Thing extends CacheableObject {
 
     if (directoryPart && referenceType) {
       return colors.blue(`${referenceType}:${directoryPart}`);
-    } else if (directoryPart) {
-      return constructorPart + `(${colors.blue(directoryPart)})`;
-    } else if (tryToGet('name')) {
-      return constructorPart + `(named ${inspect(thing.name)}`;
+    } if (directoryPart) {
+      return constructorPart + `${colors.blue(directoryPart)}`;
+    } else if (showName && tryToGet('name')) {
+      return constructorPart + `named ${inspect(thing.name)}`;
     } else if (errored && directoryErrored) {
-      return constructorPart + `(${colors.yellow(`couldn't compute reference`)})`;
+      return constructorPart + `${colors.yellow(`couldn't compute reference`)}`;
     } else {
       return constructorPart;
     }
