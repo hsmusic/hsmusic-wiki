@@ -615,6 +615,15 @@ export function filterReferenceErrors(wikiData, {
                   }
                 }
 
+                if (thing.constructor === thingConstructors.Album) {
+                  if (
+                    thing.style === 'in-game vgm' &&
+                    CacheableObject.getUpdateValue(thing, 'hasCoverArt') !== false
+                  ) {
+                    hasCoverArtwork = true;
+                  }
+                }
+
                 if (!hasCoverArtwork) {
                   nest({message: errorMessage}, ({push}) => {
                     push(new TypeError(`No cover artwork, so this shouldn't have art tags specified`));
