@@ -258,6 +258,9 @@ function getContentHeadingClosestToStickySubheading(index) {
       continue;
     }
 
+    if (heading.checkVisibility?.() === false) continue;
+    if (heading.offsetParent === null) continue;
+
     const headingRect = heading.getBoundingClientRect();
     if (headingRect.y + headingRect.height / 1.5 < stickyBottom + 40) {
       return heading;
