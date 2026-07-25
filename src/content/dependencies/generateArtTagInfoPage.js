@@ -17,10 +17,6 @@ export default {
     query.allThings =
       unique([...query.directThings, ...query.indirectThings]);
 
-    query.allDescendantsHaveMoreDescendants =
-      artTag.directDescendantArtTags
-        .every(descendant => !empty(descendant.directDescendantArtTags));
-
     return query;
   },
 
@@ -60,15 +56,12 @@ export default {
       artTag.directAncestorArtTags
         .map(artTag => relation('linkArtTagInfo', artTag)),
 
-    directDescendantInfoLinks:
+    directDescendantListItems:
       artTag.directDescendantArtTags
-        .map(artTag => relation('linkArtTagInfo', artTag)),
-
-    directDescendantGalleryLinks:
-      artTag.directDescendantArtTags.map(artTag =>
-        (query.allDescendantsHaveMoreDescendants
-          ? null
-          : relation('linkArtTagGallery', artTag))),
+        .map(descendant =>
+          relation('generateArtTagInfoPageDescendantListItem',
+            descendant,
+            artTag)),
   }),
 
   data: (query, sprawl, artTag) => ({
@@ -93,13 +86,6 @@ export default {
     relatedArtTagAnnotations:
       artTag.relatedArtTags
         .map(({annotation}) => annotation),
-
-    directDescendantTimesFeaturedTotal:
-      artTag.directDescendantArtTags.map(artTag =>
-        unique([
-          ...artTag.directlyFeaturedInArtworks,
-          ...artTag.indirectlyFeaturedInArtworks,
-        ]).length),
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -223,38 +209,8 @@ export default {
                     }),
                 }),
 
-              html.tag('ul',
-                {[html.onlyIfContent]: true},
-
-                stitchArrays({
-                  infoLink: relations.directDescendantInfoLinks,
-                  galleryLink: relations.directDescendantGalleryLinks,
-                  timesFeaturedTotal: data.directDescendantTimesFeaturedTotal,
-                }).map(({infoLink, galleryLink, timesFeaturedTotal}) =>
-                    html.tag('li',
-                      language.encapsulate(listCapsule, 'item', itemCapsule =>
-                        language.encapsulate(itemCapsule, workingCapsule => {
-                          const workingOptions = {};
-
-                          workingOptions.tag = infoLink;
-
-                          if (!html.isBlank(galleryLink ?? html.blank())) {
-                            workingCapsule += '.withGallery';
-                            workingOptions.gallery =
-                              galleryLink.slot('content',
-                                language.$(itemCapsule, 'withGallery.gallery'));
-                          }
-
-                          if (timesFeaturedTotal >= 1) {
-                            workingCapsule += `.withTimesUsed`;
-                            workingOptions.timesUsed =
-                              language.countTimesFeatured(timesFeaturedTotal, {
-                                unit: true,
-                              });
-                          }
-
-                          return language.$(workingCapsule, workingOptions);
-                        }))))),
+              html.tag('ul', {[html.onlyIfContent]: true},
+                relations.directDescendantListItems),
             ])),
         ],
 
