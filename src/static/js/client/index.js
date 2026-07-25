@@ -18,6 +18,7 @@ import * as memorableDetailsModule from './memorable-details.js';
 import * as quickDescriptionModule from './quick-description.js';
 import * as revealAllGridControlModule from './reveal-all-grid-control.js';
 import * as scriptedLinkModule from './scripted-link.js';
+import * as showMoreLessSwitcherModule from './show-more-less-switcher.js';
 import * as sidebarSearchModule from './sidebar-search.js';
 import * as stickyHeadingModule from './sticky-heading.js';
 import * as textWithTooltipModule from './text-with-tooltip.js';
@@ -44,6 +45,7 @@ export const modules = [
   quickDescriptionModule,
   revealAllGridControlModule,
   scriptedLinkModule,
+  showMoreLessSwitcherModule,
   sidebarSearchModule,
   stickyHeadingModule,
   textWithTooltipModule,

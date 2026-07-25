@@ -17,6 +17,10 @@ export default {
     query.allThings =
       unique([...query.directThings, ...query.indirectThings]);
 
+    query.hasIndirectDescendants =
+      artTag.directDescendantArtTags
+        .some(descendant => !empty(descendant.directDescendantArtTags));
+
     return query;
   },
 
@@ -56,12 +60,23 @@ export default {
       artTag.directAncestorArtTags
         .map(artTag => relation('linkArtTagInfo', artTag)),
 
+    showMoreLessSwitcher:
+      relation('generateShowMoreLessSwitcher'),
+
     directDescendantListItems:
       artTag.directDescendantArtTags
         .map(descendant =>
           relation('generateArtTagInfoPageDescendantListItem',
             descendant,
             artTag)),
+
+    indirectDescendantListItems:
+      artTag.directDescendantArtTags
+        .map(descendant => descendant.directDescendantArtTags
+          .map(descendantSquared =>
+            relation('generateArtTagInfoPageDescendantListItem',
+              descendantSquared,
+              descendant))),
   }),
 
   data: (query, sprawl, artTag) => ({
@@ -82,6 +97,9 @@ export default {
 
     numArtworksTotal:
       query.allThings.length,
+
+    hasIndirectDescendants:
+      query.hasIndirectDescendants,
 
     relatedArtTagAnnotations:
       artTag.relatedArtTags
@@ -180,13 +198,15 @@ export default {
 
           language.encapsulate(pageCapsule, 'descendsFromTags', listCapsule =>
             html.tags([
-              relations.contentHeading.clone()
-                .slots({
-                  title:
-                    language.$(listCapsule, {
-                      tag: language.sanitize(data.name),
-                    }),
-                }),
+              relations.contentHeading.clone().slots({
+                title:
+                  language.$(listCapsule, {
+                    tag: language.sanitize(data.name),
+                  }),
+
+                stickyTitle:
+                  language.$(listCapsule, 'sticky'),
+              }),
 
               html.tag('ul',
                 {[html.onlyIfContent]: true},
@@ -201,16 +221,69 @@ export default {
 
           language.encapsulate(pageCapsule, 'descendantTags', listCapsule =>
             html.tags([
-              relations.contentHeading.clone()
-                .slots({
-                  title:
-                    language.$(listCapsule, {
+              relations.contentHeading.clone().slots({
+                title:
+                  language.encapsulate(listCapsule, workingCapsule => {
+                    const workingOptions = {
                       tag: language.sanitize(data.name),
-                    }),
-                }),
+                    };
 
-              html.tag('ul', {[html.onlyIfContent]: true},
-                relations.directDescendantListItems),
+                    if (data.hasIndirectDescendants) {
+                      workingCapsule += '.withShowMoreLessSwitcher';
+                      workingOptions.showMoreLessSwitcher =
+                        relations.showMoreLessSwitcher.slots({
+                          memorableID: 'indirect-descendant-tags',
+
+                          switcherString: listCapsule + '.showMoreLessSwitcher',
+                          showMoreString: listCapsule + '.showMoreLessSwitcher.showMore',
+                          showLessString: listCapsule + '.showMoreLessSwitcher.showLess',
+
+                          showMoreTargetID: 'indirect-descendants-list',
+                          showLessTargetID: 'direct-descendants-list',
+                        });
+                    }
+
+                    return language.$(workingCapsule, workingOptions);
+                  }),
+
+                stickyTitle:
+                  language.$(listCapsule, 'sticky'),
+              }),
+
+              html.tag('ul', {id: 'direct-descendants-list'},
+                {[html.onlyIfContent]: true},
+
+                relations.directDescendantListItems.map(item =>
+                  item.slots({
+                    showTimesFeatured: true,
+                    showGalleryLink: 'auto',
+                  }))),
+
+              html.tag('dl', {id: 'indirect-descendants-list'},
+                {[html.onlyIfContent]: true},
+                {style: 'display: none'},
+
+                stitchArrays({
+                  directItem: relations.directDescendantListItems,
+                  indirectItems: relations.indirectDescendantListItems,
+                }).map(({directItem, indirectItems}) => [
+                    html.tag('dt',
+                      html.resolve(
+                        directItem.slots({
+                          showTimesFeatured: true,
+                          showGalleryLink: 'auto',
+                        }),
+                        {normalize: 'tag'})
+                          .content),
+
+                    html.tag('dd',
+                      html.tag('ul',
+                        indirectItems.map(item =>
+                          item.slots({
+                            showTimesFeatured: false,
+                            showGalleryLink: false,
+                          })))),
+                  ])),
             ])),
         ],
 

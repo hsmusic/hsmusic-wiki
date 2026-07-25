@@ -2088,10 +2088,23 @@ artTagInfoPage:
 
   descendsFromTags:
     _: "Tags which '{TAG}' falls under:"
+    sticky: "Tags which this one falls under:"
     item: "{TAG}"
 
   descendantTags:
-    _: "Tags which fall under '{TAG}':"
+    _: >-
+      Tags which fall under '{TAG}':
+
+    withShowMoreLessSwitcher: >-
+      Tags which fall under '{TAG}': {SHOW_MORE_LESS_SWITCHER}
+
+    showMoreLessSwitcher:
+      _: "({SHOW_MORE_LESS})"
+      showMore: "show more"
+      showLess: "show less"
+
+    sticky: >-
+      Tags which fall under this one:
 
     item:
       _: "{TAG}"

@@ -892,6 +892,12 @@
     margin-top: 0.35em;
     margin-bottom: 0.5em;
   }
+
+  #content #indirect-descendants-list > dt {
+    display: list-item;
+    padding-left: 0;
+    margin-left: 40px;
+  }
 }
 
 /* Footer */

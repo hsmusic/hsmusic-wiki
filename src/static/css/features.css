@@ -2197,6 +2197,21 @@
   }
 }
 
+/* "Show more" / "Show less" switchers */
+
+@layer print {
+  .show-more-less-switcher {
+    margin-left: 0.5ch;
+  }
+}
+
+@layer interaction {
+  .show-more-less-switcher > a {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+}
+
 /* Sticky heading */
 
 @layer layout {

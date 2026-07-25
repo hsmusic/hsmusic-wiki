@@ -7,17 +7,18 @@ export default {
         .every(descendant => !empty(descendant.directDescendantArtTags)),
   }),
 
-  relations: (relation, query, descendant, _ancestor) => ({
+  relations: (relation, _query, descendant, _ancestor) => ({
     infoLink:
       relation('linkArtTagInfo', descendant),
 
     galleryLink:
-      (query.allDescendantsHaveMoreDescendants
-        ? null
-        : relation('linkArtTagGallery', descendant)),
+      relation('linkArtTagGallery', descendant),
   }),
 
-  data: (_query, descendant, _ancestor) => ({
+  data: (query, descendant, _ancestor) => ({
+    allDescendantsHaveMoreDescendants:
+      query.allDescendantsHaveMoreDescendants,
+
     timesFeaturedTotal:
       unique([
         ...descendant.directlyFeaturedInArtworks,
@@ -25,7 +26,19 @@ export default {
       ]).length
   }),
 
-  generate: (data, relations, {html, language}) =>
+  slots: {
+    showTimesFeatured: {
+      type: 'boolean',
+      default: true,
+    },
+
+    showGalleryLink: {
+      validate: v => v.is(true, false, 'auto'),
+      default: 'auto',
+    },
+  },
+
+  generate: (data, relations, slots, {html, language}) =>
     html.tag('li',
       language.encapsulate('artTagInfoPage.descendantTags.item', itemCapsule =>
         language.encapsulate(itemCapsule, workingCapsule => {
@@ -33,14 +46,21 @@ export default {
 
           workingOptions.tag = relations.infoLink;
 
-          if (!html.isBlank(relations.galleryLink ?? html.blank())) {
+          const showGalleryLink =
+            (slots.showGalleryLink === true
+              ? true
+           : slots.showGalleryLink === 'auto'
+              ? data.allDescendantsHaveMoreDescendants
+              : false);
+
+          if (showGalleryLink) {
             workingCapsule += '.withGallery';
             workingOptions.gallery =
               relations.galleryLink.slot('content',
                 language.$(itemCapsule, 'withGallery.gallery'));
           }
 
-          if (data.timesFeaturedTotal >= 1) {
+          if (slots.showTimesFeatured && data.timesFeaturedTotal >= 1) {
             workingCapsule += `.withTimesUsed`;
             workingOptions.timesUsed =
               language.countTimesFeatured(data.timesFeaturedTotal, {
