@@ -138,17 +138,13 @@ export const info = {
       maxLength: settings => settings.maxActiveResultsStorage,
     },
 
-    activeFilterType: {
-      type: 'string',
-    },
+    activeFilterType: {type: 'string'},
+    resultsScrollOffset: {type: 'number'},
 
     repeatQueryOnReload: {
       type: 'boolean',
       default: false,
-    },
-
-    resultsScrollOffset: {
-      type: 'number',
+      clearOnHomepage: false,
     },
   },
 
@@ -632,7 +628,7 @@ export function addPageListeners() {
 }
 
 export function initializeState() {
-  const {session} = info;
+  const {session, state} = info;
 
   if (!info.searchInput) return;
 
@@ -641,7 +637,8 @@ export function initializeState() {
       info.searchInput.value = session.activeQuery;
       activateSidebarSearch(session.activeQuery);
     } else if (session.activeQueryResults) {
-      considerRecallingRecentSidebarSearch();
+      info.searchInput.placeholder = session.activeQuery;
+      state.recallingRecentSearch = true;
     }
   }
 }
@@ -1588,22 +1585,6 @@ function restoreSidebarSearchColumn() {
   state.tidiedSidebar = null;
 
   info.searchInput.placeholder = info.standbyInputPlaceholder;
-}
-
-function considerRecallingRecentSidebarSearch() {
-  const {session, state} = info;
-
-  if (document.documentElement.dataset.urlKey === 'localized.home') {
-    return forgetRecentSidebarSearch();
-  }
-
-  info.searchInput.placeholder = session.activeQuery;
-  state.recallingRecentSearch = true;
-}
-
-function forgetRecentSidebarSearch() {
-  clearActiveQuery();
-  clearSidebarFilter();
 }
 
 async function handleDroppedIntoSearchInput(domEvent) {

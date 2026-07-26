@@ -262,6 +262,16 @@ for (const module of modules) {
           }
         },
       });
+
+      const clearOnHomepage =
+        spec.clearOnHomepage ?? true;
+
+      if (
+        clearOnHomepage &&
+        document.documentElement.dataset.urlKey === 'localized.home'
+      ) {
+        info.session[key] = null;
+      }
     }
 
     Object.preventExtensions(info.session);
