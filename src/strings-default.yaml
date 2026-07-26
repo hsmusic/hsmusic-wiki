@@ -1189,6 +1189,7 @@ misc:
     label: "Music video!"
     label.customLabel: "{LABEL}!"
     label.customLabel.title: "{TITLE}"
+    label.customLabel.besideTitle: "{LABEL}"
 
     watchOn: >-
       Watch on: {LINKS}

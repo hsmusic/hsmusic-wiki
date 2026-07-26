@@ -38,6 +38,14 @@ export default {
   generate: (data, relations, {language, html}) =>
     language.encapsulate('misc.musicVideo', capsule =>
       html.tag('div', {class: 'music-video'}, [
+        data.title &&
+        data.label &&
+          html.tag('p', {class: 'music-video-label'},
+            {class: 'beside-title-style'},
+            language.$(capsule, 'label.customLabel.besideTitle', {
+              label: data.label,
+            })),
+
         html.tag('p', {class: 'music-video-label'},
           data.title &&
             {class: 'title-style'},
