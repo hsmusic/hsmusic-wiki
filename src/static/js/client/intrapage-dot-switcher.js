@@ -5,16 +5,34 @@ import {cssProp} from '../client-util.js';
 export const info = {
   id: 'intrapageDotSwitcherInfo',
 
+  switcherMemorableIDs: null,
+
   // Each is a two-level array, by switcher.
   // This is an evil data structure.
   switcherSpans: null,
   switcherLinks: null,
   switcherTargets: null,
+  switcherMemorableValues: null,
+
+  session: {
+    switcherChoices: {
+      type: 'json',
+      maxLength: settings => settings.maxSwitcherChoiceStorage,
+    },
+  },
+
+  settings: {
+    maxSwitcherChoiceStorage: 1000,
+  },
 };
 
 export function getPageReferences() {
   const switchers =
     Array.from(document.querySelectorAll('.dot-switcher.intrapage'));
+
+  info.switcherMemorableIDs =
+    switchers
+      .map(switcher => switcher.getAttribute('data-memorable-id'));
 
   info.switcherSpans =
     switchers
@@ -42,19 +60,81 @@ export function getPageReferences() {
             return null;
           }
         }));
+
+  info.switcherMemorableValues =
+    info.switcherLinks
+      .map(links => links
+        .map(link => link.innerText));
+}
+
+export function mutatePageContent() {
+  const {session} = info;
+
+  if (!session.switcherChoices) return;
+
+  stitchArrays({
+    memorableID: info.switcherMemorableIDs,
+    memorableValues: info.switcherMemorableValues,
+    spans: info.switcherSpans,
+    targets: info.switcherTargets,
+  }).forEach(({
+    memorableID,
+    memorableValues,
+    spans,
+    targets,
+  }) => {
+    const choice = session.switcherChoices[memorableID];
+
+    if (!choice) return;
+    if (!memorableValues.includes(choice)) return;
+
+    stitchArrays({
+      memorableValue: memorableValues,
+      span: spans,
+      target: targets,
+    }).forEach(({
+      memorableValue,
+      span,
+      target,
+    }) => {
+      if (memorableValue === choice) {
+        span.classList.add('current');
+        cssProp(target, 'display', 'block');
+      } else {
+        span.classList.remove('current');
+        cssProp(target, 'display', 'none');
+      }
+    });
+  });
 }
 
 export function addPageListeners() {
-  for (const {links, spans, targets} of stitchArrays({
+  const {session} = info;
+
+  stitchArrays({
+    memorableID: info.switcherMemorableIDs,
+    memorableValues: info.switcherMemorableValues,
     spans: info.switcherSpans,
     links: info.switcherLinks,
     targets: info.switcherTargets,
-  })) {
-    for (const [index, {span, link, target}] of stitchArrays({
+  }).forEach(({
+    memorableID,
+    memorableValues,
+    links,
+    spans,
+    targets,
+  }) => {
+    stitchArrays({
+      memorableValue: memorableValues,
       span: spans,
       link: links,
       target: targets,
-    }).entries()) {
+    }).forEach(({
+      memorableValue,
+      span,
+      link,
+      target,
+    }, index) => {
       const otherSpans =
         [...spans.slice(0, index), ...spans.slice(index + 1)];
 
@@ -74,7 +154,14 @@ export function addPageListeners() {
 
         span.classList.add('current');
         cssProp(target, 'display', 'block');
+
+        if (memorableID) {
+          session.switcherChoices = {
+            ...session.switcherChoices ?? {},
+            [memorableID]: memorableValue,
+          };
+        }
       });
-    }
-  }
+    });
+  });
 }

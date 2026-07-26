@@ -43,6 +43,7 @@ export default {
             entries:
               relations.switcher.slots({
                 initialOptionIndex: 0,
+                memorableID: 'lyrics-entry',
 
                 titles:
                   relations.annotationParts

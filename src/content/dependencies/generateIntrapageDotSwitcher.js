@@ -13,6 +13,7 @@ export default {
     },
 
     initialOptionIndex: {type: 'number'},
+    memorableID: {type: 'string'},
 
     titles: {
       validate: v => v.strictArrayOf(v.isHTML),
@@ -27,6 +28,10 @@ export default {
     relations.template.slots({
       attributes: [
         {class: 'intrapage'},
+
+        slots.memorableID &&
+          {'data-memorable-id': slots.memorableID},
+
         slots.attributes,
       ],
 
