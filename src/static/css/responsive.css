@@ -62,14 +62,16 @@
     max-width: 375px;
   }
 
-  html[data-url-key="localized.home"] #page-container.showing-sidebar-left .grid-listing > .grid-item:not(:nth-child(n+7)) {
-    flex-basis: 23%;
-    margin: 15px;
-  }
+  html[data-url-key="localized.home"] #page-container.showing-sidebar-left {
+    .grid-listing > .grid-item:not(:nth-child(n+10)) {
+      flex-basis: 23%;
+      margin: 15px;
+    }
 
-  html[data-url-key="localized.home"] #page-container.showing-sidebar-left .grid-listing > .grid-item:nth-child(n+7) {
-    flex-basis: 18%;
-    margin: 10px;
+    .grid-listing > .grid-item:nth-child(n+10) {
+      flex-basis: 18%;
+      margin: 10px;
+    }
   }
 }
 
