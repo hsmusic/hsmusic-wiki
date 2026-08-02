@@ -45,16 +45,21 @@ export default {
           ([group, things]) =>
           ([group, accumulateSum(things, thing => thing.duration)])))
 
+    const filteredGroupsOrdered =
+      allGroupsOrdered.filter(group =>
+        groupToThingsCountedForContributions.get(group).size ||
+        groupToTotalDuration.get(group));
+
     return {
       groups:
-        allGroupsOrdered,
+        filteredGroupsOrdered,
 
       groupCounts:
-        allGroupsOrdered
+        filteredGroupsOrdered
           .map(group => groupToTotalContributions.get(group)),
 
       groupDurations:
-        allGroupsOrdered
+        filteredGroupsOrdered
           .map(group => groupToTotalDuration.get(group)),
     };
   },
