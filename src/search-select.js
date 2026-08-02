@@ -159,6 +159,8 @@ function baselineProcess(thing, _opts) {
   fields.disambiguators =
     [];
 
+  fields.attachedResults = [];
+
   return fields;
 }
 
@@ -223,6 +225,30 @@ function genericProcess(thing, opts) {
    : thing.isFlash
       ? boundPrepareArtwork(thing.coverArtwork)
       : null);
+
+  const boundProcessAttachedResult = thing => ({
+    id: thing.constructor.getReference(thing),
+    doc: {
+      ...genericProcess(thing, opts),
+      artwork: null,
+      attachedResults: [],
+      disambiguators: [],
+    },
+  });
+
+  fields.attachedResults =
+    (thing.isTrack
+      ? thing.ownFeaturedInFlashes
+          .filter(flash =>
+            flash.side.directory === 's1' ||
+            flash.side.directory === 's2')
+          .map(boundProcessAttachedResult)
+
+   : thing.isArtTag && thing.name.endsWith('(archetype)')
+      ? thing.directDescendantArtTags
+          .map(boundProcessAttachedResult)
+
+   : []);
 
   fields.parentName =
     (thing.isTrack ? thing.album.name

@@ -1096,8 +1096,11 @@ function showContextControls() {
   }
 }
 
-function generateSidebarSearchResult(result, results) {
+function generateSidebarSearchResult(result, results, givenSlots = {}) {
   const preparedSlots = {
+    isAttachedResult:
+      false,
+
     color:
       result.data.color ?? null,
 
@@ -1106,6 +1109,20 @@ function generateSidebarSearchResult(result, results) {
 
     imageSource:
       getSearchResultImageSource(result),
+
+    ...givenSlots,
+  };
+
+  if (result.data.attachedResults && !givenSlots.isAttachedResult) {
+    const tidiedAttachedResults =
+      tidyResults({results: result.data.attachedResults ?? []});
+
+    preparedSlots.attachedResults =
+      tidiedAttachedResults.map(attachedResult =>
+        generateSidebarSearchResult(
+          attachedResult,
+          tidiedAttachedResults,
+          {isAttachedResult: true}));
   };
 
   switch (result.referenceType) {
@@ -1287,43 +1304,63 @@ function generateSidebarSearchResultTemplate(slots) {
   const link = document.createElement('a');
   link.classList.add('wiki-search-result');
 
+  const hasAttachedResults =
+    !empty(slots.attachedResults ?? []);
+
+  let attachedResultsDiv;
+  if (hasAttachedResults) {
+    attachedResultsDiv = document.createElement('div');
+    attachedResultsDiv.classList.add('wiki-search-result-and-attached-results');
+  }
+
+  const container =
+    (hasAttachedResults
+      ? attachedResultsDiv
+      : link);
+
+  if (slots.isAttachedResult) {
+    link.classList.add('attached');
+  }
+
   if (slots.href) {
     link.setAttribute('href', slots.href);
   }
 
   if (slots.color) {
-    cssProp(link, '--primary-color', slots.color);
+    cssProp(container, '--primary-color', slots.color);
 
     try {
       const colors =
         getColors(slots.color, {
           chroma: window.chroma,
         });
-      cssProp(link, '--light-ghost-color', colors.lightGhost);
-      cssProp(link, '--deep-color', colors.deep);
+      cssProp(container, '--light-ghost-color', colors.lightGhost);
+      cssProp(container, '--deep-color', colors.deep);
     } catch (error) {
       console.warn(error);
     }
   }
 
-  const imgContainer = document.createElement('span');
-  imgContainer.classList.add('wiki-search-result-image-container');
+  if (!slots.isAttachedResult) {
+    const imgContainer = document.createElement('span');
+    imgContainer.classList.add('wiki-search-result-image-container');
 
-  if (slots.imageSource) {
-    const img = document.createElement('img');
-    img.classList.add('wiki-search-result-image');
-    img.setAttribute('src', slots.imageSource);
-    imgContainer.appendChild(img);
-    if (slots.imageSource.endsWith('.mini.jpg')) {
-      img.classList.add('has-warning');
+    if (slots.imageSource) {
+      const img = document.createElement('img');
+      img.classList.add('wiki-search-result-image');
+      img.setAttribute('src', slots.imageSource);
+      imgContainer.appendChild(img);
+      if (slots.imageSource.endsWith('.mini.jpg')) {
+        img.classList.add('has-warning');
+      }
+    } else {
+      const placeholder = document.createElement('span');
+      placeholder.classList.add('wiki-search-result-image-placeholder');
+      imgContainer.appendChild(placeholder);
     }
-  } else {
-    const placeholder = document.createElement('span');
-    placeholder.classList.add('wiki-search-result-image-placeholder');
-    imgContainer.appendChild(placeholder);
-  }
 
-  link.appendChild(imgContainer);
+    link.appendChild(imgContainer);
+  }
 
   const text = document.createElement('span');
   text.classList.add('wiki-search-result-text-area');
@@ -1357,7 +1394,7 @@ function generateSidebarSearchResultTemplate(slots) {
       }));
   }
 
-  if (!accentSpan && slots.kindString) {
+  if (!accentSpan && slots.kindString && !slots.isAttachedResult) {
     accentSpan = document.createElement('span');
     accentSpan.classList.add('wiki-search-result-kind');
     accentSpan.appendChild(templateContent(slots.kindString));
@@ -1375,24 +1412,53 @@ function generateSidebarSearchResultTemplate(slots) {
   });
 
   link.addEventListener('keydown', domEvent => {
-    if (domEvent.key === 'ArrowDown') {
-      const elem = link.nextElementSibling;
-      if (elem) {
-        domEvent.preventDefault();
+    const containingAttachedResultsDiv =
+      (link.parentElement.classList.contains('wiki-search-result-and-attached-results')
+        ? link.parentElement
+        : null);
+
+    const focusInto = (elem, end) => {
+      if (elem.classList.contains('wiki-search-result-and-attached-results')) {
+        elem[end].focus({focusVisible: true});
+      } else {
         elem.focus({focusVisible: true});
       }
+    };
+
+    if (domEvent.key === 'ArrowDown') {
+      const sibling =
+        link.nextElementSibling ||
+        containingAttachedResultsDiv?.nextElementSibling;
+
+      if (sibling) {
+        domEvent.preventDefault();
+        focusInto(sibling, 'firstChild');
+      }
     } else if (domEvent.key === 'ArrowUp') {
-      domEvent.preventDefault();
-      const elem = link.previousElementSibling;
-      if (elem) {
-        elem.focus({focusVisible: true});
+      const sibling =
+        link.previousElementSibling ||
+        containingAttachedResultsDiv?.previousElementSibling;
+
+      if (sibling) {
+        domEvent.preventDefault();
+        focusInto(sibling, 'lastChild');
       } else {
+        domEvent.preventDefault();
         info.searchInput.focus();
       }
     }
   });
 
-  return link;
+  if (empty(slots.attachedResults ?? [])) {
+    return link;
+  } else {
+    attachedResultsDiv.appendChild(link);
+    for (const attachedResult of slots.attachedResults) {
+      attachedResultsDiv.appendChild(attachedResult);
+    }
+
+    return attachedResultsDiv;
+  }
 }
 
 function hideSidebarSearchResults() {
@@ -1415,7 +1481,11 @@ function hideSidebarSearchResults() {
 function focusFirstSidebarSearchResult() {
   const {settings, state} = info;
 
-  const elem = info.results.firstChild;
+  let elem = info.results.firstChild;
+  if (elem.classList.contains('wiki-search-result-and-attached-results')) {
+    elem = elem.firstChild;
+  }
+
   if (!elem?.classList.contains('wiki-search-result')) {
     return;
   }

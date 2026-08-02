@@ -13,6 +13,7 @@ const baselineStore = [
   'classification',
   'artwork',
   'color',
+  'attachedResults',
 ];
 
 const genericStore = baselineStore;
