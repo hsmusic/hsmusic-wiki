@@ -50,7 +50,7 @@ export default {
             (slots.showGalleryLink === true
               ? true
            : slots.showGalleryLink === 'auto'
-              ? data.allDescendantsHaveMoreDescendants
+              ? !data.allDescendantsHaveMoreDescendants
               : false);
 
           if (showGalleryLink) {
