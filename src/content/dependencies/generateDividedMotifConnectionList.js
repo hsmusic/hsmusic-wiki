@@ -89,7 +89,7 @@ export default {
   generate: (data, relations, slots, {html, language}) =>
     relations.flatList ??
 
-    html.tag('dl',
+    html.tag('dl', {class: 'division-list'},
       {[html.onlyIfContent]: true},
 
       language.encapsulate('trackList', listCapsule => [

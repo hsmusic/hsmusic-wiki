@@ -26,7 +26,7 @@ export default {
         .map(motif => relation('linkMotif', motif)),
 
     featuringTracksList:
-      relation('generateMotifConnectionListGrouped',
+      relation('generateDividedMotifConnectionList',
         motif.featuredInTracks,
         motif),
   }),
