@@ -158,7 +158,7 @@ export default {
           }),
 
         slots.type === 'chunks' &&
-          html.tag('dl', [
+          html.tag('dl',
             slots.showSkipToSection && [
               html.tag('dt',
                 language.$('listingPage.skipToSection')),
@@ -218,8 +218,7 @@ export default {
                     rows,
                     rowAttributes,
                   })),
-              ]),
-          ]),
+              ])),
       ],
 
       navLinkStyle: 'hierarchical',

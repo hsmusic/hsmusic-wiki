@@ -4,9 +4,9 @@ import {inspect} from 'node:util';
 
 import striptags from 'striptags';
 
-import {withAggregate} from '#aggregate';
+import {decorateErrorWithIndex, withAggregate} from '#aggregate';
 import {colors} from '#cli';
-import {empty, typeAppearance, unique} from '#sugar';
+import {empty, transposeArrays, typeAppearance, unique} from '#sugar';
 import * as commonValidators from '#validators';
 
 const {
@@ -353,21 +353,85 @@ export function blankAttributes() {
 export function tag(tagName, ...args) {
   const lastArg = args.at(-1);
 
-  const lastArgIsAttributes =
-    typeof lastArg === 'object' && lastArg !== null &&
-    !Array.isArray(lastArg) &&
-    !(lastArg instanceof Tag) &&
-    !(lastArg instanceof Template);
+  const classifyList = list => {
+    try {
+      return list.map(classify);
+    } catch (caughtError) {
+      const which = (list === args ? `argument list` : `array inside argument list`);
+      throw new Error(`Error classifying ${which}`, {cause: caughtError});
+    }
+  };
 
-  const content =
-    (lastArgIsAttributes
-      ? null
-      : args.at(-1));
+  const classify =
+    decorateErrorWithIndex(value => {
+      if (value === false || value === null || value === undefined) {
+        return 'nothing';
+      }
+
+      if (Array.isArray(value)) {
+        const itemsClassified = new Set(classifyList(value));
+        itemsClassified.delete('nothing');
+
+        switch (itemsClassified.size) {
+          case 0: return 'nothing';
+          case 1: return [...itemsClassified][0];
+          default:
+            throw new Error(`html.tag() can't accept an array of multiple types of arguments`);
+        }
+      }
+
+      if (value instanceof Tag) {
+        return 'content';
+      }
+
+      if (value instanceof Attributes) {
+        return 'attributes';
+      }
+
+      if (value instanceof Template) {
+        if (value.looksLikeAttributes) {
+          return 'attributes';
+        } else {
+          return 'content';
+        }
+      }
+
+      // Not null and not an array, at this point.
+      if (typeof value === 'object') {
+        return 'attributes';
+      }
+
+      return 'content';
+    });
+
+  const argsClassified = classifyList(args);
+
+  const firstContentIndex = argsClassified.indexOf('content');
+  const lastAttributesIndex = argsClassified.lastIndexOf('attributes');
+
+  if (lastAttributesIndex > firstContentIndex && firstContentIndex !== -1) {
+    throw new Error(
+      `Expected attributes not to follow content\n` +
+      `Classified as: ${argsClassified.join(' ')}`);
+  }
 
   const attributes =
-    (lastArgIsAttributes
-      ? args
-      : args.slice(0, -1));
+    (lastAttributesIndex === -1
+      ? null
+   : firstContentIndex === args.length - 1
+      ? args.slice(0, -1)
+      : transposeArrays([args, argsClassified])
+          .filter(([arg, classification]) => classification === 'attributes')
+          .map(([arg]) => arg));
+
+  const content =
+    (firstContentIndex === -1
+      ? null
+   : firstContentIndex === args.length - 1
+      ? args.at(-1)
+      : transposeArrays([args, argsClassified])
+          .filter(([arg, classification]) => classification === 'content')
+          .map(([arg]) => arg));
 
   return new Tag(tagName, attributes, content);
 }
@@ -2251,6 +2315,17 @@ export class Template {
 
   get description() {
     return this.#description;
+  }
+
+  get looksLikeAttributes() {
+    return (
+      this.#description.looksLikeAttributes ??
+      (
+        this.#description.annotation?.endsWith('Attribute') ||
+        this.#description.annotation?.endsWith('Attributes') ||
+        false
+      )
+    );
   }
 
   get blank() {

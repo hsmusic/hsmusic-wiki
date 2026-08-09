@@ -118,14 +118,12 @@ export default {
         slots.extraReadingLinks &&
           {class: 'has-external-links-only'},
 
-        [
-          wrapContent(null, relations.description),
-          wrapContent({class: 'short'}, relations.descriptionShort),
-          wrapContent({class: 'long'}, relations.descriptionLong),
+        wrapContent(null, relations.description),
+        wrapContent({class: 'short'}, relations.descriptionShort),
+        wrapContent({class: 'long'}, relations.descriptionLong),
 
-          wrapActions(null, actionsWithoutLongerDescription),
-          wrapActions({class: 'when-collapsed'}, actionsWhenCollapsed),
-          wrapActions({class: 'when-expanded'}, actionsWhenExpanded),
-        ]));
+        wrapActions(null, actionsWithoutLongerDescription),
+        wrapActions({class: 'when-collapsed'}, actionsWhenCollapsed),
+        wrapActions({class: 'when-expanded'}, actionsWhenExpanded)));
   },
 };

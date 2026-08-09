@@ -33,16 +33,13 @@ export default {
     language.encapsulate('groupGalleryPage.albumsByDate', capsule =>
       html.tag('div', {id: 'group-album-gallery-by-date'},
         slots.attributes,
-
         {[html.onlyIfContent]: true},
 
-        html.tag('section', [
+        html.tag('section',
           slots.showTitle &&
             html.tag('h2',
               language.$(capsule, 'title')),
 
           relations.styleSelector,
-
-          relations.albumGrid,
-        ]))),
+          relations.albumGrid))),
 };

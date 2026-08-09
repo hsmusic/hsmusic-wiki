@@ -75,7 +75,7 @@ export default {
                   return language.$(workingCapsule, workingOptions);
                 }))),
 
-            html.tag('ul', [
+            html.tag('ul',
               html.tag('li', {class: 'entry-description'},
                 {[html.onlyIfContent]: true},
 
@@ -108,7 +108,6 @@ export default {
                           }
 
                           return language.$(workingCapsule, workingOptions);
-                        })))),
-            ]),
+                        }))))),
           ]))),
 };

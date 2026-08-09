@@ -24,14 +24,12 @@ export default {
                     {[html.joinChildren]: ''},
                     {[html.noEdgeWhitespace]: true},
 
-                    [
-                      html.tag('span', {class: 'grid-expand-cue'},
-                        language.$(capsule, 'expand')),
+                    html.tag('span', {class: 'grid-expand-cue'},
+                      language.$(capsule, 'expand')),
 
-                      html.tag('span', {class: 'grid-collapse-cue'},
-                        {style: 'display: none'},
-                        language.$(capsule, 'collapse')),
-                    ]),
+                    html.tag('span', {class: 'grid-collapse-cue'},
+                      {style: 'display: none'},
+                      language.$(capsule, 'collapse'))),
               }),
           ]))),
 };

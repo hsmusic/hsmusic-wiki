@@ -82,37 +82,35 @@ export default {
 
       slots.attributes,
 
-      [
-        relations.coverArtistsLine,
+      relations.coverArtistsLine,
 
-        relations.coverGrid.slots({
-          links:
-            relations.trackLinks,
+      relations.coverGrid.slots({
+        links:
+          relations.trackLinks,
 
-          names:
-            data.trackNames,
+        names:
+          data.trackNames,
 
-          images:
-            stitchArrays({
-              image: relations.images,
-              name: data.trackNames,
-            }).map(({image, name}) =>
-                image.slots({
-                  missingSourceContent:
-                    language.$('misc.albumGalleryGrid.noCoverArt', {name}),
-                })),
-
-          info:
-            data.artworkArtists.map(artists =>
-              language.$('misc.coverGrid.details.coverArtists', {
-                [language.onlyIfOptions]: ['artists'],
-
-                artists:
-                  language.formatUnitList(artists),
+        images:
+          stitchArrays({
+            image: relations.images,
+            name: data.trackNames,
+          }).map(({image, name}) =>
+              image.slots({
+                missingSourceContent:
+                  language.$('misc.albumGalleryGrid.noCoverArt', {name}),
               })),
 
-          revealAllWarnings:
-            data.allWarnings,
-        }),
-      ]),
+        info:
+          data.artworkArtists.map(artists =>
+            language.$('misc.coverGrid.details.coverArtists', {
+              [language.onlyIfOptions]: ['artists'],
+
+              artists:
+                language.formatUnitList(artists),
+            })),
+
+        revealAllWarnings:
+          data.allWarnings,
+      })),
 };

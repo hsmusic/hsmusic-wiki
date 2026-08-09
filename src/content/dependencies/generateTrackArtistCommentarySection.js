@@ -76,33 +76,31 @@ export default {
           html.tag('div', {class: 'inherited-commentary-section'},
             {[html.onlyIfContent]: true},
 
-            [
-              html.tag('p', {class: ['drop', 'commentary-drop']},
-                {[html.onlyIfSiblings]: true},
+            html.tag('p', {class: ['drop', 'commentary-drop']},
+              {[html.onlyIfSiblings]: true},
 
-                language.encapsulate(capsule, 'info.fromMainRelease', workingCapsule => {
-                  const workingOptions = {};
+              language.encapsulate(capsule, 'info.fromMainRelease', workingCapsule => {
+                const workingOptions = {};
 
-                  workingOptions.album =
-                    relations.mainReleaseTrackLink.slots({
-                      content:
-                        data.mainReleaseAlbumName,
+                workingOptions.album =
+                  relations.mainReleaseTrackLink.slots({
+                    content:
+                      data.mainReleaseAlbumName,
 
-                      color:
-                        data.mainReleaseAlbumColor,
-                    });
+                    color:
+                      data.mainReleaseAlbumColor,
+                  });
 
-                  if (data.name !== data.mainReleaseName) {
-                    workingCapsule += '.namedDifferently';
-                    workingOptions.name =
-                      html.tag('i', data.mainReleaseName);
-                  }
+                if (data.name !== data.mainReleaseName) {
+                  workingCapsule += '.namedDifferently';
+                  workingOptions.name =
+                    html.tag('i', data.mainReleaseName);
+                }
 
-                  return language.$(workingCapsule, workingOptions);
-                })),
+                return language.$(workingCapsule, workingOptions);
+              })),
 
-              relations.mainReleaseArtistCommentaryEntries,
-            ]),
+            relations.mainReleaseArtistCommentaryEntries),
 
         html.tag('p', {class: ['drop', 'commentary-drop']},
           {[html.onlyIfContent]: true},

@@ -30,14 +30,12 @@ export default {
 
           [
             html.tag('div', {class: 'content-sticky-heading-row'}, [
-              html.tag('h1', [
+              html.tag('h1',
                 html.tag('span', {class: 'reference-collapsed-heading'},
                   {inert: true},
-
                   slots.title.clone()),
 
-                slots.title,
-              ]),
+                slots.title),
 
               html.tag('div', {class: 'content-sticky-heading-cover-container'},
                 {[html.onlyIfContent]: true},

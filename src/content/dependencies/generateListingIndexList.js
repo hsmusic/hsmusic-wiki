@@ -102,13 +102,11 @@ export default {
                 targetIndex === data.currentTargetIndex &&
                   {class: 'current', open: true},
 
-                [
-                  html.tag('summary',
-                    html.tag('span',
-                      html.tag('b', targetTitle))),
+                html.tag('summary',
+                  html.tag('span',
+                    html.tag('b', targetTitle))),
 
-                  listingLinkList,
-                ])));
+                listingLinkList)));
 
       case 'content':
         return (

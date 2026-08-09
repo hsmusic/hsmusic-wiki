@@ -76,7 +76,7 @@ export default {
                   }),
               }),
 
-              html.tag('dd', [
+              html.tag('dd',
                 html.tag('blockquote',
                   {[html.onlyIfContent]: true},
                   description),
@@ -89,7 +89,6 @@ export default {
                       item.slots({
                         detail:
                           (showArtists ? 'artists' : null),
-                      }))),
-              ]),
+                      })))),
             ])))),
 };

@@ -38,14 +38,12 @@ export default {
               html.tag('a', {class: 'external-link'},
                 {href: url},
 
-                [
-                  icon,
+                icon,
 
-                  html.tag('span', {class: 'external-handle'},
-                    (html.isBlank(handle)
-                      ? platform
-                      : handle)),
-                ]),
+                html.tag('span', {class: 'external-handle'},
+                  (html.isBlank(handle)
+                    ? platform
+                    : handle))),
 
               html.tag('span', {class: 'external-platform'},
                 // This is a pretty ridiculous hack, but we currently

@@ -319,7 +319,7 @@ export default {
             ],
           })),
 
-        html.tag('dl', {id: 'network-top-dl'}, [
+        html.tag('dl', {id: 'network-top-dl'},
           html.tag('dt', {id: 'top'},
             language.$(prefix, 'jumpToRoot.title')),
 
@@ -355,8 +355,7 @@ export default {
                     language.$(prefix, 'orphanArtTags.item', {
                       tag: orphanArtTagLink,
                     }))))),
-          ],
-        ]),
+          ]),
       ],
     });
   },

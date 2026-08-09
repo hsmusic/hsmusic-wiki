@@ -112,7 +112,7 @@ export default {
 
   generate(data, relations, {html, language}) {
     const recursive = (dataNode, relationsNode) =>
-      html.tag('dl', {class: dataNode === data.root && 'tree-list'}, [
+      html.tag('dl', {class: dataNode === data.root && 'tree-list'},
         dataNode.displayBriefly &&
           html.tag('dt',
             language.$('artTagPage.sidebar.otherTagsExempt', {
@@ -131,19 +131,15 @@ export default {
             isTargetTag, timesFeaturedTotal, dataSublist,
             artTagLink, relationsSublist,
           }) => [
-            html.tag('dt',
-              {class: (dataSublist || isTargetTag) && 'current'},
-              [
-                artTagLink,
-                html.tag('span', {class: 'times-used'},
-                  language.countTimesFeatured(timesFeaturedTotal)),
-              ]),
+            html.tag('dt', {class: (dataSublist || isTargetTag) && 'current'},
+              artTagLink,
+              html.tag('span', {class: 'times-used'},
+                language.countTimesFeatured(timesFeaturedTotal))),
 
             dataSublist &&
               html.tag('dd',
                 recursive(dataSublist, relationsSublist)),
-          ]),
-      ]);
+          ]));
 
     return recursive(data.root, relations.root);
   },

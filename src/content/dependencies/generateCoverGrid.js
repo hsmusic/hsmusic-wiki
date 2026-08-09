@@ -58,136 +58,133 @@ export default {
       slots.attributes,
       {[html.onlyIfContent]: true},
 
-      [
-        !empty((slots.revealAllWarnings ?? []).filter(Boolean)) &&
-          language.encapsulate('misc.coverGrid.revealAll', capsule =>
-            html.tag('div', {class: 'reveal-all-container'},
-              ((slots.tab ?? [])
-                .slice(0, 4)
-                .some(tab => tab && !html.isBlank(tab))) &&
+      !empty((slots.revealAllWarnings ?? []).filter(Boolean)) &&
+        language.encapsulate('misc.coverGrid.revealAll', capsule =>
+          html.tag('div', {class: 'reveal-all-container'},
+            ((slots.tab ?? [])
+              .slice(0, 4)
+              .some(tab => tab && !html.isBlank(tab))) &&
 
-                {class: 'has-nearby-tab'},
+              {class: 'has-nearby-tab'},
 
-              html.tag('p', {class: 'reveal-all'}, [
-                html.tag('a', {href: '#'}, [
-                  html.tag('span', {class: 'reveal-label'},
-                    language.$(capsule, 'reveal')),
+            html.tag('p', {class: 'reveal-all'}, [
+              html.tag('a', {href: '#'},
+                html.tag('span', {class: 'reveal-label'},
+                  language.$(capsule, 'reveal')),
 
-                  html.tag('span', {class: 'conceal-label'},
-                    {style: 'display: none'},
-                    language.$(capsule, 'conceal')),
-                ]),
+                html.tag('span', {class: 'conceal-label'},
+                  {style: 'display: none'},
+                  language.$(capsule, 'conceal'))),
 
-                html.tag('br'),
+              html.tag('br'),
 
-                html.tag('span', {class: 'warnings'},
-                  language.$(capsule, 'warnings', {
-                    warnings:
-                      language.formatUnitList(
-                        unique(slots.revealAllWarnings.filter(Boolean))
-                          .sort()
-                          .map(warning => html.tag('b', warning))),
-                  })),
-              ]))),
+              html.tag('span', {class: 'warnings'},
+                language.$(capsule, 'warnings', {
+                  warnings:
+                    language.formatUnitList(
+                      unique(slots.revealAllWarnings.filter(Boolean))
+                        .sort()
+                        .map(warning => html.tag('b', warning))),
+                })),
+            ]))),
 
-        stitchArrays({
-          classes: slots.classes,
-          attributes: slots.itemAttributes,
-          image: slots.images,
-          link: slots.links,
-          name: slots.names,
-          info: slots.info,
-          tab: slots.tab,
+      stitchArrays({
+        classes: slots.classes,
+        attributes: slots.itemAttributes,
+        image: slots.images,
+        link: slots.links,
+        name: slots.names,
+        info: slots.info,
+        tab: slots.tab,
 
-          notFromThisGroup:
-            slots.notFromThisGroup ??
-            Array.from(slots.links).fill(null)
-        }).map(({
-            classes,
-            attributes,
-            image,
-            link,
-            name,
-            info,
-            tab,
-            notFromThisGroup,
-          }, index) =>
-            link.slots({
-              attributes: [
-                link.getSlotValue('attributes'),
+        notFromThisGroup:
+          slots.notFromThisGroup ??
+          Array.from(slots.links).fill(null)
+      }).map(({
+          classes,
+          attributes,
+          image,
+          link,
+          name,
+          info,
+          tab,
+          notFromThisGroup,
+        }, index) =>
+          link.slots({
+            attributes: [
+              link.getSlotValue('attributes'),
 
-                {class: ['grid-item', 'box']},
+              {class: ['grid-item', 'box']},
 
-                tab &&
-                !html.isBlank(tab) &&
-                  {class: 'has-tab'},
+              tab &&
+              !html.isBlank(tab) &&
+                {class: 'has-tab'},
 
-                attributes,
+              attributes,
 
-                (classes
-                  ? {class: classes}
-                  : null),
+              (classes
+                ? {class: classes}
+                : null),
 
-                slots.cutIndex >= 1 &&
-                index >= slots.cutIndex &&
-                  {class: 'hidden-by-expandable-cut'},
-              ],
+              slots.cutIndex >= 1 &&
+              index >= slots.cutIndex &&
+                {class: 'hidden-by-expandable-cut'},
+            ],
 
-              colorContext: 'image-box',
+            colorContext: 'image-box',
 
-              content: [
-                html.tag('span',
-                  {[html.onlyIfContent]: true},
+            content: [
+              html.tag('span',
+                {[html.onlyIfContent]: true},
 
-                  tab),
+                tab),
 
-                image.slots({
-                  thumb: 'medium',
-                  lazy:
-                    (typeof slots.lazy === 'number'
-                      ? index >= slots.lazy
-                   : typeof slots.lazy === 'boolean'
-                      ? slots.lazy
-                      : false),
-                }),
+              image.slots({
+                thumb: 'medium',
+                lazy:
+                  (typeof slots.lazy === 'number'
+                    ? index >= slots.lazy
+                 : typeof slots.lazy === 'boolean'
+                    ? slots.lazy
+                    : false),
+              }),
 
-                html.tag('span',
-                  {[html.onlyIfContent]: true},
+              html.tag('span',
+                {[html.onlyIfContent]: true},
 
-                  (notFromThisGroup
-                    ? language.encapsulate('misc.coverGrid.details.notFromThisGroup', capsule =>
-                        language.$(capsule, {
-                          name,
-                          marker:
-                            html.tag('span', {class: 'grid-name-marker'},
-                              language.$(capsule, 'marker')),
-                        }))
-                    : language.sanitize(name))),
+                (notFromThisGroup
+                  ? language.encapsulate('misc.coverGrid.details.notFromThisGroup', capsule =>
+                      language.$(capsule, {
+                        name,
+                        marker:
+                          html.tag('span', {class: 'grid-name-marker'},
+                            language.$(capsule, 'marker')),
+                      }))
+                  : language.sanitize(name))),
 
-                html.tag('span',
-                  {[html.onlyIfContent]: true},
+              html.tag('span',
+                {[html.onlyIfContent]: true},
 
-                  language.$('misc.coverGrid.details.accent', {
-                    [language.onlyIfOptions]: ['details'],
+                language.$('misc.coverGrid.details.accent', {
+                  [language.onlyIfOptions]: ['details'],
 
-                    details: info,
-                  })),
-              ],
-            })),
+                  details: info,
+                })),
+            ],
+          })),
 
-        relations.actionLinks
-          .slot('actionLinks', slots.actionLinks),
+      relations.actionLinks
+        .slot('actionLinks', slots.actionLinks),
 
-        (slots.cutIndex >= 1 &&
-         slots.cutIndex < slots.links.length
-          ? relations.expando.slots({
-              caption: slots.bottomCaption,
-            })
+      (slots.cutIndex >= 1 &&
+       slots.cutIndex < slots.links.length
+        ? relations.expando.slots({
+            caption: slots.bottomCaption,
+          })
 
-       : !html.isBlank(relations.bottomCaption)
-          ? html.tag('p', {class: 'grid-caption'},
-              slots.bottomCaption)
+     : !html.isBlank(relations.bottomCaption)
+        ? html.tag('p', {class: 'grid-caption'},
+            slots.bottomCaption)
 
-          : html.blank()),
-      ]),
+        : html.blank())),
 };

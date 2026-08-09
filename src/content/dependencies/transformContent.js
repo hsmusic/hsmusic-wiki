@@ -589,14 +589,12 @@ export default {
                     align &&
                       {class: 'align-' + align},
 
-                    [
-                      !nameless &&
-                        html.tag('a', {class: 'filename'},
-                          src && {href: src},
-                          language.sanitize(basename(node.src))),
+                    !nameless &&
+                      html.tag('a', {class: 'filename'},
+                        src && {href: src},
+                        language.sanitize(basename(node.src))),
 
-                      audio,
-                    ]));
+                    audio));
 
             return {
               type: 'processed-audio',

@@ -29,13 +29,12 @@ export default {
 
               html.tag('span', {class: 'styles'},
                 data.styles.map(style =>
-                  html.tag('label', {'data-style': style}, [
+                  html.tag('label', {'data-style': style},
                     html.tag('input', {type: 'checkbox'},
                       {checked: true}),
 
                     html.tag('span',
-                      language.$(capsule, style)),
-                  ]))),
+                      language.$(capsule, style))))),
 
               html.tag('br'),
 

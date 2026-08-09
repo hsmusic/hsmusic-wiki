@@ -104,47 +104,42 @@ export default {
       html.tag('table', {class: 'group-contributions-table'},
         {[html.onlyIfContent]: true},
 
-        [
-          html.tag('thead',
-            {[html.onlyIfSiblings]: true},
+        html.tag('thead',
+          {[html.onlyIfSiblings]: true},
 
-            html.tag('tr', [
+          html.tag('tr',
+            html.tag('th',
+              language.$(capsule, 'title', slots.string)),
+
+            data.hasCountColumn &&
               html.tag('th',
-                language.$(capsule, 'title', slots.string)),
+                language.$(capsule, 'column.count', slots.string)),
 
-              data.hasCountColumn &&
-                html.tag('th',
-                  language.$(capsule, 'column.count', slots.string)),
+            data.hasDurationColumn &&
+              html.tag('th',
+                language.$(capsule, 'column.duration')))),
 
-              data.hasDurationColumn &&
-                html.tag('th',
-                  language.$(capsule, 'column.duration')),
-            ])),
+        html.tag('tbody',
+          {[html.onlyIfContent]: true},
 
-          html.tag('tbody',
-            {[html.onlyIfContent]: true},
+          stitchArrays({
+            link: relations.groupLinks,
+            directory: data.groupDirectories,
+            changesCategory: data.groupsChangeCategory,
+            count: data.groupCounts,
+            duration: data.groupDurations,
+          }).map(({link, directory, changesCategory, count, duration}) =>
+              html.tag('tr', changesCategory && {class: 'split'},
+                html.tag('td', {class: 'group'},
+                  link.slots({
+                    attributes: {'data-directory': directory},
+                  })),
 
-            stitchArrays({
-              link: relations.groupLinks,
-              directory: data.groupDirectories,
-              changesCategory: data.groupsChangeCategory,
-              count: data.groupCounts,
-              duration: data.groupDurations,
-            }).map(({link, directory, changesCategory, count, duration}) =>
-                html.tag('tr', changesCategory && {class: 'split'}, [
-                  html.tag('td', {class: 'group'},
-                    link.slots({
-                      attributes: {'data-directory': directory},
-                    })),
+                data.hasCountColumn &&
+                  html.tag('td', {class: 'count'},
+                    count),
 
-                  data.hasCountColumn &&
-                    html.tag('td', {class: 'count'},
-                      count),
-
-                  data.hasDurationColumn &&
-                    html.tag('td', {class: 'duration'},
-                      language.formatDuration(duration)),
-                ]),
-              )),
-        ])),
+                data.hasDurationColumn &&
+                  html.tag('td', {class: 'duration'},
+                    language.formatDuration(duration))))))),
 };

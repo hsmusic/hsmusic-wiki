@@ -23,8 +23,6 @@ export default {
     html.tag('section',
       relations.colorStyle,
 
-      [
-        html.tag('h2', data.name),
-        relations.rows,
-      ]),
+      html.tag('h2', data.name),
+      relations.rows),
 };

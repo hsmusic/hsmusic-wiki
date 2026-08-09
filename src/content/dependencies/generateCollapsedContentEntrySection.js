@@ -22,16 +22,14 @@ export default {
         {'data-memorable-id': slots.id},
       ],
 
-      [
-        relations.contentContentHeading.slots({
-          attributes: [
-            slots.id && {id: slots.id},
-          ],
+      relations.contentContentHeading.slots({
+        attributes: [
+          slots.id && {id: slots.id},
+        ],
 
-          string: slots.string,
-          summary: true,
-        }),
+        string: slots.string,
+        summary: true,
+      }),
 
-        relations.entries,
-      ]),
+      relations.entries),
 };

@@ -20,16 +20,14 @@ export default {
       slots.alwaysVisible &&
         {class: 'always-visible'},
 
-      [
-        html.tag('p',
-          {[html.onlyIfSiblings]: true},
+      html.tag('p',
+        {[html.onlyIfSiblings]: true},
 
-          language.$('misc.additionalNames.title')),
+        language.$('misc.additionalNames.title')),
 
-        html.tag('ul',
-          {[html.onlyIfContent]: true},
+      html.tag('ul',
+        {[html.onlyIfContent]: true},
 
-          relations.items
-            .map(item => html.tag('li', item))),
-      ]),
+        relations.items
+          .map(item => html.tag('li', item)))),
 };

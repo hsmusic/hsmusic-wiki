@@ -289,7 +289,7 @@ export default {
                     language.$('artistRollingWindowPage.contributionKind', kind)))),
 
             group:
-              html.tag('select', {id: 'contribution-group'}, [
+              html.tag('select', {id: 'contribution-group'},
                 html.tag('option', {value: '-'},
                   language.$('artistRollingWindowPage.contributionGroup.all')),
 
@@ -309,11 +309,10 @@ export default {
                           language.$('artistRollingWindowPage.contributionGroup.group', {
                             group: name,
                           }))),
-                  ]),
-              ]),
+                  ])),
           })),
 
-        html.tag('p', {id: 'timeframe-selection-info'}, [
+        html.tag('p', {id: 'timeframe-selection-info'},
           html.tag('span', {id: 'timeframe-selection-some'},
             {style: 'display: none'},
 
@@ -333,8 +332,7 @@ export default {
 
           html.tag('span', {id: 'timeframe-selection-none'},
             {style: 'display: none'},
-            language.$('artistRollingWindowPage.timeframeSelectionLine.none')),
-        ]),
+            language.$('artistRollingWindowPage.timeframeSelectionLine.none'))),
 
         html.tag('p', {id: 'timeframe-selection-control'},
           {style: 'display: none'},
@@ -354,7 +352,7 @@ export default {
                 language.$('artistRollingWindowPage.timeframeSelectionControl.next')),
           })),
 
-        html.tag('div', {id: 'timeframe-source-area'}, [
+        html.tag('div', {id: 'timeframe-source-area'},
           html.tag('p', {id: 'timeframe-empty'},
             {style: 'display: none'},
             language.$('artistRollingWindowPage.emptyTimeframeLine')),
@@ -402,8 +400,7 @@ export default {
                         {datetime: date.toUTCString()},
                         language.formatDate(date))),
                 ]),
-          }),
-        ]),
+          })),
       ],
 
       navLinkStyle: 'hierarchical',

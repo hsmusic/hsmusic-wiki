@@ -70,7 +70,9 @@ export default {
               relations.artTagLink),
 
             !empty(relations.directDescendantArtTagLinks) &&
-              html.tag('details', {class: 'current', open: true}, [
+              html.tag('details',
+                {class: 'current', open: true},
+
                 html.tag('summary',
                   html.tag('span',
                     html.tag('b',
@@ -81,32 +83,28 @@ export default {
                     link: relations.directDescendantArtTagLinks,
                     timesFeaturedTotal: data.directDescendantTimesFeaturedTotal,
                   }).map(({link, timesFeaturedTotal}) =>
-                      html.tag('li', [
+                      html.tag('li',
                         link,
                         html.tag('span', {class: 'times-used'},
-                          language.countTimesFeatured(timesFeaturedTotal)),
-                      ]))),
-              ]),
+                          language.countTimesFeatured(timesFeaturedTotal)))))),
 
             stitchArrays({
               name: data.furthestAncestorArtTagNames,
               list: relations.furthestAncestorArtTagMapLists,
             }).map(({name, list}) =>
                 html.tag('details',
-                  {
-                    class: 'has-tree-list',
-                    open:
-                      empty(relations.directDescendantArtTagLinks) &&
-                      relations.furthestAncestorArtTagMapLists.length === 1,
-                  },
-                  [
-                    html.tag('summary',
-                      html.tag('span',
-                        html.tag('b',
-                          language.sanitize(name)))),
+                  {class: 'has-tree-list'},
 
-                      list,
-                    ])),
+                  {open:
+                    empty(relations.directDescendantArtTagLinks) &&
+                    relations.furthestAncestorArtTagMapLists.length === 1},
+
+                  html.tag('summary',
+                    html.tag('span',
+                      html.tag('b',
+                        language.sanitize(name)))),
+
+                  list)),
           ],
         }),
       ],

@@ -204,16 +204,14 @@ export default {
                 style === 'aside' &&
                   {class: 'aside'},
 
-                [
-                  html.tag('blockquote',
-                    {[html.onlyIfContent]: true},
-                    description),
+                html.tag('blockquote',
+                  {[html.onlyIfContent]: true},
+                  description),
 
-                  (hasTrackNumbers
-                    ? html.tag('ol', {start: startCountingFrom},
-                        slotItems(items))
-                    : html.tag('ul', slotItems(items))),
-                ]),
+                (hasTrackNumbers
+                  ? html.tag('ol', {start: startCountingFrom},
+                      slotItems(items))
+                  : html.tag('ul', slotItems(items)))),
             ]));
 
       case 'tracks':

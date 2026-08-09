@@ -393,13 +393,11 @@ export default {
       html.tag('footer', {id: 'footer'},
         {[html.onlyIfContent]: true},
 
-        [
-          html.tag('div', {class: 'footer-content'},
-            {[html.onlyIfContent]: true},
-            footerContent),
+        html.tag('div', {class: 'footer-content'},
+          {[html.onlyIfContent]: true},
+          footerContent),
 
-          relations.footerLocalizationLinks,
-        ]);
+        relations.footerLocalizationLinks);
 
     const navHTML =
       html.tag('nav', {id: 'header'},
@@ -414,97 +412,93 @@ export default {
         !html.isBlank(slots.navBottomRowContent) &&
           {class: 'nav-has-bottom-row'},
 
-        [
-          html.tag('div', {class: 'nav-main-links'},
-            {[html.onlyIfContent]: true},
-            {class: 'nav-links-' + slots.navLinkStyle},
+        html.tag('div', {class: 'nav-main-links'},
+          {[html.onlyIfContent]: true},
+          {class: 'nav-links-' + slots.navLinkStyle},
 
-            slots.navLinks
-              ?.filter(Boolean)
-              ?.map((cur, i, entries) => {
-                let content;
+          slots.navLinks
+            ?.filter(Boolean)
+            ?.map((cur, i, entries) => {
+              let content;
 
-                if (cur.html) {
-                  content = cur.html;
-                } else {
-                  const attributes = html.attributes();
-                  let title;
+              if (cur.html) {
+                content = cur.html;
+              } else {
+                const attributes = html.attributes();
+                let title;
 
-                  switch (cur.auto) {
-                    case 'home':
-                      title = data.wikiName;
-                      attributes.set('href', to('localized.home'));
-                      break;
-                    case 'current':
-                      title = slots.title;
-                      attributes.set('href', '');
-                      break;
-                    case null:
-                    case undefined:
-                      title = cur.title;
-                      attributes.set('href', to(...cur.path));
-                      break;
-                  }
-
-                  content = html.tag('a', attributes, title);
+                switch (cur.auto) {
+                  case 'home':
+                    title = data.wikiName;
+                    attributes.set('href', to('localized.home'));
+                    break;
+                  case 'current':
+                    title = slots.title;
+                    attributes.set('href', '');
+                    break;
+                  case null:
+                  case undefined:
+                    title = cur.title;
+                    attributes.set('href', to(...cur.path));
+                    break;
                 }
 
-                const showAsCurrent =
-                  cur.current ||
-                  cur.auto === 'current' ||
-                  (slots.navLinkStyle === 'hierarchical' &&
-                    i === slots.navLinks.length - 1);
+                content = html.tag('a', attributes, title);
+              }
 
-                const navLink =
-                  html.tag('span', {class: 'nav-link'},
-                    showAsCurrent &&
-                      {class: 'current'},
+              const showAsCurrent =
+                cur.current ||
+                cur.auto === 'current' ||
+                (slots.navLinkStyle === 'hierarchical' &&
+                  i === slots.navLinks.length - 1);
 
-                    [
-                      html.tag('span', {class: 'nav-link-content'},
-                        content),
+              const navLink =
+                html.tag('span', {class: 'nav-link'},
+                  showAsCurrent &&
+                    {class: 'current'},
 
-                      html.tag('span', {class: 'nav-link-accent'},
-                        {[html.noEdgeWhitespace]: true},
-                        {[html.onlyIfContent]: true},
+                  html.tag('span', {class: 'nav-link-content'},
+                    content),
 
-                        language.$('misc.navAccent', {
-                          [language.onlyIfOptions]: ['links'],
-                          links: cur.accent,
-                        })),
-                    ]);
+                  html.tag('span', {class: 'nav-link-accent'},
+                    {[html.noEdgeWhitespace]: true},
+                    {[html.onlyIfContent]: true},
 
-                if (slots.navLinkStyle === 'index') {
-                  return navLink;
-                }
+                    language.$('misc.navAccent', {
+                      [language.onlyIfOptions]: ['links'],
+                      links: cur.accent,
+                    })));
 
-                const prev =
-                  atOffset(entries, i, -1);
+              if (slots.navLinkStyle === 'index') {
+                return navLink;
+              }
 
-                if (
-                  prev &&
-                  prev.releaseRestToWrapTogether !== true &&
-                  (prev.releaseRestToWrapTogether === false ||
-                   prev.auto === 'home')
-                ) {
-                  return navLink;
-                } else {
-                  return html.metatag('blockwrap', navLink);
-                }
-              })),
+              const prev =
+                atOffset(entries, i, -1);
 
-          html.tag('div', {class: 'nav-bottom-row'},
-            {[html.onlyIfContent]: true},
-
-            language.$('misc.navAccent', {
-              [language.onlyIfOptions]: ['links'],
-              links: slots.navBottomRowContent,
+              if (
+                prev &&
+                prev.releaseRestToWrapTogether !== true &&
+                (prev.releaseRestToWrapTogether === false ||
+                 prev.auto === 'home')
+              ) {
+                return navLink;
+              } else {
+                return html.metatag('blockwrap', navLink);
+              }
             })),
 
-          html.tag('div', {class: 'nav-content'},
-            {[html.onlyIfContent]: true},
-            slots.navContent),
-        ]);
+        html.tag('div', {class: 'nav-bottom-row'},
+          {[html.onlyIfContent]: true},
+
+          language.$('misc.navAccent', {
+            [language.onlyIfOptions]: ['links'],
+            links: slots.navBottomRowContent,
+          })),
+
+        html.tag('div', {class: 'nav-content'},
+          {[html.onlyIfContent]: true},
+          slots.navContent));
 
     const getSidebar = (side, id, needed) => {
       const sidebar =
@@ -573,7 +567,7 @@ export default {
 
     const skippersHTML =
       mainHTML &&
-        html.tag('div', {id: 'skippers'}, [
+        html.tag('div', {id: 'skippers'},
           html.tag('span', language.$('misc.skippers.skipTo')),
           html.tag('div', {class: 'skipper-list'},
             processSkippers([
@@ -618,8 +612,7 @@ export default {
               {id: 'artist-commentary', string: 'artistCommentary'},
               {id: 'crediting-sources', string: 'creditingSources'},
               {id: 'referencing-sources', string: 'referencingSources'},
-            ])),
-        ]);
+            ])));
 
     const slottedStyleTags =
       html.smush(slots.styleTags);
@@ -659,11 +652,10 @@ export default {
 
       slots.secondaryNav,
 
-      html.tag('div', {class: 'layout-columns'}, [
+      html.tag('div', {class: 'layout-columns'},
         leftSidebar,
         mainHTML,
-        rightSidebar,
-      ]),
+        rightSidebar),
 
       slots.bannerPosition === 'bottom' &&
         slots.banner,
@@ -697,130 +689,123 @@ export default {
         {'data-rebase-lib': to('staticLib.root')},
         {'data-rebase-data': to('data.root')},
 
-        [
-          // developersComment,
+        // developersComment,
 
-          html.tag('head', [
-            html.tag('title',
-              {'data-without-wiki-name':
-                relations.titleText.clone()
-                  .slot('showWikiNameInTitle', false)
-                  .toString()},
+        html.tag('head',
+          html.tag('title',
+            {'data-without-wiki-name':
+              relations.titleText.clone()
+                .slot('showWikiNameInTitle', false)
+                .toString()},
 
-              relations.titleText),
+            relations.titleText),
 
-            html.tag('meta', {charset: 'utf-8'}),
+          html.tag('meta', {charset: 'utf-8'}),
+          html.tag('meta', {
+            name: 'viewport',
+            content: 'width=device-width, initial-scale=1',
+          }),
+
+          slots.color && [
             html.tag('meta', {
-              name: 'viewport',
-              content: 'width=device-width, initial-scale=1',
+              name: 'theme-color',
+              content: colors.dark,
+              media: '(prefers-color-scheme: dark)',
             }),
 
-            slots.color && [
-              html.tag('meta', {
-                name: 'theme-color',
-                content: colors.dark,
-                media: '(prefers-color-scheme: dark)',
-              }),
+            html.tag('meta', {
+              name: 'theme-color',
+              content: colors.light,
+              media: '(prefers-color-scheme: light)',
+            }),
 
-              html.tag('meta', {
-                name: 'theme-color',
-                content: colors.light,
-                media: '(prefers-color-scheme: light)',
-              }),
+            html.tag('meta', {
+              name: 'theme-color',
+              content: colors.primary,
+            }),
+          ],
 
-              html.tag('meta', {
-                name: 'theme-color',
-                content: colors.primary,
-              }),
-            ],
+          /*
+          ...(
+            Object.entries(meta)
+              .filter(([key, value]) => value)
+              .map(([key, value]) => html.tag('meta', {[key]: value}))),
+          */
 
-            /*
-            ...(
-              Object.entries(meta)
-                .filter(([key, value]) => value)
-                .map(([key, value]) => html.tag('meta', {[key]: value}))),
-            */
-
-            canonicalHref &&
-              html.tag('link', {
-                rel: 'canonical',
-                href: canonicalHref,
-              }),
-
-            /*
-            ...(
-              localizedCanonical
-                .map(({lang, href}) => html.tag('link', {
-                  rel: 'alternate',
-                  hreflang: lang,
-                  href,
-                }))),
-            */
-
-            hasSocialEmbed &&
-              slots.socialEmbed
-                .clone()
-                .slot('mode', 'html'),
-
-            oEmbedJSONHref &&
-              html.tag('link', {
-                type: 'application/json+oembed',
-                href: oEmbedJSONHref,
-              }),
-
+          canonicalHref &&
             html.tag('link', {
-              rel: 'stylesheet',
-              href: to('staticCSS.path', 'site.css'),
+              rel: 'canonical',
+              href: canonicalHref,
             }),
 
-            relations.colorStyleTag
-              .slot('color', slots.color ?? data.wikiColor),
+          /*
+          ...(
+            localizedCanonical
+              .map(({lang, href}) => html.tag('link', {
+                rel: 'alternate',
+                hreflang: lang,
+                href,
+              }))),
+          */
 
-            relations.staticURLStyleTag,
+          hasSocialEmbed &&
+            slots.socialEmbed
+              .clone()
+              .slot('mode', 'html'),
 
-            fallbackWallpaperStyleTag,
-
-            slottedStyleTags,
-
-            html.tag('script', {
-              src: to('staticLib.path', 'chroma-js/chroma.min.cjs'),
+          oEmbedJSONHref &&
+            html.tag('link', {
+              type: 'application/json+oembed',
+              href: oEmbedJSONHref,
             }),
 
-            html.tag('script', {
-              blocking: 'render',
-              src: to('staticJS.path', 'lazy-loading.js'),
-            }),
+          html.tag('link', {
+            rel: 'stylesheet',
+            href: to('staticCSS.path', 'site.css'),
+          }),
 
-            html.tag('script', {
-              blocking: 'render',
-              type: 'module',
-              src: to('staticJS.path', 'client/index.js'),
-            }),
-          ]),
+          relations.colorStyleTag
+            .slot('color', slots.color ?? data.wikiColor),
 
-          html.tag('body',
-            [
-              wallpaperPartsHTML,
+          relations.staticURLStyleTag,
 
-              html.tag('div', {id: 'page-container'},
-                showingSidebarLeft &&
-                  {class: 'showing-sidebar-left'},
+          fallbackWallpaperStyleTag,
 
-                showingSidebarRight &&
-                  {class: 'showing-sidebar-right'},
+          slottedStyleTags,
 
-                sidebarsInContentColumn &&
-                  {class: 'sidebars-in-content-column'},
+          html.tag('script', {
+            src: to('staticLib.path', 'chroma-js/chroma.min.cjs'),
+          }),
 
-                [
-                  skippersHTML,
-                  layoutHTML,
-                ]),
+          html.tag('script', {
+            blocking: 'render',
+            src: to('staticJS.path', 'lazy-loading.js'),
+          }),
 
-              // infoCardHTML,
-              relations.imageOverlay,
-            ]),
-        ])
+          html.tag('script', {
+            blocking: 'render',
+            type: 'module',
+            src: to('staticJS.path', 'client/index.js'),
+          })),
+
+        html.tag('body',
+          wallpaperPartsHTML,
+
+          html.tag('div', {id: 'page-container'},
+            showingSidebarLeft &&
+              {class: 'showing-sidebar-left'},
+
+            showingSidebarRight &&
+              {class: 'showing-sidebar-right'},
+
+            sidebarsInContentColumn &&
+              {class: 'sidebars-in-content-column'},
+
+            skippersHTML,
+            layoutHTML),
+
+          // infoCardHTML,
+          relations.imageOverlay)),
     ]).toString();
 
     const oEmbedJSON =

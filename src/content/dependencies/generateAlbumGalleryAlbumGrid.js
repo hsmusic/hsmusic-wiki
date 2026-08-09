@@ -45,38 +45,36 @@ export default {
 
       slots.attributes,
 
-      [
-        relations.coverArtistsLine,
+      relations.coverArtistsLine,
 
-        relations.coverGrid.slots({
-          links:
-            relations.albumLinks,
+      relations.coverGrid.slots({
+        links:
+          relations.albumLinks,
 
-          names:
-            data.artworkLabels
-              .map(label => label ?? data.albumName),
+        names:
+          data.artworkLabels
+            .map(label => label ?? data.albumName),
 
-          images:
-            stitchArrays({
-              image: relations.images,
-              label: data.artworkLabels,
-            }).map(({image, label}) =>
-                image.slots({
-                  missingSourceContent:
-                    language.$('misc.albumGalleryGrid.noCoverArt', {
-                      name:
-                        label ?? data.albumName,
-                    }),
-                })),
-
-          info:
-            data.artworkArtists.map(artists =>
-              language.$('misc.coverGrid.details.coverArtists', {
-                [language.onlyIfOptions]: ['artists'],
-
-                artists:
-                  language.formatUnitList(artists),
+        images:
+          stitchArrays({
+            image: relations.images,
+            label: data.artworkLabels,
+          }).map(({image, label}) =>
+              image.slots({
+                missingSourceContent:
+                  language.$('misc.albumGalleryGrid.noCoverArt', {
+                    name:
+                      label ?? data.albumName,
+                  }),
               })),
-        }),
-      ]),
+
+        info:
+          data.artworkArtists.map(artists =>
+            language.$('misc.coverGrid.details.coverArtists', {
+              [language.onlyIfOptions]: ['artists'],
+
+              artists:
+                language.formatUnitList(artists),
+            })),
+      })),
 };

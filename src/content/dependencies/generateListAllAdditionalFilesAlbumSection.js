@@ -32,11 +32,9 @@ export default {
       html.tag('dl',
         {[html.onlyIfContent]: true},
 
-        [
-          relations.albumChunk.slot('stringsKey', slots.stringsKey),
+        relations.albumChunk.slot('stringsKey', slots.stringsKey),
 
-          relations.trackChunks.map(trackChunk =>
-            trackChunk.slot('stringsKey', slots.stringsKey)),
-        ]),
+        relations.trackChunks.map(trackChunk =>
+          trackChunk.slot('stringsKey', slots.stringsKey))),
     ]),
 };
