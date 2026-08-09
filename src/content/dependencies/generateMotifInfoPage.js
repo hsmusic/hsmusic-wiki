@@ -16,8 +16,8 @@ export default {
     motifNavLink:
       relation('linkMotif', motif),
 
-    contentHeading:
-      relation('generateContentHeading'),
+    connectionsContentHeading:
+      relation('generateMotifConnectionsContentHeading', motif),
 
     featuringTracksList:
       relation('generateMotifConnectionList',
@@ -51,19 +51,10 @@ export default {
 
         mainContent: [
           html.tags([
-            language.encapsulate('releaseInfo.tracksThatFeatureMotif', capsule =>
-              relations.contentHeading.clone()
-                .slots({
-                  attributes: {id: 'featured-in-tracks'},
-
-                  title:
-                    language.$(capsule, {
-                      motif: data.name,
-                    }),
-
-                  stickyTitle:
-                    language.$(capsule, 'sticky'),
-                })),
+            relations.connectionsContentHeading.clone().slots({
+              attributes: {id: 'featured-in-tracks'},
+              string: 'releaseInfo.tracksThatFeatureMotif',
+            }),
 
             relations.featuringTracksList,
           ]),

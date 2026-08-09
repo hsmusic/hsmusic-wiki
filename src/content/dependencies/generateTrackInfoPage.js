@@ -79,8 +79,8 @@ export default {
     contentHeading:
       relation('generateContentHeading'),
 
-    relationsContentHeading:
-      relation('generateRelationsContentHeading', 'track', track),
+    connectionsContentHeading:
+      relation('generateTrackConnectionsContentHeading', track),
 
     name:
       relation('generateName', track),
@@ -284,7 +284,7 @@ export default {
           }),
 
           html.tags([
-            relations.relationsContentHeading.clone().slots({
+            relations.connectionsContentHeading.clone().slots({
               attributes: {id: 'references'},
               string: 'releaseInfo.tracksReferenced',
             }),
@@ -293,7 +293,7 @@ export default {
           ]),
 
           html.tags([
-            relations.relationsContentHeading.clone().slots({
+            relations.connectionsContentHeading.clone().slots({
               attributes: {id: 'samples'},
               string: 'releaseInfo.tracksSampled',
             }),
@@ -303,7 +303,7 @@ export default {
 
           html.tags([
             language.encapsulate('releaseInfo.motifsFeatured', capsule =>
-              relations.relationsContentHeading.clone().slots({
+              relations.connectionsContentHeading.clone().slots({
                 attributes: {id: 'features-motifs'},
                 string: capsule,
               })),
@@ -313,7 +313,7 @@ export default {
 
           language.encapsulate('releaseInfo.tracksThatReference', capsule =>
             html.tags([
-              relations.relationsContentHeading.clone().slots({
+              relations.connectionsContentHeading.clone().slots({
                 attributes: {id: 'referenced-by'},
                 string: capsule,
               }),
@@ -325,7 +325,7 @@ export default {
 
           language.encapsulate('releaseInfo.tracksThatSample', capsule =>
             html.tags([
-              relations.relationsContentHeading.clone().slots({
+              relations.connectionsContentHeading.clone().slots({
                 attributes: {id: 'sampled-by'},
                 string: capsule,
               }),
@@ -336,7 +336,7 @@ export default {
             ])),
 
           html.tags([
-            relations.relationsContentHeading.clone().slots({
+            relations.connectionsContentHeading.clone().slots({
               attributes: {id: 'featured-in'},
               string: 'releaseInfo.flashesThatFeature',
             }),

@@ -390,10 +390,12 @@ releaseInfo:
 
   motifsFeatured:
     _: "Motifs that {TRACK} features:"
+    withoutName: "Motifs that this track features:"
     sticky: "Motifs that this track features:"
 
   tracksThatFeatureMotif:
     _: "Tracks that feature '{MOTIF}':"
+    withoutName: "Tracks that feature this motif:"
     sticky: "Tracks that feature this motif:"
 
   flashesThatFeature:
