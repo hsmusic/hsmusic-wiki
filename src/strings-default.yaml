@@ -398,7 +398,11 @@ releaseInfo:
   tracksThatFeatureMotif:
     _: "Tracks that feature '{MOTIF}':"
     withoutName: "Tracks that feature this motif:"
-    sticky: "Tracks that feature this motif:"
+
+    sticky:
+      _: "Tracks that feature this motif:"
+      fromGroup: "Tracks that feature this motif — from {GROUP}:"
+      fromOther: "Tracks that feature this motif — from somewhere else:"
 
   motifsThatDeriveFromMotif:
     _: "Motifs that derive from '{MOTIF}':"
@@ -3137,11 +3141,6 @@ motifInfoPage:
 
   nav:
     motif: "Motif: {MOTIF}"
-
-  sticky:
-    _: "Tracks that reference this motif:"
-    fromGroup: "Tracks that reference this motif — from {GROUP}:"
-    fromOther: "Tracks that reference this motif — from somewhere else:"
 
 #
 # newsIndex:

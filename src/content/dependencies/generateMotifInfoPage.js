@@ -100,10 +100,9 @@ export default {
               string: 'releaseInfo.tracksThatFeatureMotif',
             }),
 
-            relations.featuringTracksList
-              .slots({
-                headingString: pageCapsule,
-              }),
+            relations.featuringTracksList.slots({
+              headingString: 'releaseInfo.tracksThatFeatureMotif',
+            }),
           ]),
         ],
 
