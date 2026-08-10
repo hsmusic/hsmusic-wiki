@@ -276,8 +276,8 @@ export default {
                         {normalize: 'tag'})
                           .content),
 
-                    html.tag('dd',
-                      html.tag('ul',
+                    html.tag('dd', {[html.onlyIfContent]: true},
+                      html.tag('ul', {[html.onlyIfContent]: true},
                         indirectItems.map(item =>
                           item.slots({
                             showTimesFeatured: false,
