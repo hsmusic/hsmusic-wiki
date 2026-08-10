@@ -12,7 +12,7 @@ export default {
       relation('generateAdditionalNamesBox', motif.additionalNames),
 
     motifNavLink:
-      relation('linkMotif', motif),
+      relation('linkMotifWithoutTooltip', motif),
 
     connectionsContentHeading:
       relation('generateMotifConnectionsContentHeading', motif),
