@@ -324,6 +324,31 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'wiki.deconreconstruction.com'},
+
+    platform: 'deconreconstruction.wiki',
+
+    detail: {
+      substring: 'page',
+      page: {
+        pathname: /^wiki\/(.+)\/?$/,
+        transform: [
+          {command: 'decode-uri'},
+          {command: 'find-replace', find: /_/g, replace: ' '},
+        ],
+      },
+    },
+
+    icon: 'globe',
+  },
+
+  {
+    match: {domain: 'wiki.deconreconstruction.com'},
+    platform: 'deconreconstruction.wiki',
+    icon: 'globe',
+  },
+
+  {
     match: {domain: 'deconreconstruction.com'},
     platform: 'deconreconstruction',
     icon: 'globe',

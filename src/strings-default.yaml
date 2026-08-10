@@ -854,6 +854,10 @@ misc:
       _: "Deconreconstruction"
       music: "MUSIC@DCRC"
 
+      wiki:
+        _: "DCRC Wiki"
+        page: "DCRC Wiki ({PAGE})"
+
     deviantart: "DeviantArt"
     facebook: "Facebook"
 
