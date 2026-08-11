@@ -4,7 +4,7 @@ import {inspect as nodeInspect} from 'node:util';
 import {colors, ENABLE_COLOR} from '#cli';
 
 import CacheableObject from '#cacheable-object';
-import {nativeGetMatchableDirectories} from '#find';
+import {MultipleMatchesFindError, nativeGetMatchableDirectories} from '#find';
 import {replacerSpec, parseContentNodes} from '#replacer';
 import {compareArrays, cut, cutStart, empty, getNestedProp, iterateMultiline}
   from '#sugar';
@@ -169,8 +169,9 @@ function getFieldPropertyMessage(yamlDocumentSpec, property) {
 
 function decoAnnotateFindErrors(findFn) {
   function annotateMultipleNameMatchesIncludingUnfortunatelyUnsecondary(error) {
-    const matches = error[Symbol.for('hsmusic.find.multipleNameMatches')];
-    if (!matches) return;
+    if (!(error instanceof MultipleMatchesFindError)) return;
+
+    const {matches} = error;
 
     const notSoSecondary =
       matches

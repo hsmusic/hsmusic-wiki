@@ -752,3 +752,22 @@ export function conditionallySuppressError(conditionFn, callbackFn) {
     }
   };
 }
+
+export function* searchAggregate(error, ...constructors) {
+  for (const constructor of constructors) {
+    if (error instanceof constructor) {
+      yield error;
+      break;
+    }
+  }
+
+  if (error.errors) {
+    for (const sub of error.errors) {
+      yield* searchAggregate(sub, ...constructors);
+    }
+  }
+
+  if (error.cause) {
+    yield* searchAggregate(error.cause, ...constructors);
+  }
+}

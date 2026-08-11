@@ -40,12 +40,13 @@ import {fileURLToPath} from 'node:url';
 
 import wrap from 'word-wrap';
 
-import {mapAggregate, openAggregate, showAggregate} from '#aggregate';
+import {mapAggregate, openAggregate, searchAggregate, showAggregate}
+  from '#aggregate';
 import CacheableObject from '#cacheable-object';
 import {formatDuration, stringifyCache} from '#cli';
 import {displayCompositeCacheAnalysis} from '#composite';
 import * as html from '#html';
-import find, {bindFind, getAllFindSpecs} from '#find';
+import find, {bindFind, getAllFindSpecs, NoMatchFindError} from '#find';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
 import {isMain, traverse} from '#node-utils';
@@ -82,6 +83,7 @@ import {
   filterMultipleArrays,
   indentWrap as unboundIndentWrap,
   stitchArrays,
+  unique,
   withEntries,
 } from '#sugar';
 
@@ -2002,6 +2004,21 @@ async function main() {
     } catch (error) {
       if (!paragraph) console.log('');
       niceShowAggregate(error);
+
+      const noMatchErrors =
+        Array.from(searchAggregate(error, NoMatchFindError));
+
+      if (!empty(noMatchErrors)) {
+        console.log('')
+        logWarn`Summarizing above, these references didn't match anything:`;
+
+        const references = unique(noMatchErrors.map(error => error.reference));
+        sortByName(references, {getName: ref => ref});
+
+        for (const reference of references) {
+          console.warn(`- ${colors.bright(reference)}`);
+        }
+      }
 
       logWarn`The above errors were detected while validating references in data files.`;
       logWarn`The wiki should still build, but these connections between data objects`;

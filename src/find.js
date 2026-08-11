@@ -16,13 +16,93 @@ import {
 
 export {findTokenKey, boundFindData, boundFindOptions};
 
-function warnOrThrow(mode, message) {
+export class FindError extends Error {
+  constructor(reference, message) {
+    super(message);
+
+    this.reference = reference;
+  }
+}
+
+export class MalformedReferenceFindError extends FindError {
+  constructor(reference) {
+    const refPart = colors.bright(reference);
+    super(reference, `Malformed link reference: ${refPart}`)
+  }
+}
+
+export class WrongReferenceTypeFindError extends FindError {
+  constructor(reference, referenceType, referenceTypes) {
+    super(reference,
+      `Reference starts with "${referenceType}:", expected ` +
+      referenceTypes.map(type => `"${type}:"`).join(', '));
+  }
+}
+
+export class NoMatchFindError extends FindError {
+  constructor(reference) {
+    const refPart = colors.bright(reference);
+    super(reference, `Didn't match anything for ${refPart}`);
+  }
+}
+
+export class MultipleMatchesFindError extends FindError {
+  constructor(reference, matches) {
+    const refPart = colors.bright(reference);
+    super(reference,
+      `Multiple matches for reference ${refPart}. Please resolve:\n` +
+      matches
+        .map(match => `- ${inspect(match)}\n`)
+        .join('') +
+      `Returning null for this reference.`);
+
+    this.matches = matches;
+  }
+}
+
+export class CapitalizationMismatchFindError extends FindError {
+  constructor(matchingName, matchedName) {
+    if (matchingName.length === matchedName.length) {
+      let a = '', b = '';
+      for (let i = 0; i < matchingName.length; i++) {
+        if (
+          matchingName[i] === matchedName[i] ||
+          matchingName[i].toLowerCase() !== matchingName[i].toLowerCase()
+        ) {
+          a += matchingName[i];
+          b += matchedName[i];
+        } else {
+          a += colors.bright(colors.red(matchingName[i]));
+          b += colors.bright(colors.green(matchedName[i]));
+        }
+      }
+
+      matchingName = a;
+      matchedName = b;
+    }
+
+    super(matchingName,
+      `Provided capitalization differs from the matched name. Please resolve:\n` +
+      `- provided: ${matchingName}\n` +
+      `- should be: ${matchedName}\n` +
+      `Returning null for this reference.`);
+
+    this.matchingName = matchingName;
+    this.matchedName = matchedName;
+  }
+}
+
+function warnOrThrow(mode, error) {
+  if (typeof error !== 'object' || !(error instanceof Error)) {
+    throw new Error(`Expected an error object`);
+  }
+
   if (mode === 'error') {
-    throw new Error(message);
+    throw error;
   }
 
   if (mode === 'warn') {
-    logWarn(message);
+    logWarn(error.message);
   }
 
   return null;
@@ -151,56 +231,6 @@ export function processAllAvailableMatches(data, fuzz, spec) {
   return {byName, byDirectory, multipleNameMatches};
 }
 
-function oopsMultipleNameMatches(mode, {
-  name,
-  normalizedName,
-  multipleNameMatches,
-}) {
-  try {
-    return warnOrThrow(mode,
-      `Multiple matches for reference "${name}". Please resolve:\n` +
-      multipleNameMatches[normalizedName]
-        .map(match => `- ${inspect(match)}\n`)
-        .join('') +
-      `Returning null for this reference.`);
-  } catch (caughtError) {
-    throw Object.assign(caughtError, {
-      [Symbol.for('hsmusic.find.multipleNameMatches')]:
-        multipleNameMatches[normalizedName],
-    });
-  }
-}
-
-function oopsNameCapitalizationMismatch(mode, {
-  matchingName,
-  matchedName,
-}) {
-  if (matchingName.length === matchedName.length) {
-    let a = '', b = '';
-    for (let i = 0; i < matchingName.length; i++) {
-      if (
-        matchingName[i] === matchedName[i] ||
-        matchingName[i].toLowerCase() !== matchingName[i].toLowerCase()
-      ) {
-        a += matchingName[i];
-        b += matchedName[i];
-      } else {
-        a += colors.bright(colors.red(matchingName[i]));
-        b += colors.bright(colors.green(matchedName[i]));
-      }
-    }
-
-    matchingName = a;
-    matchedName = b;
-  }
-
-  return warnOrThrow(mode,
-    `Provided capitalization differs from the matched name. Please resolve:\n` +
-    `- provided: ${matchingName}\n` +
-    `- should be: ${matchedName}\n` +
-    `Returning null for this reference.`);
-}
-
 export function prepareMatchByName(mode, fuzz, {byName, multipleNameMatches}) {
   return (name) => {
     const normalizedName = fuzzName(name, fuzz);
@@ -209,33 +239,22 @@ export function prepareMatchByName(mode, fuzz, {byName, multipleNameMatches}) {
     if (match) {
       return match.thing;
     } else if (multipleNameMatches[normalizedName]) {
-      return oopsMultipleNameMatches(mode, {
-        name,
-        normalizedName,
-        multipleNameMatches,
-      });
+      return warnOrThrow(mode,
+        new MultipleMatchesFindError(name, multipleNameMatches[normalizedName]));
     } else {
       return null;
     }
   };
 }
 
-function oopsWrongReferenceType(mode, {
-  referenceType,
-  referenceTypes,
-}) {
-  return warnOrThrow(mode,
-    `Reference starts with "${referenceType}:", expected ` +
-    referenceTypes.map(type => `"${type}:"`).join(', '));
-}
-
 export function prepareMatchByDirectory(mode, {referenceTypes, byDirectory}) {
   return (referenceType, directory) => {
     if (!referenceTypes.includes(referenceType)) {
-      return oopsWrongReferenceType(mode, {
-        referenceType,
-        referenceTypes,
-      });
+      return warnOrThrow(mode,
+        new WrongReferenceTypeFindError(
+            `${referenceType}:${directory}`,
+          referenceType,
+          referenceTypes));
     }
 
     const match = byDirectory[directory];
@@ -254,8 +273,7 @@ function matchHelper(fullRef, mode, {
 }) {
   const regexMatch = fullRef.match(keyRefRegex);
   if (!regexMatch) {
-    return warnOrThrow(mode,
-      `Malformed link reference: "${fullRef}"`);
+    return warnOrThrow(mode, new MalformedReferenceFindError(fullRef));
   }
 
   const {key: keyPart, ref: refPart} = regexMatch.groups;
@@ -268,8 +286,7 @@ function matchHelper(fullRef, mode, {
   if (match) {
     return match;
   } else {
-    return warnOrThrow(mode,
-      `Didn't match anything for ${colors.bright(fullRef)}`);
+    return warnOrThrow(mode, new NoMatchFindError(fullRef));
   }
 }
 
@@ -321,7 +338,7 @@ function findHelper({
         match = byob(fullRef, data, {mode, from, fuzz});
       } catch (caught) {
         if (typeof caught === 'string') {
-          return warnOrThrow(mode, caught);
+          return warnOrThrow(mode, new Error(caught));
         } else {
           throw caught;
         }
@@ -330,8 +347,7 @@ function findHelper({
       if (match) {
         return match;
       } else {
-        return warnOrThrow(mode,
-          `Didn't match anything for ${colors.bright(fullRef)}`);
+        return warnOrThrow(mode, NoMatchFindError(fullRef));
       }
     }
 
@@ -395,10 +411,10 @@ function findHelper({
       }
 
       if (miscapitalizedMatch) {
-        return oopsNameCapitalizationMismatch(mode, {
-          matchingName: fullRef,
-          matchedName: miscapitalizedMatch.name,
-        });
+        return warnOrThrow(mode,
+          new CapitalizationMismatchFindError(
+            fullRef,
+            miscapitalizedMatch.name));
       }
     }
 
