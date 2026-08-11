@@ -997,7 +997,21 @@ function fillResultElements(results, {
       });
   }
 
+  // Note this step comes after the filtering steps above, so that
+  // it's only considering the attached results that will actually
+  // be displayed.
+  const allAttachedResults =
+    tidyResults({
+      results:
+        filteredResults
+          .flatMap(result => result.data.attachedResults ?? []),
+    });
+
+  const allAttachedResultReferences =
+    allAttachedResults.map(result => result.reference);
+
   filteredResults = filteredResults
+    .filter(result => !allAttachedResultReferences.includes(result.reference));
 
   while (info.results.firstChild) {
     info.results.firstChild.remove();
