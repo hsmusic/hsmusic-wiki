@@ -2128,7 +2128,7 @@ artTagInfoPage:
       This tag is featured in {ARTWORKS}, but only indirectly.
 
     directlyAndIndirectly: >-
-      This tag is directly featured in {ARTWORKS_DIRECTLY}, and indirectly in {ARTWORKS_INDIRECTLY} more, for a total of {ARTWORKS_TOTAL}.
+      This tag is directly featured in {ARTWORKS_DIRECTLY} and indirectly in {ARTWORKS_INDIRECTLY}, for a total of {ARTWORKS_TOTAL}.
 
   descendsFromTags:
     _: "Tags which '{TAG}' falls under:"
