@@ -997,21 +997,25 @@ function fillResultElements(results, {
       });
   }
 
-  // Note this step comes after the filtering steps above, so that
-  // it's only considering the attached results that will actually
-  // be displayed.
-  const allAttachedResults =
-    tidyResults({
-      results:
-        filteredResults
-          .flatMap(result => result.data.attachedResults ?? []),
-    });
+  // Filter non-attached results which appear later in the results list
+  // than a corresponding attached result. Note that this comes after
+  // the filtering steps above, so that we're only considering the
+  // attached results that will actually be displayed.
 
-  const allAttachedResultReferences =
-    allAttachedResults.map(result => result.reference);
-
+  const seenAttachedResultReferences = new Set();
   filteredResults = filteredResults
-    .filter(result => !allAttachedResultReferences.includes(result.reference));
+    .filter(result => {
+      if (result.attachedResults) {
+        const attachedResults =
+          tidyResults({results: result.attachedResults});
+
+        for (const {reference} of attachedResults) {
+          seenAttachedResultReferences.add(reference);
+        }
+      }
+
+      return !seenAttachedResultReferences.has(result.reference);
+    });
 
   while (info.results.firstChild) {
     info.results.firstChild.remove();
