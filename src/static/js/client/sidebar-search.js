@@ -1005,9 +1005,9 @@ function fillResultElements(results, {
   const seenAttachedResultReferences = new Set();
   filteredResults = filteredResults
     .filter(result => {
-      if (result.attachedResults) {
+      if (result.data.attachedResults) {
         const attachedResults =
-          tidyResults({results: result.attachedResults});
+          tidyResults({results: result.data.attachedResults});
 
         for (const {reference} of attachedResults) {
           seenAttachedResultReferences.add(reference);
