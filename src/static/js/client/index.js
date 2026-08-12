@@ -188,15 +188,15 @@ for (const module of modules) {
       let boundValue = undefined;
 
       const updateBoundValue = (givenValue = undefined) => {
-        if (givenValue) {
+        if (givenValue === undefined) {
+          boundValue = boundSessionStorage[infoKey]?.[key];
+        } else {
           if (
             infoKey in boundSessionStorage &&
             key in boundSessionStorage[infoKey]
           ) {
             boundSessionStorage[infoKey][key] = givenValue;
           }
-        } else {
-          boundValue = boundSessionStorage[infoKey]?.[key];
         }
       };
 
