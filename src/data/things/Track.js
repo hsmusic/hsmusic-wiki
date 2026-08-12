@@ -282,10 +282,10 @@ export class Track extends Thing {
     bandcampTrackIdentifier: simpleString(),
     bandcampArtworkIdentifier: simpleString(),
 
-    additionalNames: thingList(V(AdditionalName)),
-
     dateFirstReleased: simpleDate(),
     datePosted: simpleDate(),
+
+    additionalNames: thingList(V(AdditionalName)),
 
     // > Update & expose - Credits and contributors
 
@@ -1152,13 +1152,13 @@ export class Track extends Thing {
         transform: String,
       },
 
+      'Date First Released': {property: 'dateFirstReleased', transform: parseDate},
+      'Date Posted': {property: 'datePosted', transform: parseDate},
+
       'Additional Names': {
         property: 'additionalNames',
         transform: parseAdditionalNames,
       },
-
-      'Date First Released': {property: 'dateFirstReleased', transform: parseDate},
-      'Date Posted': {property: 'datePosted', transform: parseDate},
 
       // Credits and contributors
 

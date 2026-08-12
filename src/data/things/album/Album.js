@@ -221,11 +221,11 @@ export class Album extends Thing {
     bandcampAlbumIdentifier: simpleString(),
     bandcampArtworkIdentifier: simpleString(),
 
-    additionalNames: thingList(V(AdditionalName)),
-
     dateReleased: simpleDate(),
     datePosted: simpleDate(),
     dateAddedToWiki: simpleDate(),
+
+    additionalNames: thingList(V(AdditionalName)),
 
     // > Update & expose - Credits and contributors
 
@@ -560,14 +560,14 @@ export class Album extends Thing {
 
     musicVideos: thingList(V(MusicVideo)),
 
+    // > Update & expose - Additional files
+
+    additionalFiles: thingList(V(MiscellaneousAdditionalFile)),
+
     // > Update & expose - Content entries
 
     commentary: thingList(V(CommentaryEntry)),
     creditingSources: thingList(V(CreditingSourcesEntry)),
-
-    // > Update & expose - Additional files
-
-    additionalFiles: thingList(V(MiscellaneousAdditionalFile)),
 
     // > Update only
 
@@ -827,14 +827,14 @@ export class Album extends Thing {
         transform: String,
       },
 
+      'Date': {property: 'dateReleased', transform: parseDate},
+      'Date Posted': {property: 'datePosted', transform: parseDate},
+      'Date Added': {property: 'dateAddedToWiki', transform: parseDate},
+
       'Additional Names': {
         property: 'additionalNames',
         transform: parseAdditionalNames,
       },
-
-      'Date': {property: 'dateReleased', transform: parseDate},
-      'Date Posted': {property: 'datePosted', transform: parseDate},
-      'Date Added': {property: 'dateAddedToWiki', transform: parseDate},
 
       // Credits and contributors
 
