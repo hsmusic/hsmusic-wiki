@@ -346,7 +346,10 @@ function evaluateBindSessionStorageStep(bindSessionStorage) {
 
   let lastBoundValue;
   while (true) {
-    const {value: key, done} = generator.next(lastBoundValue);
+    const generatorResult = generator.next(lastBoundValue);
+    if (generatorResult.done) break;
+
+    const key = generatorResult.value;
     const storageKey = `hsmusic.${infoKey}.${key}`;
 
     let value = undefined;
@@ -367,8 +370,6 @@ function evaluateBindSessionStorageStep(bindSessionStorage) {
     boundSessionStorage[infoKey][key] = value;
 
     lastBoundValue = value;
-
-    if (done) break;
   }
 }
 
