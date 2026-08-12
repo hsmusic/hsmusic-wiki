@@ -22,12 +22,9 @@ import {
 } from '../client-util.js';
 
 import {getLatestDraggedLink} from './dragged-link.js';
-
-import {
-  info as wikiSearchInfo,
-  getSearchWorkerDownloadContext,
-  searchAll,
-} from './wiki-search.js';
+import {info as imageOverlayInfo} from './image-overlay.js';
+import {info as wikiSearchInfo, getSearchWorkerDownloadContext, searchAll}
+  from './wiki-search.js';
 
 export const info = {
   id: 'sidebarSearchInfo',
@@ -613,6 +610,10 @@ export function addPageListeners() {
   document.addEventListener('keypress', domEvent => {
     const {tagName} = document.activeElement ?? {};
     if (tagName === 'INPUT' || tagName === 'TEXTAREA') {
+      return;
+    }
+
+    if (imageOverlayInfo.state.visible) {
       return;
     }
 

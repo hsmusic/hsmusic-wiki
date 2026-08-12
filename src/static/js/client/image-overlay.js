@@ -23,6 +23,12 @@ export const info = {
   fileSizeWarning: null,
 
   links: null,
+
+  state: {
+    // Not actually used in this module's code - it's exposed
+    // so other modules can respond to input based on this state
+    visible: null,
+  },
 };
 
 export function getPageReferences() {
@@ -86,6 +92,8 @@ export function addPageListeners() {
 }
 
 function handleContainerClicked(evt) {
+  const {state} = info;
+
   // Only hide the image overlay if actually clicking the background.
   if (evt.target !== info.container) {
     return;
@@ -102,15 +110,21 @@ function handleContainerClicked(evt) {
   }
 
   info.container.classList.remove('visible');
+  state.visible = false;
 }
 
 function handleKeyDown(evt) {
+  const {state} = info;
+
   if (evt.key === 'Escape' || evt.key === 'Esc' || evt.keyCode === 27) {
     info.container.classList.remove('visible');
+    state.visible = false;
   }
 }
 
 async function handleImageLinkClicked(evt) {
+  const {state} = info;
+
   if (evt.metaKey || evt.shiftKey || evt.altKey) {
     return;
   }
@@ -125,6 +139,7 @@ async function handleImageLinkClicked(evt) {
   info.container.classList.add('visible');
   info.container.classList.remove('loaded');
   info.container.classList.remove('errored');
+  state.visible = true;
 
   const details = getImageLinkDetails(evt.target);
 
