@@ -299,6 +299,45 @@ for (const module of modules) {
   }
 }
 
+window.addEventListener('pageshow', domEvent => {
+  if (!domEvent.persisted) {
+    return;
+  }
+
+  const difference = {};
+  try {
+    for (const [infoKey, entries] of Object.entries(boundSessionStorage)) {
+      for (const [key, boundValue] of Object.entries(entries)) {
+        const storageKey = `hsmusic.${infoKey}.${key}`;
+        if (sessionStorage.getItem(storageKey) !== boundValue) {
+          difference[storageKey] = boundValue;
+        }
+      }
+    }
+  } catch (error) {
+    if (error instanceof DOMException) {
+      return;
+    } else {
+      throw error;
+    }
+  }
+
+  if (Object.keys(difference).length) {
+    console.debug(`Restoring page-bound session storage:`, difference);
+    try {
+      for (const [storageKey, boundValue] of Object.entries(difference)) {
+        sessionStorage.setItem(storageKey, boundValue);
+      }
+    } catch (error) {
+      if (error instanceof DOMException) {
+        console.warn(`Failed to restore page-bound session storage`, error);
+      } else {
+        throw error;
+      }
+    }
+  }
+});
+
 function evaluateBindSessionStorageStep(bindSessionStorage) {
   const {id: infoKey, session: moduleExposedSessionObject} =
     bindSessionStorage[stepInfoSymbol];
