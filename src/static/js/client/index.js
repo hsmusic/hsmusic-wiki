@@ -83,6 +83,58 @@ const boundSessionStorage =
   window.hsmusicBoundSessionStorage =
   Object.create(null);
 
+const getSessionStorageSpecAndDefaultValue = (entry) => {
+  if (typeof entry === 'object' && entry !== null) {
+    return {
+      spec: entry,
+      defaultValue: entry.default ?? null,
+    };
+  } else {
+    return {
+      spec: null,
+      defaultValue: entry,
+    };
+  }
+};
+
+const getFormatReadWriteForSessionStorageSpec = (spec) => {
+  if (spec && spec.type) {
+    switch (spec.type) {
+      case 'number':
+        return {
+          formatRead: parseFloat,
+          formatWrite: String,
+        };
+
+      case 'boolean':
+        return {
+          formatRead: value => value === 'true' ? true : false,
+          formatWrite: String,
+        };
+
+      case 'string':
+        return {
+          formatRead: String,
+          formatWrite: String,
+        };
+
+      case 'json':
+        return {
+          formatRead: JSON.parse,
+          formatWrite: JSON.stringify,
+        };
+
+      default:
+        throw new Error(`Unknown type for session storage spec "${spec.type}"`);
+    }
+  } else {
+    return {
+      formatRead: value => value,
+      formatWrite: value => value,
+    };
+  }
+};
+
 for (const module of modules) {
   const {info} = module;
 
@@ -118,46 +170,12 @@ for (const module of modules) {
 
     info.session = {};
 
-    for (const [key, spec] of Object.entries(sessionSpecs)) {
-      const hasSpec =
-        typeof spec === 'object' && spec !== null;
-
-      const defaultValue =
-        (hasSpec
-          ? spec.default ?? null
-          : spec);
-
-      let formatRead = value => value;
-      let formatWrite = value => value;
-      if (hasSpec && spec.type) {
-        switch (spec.type) {
-          case 'number':
-            formatRead = parseFloat;
-            formatWrite = String;
-            break;
-
-          case 'boolean':
-            formatRead = value => value === 'true' ? true : false;
-            formatWrite = String;
-            break;
-
-          case 'string':
-            formatRead = String;
-            formatWrite = String;
-            break;
-
-          case 'json':
-            formatRead = JSON.parse;
-            formatWrite = JSON.stringify;
-            break;
-
-          default:
-            throw new Error(`Unknown type for session storage spec "${spec.type}"`);
-        }
-      }
+    for (const [key, entry] of Object.entries(sessionSpecs)) {
+      const {spec, defaultValue} = getSessionStorageSpecAndDefaultValue(entry);
+      const {formatRead, formatWrite} = getFormatReadWriteForSessionStorageSpec(spec);
 
       let getMaxLength =
-        (!hasSpec
+        (spec === null
           ? () => Infinity
        : typeof spec.maxLength === 'function'
           ? (info.settings
@@ -304,37 +322,98 @@ window.addEventListener('pageshow', domEvent => {
     return;
   }
 
-  const difference = {};
-  try {
-    for (const [infoKey, entries] of Object.entries(boundSessionStorage)) {
-      for (const [key, boundValue] of Object.entries(entries)) {
-        const storageKey = `hsmusic.${infoKey}.${key}`;
-        if (sessionStorage.getItem(storageKey) !== boundValue) {
-          difference[storageKey] = boundValue;
-        }
-      }
-    }
-  } catch (error) {
-    if (error instanceof DOMException) {
-      return;
-    } else {
-      throw error;
-    }
-  }
+  // As of testing in August 2026, Safari and Chrome both reflect the current
+  // actual state of sessionStorage, which is associated with the tab and not
+  // the page ('s state as recorded in bfcache/memory). So for those browsers
+  // we can just check where boundSessionStorage differs and write that.
+  //
+  // Firefox on the other hand reveals the actual state of sessionStorage
+  // at the time the page was cached, but it's a fake: the values presented
+  // don't refelct what will be carried through in a following navigation.
+  //
+  // It's slower (more session storage ops) but not otherwise an issue to
+  // brashly enter ALL of boundSessionStorage on top of whatever's inside
+  // the (apparent) real sessionStorage, so right now that's the approach
+  // we take, across all browsers.
+  //
+  const onlyApplyDifference = false;
 
-  if (Object.keys(difference).length) {
-    console.debug(`Restoring page-bound session storage:`, difference);
+  if (onlyApplyDifference) {
+    const difference = {};
     try {
-      for (const [storageKey, boundValue] of Object.entries(difference)) {
-        sessionStorage.setItem(storageKey, boundValue);
+      for (const [infoKey, entries] of Object.entries(boundSessionStorage)) {
+        for (const [key, boundValue] of Object.entries(entries)) {
+          const spec = clientInfo[infoKey].session[key];
+          const {formatWrite} = getFormatReadWriteForSessionStorageSpec(spec);
+          const desiredValue = formatWrite(boundValue);
+
+          const storageKey = `hsmusic.${infoKey}.${key}`;
+          if (sessionStorage.getItem(storageKey) !== desiredValue) {
+            difference[storageKey] = desiredValue;
+          }
+        }
       }
     } catch (error) {
       if (error instanceof DOMException) {
-        console.warn(`Failed to restore page-bound session storage`, error);
+        return;
       } else {
         throw error;
       }
     }
+
+    if (Object.keys(difference).length) {
+      console.debug(`Restoring page-bound session storage: (difference only)`, difference);
+      try {
+        for (const [storageKey, desiredValue] of Object.entries(difference)) {
+          if (desiredValue === null) {
+            sessionStorage.removeItem(storageKey);
+          } else {
+            sessionStorage.setItem(storageKey, desiredValue);
+          }
+        }
+      } catch (error) {
+        if (error instanceof DOMException) {
+          console.warn(`Failed to restore page-bound session storage`, error);
+        } else {
+          throw error;
+        }
+      }
+    }
+  } else if (Object.keys(boundSessionStorage).length) {
+    try {
+      for (const [infoKey, entries] of Object.entries(boundSessionStorage)) {
+        for (const [key, boundValue] of Object.entries(entries)) {
+          const spec = clientInfo[infoKey].session[key];
+          const {formatWrite} = getFormatReadWriteForSessionStorageSpec(spec);
+          const desiredValue = formatWrite(boundValue);
+
+          const storageKey = `hsmusic.${infoKey}.${key}`;
+
+          if (desiredValue === null) {
+            sessionStorage.removeItem(storageKey);
+          } else {
+            // Firefox is being a real pain and basically giving us a window
+            // into what it thinks the session storage was at the time, only
+            // it's not ACTUALLY going to carry that session storage through
+            // to the next tab (that's kind of the whole thing we're trying
+            // to address here!). Firefox won't store the value that BELONGS
+            // there since it thinks that value is ALREADY there, so first
+            // remove it, then add it. Fortunately this works synchronously,
+            // no need for setTimeout shenanigans.
+            sessionStorage.removeItem(storageKey);
+            sessionStorage.setItem(storageKey, desiredValue);
+          }
+        }
+      }
+    } catch (error) {
+      if (error instanceof DOMException) {
+        return;
+      } else {
+        throw error;
+      }
+    }
+
+    console.debug(`Restored page-bound session storage: (the whole thing)`, boundSessionStorage);
   }
 });
 
