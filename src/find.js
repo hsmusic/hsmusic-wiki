@@ -347,7 +347,7 @@ function findHelper({
       if (match) {
         return match;
       } else {
-        return warnOrThrow(mode, NoMatchFindError(fullRef));
+        return warnOrThrow(mode, new NoMatchFindError(fullRef));
       }
     }
 
