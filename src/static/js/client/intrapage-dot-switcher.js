@@ -12,10 +12,16 @@ export const info = {
   switcherSpans: null,
   switcherLinks: null,
   switcherTargets: null,
-  switcherMemorableValues: null,
+  switcherMemorableValuesViaLinkText: null,
+  switcherMemorableValuesViaSpanText: null,
 
   session: {
-    switcherChoices: {
+    switcherChoicesViaLinkText: {
+      type: 'json',
+      maxLength: settings => settings.maxSwitcherChoiceStorage,
+    },
+
+    switcherChoicesViaSpanText: {
       type: 'json',
       maxLength: settings => settings.maxSwitcherChoiceStorage,
     },
@@ -61,8 +67,13 @@ export function getPageReferences() {
           }
         }));
 
-  info.switcherMemorableValues =
+  info.switcherMemorableValuesViaLinkText =
     info.switcherLinks
+      .map(links => links
+        .map(link => link.innerText));
+
+  info.switcherMemorableValuesViaSpanText =
+    info.switcherSpans
       .map(links => links
         .map(link => link.innerText));
 }
@@ -70,34 +81,58 @@ export function getPageReferences() {
 export function mutatePageContent() {
   const {session} = info;
 
-  if (!session.switcherChoices) return;
+  if (
+    !session.switcherChoicesViaLinkText &&
+    !session.switcherChoicesViaSpanText
+  ) return;
 
   stitchArrays({
     memorableID: info.switcherMemorableIDs,
-    memorableValues: info.switcherMemorableValues,
+    memorableValuesViaLinkText: info.switcherMemorableValuesViaLinkText,
+    memorableValuesViaSpanText: info.switcherMemorableValuesViaSpanText,
     spans: info.switcherSpans,
     targets: info.switcherTargets,
   }).forEach(({
     memorableID,
-    memorableValues,
+    memorableValuesViaLinkText,
+    memorableValuesViaSpanText,
     spans,
     targets,
   }) => {
-    const choice = session.switcherChoices[memorableID];
+    const choiceViaLinkText = session.switcherChoicesViaLinkText[memorableID];
+    const choiceViaSpanText = session.switcherChoicesViaSpanText[memorableID];
 
-    if (!choice) return;
-    if (!memorableValues.includes(choice)) return;
+    if (!choiceViaLinkText && !choiceViaSpanText) return;
+
+    const matchesViaLinkText =
+      Array.from(memorableValuesViaLinkText.entries())
+        .filter(([_index, value]) => value === choiceViaLinkText);
+
+    const matchesViaSpanText =
+      Array.from(memorableValuesViaSpanText.entries())
+        .filter(([_index, value]) => value === choiceViaSpanText);
+
+    const [bestMatchIndex] =
+      (matchesViaLinkText.length === 1
+        ? matchesViaLinkText.at(0)
+     : matchesViaSpanText.length >= 1
+        ? matchesViaSpanText.at(0)
+     : matchesViaLinkText.length > 1
+        ? matchesViaLinkText.at(0)
+        : [-1, null]);
+
+    if (bestMatchIndex === -1) {
+      return;
+    }
 
     stitchArrays({
-      memorableValue: memorableValues,
       span: spans,
       target: targets,
     }).forEach(({
-      memorableValue,
       span,
       target,
-    }) => {
-      if (memorableValue === choice) {
+    }, index) => {
+      if (index === bestMatchIndex) {
         span.classList.add('current');
         cssProp(target, 'display', 'block');
       } else {
@@ -113,24 +148,28 @@ export function addPageListeners() {
 
   stitchArrays({
     memorableID: info.switcherMemorableIDs,
-    memorableValues: info.switcherMemorableValues,
+    memorableValuesViaLinkText: info.switcherMemorableValuesViaLinkText,
+    memorableValuesViaSpanText: info.switcherMemorableValuesViaSpanText,
     spans: info.switcherSpans,
     links: info.switcherLinks,
     targets: info.switcherTargets,
   }).forEach(({
     memorableID,
-    memorableValues,
+    memorableValuesViaLinkText,
+    memorableValuesViaSpanText,
     links,
     spans,
     targets,
   }) => {
     stitchArrays({
-      memorableValue: memorableValues,
+      memorableValueViaLinkText: memorableValuesViaLinkText,
+      memorableValueViaSpanText: memorableValuesViaSpanText,
       span: spans,
       link: links,
       target: targets,
     }).forEach(({
-      memorableValue,
+      memorableValueViaLinkText,
+      memorableValueViaSpanText,
       span,
       link,
       target,
@@ -156,9 +195,14 @@ export function addPageListeners() {
         cssProp(target, 'display', 'block');
 
         if (memorableID) {
-          session.switcherChoices = {
-            ...session.switcherChoices ?? {},
-            [memorableID]: memorableValue,
+          session.switcherChoicesViaLinkText = {
+            ...session.switcherChoicesViaLinkText ?? {},
+            [memorableID]: memorableValueViaLinkText,
+          };
+
+          session.switcherChoicesViaSpanText = {
+            ...session.switcherChoicesViaSpanText ?? {},
+            [memorableID]: memorableValueViaSpanText,
           };
         }
       });
