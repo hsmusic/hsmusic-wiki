@@ -1847,11 +1847,6 @@ async function main() {
         'albums',
       ]),
 
-      listingSpec: new Set([
-        // Needed for computing page paths
-        'contentFunction', 'featureFlag',
-      ]),
-
       trackData: new Set([
         // Needed for sorting
         'album', 'date',
