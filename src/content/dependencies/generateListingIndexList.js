@@ -1,66 +1,67 @@
-import {empty, stitchArrays} from '#sugar';
+import {empty, filterMultipleArrays, stitchArrays} from '#sugar';
 
 export default {
-  sprawl({listingTargetSpec, wikiInfo}) {
-    return {listingTargetSpec, wikiInfo};
-  },
+  sprawl: (wikiData) => ({
+    listingTargetSpec: wikiData.listingTargetSpec,
+    wikiInfo: wikiData.listingTargetSpec,
+
+    // We need the whole dang wikiData object to process which listings'
+    // custom conditions are satisfied, since listings aren't actual Things
+    // that bind wikiData for themselves.
+    wikiData,
+  }),
 
   query(sprawl) {
-    const query = {};
+    const targets =
+      sprawl.listingTargetSpec;
 
     const targetListings =
       sprawl.listingTargetSpec
-        .map(({listings}) =>
-          listings
-            .filter(listing =>
-              !listing.featureFlag ||
-              sprawl.wikiInfo[listing.featureFlag]));
+        .map(target => target.listings)
+        .map(listings => listings
+          .filter(listing =>
+            (listing.condition
+              ? listing.condition(sprawl.wikiData)
+              : true)));
 
-    query.targets =
-      sprawl.listingTargetSpec
-        .filter((target, index) => !empty(targetListings[index]));
+    filterMultipleArrays(
+      targets,
+      targetListings,
+      (_target, targetListings) =>
+        !empty(targetListings));
 
-    query.targetListings =
-      targetListings
-        .filter(listings => !empty(listings))
-
-    return query;
+    return {targets, targetListings};
   },
 
-  relations(relation, query) {
-    return {
-      listingLinks:
-        query.targetListings
-          .map(listings =>
-            listings.map(listing => relation('linkListing', listing))),
-    };
-  },
-
-  data(query, sprawl, currentListing) {
-    const data = {};
-
-    data.targetStringsKeys =
-      query.targets
-        .map(({stringsKey}) => stringsKey);
-
-    data.listingStringsKeys =
+  relations: (relation, query) => ({
+    listingLinks:
       query.targetListings
-        .map(listings =>
-          listings.map(({stringsKey}) => stringsKey));
+        .map(listings => listings
+          .map(listing => relation('linkListing', listing))),
+  }),
 
-    if (currentListing) {
-      data.currentTargetIndex =
-        query.targets
-          .indexOf(currentListing.target);
+  data: (query, sprawl, currentListing) => ({
+    targetStringsKeys:
+      query.targets
+        .map(({stringsKey}) => stringsKey),
 
-      data.currentListingIndex =
-        query.targetListings
-          .find(listings => listings.includes(currentListing))
-          .indexOf(currentListing);
-    }
+    listingStringsKeys:
+      query.targetListings
+        .map(listings => listings
+          .map(({stringsKey}) => stringsKey)),
 
-    return data;
-  },
+    currentTargetIndex:
+      (currentListing
+        ? query.targets.indexOf(currentListing.target)
+        : null),
+
+    currentListingIndex:
+      (currentListing
+        ? query.targetListings
+            .find(listings => listings.includes(currentListing))
+            .indexOf(currentListing)
+        : null),
+  }),
 
   slots: {
     mode: {validate: v => v.is('content', 'sidebar')},

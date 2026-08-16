@@ -12,9 +12,11 @@ export function targets({wikiData}) {
   return (
     wikiData.listingSpec
       .filter(listing => listing.contentFunction)
+
       .filter(listing =>
-        !listing.featureFlag ||
-        wikiData.wikiInfo[listing.featureFlag]));
+        (listing.condition
+          ? listing.condition(wikiData)
+          : true)));
 }
 
 export function pathsForTarget(listing) {

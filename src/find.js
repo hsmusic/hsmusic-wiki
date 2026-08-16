@@ -434,6 +434,11 @@ const hardcodedFindSpecs = {
   listing: {
     referenceTypes: ['listing'],
     bindTo: 'listingSpec',
+
+    // TODO: find functions (including a would-be "include" part of this spec)
+    // don't get called with direct access to the entire wikiData object, so
+    // there's no way to check a listing's condition here. Listing things will
+    // take care of this later.
   },
 };
 

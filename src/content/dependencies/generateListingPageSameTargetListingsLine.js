@@ -1,21 +1,32 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  relations: (relation, listing) => ({
-    listingLinks:
+  sprawl: (wikiData) => ({wikiData}),
+
+  query: (sprawl, listing) => ({
+    listings:
       listing.target.listings
+        .filter(listing =>
+          (listing.condition
+            ? listing.condition(sprawl.wikiData)
+            : true)),
+  }),
+
+  relations: (relation, query, _sprawl, _listing) => ({
+    listingLinks:
+      query.listings
         .map(listing => relation('linkListing', listing)),
   }),
 
-  data: (listing) => ({
+  data: (query, _sprawl, listing) => ({
     targetStringsKey:
       listing.target.stringsKey,
 
     listingStringsKeys:
-      listing.target.listings.map(listing => listing.stringsKey),
+      query.listings.map(listing => listing.stringsKey),
 
     currentIndex:
-      listing.target.listings.indexOf(listing),
+      query.listings.indexOf(listing),
   }),
 
   generate: (data, relations, {html, language}) =>

@@ -1,5 +1,5 @@
 import {sortAlphabetically, sortByCount} from '#sort';
-import {filterByCount, stitchArrays, unique} from '#sugar';
+import {filterByCount, stitchArrays} from '#sugar';
 
 export default {
   sprawl: ({motifData}) =>
@@ -7,15 +7,10 @@ export default {
 
   query({motifData}, spec) {
     const motifs =
-      sortAlphabetically(
-        motifData
-          .filter(motif => !motif.isContentWarning));
+      sortAlphabetically(motifData.slice());
 
     const counts =
-      motifs.map(motif =>
-        unique([
-          ...motif.featuredInTracks,
-        ]).length);
+      motifs.map(motif => motif.featuredInTracks.length);
 
     filterByCount(motifs, counts);
     sortByCount(motifs, counts, {greatestFirst: true});
