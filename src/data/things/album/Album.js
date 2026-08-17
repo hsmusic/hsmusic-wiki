@@ -256,6 +256,11 @@ export class Album extends Thing {
       exposeDependency('#artistContribs'),
     ],
 
+    trackContributorContribs: contributionList({
+      class: input.value(AlbumArtistContribution),
+      artistProperty: input.value('albumTrackContributorContributions'),
+    }),
+
     // > Update & expose - General configuration
 
     countTracksInArtistTotals: flag(V(true)),
@@ -849,6 +854,11 @@ export class Album extends Thing {
 
       'Track Artists': {
         property: 'trackArtistContribs',
+        transform: parseContributors,
+      },
+
+      'Default Track Contributors': {
+        property: 'trackContributorContribs',
         transform: parseContributors,
       },
 

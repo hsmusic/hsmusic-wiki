@@ -358,7 +358,19 @@ export class Track extends Thing {
 
       inheritContributionListFromMainRelease(),
 
-      exposeConstant(V([])),
+      withPropertyFromObject('album', V('trackContributorContribs')),
+
+      withRecontextualizedContributionList({
+        list: '#album.trackContributorContribs',
+        artistProperty: input.value('trackContributorContributions'),
+      }),
+
+      withRedatedContributionList({
+        list: '#album.trackContributorContribs',
+        date: 'date',
+      }),
+
+      exposeDependency('#album.trackContributorContribs'),
     ],
 
     // > Update & expose - General configuration
