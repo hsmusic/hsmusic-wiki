@@ -259,6 +259,7 @@ listingSpec.push({
   directory: 'tracks/by-date',
   stringsKey: 'listTracks.byDate',
   contentFunction: 'listTracksByDate',
+  seeAlso: ['tracks/with-multiple-releases'],
 
   condition: ({trackData}) =>
     trackData.some(track => track.date),
@@ -310,6 +311,16 @@ listingSpec.push({
   condition: ({trackData, wikiInfo}) =>
     wikiInfo.enableFlashesAndGames &&
     trackData.some(track => !empty(track.ownFeaturedInFlashes)),
+});
+
+listingSpec.push({
+  directory: 'tracks/with-multiple-releases',
+  stringsKey: 'listTracks.withMultipleReleases',
+  contentFunction: 'listTracksWithMultipleReleases',
+  seeAlso: ['tracks/by-date'],
+
+  condition: ({trackData}) =>
+    trackData.some(track => !empty(track.otherReleases)),
 });
 
 listingSpec.push({

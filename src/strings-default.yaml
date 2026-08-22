@@ -2914,6 +2914,41 @@ listingPage:
         title.withDate: "{ALBUM} ({DATE})"
         item: "{TRACK}"
 
+    withMultipleReleases:
+      title: "Tracks - with Multiple Releases"
+      title.short: "...with Multiple Releases"
+
+      chunk:
+        title: "{TRACK}"
+        title.withCredit: "{TRACK} {CREDIT}"
+
+        item: >-
+          {DATE}: {ALBUM}
+
+        item.mainRelease: >-
+          {DATE}: {ALBUM} (main release)
+
+        item.single: >-
+          {DATE}: {ALBUM} (single)
+
+        item.differentCredit: >-
+          {DATE}: {ALBUM}, credited: {NAME_AND_CREDIT}
+
+        item.differentName: >-
+          {DATE}: {ALBUM}, as: {NAME}
+
+        item.withoutDate.mainRelease: >-
+          {ALBUM} (main release)
+
+        item.withoutDate: >-
+          Also: {ALBUM}
+
+        item.withoutDate.differentCredit: >-
+          Also: {ALBUM}, credited: {NAME_AND_CREDIT}
+
+        item.withoutDate.differentName: >-
+          Also: {ALBUM}, as: {NAME}
+
     # listTracks.withMusicVideos:
     #   The same as withLyrics, but for music videos.
 

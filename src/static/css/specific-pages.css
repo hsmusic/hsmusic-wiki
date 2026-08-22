@@ -264,6 +264,21 @@
   }
 }
 
+/* "Tracks - with Multiple Releases" listing */
+
+html[data-url-key="localized.listing"][data-url-value0="tracks/with-multiple-releases"] {
+  @layer print {
+    #content dd li {
+      padding-left: 1.5ch;
+      text-indent: -1.5ch; > * { text-indent: 0; }
+
+      &:not(.main-release-row) { list-style-type: circle; }
+      .different-name { display: inline-block; }
+      .different-credit { display: inline-block; }
+    }
+  }
+}
+
 /* "Random Pages" listing */
 
 @layer interaction {

@@ -58,10 +58,16 @@ export default {
       validate: v => v.strictArrayOf(v.optional(v.isObject))
     },
 
+    useContentHeadingsForChunks: {
+      type: 'boolean',
+      default: true,
+    },
+
     chunkTitles: {
       validate: v => v.strictArrayOf(v.isObject),
     },
 
+    // Only compatible with content headings enabled!! Sorry!!!!!!!
     chunkTitleAccents: {
       validate: v => v.strictArrayOf(v.optional(v.isObject)),
     },
@@ -206,25 +212,29 @@ export default {
               rows: slots.chunkRows,
               rowAttributes: slots.chunkRowAttributes,
             }).map(({title, titleAccent, id, rows, rowAttributes}) => [
-                relations.chunkHeading
-                  .clone()
-                  .slots({
-                    tag: 'dt',
-                    attributes: [id && {id}],
+                (slots.useContentHeadingsForChunks
+                  ? relations.chunkHeading.clone().slots({
+                      tag: 'dt',
+                      attributes: [id && {id}],
 
-                    title:
+                      title:
+                        formatListingString({
+                          context: 'chunk.title',
+                          provided: title,
+                        }),
+
+                      accent:
+                        titleAccent &&
+                          formatListingString({
+                            context: ['chunk.title', title.stringsKey, 'accent'],
+                            provided: titleAccent,
+                          }),
+                    })
+                  : html.tag('dt', id && {id},
                       formatListingString({
                         context: 'chunk.title',
                         provided: title,
-                      }),
-
-                    accent:
-                      titleAccent &&
-                        formatListingString({
-                          context: ['chunk.title', title.stringsKey, 'accent'],
-                          provided: titleAccent,
-                        }),
-                  }),
+                      }))),
 
                 html.tag('dd',
                   formatRowList({
