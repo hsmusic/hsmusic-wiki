@@ -235,7 +235,7 @@ export class Artwork extends Thing {
       reverse: soupyReverse.input('artworksWhichReference'),
     }),
 
-    isMainArtwork: [
+    isPrimaryArtwork: [
       withContainingArtworkList(),
       exitWithoutDependency('#containingArtworkList'),
 
@@ -249,7 +249,21 @@ export class Artwork extends Thing {
       },
     ],
 
-    mainArtwork: [
+    isSecondaryArtwork: [
+      withContainingArtworkList(),
+      exitWithoutDependency('#containingArtworkList'),
+
+      {
+        dependencies: [input.myself(), '#containingArtworkList'],
+        compute: ({
+          [input.myself()]: myself,
+          ['#containingArtworkList']: list,
+        }) =>
+          list[0] !== myself,
+      },
+    ],
+
+    primaryArtwork: [
       withContainingArtworkList(),
       exitWithoutDependency('#containingArtworkList'),
 

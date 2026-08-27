@@ -26,9 +26,9 @@ export default {
         query.linkableArtTags,
         against.artTags.filter(linkable));
 
-    data.sameAsMainArtwork =
-      !artwork.isMainArtwork &&
-      compare(artwork.mainArtwork);
+    data.sameAsPrimaryArtwork =
+      artwork.isSecondaryArtwork &&
+      compare(artwork.primaryArtwork);
 
     data.sameAsAttachedArtwork =
       compare(artwork.attachedArtwork);
@@ -60,8 +60,8 @@ export default {
 
         (data.sameAsAttachedArtwork
           ? html.blank()
-       : data.sameAsMainArtwork && relations.artTagLinks.length >= 3
-          ? language.$(capsule, 'sameTagsAsMainArtwork')
+       : data.sameAsPrimaryArtwork && relations.artTagLinks.length >= 3
+          ? language.$(capsule, 'sameTagsAsFirstArtwork')
           : stitchArrays({
               artTagLink: relations.artTagLinks,
               preferShortName: data.preferShortName,

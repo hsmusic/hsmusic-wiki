@@ -1221,7 +1221,7 @@ misc:
 
     trackArtFromAlbum: "Album cover for {ALBUM}"
 
-    sameTagsAsMainArtwork: "Same tags as main artwork"
+    sameTagsAsFirstArtwork: "Same tags as first artwork"
 
   # musicVideo:
   #   Strings for music videos, which are presented in a very similar

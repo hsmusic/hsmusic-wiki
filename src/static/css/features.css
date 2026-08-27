@@ -582,8 +582,8 @@
   }
 
   #artwork-column .cover-artwork:first-child + .cover-artwork-joiner,
-  #artwork-column .cover-artwork.attached-artwork-is-main-artwork,
-  #artwork-column .cover-artwork.attached-artwork-is-main-artwork + .cover-artwork-joiner {
+  #artwork-column .cover-artwork.attached-artwork-is-primary-artwork,
+  #artwork-column .cover-artwork.attached-artwork-is-primary-artwork + .cover-artwork-joiner {
     margin-left: 17.5px;
     margin-right: 17.5px;
   }

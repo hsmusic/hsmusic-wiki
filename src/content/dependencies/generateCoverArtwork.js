@@ -23,9 +23,9 @@ export default {
     attachAbove:
       artwork.attachAbove,
 
-    attachedArtworkIsMainArtwork:
+    attachedArtworkIsPrimaryArtwork:
       (artwork.attachAbove
-        ? artwork.attachedArtwork.isMainArtwork
+        ? artwork.attachedArtwork.isPrimaryArtwork
         : null),
 
     color:
@@ -97,8 +97,8 @@ export default {
           {class: 'commentary-art'},
 
         data.attachAbove &&
-        data.attachedArtworkIsMainArtwork &&
-          {class: 'attached-artwork-is-main-artwork'},
+        data.attachedArtworkIsPrimaryArtwork &&
+          {class: 'attached-artwork-is-primary-artwork'},
 
         attributes,
 
