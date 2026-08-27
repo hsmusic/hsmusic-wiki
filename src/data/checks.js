@@ -66,11 +66,12 @@ export function reportDirectoryErrors(wikiData, {
           continue;
         }
 
-        if (directory in directoryPlaces) {
-          directoryPlaces[directory].push(thing);
-          duplicateDirectories.add(directory);
+        const effectiveDirectory = directory.toLowerCase();
+        if (effectiveDirectory in directoryPlaces) {
+          directoryPlaces[effectiveDirectory].push(thing);
+          duplicateDirectories.add(effectiveDirectory);
         } else {
-          directoryPlaces[directory] = [thing];
+          directoryPlaces[effectiveDirectory] = [thing];
         }
       }
     }
@@ -93,14 +94,16 @@ export function reportDirectoryErrors(wikiData, {
   // things. These only need to be reported once, because resolving one of them
   // will resolve the rest, so cut out duplicate sets before reporting.
 
+  // This map isn't actually going to get reused later, it's just the state for
+  // tracking what's been seen so far.
   const seenDuplicateSets = new Map();
+
   const deduplicateDuplicateSets = [];
 
   iterateSets:
   for (const set of duplicateSets) {
     if (seenDuplicateSets.has(set.directory)) {
       const placeLists = seenDuplicateSets.get(set.directory);
-
       for (const places of placeLists) {
         // We're iterating globally over all duplicate directories, which may
         // span multiple kinds of things, but that isn't going to cause an
