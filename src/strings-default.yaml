@@ -1220,6 +1220,7 @@ misc:
       Released {YEAR}
 
     trackArtFromAlbum: "Album cover for {ALBUM}"
+    reusedFrom: "Reused from {WHERE}"
 
     sameTagsAsFirstArtwork: "Same tags as first artwork"
 

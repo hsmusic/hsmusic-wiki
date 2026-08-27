@@ -31,6 +31,7 @@ import {
   exposeDependency,
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
+  exposeWhetherDependencyAvailable,
   flipFilter,
 } from '#composite/control-flow';
 
@@ -62,7 +63,8 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {withContainingArtworkList} from '#composite/things/artwork';
+import {inheritFromMainArtwork, withContainingArtworkList}
+  from '#composite/things/artwork';
 
 export class Artwork extends Thing {
   static [Thing.referenceType] = 'artwork';
@@ -89,15 +91,36 @@ export class Artwork extends Thing {
     // Implemented in subclasses of Artwork.
     mainArtwork: exposeConstant(V(null)),
 
-    label: simpleString(),
-    source: contentString(),
-    originDetails: contentString(),
-    fileNotes: contentString(),
-    showFilename: simpleString(),
+    label: [
+      inheritFromMainArtwork(),
+      simpleString(),
+    ],
+
+    source: [
+      inheritFromMainArtwork(),
+      contentString(),
+    ],
+
+    originDetails: [
+      inheritFromMainArtwork(),
+      contentString(),
+    ],
+
+    fileNotes: [
+      inheritFromMainArtwork(),
+      contentString(),
+    ],
+
+    showFilename: [
+      inheritFromMainArtwork(),
+      simpleString(),
+    ],
 
     dateFromThingProperty: simpleString(),
 
     date: [
+      inheritFromMainArtwork(),
+
       exposeUpdateValueOrContinue({
         validate: input.value(isDate),
       }),
@@ -108,6 +131,8 @@ export class Artwork extends Thing {
     fileExtensionFromThingProperty: simpleString(),
 
     fileExtension: [
+      inheritFromMainArtwork(),
+
       exposeUpdateValueOrContinue({
         validate: input.value(isFileExtension),
       }),
@@ -120,6 +145,8 @@ export class Artwork extends Thing {
     dimensionsFromThingProperty: simpleString(),
 
     dimensions: [
+      inheritFromMainArtwork(),
+
       exposeUpdateValueOrContinue({
         validate: input.value(isDimensions),
       }),
@@ -127,12 +154,17 @@ export class Artwork extends Thing {
       constituteFrom('thing', 'dimensionsFromThingProperty'),
     ],
 
-    attachAbove: flag(V(false)),
+    attachAbove: [
+      inheritFromMainArtwork(),
+      flag(V(false)),
+    ],
 
     artistContribsFromThingProperty: simpleString(),
     artistContribsArtistProperty: simpleString(),
 
     artistContribs: [
+      // TODO: INHERIT FROM THE MAIN ARTWORK!!!!
+
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
 
@@ -162,11 +194,16 @@ export class Artwork extends Thing {
       exposeDependency('#artistContribsFromThing'),
     ],
 
-    style: simpleString(),
+    style: [
+      inheritFromMainArtwork(),
+      simpleString(),
+    ],
 
     artTagsFromThingProperty: simpleString(),
 
     artTags: [
+      inheritFromMainArtwork(),
+
       withResolvedReferenceList({
         list: input.updateValue({
           validate:
@@ -185,6 +222,8 @@ export class Artwork extends Thing {
     referencedArtworksFromThingProperty: simpleString(),
 
     referencedArtworks: [
+      // TODO: INHERIT FROM THE MAIN ARTWORK!!!!
+
       {
         compute: (continuation) => continuation({
           ['#find']:
@@ -276,6 +315,9 @@ export class Artwork extends Thing {
           list[0],
       },
     ],
+
+    isReusedArtwork:
+      exposeWhetherDependencyAvailable('mainArtwork'),
 
     attachedArtwork: [
       exitWithoutDependency('attachAbove', {
@@ -400,12 +442,19 @@ export class Artwork extends Thing {
     artworksWhichFeature: {
       bindTo: 'artworkData',
 
+      include: artwork =>
+        !artwork.isReusedArtwork,
+
       referencing: artwork => [artwork],
       referenced: artwork => artwork.artTags,
     },
   };
 
   get path() {
+    if (this.mainArtwork) {
+      return this.mainArtwork.path;
+    }
+
     if (!this.thing) return null;
     if (!this.thing.getOwnArtworkPath) return null;
 

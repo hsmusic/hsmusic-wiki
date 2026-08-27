@@ -21,6 +21,11 @@ export default {
     fileNotes:
       relation('transformContent', artwork.fileNotes),
 
+    mainArtworkLink:
+      (artwork.mainArtwork
+        ? relation('linkArtwork', artwork.mainArtwork)
+        : null),
+
     albumLink:
       (artwork.thing.isAlbum
         ? relation('linkAlbum', artwork.thing)
@@ -31,7 +36,6 @@ export default {
         artwork.date,
         artwork.thing.date),
   }),
-
 
   data: (query, artwork) => ({
     label:
@@ -47,6 +51,13 @@ export default {
     forSingleStyleAlbum:
       artwork.thing.isAlbum &&
       artwork.thing.style === 'single',
+
+    showAsReusedFromAlbum:
+      (artwork.isReusedArtwork &&
+       artwork.thing.otherReleases.includes(artwork.mainArtwork.thing)
+
+        ? artwork.mainArtwork.thing.album.name
+        : false),
 
     showFilename:
       artwork.showFilename,
@@ -154,6 +165,22 @@ export default {
                 absorbPunctuationFollowingExternalLinks: false,
               }));
 
+          if (relations.mainArtworkLink) {
+            if (data.showAsReusedFromAlbum) {
+              relations.mainArtworkLink.setSlot('content',
+                language.sanitize(data.showAsReusedFromAlbum));
+            }
+          }
+
+          const reusedFromLine =
+            html.tag('span', {class: 'reused-from-line'},
+              {[html.onlyIfContent]: true},
+
+              language.$(capsule, 'reusedFrom', {
+                [language.onlyIfOptions]: ['where'],
+                where: relations.mainArtworkLink,
+              }));
+
           const fileNotesLine =
             html.tag('span', {class: 'file-notes-line'},
               {[html.onlyIfContent]: true},
@@ -182,6 +209,7 @@ export default {
             ], {[html.joinChildren]: html.tag('br')}),
 
             originDetailsLine,
+            reusedFromLine,
             fileNotesLine,
             filenameLine,
           ];
