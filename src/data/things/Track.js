@@ -1229,6 +1229,7 @@ export class Track extends Thing {
         property: 'trackArtworks',
         transform:
           parseArtwork({
+            artworkClass: 'TrackArtwork',
             thingProperty: 'trackArtworks',
             dimensionsFromThingProperty: 'coverArtDimensions',
             fileExtensionFromThingProperty: 'coverArtFileExtension',

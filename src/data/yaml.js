@@ -1005,6 +1005,7 @@ export function parseAnnotatedReferences(entries, {
 
 export function parseArtwork({
   single = false,
+  artworkClass = 'Artwork',
   thingProperty = null,
   dimensionsFromThingProperty = null,
   fileExtensionFromThingProperty = null,
@@ -1025,7 +1026,7 @@ export function parseArtwork({
     referencedArtworksFromThingProperty,
   };
 
-  const parseSingleEntry = (entry, {subdoc, Artwork}) =>
+  const parseSingleEntry = (entry, {subdoc, [artworkClass]: Artwork}) =>
     subdoc(Artwork, entry, {bindInto: 'thing', provide});
 
   const transform = (value, ...args) =>

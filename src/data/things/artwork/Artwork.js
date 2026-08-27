@@ -86,6 +86,9 @@ export class Artwork extends Thing {
     thing: thing(),
     thingProperty: simpleString(),
 
+    // Implemented in subclasses of Artwork.
+    mainArtwork: exposeConstant(V(null)),
+
     label: simpleString(),
     source: contentString(),
     originDetails: contentString(),
