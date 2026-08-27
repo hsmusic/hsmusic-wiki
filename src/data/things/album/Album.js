@@ -757,6 +757,56 @@ export class Album extends Thing {
       getMatchableDirectories: ({thing: album}) =>
         [album.directory],
     },
+
+    albumArtwork: {
+      [Thing.findThisThingOnly]: false,
+
+      referenceTypes: ['album'],
+
+      bindTo: 'artworkData',
+
+      include: (artwork) =>
+        artwork.isArtwork &&
+        artwork.thing.isAlbum &&
+        artwork.thingProperty === 'coverArtworks',
+
+      getMatchableNames(artwork, nativeGetMatchableNames) {
+        const albumNames = nativeGetMatchableNames(artwork.thing);
+        const artworkLabel = artwork.label;
+
+        const pairAlbumArtworkNames =
+          (artworkLabel
+            ? albumNames.map(name => `${name} (${artworkLabel})`)
+            : []);
+
+        if (artwork.isPrimaryArtwork) {
+          return [...albumNames, ...pairAlbumArtworkNames];
+        } else {
+          return pairAlbumArtworkNames;
+        }
+      },
+
+      getMatchableDirectories(artwork, nativeGetMatchableDirectories) {
+        const albumDirectories = nativeGetMatchableDirectories(artwork.thing);
+        const artworkDirectory = artwork.unqualifiedDirectory;
+
+        const pairAlbumArtworkDirectories =
+          (artworkDirectory
+            ? albumDirectories.map(directory => directory + '/' + artworkDirectory)
+            : []);
+
+        // Note that this is completely unconditional on whether the artwork
+        // is the album's primary artwork. It's actually possible for secondary
+        // artworks to not have an unqualified directory, in which case THOSE
+        // are the ones matched by the `album:` reference... (That would be
+        // REALLY WEIRD in the case of an album rather than a track, though...)
+        if (artworkDirectory) {
+          return pairAlbumArtworkDirectories;
+        } else {
+          return albumDirectories;
+        }
+      },
+    },
   };
 
   static [Thing.reverseSpecs] = {

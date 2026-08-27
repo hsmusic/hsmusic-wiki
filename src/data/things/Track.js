@@ -1479,13 +1479,63 @@ export class Track extends Thing {
       include: (artwork) =>
         artwork.isArtwork &&
         artwork.thing.isTrack &&
-        artwork === artwork.thing.trackArtworks[0],
+        artwork.thingProperty === 'trackArtworks' &&
+        artwork.isPrimaryArtwork,
 
       getMatchableNames: (artwork, nativeGetMatchableNames) =>
         nativeGetMatchableNames(artwork.thing),
 
-      getMatchableDirectories: (artwork, nativeGetMatchableDirectory) =>
-        nativeGetMatchableDirectory(artwork.thing),
+      getMatchableDirectories: (artwork, nativeGetMatchableDirectories) =>
+        nativeGetMatchableDirectories(artwork.thing),
+    },
+
+    trackArtwork: {
+      [Thing.findThisThingOnly]: false,
+
+      referenceTypes: ['track'],
+
+      bindTo: 'artworkData',
+
+      include: (artwork) =>
+        artwork.isArtwork &&
+        artwork.thing.isTrack &&
+        artwork.thingProperty === 'trackArtworks',
+
+      getMatchableNames(artwork, nativeGetMatchableNames) {
+        const trackNames = nativeGetMatchableNames(artwork.thing);
+        const artworkLabel = artwork.label;
+
+        const pairTrackArtworkNames =
+          (artworkLabel
+            ? trackNames.map(name => `${name} (${artworkLabel})`)
+            : []);
+
+        if (artwork.isPrimaryArtwork) {
+          return [...trackNames, ...pairTrackArtworkNames];
+        } else {
+          return pairTrackArtworkNames;
+        }
+      },
+
+      getMatchableDirectories(artwork, nativeGetMatchableDirectories) {
+        const trackDirectories = nativeGetMatchableDirectories(artwork.thing);
+        const artworkDirectory = artwork.unqualifiedDirectory;
+
+        const pairTrackArtworkDirectories =
+          (artworkDirectory
+            ? trackDirectories.map(directory => directory + '/' + artworkDirectory)
+            : []);
+
+        // Note that this is completely unconditional on whether the artwork
+        // is the track's primary artwork. It's actually possible for secondary
+        // artworks to not have an unqualified directory, in which case THOSE
+        // are the ones matched by the `track:` reference...
+        if (artworkDirectory) {
+          return pairTrackArtworkDirectories;
+        } else {
+          return trackDirectories;
+        }
+      },
     },
   };
 
