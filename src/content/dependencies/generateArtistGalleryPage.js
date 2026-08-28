@@ -9,7 +9,8 @@ export default {
           artist.trackCoverArtistContributions,
         ]).flat()
           .filter(contrib => !contrib.annotation?.startsWith(`edits for wiki`))
-          .map(contrib => contrib.thing),
+          .map(contrib => contrib.thing)
+          .filter(artwork => !artwork.isReusedArtwork),
         {latestFirst: true}),
   }),
 
