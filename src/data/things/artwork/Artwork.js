@@ -472,6 +472,10 @@ export class Artwork extends Thing {
       return false;
     }
 
+    if (this.isReusedArtwork) {
+      return false;
+    }
+
     return true;
   }
 
