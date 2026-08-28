@@ -63,8 +63,11 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {inheritFromMainArtwork, withContainingArtworkList}
-  from '#composite/things/artwork';
+import {
+  inheritContributionListFromMainArtwork,
+  inheritFromMainArtwork,
+  withContainingArtworkList,
+} from '#composite/things/artwork';
 
 export class Artwork extends Thing {
   static [Thing.referenceType] = 'artwork';
@@ -118,9 +121,8 @@ export class Artwork extends Thing {
 
     dateFromThingProperty: simpleString(),
 
+    // Date is not inherited from the main artwork.
     date: [
-      inheritFromMainArtwork(),
-
       exposeUpdateValueOrContinue({
         validate: input.value(isDate),
       }),
@@ -163,7 +165,7 @@ export class Artwork extends Thing {
     artistContribsArtistProperty: simpleString(),
 
     artistContribs: [
-      // TODO: INHERIT FROM THE MAIN ARTWORK!!!!
+      inheritContributionListFromMainArtwork(),
 
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
