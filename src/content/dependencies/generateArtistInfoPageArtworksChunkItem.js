@@ -2,6 +2,9 @@ import {empty} from '#sugar';
 
 export default {
   query: (contrib) => ({
+    artwork:
+      contrib.thing,
+
     kind:
       (contrib.thing.thingProperty === 'bannerArtwork'
         ? 'banner'
@@ -18,11 +21,17 @@ export default {
 
     trackLink:
       (query.kind === 'track-cover'
-        ? relation('linkTrack', contrib.thing.thing)
+        ? relation('linkTrack', query.artwork.thing)
         : null),
 
     originDetails:
-      relation('transformContent', contrib.thing.originDetails),
+      relation('transformContent', query.artwork.originDetails),
+
+    mainArtworkLink:
+      (query.artwork.mainArtwork
+        ? relation('linkOtherArtworkOnArtistInfoPage',
+            query.artwork.mainArtwork, contrib.artist)
+        : null),
   }),
 
   data: (query, contrib) => ({
@@ -33,7 +42,13 @@ export default {
       contrib.annotation,
 
     label:
-      contrib.thing.label,
+      query.artwork.label,
+
+    showAsReusedFromAlbum:
+      query.artwork.isReusedArtwork &&
+      query.artwork.thing.isTrack &&
+      query.artwork.thing.otherReleases
+        .includes(query.artwork.mainArtwork.thing),
   }),
 
   slots: {
@@ -44,38 +59,38 @@ export default {
   },
 
   generate: (data, relations, slots, {html, language}) =>
-    relations.template.slots({
-      annotation:
-        language.encapsulate('artistPage.creditList.entry.artwork.accent', workingCapsule => {
-          const workingOptions = {};
+    language.encapsulate('artistPage.creditList.entry', capsule =>
+      relations.template.slots({
+        annotation:
+          language.encapsulate(capsule, 'artwork.accent', workingCapsule => {
+            const workingOptions = {};
 
-          const artworkLabel = data.label;
+            const artworkLabel = data.label;
 
-          if (artworkLabel) {
-            workingCapsule += '.withLabel';
-            workingOptions.label =
-              language.typicallyLowerCase(artworkLabel);
-          }
+            if (artworkLabel) {
+              workingCapsule += '.withLabel';
+              workingOptions.label =
+                language.typicallyLowerCase(artworkLabel);
+            }
 
-          const contribAnnotation =
-            (slots.filterEditsForWiki
-              ? data.annotation?.replace(/^edits for wiki(: )?/, '')
-              : data.annotation);
+            const contribAnnotation =
+              (slots.filterEditsForWiki
+                ? data.annotation?.replace(/^edits for wiki(: )?/, '')
+                : data.annotation);
 
-          if (contribAnnotation) {
-            workingCapsule += '.withAnnotation';
-            workingOptions.annotation = contribAnnotation;
-          }
+            if (contribAnnotation) {
+              workingCapsule += '.withAnnotation';
+              workingOptions.annotation = contribAnnotation;
+            }
 
-          if (empty(Object.keys(workingOptions))) {
-            return html.blank();
-          }
+            if (empty(Object.keys(workingOptions))) {
+              return html.blank();
+            }
 
-          return language.$(workingCapsule, workingOptions);
-        }),
+            return language.$(workingCapsule, workingOptions);
+          }),
 
-      content:
-        language.encapsulate('artistPage.creditList.entry', capsule =>
+        content:
           (data.kind === 'track-cover'
             ? language.$(capsule, 'track', {
                 track: relations.trackLink,
@@ -86,12 +101,22 @@ export default {
                     ? language.$(capsule, 'wallpaperArt')
                  : data.kind === 'banner'
                     ? language.$(capsule, 'bannerArt')
-                    : language.$(capsule, 'coverArt')))))),
+                    : language.$(capsule, 'coverArt'))))),
 
-      originDetails:
-        relations.originDetails.slots({
-          mode: 'inline',
-          absorbPunctuationFollowingExternalLinks: false,
-        }),
-    }),
+        originDetails:
+          html.tags([
+            relations.originDetails.slots({
+              mode: 'inline',
+              absorbPunctuationFollowingExternalLinks: false,
+            }),
+
+            relations.mainArtworkLink &&
+              html.tag('span',
+                language.$(capsule, 'artwork.reusedFrom', {
+                  where:
+                    relations.mainArtworkLink
+                      .slot('showAlbumName', data.showAsReusedFromAlbum),
+                })),
+          ], {[html.joinChildren]: html.tag('br')}),
+      })),
 };

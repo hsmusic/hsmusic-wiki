@@ -23,11 +23,15 @@ export default {
       type: 'boolean',
       default: false,
     },
+
+    id: {type: 'string'},
   },
 
   generate: (data, relations, slots, {html}) =>
     relations.template.slots({
       mode: 'album',
+      id: slots.id,
+
       link:
         relations.albumLink
           .slot('showNameDetail', 'accent'),

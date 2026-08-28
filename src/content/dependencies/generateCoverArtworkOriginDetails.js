@@ -54,6 +54,7 @@ export default {
 
     showAsReusedFromAlbum:
       (artwork.isReusedArtwork &&
+       artwork.thing.isTrack &&
        artwork.thing.otherReleases.includes(artwork.mainArtwork.thing)
 
         ? artwork.mainArtwork.thing.album.name

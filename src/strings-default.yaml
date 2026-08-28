@@ -1985,6 +1985,9 @@ artistPage:
         withLabel.withAnnotation: >-
           {LABEL}: {ANNOTATION}
 
+      artwork.reusedFrom: >-
+        Reused from {WHERE}
+
   # contributedDurationLine:
   #   This is shown at the top of the artist's track list, provided
   #   any of their tracks have durations at all.
