@@ -1,18 +1,25 @@
 export default {
-  relations: (relation, artwork) => ({
+  query: (artwork) => ({
+    mainArtwork:
+      (artwork.isReusedArtwork
+        ? artwork.mainArtwork
+        : artwork),
+  }),
+
+  relations: (relation, query, artwork) => ({
     referencedArtworksLink:
       relation('linkReferencedArtworks', artwork),
 
     referencingArtworksLink:
-      relation('linkReferencingArtworks', artwork),
+      relation('linkReferencingArtworks', query.mainArtwork),
   }),
 
-  data: (artwork) => ({
+  data: (query, artwork) => ({
     referenced:
       artwork.referencedArtworks.length,
 
     referencedBy:
-      artwork.referencedByArtworks.length,
+      query.mainArtwork.referencedByArtworks.length,
   }),
 
   generate: (data, relations, {html, language}) =>

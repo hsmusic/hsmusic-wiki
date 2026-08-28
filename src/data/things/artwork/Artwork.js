@@ -224,7 +224,7 @@ export class Artwork extends Thing {
     referencedArtworksFromThingProperty: simpleString(),
 
     referencedArtworks: [
-      // TODO: INHERIT FROM THE MAIN ARTWORK!!!!
+      inheritFromMainArtwork(),
 
       {
         compute: (continuation) => continuation({
