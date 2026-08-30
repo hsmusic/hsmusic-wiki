@@ -1,6 +1,5 @@
 import {inspect} from 'node:util';
 
-import {colors} from '#cli';
 import {input, V} from '#composite';
 import find from '#find';
 import Thing from '#thing';
@@ -94,10 +93,10 @@ export class Artwork extends Thing {
     // Implemented in subclasses of Artwork.
     mainArtwork: exposeConstant(V(null)),
 
-    label: [
-      inheritFromMainArtwork(),
-      simpleString(),
-    ],
+    // Not inherited from main artwork, as unqualifiedDirectory isn't either,
+    // since it's an identifying property of this artwork (it is part of how
+    // the artwork is referenced).
+    label: simpleString(),
 
     source: [
       inheritFromMainArtwork(),
