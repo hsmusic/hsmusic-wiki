@@ -14,6 +14,7 @@ import {
   simpleString,
   soupyFind,
   soupyReverse,
+  thing,
   thingList,
 } from '#composite/wiki-properties';
 
@@ -22,8 +23,14 @@ export class Motif extends Thing {
   static [Thing.friendlyName] = `Motif`;
   static [Thing.wikiData] = 'motifData';
 
-  static [Thing.getPropertyDescriptors] = ({AdditionalName, Motif}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    AdditionalName,
+    Motif,
+    MotifSection,
+  }) => ({
     // Update & expose
+
+    motifSection: thing(V(MotifSection)),
 
     name: name(V('Unnamed Motif')),
     directory: directory(),
