@@ -33,7 +33,6 @@ import {
   flag,
   name,
   simpleDate,
-  soupyReverse,
   thing,
   thingList,
 } from '#composite/wiki-properties';
@@ -182,10 +181,6 @@ export class TrackSection extends Thing {
     description: contentString(),
 
     tracks: thingList(V(Track)),
-
-    // Update only
-
-    reverse: soupyReverse(),
 
     // Expose only
 

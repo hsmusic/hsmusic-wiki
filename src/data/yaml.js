@@ -2006,8 +2006,6 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
       'wikiInfo',
     ]],
 
-    ['trackSectionData', [/* reverse */]],
-
     ['wikiInfo', [/* find */]],
   ]);
 
