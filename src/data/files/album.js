@@ -35,7 +35,7 @@ export default ({
       ? CloseAsideTrackSection
       : Track),
 
-  connect({header: album, entries}) {
+  *connect({header: album, entries}) {
     const trackSections = [];
 
     let currentTrackSection = new TrackSection();
@@ -48,12 +48,14 @@ export default ({
       isDefaultTrackSection: true,
     });
 
-    const closeCurrentTrackSection = () => {
-      if (
-        currentTrackSection.isDefaultTrackSection &&
-        empty(currentTrackSectionTracks)
-      ) {
-        return;
+    const closeCurrentTrackSection = function*() {
+      if (currentTrackSection.isDefaultTrackSection) {
+        if (empty(currentTrackSectionTracks)) {
+          return;
+        } else {
+          yield currentTrackSection;
+          // ...and continue closing the section like normal, below
+        }
       }
 
       currentTrackSection.tracks = currentTrackSectionTracks;
@@ -64,7 +66,7 @@ export default ({
 
     for (const entry of entries) {
       if (entry instanceof TrackSection) {
-        closeCurrentTrackSection();
+        yield* closeCurrentTrackSection();
         currentTrackSection = entry;
         currentTrackSectionTracks = [];
 
@@ -84,7 +86,7 @@ export default ({
           throw new Error(`Expected "Close Aside Section: ${currentTrackSection.name}", got "${entry.name}"`);
         }
 
-        closeCurrentTrackSection();
+        yield* closeCurrentTrackSection();
         currentTrackSection = Thing.clone(latestNonAsideTrackSection);
         currentTrackSection.tracks = [];
         currentTrackSectionTracks = [];
@@ -98,7 +100,7 @@ export default ({
       currentTrackSectionTracks.push(entry);
     }
 
-    closeCurrentTrackSection();
+    yield* closeCurrentTrackSection();
 
     album.trackSections = trackSections;
   },

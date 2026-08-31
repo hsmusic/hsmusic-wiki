@@ -1609,7 +1609,7 @@ async function main() {
 
     let loadAggregate, loadResult;
     let processAggregate, processResult;
-    let connectAggregate;
+    let connectAggregate, connectResult;
     let makeWikiDataResult;
 
     const dataSteps = getAllDataSteps();
@@ -1660,7 +1660,7 @@ async function main() {
     }
 
     try {
-      ({aggregate: connectAggregate} =
+      ({aggregate: connectAggregate, result: connectResult} =
           connectThingsFromDataSteps(
             processResult,
             dataSteps));
@@ -1674,7 +1674,7 @@ async function main() {
       makeWikiDataResult =
         makeWikiDataFromDataSteps(
           processResult,
-          dataSteps);
+          connectResult);
     } catch (error) {
       return whoops(error, 'preparing wikiData object');
     }

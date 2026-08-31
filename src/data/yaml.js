@@ -20,6 +20,7 @@ import {
   annotateErrorWithFile,
   decorateErrorWithIndex,
   decorateErrorWithAnnotation,
+  mapAggregate,
   openAggregate,
   showAggregate,
 } from '#aggregate';
@@ -1832,21 +1833,32 @@ export async function processThingsFromDataSteps(documentLists, fileLists, dataS
 // of the results from the YAML files, called "networks" - one network and
 // one call to .connect() per YAML file - in order to form data connections
 // (direct links) between related objects within a file.
+//
+// This function returns an array of arrays, one per "network" (see above).
+// Each array is the yielded results of connect() for that network - a list of
+// things which were constructed inside connect(), and should be treated as
+// results just like the things made from documents actually present in YAML.
 export function connectThingsFromDataStep(results, dataStep) {
   const {documentMode} = dataStep;
+  const constructedThings = [];
 
   switch (documentMode) {
     case documentModes.oneDocumentTotal:
     case documentModes.onePerFile: {
       // These results are never connected.
-      return;
+      return [];
     }
 
     case documentModes.allInOne:
     case documentModes.allTogether:
     case documentModes.headerAndEntries: {
       for (const result of results) {
-        dataStep.connect?.(result.network);
+        const ret = dataStep.connect?.(result.network);
+        if (ret) {
+          constructedThings.push(Array.from(ret));
+        } else {
+          constructedThings.push([]);
+        }
       }
 
       break;
@@ -1855,21 +1867,23 @@ export function connectThingsFromDataStep(results, dataStep) {
     default:
       throw new Error(`Invalid documentMode: ${documentMode.toString()}`);
   }
+
+  return constructedThings;
 }
 
 export function connectThingsFromDataSteps(processThingResultLists, dataSteps) {
-  const aggregate =
-    openAggregate({
+  return mapAggregate(
+    stitchArrays({
+      dataStep: dataSteps,
+      processThingResults: processThingResultLists,
+    }),
+    {
       message: `Errors connecting things from data files`,
       translucent: true,
-    });
-
-  stitchArrays({
-    dataStep: dataSteps,
-    processThingResults: processThingResultLists,
-  }).forEach(({dataStep, processThingResults}) => {
+    },
+    ({dataStep, processThingResults}) => {
       try {
-        connectThingsFromDataStep(processThingResults, dataStep);
+        return connectThingsFromDataStep(processThingResults, dataStep);
       } catch (caughtError) {
         const error = new Error(
           `Error connecting things for data step: ${colors.bright(dataStep.title)}`,
@@ -1877,22 +1891,41 @@ export function connectThingsFromDataSteps(processThingResultLists, dataSteps) {
 
         error[Symbol.for('hsmusic.aggregate.translucent')] = true;
 
-        aggregate.push(error);
+        throw error;
       }
     });
-
-  return {result: null, aggregate};
 }
 
-export function makeWikiDataFromDataSteps(processThingResultLists, _dataSteps) {
+export function makeWikiDataFromDataSteps(
+  processThingResultLists,
+  connectThingsResultLists,
+) {
   const wikiData = makeEmptyWikiData();
 
   for (const result of processThingResultLists.flat(2)) {
     pushWikiData(wikiData, result.wikiData);
   }
 
-  const scanForConstituted =
-    processThingResultLists.flat(2).flatMap(result => result.flat);
+  const incomingSingleThings = Object.create(null);
+  const planToPushSingleThing = thing => {
+    const key = thing.constructor[Thing.wikiData];
+    if (key in incomingSingleThings) {
+      incomingSingleThings[key].push(thing);
+    } else {
+      incomingSingleThings[key] = [thing];
+    }
+  };
+
+  const constructedFromConnecting = connectThingsResultLists.flat(2);
+
+  for (const thing of constructedFromConnecting) {
+    planToPushSingleThing(thing);
+  }
+
+  const scanForConstituted = [
+    ...processThingResultLists.flat(2).flatMap(result => result.flat),
+    ...constructedFromConnecting,
+  ];
 
   const exists = new Set(scanForConstituted);
 
@@ -1910,15 +1943,13 @@ export function makeWikiDataFromDataSteps(processThingResultLists, _dataSteps) {
       for (const thing of maybeConstitutedThings) {
         if (exists.has(thing)) continue;
         exists.add(thing);
-
-        if (thing.constructor[Thing.wikiData]) {
-          pushWikiData(wikiData, {[thing.constructor[Thing.wikiData]]: [thing]});
-        }
-
+        planToPushSingleThing(thing);
         scanForConstituted.push(thing);
       }
     }
   }
+
+  pushWikiData(wikiData, incomingSingleThings);
 
   return wikiData;
 }
@@ -1937,11 +1968,14 @@ export async function loadAndProcessDataDocuments(dataSteps, {dataPath}) {
     aggregate.receive(
       await processThingsFromDataSteps(documentLists, fileLists, dataSteps, {dataPath}));
 
-  aggregate.receive(
-    connectThingsFromDataSteps(processThingResultLists, dataSteps));
+  const connectThingsResultLists =
+    aggregate.receive(
+      connectThingsFromDataSteps(processThingResultLists, dataSteps));
 
   const wikiData =
-    makeWikiDataFromDataSteps(processThingResultLists, dataSteps);
+    makeWikiDataFromDataSteps(
+      processThingResultLists,
+      connectThingsResultLists);
 
   return {aggregate, result: wikiData};
 }
