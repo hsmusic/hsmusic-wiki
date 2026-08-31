@@ -1,11 +1,13 @@
 import {input, V} from '#composite';
 import Thing from '#thing';
+import {isColor} from '#validators';
 import {parseAdditionalNames} from '#yaml';
 
-import {exposeConstant} from '#composite/control-flow';
+import {exposeConstant, exposeDependency, exposeUpdateValueOrContinue}
+  from '#composite/control-flow';
+import {withPropertyFromObject} from '#composite/data';
 
 import {
-  color,
   contentString,
   directory,
   name,
@@ -34,7 +36,15 @@ export class Motif extends Thing {
 
     name: name(V('Unnamed Motif')),
     directory: directory(),
-    color: color(),
+
+    color: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isColor),
+      }),
+
+      withPropertyFromObject('motifSection', V('color')),
+      exposeDependency('#motifSection.color'),
+    ],
 
     additionalNames: thingList({
       class: input.value(AdditionalName),

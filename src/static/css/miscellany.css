@@ -488,6 +488,10 @@
     &:has(a:hover) {
       text-decoration: none !important;
     }
+
+    span {
+      text-decoration: underline;
+    }
   }
 
   summary.underline-white > span:hover {

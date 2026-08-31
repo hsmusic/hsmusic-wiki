@@ -3209,7 +3209,15 @@ motifInfoPage:
   title: "{MOTIF}"
 
   nav:
-    motif: "Motif: {MOTIF}"
+    section: "Motifs: {SECTION}"
+    motif: "{MOTIF}"
+    motif.withoutSection: "Motif: {MOTIF}"
+
+motifSidebar:
+  title: "Motifs"
+
+  motifList:
+    section: "{SECTION}"
 
 #
 # newsIndex:

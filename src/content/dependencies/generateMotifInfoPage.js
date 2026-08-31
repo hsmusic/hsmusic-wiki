@@ -8,8 +8,19 @@ export default {
     layout:
       relation('generatePageLayout'),
 
+    sidebar:
+      relation('generateMotifSidebar', motif),
+
+    navAccent:
+      relation('generateMotifNavAccent', motif),
+
     additionalNamesBox:
       relation('generateAdditionalNamesBox', motif.additionalNames),
+
+    motifSectionLink:
+      (motif.motifSection.isDefaultMotifSection
+        ? null
+        : relation('linkMotifSection', motif.motifSection)),
 
     motifNavLink:
       relation('linkMotifWithoutTooltip', motif),
@@ -38,13 +49,14 @@ export default {
     name:
       motif.name,
 
+    color:
+      motif.color,
+
     abcNotation:
       motif.abcNotation,
 
     directory:
       motif.directory,
-    color:
-      motif.color,
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -120,12 +132,28 @@ export default {
               title: language.$('listingIndex.title'),
             },
 
+          relations.motifSectionLink &&
+            {
+              html:
+                language.$(pageCapsule, 'nav.section', {
+                  section: relations.motifSectionLink,
+                }),
+            },
+
           {
             html:
-              language.$(pageCapsule, 'nav.motif', {
-                motif: relations.motifNavLink,
-              }),
+              (relations.motifSectionLink
+                ? language.$(pageCapsule, 'nav.motif', {
+                    motif: relations.motifNavLink,
+                  })
+                : language.$(pageCapsule, 'nav.motif.withoutSection', {
+                    motif: relations.motifNavLink,
+                  })),
           },
         ],
+
+        navBottomRowContent: relations.navAccent,
+
+        leftSidebar: relations.sidebar,
       })),
 };
