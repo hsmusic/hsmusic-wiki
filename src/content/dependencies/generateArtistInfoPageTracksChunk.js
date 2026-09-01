@@ -147,6 +147,31 @@ export default {
         });
       }).length;
 
+    // Contributions that aren't annotated "(as <NAME>)" don't have this
+    // artistText property.
+    const creditedAsAliases =
+      unique(
+        trackContribLists
+          .filter(contribs => contribs[0].thing.isTrack)
+          .flatMap(contribs => contribs.map(contrib => contrib.artistText)));
+
+    const creditedAsAliasesOnAlbum =
+      unique(
+        [...album.artistContribs, ...album.trackArtistContribs]
+          .filter(contrib => contrib.artist === artist)
+          .map(contrib => contrib.artistText));
+
+    data.consistentlyCreditedAsAlias =
+      (creditedAsAliases.length === 1
+        ? creditedAsAliases[0]
+        : null);
+
+    data.mostlyCreditedAsAlias =
+      (creditedAsAliasesOnAlbum.length === 1 &&
+       creditedAsAliases.length > 1
+        ? creditedAsAliasesOnAlbum[0]
+        : null);
+
     return data;
   },
 
@@ -180,6 +205,9 @@ export default {
 
       duration: data.duration,
       durationApproximate: data.durationApproximate,
+
+      consistentlyCreditedAsAlias: data.consistentlyCreditedAsAlias,
+      mostlyCreditedAsAlias: data.mostlyCreditedAsAlias,
 
       list:
         html.tag('ul',

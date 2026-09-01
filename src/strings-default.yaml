@@ -1626,24 +1626,48 @@ artistPage:
     album:
       _: "{ALBUM}"
 
-      withCredit: "{ALBUM} {CREDIT}"
-      credit:
-        by: "by {ARTISTS}"
+      withCredit: >-
+        {ALBUM} {CREDIT}
+
+      credit.by: "by {ARTISTS}"
+
+      # withDate and withDateRange don't appear alongside each other.
 
       withDate: >-
         {ALBUM} ({DATE})
 
+      withDateRange: >-
+        {ALBUM} (tracks {DATE_RANGE})
+
       withDuration: >-
         {ALBUM} ({DURATION})
 
-      withDateRange: >-
-        {ALBUM} (tracks {DATE_RANGE})
+      withCreditedAlias: >-
+        {ALBUM} — {AS}
+
+      withCreditedAlias.as: "as {ALIAS}"
+      withCreditedAlias.as.exceptAsNoted: "as {ALIAS}, except as noted"
 
       withDate.withDuration: >-
         {ALBUM} ({DATE}; {DURATION})
 
       withDateRange.withDuration: >-
         {ALBUM} (tracks {DATE_RANGE}; {DURATION})
+
+      withDate.withCreditedAlias: >-
+        {ALBUM} ({DATE}) — {AS}
+
+      withDateRange.withCreditedAlias: >-
+        {ALBUM} (tracks {DATE_RANGE}) — {AS}
+
+      withDuration.withCreditedAlias: >-
+        {ALBUM} ({DURATION}) — {AS}
+
+      withDate.withDuration.withCreditedAlias: >-
+        {ALBUM} ({DATE}; {DURATION}) — {AS}
+
+      withDateRange.withDuration.withCreditedAlias: >-
+        {ALBUM} (tracks {DATE_RANGE}; {DURATION}) — {AS}
 
     # flashAct:
     #   Flashes are chunked by flash act, though a single flash act
@@ -1677,6 +1701,9 @@ artistPage:
 
       withCitation: "{ENTRY} ({CITATION})"
 
+      withCreditedAliases: >-
+        {ENTRY} — as {ALIASES}
+
       citation: "{CITATION}"
       citation.quoted: "quoted: {CITATION}"
       quoted: "quoted"
@@ -1704,6 +1731,12 @@ artistPage:
 
         rerelease: >-
           Also released on {ALBUM}
+
+      rerelease.withCreditedAliases: >-
+        {ENTRY} ({RERELEASE}) — as {ALIASES}
+
+      firstRelease.withCreditedAliases: >-
+        {ENTRY} ({FIRST_RELEASE}) — as {ALIASES}
 
       track: "{TRACK}"
 

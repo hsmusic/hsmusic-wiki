@@ -34,6 +34,10 @@ export default {
       !compareArrays(
         query.normalContributions.map(({artist}) => artist),
         contextNormalContributions.map(({artist}) => artist),
+        {checkOrder: true}) ||
+      !compareArrays(
+        query.normalContributions.map(({artistText}) => artistText),
+        contextNormalContributions.map(({artistText}) => artistText),
         {checkOrder: true});
 
     query.normalContributionAnnotationsDifferFromContext =

@@ -166,8 +166,14 @@
 html[data-url-key="localized.artist"] {
   @layer print {
     #content dl a.local-link {
-      font-weight: 800;
-      filter: brightness(1.1);
+      &:not(.credited-alias) {
+        font-weight: 800;
+        filter: brightness(1.1);
+      }
+
+      &.credited-alias {
+        color: inherit;
+      }
     }
   }
 }

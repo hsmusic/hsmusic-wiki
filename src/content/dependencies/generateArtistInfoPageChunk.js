@@ -31,6 +31,9 @@ export default {
 
     duration: {validate: v => v.isDuration},
     durationApproximate: {type: 'boolean'},
+
+    consistentlyCreditedAsAlias: {type: 'string'},
+    mostlyCreditedAsAlias: {type: 'string'},
   },
 
   generate(data, slots, {html, language}) {
@@ -55,8 +58,9 @@ export default {
     let accentedLink;
     switch (slots.mode) {
       case 'album': {
+        const capsule = 'artistPage.creditList.album';
         const options = {album: slots.link};
-        const parts = ['artistPage.creditList.album'];
+        const parts = [capsule];
 
         if (slots.date) {
           parts.push('withDate');
@@ -75,6 +79,28 @@ export default {
           options.duration =
             language.formatDuration(slots.duration, {
               approximate: slots.durationApproximate,
+            });
+        }
+
+        const wrapAlias = alias =>
+          html.tag('a', {class: 'credited-alias'},
+            {href: ''},
+            {class: 'local-link'},
+            language.sanitize(alias));
+
+        if (slots.consistentlyCreditedAsAlias) {
+          parts.push('withCreditedAlias');
+          options.as =
+            language.$(capsule, 'withCreditedAlias.as', {
+              alias:
+                wrapAlias(slots.consistentlyCreditedAsAlias),
+            });
+        } else if (slots.mostlyCreditedAsAlias) {
+          parts.push('withCreditedAlias');
+          options.as =
+            language.$(capsule, 'withCreditedAlias.as.exceptAsNoted', {
+              alias:
+                wrapAlias(slots.mostlyCreditedAsAlias),
             });
         }
 
