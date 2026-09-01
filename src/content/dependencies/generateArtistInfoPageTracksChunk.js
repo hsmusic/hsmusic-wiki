@@ -93,7 +93,7 @@ export default {
           trackContribLists)),
   }),
 
-  data(artist, _query, album, trackContribLists) {
+  data(_query, artist, album, trackContribLists) {
     const data = {};
 
     const contribs =
