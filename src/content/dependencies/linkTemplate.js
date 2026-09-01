@@ -1,4 +1,4 @@
-import {empty} from '#sugar';
+import {compareArrays, empty} from '#sugar';
 
 import striptags from 'striptags';
 
@@ -31,6 +31,8 @@ export default {
     html,
     language,
     to,
+    pagePath,
+    pagePathStringFromRoot,
   }) {
     const {attributes} = slots;
 
@@ -41,6 +43,25 @@ export default {
        : !empty(slots.path)
           ? to(...slots.path)
           : '');
+
+      const locallink =
+        (slots.path
+            // This precludes links to any other scope on the site...
+            // but like, those *aren't pages,* so of course that means
+            // this link isn't a link to the current page.
+          ? slots.path.at(0).startsWith('localized.') &&
+            compareArrays(pagePath, [
+              slots.path.at(0).replace(/^localized\./, ''),
+              ...slots.path.slice(1),
+            ])
+
+       : href.startsWith('/')
+          ? href === pagePathStringFromRoot
+          : false);
+
+      if (locallink) {
+        attributes.add('class', 'local-link');
+      }
 
       if (appendIndexHTML) {
         if (/^(?!https?:\/\/).+\/$/.test(href) && href.endsWith('/')) {
