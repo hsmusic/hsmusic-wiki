@@ -161,6 +161,17 @@
   }
 }
 
+/* Artist info page */
+
+html[data-url-key="localized.artist"] {
+  @layer print {
+    #content dl a.local-link {
+      font-weight: 800;
+      filter: brightness(1.1);
+    }
+  }
+}
+
 /* Artist rolling window page */
 
 @layer layout {
