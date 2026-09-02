@@ -1835,11 +1835,29 @@ artistPage:
         withNoFiles: >-
           {TITLE}: {TRACK} (no files)
 
+        withAnnotation: >-
+          {TITLE}: {TRACK} — {ANNOTATION}
+
         withCredit.withMultipleFiles: >-
           {TITLE} ({CREDIT}): {TRACK} ({FILES})
 
         withCredit.withNoFiles: >-
           {TITLE} ({CREDIT}): {TRACK} (no files)
+
+        withCredit.withAnnotation: >-
+          {TITLE} ({CREDIT}): {TRACK} — {ANNOTATION}
+
+        withMultipleFiles.withAnnotation: >-
+          {TITLE}: {TRACK} ({FILES}) — {ANNOTATION}
+
+        withNoFiles.withAnnotation: >-
+          {TITLE}: {TRACK} (no files) — {ANNOTATION}
+
+        withCredit.withMultipleFiles.withAnnotation: >-
+          {TITLE} ({CREDIT}): {TRACK} ({FILES}) — {ANNOTATION}
+
+        withCredit.withNoFiles.withAnnotation: >-
+          {TITLE} ({CREDIT}): {TRACK} (no files) — {ANNOTATION}
 
         placeholderTitle: "Additional file"
         credit: "by {ARTISTS}"
@@ -1857,11 +1875,29 @@ artistPage:
         withNoFiles: >-
           {TITLE}: {TRACK} (no files)
 
+        withAnnotation: >-
+          {TITLE}: {TRACK} — {ANNOTATION}
+
         withCredit.withMultipleFiles: >-
           {TITLE} ({CREDIT}): {TRACK} ({FILES})
 
         withCredit.withNoFiles: >-
           {TITLE} ({CREDIT}): {TRACK} (no files)
+
+        withCredit.withAnnotation: >-
+          {TITLE} ({CREDIT}): {TRACK} — {ANNOTATION}
+
+        withMultipleFiles.withAnnotation: >-
+          {TITLE}: {TRACK} ({FILES}) — {ANNOTATION}
+
+        withNoFiles.withAnnotation: >-
+          {TITLE}: {TRACK} (no files) — {ANNOTATION}
+
+        withCredit.withMultipleFiles.withAnnotation: >-
+          {TITLE} ({CREDIT}): {TRACK} ({FILES}) — {ANNOTATION}
+
+        withCredit.withNoFiles.withAnnotation: >-
+          {TITLE} ({CREDIT}): {TRACK} (no files) — {ANNOTATION}
 
         placeholderTitle: "Sheet music"
         credit: "by {ARTISTS}"
@@ -1879,11 +1915,29 @@ artistPage:
         withNoFiles: >-
           {TITLE}: {TRACK} (no files)
 
+        withAnnotation: >-
+          {TITLE}: {TRACK} — {ANNOTATION}
+
         withCredit.withMultipleFiles: >-
           {TITLE} ({CREDIT}): {TRACK} ({FILES})
 
         withCredit.withNoFiles: >-
           {TITLE} ({CREDIT}): {TRACK} (no files)
+
+        withCredit.withAnnotation: >-
+          {TITLE} ({CREDIT}): {TRACK} — {ANNOTATION}
+
+        withMultipleFiles.withAnnotation: >-
+          {TITLE}: {TRACK} ({FILES}) — {ANNOTATION}
+
+        withNoFiles.withAnnotation: >-
+          {TITLE}: {TRACK} (no files) — {ANNOTATION}
+
+        withCredit.withMultipleFiles.withAnnotation: >-
+          {TITLE} ({CREDIT}): {TRACK} ({FILES}) — {ANNOTATION}
+
+        withCredit.withNoFiles.withAnnotation: >-
+          {TITLE} ({CREDIT}): {TRACK} (no files) — {ANNOTATION}
 
         placeholderTitle: "MIDI or project music"
         credit: "by {ARTISTS}"

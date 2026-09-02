@@ -70,11 +70,6 @@ export default {
       language.encapsulate(
         'artistPage.creditList.entry', data.for, slots.string);
 
-    relations.template.setSlots({
-      annotation:
-        language.formatUnitList(data.contribAnnotationParts),
-    });
-
     const titleLine =
       language.encapsulate(capsule, workingCapsule => {
         const workingOptions = {};
@@ -108,6 +103,14 @@ export default {
           workingCapsule += '.withMultipleFiles';
           workingOptions.files =
             language.countFiles(numFiles, {unit: true});
+        }
+
+        const annotation =
+          language.formatUnitList(data.contribAnnotationParts);
+
+        if (!html.isBlank(annotation)) {
+          workingCapsule += '.withAnnotation';
+          workingOptions.annotation = annotation;
         }
 
         return language.$(workingCapsule, workingOptions);
