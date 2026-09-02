@@ -74,15 +74,15 @@ export default {
       language.encapsulate(capsule, workingCapsule => {
         const workingOptions = {};
 
-        const titlePart =
+        const titleText =
           (data.title
             ? language.sanitize(data.title)
             : language.$(capsule, 'placeholderTitle'));
 
         workingOptions.title =
-          (numFiles <= 1
-            ? relations.fileLinks[0].slot('content', titlePart)
-            : html.tag('b', titlePart));
+          (numFiles >= 2
+            ? html.tag('b', titleText)
+            : relations.fileLinks[0].slot('content', titleText));
 
         if (data.for === 'track') {
           workingOptions.track = relations.trackLink;
@@ -97,12 +97,12 @@ export default {
           workingOptions.credit = relations.artistCredit;
         }
 
-        if (numFiles === 0) {
-          workingCapsule += '.withNoFiles';
-        } else if (numFiles >= 2) {
+        if (numFiles >= 2) {
           workingCapsule += '.withMultipleFiles';
           workingOptions.files =
             language.countFiles(numFiles, {unit: true});
+        } else if (numFiles === 0) {
+          workingCapsule += '.withNoFiles';
         }
 
         const annotation =
@@ -116,24 +116,21 @@ export default {
         return language.$(workingCapsule, workingOptions);
       });
 
-    if (relations.fileLinks.length <= 1) {
-      relations.template.setSlot('content', titleLine);
+    if (numFiles >= 2) {
+      relations.template.setSlot('content',
+        html.tag('details',
+          html.tag('summary',
+            html.tag('span', titleLine)),
+
+          html.tag('ul',
+            stitchArrays({
+              link: relations.fileLinks,
+              filename: data.filenames,
+            }).map(({link, filename}) =>
+                html.tag('li',
+                  link.slot('content', language.sanitize(filename)))))));
     } else {
-      const summary =
-        html.tag('summary',
-          html.tag('span', titleLine));
-
-      const list =
-        html.tag('ul',
-          stitchArrays({
-            link: relations.fileLinks,
-            filename: data.filenames,
-          }).map(({link, filename}) =>
-              html.tag('li',
-                link.slot('content', language.sanitize(filename)))));
-
-      const details = html.tag('details', [summary, list]);
-      relations.template.setSlot('content', details);
+      relations.template.setSlot('content', titleLine);
     }
 
     return relations.template;

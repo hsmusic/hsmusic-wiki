@@ -2060,7 +2060,20 @@ artistPage:
         credit.alongsideTitle: >-
           by {ARTISTS}
 
-      flash: "{FLASH}"
+      flash:
+        _: >-
+          {FLASH}
+
+        withAnnotation: >-
+          {FLASH} — {ANNOTATION}
+
+        withOneTrack.withAnnotation: >-
+          {FLASH} — {ANNOTATION}: {TRACK}
+
+        withMultipleTracks.withAnnotation: >-
+          {FLASH} ({TRACKS}) — {ANNOTATION}
+
+        fallbackMusicAnnotation: "music"
 
       artwork.accent:
         withLabel: >-

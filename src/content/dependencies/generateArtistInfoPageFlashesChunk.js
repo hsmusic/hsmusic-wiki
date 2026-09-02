@@ -1,5 +1,5 @@
 export default {
-  relations: (relation, flashAct, contribs) => ({
+  relations: (relation, artist, flashAct, contribLists) => ({
     template:
       relation('generateArtistInfoPageChunk', flashAct),
 
@@ -7,15 +7,23 @@ export default {
       relation('linkFlashAct', flashAct),
 
     items:
-      contribs
-        .map(contrib =>
-          relation('generateArtistInfoPageFlashesChunkItem', contrib)),
+      contribLists
+        .map(contribs =>
+          relation('generateArtistInfoPageFlashesChunkItem',
+            artist,
+            contribs)),
   }),
 
-  data: (_flashAct, contribs) => ({
+  data: (_artist, _flashAct, contribLists) => ({
+    // Multiple dates because consecutive flashes within a range of time
+    // that are all to the same flash act are chunked together (and we will
+    // show that range of time in the chunk heading). However, we don't treat
+    // the individual flash contributions as uniquely dated (e.g. differing
+    // from the date of the flash), so just use one date arbitrarily from
+    // each flash's contribution list.
     dates:
-      contribs
-        .map(contrib => contrib.date),
+      contribLists
+        .map(contribs => contribs[0].date),
   }),
 
   generate: (data, relations, {html}) =>
