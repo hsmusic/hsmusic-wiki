@@ -43,7 +43,7 @@ export default {
 
     if (!empty(slots.dates)) {
       earliestItemDate = slots.dates[0];
-      latestItemDate = slots.dates[1];
+      latestItemDate = slots.dates[0];
 
       for (const date of slots.dates.slice(1)) {
         if (date < earliestItemDate) earliestItemDate = date;
