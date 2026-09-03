@@ -1062,6 +1062,7 @@ Object.assign(Language.prototype, {
   countFiles: countHelper('files'),
   countFlashes: countHelper('flashes'),
   countMonths: countHelper('months'),
+  countSoundDetailRows: countHelper('soundDetailRows', 'rows'),
   countTimesFeatured: countHelper('timesFeatured'),
   countTimesReferenced: countHelper('timesReferenced'),
   countTimesUsed: countHelper('timesUsed'),

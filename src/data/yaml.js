@@ -1247,6 +1247,37 @@ export function parseFeaturedMotifs(value, {subdoc, FeaturedMotifConnection}) {
   });
 }
 
+export function parseSoundDetails(value, {
+  subdoc,
+  BPMSoundDetail,
+  SampledTrackSoundDetail,
+  SoftwareSoundDetail,
+  SoundfontSoundDetail,
+  TimeSignatureSoundDetail,
+  VSTSoundDetail,
+}) {
+  return parseArrayEntries(value, item => {
+    if (typeof item === 'object' && !Array.isArray(item)) {
+      const constructor =
+        (item['BPM'] ? BPMSoundDetail
+       : item['Sampled Track'] ? SampledTrackSoundDetail
+       : item['Software'] ? SoftwareSoundDetail
+       : item['Soundfont'] ? SoundfontSoundDetail
+       : item['Time Signature'] ? TimeSignatureSoundDetail
+       : item['VST'] ? VSTSoundDetail
+          : null);
+
+      if (!constructor) {
+        return item;
+      }
+
+      return subdoc(constructor, item, {bindInto: 'track'});
+    } else {
+      return item;
+    }
+  });
+}
+
 export const durationRegexRaw =
   String.raw`(?:(?<hour>\d\d?):)?(?<minute>\d\d?):(?<second>\d\d)`;
 

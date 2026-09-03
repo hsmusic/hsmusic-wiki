@@ -10,6 +10,7 @@ export * from './group/index.js';
 export * from './motif/index.js';
 export * from './homepage-layout/index.js';
 export * from './sorting-rule/index.js';
+export * from './sound-detail/index.js';
 
 export * from './AdditionalName.js';
 export * from './ArtTag.js';
