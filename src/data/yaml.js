@@ -372,6 +372,7 @@ function makeProcessDocument(thingConstructor, {
         aggregate.close();
       } catch (caughtError) {
         error = caughtError;
+        result ??= {thing: null, flat: [], wikiData: {}};
       }
 
       if (result.thing) {
