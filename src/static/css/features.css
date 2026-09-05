@@ -2241,6 +2241,41 @@
   }
 }
 
+/* Sound details */
+
+@layer layout {
+  .sound-details > .info {
+    margin-left: 40px;
+    margin-top: 0.25em;
+    margin-bottom: 0.5em;
+  }
+
+  .sound-details > ul {
+    margin-top: 0.5em;
+  }
+
+  .sound-details .notes {
+    display: block;
+
+    margin-top: 0.15em;
+    padding-left: 20px;
+    margin-bottom: 0.35em;
+
+    > :first-child { margin-top: 0; }
+    > :last-child { margin-bottom: 0; }
+  }
+}
+
+@layer print {
+  .sound-details > .info {
+    font-style: oblique;
+  }
+
+  .sound-details .kind {
+    font-weight: 800;
+  }
+}
+
 /* Sticky heading */
 
 @layer layout {

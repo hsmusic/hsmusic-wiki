@@ -372,6 +372,7 @@ function makeProcessDocument(thingConstructor, {
         aggregate.close();
       } catch (caughtError) {
         error = caughtError;
+        result ??= {thing: null, flat: [], wikiData: {}};
       }
 
       if (result.thing) {
@@ -1243,6 +1244,37 @@ export function parseFeaturedMotifs(value, {subdoc, FeaturedMotifConnection}) {
 
     return documents.map(document =>
       subdoc(FeaturedMotifConnection, document, {bindInto: 'track'}));
+  });
+}
+
+export function parseSoundDetails(value, {
+  subdoc,
+  BPMSoundDetail,
+  SampledTrackSoundDetail,
+  SoftwareSoundDetail,
+  SoundfontSoundDetail,
+  TimeSignatureSoundDetail,
+  VSTSoundDetail,
+}) {
+  return parseArrayEntries(value, item => {
+    if (typeof item === 'object' && !Array.isArray(item)) {
+      const constructor =
+        (item['BPM'] ? BPMSoundDetail
+       : item['Sampled Track'] ? SampledTrackSoundDetail
+       : item['Software'] ? SoftwareSoundDetail
+       : item['Soundfont'] ? SoundfontSoundDetail
+       : item['Time Signature'] ? TimeSignatureSoundDetail
+       : item['VST'] ? VSTSoundDetail
+          : null);
+
+      if (!constructor) {
+        return item;
+      }
+
+      return subdoc(constructor, item, {bindInto: 'track'});
+    } else {
+      return item;
+    }
   });
 }
 

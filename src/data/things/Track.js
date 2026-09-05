@@ -45,6 +45,7 @@ import {
   parseMusicVideos,
   parseReferencingSources,
   parseSheetMusicFiles,
+  parseSoundDetails,
   parseURLs,
 } from '#yaml';
 
@@ -134,6 +135,7 @@ export class Track extends Thing {
     MusicVideo,
     ReferencingSourcesEntry,
     SheetMusicFile,
+    SoundDetail,
     TrackArtistContribution,
     TrackSection,
     WikiInfo,
@@ -636,6 +638,14 @@ export class Track extends Thing {
     featuredMotifs: thingList({
       class: input.value(FeaturedMotifConnection),
     }),
+
+    soundDetails: [
+      inheritFromMainRelease(),
+
+      thingList({
+        class: input.value(SoundDetail),
+      }),
+    ],
 
     // > Update & expose - Music videos
 
@@ -1273,6 +1283,11 @@ export class Track extends Thing {
       'Featured Motifs': {
         property: 'featuredMotifs',
         transform: parseFeaturedMotifs,
+      },
+
+      'Sound Details': {
+        property: 'soundDetails',
+        transform: parseSoundDetails,
       },
 
       // Music videos

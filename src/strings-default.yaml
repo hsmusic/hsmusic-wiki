@@ -114,6 +114,17 @@ count:
       many: ""
       other: "{FLASHES} flashes"
 
+  soundDetailRows:
+    _: "{ROWS}"
+
+    withUnit:
+      zero: ""
+      one: "{ROWS} row"
+      two: ""
+      few: ""
+      many: ""
+      other: "{ROWS} rows"
+
   tracks:
     _: "{TRACKS}"
 
@@ -779,6 +790,40 @@ misc:
         trackContribution: "track contribution"
         wallpaperArt: "wallpaper art"
 
+  soundDetails:
+    _: "{CUE} for {THING}:"
+    withoutName: "{CUE}:"
+    withRowCount: "{CUE} for {THING}: ({ROWS})"
+    withRowCount.withoutName: "{CUE}: ({ROWS})"
+
+    collapsed: "{CUE} for {THING}..."
+    withoutName.collapsed: "{CUE}..."
+    withRowCount.collapsed: "{CUE} for {THING}... ({ROWS})"
+    withRowCount.withoutName.collapsed: "{CUE}... ({ROWS})"
+
+    cue: "Sound details"
+
+    info.contribute: >-
+      For the latest data, or to contribute: {LINK}
+
+    info.contribute.link: >-
+      Homestuck Sample Sheet
+
+    row:
+      soundfont.kind: "Soundfont"
+
+      soundfont: >-
+        {KIND}: {NAME}
+
+      soundfont.withBank: >-
+        {KIND}: {NAME} — {BANK}
+
+      soundfont.withDetail: >-
+        {KIND}: {NAME} — {DETAIL}
+
+      soundfont.withBank.withDetail: >-
+        {KIND}: {NAME} — {BANK}: {DETAIL}
+
   creditingSources:
     _: "{CUE} for {THING}:"
     withoutName: "{CUE}:"
@@ -788,6 +833,16 @@ misc:
 
     cue: "Crediting sources"
     sticky: "Crediting sources:"
+
+  referencingSources:
+    _: "{CUE} for {THING}:"
+    withoutName: "{CUE}:"
+
+    collapsed: "{CUE} for {THING}…"
+    withoutName.collapsed: "{CUE}…"
+
+    cue: "Referencing sources"
+    sticky: "Referencing sources:"
 
   downloadLayoutMedia:
     withWallpaper: >-
@@ -916,8 +971,6 @@ misc:
     youtubeMusic: "YouTube Music"
 
   flashActWithTitle: "{ACT}: {TITLE}"
-
-  # lyrics:
 
   lyrics:
     source: >-
@@ -1087,16 +1140,6 @@ misc:
       flash: "Flashes"
       group: "Groups"
       track: "Tracks"
-
-  referencingSources:
-    _: "{CUE} for {THING}:"
-    withoutName: "{CUE}:"
-
-    collapsed: "{CUE} for {THING}…"
-    withoutName.collapsed: "{CUE}…"
-
-    cue: "Referencing sources"
-    sticky: "Referencing sources:"
 
   # skippers:
   #
