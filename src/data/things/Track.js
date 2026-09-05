@@ -500,6 +500,8 @@ export class Track extends Thing {
       urls(),
     ],
 
+    additionalURLs: urls(),
+
     // > Update & expose - Artworks
 
     trackArtworks: [
@@ -1220,6 +1222,11 @@ export class Track extends Thing {
 
       'URLs': {
         property: 'urls',
+        transform: parseURLs,
+      },
+
+      'Additional URLs': {
+        property: 'additionalURLs',
         transform: parseURLs,
       },
 

@@ -468,6 +468,12 @@ releaseInfo:
   watchOn: "Watch on {LINKS}."
   watchOn.title: "Watch on:"
 
+  availableLinks: "Available links: {LINKS}."
+  availableLinks.title: "Available links:"
+
+  moreLinks: "More links: {LINKS}."
+  moreLinks.title: "More links:"
+
   readCommentary:
     _: "Read {LINK}."
 

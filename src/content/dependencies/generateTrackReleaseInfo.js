@@ -13,6 +13,12 @@ export default {
     listenLineOrList:
       relation('generateListenLineOrList', track),
 
+    additionalLinksLineOrList:
+      relation('generateExternalLinksLineOrList', track.additionalURLs),
+
+    conjoinStandaloneParagraphs:
+      relation('conjoinStandaloneParagraphs'),
+
     albumLink:
       relation('linkAlbum', track.album),
 
@@ -132,9 +138,22 @@ export default {
           }),
         ]),
 
-        relations.listenLineOrList.slots({
-          visibleWithoutLinks: true,
-          context: 'track',
+        relations.conjoinStandaloneParagraphs.slots({
+          items: [
+            relations.listenLineOrList.slots({
+              visibleWithoutLinks: true,
+              context: 'track',
+            }),
+
+            relations.additionalLinksLineOrList.slots({
+              string:
+                (html.isBlank(relations.listenLineOrList)
+                  ? 'releaseInfo.availableLinks'
+                  : 'releaseInfo.moreLinks'),
+
+              inlineListStyle: 'unit',
+            }),
+          ],
         }),
       ])),
 };
