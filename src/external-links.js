@@ -458,17 +458,6 @@ export const externalLinkSpec = [
 
   {
     match: {
-      domain: 'hsmusic.wiki',
-      pathname: /^media\/misc\/archive/,
-    },
-
-    platform: 'hsmusic.archive',
-
-    icon: 'globe',
-  },
-
-  {
-    match: {
       domain: 'media.hsmusic.wiki',
       pathname: /^misc\/archive/,
     },
@@ -1062,10 +1051,25 @@ export function getExternalLinkStringOfStyleFromDescriptor(urlEntry, style, desc
       }
 
       if (urlEntry.annotation) {
-        return language.$(prefix, 'withAnnotation', {
-          link: platformPart,
-          annotation: language.sanitize(urlEntry.annotation),
-        });
+        // Get jank. If the platform ends with a parentheses part, join that
+        // with the annotation. This is NOT the original intended use of this
+        // "withAutomaticAndCustomAnnotations" string.
+        const [platformMain, platformAnnotation] =
+          platformPart.toString().match(/(.*) \(([^)]*)\)$/)?.slice(1) ??
+          [null, null];
+
+        if (platformAnnotation) {
+          return language.$(prefix, 'withAutomaticAndCustomAnnotations', {
+            link: platformMain,
+            automatic: platformAnnotation,
+            custom: language.sanitize(urlEntry.annotation),
+          });
+        } else {
+          return language.$(prefix, 'withAnnotation', {
+            link: platformPart,
+            annotation: language.sanitize(urlEntry.annotation),
+          });
+        }
       } else {
         return platformPart;
       }

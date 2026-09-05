@@ -824,7 +824,7 @@ misc:
       {LINK} ({ANNOTATION})
 
     withAutomaticAndCustomAnnotations: >-
-      {LINK} ({AUTOMATIC}, {CUSTOM})
+      {LINK} ({AUTOMATIC} - {CUSTOM})
 
     opensInNewTab: "{PLATFORM} (opens in new tab)"
     opensInNewTab.annotation: "opens in new tab"
