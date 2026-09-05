@@ -28,6 +28,7 @@ export class Language extends Thing {
     Object.assign(this.prototype, {
       splitDisjunctionList: /,| (?=hoặc)/,
       splitConjunctionList: /,| (?=and)/,
+      splitUnitList: /,/,
     });
   }
 

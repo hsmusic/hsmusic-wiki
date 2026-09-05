@@ -28,6 +28,11 @@ export default {
       default: [],
     },
 
+    inlineListStyle: {
+      validate: v => v.is('conjunction', 'disjunction', 'unit'),
+      default: 'disjunction',
+    },
+
     maximumTotalEntriesInLine: {type: 'number', default: 4},
     maximumAnnotatedEntriesInLine: {type: 'number', default: 1},
     maximumParenthesizedEntriesInLine: {type: 'number', default: 3},
@@ -76,22 +81,33 @@ export default {
     }
 
     switch (style) {
-      case 'line': return (
-        html.tag('p',
-          html.metatag('chunkwrap', {split: language.splitDisjunctionList},
-            language.$(slots.string, {
-              links:
-                language.formatDisjunctionList(externalLinks),
-            })))
-      );
+      case 'line': {
+        const [list, split] =
+          (slots.inlineListStyle === 'disjunction'
+            ? ['formatDisjunctionList', 'splitDisjunctionList']
+         : slots.inlineListStyle === 'conjunction'
+            ? ['formatConjunctionList', 'splitConjunctionList']
+            : ['formatUnitList', 'splitUnitList']);
 
-      case 'list': return (
-        html.tags([
-          html.tag('p', language.$(slots.string, 'title')),
-          html.tag('ul',
-            externalLinks.map(link => html.tag('li', link))),
-        ])
-      );
+        return (
+          html.tag('p',
+            html.metatag('chunkwrap', {split: language[split]},
+              language.$(slots.string, {
+                links:
+                  language[list](externalLinks),
+              })))
+        );
+      }
+
+      case 'list': {
+        return (
+          html.tags([
+            html.tag('p', language.$(slots.string, 'title')),
+            html.tag('ul',
+              externalLinks.map(link => html.tag('li', link))),
+          ])
+        );
+      }
 
       default:
         return html.blank();
