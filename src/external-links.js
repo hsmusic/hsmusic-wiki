@@ -48,6 +48,7 @@ export const isExternalLinkTransformCommand =
   is(...[
     'decode-uri',
     'find-replace',
+    'substitute-platform',
   ]);
 
 export const isExternalLinkTransformSpec =
@@ -714,6 +715,24 @@ export const externalLinkSpec = [
     match: {domain: 'web.archive.org'},
     platform: 'waybackMachine',
     icon: 'internetArchive',
+
+    detail: {
+      substring: 'platform',
+      platform: {
+        // Deliberately only processes the domain, ~maybe~ it should include
+        // the path too?
+        pathname: /^web\/\d+\/(https?:\/\/.+)\/?$/,
+        transform: [
+          {command: 'substitute-platform'},
+        ],
+      },
+    },
+  },
+
+  {
+    match: {domain: 'web.archive.org'},
+    platform: 'waybackMachine',
+    icon: 'internetArchive',
   },
 
   {
@@ -848,6 +867,8 @@ export function extractPartFromExternalLink(urlEntry, extract, {
   // Set to 'test' to just see if this would extract anything.
   // This disables running custom transformations.
   mode = 'extract',
+
+  language,
 } = {}) {
   const {domain, pathname, query} = urlParts(urlEntry.url);
 
@@ -887,6 +908,17 @@ export function extractPartFromExternalLink(urlEntry, extract, {
               case 'find-replace':
                 transform.push(value =>
                   value.replace(options.find, options.replace));
+                break;
+
+              case 'substitute-platform':
+                transform.push(value => {
+                  const urlEntry = {url: value};
+                  return getExternalLinkStringOfStyleFromDescriptors(
+                    urlEntry,
+                    'platform',
+                    externalLinkSpec, // TODO: rudely assumes freebie access
+                    {language}); // TODO: rudely doesn't pass along context
+                });
                 break;
             }
           }
@@ -948,12 +980,12 @@ export function extractPartFromExternalLink(urlEntry, extract, {
   return value;
 }
 
-export function extractAllCustomPartsFromExternalLink(urlEntry, custom) {
+export function extractAllCustomPartsFromExternalLink(urlEntry, custom, {language}) {
   const customParts = {};
 
   // All or nothing: if one part doesn't match, all results are scrapped.
   for (const [key, value] of Object.entries(custom)) {
-    customParts[key] = extractPartFromExternalLink(urlEntry, value);
+    customParts[key] = extractPartFromExternalLink(urlEntry, value, {language});
     if (!customParts[key]) return null;
   }
 
@@ -977,13 +1009,16 @@ export function getExternalLinkStringOfStyleFromDescriptor(urlEntry, style, desc
         withEntries(rest, entries => entries
           .map(([key, value]) => [
             key,
-            extractPartFromExternalLink(urlEntry, value),
+            extractPartFromExternalLink(urlEntry, value, {language}),
           ]));
 
       return language.$(prefix, descriptor.platform, substring, opts);
     } else if (descriptor.detail.annotation) {
       const annotation =
-        extractPartFromExternalLink(urlEntry, descriptor.detail.annotation);
+        extractPartFromExternalLink(
+          urlEntry,
+          descriptor.detail.annotation,
+          {language});
 
       if (urlEntry.annotation) {
         return language.$(prefix, descriptor.platform, 'withAutomaticAndCustomAnnotations', {
@@ -1038,7 +1073,10 @@ export function getExternalLinkStringOfStyleFromDescriptor(urlEntry, style, desc
 
     case 'handle': {
       if (descriptor.handle) {
-        return extractPartFromExternalLink(urlEntry, descriptor.handle);
+        return extractPartFromExternalLink(
+          urlEntry,
+          descriptor.handle,
+          {language});
       } else {
         return null;
       }

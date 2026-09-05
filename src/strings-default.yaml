@@ -904,7 +904,11 @@ misc:
     tumblr: "Tumblr"
     twitch: "Twitch"
     twitter: "Twitter"
-    waybackMachine: "Wayback Machine"
+
+    waybackMachine:
+      _: "Wayback Machine"
+      platform: "{PLATFORM} (archive)"
+
     wikipedia: "Wikipedia"
 
     youtube:
