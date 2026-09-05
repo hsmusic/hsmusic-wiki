@@ -45,7 +45,7 @@ export default {
           : '');
 
       const locallink =
-        (slots.path
+        (!empty(slots.path)
             // This precludes links to any other scope on the site...
             // but like, those *aren't pages,* so of course that means
             // this link isn't a link to the current page.
