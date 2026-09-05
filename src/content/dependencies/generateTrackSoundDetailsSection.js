@@ -30,6 +30,7 @@ export default {
     language.encapsulate('misc.soundDetails', capsule =>
       html.tag('details', {class: 'sound-details'},
         {class: 'memorable', 'data-memorable-id': 'sound-details'},
+        {[html.onlyIfContent]: true},
 
         relations.contentHeading.slots({
           tag: 'summary',
@@ -72,6 +73,8 @@ export default {
         }),
 
         html.tag('p', {class: 'info'},
+          {[html.onlyIfSiblings]: true},
+
           language.$(capsule, 'info.contribute', {
             link:
               relations.externalLink.slots({
