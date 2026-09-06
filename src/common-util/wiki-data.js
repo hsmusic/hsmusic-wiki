@@ -754,7 +754,9 @@ export function* matchMarkdownLinks(markdownSource, {marked}) {
 export function* matchInlineLinks(source) {
   const plausibleLinkRegexp =
     re('gmi', [
-      /\b[a-z]*:\/\//,
+      /(?<!`)(?<!<code>)\b/,
+
+      /[a-z]*:\/\//,
       /.*?/,
 
       '(?=',
