@@ -115,6 +115,11 @@ export class Flash extends Thing {
       find: soupyFind.input('track'),
     }),
 
+    previouslyFeaturedTracks: referenceList({
+      class: input.value(Track),
+      find: soupyFind.input('track'),
+    }),
+
     urls: urls(),
 
     additionalNames: thingList(V(AdditionalName)),
@@ -200,6 +205,13 @@ export class Flash extends Thing {
       referenced: flash => flash.featuredTracks,
     },
 
+    flashesWhichPreviouslyFeatured: {
+      bindTo: 'flashData',
+
+      referencing: flash => [flash],
+      referenced: flash => flash.previouslyFeaturedTracks,
+    },
+
     flashContributorContributionsBy:
       soupyReverse.contributionsBy('flashData', 'contributorContribs'),
 
@@ -248,6 +260,7 @@ export class Flash extends Thing {
       },
 
       'Featured Tracks': {property: 'featuredTracks'},
+      'Previously Featured Tracks': {property: 'previouslyFeaturedTracks'},
 
       'Contributors': {
         property: 'contributorContribs',

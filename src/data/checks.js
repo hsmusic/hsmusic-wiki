@@ -304,6 +304,7 @@ export function filterReferenceErrors(wikiData, {
     ['flashData', {
       contributorContribs: '_contrib',
       featuredTracks: 'track',
+      previouslyFeaturedTracks: 'track',
     }],
 
     ['midiProjectFileData', additionalFileShape],

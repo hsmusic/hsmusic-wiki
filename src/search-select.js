@@ -238,7 +238,8 @@ function genericProcess(thing, opts) {
 
   fields.attachedResults =
     (thing.isTrack
-      ? thing.ownFeaturedInFlashes
+      ? [...thing.ownFeaturedInFlashes,
+         ...thing.ownPreviouslyFeaturedInFlashes]
           .filter(flash =>
             flash.side.directory === 's1' ||
             flash.side.directory === 's2')

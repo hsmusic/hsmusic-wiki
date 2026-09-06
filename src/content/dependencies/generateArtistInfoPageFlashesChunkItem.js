@@ -33,11 +33,19 @@ export default {
     regularContribAnnotationParts:
       query.regularContributions
         .flatMap(contrib => contrib.annotationParts),
+
+    numTracks:
+      query.mockFeaturedTrackContributions.length,
+
+    numTracksPreviouslyFeatured:
+      query.mockFeaturedTrackContributions
+        .filter(({previously}) => previously)
+        .length,
   }),
 
   generate: (data, relations, {html, language}) =>
     language.encapsulate('artistPage.creditList.entry.flash', capsule => {
-      const numTracks = relations.trackListItems.length;
+      const {numTracks, numTracksPreviouslyFeatured} = data;
 
       relations.trackListItems.forEach(item => {
         item.setSlots({
@@ -71,8 +79,13 @@ export default {
             language.formatUnitList(data.regularContribAnnotationParts);
 
           if (html.isBlank(annotation) && numTracks >= 1) {
-            annotation =
-              language.$(capsule, 'fallbackMusicAnnotation');
+            if (numTracksPreviouslyFeatured === numTracks) {
+              annotation =
+                language.$(capsule, 'fallbackPreviousMusicAnnotation');
+            } else {
+              annotation =
+                language.$(capsule, 'fallbackMusicAnnotation');
+            }
           }
 
           if (!html.isBlank(annotation)) {

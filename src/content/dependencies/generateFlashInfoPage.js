@@ -71,6 +71,9 @@ export default {
     featuredTracksList:
       relation('generateTrackList', flash.featuredTracks, []),
 
+    previouslyFeaturedTracksList:
+      relation('generateTrackList', flash.previouslyFeaturedTracks, []),
+
     contributorContributionList:
       relation('generateContributionList', flash.contributorContribs),
 
@@ -161,6 +164,19 @@ export default {
               }),
 
             relations.featuredTracksList,
+          ]),
+
+          html.tags([
+            relations.contentHeading.clone()
+              .slots({
+                attributes: {id: 'previously-featured'},
+                title:
+                  language.$('releaseInfo.tracksPreviouslyFeatured', {
+                    flash: html.tag('i', data.name),
+                  }),
+              }),
+
+            relations.previouslyFeaturedTracksList,
           ]),
 
           relations.contributorContributionList.slots({

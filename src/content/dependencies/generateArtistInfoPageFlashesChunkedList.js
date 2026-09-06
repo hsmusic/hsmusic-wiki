@@ -14,14 +14,26 @@ export default {
     const mockFeaturedTrackContributions =
       artist.trackArtistContributions
         .map(contrib => contrib.thing)
-        .flatMap(track => track.ownFeaturedInFlashes
-          .map(flash => ({
+        .map(track => [
+          track.ownFeaturedInFlashes.map(flash => ({
             isMockFeaturedTrackContribution: true,
             date: flash.date,
             thing: flash,
             artist,
             track,
-          })));
+            previously: false,
+          })),
+
+          track.ownPreviouslyFeaturedInFlashes.map(flash => ({
+            isMockFeaturedTrackContribution: true,
+            date: flash.date,
+            thing: flash,
+            artist,
+            track,
+            previously: true,
+          })),
+        ])
+        .flat(2);
 
     const allContributions =
       (sprawl.enableFlashesAndGames

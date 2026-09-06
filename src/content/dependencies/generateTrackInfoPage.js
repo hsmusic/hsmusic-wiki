@@ -121,7 +121,14 @@ export default {
         track),
 
     flashesThatFeatureList:
-      relation('generateDividedFeaturedInFlashesList', track.featuredInFlashes, track),
+      relation('generateDividedFeaturedInFlashesList',
+        track.featuredInFlashes,
+        track),
+
+    flashesThatPreviouslyFeaturedList:
+      relation('generateDividedFeaturedInFlashesList',
+        track.previouslyFeaturedInFlashes,
+        track),
 
     lyricsSection:
       relation('generateLyricsSection', track.lyrics),
@@ -344,6 +351,15 @@ export default {
             }),
 
             relations.flashesThatFeatureList,
+          ]),
+
+          html.tags([
+            relations.connectionsContentHeading.clone().slots({
+              attributes: {id: 'previously-featured-in'},
+              string: 'releaseInfo.flashesThatPreviouslyFeatured',
+            }),
+
+            relations.flashesThatPreviouslyFeaturedList,
           ]),
 
           data.firstTrackInSingle &&

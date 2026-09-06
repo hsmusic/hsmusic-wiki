@@ -414,6 +414,11 @@ releaseInfo:
     withoutName: "Flashes that feature this track:"
     sticky: "Flashes that feature this track:"
 
+  flashesThatPreviouslyFeatured:
+    _: "Flashes that previously featured {TRACK}:"
+    withoutName: "Flashes that previously featured this track:"
+    sticky: "Flashes that previously featured this track:"
+
   referencesArtworks: "References {ARTWORKS}."
   referencedByArtworks: "Referenced by {ARTWORKS}."
 
@@ -421,6 +426,7 @@ releaseInfo:
   # such as "Tracks that this flash features",
   # because not all flashes are *called* flashes!
   tracksFeatured: "Tracks that {FLASH} features:"
+  tracksPreviouslyFeatured: "Tracks that {FLASH} previously featured:"
 
   # Actions
 
@@ -2084,6 +2090,7 @@ artistPage:
           {FLASH} ({TRACKS}) — {ANNOTATION}
 
         fallbackMusicAnnotation: "music"
+        fallbackPreviousMusicAnnotation: "previously"
 
       artwork.accent:
         withLabel: >-
