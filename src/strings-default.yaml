@@ -758,6 +758,9 @@ misc:
     # isn't a specially detected web platform.
     noExternalLinkPlatformName: "Other"
 
+    mainNameIfAliased: >-
+      {NAME}:
+
     chronology:
       heading:
         artistReleases: "Releases by {ARTIST}:"

@@ -178,12 +178,15 @@
     height: 1.4em;
   }
 
+  .contribution-tooltip .main-name,
   .contribution-tooltip .chronology-heading {
     grid-column-start: handle-start;
-    grid-column-end: platform-end;
-
-    min-width: 30ch;
+    grid-column-end: handle-end;
     margin-bottom: 2px;
+  }
+
+  .contribution-tooltip .chronology-heading {
+    min-width: 30ch;
   }
 
   .contribution-tooltip .chronology-link {
@@ -258,6 +261,11 @@
     margin-bottom: 4px;
   }
 
+  .contribution-tooltip .main-name {
+    font-size: 0.9em;
+    font-style: oblique;
+  }
+
   .contribution-tooltip .chronology-heading {
     font-size: 0.85em;
     font-style: oblique;
@@ -272,6 +280,14 @@
 @layer interaction {
   .contribution-tooltip .tooltip-content {
     cursor: default;
+  }
+
+  .contribution-tooltip.show-info {
+    .main-name,
+    .chronology-heading {
+      grid-column-start: handle-start;
+      grid-column-end: platform-end;
+    }
   }
 
   .contribution-tooltip.show-info .external-platform,

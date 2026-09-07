@@ -1,3 +1,5 @@
+import {compareKebabCase} from '#wiki-data';
+
 function compareReleaseContributions(a, b) {
   if (a === b) {
     return true;
@@ -61,6 +63,9 @@ export default {
     artistName:
       contribution.artist.name,
 
+    creditedName:
+      contribution.artistText,
+
     isAlbumArtistContribution:
       contribution.thing.isAlbum &&
       contribution.thingProperty === 'artistContribs',
@@ -95,8 +100,20 @@ export default {
         },
 
         content: [
-          slots.showExternalLinks &&
-            relations.externalLinkSection,
+          html.tags([
+            data.creditedName &&
+            !compareKebabCase(data.creditedName, data.artistName) &&
+              html.tag('span', {class: 'main-name'},
+                {[html.onlyIfSiblings]: true},
+
+                language.$(capsule, 'mainNameIfAliased', {
+                  name:
+                    language.sanitize(data.artistName),
+                })),
+
+            slots.showExternalLinks &&
+              relations.externalLinkSection,
+          ]),
 
           slots.showChronology &&
             language.encapsulate(capsule, 'chronology', capsule => {
