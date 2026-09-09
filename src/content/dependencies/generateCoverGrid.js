@@ -5,6 +5,9 @@ export default {
     expando:
       relation('generateGridExpando'),
 
+    actionLinks:
+      relation('generateGridActionLinks'),
+
     items:
       (artworksAndThings
         ? artworksAndThings.map(x => relation('generateCoverGridItem', x))
@@ -96,13 +99,7 @@ export default {
               })))));
 
     const actionLinks =
-      html.tag('div', {class: 'grid-actions'},
-        {[html.onlyIfContent]: true},
-
-        (slots.actionLinks ?? [])
-          .filter(link => link && !html.isBlank(link))
-          .map(link => link
-            .slot('attributes', {class: ['grid-item', 'box']})));
+      relations.actionLinks.slot('actionLinks', slots.actionLinks);
 
     const bottom =
       (slots.cutIndex >= 1 &&

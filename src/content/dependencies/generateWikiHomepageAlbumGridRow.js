@@ -1,4 +1,4 @@
-import {empty, stitchArrays} from '#sugar';
+import {empty} from '#sugar';
 import {getNewAdditions, getNewReleases} from '#wiki-data';
 
 export default {
@@ -33,42 +33,15 @@ export default {
 
   relations: (relation, sprawl, _row) => ({
     coverGrid:
-      relation('generateCoverGrid'),
-
-    links:
-      sprawl.albums
-        .map(album => relation('linkAlbum', album)),
-
-    images:
-      sprawl.albums
-        .map(album =>
-          relation('image',
-            (album.hasCoverArt
-              ? album.coverArtworks[0]
-              : null))),
+      relation('generateCoverGrid',
+        sprawl.albums.map(album =>
+          (album.hasCoverArt
+            ? album.coverArtworks[0]
+            : album))),
   }),
 
-  data: (sprawl, _row) => ({
-    names:
-      sprawl.albums
-        .map(album => album.name),
-  }),
-
-  generate: (data, relations, {language}) =>
+  generate: (relations) =>
     relations.coverGrid.slots({
-      links: relations.links,
-      names: data.names,
-
-      images:
-        stitchArrays({
-          image: relations.images,
-          name: data.names,
-        }).map(({image, name}) =>
-            image.slots({
-              missingSourceContent:
-                language.$('misc.coverGrid.noCoverArt', {
-                  album: name,
-                }),
-              })),
+      allWarnings: [],
     }),
 };
