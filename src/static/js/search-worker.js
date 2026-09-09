@@ -487,10 +487,14 @@ function performSearchAction({query, options}) {
 const interestingFieldCombinations = [
   ['primaryName'],
   ['primaryName', 'nameDetail'],
+  ['directory'],
+  ['directory', 'nameDetail'],
   ['additionalNames'],
   ['additionalNames', 'nameDetail'],
   ['primaryName', 'groups'],
   ['primaryName', 'nameDetail', 'groups'],
+  ['directory', 'groups'],
+  ['directory', 'nameDetail', 'groups'],
 ];
 
 function queryGenericIndex(query, options) {

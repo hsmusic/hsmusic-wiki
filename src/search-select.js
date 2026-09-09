@@ -150,6 +150,10 @@ function baselineProcess(thing, _opts) {
     thing.nameDetailAcrossWiki ??
     thing.nameDetail;
 
+  fields.directory =
+    thing.directoryWithinAlbum ??
+    thing.directory;
+
   fields.artwork =
     null;
 
@@ -254,6 +258,11 @@ function genericProcess(thing, opts) {
   fields.parentName =
     (thing.isTrack ? thing.album.name
    : thing.isGroup ? thing.category.name
+   : thing.isFlash ? thing.act.name
+      : null);
+
+  fields.parentDirectory =
+    (thing.isTrack ? thing.album.name
    : thing.isFlash ? thing.act.name
       : null);
 
