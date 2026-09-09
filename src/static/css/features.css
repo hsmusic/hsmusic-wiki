@@ -572,7 +572,6 @@
   #artwork-column .album-art-info {
     width: 83.83%;
     margin: 10px 4px 18px auto;
-    z-index: 2;
   }
 
   #artwork-column .cover-artwork:not(:first-child),
@@ -691,8 +690,12 @@
     --normal-shadow: -0.7px 3.3px 10px 8px #00000068;
   }
 
+  #artwork-column .cover-artwork:has(+ .album-art-info) {
+    --normal-shadow: -1px 2px 10px 7px #00000070;
+  }
+
   #artwork-column .album-art-info {
-    box-shadow: 0 0 9px 9px #00000068;
+    box-shadow: 0 3px 9px 5px #00000068;
   }
 
   .cover-artwork .image-details {
