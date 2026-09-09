@@ -33,15 +33,22 @@ export default {
 
   relations: (relation, sprawl, _row) => ({
     coverGrid:
-      relation('generateCoverGrid',
-        sprawl.albums.map(album =>
+      relation('generateCoverGrid'),
+
+    coverGridItems:
+      sprawl.albums.map(album =>
+        relation('generateCoverGridItem',
           (album.hasCoverArt
             ? album.coverArtworks[0]
             : album))),
   }),
 
-  generate: (relations) =>
+  generate: (relations, {html}) =>
     relations.coverGrid.slots({
       allWarnings: [],
+
+      items:
+        relations.coverGridItems
+          .map(item => item.slot('details', html.blank())),
     }),
 };
