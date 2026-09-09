@@ -1,12 +1,11 @@
 import {sortArtworksChronologically} from '#sort';
-import {empty, stitchArrays, unique} from '#sugar';
+import {stitchArrays, unique} from '#sugar';
 
 export default {
-  sprawl({wikiInfo}) {
-    return {
-      enableListings: wikiInfo.enableListings,
-    };
-  },
+  sprawl: ({wikiInfo}) => ({
+    enableListings:
+      wikiInfo.enableListings,
+  }),
 
   query(sprawl, artTag) {
     const directArtworks = artTag.directlyFeaturedInArtworks;
@@ -18,98 +17,66 @@ export default {
     return {directArtworks, indirectArtworks, allArtworks};
   },
 
-  relations(relation, query, sprawl, artTag) {
-    const relations = {};
+  relations: (relation, query, sprawl, artTag) => ({
+    layout:
+      relation('generatePageLayout'),
 
-    relations.layout =
-      relation('generatePageLayout');
+    navLinks:
+      relation('generateArtTagNavLinks', artTag),
 
-    relations.navLinks =
-      relation('generateArtTagNavLinks', artTag);
+    additionalNamesBox:
+      relation('generateAdditionalNamesBox', artTag.additionalNames),
 
-    relations.additionalNamesBox =
-      relation('generateAdditionalNamesBox', artTag.additionalNames);
+    quickDescription:
+      relation('generateQuickDescription', artTag),
 
-    relations.quickDescription =
-      relation('generateQuickDescription', artTag);
+    featuredLine:
+      relation('generateArtTagGalleryPageFeaturedLine'),
 
-    relations.featuredLine =
-      relation('generateArtTagGalleryPageFeaturedLine');
+    showingLine:
+      relation('generateArtTagGalleryPageShowingLine'),
 
-    relations.showingLine =
-      relation('generateArtTagGalleryPageShowingLine');
+    extraReadingLinks:
+      artTag.extraReadingURLs
+        .map(entry => relation('linkExternal', entry)),
 
-    if (!empty(artTag.extraReadingURLs)) {
-      relations.extraReadingLinks =
-        artTag.extraReadingURLs
-          .map(entry => relation('linkExternal', entry));
-    }
+    ancestorLinks:
+      artTag.directAncestorArtTags
+        .map(artTag => relation('linkArtTagGallery', artTag)),
 
-    if (!empty(artTag.directAncestorArtTags)) {
-      relations.ancestorLinks =
-        artTag.directAncestorArtTags
-          .map(artTag => relation('linkArtTagGallery', artTag));
-    }
+    descendantLinks:
+      artTag.directDescendantArtTags
+        .map(artTag => relation('linkArtTagGallery', artTag)),
 
-    if (!empty(artTag.directDescendantArtTags)) {
-      relations.descendantLinks =
-        artTag.directDescendantArtTags
-          .map(artTag => relation('linkArtTagGallery', artTag));
-    }
+    coverGrid:
+      relation('generateCoverGrid'),
 
-    relations.coverGrid =
-      relation('generateCoverGrid');
-
-    relations.links =
+    coverGridItems:
       query.allArtworks
-        .map(artwork => relation('linkAnythingMan', artwork.thing));
+        .map(artwork => relation('generateCoverGridItem', artwork)),
+  }),
 
-    relations.images =
+  data: (query, sprawl, artTag) => ({
+    enableListings: sprawl.enableListings,
+
+    name: artTag.name,
+    color: artTag.color,
+
+    numArtworksIndirectly: query.indirectArtworks.length,
+    numArtworksDirectly: query.directArtworks.length,
+    numArtworksTotal: query.allArtworks.length,
+
+    onlyFeaturedIndirectly:
+      query.allArtworks.map(artwork => !query.directArtworks.includes(artwork)),
+
+    hasMixedDirectIndirect:
+      query.allArtworks.some(artwork => query.directArtworks.includes(artwork)) &&
+      query.allArtworks.some(artwork => !query.directArtworks.includes(artwork)),
+
+    allWarnings:
       query.allArtworks
-        .map(artwork => relation('image', artwork));
-
-    return relations;
-  },
-
-  data(query, sprawl, artTag) {
-    const data = {};
-
-    data.enableListings = sprawl.enableListings;
-
-    data.name = artTag.name;
-    data.color = artTag.color;
-
-    data.numArtworksIndirectly = query.indirectArtworks.length;
-    data.numArtworksDirectly = query.directArtworks.length;
-    data.numArtworksTotal = query.allArtworks.length;
-
-    data.names =
-      query.allArtworks
-        .map(artwork => artwork.thing.name);
-
-    data.artworkArtists =
-      query.allArtworks
-        .map(artwork => artwork.artistContribs
-          .map(contrib => contrib.artist.name));
-
-    data.artworkLabels =
-      query.allArtworks
-        .map(artwork => artwork.label)
-
-    data.onlyFeaturedIndirectly =
-      query.allArtworks.map(artwork =>
-        !query.directArtworks.includes(artwork));
-
-    data.hasMixedDirectIndirect =
-      data.onlyFeaturedIndirectly.includes(true) &&
-      data.onlyFeaturedIndirectly.includes(false);
-
-    data.allWarnings =
-      query.allArtworks
-        .flatMap(artwork => artwork?.contentWarnings);
-
-    return data;
-  },
+        .flatMap(artwork => artwork?.contentWarnings),
+  }),
 
   generate: (data, relations, {html, language}) =>
     language.encapsulate('artTagGalleryPage', pageCapsule =>
@@ -127,7 +94,7 @@ export default {
         mainClasses: ['top-index'],
         mainContent: [
           relations.quickDescription.slots({
-            extraReadingLinks: relations.extraReadingLinks ?? null,
+            extraReadingLinks: relations.extraReadingLinks,
           }),
 
           html.tag('p', {class: 'quick-info'}, [
@@ -177,53 +144,40 @@ export default {
             ],
           ]),
 
-          relations.ancestorLinks &&
-            html.tag('p', {id: 'descends-from-line'},
-              {class: 'quick-info'},
-              language.$(pageCapsule, 'descendsFrom', {
-                tags: language.formatUnitList(relations.ancestorLinks),
-              })),
+          html.tag('p', {id: 'descends-from-line'},
+            {class: 'quick-info'},
+            {[html.onlyIfContent]: true},
 
-          relations.descendantLinks &&
-            html.tag('p', {id: 'descendants-line'},
-              {class: 'quick-info'},
-              language.$(pageCapsule, 'descendants', {
-                tags: language.formatUnitList(relations.descendantLinks),
-              })),
+            language.$(pageCapsule, 'descendsFrom', {
+              [language.onlyIfOptions]: ['tags'],
+              tags: language.formatUnitList(relations.ancestorLinks),
+            })),
 
-          relations.coverGrid
-            .slots({
-              links: relations.links,
-              images: relations.images,
-              names: data.names,
-              lazy: 12,
+          html.tag('p', {id: 'descendants-line'},
+            {class: 'quick-info'},
+            {[html.onlyIfContent]: true},
 
-              classes:
-                data.onlyFeaturedIndirectly.map(onlyFeaturedIndirectly =>
-                  (onlyFeaturedIndirectly ? 'featured-indirectly' : '')),
+            language.$(pageCapsule, 'descendants', {
+              [language.onlyIfOptions]: ['tags'],
+              tags: language.formatUnitList(relations.descendantLinks),
+            })),
 
-              info:
-                stitchArrays({
-                  artists: data.artworkArtists,
-                  label: data.artworkLabels,
-                }).map(({artists, label}) =>
-                    language.encapsulate('misc.coverGrid.details.coverArtists', workingCapsule => {
-                      const workingOptions = {};
+          relations.coverGrid.slots({
+            lazy: 12,
+            allWarnings: data.allWarnings,
 
-                      workingOptions[language.onlyIfOptions] = ['artists'];
-                      workingOptions.artists =
-                        language.formatUnitList(artists);
-
-                      if (label) {
-                        workingCapsule += '.customLabel';
-                        workingOptions.label = label;
-                      }
-
-                      return language.$(workingCapsule, workingOptions);
-                    })),
-
-              revealAllWarnings: data.allWarnings,
-            }),
+            items:
+              stitchArrays({
+                item: relations.coverGridItems,
+                onlyFeaturedIndirectly: data.onlyFeaturedIndirectly,
+              }).map(({item, onlyFeaturedIndirectly}) =>
+                  item.slots({
+                    attributes: [
+                      onlyFeaturedIndirectly &&
+                        {class: 'featured-indirectly'},
+                    ],
+                  })),
+          }),
         ],
 
         navLinkStyle: 'hierarchical',

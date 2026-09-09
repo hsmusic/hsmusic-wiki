@@ -12,9 +12,6 @@ export default {
     artTagDetails:
       relation('generateCoverArtworkArtTagDetails', artwork),
 
-    artistDetails:
-      relation('generateCoverArtworkArtistDetails', artwork),
-
     referenceDetails:
       relation('generateCoverArtworkReferenceDetails', artwork),
   }),
@@ -50,7 +47,6 @@ export default {
 
     showOriginDetails: {type: 'boolean', default: false},
     showArtTagDetails: {type: 'boolean', default: false},
-    showArtistDetails: {type: 'boolean', default: false},
     showReferenceDetails: {type: 'boolean', default: false},
 
     details: {
@@ -139,9 +135,6 @@ export default {
 
               slots.showArtTagDetails &&
                 relations.artTagDetails,
-
-              slots.showArtistDetails &&
-                relations.artistDetails,
 
               slots.showReferenceDetails &&
                 relations.referenceDetails,

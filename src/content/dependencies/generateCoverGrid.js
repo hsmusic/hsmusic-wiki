@@ -1,190 +1,127 @@
-import {empty, stitchArrays, unique} from '#sugar';
+import {unique} from '#sugar';
 
 export default {
-  relations: (relation) => ({
-    actionLinks:
-      relation('generateGridActionLinks'),
-
+  relations: (relation, artworksAndThings) => ({
     expando:
       relation('generateGridExpando'),
+
+    items:
+      (artworksAndThings
+        ? artworksAndThings.map(x => relation('generateCoverGridItem', x))
+        : null),
+  }),
+
+  data: (artworksAndThings) => ({
+    allWarnings:
+      (artworksAndThings ?? [])
+        .filter(artworkOrThing => artworkOrThing.isArtwork)
+        .flatMap(artwork => artwork.contentWarnings)
   }),
 
   slots: {
     attributes: {type: 'attributes', mutable: false},
 
-    images: {validate: v => v.strictArrayOf(v.isHTML)},
-    links: {validate: v => v.strictArrayOf(v.isHTML)},
-    names: {validate: v => v.strictArrayOf(v.isHTML)},
-    info: {validate: v => v.strictArrayOf(v.isHTML)},
-    tab: {validate: v => v.strictArrayOf(v.isHTML)},
-    notFromThisGroup: {validate: v => v.strictArrayOf(v.isBoolean)},
-
-    // Differentiating from sparseArrayOf here - this list of classes should
-    // have the same length as the items above, i.e. nulls aren't going to be
-    // filtered out of it, but it is okay to *include* null (standing in for
-    // no classes for this grid item).
-    classes: {
-      validate: v =>
-        v.strictArrayOf(
-          v.optional(
-            v.anyOf(
-              v.isArray,
-              v.isString))),
-    },
-
-    itemAttributes: {
-      validate: v =>
-        v.strictArrayOf(
-          v.optional(v.isAttributes)),
-    },
-
+    // Configuration stuff
     lazy: {validate: v => v.anyOf(v.isWholeNumber, v.isBoolean)},
-    actionLinks: {validate: v => v.sparseArrayOf(v.isHTML)},
-
-    revealAllWarnings: {
-      validate: v => v.looseArrayOf(v.isString),
-    },
-
-    bottomCaption: {
-      type: 'html',
-      mutable: false,
-    },
-
     cutIndex: {validate: v => v.isWholeNumber},
+
+    // Optional - overrides the defaults
+    items: {validate: v => v.strictArrayOf(v.isHTML)},
+    allWarnings: {validate: v => v.looseArrayOf(v.isString)},
+
+    // Optional
+    actionLinks: {validate: v => v.sparseArrayOf(v.isHTML)},
+    bottomCaption: {type: 'html', mutable: false},
   },
 
-  generate: (relations, slots, {html, language}) =>
-    html.tag('div', {class: 'grid-listing'},
-      slots.attributes,
-      {[html.onlyIfContent]: true},
+  generate(data, relations, slots, {html, language}) {
+    const items =
+      slots.items ??
+      relations.items;
 
-      !empty((slots.revealAllWarnings ?? []).filter(Boolean)) &&
-        language.encapsulate('misc.coverGrid.revealAll', capsule =>
-          html.tag('div', {class: 'reveal-all-container'},
-            ((slots.tab ?? [])
-              .slice(0, 4)
-              .some(tab => tab && !html.isBlank(tab))) &&
+    for (const [index, item] of items.entries()) {
+      item.setSlots({
+        lazy:
+          (typeof slots.lazy === 'number'
+            ? index >= slots.lazy
+         : typeof slots.lazy === 'boolean'
+            ? slots.lazy
+            : false),
 
-              {class: 'has-nearby-tab'},
+        cut:
+          slots.cutIndex >= 1 &&
+          index >= slots.cutIndex,
+      });
+    }
 
-            html.tag('p', {class: 'reveal-all'}, [
-              html.tag('a', {href: '#'},
-                html.tag('span', {class: 'reveal-label'},
-                  language.$(capsule, 'reveal')),
+    const anyTabsOnFirstLine =
+      items.slice(0, 4)
+        .map(item => item.getSlotValue('tab'))
+        .some(tab => !html.isBlank(tab));
 
-                html.tag('span', {class: 'conceal-label'},
-                  {style: 'display: none'},
-                  language.$(capsule, 'conceal'))),
+    const allWarnings =
+      slots.allWarnings ??
+      data.allWarnings;
 
-              html.tag('br'),
+    const revealAllWarningsLine =
+      language.encapsulate('misc.coverGrid.revealAll', capsule =>
+        html.tag('div', {class: 'reveal-all-container'},
+          anyTabsOnFirstLine &&
+            {class: 'has-nearby-tab'},
 
-              html.tag('span', {class: 'warnings'},
-                language.$(capsule, 'warnings', {
-                  warnings:
-                    language.formatUnitList(
-                      unique(slots.revealAllWarnings.filter(Boolean))
-                        .sort()
-                        .map(warning => html.tag('b', warning))),
-                })),
-            ]))),
+          html.tag('p', {class: 'reveal-all'},
+            {[html.joinChildren]: html.tag('br')},
 
-      stitchArrays({
-        classes: slots.classes,
-        attributes: slots.itemAttributes,
-        image: slots.images,
-        link: slots.links,
-        name: slots.names,
-        info: slots.info,
-        tab: slots.tab,
+            html.tag('a', {href: '#'},
+              {[html.onlyIfSiblings]: true},
 
-        notFromThisGroup:
-          slots.notFromThisGroup ??
-          Array.from(slots.links).fill(null)
-      }).map(({
-          classes,
-          attributes,
-          image,
-          link,
-          name,
-          info,
-          tab,
-          notFromThisGroup,
-        }, index) =>
-          link.slots({
-            attributes: [
-              link.getSlotValue('attributes'),
+              html.tag('span', {class: 'reveal-label'},
+                language.$(capsule, 'reveal')),
 
-              {class: ['grid-item', 'box']},
+              html.tag('span', {class: 'conceal-label'},
+                {style: 'display: none'},
+                language.$(capsule, 'conceal'))),
 
-              tab &&
-              !html.isBlank(tab) &&
-                {class: 'has-tab'},
+            html.tag('span', {class: 'warnings'},
+              {[html.onlyIfContent]: true},
 
-              attributes,
+              language.$(capsule, 'warnings', {
+                [language.onlyIfOptions]: ['warnings'],
 
-              (classes
-                ? {class: classes}
-                : null),
+                warnings:
+                  language.formatUnitList(
+                    unique(allWarnings.filter(Boolean))
+                      .sort()
+                      .map(warning => html.tag('b', warning))),
+              })))));
 
-              slots.cutIndex >= 1 &&
-              index >= slots.cutIndex &&
-                {class: 'hidden-by-expandable-cut'},
-            ],
+    const actionLinks =
+      html.tag('div', {class: 'grid-actions'},
+        {[html.onlyIfContent]: true},
 
-            colorContext: 'image-box',
+        (slots.actionLinks ?? [])
+          .filter(link => link && !html.isBlank(link))
+          .map(link => link
+            .slot('attributes', {class: ['grid-item', 'box']})));
 
-            content: [
-              html.tag('span',
-                {[html.onlyIfContent]: true},
-
-                tab),
-
-              image.slots({
-                thumb: 'medium',
-                lazy:
-                  (typeof slots.lazy === 'number'
-                    ? index >= slots.lazy
-                 : typeof slots.lazy === 'boolean'
-                    ? slots.lazy
-                    : false),
-              }),
-
-              html.tag('span',
-                {[html.onlyIfContent]: true},
-
-                (notFromThisGroup
-                  ? language.encapsulate('misc.coverGrid.details.notFromThisGroup', capsule =>
-                      language.$(capsule, {
-                        name,
-                        marker:
-                          html.tag('span', {class: 'grid-name-marker'},
-                            language.$(capsule, 'marker')),
-                      }))
-                  : language.sanitize(name))),
-
-              html.tag('span',
-                {[html.onlyIfContent]: true},
-
-                language.$('misc.coverGrid.details.accent', {
-                  [language.onlyIfOptions]: ['details'],
-
-                  details: info,
-                })),
-            ],
-          })),
-
-      relations.actionLinks
-        .slot('actionLinks', slots.actionLinks),
-
+    const bottom =
       (slots.cutIndex >= 1 &&
-       slots.cutIndex < slots.links.length
-        ? relations.expando.slots({
-            caption: slots.bottomCaption,
-          })
+       slots.cutIndex < items.length
+        ? relations.expando.slot('caption', slots.bottomCaption)
+        : html.tag('p', {class: 'grid-caption'},
+            {[html.onlyIfContent]: true},
+            slots.bottomCaption));
 
-     : !html.isBlank(relations.bottomCaption)
-        ? html.tag('p', {class: 'grid-caption'},
-            slots.bottomCaption)
+    const grid =
+      html.tag('div', {class: 'grid-listing'},
+        {[html.onlyIfContent]: true},
+        slots.attributes,
 
-        : html.blank())),
+        revealAllWarningsLine,
+        items,
+        actionLinks,
+        bottom);
+
+    return grid;
+  },
 };

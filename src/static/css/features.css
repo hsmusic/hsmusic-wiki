@@ -1080,6 +1080,10 @@
     max-width: 200px;
   }
 
+  .grid-listing.big > .grid-item {
+    max-width: 280px;
+  }
+
   .grid-actions {
     margin: 15px;
     align-self: center;

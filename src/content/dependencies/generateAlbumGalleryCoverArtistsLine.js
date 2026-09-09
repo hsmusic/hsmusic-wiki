@@ -1,17 +1,25 @@
 export default {
-  relations(relation, coverArtists) {
-    return {
-      coverArtistLinks:
-        coverArtists
-          .map(artist => relation('linkArtistGallery', artist)),
-    };
-  },
+  relations: (relation, artists) => ({
+    artistLinks:
+      artists
+        .map(artist => relation('linkArtistGallery', artist)),
+  }),
 
-  generate(relations, {html, language}) {
-    return (
+  data: (artists) => ({
+    creditAsFrom:
+      artists.every(artist => artist.creditArtworksAsFromArtist),
+  }),
+
+  generate: (data, relations, {html, language}) =>
+    language.encapsulate('albumGalleryPage', pageCapsule =>
       html.tag('p', {class: 'quick-info'},
-        language.$('albumGalleryPage.coverArtistsLine', {
-          artists: language.formatConjunctionList(relations.coverArtistLinks),
-        })));
-  },
+        (data.creditAsFrom
+          ? language.$(pageCapsule, 'allTrackArtworkFrom', {
+              artists:
+                language.formatConjunctionList(relations.artistLinks),
+            })
+          : language.$(pageCapsule, 'allTrackArtworkBy', {
+              artists:
+                language.formatConjunctionList(relations.artistLinks),
+            })))),
 };

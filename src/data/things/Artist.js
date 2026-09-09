@@ -49,6 +49,8 @@ export class Artist extends Thing {
     directory: directory(),
     urls: urls(),
 
+    creditArtworksAsFromArtist: flag(V(false)),
+
     contextNotes: contentString(),
 
     hasAvatar: flag(V(false)),
@@ -364,6 +366,11 @@ export class Artist extends Thing {
       'Artist': {property: 'name'},
       'Directory': {property: 'directory'},
       'URLs': {property: 'urls', transform: parseURLs},
+
+      'Credit Artworks As From Artist': {
+        property: 'creditArtworksAsFromArtist',
+      },
+
       'Context Notes': {property: 'contextNotes'},
 
       // note: doesn't really work as an independent field yet

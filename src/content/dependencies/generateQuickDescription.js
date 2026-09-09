@@ -1,3 +1,5 @@
+import {empty} from '#sugar';
+
 export default {
   query: (thing) => ({
     hasDescription:
@@ -40,10 +42,13 @@ export default {
   generate(data, relations, slots, {html, language}) {
     const prefix = 'misc.quickDescription';
 
+    const hasExtraReadingLinks =
+      !empty(slots.extraReadingLinks);
+
     const actionsWithoutLongerDescription =
       (data.hasLongerDescription
         ? null
-     : slots.extraReadingLinks
+     : hasExtraReadingLinks
         ? language.$(prefix, 'readMore', {
             links:
               language.formatDisjunctionList(slots.extraReadingLinks),
@@ -56,7 +61,7 @@ export default {
         content);
 
     const actionsWhenCollapsed =
-      (data.hasLongerDescription && slots.extraReadingLinks
+      (data.hasLongerDescription && hasExtraReadingLinks
         ? language.$(prefix, 'expandDescription.orReadMore', {
             links:
               language.formatDisjunctionList(slots.extraReadingLinks),
@@ -73,7 +78,7 @@ export default {
         : null);
 
     const actionsWhenExpanded =
-      (data.hasLongerDescription && slots.extraReadingLinks
+      (data.hasLongerDescription && hasExtraReadingLinks
         ? language.$(prefix, 'collapseDescription.orReadMore', {
             links:
               language.formatDisjunctionList(slots.extraReadingLinks),
@@ -111,11 +116,11 @@ export default {
           {class: 'collapsed'},
 
         !data.hasLongerDescription &&
-        !slots.extraReadingLinks &&
+        hasExtraReadingLinks &&
           {class: 'has-content-only'},
 
         !data.hasDescription &&
-        slots.extraReadingLinks &&
+        !hasExtraReadingLinks &&
           {class: 'has-external-links-only'},
 
         wrapContent(null, relations.description),

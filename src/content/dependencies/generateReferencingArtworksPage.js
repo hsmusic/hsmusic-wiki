@@ -3,19 +3,12 @@ export default {
     layout:
       relation('generatePageLayout'),
 
-    cover:
-      relation('generateCoverArtwork', artwork),
+    thisArtworkCoverGrid:
+      relation('generateCoverGrid', [artwork]),
 
-    coverGrid:
-      relation('generateCoverGrid'),
-
-    links:
-      artwork.referencedByArtworks.map(({artwork}) =>
-        relation('linkAnythingMan', artwork.thing)),
-
-    images:
-      artwork.referencedByArtworks.map(({artwork}) =>
-        relation('image', artwork)),
+    referencingArtworksCoverGrid:
+      relation('generateCoverGrid',
+        artwork.referencedByArtworks.map(({artwork}) => artwork)),
   }),
 
   data: (artwork) => ({
@@ -24,16 +17,6 @@ export default {
 
     count:
       artwork.referencedByArtworks.length,
-
-    names:
-      artwork.referencedByArtworks
-        .map(({artwork}) => artwork.thing.name),
-
-    coverArtistNames:
-      artwork.referencedByArtworks
-        .map(({artwork}) =>
-          artwork.artistContribs
-            .map(contrib => contrib.artist.name)),
   }),
 
   slots: {
@@ -55,8 +38,9 @@ export default {
         styleTags: slots.styleTags,
 
         artworkColumnContent:
-          relations.cover.slots({
-            showArtistDetails: true,
+          relations.thisArtworkCoverGrid.slots({
+            attributes: {class: 'big'},
+            allWarnings: [],
           }),
 
         mainClasses: ['top-index'],
@@ -69,18 +53,7 @@ export default {
                 }),
             })),
 
-          relations.coverGrid.slots({
-            links: relations.links,
-            images: relations.images,
-            names: data.names,
-
-            info:
-              data.coverArtistNames.map(names =>
-                language.$('misc.coverGrid.details.coverArtists', {
-                  artists:
-                    language.formatUnitList(names),
-                })),
-          }),
+          relations.referencingArtworksCoverGrid,
         ],
 
         navLinkStyle: 'hierarchical',

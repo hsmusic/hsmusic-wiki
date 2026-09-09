@@ -185,13 +185,9 @@ export default {
     sourceGrid:
       relation('generateCoverGrid'),
 
-    sourceGridImages:
+    sourceGridItems:
       query.thingArtworks
-        .map(artwork => relation('image', artwork)),
-
-    sourceGridLinks:
-      query.things
-        .map(thing => relation('linkAnythingMan', thing)),
+        .map(artwork => relation('generateCoverGridItem', artwork)),
   }),
 
   data: (query, sprawl, artist) => ({
@@ -222,10 +218,6 @@ export default {
 
     kinds:
       query.kinds,
-
-    sourceGridNames:
-      query.things
-        .map(thing => thing.name),
 
     sourceGridGroupDirectories:
       query.thingGroups
@@ -359,47 +351,39 @@ export default {
 
           relations.sourceGrid.slots({
             attributes: {style: 'display: none'},
-
             lazy: true,
 
-            links:
-              relations.sourceGridLinks.map(link =>
-                link.slot('attributes', {target: '_blank'})),
-
-            names:
-              data.sourceGridNames,
-
-            images:
-              relations.sourceGridImages,
-
-            info:
+            items:
               stitchArrays({
+                item: relations.sourceGridItems,
                 contributionKinds: data.sourceGridContributionKinds,
                 contributionDates: data.sourceGridContributionDates,
                 groupDirectories: data.sourceGridGroupDirectories,
                 groupNames: data.sourceGridGroupNames,
               }).map(({
+                  item,
                   contributionKinds,
                   contributionDates,
                   groupDirectories,
                   groupNames,
-                }) => [
-                  stitchArrays({
-                    directory: groupDirectories,
-                    name: groupNames,
-                  }).map(({directory, name}) =>
-                    html.tag('data', {class: 'contribution-group'},
-                      {value: directory},
-                      name)),
+                }) =>
+                  item.slot('details', [
+                    stitchArrays({
+                      directory: groupDirectories,
+                      name: groupNames,
+                    }).map(({directory, name}) =>
+                      html.tag('data', {class: 'contribution-group'},
+                        {value: directory},
+                        name)),
 
-                  stitchArrays({
-                    kind: contributionKinds,
-                    date: contributionDates,
-                  }).map(({kind, date}) =>
-                      html.tag('time', {class: `${kind}-contribution-date`},
-                        {datetime: date.toUTCString()},
-                        language.formatDate(date))),
-                ]),
+                    stitchArrays({
+                      kind: contributionKinds,
+                      date: contributionDates,
+                    }).map(({kind, date}) =>
+                        html.tag('time', {class: `${kind}-contribution-date`},
+                          {datetime: date.toUTCString()},
+                          language.formatDate(date))),
+                  ])),
           })),
       ],
 

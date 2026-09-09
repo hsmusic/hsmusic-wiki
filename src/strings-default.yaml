@@ -1217,6 +1217,18 @@ misc:
     artworkBy.customLabel.withYear: >-
       {LABEL} ({YEAR}) by {ARTISTS}
 
+    artworkFrom: >-
+      Artwork from {ARTISTS}
+
+    artworkFrom.customLabel: >-
+      {LABEL} from {ARTISTS}
+
+    artworkFrom.withYear: >-
+      Artwork ({YEAR}) from {ARTISTS}
+
+    artworkFrom.customLabel.withYear: >-
+      {LABEL} ({YEAR}) from {ARTISTS}
+
     source: >-
       Via {SOURCE}
 
@@ -1329,13 +1341,16 @@ misc:
       albumLength.tracksOnly: >-
         {TRACKS}
 
-      coverArtists: "Artwork by {ARTISTS}"
-      coverArtists.customLabel: "{LABEL} by {ARTISTS}"
+      artworkBy: >-
+        Artwork by {ARTISTS}
+      artworkBy.customLabel: >-
+        {LABEL} by {ARTISTS}
+      artworkFrom: >-
+        Artwork from {ARTISTS}
+      artworkFrom.customLabel: >-
+        {LABEL} from {ARTISTS}
 
       otherCoverArtists: "With {ARTISTS}"
-
-  albumGalleryGrid:
-    noCoverArt: "{NAME}"
 
   # uiLanguage:
   #   Displayed in the footer, for switching between languages.
@@ -1549,8 +1564,11 @@ albumGalleryPage:
   #   This is displayed if every track (which has artwork at all)
   #   has the same illustration credits.
 
-  coverArtistsLine: >-
+  allTrackArtworkBy: >-
     All track artwork by {ARTISTS}.
+
+  allTrackArtworkFrom: >-
+    All track artwork from {ARTISTS}.
 
   # noTrackArtworksLine:
   #   This is displayed if none of the tracks on the album have any
@@ -1558,7 +1576,7 @@ albumGalleryPage:
   #   be linked from the album's other pages, but it is possible to
   #   end up on "stub galleries" using nav links on another gallery.
 
-  noTrackArtworksLine: >-
+  noTrackArtworks: >-
     This album doesn't have any track artwork.
 
   # setSwitcher:

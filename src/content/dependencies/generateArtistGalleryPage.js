@@ -1,4 +1,5 @@
 import {sortArtworksChronologically} from '#sort';
+import {stitchArrays} from '#sugar';
 
 export default {
   query: (artist) => ({
@@ -24,13 +25,9 @@ export default {
     coverGrid:
       relation('generateCoverGrid'),
 
-    links:
+    coverGridItems:
       query.artworks
-        .map(artwork => relation('linkAnythingMan', artwork.thing)),
-
-    images:
-      query.artworks
-        .map(artwork => relation('image', artwork)),
+        .map(artwork => relation('generateCoverGridItem', artwork)),
   }),
 
   data: (query, artist) => ({
@@ -39,10 +36,6 @@ export default {
 
     numArtworks:
       query.artworks.length,
-
-    names:
-      query.artworks
-        .map(artwork => artwork.thing.name),
 
     otherCoverArtists:
       query.artworks
@@ -75,22 +68,20 @@ export default {
                 }),
             })),
 
-          relations.coverGrid
-            .slots({
-              links: relations.links,
-              images: relations.images,
-              names: data.names,
+          relations.coverGrid.slots({
+            allWarnings: data.allWarnings,
 
-              info:
-                data.otherCoverArtists.map(names =>
-                  language.$('misc.coverGrid.details.otherCoverArtists', {
-                    [language.onlyIfOptions]: ['artists'],
-
-                    artists: language.formatUnitList(names),
-                  })),
-
-              revealAllWarnings: data.allWarnings,
-            }),
+            items:
+              stitchArrays({
+                item: relations.coverGridItems,
+                otherCoverArtists: data.otherCoverArtists,
+              }).map(({item, otherCoverArtists}) =>
+                  item.slot('details',
+                    language.$('misc.coverGrid.details.otherCoverArtists', {
+                      [language.onlyIfOptions]: ['artists'],
+                      artists: language.formatUnitList(otherCoverArtists),
+                    }))),
+          }),
         ],
 
         navLinkStyle: 'hierarchical',

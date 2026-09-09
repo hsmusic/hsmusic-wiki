@@ -1,5 +1,3 @@
-import {stitchArrays} from '#sugar';
-
 export default {
   query: (album) => ({
     artworks:
@@ -8,73 +6,24 @@ export default {
         : []),
   }),
 
-  relations: (relation, query, album) => ({
+  relations: (relation, query, _album) => ({
     coverGrid:
-      relation('generateCoverGrid'),
+      relation('generateCoverGrid', query.artworks),
 
-    albumLinks:
-      query.artworks.map(_artwork =>
-        relation('linkAlbum', album)),
-
-    images:
+    coverGridItems:
       query.artworks
-        .map(artwork => relation('image', artwork)),
-  }),
-
-  data: (query, album) => ({
-    albumName:
-      album.name,
-
-    artworkLabels:
-      query.artworks
-        .map(artwork => artwork.label),
-
-    artworkArtists:
-      query.artworks
-        .map(artwork => artwork.artistContribs
-          .map(contrib => contrib.artist.name)),
+        .map(artwork => relation('generateCoverGridItem', artwork))
   }),
 
   slots: {
     attributes: {type: 'attributes', mutable: false},
   },
 
-  generate: (data, relations, slots, {html, language}) =>
-    html.tag('div',
-      {[html.onlyIfContent]: true},
-
+  generate: (relations, slots, {html}) =>
+    html.tag('div', {[html.onlyIfContent]: true},
       slots.attributes,
 
-      relations.coverArtistsLine,
-
       relations.coverGrid.slots({
-        links:
-          relations.albumLinks,
-
-        names:
-          data.artworkLabels
-            .map(label => label ?? data.albumName),
-
-        images:
-          stitchArrays({
-            image: relations.images,
-            label: data.artworkLabels,
-          }).map(({image, label}) =>
-              image.slots({
-                missingSourceContent:
-                  language.$('misc.albumGalleryGrid.noCoverArt', {
-                    name:
-                      label ?? data.albumName,
-                  }),
-              })),
-
-        info:
-          data.artworkArtists.map(artists =>
-            language.$('misc.coverGrid.details.coverArtists', {
-              [language.onlyIfOptions]: ['artists'],
-
-              artists:
-                language.formatUnitList(artists),
-            })),
+        items: relations.coverGridItems,
       })),
 };

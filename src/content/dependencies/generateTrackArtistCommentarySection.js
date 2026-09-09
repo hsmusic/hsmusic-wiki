@@ -1,4 +1,4 @@
-import {empty, stitchArrays} from '#sugar';
+import {stitchArrays} from '#sugar';
 
 export default {
   query: (track) => ({
