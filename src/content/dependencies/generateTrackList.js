@@ -1,8 +1,10 @@
 export default {
-  relations: (relation, tracks, contextContributions) => ({
+  relations: (relation, list, contextContributions) => ({
     items:
-      tracks.map(track =>
-        relation('generateTrackListItem', track, contextContributions)),
+      list.map(item =>
+        (item.isDivider
+          ? relation('generateListDivider')
+          : relation('generateTrackListItem', item, contextContributions))),
   }),
 
   slots: {
@@ -31,16 +33,21 @@ export default {
     html.tag('ul',
       {[html.onlyIfContent]: true},
 
-      relations.items.map(item =>
-        item.slots({
-          showArtists: slots.showArtists,
-          showDuration: slots.showDuration,
+      relations.items.map(item => {
+        if (item.setSlots) {
+          item.setSlots({
+            showArtists: slots.showArtists,
+            showDuration: slots.showDuration,
 
-          showNameDetail:
-            (slots.showNameDetail
-              ? 'from across wiki'
-              : false),
+            showNameDetail:
+              (slots.showNameDetail
+                ? 'from across wiki'
+                : false),
 
-          colorMode: slots.colorMode,
-        }))),
+            colorMode: slots.colorMode,
+          });
+        };
+
+        return item;
+      })),
 };

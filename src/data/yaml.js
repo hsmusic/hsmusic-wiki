@@ -796,6 +796,20 @@ export function parseURLs(entries) {
   });
 }
 
+export function parseDividedReferenceList(entries) {
+  return parseArrayEntries(entries, item => {
+    if (item === '---') {
+      return {
+        [Symbol.for('hsmusic.find.passthrough')]: true,
+        [Symbol.for('hsmusic.reverse.ignore')]: true,
+        isDivider: true,
+      };
+    }
+
+    return item;
+  });
+}
+
 export function parseExcludingURLs(value) {
   if (typeof value === 'boolean') {
     switch (value) {

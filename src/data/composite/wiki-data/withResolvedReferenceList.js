@@ -4,7 +4,7 @@
 // ({notFoundMode: 'exit'}) or leave null in place ('null').
 
 import {input, templateCompositeFrom} from '#composite';
-import {isString, validateArrayItems} from '#validators';
+import {anyOf, isString, validateArrayItems} from '#validators';
 
 import {raiseOutputWithoutDependency, withAvailabilityFilter}
   from '#composite/control-flow';
@@ -22,7 +22,16 @@ export default templateCompositeFrom({
 
   inputs: {
     list: input({
-      validate: validateArrayItems(isString),
+      validate:
+        validateArrayItems(
+          anyOf(
+            isString,
+            item => {
+              if (typeof item !== 'object') return false;
+              if (item[Symbol.for('hsmusic.find.passthrough')]) return true;
+              return false;
+            })),
+
       acceptsNull: true,
     }),
 

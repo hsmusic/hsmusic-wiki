@@ -76,6 +76,10 @@ function reverseHelper(spec) {
       referencedThings: referencedThings,
     }).forEach(({referencingThing, referencedThings}) => {
         for (const referencedThing of referencedThings) {
+          if (referencedThing[Symbol.for('hsmusic.reverse.ignore')]) {
+            continue;
+          }
+
           if (cacheRecord.has(referencedThing)) {
             cacheRecord.get(referencedThing).push(referencingThing);
           } else {

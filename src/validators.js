@@ -923,7 +923,12 @@ export function validateReference(type) {
 }
 
 export function validateReferenceList(type) {
-  return validateArrayItems(validateReference(type));
+  return validateArrayItems(
+    anyOf(
+      validateReference(type),
+      validateProperties({
+        isDivider: is(true),
+      })));
 }
 
 export function validateThing({

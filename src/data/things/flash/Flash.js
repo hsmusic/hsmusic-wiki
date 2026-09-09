@@ -12,6 +12,7 @@ import {
   parseCreditingSources,
   parseDate,
   parseDimensions,
+  parseDividedReferenceList,
   parseURLs,
 } from '#yaml';
 
@@ -259,8 +260,15 @@ export class Flash extends Thing {
         transform: parseDimensions,
       },
 
-      'Featured Tracks': {property: 'featuredTracks'},
-      'Previously Featured Tracks': {property: 'previouslyFeaturedTracks'},
+      'Featured Tracks': {
+        property: 'featuredTracks',
+        transform: parseDividedReferenceList,
+      },
+
+      'Previously Featured Tracks': {
+        property: 'previouslyFeaturedTracks',
+        transform: parseDividedReferenceList,
+      },
 
       'Contributors': {
         property: 'contributorContribs',

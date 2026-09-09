@@ -308,6 +308,10 @@ function findHelper({
   const entry = (fullRef, data, opts = {}) => {
     if (!fullRef) return null;
 
+    if (fullRef[Symbol.for('hsmusic.find.passthrough')] === true) {
+      return fullRef;
+    }
+
     const {
       // The mode argument here may be 'warn', 'error', or 'quiet'. 'error' throws
       // errors for null matches (with details about the error), while 'warn' and
