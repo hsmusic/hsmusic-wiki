@@ -69,11 +69,14 @@ export default {
     const revealAllWarningsLine =
       language.encapsulate('misc.coverGrid.revealAll', capsule =>
         html.tag('div', {class: 'reveal-all-container'},
+          {[html.onlyIfContent]: true},
+
           anyTabsOnFirstLine &&
             {class: 'has-nearby-tab'},
 
           html.tag('p', {class: 'reveal-all'},
             {[html.joinChildren]: html.tag('br')},
+            {[html.onlyIfContent]: true},
 
             html.tag('a', {href: '#'},
               {[html.onlyIfSiblings]: true},
