@@ -5,7 +5,8 @@ export default {
     otherSecondaryReleasesWithCommentary:
       track.otherReleases
         .filter(track => !track.isMainRelease)
-        .filter(track => !empty(track.commentary)),
+        .filter(track => track.commentary
+          .some(entry => !entry.isWikiEditorCommentary)),
   }),
 
   relations: (relation, query, track) => ({
@@ -105,8 +106,14 @@ export default {
         html.tag('p', {class: ['drop', 'commentary-drop']},
           {[html.onlyIfContent]: true},
 
-          language.encapsulate(capsule, 'info.seeSpecificReleases', workingCapsule => {
+          language.encapsulate(capsule, 'info', workingCapsule => {
             const workingOptions = {};
+
+            if (html.isBlank(relations.artistCommentaryEntries)) {
+              workingCapsule += '.forArtistCommentary';
+            } else {
+              workingCapsule += '.forAdditionalArtistCommentary';
+            }
 
             workingOptions[language.onlyIfOptions] = ['albums'];
 
@@ -121,10 +128,6 @@ export default {
                       content: language.sanitize(albumName),
                       color: albumColor,
                     })));
-
-            if (!html.isBlank(relations.artistCommentaryEntries)) {
-              workingCapsule += '.withMainCommentary';
-            }
 
             return language.$(workingCapsule, workingOptions);
           })),

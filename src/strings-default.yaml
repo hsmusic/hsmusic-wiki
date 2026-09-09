@@ -720,11 +720,11 @@ misc:
       fromMainRelease.namedDifferently: >-
         The following commentary is properly placed on this track's main release, {ALBUM}, where it's named {NAME}.
 
-      seeSpecificReleases: >-
-        For release-specific commentary, check out: {ALBUMS}.
+      forArtistCommentary: >-
+        For artist commentary, check out: {ALBUMS}.
 
-      seeSpecificReleases.withMainCommentary: >-
-        For release-specific commentary, see also: {ALBUMS}.
+      forAdditionalArtistCommentary: >-
+        For more commentary, see also: {ALBUMS}.
 
   artistCredit:
     withNormalArtists: >-
