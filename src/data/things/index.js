@@ -3,6 +3,7 @@
 export * from './additional-file/index.js';
 export * from './album/index.js';
 export * from './artwork/index.js';
+export * from './carousel/index.js';
 export * from './content/index.js';
 export * from './contrib/index.js';
 export * from './flash/index.js';

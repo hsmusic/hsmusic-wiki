@@ -1,5 +1,5 @@
 import {sortChronologically} from '#sort';
-import {filterItemsForCarousel, getTotalDuration} from '#wiki-data';
+import {getTotalDuration} from '#wiki-data';
 
 export default {
   sprawl: ({wikiInfo}) =>
@@ -13,9 +13,6 @@ export default {
 
     query.allTracks =
       query.allAlbums.flatMap((album) => album.tracks);
-
-    query.carouselAlbums =
-      filterItemsForCarousel(group.featuredAlbums);
 
     return query;
   },
@@ -33,15 +30,9 @@ export default {
         : null),
 
     coverCarousel:
-      relation('generateCoverCarousel'),
-
-    carouselLinks:
-      query.carouselAlbums
-        .map(album => relation('linkAlbum', album)),
-
-    carouselImages:
-      query.carouselAlbums
-        .map(album => relation('image', album.coverArtworks[0])),
+      (group.carousel
+        ? relation('generateCoverCarousel', group.carousel)
+        : null),
 
     quickDescription:
       relation('generateQuickDescription', group),
@@ -83,11 +74,7 @@ export default {
 
         mainClasses: ['top-index'],
         mainContent: [
-          relations.coverCarousel.slots({
-            links: relations.carouselLinks,
-            images: relations.carouselImages,
-          }),
-
+          relations.coverCarousel,
           relations.quickDescription,
 
           html.tag('p', {class: 'quick-info'},

@@ -534,17 +534,6 @@ export function getCarouselLayoutForNumberOfItems(numItems) {
     carouselLayoutMap[numItems]);
 }
 
-export function filterItemsForCarousel(items) {
-  if (empty(items)) {
-    return [];
-  }
-
-  return items
-    .filter(item => item.hasCoverArt)
-    .filter(item => item.artTags.every(artTag => !artTag.isContentWarning))
-    .slice(0, maxCarouselLayoutItems + 1);
-}
-
 // Ridiculous caching support nonsense
 
 export class TupleMap {

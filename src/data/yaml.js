@@ -829,6 +829,28 @@ export function parseExcludingURLs(value) {
   return value;
 }
 
+export function parseAlbumCarousel(value, {subdoc, AlbumCarousel}) {
+  return subdoc(AlbumCarousel, value, {bindInto: 'thing'});
+}
+
+export function parseAlbumCarouselTiles(entries, {subdoc, AlbumCarouselTile}) {
+  return parseArrayEntries(entries, item => {
+    let document;
+
+    if (typeof item === 'string') {
+      document = {
+        'Album': item,
+      };
+    } else if (typeof item === 'object' && !Array.isArray(item)) {
+      document = item;
+    } else {
+      return document; // shrug
+    }
+
+    return subdoc(AlbumCarouselTile, document, {bindInto: 'carousel'});
+  });
+}
+
 export function parseAdditionalFilesEntries(thingClass, entries, {subdoc}) {
   return parseArrayEntries(entries, item => {
     if (typeof item !== 'object') return item;
@@ -2016,6 +2038,8 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
       'artworkData',
       'wikiInfo',
     ]],
+
+    ['albumCarouselTileData', [/* find */]],
 
     ['artTagData', [/* reverse */]],
 

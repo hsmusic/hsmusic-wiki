@@ -1,21 +1,19 @@
 import {input, V} from '#composite';
 import Thing from '#thing';
+import {parseAlbumCarousel} from '#yaml';
 
 import {exposeConstant} from '#composite/control-flow';
-import {referenceList, soupyFind} from '#composite/wiki-properties';
+import {thing} from '#composite/wiki-properties';
 
 import {HomepageLayoutRow} from './HomepageLayoutRow.js';
 
 export class HomepageLayoutAlbumCarouselRow extends HomepageLayoutRow {
   static [Thing.friendlyName] = `Homepage Album Carousel Row`;
 
-  static [Thing.getPropertyDescriptors] = (opts, {Album} = opts) => ({
+  static [Thing.getPropertyDescriptors] = ({AlbumCarousel}) => ({
     // Update & expose
 
-    albums: referenceList({
-      class: input.value(Album),
-      find: soupyFind.input('album'),
-    }),
+    carousel: thing(V(AlbumCarousel)),
 
     // Expose only
 
@@ -25,7 +23,10 @@ export class HomepageLayoutAlbumCarouselRow extends HomepageLayoutRow {
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
-      'Albums': {property: 'albums'},
+      'Carousel': {
+        property: 'carousel',
+        transform: parseAlbumCarousel,
+      },
     },
   };
 }

@@ -1,7 +1,13 @@
 import {input, V} from '#composite';
 import Thing from '#thing';
 import {isBoolean} from '#validators';
-import {parseAnnotatedReferences, parseSerieses, parseURLs} from '#yaml';
+
+import {
+  parseAlbumCarousel,
+  parseAnnotatedReferences,
+  parseSerieses,
+  parseURLs,
+} from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
 import {withUniqueReferencingThing} from '#composite/wiki-data';
@@ -21,6 +27,7 @@ import {
   referenceList,
   soupyFind,
   soupyReverse,
+  thing,
   thingList,
   urls,
 } from '#composite/wiki-properties';
@@ -29,7 +36,12 @@ export class Group extends Thing {
   static [Thing.referenceType] = 'group';
   static [Thing.wikiData] = 'groupData';
 
-  static [Thing.getPropertyDescriptors] = ({Album, Artist, Series}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    Album,
+    AlbumCarousel,
+    Artist,
+    Series,
+  }) => ({
     // Update & expose
 
     name: name(V('Unnamed Group')),
@@ -71,10 +83,7 @@ export class Group extends Thing {
       thing: input.value('artist'),
     }),
 
-    featuredAlbums: referenceList({
-      class: input.value(Album),
-      find: soupyFind.input('album'),
-    }),
+    carousel: thing(V(AlbumCarousel)),
 
     serieses: thingList(V(Series)),
 
@@ -187,7 +196,10 @@ export class Group extends Thing {
           }),
       },
 
-      'Featured Albums': {property: 'featuredAlbums'},
+      'Carousel': {
+        property: 'carousel',
+        transform: parseAlbumCarousel,
+      },
 
       'Series': {
         property: 'serieses',

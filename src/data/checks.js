@@ -271,6 +271,10 @@ export function filterReferenceErrors(wikiData, {
       creditingSources: '_content',
     }],
 
+    ['albumCarouselTileData', {
+      album: 'album',
+    }],
+
     ['artTagData', {
       directDescendantArtTags: 'artTag',
     }],
@@ -288,11 +292,6 @@ export function filterReferenceErrors(wikiData, {
 
     ['groupCategoryData', {
       groups: 'group',
-    }],
-
-    ['homepageLayout.sections.rows', {
-      _include: row => row.type === 'album carousel',
-      albums: 'album',
     }],
 
     ['homepageLayout.sections.rows', {
