@@ -56,7 +56,7 @@ export default {
 
     const name =
       slots.name ??
-      language.sanitize(html.resolve(link, {normalize: 'plain'}));
+      html.resolve(link, {normalize: 'plain'});
 
     const details =
       slots.details ??

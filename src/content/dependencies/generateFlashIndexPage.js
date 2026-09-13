@@ -32,17 +32,9 @@ export default {
 
     actCoverGrids:
       query.flashActs
-        .map(() => relation('generateCoverGrid')),
-
-    actCoverGridLinks:
-      query.flashActs
-        .map(act => act.flashes
-          .map(flash => relation('linkFlash', flash))),
-
-    actCoverGridImages:
-      query.flashActs
-        .map(act => act.flashes
-          .map(flash => relation('image', flash.coverArtwork))),
+        .map(act =>
+          relation('generateCoverGrid',
+            act.flashes.map(flash => flash.coverArtwork))),
   }),
 
   data: (query) => ({
@@ -61,11 +53,6 @@ export default {
     actAnchors:
       query.flashActs
         .map(act => act.directory),
-
-    actCoverGridNames:
-      query.flashActs
-        .map(act => act.flashes
-          .map(flash => flash.name)),
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -104,20 +91,12 @@ export default {
             colorStyle: relations.actColorStyles,
             actLink: relations.actLinks,
             anchor: data.actAnchors,
-
             coverGrid: relations.actCoverGrids,
-            coverGridImages: relations.actCoverGridImages,
-            coverGridLinks: relations.actCoverGridLinks,
-            coverGridNames: data.actCoverGridNames,
           }).map(({
               colorStyle,
               actLink,
               anchor,
-
               coverGrid,
-              coverGridImages,
-              coverGridLinks,
-              coverGridNames,
             }, index) => [
               html.tag('h2',
                 {id: anchor},
@@ -125,9 +104,6 @@ export default {
                 actLink),
 
               coverGrid.slots({
-                links: coverGridLinks,
-                images: coverGridImages,
-                names: coverGridNames,
                 lazy: index === 0 ? 4 : true,
               }),
             ]),
