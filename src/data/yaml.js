@@ -1924,6 +1924,10 @@ export function makeWikiDataFromDataSteps(
   const incomingSingleThings = Object.create(null);
   const planToPushSingleThing = thing => {
     const key = thing.constructor[Thing.wikiData];
+    if (!key) {
+      throw new Error(`${thing.constructor.name} doesn't belong to wikiData`);
+    }
+
     if (key in incomingSingleThings) {
       incomingSingleThings[key].push(thing);
     } else {
@@ -1934,7 +1938,12 @@ export function makeWikiDataFromDataSteps(
   const constructedFromConnecting = connectThingsResultLists.flat(2);
 
   for (const thing of constructedFromConnecting) {
-    planToPushSingleThing(thing);
+    try {
+      planToPushSingleThing(thing);
+    } catch (caughtError) {
+      throw new Error(`Don't yield/return ${thing.constructor.name} in *connect()`,
+        {cause: caughtError});
+    }
   }
 
   const scanForConstituted = [
