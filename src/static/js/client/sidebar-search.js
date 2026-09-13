@@ -584,7 +584,6 @@ export function addPageListeners() {
     domEvent.preventDefault();
     clearSidebarSearch();
     clearSidebarFilter();
-    possiblyHideSearchSidebarColumn();
   });
 
   forEachFilter((type, filterLink) => {
@@ -924,8 +923,6 @@ function showSidebarSearchResults(results) {
   const {session} = info;
 
   console.debug(`Showing search results:`, tidyResults(results));
-
-  showSearchSidebarColumn();
 
   info.searchBox.classList.add('showing-results');
   info.searchSidebarColumn.classList.add('search-showing-results');
@@ -1533,50 +1530,6 @@ function restoreSidebarSearchResultsScrollOffset() {
   if (session.resultsScrollOffset) {
     info.resultsContainer.scrollTop = session.resultsScrollOffset;
   }
-}
-
-function showSearchSidebarColumn() {
-  const {state} = info;
-
-  if (!info.searchSidebarColumn) {
-    return;
-  }
-
-  if (!info.searchSidebarColumn.classList.contains('initially-hidden')) {
-    return;
-  }
-
-  info.searchSidebarColumn.classList.remove('initially-hidden');
-
-  if (info.searchSidebarColumn.id === 'sidebar-left') {
-    info.pageContainer.classList.add('showing-sidebar-left');
-  } else if (info.searchSidebarColumn.id === 'sidebar-right') {
-    info.pageContainer.classList.add('showing-sidebar-right');
-  }
-
-  state.sidebarColumnShownForSearch = true;
-}
-
-function possiblyHideSearchSidebarColumn() {
-  const {state} = info;
-
-  if (!info.searchSidebarColumn) {
-    return;
-  }
-
-  if (!state.sidebarColumnShownForSearch) {
-    return;
-  }
-
-  info.searchSidebarColumn.classList.add('initially-hidden');
-
-  if (info.searchSidebarColumn.id === 'sidebar-left') {
-    info.pageContainer.classList.remove('showing-sidebar-left');
-  } else if (info.searchSidebarColumn.id === 'sidebar-right') {
-    info.pageContainer.classList.remove('showing-sidebar-right');
-  }
-
-  state.sidebarColumnShownForSearch = null;
 }
 
 // This should be called after results are shown, since it checks the

@@ -34,19 +34,13 @@ export default {
       type: 'boolean',
       default: false,
     },
-
-    // Provide to include all the HTML for the sidebar in place as usual,
-    // but start it out totally invisible. This is mainly so client-side
-    // JavaScript can show the sidebar if it needs to (and has a target
-    // to slot its own content into). If there are no boxes and this
-    // option *isn't* provided, then the sidebar will just be blank.
-    initiallyHidden: {
-      type: 'boolean',
-      default: false,
-    },
   },
 
   generate(slots, {html}) {
+    if (html.isBlank(slots.boxes)) {
+      return html.blank();
+    }
+
     const attributes =
       html.attributes({class: [
         'sidebar-column',
@@ -75,14 +69,6 @@ export default {
       attributes.add('class', 'all-boxes-collapsible');
     }
 
-    if (slots.initiallyHidden) {
-      attributes.add('class', 'initially-hidden');
-    }
-
-    if (html.isBlank(slots.boxes) && !slots.initiallyHidden) {
-      return html.blank();
-    } else {
-      return html.tag('div', attributes, slots.boxes);
-    }
+    return html.tag('div', attributes, slots.boxes);
   },
 };
