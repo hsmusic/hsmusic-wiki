@@ -540,7 +540,7 @@ export class Tag {
     if (!disabledTagTracing) {
       this.#traceError = new Error();
     }
-}
+  }
 
   clone() {
     return Reflect.construct(this.constructor, [
@@ -2205,18 +2205,30 @@ export class Template {
     const providedValue = this.#slotValues[slotName] ?? null;
 
     if (description.type === 'html') {
+      // Per validateSlotValueAgainstDescription, providedValue matches
+      // the validator isHTML. Take care of trivial blanks first - null,
+      // undefined, false, and empty string.
       if (!providedValue) {
         return blank();
       }
 
+      // Handle tags and templates. These are good to go for exposing as
+      // a value, but must cloned if the slot is marked as mutable.
       if (
-        (providedValue instanceof Tag || providedValue instanceof Template) &&
-        description.mutable
+        providedValue instanceof Tag ||
+        providedValue instanceof Template
       ) {
-        return providedValue.clone();
+        if (description.mutable) {
+          return providedValue.clone();
+        } else {
+          return providedValue;
+        }
       }
 
-      return providedValue;
+      // The only other possibilities are non-empty string and array.
+      // Neither of these is HTML as-is, so wrap in a dummy html.tags()
+      // element, which will also shuttle away nested trivial blanks.
+      return tags(providedValue);
     }
 
     if (description.type === 'attributes') {
@@ -2493,12 +2505,6 @@ export const isHTML =
     isString,
     isTag,
     isTemplate,
-
-    value => {
-      isArray(value);
-      return value.length === 0;
-    },
-
     isArrayOfHTML);
 
 export const isAttributeKey =
