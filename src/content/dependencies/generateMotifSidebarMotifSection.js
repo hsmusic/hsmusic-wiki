@@ -5,7 +5,7 @@ export default {
 
     motifLinks:
       motifSection.motifs
-        .map(motif => relation('linkMotif', motif)),
+        .map(motif => relation('linkMotifInParticularlyBoringManner', motif)),
   }),
 
   data: (motif, motifSection) => ({

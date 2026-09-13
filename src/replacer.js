@@ -122,7 +122,7 @@ export const replacerSpec = {
 
   'motif': {
     find: 'motif',
-    link: 'linkMotifWithoutTooltip',
+    link: 'linkMotifInParticularlyBoringManner',
   },
 
   'news-index': {

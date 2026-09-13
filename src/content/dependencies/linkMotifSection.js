@@ -1,7 +1,7 @@
 export default {
   relations: (relation, motifSection) => ({
     link:
-      relation('linkMotif', motifSection.motifs[0]),
+      relation('linkMotifInParticularlyBoringManner', motifSection.motifs[0]),
   }),
 
   data: (motifSection) => ({

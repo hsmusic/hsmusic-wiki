@@ -23,7 +23,7 @@ export default {
         : relation('linkMotifSection', motif.motifSection)),
 
     motifNavLink:
-      relation('linkMotifWithoutTooltip', motif),
+      relation('linkMotifInParticularlyBoringManner', motif),
 
     connectionsContentHeading:
       relation('generateMotifConnectionsContentHeading', motif),

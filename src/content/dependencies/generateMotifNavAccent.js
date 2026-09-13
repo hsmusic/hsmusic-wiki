@@ -37,12 +37,12 @@ export default {
 
     previousMotifLink:
       (query.previousMotif
-        ? relation('linkMotif', query.previousMotif)
+        ? relation('linkMotifInParticularlyBoringManner', query.previousMotif)
         : null),
 
     nextMotifLink:
       (query.nextMotif
-        ? relation('linkMotif', query.nextMotif)
+        ? relation('linkMotifInParticularlyBoringManner', query.nextMotif)
         : null),
   }),
 

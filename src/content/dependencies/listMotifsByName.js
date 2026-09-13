@@ -1,9 +1,6 @@
 import {sortAlphabetically} from '#sort';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkMotif'],
-  extraDependencies: ['wikiData'],
-
   sprawl({motifData}) {
     return {motifData};
   },
