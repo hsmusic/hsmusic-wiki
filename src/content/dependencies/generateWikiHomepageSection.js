@@ -15,6 +15,9 @@ export default {
   }),
 
   data: (homepageSection) => ({
+    isDefaultSection:
+      homepageSection.isDefaultHomepageLayoutSection,
+
     name:
       homepageSection.name,
   }),
@@ -23,6 +26,8 @@ export default {
     html.tag('section',
       relations.colorStyle,
 
-      html.tag('h2', data.name),
+      !data.isDefaultSection &&
+        html.tag('h2', data.name),
+
       relations.rows),
 };

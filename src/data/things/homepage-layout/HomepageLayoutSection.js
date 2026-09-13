@@ -2,7 +2,7 @@ import {V} from '#composite';
 import Thing from '#thing';
 
 import {exposeConstant} from '#composite/control-flow';
-import {color, name, thingList} from '#composite/wiki-properties';
+import {color, flag, name, thingList} from '#composite/wiki-properties';
 
 export class HomepageLayoutSection extends Thing {
   static [Thing.friendlyName] = `Homepage Section`;
@@ -13,6 +13,8 @@ export class HomepageLayoutSection extends Thing {
     name: name(V(`Unnamed Homepage Section`)),
 
     color: color(),
+
+    isDefaultHomepageLayoutSection: flag(V(false)),
 
     rows: thingList(V(HomepageLayoutRow)),
 

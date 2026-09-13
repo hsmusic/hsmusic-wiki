@@ -48,21 +48,27 @@ export default ({
     const homepageLayout = results[0];
     const sections = [];
 
-    let currentSection = null;
+    let currentSection = new HomepageLayoutSection;
     let currentSectionRows = [];
 
+    Object.assign(currentSection, {
+      name: `Default Homepage Section`,
+      isDefaultHomepageLayoutSection: true,
+    });
+
     const closeCurrentSection = () => {
-      if (currentSection) {
-        for (const row of currentSectionRows) {
-          row.section = currentSection;
+      if (currentSection.isDefaultHomepageLayoutSection) {
+        if (empty(currentSectionRows)) {
+          return;
         }
-
-        currentSection.rows = currentSectionRows;
-        sections.push(currentSection);
-
-        currentSection = null;
-        currentSectionRows = [];
       }
+
+      for (const row of currentSectionRows) {
+        row.section = currentSection;
+      }
+
+      currentSection.rows = currentSectionRows;
+      sections.push(currentSection);
     };
 
     for (const entry of results.slice(1)) {
@@ -71,6 +77,7 @@ export default ({
       } else if (entry instanceof HomepageLayoutSection) {
         closeCurrentSection();
         currentSection = entry;
+        currentSectionRows = [];
       } else if (entry instanceof HomepageLayoutRow) {
         if (currentSection) {
           currentSectionRows.push(entry);
