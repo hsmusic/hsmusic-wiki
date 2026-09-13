@@ -138,7 +138,7 @@ export default {
 
       if (slots.fromContent) {
         const text =
-          html.resolve(slots.content, {type: 'plain'});
+          html.resolve(slots.content, {normalize: 'plain'});
 
         if (text.split(' ').length >= 4 || text.length >= 24) {
           linkContent =
