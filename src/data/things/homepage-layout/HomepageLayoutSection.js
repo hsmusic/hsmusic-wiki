@@ -1,14 +1,22 @@
-import {V} from '#composite';
+import {input, V} from '#composite';
 import Thing from '#thing';
 
-import {exposeConstant} from '#composite/control-flow';
-import {color, flag, name, thingList} from '#composite/wiki-properties';
+import {exitWithoutDependency, exposeConstant, exposeDependency}
+  from '#composite/control-flow';
+import {withLengthOfList, withNearbyItemFromList, withPropertyFromObject}
+  from '#composite/data';
+import {color, flag, name, thing, thingList} from '#composite/wiki-properties';
 
 export class HomepageLayoutSection extends Thing {
   static [Thing.friendlyName] = `Homepage Section`;
 
-  static [Thing.getPropertyDescriptors] = ({HomepageLayoutRow}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    HomepageLayout,
+    HomepageLayoutRow,
+  }) => ({
     // Update & expose
+
+    homepageLayout: thing(V(HomepageLayout)),
 
     name: name(V(`Unnamed Homepage Section`)),
 
@@ -21,6 +29,33 @@ export class HomepageLayoutSection extends Thing {
     // Expose only
 
     isHomepageLayoutSection: exposeConstant(V(true)),
+
+    startCountingRowsFrom: [
+      withPropertyFromObject('homepageLayout', V('sections')),
+
+      withNearbyItemFromList({
+        list: '#homepageLayout.sections',
+        item: input.myself(),
+        offset: input.value(-1),
+      }).outputs({
+        '#nearbyItem': '#previousSection',
+      }),
+
+      exitWithoutDependency('#previousSection', V(1)),
+
+      withPropertyFromObject('#previousSection', V('continueCountingRowsFrom')),
+      exposeDependency('#previousSection.continueCountingRowsFrom'),
+    ],
+
+    continueCountingRowsFrom: [
+      withLengthOfList('rows'),
+
+      {
+        dependencies: ['startCountingRowsFrom', '#rows.length'],
+        compute: ({startCountingRowsFrom, '#rows.length': rows}) =>
+          startCountingRowsFrom + rows,
+      },
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {

@@ -273,6 +273,7 @@ export function filterReferenceErrors(wikiData, {
 
     ['albumCarouselTileData', {
       album: 'album',
+      randomizeFromAlbums: 'album',
     }],
 
     ['artTagData', {

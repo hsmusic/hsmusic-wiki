@@ -17,6 +17,7 @@ import * as intrapageDotSwitcherModule from './intrapage-dot-switcher.js';
 import * as liveMousePositionModule from './live-mouse-position.js';
 import * as memorableDetailsModule from './memorable-details.js';
 import * as quickDescriptionModule from './quick-description.js';
+import * as randomizedCarouselModule from './randomized-carousel.js';
 import * as revealAllGridControlModule from './reveal-all-grid-control.js';
 import * as scriptedLinkModule from './scripted-link.js';
 import * as showMoreLessSwitcherModule from './show-more-less-switcher.js';
@@ -48,6 +49,7 @@ export const modules = [
   liveMousePositionModule,
   memorableDetailsModule,
   quickDescriptionModule,
+  randomizedCarouselModule,
   revealAllGridControlModule,
   scriptedLinkModule,
   showMoreLessSwitcherModule,

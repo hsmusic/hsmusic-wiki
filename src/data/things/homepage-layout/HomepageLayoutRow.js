@@ -1,10 +1,11 @@
 import {inspect} from 'node:util';
 
 import {colors} from '#cli';
-import {V} from '#composite';
+import {input, V} from '#composite';
 import Thing from '#thing';
 
-import {exposeConstant} from '#composite/control-flow';
+import {exitWithoutDependency, exposeConstant} from '#composite/control-flow';
+import {withIndexInList, withPropertiesFromObject} from '#composite/data';
 import {soupyFind, thing} from '#composite/wiki-properties';
 
 export class HomepageLayoutRow extends Thing {
@@ -32,6 +33,22 @@ export class HomepageLayoutRow extends Thing {
         },
       },
     },
+
+    rowNumber: [
+      exitWithoutDependency('section', V(0)),
+      withPropertiesFromObject('section', V(['rows', 'startCountingRowsFrom'])),
+
+      withIndexInList('#section.rows', input.myself()),
+      exitWithoutDependency('#index', V(0), V('index')),
+
+      {
+        dependencies: ['#section.startCountingRowsFrom', '#index'],
+        compute: ({
+          ['#section.startCountingRowsFrom']: startCountingRowsFrom,
+          ['#index']: index,
+        }) => startCountingRowsFrom + index,
+      },
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {

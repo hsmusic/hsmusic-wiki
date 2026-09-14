@@ -68,6 +68,8 @@ export default ({
       }
 
       currentSection.rows = currentSectionRows;
+      currentSection.homepageLayout = homepageLayout;
+
       sections.push(currentSection);
     };
 

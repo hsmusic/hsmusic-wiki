@@ -2,7 +2,7 @@ import {input, V} from '#composite';
 import Thing from '#thing';
 import {parseAlbumCarousel} from '#yaml';
 
-import {exposeConstant} from '#composite/control-flow';
+import {exitWithoutDependency, exposeConstant} from '#composite/control-flow';
 import {thing} from '#composite/wiki-properties';
 
 import {HomepageLayoutRow} from './HomepageLayoutRow.js';
@@ -19,13 +19,28 @@ export class HomepageLayoutAlbumCarouselRow extends HomepageLayoutRow {
 
     isHomepageLayoutAlbumCarouselRow: exposeConstant(V(true)),
     type: exposeConstant(V('album carousel')),
+
+    carouselSeedSuffix: [
+      exitWithoutDependency('rowNumber', V(null), V('falsy')),
+
+      {
+        dependencies: ['rowNumber'],
+        compute: ({rowNumber}) =>
+          (rowNumber
+            ? 'homepage-row-' + rowNumber
+            : null),
+      },
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Carousel': {
         property: 'carousel',
-        transform: parseAlbumCarousel,
+        transform:
+          parseAlbumCarousel({
+            seedSuffixFromThingProperty: 'carouselSeedSuffix',
+          }),
       },
     },
   };

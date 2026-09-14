@@ -1,11 +1,14 @@
 import {inspect} from 'node:util';
 
-import {V} from '#composite';
+import {input, V} from '#composite';
 import Thing from '#thing';
+import {isString} from '#validators';
 import {parseAlbumCarouselTiles} from '#yaml';
 
-import {exposeConstant} from '#composite/control-flow';
-import {thing, thingList} from '#composite/wiki-properties';
+import {exposeConstant, exposeUpdateValueOrContinue}
+  from '#composite/control-flow';
+import {constituteFrom} from '#composite/wiki-data';
+import {simpleString, thing, thingList} from '#composite/wiki-properties';
 
 export class AlbumCarousel extends Thing {
   static [Thing.friendlyName] = `Album Carousel';`
@@ -16,6 +19,16 @@ export class AlbumCarousel extends Thing {
 
     thing: thing(),
 
+    seedSuffixFromThingProperty: simpleString(),
+
+    seedSuffix: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isString),
+      }),
+
+      constituteFrom('thing', 'seedSuffixFromThingProperty'),
+    ],
+
     tiles: thingList(V(AlbumCarouselTile)),
 
     // Expose only
@@ -25,6 +38,8 @@ export class AlbumCarousel extends Thing {
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
+      'Seed': {property: 'seedSuffix'},
+
       'Tiles': {
         property: 'tiles',
         transform: parseAlbumCarouselTiles,

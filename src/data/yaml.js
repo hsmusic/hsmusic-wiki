@@ -829,8 +829,15 @@ export function parseExcludingURLs(value) {
   return value;
 }
 
-export function parseAlbumCarousel(value, {subdoc, AlbumCarousel}) {
-  return subdoc(AlbumCarousel, value, {bindInto: 'thing'});
+export function parseAlbumCarousel({
+  seedSuffixFromThingProperty = null,
+}) {
+  const provide = {seedSuffixFromThingProperty};
+
+  const transform = (value, {subdoc, AlbumCarousel}) =>
+    subdoc(AlbumCarousel, value, {bindInto: 'thing', provide});
+
+  return transform;
 }
 
 export function parseAlbumCarouselTiles(entries, {subdoc, AlbumCarouselTile}) {

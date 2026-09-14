@@ -5,7 +5,8 @@ import {V} from '#composite';
 import Thing from '#thing';
 
 import {exposeConstant} from '#composite/control-flow';
-import {singleReference, soupyFind, thing} from '#composite/wiki-properties';
+import {referenceList, singleReference, soupyFind, thing}
+  from '#composite/wiki-properties';
 
 export class AlbumCarouselTile extends Thing {
   static [Thing.friendlyName] = `Album Carousel Tile';`
@@ -20,6 +21,10 @@ export class AlbumCarouselTile extends Thing {
       find: soupyFind.input('album'),
     }),
 
+    randomizeFromAlbums: referenceList({
+      find: soupyFind.input('album'),
+    }),
+
     // Update only
 
     find: soupyFind(),
@@ -28,6 +33,7 @@ export class AlbumCarouselTile extends Thing {
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Album': {property: 'album'},
+      'Randomize From': {property: 'randomizeFromAlbums'},
     },
   };
 

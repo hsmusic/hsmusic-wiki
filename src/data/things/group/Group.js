@@ -198,7 +198,10 @@ export class Group extends Thing {
 
       'Carousel': {
         property: 'carousel',
-        transform: parseAlbumCarousel,
+        transform:
+          parseAlbumCarousel({
+            seedSuffixFromThingProperty: 'directory',
+          }),
       },
 
       'Series': {
