@@ -133,6 +133,9 @@ export default {
     lyricsSection:
       relation('generateLyricsSection', track.lyrics),
 
+    soundDetailsSection:
+      relation('generateTrackSoundDetailsSection', track),
+
     sheetMusicFilesList:
       relation('generateAdditionalFilesList', track.sheetMusicFiles),
 
@@ -382,6 +385,8 @@ export default {
               language.$(pageCapsule, 'needsLyrics')),
 
           relations.lyricsSection,
+
+          relations.soundDetailsSection,
 
           html.tags([
             relations.contentHeading.clone().slots({
