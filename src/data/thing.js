@@ -25,11 +25,15 @@ export default class Thing extends CacheableObject {
   static yamlDocumentSpec = Symbol.for('Thing.yamlDocumentSpec');
 
   static yamlSourceFilename = Symbol.for('Thing.yamlSourceFilename');
+  static yamlSourceLineNumber = Symbol.for('Thing.yamlSourceLineNumber');
   static yamlSourceDocument = Symbol.for('Thing.yamlSourceDocument');
+  static yamlSourceDocumentNumber = Symbol.for('Thing.yamlSourceDocument');
   static yamlSourceDocumentPlacement = Symbol.for('Thing.yamlSourceDocumentPlacement');
 
   [Symbol.for('Thing.yamlSourceFilename')] = null;
+  [Symbol.for('Thing.yamlSourceLineNumber')] = null;
   [Symbol.for('Thing.yamlSourceDocument')] = null;
+  [Symbol.for('Thing.yamlSourceDocumentNumber')] = null;
   [Symbol.for('Thing.yamlSourceDocumentPlacement')] = null;
 
   static isThingConstructor = Symbol.for('Thing.isThingConstructor');

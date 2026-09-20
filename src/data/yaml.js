@@ -1471,13 +1471,29 @@ export async function getFilesFromDataStep(dataStep, {dataPath}) {
   }
 }
 
-export async function loadYAMLDocumentsFromFile(file) {
+export async function loadYAMLDocumentsFromFile(file, {dataPath}) {
   let contents;
   try {
     contents = await readFile(file, 'utf-8');
   } catch (caughtError) {
     throw new Error(`Failed to read data file`, {cause: caughtError});
   }
+
+  const splitDocuments =
+    Array.from(splitDocumentsInYAMLSourceText(contents));
+
+  const adjustForBlankDocumentsAtStart =
+    splitDocuments.findIndex(sd => {
+      try {
+        const result = yaml.load(sd.text);
+        if (result === null) return false;
+        if (result === undefined) return false;
+        return true;
+      } catch {
+        // It's invalid, so it's... probably trying... to represent SOMETHING.
+        return true;
+      }
+    });
 
   let documents;
   try {
@@ -1490,8 +1506,26 @@ export async function loadYAMLDocumentsFromFile(file) {
     message: `Found blank documents - check for extra '${colors.cyan(`---`)}'`,
   });
 
-  const filteredDocuments =
+  const readyDocuments =
     documents
+      .map((doc, index) => ({
+        ...doc,
+
+        [Thing.yamlSourceFilename]:
+          path.relative(dataPath, file)
+            .split(path.sep)
+            .join(path.posix.sep),
+
+        [Thing.yamlSourceLineNumber]:
+          splitDocuments[adjustForBlankDocumentsAtStart + index].lineNumber,
+
+        [Thing.yamlSourceDocument]: doc,
+        [Thing.yamlSourceDocumentNumber]:
+          adjustForBlankDocumentsAtStart + index,
+      }));
+
+  const filteredDocuments =
+    readyDocuments
       .filter(doc => doc !== null);
 
   if (filteredDocuments.length !== documents.length) {
@@ -1561,6 +1595,13 @@ export function processThingsFromDataStep(documents, dataStep) {
     processDocumentFns.set(dataStep, submap);
   }
 
+  const passthruMetadata = (document) => ({
+    [Thing.yamlSourceFilename]: document[Thing.yamlSourceFilename],
+    [Thing.yamlSourceLineNumber]: document[Thing.yamlSourceLineNumber],
+    [Thing.yamlSourceDocument]: document[Thing.yamlSourceDocument],
+    [Thing.yamlSourceDocumentNumber]: document[Thing.yamlSourceDocumentNumber],
+  });
+
   function processDocument(document, thingClassOrFn) {
     const thingClass =
       (thingClassOrFn.prototype instanceof Thing
@@ -1607,9 +1648,11 @@ export function processThingsFromDataStep(documents, dataStep) {
           const {result, aggregate: subAggregate} =
             processDocument(document, dataStep.documentThing);
 
-          result.thing[Thing.yamlSourceDocument] = document;
+          Object.assign(result.thing, passthruMetadata(document));
+
+          const yamlIndex = document[Thing.yamlSourceDocumentNumber];
           result.thing[Thing.yamlSourceDocumentPlacement] =
-            [documentModes.allInOne, index];
+            [documentModes.allInOne, yamlIndex];
 
           things.push(result.thing);
           flat.push(...result.flat);
@@ -1636,7 +1679,8 @@ export function processThingsFromDataStep(documents, dataStep) {
       const {result, aggregate} =
         processDocument(documents[0], dataStep.documentThing);
 
-      result.thing[Thing.yamlSourceDocument] = documents[0];
+      Object.assign(result.thing, passthruMetadata(documents[0]));
+
       result.thing[Thing.yamlSourceDocumentPlacement] =
         [documentModes.oneDocumentTotal];
 
@@ -1664,7 +1708,8 @@ export function processThingsFromDataStep(documents, dataStep) {
       const {result: headerResult, aggregate: headerAggregate} =
         processDocument(headerDocument, dataStep.headerDocumentThing);
 
-      headerResult.thing[Thing.yamlSourceDocument] = headerDocument;
+      Object.assign(headerResult.thing, passthruMetadata(headerDocument));
+
       headerResult.thing[Thing.yamlSourceDocumentPlacement] =
         [documentModes.headerAndEntries, 'header'];
 
@@ -1683,9 +1728,11 @@ export function processThingsFromDataStep(documents, dataStep) {
         const {result: entryResult, aggregate: entryAggregate} =
           processDocument(entryDocument, dataStep.entryDocumentThing);
 
-        entryResult.thing[Thing.yamlSourceDocument] = entryDocument;
+        Object.assign(entryResult.thing, passthruMetadata(entryDocument));
+
+        const yamlIndex = entryDocument[Thing.yamlSourceDocumentNumber];
         entryResult.thing[Thing.yamlSourceDocumentPlacement] =
-          [documentModes.headerAndEntries, 'entry', index];
+          [documentModes.headerAndEntries, 'entry', yamlIndex];
 
         entryResults.push(entryResult);
         pushWikiData(wikiData, entryResult.wikiData);
@@ -1724,7 +1771,8 @@ export function processThingsFromDataStep(documents, dataStep) {
       const {result, aggregate} =
         processDocument(documents[0], dataStep.documentThing);
 
-      result.thing[Thing.yamlSourceDocument] = documents[0];
+      Object.assign(result.thing, passthruMetadata(documents[0]));
+
       result.thing[Thing.yamlSourceDocumentPlacement] =
         [documentModes.onePerFile];
 
@@ -1774,7 +1822,7 @@ export async function loadYAMLDocumentsFromDataSteps(dataSteps, {dataPath}) {
     fileLists
       .map(files => files
         .map(file =>
-          loadYAMLDocumentsFromFile(file).then(
+          loadYAMLDocumentsFromFile(file, {dataPath}).then(
             ({result, aggregate}) => {
               const close =
                 decorateErrorWithFileFromDataPath(aggregate.close, {dataPath});
@@ -1838,13 +1886,6 @@ export async function processThingsFromDataSteps(documentLists, fileLists, dataS
         }).map(({file, documents}) => {
             const {result, aggregate} =
               processThingsFromDataStep(documents, dataStep);
-
-            for (const thing of result.file) {
-              thing[Thing.yamlSourceFilename] =
-                path.relative(dataPath, file)
-                  .split(path.sep)
-                  .join(path.posix.sep);
-            }
 
             const close = decorateErrorWithFileFromDataPath(aggregate.close, {dataPath});
             aggregate.close = () => close({file});
@@ -2357,31 +2398,37 @@ export function flattenThingLayoutToDocumentOrder(layout) {
 
 export function* splitDocumentsInYAMLSourceText(sourceText) {
   // Not multiline!
-  const dividerRegex = /(?:\r\n|\n|^)-{3,}(?:\r\n|\n|$)/g;
+  const dividerRegex = /(?:\r\n|\n|^)-{3,} *(?:\r\n|\n|$)/g;
 
   let previousDivider = '';
+  let lineNumber = 1;
 
   while (true) {
     const {lastIndex} = dividerRegex;
     const match = dividerRegex.exec(sourceText);
     if (match) {
       const nextDivider = match[0];
+      const text = sourceText.slice(lastIndex, match.index);
 
       yield {
         previousDivider,
         nextDivider,
-        text: sourceText.slice(lastIndex, match.index),
+        lineNumber,
+        text,
       };
 
       previousDivider = nextDivider;
+      lineNumber += text.split(/\r\n|\n/).length + 1;
     } else {
       const nextDivider = '';
       const lineBreak = previousDivider.match(/\r?\n/)?.[0] ?? '';
+      const text = sourceText.slice(lastIndex).replace(/(?<!\n)$/, lineBreak);
 
       yield {
         previousDivider,
         nextDivider,
-        text: sourceText.slice(lastIndex).replace(/(?<!\n)$/, lineBreak),
+        lineNumber,
+        text,
       };
 
       return;
