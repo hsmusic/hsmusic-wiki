@@ -1416,6 +1416,10 @@
     box-sizing: border-box;
   }
 
+  .sidebar-column:not(.wide) .image-outer-area {
+    padding: 2px;
+  }
+
   .image-link {
     display: block;
     overflow: hidden;
