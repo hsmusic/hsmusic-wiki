@@ -857,7 +857,7 @@
   .music-video .image-link::after {
     content: "▶︎";
     background: #0008;
-    color: white;
+    color: var(--bright-color);
     position: absolute;
     top: 0;
     left: 0;
@@ -915,7 +915,7 @@
     content: "\0020\00b7\0020";
     white-space: pre;
     font-weight: 800;
-    color: white;
+    color: var(--bright-color);
   }
 
   /* Yeah, all this stuff only applies to elements of the dot switcher
@@ -1181,7 +1181,7 @@
   }
 
   .grid-name-marker {
-    color: white;
+    color: var(--bright-color);
   }
 
   /* info */
@@ -1549,13 +1549,15 @@
   .image {
     --reveal-filter: ;
     --shadow-filter: ;
+    --hover-filter: ;
 
     background: #0006;
 
     backdrop-filter: blur(0);
     filter:
       var(--reveal-filter)
-      var(--shadow-filter);
+      var(--shadow-filter)
+      var(--hover-filter);
   }
 
   .reveal .image.reveal-thumbnail {
@@ -1566,7 +1568,7 @@
 @layer print {
   .image-container {
     text-align: left;
-    color: white;
+    color: var(--body-color);
   }
 
   .content-image-container.align-center {
@@ -1632,8 +1634,16 @@
 }
 
 @layer interaction {
+  :is(.image-link, .grid-item):not(:hover, :focus) .image {
+    --hover-filter: brightness(0.94);
+  }
+
+  :is(.cover-artwork):not(:hover, :focus) .image {
+    --hover-filter: brightness(0.97);
+  }
+
   .image-link:focus {
-    outline: 3px double white;
+    outline: 3px double var(--bright-color);
   }
 
   .image-link:focus:not(:focus-visible) {
@@ -1783,7 +1793,7 @@
 @layer material {
   #image-overlay-container {
     background: rgba(0, 0, 0, 0.8);
-    color: white;
+    color: var(--bright-color);
   }
 
   #image-overlay-container::before {
@@ -1831,7 +1841,7 @@
 
 @layer print {
   #image-overlay-action-container {
-    color: white;
+    color: var(--body-color);
     font-style: oblique;
     text-align: center;
   }
@@ -2428,11 +2438,15 @@
 }
 
 @layer print {
+  .content-sticky-heading-row h1 {
+    color: var(--bright-color);
+  }
+
   .content-sticky-subheading-row h2 {
     font-size: 0.9em !important;
     font-weight: normal;
     font-style: oblique;
-    color: #eee;
+    color: var(--body-color);
   }
 }
 
