@@ -130,7 +130,7 @@
   }
 
   .carousel-container {
-    --carousel-tile-min-width: 120px;
+    --carousel-tile-min-width: 1px; /* :-) */
     --carousel-row-count: 3;
     --carousel-column-count: 6;
 
@@ -217,8 +217,8 @@
     border-radius: 4px;
 
     box-shadow:
-      inset 20px 2px 40px var(--shadow-color),
-      inset -20px -2px 40px var(--shadow-color);
+      inset 15px 2px 40px var(--shadow-color),
+      inset -25px -2px 40px var(--shadow-color);
   }
 
   .carousel-tile {
@@ -256,31 +256,31 @@
 
   @keyframes carousel-marquee1 {
     0% {
-      transform: translateX(-100%) translateX(70px);
+      transform: translateX(-100%) translateX(4%);
     }
 
     100% {
-      transform: translateX(-200%) translateX(70px);
+      transform: translateX(-200%) translateX(4%);
     }
   }
 
   @keyframes carousel-marquee2 {
     0% {
-      transform: translateX(0%) translateX(70px);
+      transform: translateX(0%) translateX(4%);
     }
 
     100% {
-      transform: translateX(-100%) translateX(70px);
+      transform: translateX(-100%) translateX(4%);
     }
   }
 
   @keyframes carousel-marquee3 {
     0% {
-      transform: translateX(100%) translateX(70px);
+      transform: translateX(100%) translateX(4%);
     }
 
     100% {
-      transform: translateX(0%) translateX(70px);
+      transform: translateX(0%) translateX(4%);
     }
   }
 
