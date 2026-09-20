@@ -76,6 +76,17 @@ export class WikiInfo extends Thing {
     wikiWallpaperStyle: simpleString(),
     wikiWallpaperParts: wallpaperParts(),
 
+    hasMetaWallpaper: flag(V(false)),
+
+    metaWallpaperBrightness: {
+      flags: {update: true, expose: true},
+      update: {validate: isNumber},
+    },
+
+    metaWallpaperFileExtension: fileExtension(V('jpg')),
+    metaWallpaperStyle: simpleString(),
+    metaWallpaperParts: wallpaperParts(),
+
     divideTrackListsByGroups: referenceList({
       class: input.value(Group),
       find: soupyFind.input('group'),
@@ -146,13 +157,14 @@ export class WikiInfo extends Thing {
 
       'Wiki Wallpaper Brightness': {property: 'wikiWallpaperBrightness'},
       'Wiki Wallpaper File Extension': {property: 'wikiWallpaperFileExtension'},
-
       'Wiki Wallpaper Style': {property: 'wikiWallpaperStyle'},
+      'Wiki Wallpaper Parts': {property: 'wikiWallpaperParts', transform: parseWallpaperParts},
 
-      'Wiki Wallpaper Parts': {
-        property: 'wikiWallpaperParts',
-        transform: parseWallpaperParts,
-      },
+      'Has Meta Wallpaper': {property: 'hasMetaWallpaper'},
+      'Meta Wallpaper Brightness': {property: 'metaWallpaperBrightness'},
+      'Meta Wallpaper File Extension': {property: 'metaWallpaperFileExtension'},
+      'Meta Wallpaper Style': {property: 'metaWallpaperStyle'},
+      'Meta Wallpaper Parts': {property: 'metaWallpaperParts', transform: parseWallpaperParts},
 
       'Enable Flashes & Games': {property: 'enableFlashesAndGames'},
       'Enable Listings': {property: 'enableListings'},
@@ -179,6 +191,4 @@ export class WikiInfo extends Thing {
       },
     },
   };
-
-
 }

@@ -69,6 +69,8 @@ export default {
             entry: data.name,
           }),
 
+        wallpaper: 'meta',
+
         headingMode: 'sticky',
 
         mainClasses: ['long-content'],

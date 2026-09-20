@@ -50,6 +50,9 @@ export default {
     relations.wikiWallpaperStyleTag =
       relation('generateWikiWallpaperStyleTag');
 
+    relations.metaWallpaperStyleTag =
+      relation('generateWikiMetaWallpaperStyleTag');
+
     relations.imageOverlay =
       relation('generateImageOverlay');
 
@@ -107,6 +110,11 @@ export default {
     },
 
     color: {validate: v => v.isColor},
+
+    wallpaper: {
+      validate: v => v.is('auto', 'wiki', 'meta'),
+      default: 'auto',
+    },
 
     styleTags: {
       type: 'html',
@@ -629,12 +637,14 @@ export default {
         .find(tag => tag.attributes.has('class', 'wallpaper-style'));
 
     const fallbackWallpaperStyleTag =
-      (slottedWallpaperStyleTag
-        ? html.blank()
+      (slots.wallpaper === 'auto' && slottedWallpaperStyleTag
+        ? null
+     : slots.wallpaper === 'meta'
+        ? relations.metaWallpaperStyleTag
         : relations.wikiWallpaperStyleTag);
 
     const usingWallpaperStyleTag =
-      (slottedWallpaperStyleTag
+      (slots.wallpaper === 'auto' && slottedWallpaperStyleTag
         ? slottedWallpaperStyleTag
         : html.resolve(fallbackWallpaperStyleTag, {normalize: 'tag'}));
 

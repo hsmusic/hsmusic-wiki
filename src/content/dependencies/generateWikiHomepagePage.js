@@ -43,6 +43,7 @@ export default {
     relations.layout.slots({
       title: data.wikiName,
       showWikiNameInTitle: false,
+      wallpaper: 'meta',
 
       mainClasses: ['top-index'],
       headingMode: 'static',

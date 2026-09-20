@@ -20,6 +20,8 @@ export default {
         title: data.name,
         headingMode: 'sticky',
 
+        wallpaper: 'meta',
+
         styleTags: [
           html.tag('style', {class: 'static-page-style'},
             {[html.onlyIfContent]: true},
