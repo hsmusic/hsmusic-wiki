@@ -365,7 +365,7 @@ export default {
     // but for now subtitle is totally separate.
     const subheadingHTML =
       (html.isBlank(slots.subtitle)
-        ? null
+        ? html.blank()
         : html.tag('h2', {class: 'page-subtitle'},
             language.sanitize(slots.subtitle)));
 
