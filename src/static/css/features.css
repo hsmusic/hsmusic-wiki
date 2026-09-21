@@ -167,7 +167,7 @@
       right: 0;
     }
 
-    > .carousel-tile {
+    .carousel-tile > a {
       display: inline-block;
       margin: 0;
       flex: 1 1 150px;
@@ -226,6 +226,7 @@
   }
 
   .carousel-tile .image-container {
+    aspect-ratio: 1 / 1;
     border: none;
     border-radius: 6px;
   }
