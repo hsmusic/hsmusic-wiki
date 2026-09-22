@@ -36,6 +36,9 @@ export default {
   }),
 
   data: (query, albums, group) => ({
+    showRevealAllArtworksControl:
+      group.showRevealAllArtworksControl,
+
     styles:
       albums.map(album => album.style),
 
@@ -61,7 +64,10 @@ export default {
   generate: (data, relations, {language}) =>
     language.encapsulate('misc.coverGrid', capsule =>
       relations.coverGrid.slots({
-        allWarnings: data.allWarnings,
+        allWarnings:
+          (data.showRevealAllArtworksControl
+            ? data.allWarnings
+            : null),
 
         items:
           stitchArrays({

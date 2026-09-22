@@ -134,26 +134,6 @@ export default {
                   }),
                 ])),
 
-          /*
-          data.trackGridLabels.some(value => value !== null) &&
-            html.tag('p', {class: 'gallery-set-switcher'},
-              language.encapsulate(pageCapsule, 'setSwitcher', switcherCapsule =>
-                language.$(switcherCapsule, {
-                  sets:
-                    relations.setSwitcher.slots({
-                      initialOptionIndex: 0,
-
-                      titles:
-                        data.trackGridLabels.map(label =>
-                          label ??
-                          language.$(switcherCapsule, 'unlabeledSet')),
-
-                      targetIDs:
-                        data.trackGridIDs,
-                    }),
-                }))),
-          */
-
           relations.albumsByDateView.slots({
             showTitle:
               !html.isBlank(relations.albumsBySeriesView),

@@ -71,6 +71,8 @@ export class Group extends Thing {
 
     divideAlbumsByStyle: flag(V(false)),
 
+    showRevealAllArtworksControl: flag(V(true)),
+
     description: contentString(),
 
     urls: urls(),
@@ -182,6 +184,10 @@ export class Group extends Thing {
 
       'Divide Albums By Style': {
         property: 'divideAlbumsByStyle',
+      },
+
+      'Show Reveal All Warnings Control': {
+        property: 'showRevealAllArtworksControl',
       },
 
       'Description': {property: 'description'},
