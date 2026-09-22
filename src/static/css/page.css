@@ -354,22 +354,15 @@
   #header { display: grid; }
 
   .nav-main-links { grid-area: main-links; }
-  .nav-content { grid-area: content; }
   .nav-bottom-row { grid-area: bottom-row; }
+  .nav-right-end-content { grid-area: right-end-content; }
 
-  #header.nav-has-main-links.nav-has-content {
-    grid-template-columns: 2.5fr 3fr;
+  #header {
+    grid-template-columns: 2.5fr fit-content(40%);
     grid-template-rows: min-content 1fr;
     grid-template-areas:
-      "main-links content"
-      "bottom-row content";
-  }
-
-  #header.nav-has-main-links:not(.nav-has-content) {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "main-links"
-      "bottom-row";
+      "main-links right-end-content"
+      "bottom-row right-end-content";
   }
 
   .nav-main-links {
@@ -392,6 +385,10 @@
 
   .nav-main-links .nav-link-accent {
     display: inline-block;
+  }
+
+  .nav-right-end-content {
+    text-align: right;
   }
 
   .series-nav-links {

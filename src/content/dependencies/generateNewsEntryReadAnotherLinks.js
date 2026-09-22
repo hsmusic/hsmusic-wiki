@@ -40,21 +40,6 @@ export default {
 
     const entryLines = [];
 
-    if (relations.previousEntryLink) {
-      const parts = [prefix, `previous`];
-      const options = {};
-
-      options.entry = relations.previousEntryLink;
-
-      if (relations.previousEntryDatetimestamp) {
-        parts.push('withDate');
-        options.date =
-          relations.previousEntryDatetimestamp.slot('style', 'full');
-      }
-
-      entryLines.push(language.$(...parts, options));
-    }
-
     if (relations.nextEntryLink) {
       const parts = [prefix, `next`];
       const options = {};
@@ -65,6 +50,21 @@ export default {
         parts.push('withDate');
         options.date =
           relations.nextEntryDatetimestamp.slot('style', 'full');
+      }
+
+      entryLines.push(language.$(...parts, options));
+    }
+
+    if (relations.previousEntryLink) {
+      const parts = [prefix, `previous`];
+      const options = {};
+
+      options.entry = relations.previousEntryLink;
+
+      if (relations.previousEntryDatetimestamp) {
+        parts.push('withDate');
+        options.date =
+          relations.previousEntryDatetimestamp.slot('style', 'full');
       }
 
       entryLines.push(language.$(...parts, options));

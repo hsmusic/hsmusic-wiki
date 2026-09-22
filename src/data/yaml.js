@@ -2137,6 +2137,8 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
     ]],
 
     ['wikiInfo', [/* find */]],
+
+    ['wikiUpdateData', ['wikiUpdateData']],
   ]);
 
   const constructorHasFindMap = new Map();

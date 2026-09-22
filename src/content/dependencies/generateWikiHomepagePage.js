@@ -29,6 +29,9 @@ export default {
       homepageLayout.navbarLinks
         .map(content => relation('transformContent', content)),
 
+    updateNavLinks:
+      relation('generateWikiHomepageNavUpdateLinks'),
+
     sections:
       homepageLayout.sections
         .map(section => relation('generateWikiHomepageSection', section)),
@@ -83,5 +86,8 @@ export default {
               }),
           })),
       ],
+
+      navRightEndContent:
+        relations.updateNavLinks,
     }),
 };

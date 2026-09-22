@@ -11,3 +11,4 @@ export * as listing from './listing.js';
 export * as news from './news.js';
 export * as static from './static.js';
 export * as track from './track.js';
+export * as wikiUpdate from './wiki-update.js';

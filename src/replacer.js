@@ -184,7 +184,17 @@ export const replacerSpec = {
   'tooltip': {
     value: (ref) => ref,
     link: null,
-  }
+  },
+
+  'update': {
+    find: 'wikiUpdate',
+    link: 'linkWikiUpdate',
+  },
+
+  'update-index': {
+    find: null,
+    link: 'linkWikiUpdateIndex',
+  },
 };
 
 // Syntax literals.

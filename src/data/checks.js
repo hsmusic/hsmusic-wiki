@@ -339,6 +339,10 @@ export function filterReferenceErrors(wikiData, {
     ['wikiInfo', {
       divideTrackListsByGroups: 'group',
     }],
+
+    ['wikiUpdateData', {
+      newsEntry: 'newsEntry',
+    }],
   ];
 
   const boundFind = bindFind(wikiData, {mode: 'error'});
@@ -829,6 +833,10 @@ export function reportContentTextErrors(wikiData, {
     ['wikiInfo', {
       description: '_content',
       footerContent: '_content',
+    }],
+
+    ['wikiUpdateSectionData', {
+      changes: '_content',
     }],
   ];
 

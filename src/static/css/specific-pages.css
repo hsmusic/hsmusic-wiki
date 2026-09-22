@@ -267,17 +267,52 @@ html[data-url-key="localized.artist"] {
 
 /* Homepage */
 
-@layer print {
-  html[data-url-key="localized.home"] #content h1 {
-    text-align: center;
-    font-size: 2.5em;
+html[data-url-key="localized.home"] {
+  #header:has(.wiki-update) {
+    @layer print {
+      .nav-main-links > .nav-link:first-child {
+        display: block;
+      }
+    }
+
+    @layer construction {
+      .nav-main-links > .nav-link:nth-child(2)::before {
+        content: "";
+      }
+    }
   }
 
-  html[data-language-code="preview-en"][data-url-key="localized.home"] #content h1::after {
-    font-family: cursive;
-    display: block;
-    content: "(Preview Build)";
-    font-size: 0.8em;
+  @layer print {
+    #content h1 {
+      text-align: center;
+      font-size: 2.5em;
+    }
+
+    #header .wiki-update {
+      white-space: nowrap;
+    }
+
+    #header .wiki-update a {
+      font-style: oblique;
+      filter: brightness(1.15);
+    }
+
+    #header .wiki-update.main-update a {
+      font-weight: 800;
+    }
+
+    #header .wiki-update:not(.main-update) {
+      opacity: 0.9;
+    }
+  }
+
+  /* Layout - Medium or Thin */
+  @media (max-width: 849.98px) {
+    .nav-link:has(a[href^="feedback"]),
+    .nav-link:has(a[href^="discord"]),
+    .nav-link:has(a[href^="changelog"]) {
+      display: none;
+    }
   }
 }
 
@@ -316,5 +351,74 @@ html[data-url-key="localized.listing"][data-url-value0="tracks/with-multiple-rel
   html[data-url-key="localized.newsEntry"] .read-another-links {
     font-style: oblique;
     font-size: 0.9em;
+  }
+}
+
+/* Wiki update page */
+
+html[data-url-key="localized.wikiUpdate"] {
+  @layer print {
+    .main-content-container > h2 {
+      font-size: 1em;
+      margin: 1em 0 0.25em;
+    }
+
+    #content p:has(+ .regular-update-list) {
+      margin-bottom: 0.5em;
+    }
+
+    #content p:has(+ .nearby-main-updates) {
+      margin-bottom: 0.5em;
+    }
+
+    #content .nearby-main-updates {
+      padding-left: 0;
+      margin-top: 0.5em;
+    }
+
+    #content .regular-update-list {
+      padding-left: 25px;
+    }
+
+    #content .nearby-main-updates li,
+    #content .regular-update-list li {
+      margin-bottom: 2px;
+    }
+
+    #content .nearby-main-updates li {
+      list-style: none;
+    }
+
+    #content ul {
+      margin-top: 0.2em;
+      margin-bottom: 0.6em;
+    }
+
+    #content details {
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+    }
+  }
+}
+
+/* Wiki updates index */
+
+html[data-url-key="localized.wikiUpdateIndex"] {
+  #content p:has(+ .regular-update-list) {
+    margin-bottom: 0.5em;
+  }
+
+  #content .regular-update-list {
+    padding-left: 25px;
+  }
+
+  #content .nearby-main-updates li,
+  #content .regular-update-list li {
+    margin-bottom: 2px;
+  }
+
+  #content ul {
+    margin-top: 0.2em;
+    margin-bottom: 0.6em;
   }
 }

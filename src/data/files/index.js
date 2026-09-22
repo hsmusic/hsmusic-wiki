@@ -9,3 +9,4 @@ export {default as getNewsLoadingSpec} from './news.js';
 export {default as getSortingRuleLoadingSpec} from './sorting-rule.js';
 export {default as getStaticPageLoadingSpec} from './static-page.js';
 export {default as getWikiInfoLoadingSpec} from './wiki-info.js';
+export {default as getWikiUpdateLoadingSpec} from './wiki-update.js';

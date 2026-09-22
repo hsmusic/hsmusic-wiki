@@ -215,11 +215,13 @@
 
   /* Disable grid features, just line header children up vertically */
 
-  #header {
-    display: block;
-  }
+  html:not([data-url-key="localized.home"]) {
+    #header {
+      display: block;
+    }
 
-  #header > div:not(:first-child) {
-    margin-top: 0.5em;
+    #header > div:not(:first-child) {
+      margin-top: 0.5em;
+    }
   }
 }

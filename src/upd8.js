@@ -1724,6 +1724,7 @@ async function main() {
       }
       logThings('staticPageData', 'static pages');
       logThings('sortingRules', 'sorting rules');
+      logThings('wikiUpdateData', 'wiki updates');
       if (wikiData.homepageLayout) {
         logInfo` - ${1} homepage layout (${
           wikiData.homepageLayout.sections.length

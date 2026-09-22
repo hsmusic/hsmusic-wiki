@@ -1377,6 +1377,10 @@ homepage:
     entry:
       viewRest: "(View rest of entry!)"
 
+  nav.update:
+    _: "{UPDATE}"
+    withDate: "{UPDATE} ~ {DATE}"
+
 #
 # albumSidebar:
 #   This sidebar is displayed on both the album and track info pages!
@@ -3474,3 +3478,44 @@ trackPage:
       withArtists.withCoverArtists: "By {ARTISTS}; art by {COVER_ARTISTS}."
       withArtists: "By {ARTISTS}."
       withCoverArtists: "Art by {COVER_ARTISTS}."
+
+wikiUpdateIndex:
+  title: "Changelog"
+
+wikiUpdatePage:
+  title: "{UPDATE}"
+
+  info:
+    mainUpdate: >-
+      Main update.
+
+    regularUpdate: >-
+      Regular update.
+
+    mainUpdate.withDate:
+      Main update, released {DATE}.
+
+    regularUpdate.withDate:
+      Regular update, released {DATE}.
+
+    readNewsEntry: >-
+      Read the news entry: {ENTRY}
+
+    nearbyUpdates:
+      previous:
+        _: "← {UPDATE}"
+        withDate: "← {DATE}: {UPDATE}"
+
+      next:
+        _: "→ {UPDATE}"
+        withDate: "→ {DATE}: {UPDATE}"
+
+    regularUpdates:
+      title: "Smaller updates following this one:"
+      title.latestMainUpdate: "Smaller updates since this one:"
+      item: "{DATE}: {UPDATE}"
+
+    backToMainUpdate: >-
+      Return to main update: {MAIN_UPDATE}
+
+  section: "{SECTION}"
