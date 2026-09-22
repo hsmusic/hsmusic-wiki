@@ -14,11 +14,7 @@ export const info = {
   randomizedCarouselTileIndexes: null,
   randomizedCarouselTileLengths: null,
 
-  // Each conceptual tile is represented by three actual elements, since that's
-  // how the carousel looping effect is coded. So the "leaf" element here is
-  // a list of options, each option of which is three tiles. Then there are
-  // multiple lists of options per carousel.
-  randomizedCarouselTileTileTiles: null,
+  randomizedCarouselTileTiles: null,
 
   session: {
     // Blank string means use the default, 'random' means use a new seed
@@ -86,7 +82,7 @@ export function getPageReferences() {
       .map(tiles => tiles
         .map(tile => tile.querySelectorAll('.carousel-tile').length));
 
-  info.randomizedCarouselTileTileTiles =
+  info.randomizedCarouselTileTiles =
     stitchArrays({
       indexes: info.randomizedCarouselTileIndexes,
       lengths: info.randomizedCarouselTileLengths,
@@ -97,30 +93,21 @@ export function getPageReferences() {
           randomizerLength: lengths,
         }).map(({randomizerIndex, randomizerLength}) =>
             Array.from({length: randomizerLength}, (_, optionIndex) =>
-              Array.from({length: 3}, (_, gridIndex) =>
-                carousel.querySelector(
-                  `.carousel-grid:nth-child(${gridIndex + 1})` +
-                  ` > :nth-child(${randomizerIndex + 1})` +
-                  ` > :nth-child(${optionIndex + 1})`)))));
+              carousel.querySelector(
+                `.carousel-grid` +
+                ` > :nth-child(${randomizerIndex + 1})` +
+                ` > :nth-child(${optionIndex + 1})`))));
 }
 
 export function mutatePageContent() {
-  info.randomizedCarouselTileTileTiles.forEach((tileTileTiles, carouselIndex) => {
+  info.randomizedCarouselTileTiles.forEach((tileTiles, carouselIndex) => {
     const seed = getInitialSeed(carouselIndex);
     const next = prng(seed);
 
-    tileTileTiles.forEach(optionTileLists => {
-      const choice = Math.floor(optionTileLists.length * next());
-
-      optionTileLists.forEach((optionTiles, index) => {
-        for (const tile of optionTiles) {
-          if (index === choice) {
-            cssProp(tile, 'display', null);
-          } else {
-            cssProp(tile, 'display', 'none');
-          }
-        }
-      });
+    tileTiles.forEach(optionTiles => {
+      const choice = Math.floor(optionTiles.length * next());
+      const tile = optionTiles[choice];
+      tile.classList.add('show');
     });
   });
 }

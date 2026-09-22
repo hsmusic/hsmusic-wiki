@@ -7,21 +7,20 @@ export default {
       relation('image', album.coverArtworks[0]),
   }),
 
-  slots: {
-    attributes: {type: 'attributes', mutable: false},
-    lazy: {type: 'boolean', default: false},
-  },
+  generate: (relations) =>
+    relations.link.slots({
+      attributes: {class: 'carousel-tile'},
+      color: false,
 
-  generate: (relations, slots, {html}) =>
-    html.tag('div', {class: ['carousel-tile', 'carousel-album-tile']},
-      slots.attributes,
-
-      relations.link.slots({
-        attributes: {tabindex: '-1'},
-        content:
-          relations.image.slots({
-            thumb: 'small',
-            lazy: slots.lazy,
-          }),
-      })),
+      content:
+        relations.image.slots({
+          thumb: 'small',
+          lazy: 'native',
+          needsDimensionAttributes: false,
+          needsImageOverlayAttributes: false,
+          needsInnerOuterWrappers: false,
+          needsImageClass: false,
+          needsContainer: false,
+        }),
+    }),
 };

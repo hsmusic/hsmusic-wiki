@@ -27,14 +27,17 @@ export default {
     responsiveSizes: {type: 'string'},
 
     reveal: {type: 'boolean', default: true},
-    lazy: {type: 'boolean', default: false},
+    lazy: {validate: v => v.is(true, false, 'native')},
 
     link: {
       validate: v => v.anyOf(v.isBoolean, v.isString),
       default: false,
     },
 
-    color: {validate: v => v.isColor},
+    color: {
+      validate: v => v.anyOf(v.isBoolean, v.isColor),
+      default: true,
+    },
 
     // Added to the .image-container.
     attributes: {
@@ -50,6 +53,13 @@ export default {
 
     // Added to the <img> itself.
     alt: {type: 'string'},
+
+    needsDimensionAttributes: {type: 'boolean', default: true},
+    needsImageOverlayAttributes: {type: 'boolean', default: true},
+    needsInnerOuterWrappers: {type: 'boolean', default: true},
+
+    needsImageClass: {type: 'boolean', default: true},
+    needsContainer: {type: 'boolean', default: true},
 
     // Specify 'src' or 'path', or the path will be used from the artwork.
     // If none of the above is present, the message in missingSourceContent
@@ -139,19 +149,22 @@ export default {
       !empty(warnings);
 
     const imgAttributes = html.attributes([
-      {class: 'image'},
+      slots.needsImageClass &&
+        {class: 'image'},
 
       slots.imgAttributes,
 
       slots.alt && {alt: slots.alt},
 
-      dimensions &&
-      dimensions[0] &&
-        {width: dimensions[0]},
+      slots.needsDimensionAttributes && [
+        dimensions &&
+        dimensions[0] &&
+          {width: dimensions[0]},
 
-      dimensions &&
-      dimensions[1] &&
-        {height: dimensions[1]},
+        dimensions &&
+        dimensions[1] &&
+          {height: dimensions[1]},
+      ],
     ]);
 
     const isPlaceholder =
@@ -219,28 +232,38 @@ export default {
 
       availableThumbs = getThumbnailsAvailableForDimensions(originalDimensions);
 
-      const fileSize =
-        (willLink && mediaSrc
-          ? getSizeOfMediaFile(mediaSrc)
-          : null);
+      if (slots.needsImageOverlayAttributes) {
+        const fileSize =
+          (willLink && mediaSrc
+            ? getSizeOfMediaFile(mediaSrc)
+            : null);
 
-      imgAttributes.add([
-        fileSize &&
-          {'data-original-size': fileSize},
+        imgAttributes.add([
+          fileSize &&
+            {'data-original-size': fileSize},
 
-        {'data-dimensions': originalDimensions.join('x')},
+          {'data-dimensions': originalDimensions.join('x')},
 
-        !empty(availableThumbs) &&
-          {'data-thumbs':
-              availableThumbs
-                .map(([tack, size]) => `${tack}:${size}`)
-                .join(' ')},
-      ]);
+          !empty(availableThumbs) &&
+            {'data-thumbs':
+                availableThumbs
+                  .map(([tack, size]) => `${tack}:${size}`)
+                  .join(' ')},
+        ]);
+      }
     }
+
+    // Not appended on scripted-lazy (lazy: true) images, since two systems
+    // to the same end really shouldn't be interacting.
+    const nativeLazyAttribute =
+      (slots.lazy === 'native'
+        ? {loading: 'lazy'}
+        : null);
 
     let displayStaticImg =
       html.tag('img',
         imgAttributes,
+        nativeLazyAttribute,
         {src: displaySrc});
 
     if (hasThumbnails && slots.responsiveThumb) responsive: {
@@ -269,6 +292,10 @@ export default {
       displayStaticImg =
         html.tag('img',
           imgAttributes,
+          nativeLazyAttribute,
+
+          slots.lazy === 'native' &&
+            {loading: 'lazy'},
 
           {sizes:
             (slots.responsiveSizes.match(/(?=(?:,|^))\s*\S/)
@@ -289,9 +316,10 @@ export default {
     }
 
     const images = {
-      displayStatic: displayStaticImg,
+      displayStatic:
+        displayStaticImg,
 
-      displayLazy:
+      displayScriptedLazy:
         slots.lazy &&
           html.tag('img',
             imgAttributes,
@@ -301,9 +329,10 @@ export default {
         revealSrc &&
           html.tag('img', {class: 'reveal-thumbnail'},
             imgAttributes,
+            nativeLazyAttribute,
             {src: revealSrc}),
 
-      revealLazy:
+      revealScriptedLazy:
         slots.lazy &&
         revealSrc &&
           html.tag('img', {class: 'reveal-thumbnail'},
@@ -314,9 +343,9 @@ export default {
     const staticImageContent =
       html.tags([images.displayStatic, images.revealStatic]);
 
-    if (slots.lazy) {
+    if (slots.lazy === true) {
       const lazyImageContent =
-        html.tags([images.displayLazy, images.revealLazy]);
+        html.tags([images.displayScriptedLazy, images.revealScriptedLazy]);
 
       return html.tags([
         html.tag('noscript',
@@ -341,9 +370,11 @@ export default {
           ]);
       }
 
-      wrapped =
-        html.tag('div', {class: 'image-inner-area'},
-          wrapped);
+      if (slots.needsInnerOuterWrappers) {
+        wrapped =
+          html.tag('div', {class: 'image-inner-area'},
+            wrapped);
+      }
 
       if (willLink) {
         wrapped =
@@ -355,40 +386,47 @@ export default {
             wrapped);
       }
 
-      wrapped =
-        html.tag('div', {class: 'image-outer-area'},
-          wrapped);
+      if (slots.needsInnerOuterWrappers) {
+        wrapped =
+          html.tag('div', {class: 'image-outer-area'},
+            wrapped);
+      }
 
-      wrapped =
-        html.tag('div', {class: 'image-container'},
-          typeof slots.link === 'string' &&
-            {class: 'no-image-preview'},
+      if (slots.needsContainer) {
+        wrapped =
+          html.tag('div', {class: 'image-container'},
+            typeof slots.link === 'string' &&
+              {class: 'no-image-preview'},
 
-          (isPlaceholder
-            ? {class: 'placeholder-image'}
-            : [
-                willLink &&
-                  {class: 'has-link'},
+            (isPlaceholder
+              ? {class: 'placeholder-image'}
+              : [
+                  willLink &&
+                    {class: 'has-link'},
 
-                willReveal &&
-                  {class: 'reveal'},
+                  willReveal &&
+                    {class: 'reveal'},
 
-                revealSrc &&
-                  {class: 'has-reveal-thumbnail'},
-              ]),
+                  revealSrc &&
+                    {class: 'has-reveal-thumbnail'},
+                ]),
 
-          visibility === 'hidden' &&
-            {class: 'js-hide'},
+            visibility === 'hidden' &&
+              {class: 'js-hide'},
 
-          slots.color &&
-            relations.colorStyle.slots({
-              color: slots.color,
-              context: 'image-box',
-            }),
+            (slots.color === true
+              ? relations.colorStyle.slot('context', 'image-box')
+           : slots.color
+              ? relations.colorStyle.slots({
+                  color: slots.color,
+                  context: 'image-box',
+                })
+              : null),
 
-          slots.attributes,
+            slots.attributes,
 
-          wrapped);
+            wrapped);
+      }
 
       return wrapped;
     }

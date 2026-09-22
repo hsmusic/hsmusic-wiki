@@ -120,8 +120,8 @@
   .carousel-container {
     position: relative;
     overflow: hidden;
-    margin: 20px 0 5px 0;
-    padding: 8px 0;
+    margin: 20px -6px 5px -6px;
+    padding: 8px 8px;
   }
 
   .carousel-container + .quick-info,
@@ -129,7 +129,7 @@
     margin-top: 25px;
   }
 
-  .carousel-container {
+  .carousel-grid {
     --carousel-tile-min-width: 1px; /* :-) */
     --carousel-row-count: 3;
     --carousel-column-count: 6;
@@ -140,9 +140,7 @@
     &[data-carousel-columns="4"] { --carousel-column-count: 4; }
     &[data-carousel-columns="5"] { --carousel-column-count: 5; }
     &[data-carousel-columns="6"] { --carousel-column-count: 6; }
-  }
 
-  .carousel-grid {
     /* Thanks to: https://css-tricks.com/an-auto-filling-css-grid-with-max-columns/ */
     --carousel-gap-count: calc(var(--carousel-column-count) - 1);
     --carousel-total-gap-width: calc(var(--carousel-gap-count) * 10px);
@@ -159,27 +157,19 @@
 
     z-index: 5;
 
-    &:nth-child(2),
-    &:nth-child(3) {
-      position: absolute;
-      top: 8px;
-      left: 0;
-      right: 0;
-    }
-
-    .carousel-tile > a {
-      display: inline-block;
+    .carousel-tile {
       margin: 0;
       flex: 1 1 150px;
-      padding: 3px;
     }
 
-    .carousel-tile {
-      .image-outer-area {
-        padding: 0;
-      }
+    a.carousel-tile {
+      display: block;
 
-      .image {
+      aspect-ratio: 1 / 1;
+      padding: 2.5px;
+
+      img {
+        display: block;
         width: 100%;
         height: 100%;
         margin-top: auto;
@@ -217,81 +207,62 @@
     border-radius: 4px;
 
     box-shadow:
-      inset 15px 2px 40px var(--shadow-color),
-      inset -25px -2px 40px var(--shadow-color);
+      inset 20px 0 35px var(--shadow-color),
+      inset -20px 0 35px var(--shadow-color);
   }
 
   .carousel-tile {
     border-radius: 7px;
+    overflow: hidden;
+
+    img {
+      border-radius: 6px;
+    }
+  }
+}
+
+@layer construction {
+  @media (scripting: none) {
+    .carousel-container > noscript + .carousel-grid {
+      display: none;
+    }
   }
 
-  .carousel-tile .image-container {
-    aspect-ratio: 1 / 1;
-    border: none;
-    border-radius: 6px;
+  .carousel-randomized-tile:not(:has(.carousel-tile.show)) {
+    &::before {
+      display: block;
+      aspect-ratio: 1 / 1;
+    }
+
+    &::after {
+      content: "";
+      display: block;
+      margin: 3px;
+      aspect-ratio: 1 / 1;
+      background: #0002;
+      border-radius: 6px;
+    }
   }
 
-  .carousel-tile .image-inner-area::after {
-    box-shadow: none;
+  .carousel-randomized-tile > .carousel-tile:not(.show) {
+    display: none;
   }
 }
 
 @layer interaction {
-  .carousel-container:hover .carousel-grid {
-    animation-play-state: running;
-  }
-
-  .carousel-grid {
-    transform: translateX(0);
-    animation: carousel-marquee1 40s linear infinite;
-    animation-play-state: paused;
-  }
-
-  .carousel-grid:nth-child(2) {
-    animation-name: carousel-marquee2;
-  }
-
-  .carousel-grid:nth-child(3) {
-    animation-name: carousel-marquee3;
-  }
-
-  @keyframes carousel-marquee1 {
-    0% {
-      transform: translateX(-100%) translateX(4%);
-    }
-
-    100% {
-      transform: translateX(-200%) translateX(4%);
-    }
-  }
-
-  @keyframes carousel-marquee2 {
-    0% {
-      transform: translateX(0%) translateX(4%);
-    }
-
-    100% {
-      transform: translateX(-100%) translateX(4%);
-    }
-  }
-
-  @keyframes carousel-marquee3 {
-    0% {
-      transform: translateX(100%) translateX(4%);
-    }
-
-    100% {
-      transform: translateX(0%) translateX(4%);
-    }
-  }
-
   .carousel-tile {
-    filter: brightness(0.8);
+    filter: brightness(0.85);
   }
 
-  .carousel-tile:hover {
+  .carousel-tile:hover,
+  .carousel-tile:focus-within {
+    z-index: 1;
     filter: brightness(1);
     background: var(--dim-color);
+  }
+
+  .carousel-tile:focus-within {
+    outline: 3px double var(--bright-color);
   }
 }
 

@@ -29,6 +29,10 @@ export class AlbumCarousel extends Thing {
       constituteFrom('thing', 'seedSuffixFromThingProperty'),
     ],
 
+    // TODO: Should ensure tiles are of static value, so really just
+    // be an album reference list, but...
+    scriptlessTiles: thingList(V(AlbumCarouselTile)),
+
     tiles: thingList(V(AlbumCarouselTile)),
 
     // Expose only
@@ -39,6 +43,11 @@ export class AlbumCarousel extends Thing {
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Seed': {property: 'seedSuffix'},
+
+      'Scriptless Tiles': {
+        property: 'scriptlessTiles',
+        transform: parseAlbumCarouselTiles,
+      },
 
       'Tiles': {
         property: 'tiles',
