@@ -4,7 +4,7 @@ export default {
       ? {equal: true, date: currentDate}
       : {equal: false, currentDate, referenceDate}),
 
-  relations: (relation, currentDate) => ({
+  relations: (relation, currentDate, _referenceDate) => ({
     template:
       relation('generateDatetimestampTemplate'),
 

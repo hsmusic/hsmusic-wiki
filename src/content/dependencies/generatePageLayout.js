@@ -164,12 +164,12 @@ export default {
 
     // Nav & Footer
 
-    navContent: {
+    navBottomRowContent: {
       type: 'html',
       mutable: false,
     },
 
-    navBottomRowContent: {
+    navRightEndContent: {
       type: 'html',
       mutable: false,
     },
@@ -421,11 +421,11 @@ export default {
         !empty(slots.navLinks) &&
           {class: 'nav-has-main-links'},
 
-        !html.isBlank(slots.navContent) &&
-          {class: 'nav-has-content'},
-
         !html.isBlank(slots.navBottomRowContent) &&
           {class: 'nav-has-bottom-row'},
+
+        !html.isBlank(slots.navRightEndContent) &&
+          {class: 'nav-has-right-end-content'},
 
         html.tag('div', {class: 'nav-main-links'},
           {[html.onlyIfContent]: true},
@@ -511,9 +511,9 @@ export default {
             links: slots.navBottomRowContent,
           })),
 
-        html.tag('div', {class: 'nav-content'},
+        html.tag('div', {class: 'nav-right-end-content'},
           {[html.onlyIfContent]: true},
-          slots.navContent));
+          slots.navRightEndContent));
 
     const getSidebar = (side, id, needed) => {
       const sidebar =
