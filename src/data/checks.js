@@ -295,6 +295,10 @@ export function filterReferenceErrors(wikiData, {
       groups: 'group',
     }],
 
+    ['groupData', {
+      closelyLinkedArtists: '_closelyLinkedArtist',
+    }],
+
     ['homepageLayout.sections.rows', {
       _include: row => row.type === 'album grid',
       sourceGroup: '_homepageSourceGroup',
@@ -432,6 +436,7 @@ export function filterReferenceErrors(wikiData, {
                 break;
 
               case '_contrib':
+              case '_closelyLinkedArtist':
                 findFn = contribRef => findArtistOrAlias(contribRef.artist);
                 break;
 
