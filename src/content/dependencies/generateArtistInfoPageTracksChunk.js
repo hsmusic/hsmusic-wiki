@@ -124,6 +124,8 @@ export default {
     const tracks =
       trackContribLists
         .map(contribs => contribs[0].thing)
+        // TODO: Why teh fudge are we checking if the thing isTrack
+        // if its a god darn argument trackContribLists????
         .filter(thing => thing.isTrack);
 
     data.numLinkingOtherReleases =
@@ -147,30 +149,30 @@ export default {
         });
       }).length;
 
-    // Contributions that aren't annotated "(as <NAME>)" don't have this
-    // artistText property.
-    const creditedAsAliases =
+    const rawCreditedAsAliasesOnTracks =
       unique(
         trackContribLists
           .filter(contribs => contribs[0].thing.isTrack)
           .flatMap(contribs => contribs.map(contrib => contrib.artistText)));
 
-    const creditedAsAliasesOnAlbum =
+    const rawCreditedAsAliasesOnAlbum =
       unique(
-        [...album.artistContribs, ...album.trackArtistContribs]
+        album.artistContribs
           .filter(contrib => contrib.artist === artist)
           .map(contrib => contrib.artistText));
 
-    data.consistentlyCreditedAsAlias =
-      (creditedAsAliases.length === 1
-        ? creditedAsAliases[0]
-        : null);
+    const rawCreditedAsAliases =
+      unique([
+        ...rawCreditedAsAliasesOnTracks,
+        ...rawCreditedAsAliasesOnAlbum,
+      ]);
 
-    data.mostlyCreditedAsAlias =
-      (creditedAsAliasesOnAlbum.length === 1 &&
-       creditedAsAliases.length > 1
-        ? creditedAsAliasesOnAlbum[0]
-        : null);
+    data.creditedAsAliases =
+      (rawCreditedAsAliases.includes(null) && rawCreditedAsAliases.length > 1
+        ? rawCreditedAsAliases.map(name => name ?? artist.name)
+     : rawCreditedAsAliases.includes(null) && rawCreditedAsAliases.length === 1
+        ? []
+        : rawCreditedAsAliases);
 
     return data;
   },
@@ -206,8 +208,7 @@ export default {
       duration: data.duration,
       durationApproximate: data.durationApproximate,
 
-      consistentlyCreditedAsAlias: data.consistentlyCreditedAsAlias,
-      mostlyCreditedAsAlias: data.mostlyCreditedAsAlias,
+      creditedAsAliases: data.creditedAsAliases,
 
       list:
         html.tag('ul',

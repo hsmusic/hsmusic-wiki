@@ -32,8 +32,7 @@ export default {
     duration: {validate: v => v.isDuration},
     durationApproximate: {type: 'boolean'},
 
-    consistentlyCreditedAsAlias: {type: 'string'},
-    mostlyCreditedAsAlias: {type: 'string'},
+    creditedAsAliases: {validate: v => v.strictArrayOf(v.isString)},
   },
 
   generate(data, slots, {html, language}) {
@@ -88,19 +87,13 @@ export default {
             {class: 'local-link'},
             language.sanitize(alias));
 
-        if (slots.consistentlyCreditedAsAlias) {
+        if (!empty(slots.creditedAsAliases)) {
           parts.push('withCreditedAlias');
           options.as =
             language.$(capsule, 'withCreditedAlias.as', {
               alias:
-                wrapAlias(slots.consistentlyCreditedAsAlias),
-            });
-        } else if (slots.mostlyCreditedAsAlias) {
-          parts.push('withCreditedAlias');
-          options.as =
-            language.$(capsule, 'withCreditedAlias.as.exceptAsNoted', {
-              alias:
-                wrapAlias(slots.mostlyCreditedAsAlias),
+                language.formatUnitList(
+                  slots.creditedAsAliases.map(wrapAlias)),
             });
         }
 

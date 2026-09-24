@@ -1742,9 +1742,6 @@ artistPage:
 
       withCitation: "{ENTRY} ({CITATION})"
 
-      withCreditedAliases: >-
-        {ENTRY} — as {ALIASES}
-
       citation: "{CITATION}"
       citation.quoted: "quoted: {CITATION}"
       quoted: "quoted"
@@ -1772,12 +1769,6 @@ artistPage:
 
         rerelease: >-
           Also released on {ALBUM}
-
-      rerelease.withCreditedAliases: >-
-        {ENTRY} ({RERELEASE}) — as {ALIASES}
-
-      firstRelease.withCreditedAliases: >-
-        {ENTRY} ({FIRST_RELEASE}) — as {ALIASES}
 
       track: "{TRACK}"
 

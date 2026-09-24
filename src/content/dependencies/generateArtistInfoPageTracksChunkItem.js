@@ -1,5 +1,5 @@
 import {sortAlbumsTracksChronologically} from '#sort';
-import {empty, unique} from '#sugar';
+import {empty} from '#sugar';
 import {selectRepresentativeArtistContributorContribs} from '#wiki-data';
 
 export default {
@@ -52,48 +52,6 @@ export default {
         return contribs.some(contrib => contrib.artist === artist);
       });
 
-    const rawCreditedNames =
-      unique(contribs.map(contrib => contrib.artistText));
-
-    query.creditedNames =
-      (rawCreditedNames.includes(null) && rawCreditedNames.length > 1
-        ? [
-            artist.name,
-            ...rawCreditedNames.filter(name => name !== null),
-          ]
-     : rawCreditedNames.includes(null) && rawCreditedNames.length === 1
-        ? []
-        : rawCreditedNames);
-
-    query.chunkHasOtherCreditedNames =
-      chunkContribs.some(chunkContribs =>
-        chunkContribs !== contribs &&
-        chunkContribs.some(contrib =>
-          !rawCreditedNames.includes(contrib.artistText)));
-
-    // OK these next two variables are stolen right from the chunk's
-    // query function, duplicated logic beware.
-
-    const album = query.track.album;
-
-    const creditedAsAliasesOnAlbum =
-      unique(
-        [...album.artistContribs, ...album.trackArtistContribs]
-          .filter(contrib => contrib.artist === artist)
-          .map(contrib => contrib.artistText));
-
-    const mostlyCreditedAsAlias =
-      (creditedAsAliasesOnAlbum.length === 1
-        ? creditedAsAliasesOnAlbum[0]
-        : null);
-
-    if (
-      query.creditedNames.length === 1 &&
-      query.creditedNames[0] === mostlyCreditedAsAlias
-    ) {
-      query.creditedNames = [];
-    }
-
     return query;
   },
 
@@ -133,11 +91,6 @@ export default {
         ? query.displayedContributions
             .flatMap(contrib => contrib.annotationParts)
         : null),
-
-    creditedAsAliases:
-      (query.creditedNames && query.chunkHasOtherCreditedNames
-        ? query.creditedNames
-        : []),
   }),
 
   slots: {
@@ -156,8 +109,6 @@ export default {
         (data.contribAnnotationParts
           ? language.formatUnitList(data.contribAnnotationParts)
           : html.blank()),
-
-      creditedAsAliases: data.creditedAsAliases,
 
       content:
         language.$('artistPage.creditList.entry.track', {

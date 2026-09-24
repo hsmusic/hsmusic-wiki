@@ -1,5 +1,3 @@
-import {empty} from '#sugar';
-
 export default {
   relations: (relation) => ({
     textWithTooltip:
@@ -20,10 +18,6 @@ export default {
     citation: {
       type: 'html',
       mutable: false,
-    },
-
-    creditedAsAliases: {
-      validate: v => v.strictArrayOf(v.isString),
     },
 
     rereleaseTooltip: {
@@ -74,17 +68,6 @@ export default {
           } else if (!html.isBlank(slots.citation)) {
             workingCapsule += '.withCitation';
             workingOptions.citation = slots.citation;
-          }
-
-          if (!empty(slots.creditedAsAliases)) {
-            workingCapsule += '.withCreditedAliases';
-            workingOptions.aliases =
-              language.formatUnitList(
-                slots.creditedAsAliases.map(alias =>
-                  html.tag('a', {class: 'credited-alias'},
-                    {href: ''},
-                    {class: 'local-link'},
-                    language.sanitize(alias))));
           }
 
           if (workingCapsule === entryCapsule) {
