@@ -21,6 +21,16 @@ export function pathsForTarget(update) {
         args: [update],
       },
     },
+
+    ...update.sections.map(section => ({
+      type: 'page',
+      path: ['wikiUpdateSection', update.directory, section.hash],
+
+      contentFunction: {
+        name: 'generateWikiUpdateSectionPage',
+        args: [section],
+      },
+    }))
   ];
 }
 

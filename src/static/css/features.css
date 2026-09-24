@@ -448,6 +448,12 @@
   }
 }
 
+@layer print {
+  .content-heading .hover-links {
+    font-weight: normal;
+  }
+}
+
 @layer construction {
   summary.content-heading {
     list-style-type: none;
@@ -466,6 +472,12 @@
 }
 
 @layer interaction {
+  .content-heading .hover-links {
+    &:where(.content-heading:not(:hover, :focus, :focus-within) *) {
+      display: none;
+    }
+  }
+
   .content-heading.highlight-hash-link {
     animation: highlight-hash-link 4s;
     animation-delay: 125ms;

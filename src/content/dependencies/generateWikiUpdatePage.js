@@ -59,7 +59,6 @@ export default {
           }),
 
         wallpaper: 'meta',
-
         headingMode: 'sticky',
 
         mainClasses: ['long-content'],
@@ -82,11 +81,13 @@ export default {
           relations.nearbyMainUpdates,
           relations.subsequentRegularUpdates,
 
-          relations.changes.slots({
-            mode: 'multiline',
-          }),
+          relations.changes,
 
-          relations.sections,
+          relations.sections
+            .map(section =>
+              section.slots({
+                showHashPageLinks: true
+              })),
         ],
 
         navLinkStyle: 'hierarchical',

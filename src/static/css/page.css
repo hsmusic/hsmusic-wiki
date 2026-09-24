@@ -564,6 +564,7 @@
 
   .sidebar h1 a {
     word-break: break-word;
+    line-break: loose;
   }
 
   .sidebar h2 {

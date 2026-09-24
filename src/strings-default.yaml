@@ -3509,4 +3509,22 @@ wikiUpdatePage:
     backToMainUpdate: >-
       Return to main update: {MAIN_UPDATE}
 
-  section: "{SECTION}"
+    updateSection: >-
+      You're reading an excerpt of this update.
+
+    backToEntireUpdateChangelog: >-
+      Return: {UPDATE}
+
+  section:
+    _: >-
+      {SECTION}
+
+    withLinks: >-
+      {SECTION} {LINKS}
+
+    links: "— links: {HASH}, {PAGE}"
+    links.hash: "this page"
+    links.page: "its page"
+
+wikiUpdateSidebar:
+  sectionList: "Change sections:"

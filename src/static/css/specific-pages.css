@@ -356,7 +356,8 @@ html[data-url-key="localized.listing"][data-url-value0="tracks/with-multiple-rel
 
 /* Wiki update page */
 
-html[data-url-key="localized.wikiUpdate"] {
+html[data-url-key="localized.wikiUpdate"],
+html[data-url-key="localized.wikiUpdateSection"] {
   @layer print {
     .main-content-container > h2 {
       font-size: 1em;

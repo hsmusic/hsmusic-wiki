@@ -1,8 +1,9 @@
-import {V} from '#composite';
+import {input, V} from '#composite';
 import Thing from '#thing';
 
-import {exposeConstant} from '#composite/control-flow';
-import {contentString, name, simpleString, thing}
+import {exposeConstant, exposeDependency} from '#composite/control-flow';
+import {withNearbyItemFromList, withPropertyFromObject} from '#composite/data';
+import {contentString, directory, name, thing}
   from '#composite/wiki-properties';
 
 export class WikiUpdateSection extends Thing {
@@ -15,13 +16,25 @@ export class WikiUpdateSection extends Thing {
     update: thing(V(WikiUpdate)),
 
     name: name(V(`Unnamed Wiki Update Section`)),
-    hash: simpleString(),
+    hash: directory(),
 
     changes: contentString(),
 
     // Expose only
 
     isWikiUpdateSection: exposeConstant(V(true)),
+
+    nextSection: [
+      withPropertyFromObject('update', V('sections')),
+      withNearbyItemFromList('#update.sections', input.myself(), V(+1)),
+      exposeDependency('#nearbyItem'),
+    ],
+
+    previousSection: [
+      withPropertyFromObject('update', V('sections')),
+      withNearbyItemFromList('#update.sections', input.myself(), V(-1)),
+      exposeDependency('#nearbyItem'),
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {
