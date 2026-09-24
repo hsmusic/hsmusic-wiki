@@ -341,10 +341,15 @@ export function getPagePathname({
 export function getPageSubdirectoryPrefix({
   pagePath,
 }) {
-  const timesNestedDeeply = (pagePath
-    .slice(1) // skip URL key, only check arguments
-    .join('/')
-    .split('/')
-    .length - 1);
+  const pagePathArgs = pagePath.slice(1);
+
+  if (pagePathArgs.length === 0) {
+    return '';
+  }
+
+  const timesNestedDeeply =
+    pagePathArgs.join('/').split('/').length -
+    pagePathArgs.length;
+
   return '../'.repeat(timesNestedDeeply);
 }
