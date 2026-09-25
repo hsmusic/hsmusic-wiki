@@ -1129,7 +1129,7 @@
   }
 
   .grid-item .image-inner-area::after {
-    box-shadow: none;
+    content: none;
   }
 
   .grid-item .image {
