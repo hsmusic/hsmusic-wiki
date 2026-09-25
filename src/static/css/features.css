@@ -1413,7 +1413,7 @@
     overflow: hidden;
 
     width: 100%;
-    aspect-ratio: 1 / 1;
+    height: 100%;
   }
 
   .image-link .image-inner-area {
@@ -1691,6 +1691,11 @@
   }
 
   .reveal:not(.revealed) .image-inner-area {
+    &:where(.grid-item *) {
+      height: unset;
+      aspect-ratio: 1 / 1;
+    }
+
     background: var(--deep-color);
   }
 
