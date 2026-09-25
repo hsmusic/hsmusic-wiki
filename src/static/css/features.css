@@ -1623,7 +1623,9 @@
 
 @layer interaction {
   :is(.image-link, .grid-item):not(:hover, :focus) .image {
-    --hover-filter: brightness(0.94);
+    &:where(:not(.image-container.reveal:not(.revealed) *)) {
+      --hover-filter: brightness(0.94);
+    }
   }
 
   :is(.cover-artwork):not(:hover, :focus) .image {
