@@ -57,11 +57,6 @@ export default {
       type: 'string',
       default: 'additionalFile',
     },
-
-    disableStandaloneWithFiles: {
-      type: 'boolean',
-      default: false,
-    },
   },
 
   generate(data, relations, slots, {html, language}) {
@@ -74,15 +69,40 @@ export default {
       language.encapsulate(capsule, workingCapsule => {
         const workingOptions = {};
 
-        const titleText =
-          (data.title
-            ? language.sanitize(data.title)
-            : language.$(capsule, 'placeholderTitle'));
+        switch (numFiles) {
+          case 0: {
+            workingOptions.title =
+              (data.title
+                ? language.$(capsule, 'title', {title: data.title})
+                : language.$(capsule, 'placeholderTitle'));
 
-        workingOptions.title =
-          (numFiles >= 2
-            ? html.tag('b', titleText)
-            : relations.fileLinks[0].slot('content', titleText));
+            break;
+          }
+
+          case 1: {
+            const link = relations.fileLinks[0];
+
+            workingOptions.title =
+              link.slot('content',
+                (data.title
+                  ? language.$(capsule, 'title', {title: data.title})
+                  : language.$(capsule, 'placeholderTitle')));
+
+            break;
+          }
+
+          default: {
+            workingOptions.title =
+              (data.title
+                ? language.$(capsule, 'title', {
+                    title:
+                      html.tag('b', language.sanitize(data.title)),
+                  })
+                : html.tag('b', language.$(capsule, 'placeholderTitle')));
+
+            break;
+          }
+        }
 
         if (data.for === 'track') {
           workingOptions.track = relations.trackLink;

@@ -18,11 +18,6 @@ export default {
       type: 'string',
       default: 'additionalFile',
     },
-
-    disableStandaloneWithFiles: {
-      type: 'boolean',
-      default: false,
-    },
   },
 
   generate: (relations, slots, {html}) =>
@@ -36,9 +31,6 @@ export default {
       list:
         html.tag('ul',
           relations.items
-            .map(item => item.slots({
-              string: slots.string,
-              disableStandaloneWithFiles: slots.disableStandaloneWithFiles,
-            }))),
+            .map(item => item.slot('string', slots.string))),
     }),
 };

@@ -1891,6 +1891,7 @@ artistPage:
         withCredit.withNoFiles.withAnnotation: >-
           {TITLE} ({CREDIT}): {TRACK} (no files) — {ANNOTATION}
 
+        title: "{TITLE}"
         placeholderTitle: "Additional file"
         credit: "by {ARTISTS}"
 
@@ -1931,6 +1932,7 @@ artistPage:
         withCredit.withNoFiles.withAnnotation: >-
           {TITLE} ({CREDIT}): {TRACK} (no files) — {ANNOTATION}
 
+        title: "{TITLE}"
         placeholderTitle: "Sheet music"
         credit: "by {ARTISTS}"
 
@@ -1971,6 +1973,7 @@ artistPage:
         withCredit.withNoFiles.withAnnotation: >-
           {TITLE} ({CREDIT}): {TRACK} (no files) — {ANNOTATION}
 
+        title: "{TITLE}"
         placeholderTitle: "MIDI or project music"
         credit: "by {ARTISTS}"
 
@@ -2072,25 +2075,44 @@ artistPage:
 
       album.miscellaneousAdditionalFile:
         _: >-
-          (album additional files)
-
-        withTitle: >-
-          (for album: {TITLE})
+          ({TITLE})
 
         withCredit: >-
-          (for album: {CREDIT})
+          ({TITLE} {CREDIT})
 
-        withCredit.withTitle: >-
-          (for album: {TITLE} {CREDIT})
+        withMultipleFiles: >-
+          ({TITLE} — {FILES})
 
-        credit: >-
-          files by {ARTISTS}
+        withNoFiles: >-
+          ({TITLE} — no files)
 
-        credit.standaloneWithFiles: >-
-          {FILES} by {ARTISTS}
+        withAnnotation: >-
+          ({TITLE} — {ANNOTATION})
 
-        credit.alongsideTitle: >-
-          by {ARTISTS}
+        withCredit.withMultipleFiles: >-
+          ({TITLE} {CREDIT} — {FILES})
+
+        withCredit.withNoFiles: >-
+          ({TITLE} {CREDIT} — no files)
+
+        withCredit.withAnnotation: >-
+          ({TITLE} {CREDIT} — {ANNOTATION})
+
+        withMultipleFiles.withAnnotation: >-
+          ({TITLE} — {ANNOTATION}; {FILES})
+
+        withNoFiles.withAnnotation: >-
+          ({TITLE} — {ANNOTATION}; no files)
+
+        withCredit.withMultipleFiles.withAnnotation: >-
+          ({TITLE} {CREDIT} — {ANNOTATION}; {FILES})
+
+        withCredit.withNoFiles.withAnnotation: >-
+          ({TITLE} {CREDIT} —
+
+        title: "for album: {TITLE}"
+        placeholderTitle: "album additional files"
+        credit: "by {ARTISTS}"
 
       flash:
         _: >-

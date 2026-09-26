@@ -63,7 +63,6 @@ export default {
         relations.chunks.map(chunk =>
           chunk.slots({
             string: 'sheetMusicFile',
-            disableStandaloneWithFiles: true,
           })),
     }),
 };
