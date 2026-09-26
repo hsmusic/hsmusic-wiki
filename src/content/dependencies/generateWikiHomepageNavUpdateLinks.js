@@ -17,7 +17,7 @@ export default {
         .find(update => update.isMainUpdate);
 
     sprawl.latestRegularUpdate =
-      sprawl.latestMainUpdate.subsequentRegularUpdates.at(0)
+      sprawl.latestMainUpdate?.subsequentRegularUpdates.at(0)
       ?? null;
 
     return sprawl;
