@@ -58,6 +58,26 @@ export default {
       });
     }
 
+    const linkTexts =
+      externalLinks
+        .map(link => html.resolve(link, {normalize: 'plain'}))
+        .map(text => text.trim());
+
+    const linksReadSameAsAnotherLink =
+      linkTexts.map((text1, index1) =>
+        linkTexts.some((text2, index2) =>
+          index1 !== index2 &&
+          text1 === text2));
+
+    stitchArrays({
+      link: externalLinks,
+      linkReadsSameAsAnotherLink: linksReadSameAsAnotherLink,
+    }).forEach(({link, linkReadsSameAsAnotherLink}) => {
+        if (linkReadsSameAsAnotherLink) {
+          link.setSlot('style', 'platform-with-handle');
+        }
+      });
+
     let style = 'line';
 
     if (data.totalEntries > slots.maximumTotalEntriesInLine) {

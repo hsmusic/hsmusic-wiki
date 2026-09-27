@@ -14,6 +14,7 @@ import {
 
 export const externalLinkStyles = [
   'platform',
+  'platform-with-handle',
   'handle',
   'icon-id',
 ];
@@ -1086,6 +1087,25 @@ export function getExternalLinkStringOfStyleFromDescriptor(urlEntry, style, desc
       }
     }
 
+    case 'platform-with-handle': {
+      const platformPart =
+        getExternalLinkStringOfStyleFromDescriptor(
+          urlEntry, 'platform', descriptor, {language});
+
+      const handlePart =
+        getExternalLinkStringOfStyleFromDescriptor(
+          urlEntry, 'handle', descriptor, {language});
+
+      if (platformPart && handlePart) {
+        return language.$('misc.external.withHandle', {
+          platform: platformPart,
+          handle: handlePart,
+        });
+      } else {
+        return platformPart;
+      }
+    }
+
     case 'icon-id': {
       if (descriptor.icon) {
         return descriptor.icon;
@@ -1097,16 +1117,19 @@ export function getExternalLinkStringOfStyleFromDescriptor(urlEntry, style, desc
 }
 
 export function couldDescriptorSupportStyle(descriptor, style) {
-  if (style === 'platform') {
-    return true;
-  }
+  switch (style) {
+    case 'platform':
+      return true;
 
-  if (style === 'handle') {
-    return !!descriptor.handle;
-  }
+    case 'handle':
+      return !!descriptor.handle;
 
-  if (style === 'icon-id') {
-    return !!descriptor.icon;
+    case 'platform-with-handle':
+      // Falls back to just platform style.
+      return true;
+
+    case 'icon-id':
+      return !!descriptor.icon;
   }
 }
 
