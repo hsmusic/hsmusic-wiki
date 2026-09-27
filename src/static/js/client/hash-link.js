@@ -118,13 +118,26 @@ export function addPageListeners() {
         return;
       }
 
-      expandDetails(target);
+      // We're taking full responsibility for doing what a hash link is
+      // supposed to do. Get ready for it!
+      evt.preventDefault();
 
-      // Hide skipper box right away, so the layout is updated on time for the
-      // math operations coming up next.
-      const skipper = document.getElementById('skippers');
-      skipper.style.display = 'none';
-      setTimeout(() => skipper.style.display = '');
+      const fromSkipperLink =
+        !!evt.target.closest('#skippers');
+
+      if (!fromSkipperLink) {
+        history.pushState({}, '', href);
+      }
+
+      if (fromSkipperLink) {
+        // Hide skipper box right away, so the layout is updated on time for the
+        // math operations coming up next.
+        const skipper = document.getElementById('skippers');
+        skipper.style.display = 'none';
+        setTimeout(() => skipper.style.display = '');
+      }
+
+      expandDetails(target);
 
       const box = target.getBoundingClientRect();
       const style = window.getComputedStyle(target);
@@ -134,8 +147,6 @@ export function addPageListeners() {
         + box.top
         - style['scroll-margin-top'].replace('px', '');
 
-      evt.preventDefault();
-      history.pushState({}, '', href);
       window.scrollTo({top: scrollY, behavior: 'smooth'});
 
       // Get grumpy.
