@@ -137,7 +137,17 @@ export function addPageListeners() {
       evt.preventDefault();
       history.pushState({}, '', href);
       window.scrollTo({top: scrollY, behavior: 'smooth'});
+
+      // Get grumpy.
       target.focus({preventScroll: true});
+      if (document.activeElement !== target && !target.hasAttribute('tabindex')) {
+        target.setAttribute('tabindex', '-1');
+        target.focus({preventScroll: true});
+        if (document.activeElement !== target) {
+          target.removeAttribute('tabindex');
+          console.warn(`Couldn't focus target even after setting tabindex:`, target);
+        }
+      }
 
       const maxScroll =
           document.body.scrollHeight
