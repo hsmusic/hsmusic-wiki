@@ -695,6 +695,9 @@ export function isDuration(duration) {
   return true;
 }
 
+export const isCarouselUpdateFrequency =
+  is('daily', 'weekly');
+
 export function isTimeIntoDuration(time) {
   isNumber(time);
   isPositiveOrZero(time);

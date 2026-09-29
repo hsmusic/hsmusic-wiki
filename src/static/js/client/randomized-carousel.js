@@ -6,12 +6,18 @@ import {cssProp} from '../client-util.js';
 export const info = {
   id: 'randomizedCarouselInfo',
 
-  seedOfTheWeek: null,
-
   carousels: null,
   carouselSeedSuffixes: null,
+  carouselAnchorDates: null,
+  carouselUpdateFrequencies: null,
   carouselGrids: null,
 
+  carouselTiles: null,
+  carouselTileAnchorDates: null,
+  carouselTileUpdateFrequencies: null,
+
+  // Sparse arrays. Map onto carouselTiles etc, above.
+  randomizedCarouselTiles: null,
   randomizedCarouselTileOptionTiles: null,
 
   session: {
@@ -25,24 +31,49 @@ export const info = {
   },
 };
 
-function getSeedOfTheWeek() {
+function stringifyDate(date) {
+  return date.toISOString().slice(0, '2026-09-13'.length);
+}
+
+function getSeedOfTheWeek(dayOfTheWeek) {
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
 
   const sunday = new Date(today);
   sunday.setUTCDate(today.getUTCDate() - today.getUTCDay());
 
-  return sunday.toISOString().slice(0, '2026-09-13'.length);
+  return stringifyDate(sunday);
 }
 
-function getInitialSeed(carouselIndex) {
+function getRotatingSeed(anchorDate, updateFrequency) {
+  switch (updateFrequency) {
+    case 'daily':
+      return stringifyDate(new Date);
+
+    case 'weekly':
+      return getSeedOfTheWeek(anchorDate.getUTCDay());
+
+    default:
+      return stringifyDate(anchorDate);
+  }
+}
+
+function getInitialSeed(carouselIndex, tileIndex) {
   const {session} = info;
+
+  const anchorDate =
+    info.carouselTileAnchorDates[carouselIndex][tileIndex] ??
+    info.carouselAnchorDates[carouselIndex];
+
+  const updateFrequency =
+    info.carouselTileUpdateFrequencies[carouselIndex][tileIndex] ??
+    info.carouselUpdateFrequencies[carouselIndex];
 
   const basicSeed =
     (session.randomizeWithSeed === 'random'
       ? Math.floor(Math.random() * 100000).toString()
    : session.randomizeWithSeed === ''
-      ? getSeedOfTheWeek()
+      ? getRotatingSeed(anchorDate, updateFrequency)
       : session.randomizeWithSeed);
 
   const seedSuffix = info.carouselSeedSuffixes[carouselIndex];
@@ -54,11 +85,12 @@ function getInitialSeed(carouselIndex) {
   }
 }
 
-export function initializeState() {
-  info.seedOfTheWeek = getSeedOfTheWeek();
-}
-
 export function getPageReferences() {
+  const adjustDateIfYouInsistProbablyNotNecessaryButUnsure = date => {
+    date.setUTCHours(0, 0, 0, 0);
+    return date;
+  };
+
   info.carousels =
     Array.from(document.querySelectorAll('.carousel-container'));
 
@@ -66,25 +98,74 @@ export function getPageReferences() {
     info.carousels
       .map(carousel => carousel.dataset.carouselSeedSuffix ?? null);
 
+  info.carouselAnchorDates =
+    info.carousels
+      .map(carousel => new Date(carousel.dataset.anchorDate))
+      .map(date => adjustDateIfYouInsistProbablyNotNecessaryButUnsure(date));
+
+  info.carouselUpdateFrequencies =
+    info.carousels
+      .map(carousel => carousel.dataset.updateFrequency);
+
   info.carouselGrids =
     info.carousels
       .map(carousel => carousel.querySelector('.carousel-grid'));
 
-  info.randomizedCarouselTileOptionTiles =
+  // It's about to get fun here
+  const keep = f => v => f(v) ? v : null;
+  const iffy = f => v => v ? f(v) : v;
+
+  info.carouselTiles =
     info.carouselGrids
-      .map(grid => Array.from(grid.querySelectorAll('.carousel-randomized-tile')))
+      .map(grid => grid.querySelectorAll(':scope > .carousel-tile'))
+      .map(tiles => Array.from(tiles));
+
+  info.carouselTileAnchorDates =
+    info.carouselTiles
       .map(tiles => tiles
-        .map(tile => Array.from(tile.querySelectorAll('.carousel-tile'))));
+        .map(tile => tile.dataset.anchorDate ?? null)
+        .map(iffy(date => new Date(date)))
+        .map(iffy(adjustDateIfYouInsistProbablyNotNecessaryButUnsure)));
+
+  info.carouselTileUpdateFrequencies =
+    info.carouselTiles
+      .map(tiles => tiles
+        .map(tile => tile.dataset.updateFrequency ?? null));
+
+  info.randomizedCarouselTiles =
+    info.carouselTiles
+      .map(tiles => tiles
+        .map(keep(tile => tile.matches('.carousel-randomized-tile'))));
+
+  info.randomizedCarouselTileOptionTiles =
+    info.randomizedCarouselTiles
+      .map(tiles => tiles
+        .map(iffy(tile => tile.querySelectorAll('.carousel-tile')))
+        .map(iffy(optionTiles => Array.from(optionTiles))));
 }
 
 export function mutatePageContent() {
   info.randomizedCarouselTileOptionTiles.forEach((lists, carouselIndex) => {
-    const seed = getInitialSeed(carouselIndex);
-    const next = prng(seed);
+    const carouselPool = Object.create(null);
+    const splishSplashPRNG = seed => {
+      if (seed in carouselPool) {
+        return carouselPool[seed];
+      } else {
+        const next = prng(seed);
+        carouselPool[seed] = next;
+        return next;
+      }
+    };
 
-    lists.forEach(optionTiles => {
+    lists.forEach((optionTiles, tileIndex) => {
+      if (!optionTiles) return;
+
+      const seed = getInitialSeed(carouselIndex, tileIndex);
+      const next = splishSplashPRNG(seed);
+
       const choice = Math.floor(optionTiles.length * next());
       const tile = optionTiles[choice];
+
       tile.classList.add('show');
     });
   });

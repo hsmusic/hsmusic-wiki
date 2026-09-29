@@ -1,10 +1,14 @@
 import {inspect} from 'node:util';
 
 import {colors} from '#cli';
-import {V} from '#composite';
+import {input, V} from '#composite';
 import Thing from '#thing';
+import {isDate, isCarouselUpdateFrequency} from '#validators';
+import {parseDate} from '#yaml';
 
-import {exposeConstant} from '#composite/control-flow';
+import {exposeConstant, exposeUpdateValueOrContinue}
+  from '#composite/control-flow';
+import {constituteFrom} from '#composite/wiki-data';
 import {referenceList, singleReference, soupyFind, thing}
   from '#composite/wiki-properties';
 
@@ -16,6 +20,22 @@ export class AlbumCarouselTile extends Thing {
     // Update & expose
 
     carousel: thing(V(AlbumCarousel)),
+
+    anchorDate: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isDate),
+      }),
+
+      constituteFrom('carousel', V('anchorDate')),
+    ],
+
+    updateFrequency: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isCarouselUpdateFrequency),
+      }),
+
+      constituteFrom('carousel', V('updateFrequency')),
+    ],
 
     album: singleReference({
       find: soupyFind.input('album'),
@@ -32,6 +52,9 @@ export class AlbumCarouselTile extends Thing {
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
+      'Anchor Date': {property: 'anchorDate', transform: parseDate},
+      'Update Frequency': {property: 'updateFrequency'},
+
       'Album': {property: 'album'},
       'Randomize From': {property: 'randomizeFromAlbums'},
     },

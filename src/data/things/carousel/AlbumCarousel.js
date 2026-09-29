@@ -2,8 +2,8 @@ import {inspect} from 'node:util';
 
 import {input, V} from '#composite';
 import Thing from '#thing';
-import {isString} from '#validators';
-import {parseAlbumCarouselTiles} from '#yaml';
+import {isCarouselUpdateFrequency, isDate, isString} from '#validators';
+import {parseAlbumCarouselTiles, parseDate} from '#yaml';
 
 import {exposeConstant, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
@@ -29,6 +29,22 @@ export class AlbumCarousel extends Thing {
       constituteFrom('thing', 'seedSuffixFromThingProperty'),
     ],
 
+    anchorDate: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isDate),
+      }),
+
+      exposeConstant(V(new Date('2023-01-01'))),
+    ],
+
+    updateFrequency: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isCarouselUpdateFrequency),
+      }),
+
+      exposeConstant(V('weekly')),
+    ],
+
     // TODO: Should ensure tiles are of static value, so really just
     // be an album reference list, but...
     scriptlessTiles: thingList(V(AlbumCarouselTile)),
@@ -42,6 +58,9 @@ export class AlbumCarousel extends Thing {
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
+      'Anchor Date': {property: 'anchorDate', transform: parseDate},
+      'Update Frequency': {property: 'updateFrequency'},
+
       'Seed': {property: 'seedSuffix'},
 
       'Scriptless Tiles': {
