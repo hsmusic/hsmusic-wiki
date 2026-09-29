@@ -10,11 +10,9 @@ export const info = {
 
   carousels: null,
   carouselSeedSuffixes: null,
+  carouselGrids: null,
 
-  randomizedCarouselTileIndexes: null,
-  randomizedCarouselTileLengths: null,
-
-  randomizedCarouselTileTiles: null,
+  randomizedCarouselTileOptionTiles: null,
 
   session: {
     // Blank string means use the default, 'random' means use a new seed
@@ -68,43 +66,23 @@ export function getPageReferences() {
     info.carousels
       .map(carousel => carousel.dataset.carouselSeedSuffix ?? null);
 
-  info.randomizedCarouselTileIndexes =
+  info.carouselGrids =
     info.carousels
-      .map(carousel => carousel.querySelector('.carousel-grid'))
+      .map(carousel => carousel.querySelector('.carousel-grid'));
+
+  info.randomizedCarouselTileOptionTiles =
+    info.carouselGrids
       .map(grid => Array.from(grid.querySelectorAll('.carousel-randomized-tile')))
       .map(tiles => tiles
-        .map(tile => Array.from(tile.parentElement.children).indexOf(tile)));
-
-  info.randomizedCarouselTileLengths =
-    info.carousels
-      .map(carousel => carousel.querySelector('.carousel-grid'))
-      .map(grid => Array.from(grid.querySelectorAll('.carousel-randomized-tile')))
-      .map(tiles => tiles
-        .map(tile => tile.querySelectorAll('.carousel-tile').length));
-
-  info.randomizedCarouselTileTiles =
-    stitchArrays({
-      indexes: info.randomizedCarouselTileIndexes,
-      lengths: info.randomizedCarouselTileLengths,
-      carousel: info.carousels,
-    }).map(({indexes, lengths, carousel}) =>
-        stitchArrays({
-          randomizerIndex: indexes,
-          randomizerLength: lengths,
-        }).map(({randomizerIndex, randomizerLength}) =>
-            Array.from({length: randomizerLength}, (_, optionIndex) =>
-              carousel.querySelector(
-                `.carousel-grid` +
-                ` > :nth-child(${randomizerIndex + 1})` +
-                ` > :nth-child(${optionIndex + 1})`))));
+        .map(tile => Array.from(tile.querySelectorAll('.carousel-tile'))));
 }
 
 export function mutatePageContent() {
-  info.randomizedCarouselTileTiles.forEach((tileTiles, carouselIndex) => {
+  info.randomizedCarouselTileOptionTiles.forEach((lists, carouselIndex) => {
     const seed = getInitialSeed(carouselIndex);
     const next = prng(seed);
 
-    tileTiles.forEach(optionTiles => {
+    lists.forEach(optionTiles => {
       const choice = Math.floor(optionTiles.length * next());
       const tile = optionTiles[choice];
       tile.classList.add('show');
