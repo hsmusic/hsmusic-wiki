@@ -5,6 +5,8 @@ export default {
     tile:
       (!empty(tile.randomizeFromAlbums)
         ? relation('generateCoverCarouselRandomizedTile', tile)
+     : !empty(tile.rotateFromAlbums)
+        ? relation('generateCoverCarouselRotatingTile', tile)
      : tile.album
         ? relation('generateCoverCarouselAlbumTile', tile.album)
         : null),

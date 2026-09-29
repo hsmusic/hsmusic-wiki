@@ -228,7 +228,8 @@
     }
   }
 
-  .carousel-randomized-tile:not(:has(.carousel-tile.show)) {
+  .carousel-randomized-tile:not(:has(.carousel-tile.show)),
+  .carousel-rotating-tile:not(:has(.carousel-tile.show)) {
     &::before {
       display: block;
       aspect-ratio: 1 / 1;
@@ -244,7 +245,8 @@
     }
   }
 
-  .carousel-randomized-tile > .carousel-tile:not(.show) {
+  .carousel-randomized-tile > .carousel-tile:not(.show),
+  .carousel-rotating-tile > .carousel-tile:not(.show) {
     display: none;
   }
 }

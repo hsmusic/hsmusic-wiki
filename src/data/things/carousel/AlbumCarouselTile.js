@@ -45,6 +45,10 @@ export class AlbumCarouselTile extends Thing {
       find: soupyFind.input('album'),
     }),
 
+    rotateFromAlbums: referenceList({
+      find: soupyFind.input('album'),
+    }),
+
     // Update only
 
     find: soupyFind(),
@@ -57,7 +61,15 @@ export class AlbumCarouselTile extends Thing {
 
       'Album': {property: 'album'},
       'Randomize From': {property: 'randomizeFromAlbums'},
+      'Rotate From': {property: 'rotateFromAlbums'},
     },
+
+    invalidFieldCombinations: [
+      {
+        message: `Don't combine multiple ways of selecting albums in one tile`,
+        fields: ['Album', 'Randomize From', 'Rotate From'],
+      },
+    ],
   };
 
   [inspect.custom](depth, options, inspect) {

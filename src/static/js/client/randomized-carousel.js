@@ -20,6 +20,10 @@ export const info = {
   randomizedCarouselTiles: null,
   randomizedCarouselTileOptionTiles: null,
 
+  // Sparse arrays, again.
+  rotatingCarouselTiles: null,
+  rotatingCarouselTileOptionTiles: null,
+
   session: {
     // Blank string means use the default, 'random' means use a new seed
     // on each page load, any other string is a seed to use and reuse.
@@ -39,10 +43,10 @@ function getSeedOfTheWeek(dayOfTheWeek) {
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
 
-  const sunday = new Date(today);
-  sunday.setUTCDate(today.getUTCDate() - today.getUTCDay());
+  const weekday = new Date(today);
+  weekday.setUTCDate(today.getUTCDate() - today.getUTCDay() + dayOfTheWeek);
 
-  return stringifyDate(sunday);
+  return stringifyDate(weekday);
 }
 
 function getRotatingSeed(anchorDate, updateFrequency) {
@@ -55,6 +59,34 @@ function getRotatingSeed(anchorDate, updateFrequency) {
 
     default:
       return stringifyDate(anchorDate);
+  }
+}
+
+function getRotatingIndex(anchorDate, updateFrequency) {
+  switch (updateFrequency) {
+    case 'daily': {
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+
+      const a = Math.min(today, anchorDate);
+      const b = Math.max(today, anchorDate);
+      return (b - a) / 86400000;
+    }
+
+    case 'weekly': {
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+
+      const dayOfTheWeek = anchorDate.getUTCDay();
+      today.setUTCDate(today.getUTCDate() - today.getUTCDay() + dayOfTheWeek);
+
+      const a = Math.min(today, anchorDate);
+      const b = Math.max(today, anchorDate);
+      return (b - a) / 86400000;
+    }
+
+    default:
+      return 0;
   }
 }
 
@@ -83,6 +115,21 @@ function getInitialSeed(carouselIndex, tileIndex) {
   } else {
     return basicSeed;
   }
+}
+
+function getCurrentIndex(carouselIndex, tileIndex, length) {
+  const anchorDate =
+    info.carouselTileAnchorDates[carouselIndex][tileIndex] ??
+    info.carouselAnchorDates[carouselIndex];
+
+  const updateFrequency =
+    info.carouselTileUpdateFrequencies[carouselIndex][tileIndex] ??
+    info.carouselUpdateFrequencies[carouselIndex];
+
+  const index =
+    getRotatingIndex(anchorDate, updateFrequency);
+
+  return index % length;
 }
 
 export function getPageReferences() {
@@ -142,6 +189,17 @@ export function getPageReferences() {
       .map(tiles => tiles
         .map(iffy(tile => tile.querySelectorAll('.carousel-tile')))
         .map(iffy(optionTiles => Array.from(optionTiles))));
+
+  info.rotatingCarouselTiles =
+    info.carouselTiles
+      .map(tiles => tiles
+        .map(keep(tile => tile.matches('.carousel-rotating-tile'))));
+
+  info.rotatingCarouselTileOptionTiles =
+    info.rotatingCarouselTiles
+      .map(tiles => tiles
+        .map(iffy(tile => tile.querySelectorAll('.carousel-tile')))
+        .map(iffy(optionTiles => Array.from(optionTiles))));
 }
 
 export function mutatePageContent() {
@@ -165,6 +223,17 @@ export function mutatePageContent() {
 
       const choice = Math.floor(optionTiles.length * next());
       const tile = optionTiles[choice];
+
+      tile.classList.add('show');
+    });
+  });
+
+  info.rotatingCarouselTileOptionTiles.forEach((lists, carouselIndex) => {
+    lists.forEach((optionTiles, tileIndex) => {
+      if (!optionTiles) return;
+
+      const index = getCurrentIndex(carouselIndex, tileIndex, optionTiles.length);
+      const tile = optionTiles[index];
 
       tile.classList.add('show');
     });
