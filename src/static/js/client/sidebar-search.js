@@ -961,10 +961,11 @@ function showSidebarSearchResults(results) {
 
 function tidyResults(results) {
   const tidiedResults =
-    results.results.map(({doc, id}) => ({
+    results.results.map(({doc, id, tier}) => ({
       reference: id ?? null,
       referenceType: (id ? id.split(':')[0] : null),
       directory: (id ? id.split(':')[1] : null),
+      tier: tier,
       data: doc,
     }));
 
@@ -1026,6 +1027,7 @@ function fillResultElements(results, {
     return false;
   }
 
+  let lastTier = null;
   for (const result of filteredResults) {
     let el;
     try {
@@ -1036,6 +1038,13 @@ function fillResultElements(results, {
     }
 
     if (!el) continue;
+
+    if (result.tier !== lastTier && lastTier) {
+      info.results.appendChild(document.createElement('hr'));
+      lastTier = result.tier;
+    } else if (result.tier !== lastTier) {
+      lastTier = result.tier;
+    }
 
     info.results.appendChild(el);
   }
@@ -1442,18 +1451,26 @@ function generateSidebarSearchResultTemplate(slots) {
     };
 
     if (domEvent.key === 'ArrowDown') {
-      const sibling =
+      let sibling =
         link.nextElementSibling ||
         containingAttachedResultsDiv?.nextElementSibling;
+
+      if (sibling?.tagName === 'HR') {
+        sibling = sibling.nextElementSibling;
+      }
 
       if (sibling) {
         domEvent.preventDefault();
         focusInto(sibling, 'firstChild');
       }
     } else if (domEvent.key === 'ArrowUp') {
-      const sibling =
+      let sibling =
         link.previousElementSibling ||
         containingAttachedResultsDiv?.previousElementSibling;
+
+      if (sibling?.tagName === 'HR') {
+        sibling = sibling.previousElementSibling;
+      }
 
       if (sibling) {
         domEvent.preventDefault();
@@ -1477,6 +1494,25 @@ function generateSidebarSearchResultTemplate(slots) {
   }
 }
 
+function focusIntoResultishElement(elem, end = '') {
+  if (!elem) {
+    return false;
+  }
+
+  if (elem.matches('.wiki-search-result')) {
+    elem.focus({focusVisible: true});
+    return true;
+  }
+
+  const childResult = elem.querySelector('.wiki-search-result' + end);
+  if (childResult) {
+    childResult.focus({focusVisible: true});
+    return true;
+  }
+
+  return false;
+}
+
 function hideSidebarSearchResults() {
   cssProp(info.contextContainer, 'display', 'none');
   cssProp(info.filterContainer, 'display', 'none');
@@ -1497,25 +1533,18 @@ function hideSidebarSearchResults() {
 function focusFirstSidebarSearchResult() {
   const {settings, state} = info;
 
-  let elem = info.results.firstChild;
-  if (elem.classList.contains('wiki-search-result-and-attached-results')) {
-    elem = elem.firstChild;
-  }
-
-  if (!elem?.classList.contains('wiki-search-result')) {
-    return;
-  }
-
   if (state.dismissChangeEventTimeout) {
     clearTimeout(state.dismissChangeEventTimeout);
+  }
+
+  if (!focusIntoResultishElement(info.results.firstChild)) {
+    return;
   }
 
   state.dismissChangeEventTimeout =
     setTimeout(() => {
       state.dismissChangeEventTimeout = null;
     }, settings.dismissChangeEventAfterFocusingFirstResultLatency);
-
-  elem.focus({focusVisible: true});
 }
 
 function saveSidebarSearchResultsScrollOffset() {

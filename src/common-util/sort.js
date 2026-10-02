@@ -9,7 +9,7 @@
 // somehow.
 export const SORTING_LOCALE = 'en';
 
-import {empty, sortMultipleArrays, unique}
+import {empty, re, sortMultipleArrays, unique}
   from './sugar.js';
 
 // General sorting utilities! These don't do any sorting on their own but are
@@ -60,6 +60,50 @@ export function normalizeName(s) {
 
   return s;
 }
+
+// It's normalizeName, but tougher!
+export const badtothebone                                 = 3;
+export function aggressivelyNormalizeName(s, badtothebone = 3) {
+  if (badtothebone >= 3) {
+    // Discard everything up to "Vol" etc.
+    s = s.replace(/^.*(?=Vol(\.|ume)?[ 0-9])/, '');
+  }
+
+  if (badtothebone >= 2) {
+    // Discard a parenthesized part at the end of the name, and stuff
+    // after a colon, which might be details, annotations, subtitles,
+    // or otherwise "extra".
+    s = s.replace(/ \(.*\)$/, '');
+    s = s.replace(/(?<!\b): .*/, '');
+  }
+
+  s = normalizeName(s);
+
+  if (badtothebone >= 1) {
+    // Stem words.
+    let s2;
+    do { s2 = s.replace(stemRegex, ''); }
+    while (s2 !== s && (s = s2));
+  }
+
+  s = s.replace(/^(.*?: )?\[S\] /, '');
+
+  return s;
+}
+
+// This stemmer can become WAY COOLER but we're not doing it right now.
+const stemRegex =
+  re('g', [
+    '(?<!\\b)',
+    '(',
+       'ing',
+      '|ies',
+      '|(?<=[aeiou][^aeiou])es',
+      '|(?<![aeiou])(?<!(?!the|by))[ey]',
+      '|(?<![aeious])s',
+    ')',
+    '\\b',
+  ]);
 
 // Component sort functions - these sort by one particular property, applying
 // unique particulars where appropriate. Usually you don't want to use these

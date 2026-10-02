@@ -131,9 +131,8 @@ export class Artwork extends Thing {
 
     fileExtensionFromThingProperty: simpleString(),
 
+    // File extension is not inherited from the main artwork.
     fileExtension: [
-      inheritFromMainArtwork(),
-
       exposeUpdateValueOrContinue({
         validate: input.value(isFileExtension),
       }),
@@ -145,9 +144,8 @@ export class Artwork extends Thing {
 
     dimensionsFromThingProperty: simpleString(),
 
+    // Dimensions aren't inherited from the main artowrk.
     dimensions: [
-      inheritFromMainArtwork(),
-
       exposeUpdateValueOrContinue({
         validate: input.value(isDimensions),
       }),
@@ -452,10 +450,6 @@ export class Artwork extends Thing {
   };
 
   get path() {
-    if (this.mainArtwork) {
-      return this.mainArtwork.path;
-    }
-
     if (!this.thing) return null;
     if (!this.thing.getOwnArtworkPath) return null;
 

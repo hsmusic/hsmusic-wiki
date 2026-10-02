@@ -3,6 +3,10 @@ import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
 import {default as searchSpec, makeSearchIndex}
   from '../shared-util/search-shape.js';
 
+import {aggressivelyNormalizeName, badtothebone, normalizeName}
+  from '../shared-util/sort.js';
+import {getKebabCase} from '../shared-util/wiki-data.js';
+
 import {
   empty,
   groupArray,
@@ -520,6 +524,10 @@ function queryIndex({termsKey, indexKey}, query, options) {
 
   if (empty(terms)) return null;
 
+  // We'll need this later, not for the bulk/core of search processing.
+  const friendlyQuery =
+    terms.join(' ');
+
   const particles =
     particulate(terms);
 
@@ -603,7 +611,31 @@ function queryIndex({termsKey, indexKey}, query, options) {
   const constitutedResults =
     boilerplate.constitute(filteredResults);
 
-  return constitutedResults;
+  const tierMemory = Object.create(null);
+  const rawTieredResults =
+    constitutedResults.map(result => ({
+      ...result,
+      tier: tierResultForQuery(result, friendlyQuery, tierMemory),
+    }));
+
+  // tierOrder is defined down by tierResultForQuery lol
+  rawTieredResults.sort((a, b) => {
+    const tA = tierOrder.indexOf(a.tier[0]);
+    const tB = tierOrder.indexOf(b.tier[0]);
+    if (tA === tB) {
+      return a.tier[1] - b.tier[1];
+    } else {
+      return tA - tB;
+    }
+  });
+
+  const nicelyTieredResuls =
+    rawTieredResults.map(result => ({
+      ...result,
+      tier: result.tier[0],
+    }));
+
+  return nicelyTieredResuls;
 }
 
 function processTerms(query) {
@@ -713,4 +745,112 @@ function queryBoilerplate(index) {
       return {rawResults, fieldResults};
     },
   };
+}
+
+const tierOrder = ['sweet', 'cool', 'fine'];
+
+function tierResultForQuery(result, query, memory) {
+  function blabla() {
+    for (let r = 0; r <= badtothebone; r++) {
+      const divshift = 10 ** r;
+
+      const queryKebab = memory['queryKebab' + r] ??=
+        getKebabCase(aggressivelyNormalizeName(query, r));
+
+      const nameKebab =
+        getKebabCase(aggressivelyNormalizeName(result.doc.primaryName, r));
+
+      if (nameKebab === queryKebab) {
+        return ['sweet', -10 / divshift];
+      }
+    }
+
+    for (let r = 0; r <= badtothebone; r++) {
+      const divshift = 10 ** r;
+
+      const queryKebab = memory['queryKebab' + r] ??=
+        getKebabCase(aggressivelyNormalizeName(query, r));
+
+      const nameKebab =
+        getKebabCase(aggressivelyNormalizeName(result.doc.primaryName, r));
+
+      const queryKebabWords = memory['queryKebabWords' + r] ??=
+        queryKebab.split('-');
+
+      const nameKebabWords =
+        nameKebab.split('-');
+
+      if (nameKebabWords.length - queryKebabWords.length < 5) {
+        if (nameKebab.startsWith(queryKebab)) {
+          if (nameKebab[queryKebab.length] === '-') {
+            return ['cool', -9.5 / divshift];
+          } else {
+            return ['cool', -8.5 / divshift];
+          }
+        } else if (nameKebab.endsWith(queryKebab)) {
+          if (nameKebab.at(-queryKebab.length - 1) === '-') {
+            return ['cool', -9.0 / divshift];
+          } else {
+            return ['cool', -8.0 / divshift];
+          }
+        }
+
+        const maxScoreAcrossAnyResult = queryKebabWords.length;
+        const normalizeAcrossResults = 7 / maxScoreAcrossAnyResult;
+
+        const j = Math.min(nameKebabWords.length, queryKebabWords.length);
+        let i = 0, meow = '', woof = '';
+        for (i; i < j; i++) {
+          const mmmm = nameKebabWords[i];
+          const wwww = queryKebabWords[i];
+          meow = (meow ? `${meow}-${mmmm}` : mmmm);
+          woof = (woof ? `${woof}-${wwww}` : wwww);
+          if (meow !== woof) break;
+        }
+
+        if (i > 0) {
+          return ['cool', -(i * normalizeAcrossResults + 0.5) / divshift];
+        }
+
+        i = 0, meow = '', woof = '';
+        for (i; i < j; i++) {
+          const mmmm = nameKebabWords.at(-i - 1);
+          const wwww = queryKebabWords.at(-i - 1);
+          meow = (meow ? `${mmmm}-${meow}` : mmmm);
+          woof = (woof ? `${wwww}-${woof}` : wwww);
+          if (meow !== woof) break;
+        }
+
+        if (i > 0) {
+          return ['cool', -i * normalizeAcrossResults / divshift];
+        }
+      }
+    }
+
+    return ['fine', 0];
+  }
+
+  const tier = blabla();
+  if (tier[0] === 'fine') {
+    return tier;
+  }
+
+  const referenceType = result.id.split(':')[0];
+  if (
+    referenceType === 'artist' ||
+    referenceType === 'group' ||
+    referenceType === 'tag'
+  ) {
+    return [tier[0], -20];
+  }
+
+  if (referenceType === 'album') {
+    return [tier[0], -12];
+  }
+
+  if (referenceType === 'flash') {
+    return [tier[0], -11];
+  }
+
+  return tier;
 }
