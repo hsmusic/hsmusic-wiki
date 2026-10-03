@@ -36,6 +36,7 @@ import {
 
 import {
   withFilteredList,
+  withIndexInList,
   withNearbyItemFromList,
   withPropertyFromList,
   withPropertyFromObject,
@@ -155,6 +156,26 @@ export class Artwork extends Thing {
 
     attachAbove: [
       inheritFromMainArtwork(),
+
+      // Can't attach above if this artwork isn't part of a list!
+
+      withContainingArtworkList(),
+      exitWithoutDependency('#containingArtworkList', V(false)),
+
+      // Also can't attach above if this is the first artwork in the list.
+
+      withIndexInList('#containingArtworkList', input.myself()),
+
+      {
+        dependencies: ['#index'],
+        compute: (continuation, {
+          ['#index']: index,
+        }) =>
+          (index === 0
+            ? continuation.exit(false)
+            : continuation()),
+      },
+
       flag(V(false)),
     ],
 
