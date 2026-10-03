@@ -9,8 +9,8 @@ export default {
 
     regularWikiWallpaperStyleTag:
       (wikiInfo.hasMetaWallpaper
-        ? relation('generateWikiWallpaperStyleTag')
-        : null),
+        ? null
+        : relation('generateWikiWallpaperStyleTag')),
   }),
 
   data: ({wikiInfo}) => ({
