@@ -186,8 +186,11 @@ export default {
       relation('generateCoverGrid'),
 
     sourceGridItems:
-      query.thingArtworks
-        .map(artwork => relation('generateCoverGridItem', artwork)),
+      stitchArrays({
+        thing: query.things,
+        artwork: query.thingArtworks,
+      }).map(({thing, artwork}) =>
+          relation('generateCoverGridItem', artwork ?? thing)),
   }),
 
   data: (query, sprawl, artist) => ({
