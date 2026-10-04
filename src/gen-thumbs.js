@@ -553,12 +553,19 @@ function prepareConvertArgs(filePathInMedia, dirnameInCache, thumbtacks) {
   thumbtacks.sort((a, b) => thumbnailSpec[b].size - thumbnailSpec[a].size);
 
   for (const tack of thumbtacks) {
-    const {size, quality} = thumbnailSpec[tack];
+    const {size, quality, pixelize} = thumbnailSpec[tack];
     const filename = `${basename}.${tack}.jpg`;
     const filePathInCache = path.join(dirnameInCache, filename);
     args.push(
       '(', '+clone',
-      '-resize', `${size}x${size}>`,
+
+      ...pixelize === true
+        ? ['-interpolate', 'Integer',
+           '-filter', 'point',
+           '-resize']
+        : ['-resize'],
+      `${size}x${size}>`,
+
       '-interlace', 'Plane',
       '-quality', `${quality}%`,
       '-write', filePathInCache,
