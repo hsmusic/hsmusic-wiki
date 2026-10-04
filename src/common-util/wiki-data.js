@@ -756,11 +756,11 @@ export function* matchInlineLinks(source) {
 
         // We really can't match a closing parenthesis if the link
         // started with an opening parenthesis.
-        /(?:(?<=\(\S*)\))?/,
-        /(?:(?<=\[\S*)\])?/,
-        /(?:(?<=\{\S*)\})?/,
-        /(?:(?<=<\S*)>)?/,
-        /(?:(?<=["'“”‘’]\S*)["'“”‘’])?/,
+        /(?:(?<=\([a-z]*:\/\/\S*)\))?/,
+        /(?:(?<=\[[a-z]*:\/\/\S*)\])?/,
+        /(?:(?<=\{[a-z]*:\/\/\S*)\})?/,
+        /(?:(?<=<[a-z]*:\/\/\S*)>)?/,
+        /(?:(?<=["'“”‘’][a-z]*:\/\/\S*)["'“”‘’])?/,
 
         // Actual terminators.
         /(?:\s|$|<br>)/,
