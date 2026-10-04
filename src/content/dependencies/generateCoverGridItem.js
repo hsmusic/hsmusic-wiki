@@ -46,9 +46,12 @@ export default {
   },
 
   generate(relations, slots, {html, language}) {
-    const link =
+    const immutableLink =
       slots.link ??
       relations.link;
+
+    const mutableLink =
+      immutableLink.clone();
 
     const image =
       slots.image ??
@@ -56,7 +59,7 @@ export default {
 
     const name =
       slots.name ??
-      html.resolve(link, {normalize: 'plain'});
+      html.resolve(immutableLink, {normalize: 'plain'});
 
     const details =
       slots.details ??
@@ -72,7 +75,7 @@ export default {
     const attributes = html.attributes([
       {class: ['grid-item', 'box']},
 
-      link.getSlotValue('attributes'),
+      immutableLink.getSlotValue('attributes'),
       slots.attributes,
 
       !html.isBlank(slots.tab) &&
@@ -110,12 +113,12 @@ export default {
         })),
     ]);
 
-    link.setSlots({
+    mutableLink.setSlots({
       colorContext: 'image-box',
       attributes,
       content,
     });
 
-    return link;
+    return mutableLink;
   },
 };
