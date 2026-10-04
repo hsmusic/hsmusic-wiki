@@ -121,7 +121,7 @@
     position: relative;
     overflow: hidden;
     margin: 20px -6px 5px -6px;
-    padding: 8px 8px;
+    padding: 8px;
   }
 
   .carousel-container + .quick-info,
@@ -160,7 +160,7 @@
       display: block;
 
       aspect-ratio: 1 / 1;
-      padding: min(2.5px, 0.4vw);
+      padding: min(2.5px, 0.3vw);
 
       img {
         display: block;
@@ -201,8 +201,8 @@
     border-radius: 4px;
 
     box-shadow:
-      inset 20px 0 35px var(--shadow-color),
-      inset -20px 0 35px var(--shadow-color);
+      inset min(20px, -0.4vw) 0 35px var(--shadow-color),
+      inset max(-20px, -0.4vw) 0 35px var(--shadow-color);
   }
 
   .carousel-tile {

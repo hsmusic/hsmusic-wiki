@@ -224,4 +224,41 @@
       margin-top: 0.5em;
     }
   }
+
+  /* Force a 3x6 carousel to be 6x3 instead, and move the right half to the bottom */
+
+  .carousel-container:has(.carousel-grid[data-carousel-rows="3"][data-carousel-columns="6"]) {
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+
+    .carousel-grid {
+      padding-left: min(16px, 1vw);
+      padding-right: min(16px, 1vw);
+
+      --carousel-column-count: 3;
+      --carousel-row-count: 6;
+
+      reading-flow: grid-order;
+
+      > :nth-child( 1) { order:  1; }   > :nth-child( 4) { order: 10; }
+      > :nth-child( 2) { order:  2; }   > :nth-child( 5) { order: 11; }
+      > :nth-child( 3) { order:  3; }   > :nth-child( 6) { order: 12; }
+
+      > :nth-child( 7) { order:  4; }   > :nth-child(10) { order: 13; }
+      > :nth-child( 8) { order:  5; }   > :nth-child(11) { order: 14; }
+      > :nth-child( 9) { order:  6; }   > :nth-child(12) { order: 15; }
+
+      > :nth-child(13) { order:  7; }   > :nth-child(16) { order: 16; }
+      > :nth-child(14) { order:  8; }   > :nth-child(17) { order: 17; }
+      > :nth-child(15) { order:  9; }   > :nth-child(18) { order: 18; }
+
+      max-width: 375px;
+      filter: drop-shadow(0 5px 2px #0004);
+
+      a.carousel-tile {
+        padding: 0.6vw;
+      }
+    }
+  }
 }
