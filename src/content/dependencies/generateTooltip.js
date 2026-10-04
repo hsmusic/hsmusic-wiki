@@ -14,7 +14,10 @@ export default {
     // of an inner span where we might be applying [html.joinChildren], so we
     // can't have it wrapped as its own self-entire html.tags().
     content: {
-      validate: v => v.looseArrayOf(v.isHTML),
+      validate: v =>
+        v.anyOf(
+          v.isHTML,
+          v.looseArrayOf(v.isHTML)),
     },
   },
 
