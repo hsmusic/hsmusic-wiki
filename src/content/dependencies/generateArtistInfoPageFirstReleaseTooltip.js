@@ -47,9 +47,7 @@ query: (track, artist) => ({
           relations.firstReleaseColorStyle,
         ],
 
-        contentAttributes: [
-          {[html.joinChildren]: html.tag('hr', {class: 'cute'})},
-        ],
+        separateContentItems: true,
 
         content:
           stitchArrays({

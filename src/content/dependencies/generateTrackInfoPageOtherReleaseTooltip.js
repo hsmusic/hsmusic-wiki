@@ -33,10 +33,7 @@ export default {
           relations.colorStyle,
         ],
 
-        contentAttributes: [
-          {[html.joinChildren]:
-            html.tag('span', {class: 'cute-break'})},
-        ],
+        separateContentItems: true,
 
         content: [
           language.encapsulate(capsule, 'differentName', workingCapsule => {

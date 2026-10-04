@@ -56,9 +56,7 @@ export default {
 
     tooltip.setSlots({
       attributes: {class: 'commentary-date-tooltip'},
-      contentAttributes: [
-        {[html.joinChildren]: html.tag('span', {class: 'cute-break'})},
-      ],
+      separateContentItems: true,
 
       content: [
         data.sameDayAs === 'album' &&

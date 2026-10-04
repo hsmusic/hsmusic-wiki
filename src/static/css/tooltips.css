@@ -245,20 +245,18 @@
 }
 
 @layer print {
-  .contribution-tooltip .tooltip-divider,
-  .tooltip-content hr.cute,
-  .tooltip-content span.cute-break {
+  .tooltip-content .tooltip-divider {
     display: block;
-    grid-column-start: icon-start;
-    grid-column-end: platform-end;
-    border-top: 1px dotted var(--primary-color);
-  }
 
-  /* Don't mind me... */
-  .tooltip-content .tooltip-divider,
-  .tooltip-content hr.cute {
+    &:is(.contribution-tooltip *) {
+      grid-column-start: icon-start;
+      grid-column-end: platform-end;
+    }
+
     margin-top: 3px;
     margin-bottom: 4px;
+
+    border-top: 1px dotted var(--primary-color);
   }
 
   .contribution-tooltip .main-name {

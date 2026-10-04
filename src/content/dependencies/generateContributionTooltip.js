@@ -94,10 +94,7 @@ export default {
         attributes:
           {class: 'contribution-tooltip'},
 
-        contentAttributes: {
-          [html.joinChildren]:
-            html.tag('span', {class: 'tooltip-divider'}),
-        },
+        separateContentItems: true,
 
         content: [
           html.tags([
