@@ -130,7 +130,6 @@
   }
 
   .carousel-grid {
-    --carousel-tile-min-width: 1px; /* :-) */
     --carousel-row-count: 3;
     --carousel-column-count: 6;
 
@@ -141,14 +140,9 @@
     &[data-carousel-columns="5"] { --carousel-column-count: 5; }
     &[data-carousel-columns="6"] { --carousel-column-count: 6; }
 
-    /* Thanks to: https://css-tricks.com/an-auto-filling-css-grid-with-max-columns/ */
-    --carousel-gap-count: calc(var(--carousel-column-count) - 1);
-    --carousel-total-gap-width: calc(var(--carousel-gap-count) * 10px);
-    --carousel-calculated-tile-max-width: calc((100% - var(--carousel-total-gap-width)) / var(--carousel-column-count));
-
     position: relative;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(max(var(--carousel-tile-min-width), var(--carousel-calculated-tile-max-width)), 1fr));
+    grid-template-columns: repeat(var(--carousel-column-count), 1fr);
     grid-template-rows: repeat(var(--carousel-row-count), auto);
     grid-auto-flow: dense;
     grid-auto-rows: 0;
@@ -166,7 +160,7 @@
       display: block;
 
       aspect-ratio: 1 / 1;
-      padding: 2.5px;
+      padding: min(2.5px, 0.4vw);
 
       img {
         display: block;
