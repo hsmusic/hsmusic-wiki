@@ -171,8 +171,15 @@ export default {
 
     let content;
 
+    let multipleArtists = false;
+
     if (formattedArtistList) {
       if (effectivelyDiffers) {
+        // We can't know this without inspecting the actual text, but anyway
+        // this variable is only intended to control whether we use blockwrap,
+        // which is not guaranteed appropriate on custom artist text.
+        multipleArtists = false;
+
         content =
           language.$(slots.normalStringKey, {
             ...slots.additionalStringOptions,
@@ -209,6 +216,7 @@ export default {
 
       if (empty(relations.featuringContributionLinks)) {
         if (effectivelyDiffers) {
+          multipleArtists = relations.normalContributionLinks.length >= 2;
           content =
             language.$(slots.normalStringKey, {
               ...slots.additionalStringOptions,
@@ -218,6 +226,7 @@ export default {
           return html.blank();
         }
       } else if (effectivelyDiffers && slots.normalFeaturingStringKey) {
+        multipleArtists = true;
         content =
           language.$(slots.normalFeaturingStringKey, {
             ...slots.additionalStringOptions,
@@ -225,12 +234,17 @@ export default {
             featuring: featuringList,
         });
       } else if (slots.featuringStringKey) {
+        multipleArtists = relations.featuringContributionLinks.length >= 2;
         content =
           language.$(slots.featuringStringKey, {
             ...slots.additionalStringOptions,
             artists: featuringList,
           });
       } else {
+        multipleArtists =
+          (relations.normalContributionLinks + relations.featuringContributionLinks)
+            >= 2;
+
         content =
           language.$(slots.normalStringKey, {
             ...slots.additionalStringOptions,
@@ -239,7 +253,7 @@ export default {
       }
     }
 
-    if (slots.chunkwrap) {
+    if (slots.chunkwrap && multipleArtists) {
       // TODO: This is obviously evil.
       return (
         html.metatag('chunkwrap', {split: language.splitConjunctionList},
