@@ -93,6 +93,7 @@ export const allStaticWebRoutes = [
 ];
 
 export async function identifyDynamicWebRoutes({
+  dataPath,
   mediaPath,
   mediaCachePath,
   wikiCachePath,
@@ -122,6 +123,21 @@ export async function identifyDynamicWebRoutes({
         () => [{
           from,
           to: ['shared.path', 'favicon.ico'],
+          statically: 'symlink',
+        }],
+        () => []);
+    },
+
+    () => {
+      const from =
+        path.resolve(path.join(dataPath, 'custom.css'));
+
+      return stat(from).then(
+        // {statically: 'copy'} is not workable for individual files
+        // at the moment, so this remains a symlink.
+        () => [{
+          from,
+          to: ['shared.customCSS'],
           statically: 'symlink',
         }],
         () => []);

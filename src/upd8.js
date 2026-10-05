@@ -3218,6 +3218,8 @@ async function main() {
   let webRouteSources = null;
   let preparedWebRoutes = null;
 
+  let wikiHasCustomCSS = false;
+
   if (stepStatusSummary.identifyWebRoutes.status === STATUS_NOT_STARTED) {
     Object.assign(stepStatusSummary.identifyWebRoutes, {
       status: STATUS_STARTED_NOT_DONE,
@@ -3228,6 +3230,7 @@ async function main() {
 
     try {
       webRouteSources = await identifyAllWebRoutes({
+        dataPath,
         mediaCachePath,
         mediaPath,
         wikiCachePath,
@@ -3244,6 +3247,10 @@ async function main() {
 
       aggregate.close();
       preparedWebRoutes = result;
+
+      wikiHasCustomCSS =
+        preparedWebRoutes
+          .some(({to}) => to === fromRoot.to('shared.customCSS'));
     } catch (error) {
       if (!paragraph) console.log('');
       niceShowAggregate(error, {showTraces: true});
@@ -3407,6 +3414,7 @@ async function main() {
     urlSpec,
     urls,
     wikiData,
+    wikiHasCustomCSS,
   };
 
   try {

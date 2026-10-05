@@ -87,7 +87,10 @@ localized:
 localizedWithBaseDirectory: '<auto>'
 
 shared:
-  paths: *genericPaths
+  paths:
+  - *genericPaths
+
+  - customCSS: 'custom.css'
 
 staticCSS:
   prefix:

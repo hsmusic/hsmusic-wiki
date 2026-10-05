@@ -247,6 +247,7 @@ export default {
     pagePath,
     pagePathStringFromRoot,
     to,
+    wikiHasCustomCSS,
   }) {
     const colors = getColors(slots.color ?? data.wikiColor);
     const hasSocialEmbed = !html.isBlank(slots.socialEmbed);
@@ -785,6 +786,12 @@ export default {
             html.tag('link', {
               rel: 'stylesheet',
               href: to('staticLib.path', 'abcjs/abcjs-audio.css'),
+            }),
+
+          wikiHasCustomCSS &&
+            html.tag('link', {
+              rel: 'stylesheet',
+              href: to('shared.customCSS'),
             }),
 
           relations.colorStyleTag

@@ -31,6 +31,7 @@ export function bindUtilities({
   to,
   urls,
   wikiData,
+  wikiHasCustomCSS,
 }) {
   const bound = {};
 
@@ -50,6 +51,7 @@ export function bindUtilities({
     to,
     urls,
     wikiData,
+    wikiHasCustomCSS,
     wikiInfo: wikiData.wikiInfo,
   });
 
