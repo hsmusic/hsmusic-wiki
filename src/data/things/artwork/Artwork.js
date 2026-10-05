@@ -222,7 +222,9 @@ export class Artwork extends Thing {
     artTagsFromThingProperty: simpleString(),
 
     artTags: [
-      inheritFromMainArtwork(),
+      inheritFromMainArtwork({
+        unlessProvided: input.value(true),
+      }),
 
       withResolvedReferenceList({
         list: input.updateValue({
