@@ -15,32 +15,42 @@ export default {
       album.dateStyle,
   }),
 
-  generate: (data, {language}) =>
+  generate: (data, {html, language}) =>
     language.encapsulate('albumPage.socialEmbed.body', workingCapsule => {
       const workingOptions = {};
 
+      let any = false;
+
       if (data.duration > 0) {
+        any = true;
         workingCapsule += '.withDuration';
         workingOptions.duration =
           language.formatDuration(data.duration);
       }
 
       if (data.tracks > 0) {
+        any = true;
         workingCapsule += '.withTracks';
         workingOptions.tracks =
           language.countTracks(data.tracks, {unit: true});
       }
 
       if (data.dateStyle === 'released') {
+        any = true;
         workingCapsule += '.withDateReleased';
         workingOptions.date =
           language.formatDate(data.date);
       } else if (data.dateStyle === 'posted') {
+        any = true;
         workingCapsule += '.withDatePosted';
         workingOptions.date =
           language.formatDate(data.date);
       }
 
-      return language.$(workingCapsule, workingOptions);
+      if (any) {
+        return language.$(workingCapsule, workingOptions);
+      } else {
+        return html.blank();
+      }
     }),
 };
