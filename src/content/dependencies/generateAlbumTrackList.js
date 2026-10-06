@@ -85,22 +85,26 @@ export default {
             .map(section =>
               (section.isDefaultTrackSection
                 ? null
+             : section.isTrackSectionContinuation
+                ? null
                 : section.name));
-
-        data.trackSectionStyles =
-          album.trackSections
-            .map(section => section.style);
 
         data.trackSectionDurations =
           album.trackSections
             .map(section =>
               (section.hideDuration
                 ? null
+             : section.isTrackSectionContinuation
+                ? null
                 : accumulateSum(section.tracks, track => track.duration)));
 
         data.trackSectionDurationsApproximate =
           album.trackSections
             .map(section => section.tracks.length > 1);
+
+        data.trackSectionsAreAsideSections =
+          album.trackSections
+            .map(section => section.isAsideTrackSection === true);
 
         data.trackSectionsHaveTrackNumbers =
           album.trackSections
@@ -145,9 +149,9 @@ export default {
             items: relations.trackSectionItems,
 
             name: data.trackSectionNames,
-            style: data.trackSectionStyles,
             duration: data.trackSectionDurations,
             durationApproximate: data.trackSectionDurationsApproximate,
+            isAsideTrackSection: data.trackSectionsAreAsideSections,
             hasTrackNumbers: data.trackSectionsHaveTrackNumbers,
             startCountingFrom: data.trackSectionsStartCountingFrom,
           }).map(({
@@ -156,9 +160,9 @@ export default {
               items,
 
               name,
-              style,
               duration,
               durationApproximate,
+              isAsideTrackSection,
               hasTrackNumbers,
               startCountingFrom,
             }) => [
@@ -167,7 +171,7 @@ export default {
                   tag: 'dt',
 
                   attributes: [
-                    style === 'aside' &&
+                    isAsideTrackSection &&
                       {class: 'aside'},
                   ],
 
@@ -201,7 +205,7 @@ export default {
                 })),
 
               html.tag('dd',
-                style === 'aside' &&
+                isAsideTrackSection &&
                   {class: 'aside'},
 
                 html.tag('blockquote',

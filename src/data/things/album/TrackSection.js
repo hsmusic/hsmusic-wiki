@@ -17,8 +17,15 @@ import {
   isString,
 } from '#validators';
 
-import {withLengthOfList, withNearbyItemFromList, withPropertyFromObject}
-  from '#composite/data';
+import {
+  withFilteredList,
+  withFlattenedList,
+  withMappedList,
+  withLengthOfList,
+  withNearbyItemFromList,
+  withPropertyFromList,
+  withPropertyFromObject,
+} from '#composite/data';
 
 import {
   exitWithoutDependency,
@@ -48,12 +55,6 @@ export class TrackSection extends Thing {
     album: thing(V(Album)),
 
     name: name(V('Unnamed Track Section')),
-
-    style: {
-      flags: {update: true, expose: true},
-      update: {validate: is('section', 'aside')},
-      expose: {transform: value => value ?? 'section'},
-    },
 
     // Track sections don't have a Name Detail themselves, but they do provide
     // a value which tracks can reference via 'Name Detail: section'.
@@ -152,14 +153,6 @@ export class TrackSection extends Thing {
         validate: input.value(isBoolean),
       }),
 
-      {
-        dependencies: ['style'],
-        compute: (continuation, {style}) =>
-          (style === 'aside'
-            ? true
-            : continuation()),
-      },
-
       withPropertyFromObject('album', V('hideTrackSectionDurations')),
       exposeDependency('#album.hideTrackSectionDurations'),
     ],
@@ -209,6 +202,39 @@ export class TrackSection extends Thing {
         compute: ({startCountingFrom, '#tracks.length': tracks}) =>
           startCountingFrom + tracks,
       },
+    ],
+
+    stem: exposeConstant(V(null)),
+
+    sectionsInRun: [
+      withPropertyFromObject('album', V('trackSections')),
+
+      {
+        dependencies: [input.myself(), 'stem'],
+        compute: (continuation, {
+          [input.myself()]: myself,
+          ['stem']: myStem,
+        }) => continuation({
+          ['#map']:
+            (myStem
+              ? section =>
+                  section === myStem ||
+                  section.stem === myStem
+              : section =>
+                  section === myself ||
+                  section.stem === myself),
+        }),
+      },
+
+      withMappedList('#album.trackSections', '#map'),
+      withFilteredList('#album.trackSections', '#mappedList'),
+      exposeDependency('#filteredList'),
+    ],
+
+    tracksInRun: [
+      withPropertyFromList('sectionsInRun', V('tracks')),
+      withFlattenedList('#sectionsInRun.tracks'),
+      exposeDependency('#flattenedList'),
     ],
   });
 

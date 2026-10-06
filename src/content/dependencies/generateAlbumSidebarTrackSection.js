@@ -24,6 +24,7 @@ export default {
     data.name = trackSection.name;
     data.color = trackSection.color;
     data.isDefaultTrackSection = trackSection.isDefaultTrackSection;
+    data.isAsideTrackSection = !!trackSection.isAsideTrackSection;
     data.hasSiblingSections = album.trackSections.length > 1;
 
     data.firstTrackNumber =
@@ -52,11 +53,19 @@ export default {
         .map(track => empty(track.commentary));
 
     data.tracksAreCurrentTrack =
-      trackSection.tracks
-        .map(traaaaaaaack => traaaaaaaack === track);
+      (track
+        ? trackSection.tracks.map(t2 => t2 === track)
+        : trackSection.tracks.map(() => false));
 
     data.includesCurrentTrack =
-      data.tracksAreCurrentTrack.includes(true);
+      (track
+        ? trackSection.tracks.includes(track)
+        : null);
+
+    data.runIncludesCurrentTrack =
+      (track
+        ? trackSection.tracksInRun.includes(track)
+        : null);
 
     return data;
   },
@@ -158,12 +167,19 @@ export default {
       // Leave sidebar track sections collapsed on album info page,
       // since there's already a view of the full track listing
       // in the main content area.
-      data.isTrackPage &&
+      data.isTrackPage && [
+        // Expand the track section which includes the track
+        // currently being viewed.
+        data.includesCurrentTrack &&
+          {open: true},
 
-      // Only expand the track section which includes the track
-      // currently being viewed by default.
-      data.includesCurrentTrack &&
-        {open: true},
+        // Also expand sections in a "run" of consecutive, connecting track
+        // sections (and one those includes the current track), but only
+        // the ones that are regular track sections - not aside sections.
+        data.runIncludesCurrentTrack &&
+        !data.isAsideTrackSection &&
+          {open: true},
+      ],
 
       html.tag('summary',
         colorStyle,

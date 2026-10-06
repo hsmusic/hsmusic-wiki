@@ -14,6 +14,7 @@ export default ({
 
     AsideTrackSection,
     CloseAsideTrackSection,
+    TrackSectionContinuation,
   },
 }) => ({
   title: `Process album files`,
@@ -38,25 +39,26 @@ export default ({
   *connect({header: album, entries}) {
     const trackSections = [];
 
-    let currentTrackSection = new TrackSection();
-    let currentTrackSectionTracks = [];
+    const defaultTrackSection = new TrackSection();
 
-    let latestNonAsideTrackSection = currentTrackSection;
-
-    Object.assign(currentTrackSection, {
+    Object.assign(defaultTrackSection, {
       name: `Default Track Section`,
       isDefaultTrackSection: true,
     });
 
+    let currentTrackSection = null;
+    let currentTrackSectionTracks = null;
+
+    let latestNonContinuationTrackSection = null;
+
+    const leadingContinuationTrackSections = [];
+
     const closeCurrentTrackSection = function*() {
-      if (currentTrackSection.isDefaultTrackSection) {
-        if (empty(currentTrackSectionTracks)) {
-          return;
-        } else {
-          yield currentTrackSection;
-          // ...and continue closing the section like normal, below
-        }
+      if (!currentTrackSection) {
+        return;
       }
+
+      yield currentTrackSection;
 
       currentTrackSection.tracks = currentTrackSectionTracks;
       currentTrackSection.album = album;
@@ -64,21 +66,42 @@ export default ({
       trackSections.push(currentTrackSection);
     };
 
+    const attachLeadingTrackSections = stem => {
+      // Aside track sections (or continuations in general) placed at
+      // the front of an album stem from the first non-continuation
+      // track section, even though that section is ahead of them.
+      for (const section of leadingContinuationTrackSections) {
+        section.stem = stem;
+      }
+    };
+
     for (const entry of entries) {
       if (entry instanceof TrackSection) {
         yield* closeCurrentTrackSection();
+
+        if (entry.isTrackSectionContinuation || entry.isAsideTrackSection) {
+          if (latestNonContinuationTrackSection) {
+            entry.stem = latestNonContinuationTrackSection;
+          } else {
+            leadingContinuationTrackSections.push(entry);
+          }
+        } else {
+          if (latestNonContinuationTrackSection) {
+            latestNonContinuationTrackSection = entry;
+          } else {
+            attachLeadingTrackSections(entry);
+            latestNonContinuationTrackSection = entry;
+          }
+        }
+
         currentTrackSection = entry;
         currentTrackSectionTracks = [];
-
-        if (entry.style !== 'aside') {
-          latestNonAsideTrackSection = entry;
-        }
 
         continue;
       }
 
       if (entry instanceof CloseAsideTrackSection) {
-        if (currentTrackSection.style !== 'aside') {
+        if (!currentTrackSection.isAsideTrackSection) {
           throw new Error(`Current track section "${currentTrackSection.name}" is not an aside`);
         }
 
@@ -87,17 +110,36 @@ export default ({
         }
 
         yield* closeCurrentTrackSection();
-        currentTrackSection = Thing.clone(latestNonAsideTrackSection);
-        currentTrackSection.tracks = [];
-        currentTrackSectionTracks = [];
+
+        currentTrackSection = null;
+        currentTrackSectionTracks = null;
 
         continue;
       }
 
-      entry.album = album;
-      entry.trackSection = currentTrackSection;
+      if (entry instanceof Track) {
+        if (!currentTrackSection) {
+          if (latestNonContinuationTrackSection) {
+            currentTrackSection = new TrackSectionContinuation();
+            currentTrackSection.stem = latestNonContinuationTrackSection;
+            currentTrackSectionTracks = [];
+          } else {
+            attachLeadingTrackSections(defaultTrackSection);
+            latestNonContinuationTrackSection = defaultTrackSection;
+            currentTrackSection = defaultTrackSection;
+            currentTrackSectionTracks = [];
+          }
+        }
 
-      currentTrackSectionTracks.push(entry);
+        entry.album = album;
+        entry.trackSection = currentTrackSection;
+
+        currentTrackSectionTracks.push(entry);
+
+        continue;
+      }
+
+      throw new Error(`Unrecognized entry class "${entry.constructor.name}"`);
     }
 
     yield* closeCurrentTrackSection();

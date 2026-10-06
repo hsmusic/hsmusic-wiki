@@ -582,15 +582,6 @@
     margin-left: 0;
   }
 
-  .album-group-list dt.aside {
-    margin-left: -5px;
-  }
-
-  .album-group-list dd.aside {
-    border-left: 1px dashed;
-    margin-left: 3px;
-  }
-
   .album-group-list dd.aside :is(ul, ol) {
     padding-left: 36px;
   }
@@ -626,5 +617,50 @@
   .album-group-list dt,
   .group-series-list dt {
     font-style: oblique;
+  }
+}
+
+/* Aside track sections */
+
+@layer layout {
+  .album-group-list dt.aside {
+    margin-left: -5px;
+    padding: 5px 4px 0 5px;
+  }
+
+  .album-group-list dd.aside {
+    position: relative;
+    margin-top: 1px;
+    margin-left: -5px;
+    padding: 2px 8px 5px 4px;
+    padding-left: 8px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 11px;
+      bottom: 6px;
+    }
+  }
+
+  .album-group-list dd:has(+ dt.aside) { margin-bottom: 0.65em; }
+  .album-group-list dt.aside           { margin-top: 0.65em; }
+  .album-group-list dd.aside           { margin-bottom: 0.65em; }
+  .album-group-list dd.aside + dt      { margin-top: 0.65em; }
+}
+
+@layer material {
+  .album-group-list dt.aside,
+  .album-group-list dd.aside {
+    background: #ffffff0a;
+    border: 1px solid #ffffff3a;
+
+    &:is(dt) { border-bottom: none; border-radius: 4px 4px 0 0; }
+    &:is(dd) { border-top: none; border-radius: 0 0 4px 4px; }
+  }
+
+  .album-group-list dd.aside::before {
+    border-left: 1px dashed;
   }
 }
