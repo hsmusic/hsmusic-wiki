@@ -8,6 +8,7 @@ export default {
       sortChronologically(series.albums.slice(), {latestFirst: true});
 
     query.allAlbumsDated =
+      series.albums.length >= 1 &&
       series.albums.every(album => album.date);
 
     query.anyAlbumNotFromThisGroup =
