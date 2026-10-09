@@ -1,4 +1,4 @@
-const PRETEND_RELEASE_WIKI = true;
+const PRETEND_RELEASE_WIKI = false;
 
 function dummy(wikiUpdateData) {
   if (PRETEND_RELEASE_WIKI) {
