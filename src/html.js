@@ -825,7 +825,7 @@ export class Tag {
         .map((line, i) =>
           (i === 0 && this.noEdgeWhitespace
             ? line
-            : '    ' + line))
+            : ' '.repeat(2) + line))
         .join('\n'),
       closeTag,
     ];

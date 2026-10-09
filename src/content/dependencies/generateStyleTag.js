@@ -3,7 +3,7 @@ import {empty} from '#sugar';
 const indent = text =>
   text
     .split('\n')
-    .map(line => ' '.repeat(4) + line)
+    .map(line => ' '.repeat(2) + line)
     .join('\n');
 
 export default {
