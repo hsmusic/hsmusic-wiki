@@ -95,6 +95,7 @@ export default {
                 html.tag('b',
                   language.formatDuration(data.totalDuration, {
                     unit: true,
+                    showZero: true,
                   })),
             })),
 

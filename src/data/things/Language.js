@@ -705,14 +705,18 @@ export class Language extends Thing {
     }
   }
 
-  formatDuration(secTotal, {approximate = false, unit = false} = {}) {
+  formatDuration(secTotal, {
+    approximate = false,
+    unit = false,
+    showZero = false,
+  } = {}) {
     // Null or undefined duration is blank content.
     if (secTotal === null || secTotal === undefined) {
       return html.blank();
     }
 
-    // Zero duration is a "missing" string.
-    if (secTotal === 0) {
+    // Zero duration is a "missing" string, unless bypassed.
+    if (secTotal === 0 && !showZero) {
       return this.formatString('count.duration.missing');
     }
 

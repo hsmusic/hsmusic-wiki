@@ -22,9 +22,6 @@ export function pathsForTarget(group) {
       type: 'page',
       path: ['groupGallery', group.directory],
 
-      condition: () =>
-        !empty(group.albums),
-
       contentFunction: {
         name: 'generateGroupGalleryPage',
         args: [group],

@@ -9,9 +9,12 @@ export default {
       relation('linkGroup', group),
 
     galleryLink:
-      (empty(group.albums)
-        ? null
-        : relation('linkGroupGallery', group)),
+      relation('linkGroupGallery', group),
+  }),
+
+  data: (group) => ({
+    hasAnyAlbums:
+      !empty(group.albums),
   }),
 
   slots: {
@@ -20,7 +23,7 @@ export default {
     },
   },
 
-  generate: (relations, slots, {language}) =>
+  generate: (data, relations, slots, {language}) =>
     relations.switcher.slots({
       links: [
         relations.infoLink.slots({
@@ -32,14 +35,15 @@ export default {
           content: language.$('misc.nav.info'),
         }),
 
-        relations.galleryLink?.slots({
-          attributes: [
-            slots.currentExtra === 'gallery' &&
-              {class: 'current'},
-          ],
+        (data.hasAnyAlbums || slots.currentExtra === 'gallery') &&
+          relations.galleryLink.slots({
+            attributes: [
+              slots.currentExtra === 'gallery' &&
+                {class: 'current'},
+            ],
 
-          content: language.$('misc.nav.gallery'),
-        }),
+            content: language.$('misc.nav.gallery'),
+          }),
       ],
     }),
 };
