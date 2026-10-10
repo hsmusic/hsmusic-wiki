@@ -637,7 +637,8 @@ export function initializeState() {
       info.searchInput.value = session.activeQuery;
       activateSidebarSearch(session.activeQuery);
     } else if (session.activeQueryResults) {
-      info.searchInput.placeholder = session.activeQuery;
+      info.searchInput.placeholder = session.activeQuery
+      info.searchBox.classList.add('more-than-it-looks');
       state.recallingRecentSearch = true;
     }
   }
@@ -924,6 +925,7 @@ function showSidebarSearchResults(results) {
 
   console.debug(`Showing search results:`, tidyResults(results));
 
+  info.searchBox.classList.remove('more-than-it-looks');
   info.searchBox.classList.add('showing-results');
   info.searchSidebarColumn.classList.add('search-showing-results');
 

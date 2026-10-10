@@ -526,6 +526,8 @@
 
 @layer layout {
   .sidebar {
+    position: relative;
+
     --content-padding: 5px;
     padding: var(--content-padding);
   }
@@ -748,6 +750,21 @@
   .group-chronology-link a,
   .series-chronology-link a {
     font-style: normal;
+  }
+}
+
+@layer interaction {
+  .sidebar.more-than-it-looks {
+    border-bottom: 1px dashed
+      color-mix(in srgb, var(--primary-color), 20% transparent);
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -4px; left: 4px; right: 12px;
+      border-bottom: 1px solid
+        color-mix(in srgb, var(--primary-color), 50% transparent);
+    }
   }
 }
 
