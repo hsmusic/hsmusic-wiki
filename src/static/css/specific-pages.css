@@ -289,7 +289,7 @@ html[data-url-key="localized.home"] {
     }
 
     #header .wiki-update {
-      white-space: nowrap;
+      display: inline-block;
     }
 
     #header .wiki-update a {
@@ -308,10 +308,26 @@ html[data-url-key="localized.home"] {
 
   /* Layout - Medium or Thin */
   @media (max-width: 849.98px) {
+    #header {
+      grid-template-columns: 2.5fr fit-content(60%);
+    }
+
     .nav-link:has(a[href^="feedback"]),
     .nav-link:has(a[href^="discord"]),
     .nav-link:has(a[href^="changelog"]) {
       display: none;
+    }
+  }
+
+  /* Layout - Ultra thin... */
+
+  @media (max-width: 450px) {
+    #header {
+      display: block;
+    }
+
+    .nav-right-end-content {
+      margin-top: 0.5em;
     }
   }
 }
