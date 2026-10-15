@@ -663,6 +663,7 @@ misc:
     trackCover: "track cover"
     artistAvatar: "artist avatar"
     flashArt: "flash art"
+    wikiBanner: "wiki banner"
 
   # artistCommentary:
 

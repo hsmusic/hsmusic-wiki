@@ -12,6 +12,7 @@ import {
 import {
   parseAnnotatedReferences,
   parseContributionPresets,
+  parseDimensions,
   parseWallpaperParts,
 } from '#yaml';
 
@@ -22,6 +23,7 @@ import {
   canonicalBase,
   color,
   contentString,
+  dimensions,
   fileExtension,
   flag,
   name,
@@ -66,6 +68,11 @@ export class WikiInfo extends Thing {
 
     canonicalBase: canonicalBase(),
     canonicalMediaBase: canonicalBase(),
+
+    hasWikiBanner: flag(V(false)),
+    wikiBannerFileExtension: fileExtension(V('jpg')),
+    wikiBannerDimensions: dimensions(),
+    wikiBannerStyle: simpleString(),
 
     wikiWallpaperBrightness: {
       flags: {update: true, expose: true},
@@ -154,6 +161,11 @@ export class WikiInfo extends Thing {
 
       'Canonical Base': {property: 'canonicalBase'},
       'Canonical Media Base': {property: 'canonicalMediaBase'},
+
+      'Has Wiki Banner': {property: 'hasWikiBanner'},
+      'Wiki Banner File Extension': {property: 'wikiBannerFileExtension'},
+      'Wiki Banner Dimensions': {property: 'wikiBannerDimensions', transform: parseDimensions},
+      'Wiki Banner Style': {property: 'wikiBannerStyle'},
 
       'Wiki Wallpaper Brightness': {property: 'wikiWallpaperBrightness'},
       'Wiki Wallpaper File Extension': {property: 'wikiWallpaperFileExtension'},

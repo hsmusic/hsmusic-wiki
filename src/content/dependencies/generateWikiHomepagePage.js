@@ -11,6 +11,12 @@ export default {
     layout:
       relation('generatePageLayout'),
 
+    banner:
+      relation('generateWikiBanner'),
+
+    bannerStyle:
+      relation('generateWikiBannerStyleTag'),
+
     sidebar:
       relation('generatePageSidebar'),
 
@@ -47,6 +53,8 @@ export default {
       title: data.wikiName,
       showWikiNameInTitle: false,
       wallpaper: 'meta',
+
+      styleTags: [relations.bannerStyle],
 
       mainClasses: ['top-index'],
       headingMode: 'static',
@@ -89,5 +97,8 @@ export default {
 
       navRightEndContent:
         relations.updateNavLinks,
+
+      banner: relations.banner,
+      bannerPosition: 'top',
     }),
 };

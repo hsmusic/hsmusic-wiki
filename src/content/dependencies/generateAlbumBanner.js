@@ -1,52 +1,32 @@
 export default {
-  relations(relation, album) {
-    if (!album.hasBannerArt) {
-      return {};
-    }
+  relations: (relation, album) => ({
+    banner:
+      relation('generateBanner'),
 
-    return {
-      banner:
-        relation('generateBanner'),
+    colorAttribute:
+      relation('generateColorStyleAttribute', album.color),
+  }),
 
-      colorAttribute:
-        relation('generateColorStyleAttribute', album.color),
-    };
-  },
+  data: (album) => ({
+    path:
+      (album.hasBannerArt
+        ? album.bannerArtwork.path
+        : null),
 
-  data(album) {
-    if (!album.hasBannerArt) {
-      return {};
-    }
+    dimensions:
+      (album.hasBannerArt
+        ? album.bannerArtwork.dimensions
+        : null),
 
-    return {
-      path: album.bannerArtwork.path,
-      dimensions: album.bannerArtwork.dimensions,
-    };
-  },
+    color:
+      album.color,
+  }),
 
-  slots: {
-    mode: {
-      validate: v => v.is('main', 'sub'),
-      default: 'main',
-    },
-  },
-
-  generate(data, relations, slots, {html, language}) {
-    if (!relations.banner) {
-      return html.blank();
-    }
-
-    return relations.banner.slots({
+  generate: (data, relations, {html, language}) =>
+    relations.banner.slots({
       path: data.path,
       dimensions: data.dimensions,
+      color: data.color,
       alt: language.$('misc.alt.albumBanner'),
-
-      attributes: [
-        slots.mode === 'sub' && [
-          {class: ['dim', 'short']},
-          relations.colorAttribute.slot('context', 'banner'),
-        ],
-      ],
-    });
-  },
+    }),
 };

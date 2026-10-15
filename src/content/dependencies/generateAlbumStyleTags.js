@@ -15,7 +15,6 @@ export default {
     data.hasBanner = !empty(album.bannerArtistContribs);
 
     if (data.hasBanner) {
-      data.hasBannerStyle = !!album.bannerStyle;
       data.bannerStyle = album.bannerStyle;
     }
 
