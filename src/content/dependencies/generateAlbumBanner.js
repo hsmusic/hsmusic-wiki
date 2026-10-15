@@ -22,7 +22,7 @@ export default {
       album.color,
   }),
 
-  generate: (data, relations, {html, language}) =>
+  generate: (data, relations, {language}) =>
     relations.banner.slots({
       path: data.path,
       dimensions: data.dimensions,
