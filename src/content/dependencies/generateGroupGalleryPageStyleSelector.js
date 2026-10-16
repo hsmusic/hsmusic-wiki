@@ -30,11 +30,23 @@ export default {
               html.tag('span', {class: 'styles'},
                 data.styles.map(style =>
                   html.tag('label', {'data-style': style},
+                    {[html.onlyIfContent]: true},
+
                     html.tag('input', {type: 'checkbox'},
+                      {[html.onlyIfSiblings]: true},
                       {checked: true}),
 
                     html.tag('span',
-                      language.$(capsule, style))))),
+                      language.encapsulate(capsule, workingCapsule => {
+                        switch (style) {
+                          case 'album': workingCapsule += '.album'; break;
+                          case 'single': workingCapsule += '.single'; break;
+                          case 'in-game vgm': workingCapsule += '.vgm'; break;
+                          default: return html.blank();
+                        }
+
+                        return language.$(workingCapsule);
+                      }))))),
 
               html.tag('br'),
 
