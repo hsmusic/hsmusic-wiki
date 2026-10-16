@@ -1092,7 +1092,7 @@ misc:
       flash: "(flash)"
       group: "(group)"
       single: "(single)"
-      vgmAlbum: "(in-game VGM)"
+      vgmAlbum: "(game)"
 
     resultDisambiguator:
       group: "({CATEGORY})"
@@ -1483,7 +1483,7 @@ albumPage:
         {TYPE}: {NAME_DETAIL}
 
       type.single: "single" # This string should probably never appear, but...
-      type.vgm: "in-game VGM"
+      type.vgm: "game"
 
       withLinks: >-
         {ACCENT} - {LINKS}
@@ -2554,7 +2554,7 @@ groupGalleryPage:
 
     album: "Albums"
     single: "Singles"
-    vgm: "In-game VGM"
+    vgm: "Games"
 
     count:
       all: "all {TOTAL}"
