@@ -1480,7 +1480,7 @@ albumPage:
         {TYPE}
 
       withNameDetail.withType: >-
-        {TYPE}: {NAME_DETAIL}
+        {TYPE} - {NAME_DETAIL}
 
       type.single: "single" # This string should probably never appear, but...
       type.vgm: "game"
