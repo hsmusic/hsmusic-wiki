@@ -141,9 +141,9 @@ export class Language extends Thing {
 
     onlyIfOptions: exposeConstant(V(Symbol.for(`language.onlyIfOptions`))),
 
-    intl_date: this.#intlHelper(Intl.DateTimeFormat, {full: true}),
-    intl_dateYear: this.#intlHelper(Intl.DateTimeFormat, {year: 'numeric'}),
-    intl_dateMonthDay: this.#intlHelper(Intl.DateTimeFormat, {month: 'numeric', day: 'numeric'}),
+    intl_date: this.#intlHelper(Intl.DateTimeFormat, {timeZone: 'UTC', full: true}),
+    intl_dateYear: this.#intlHelper(Intl.DateTimeFormat, {timeZone: 'UTC', year: 'numeric'}),
+    intl_dateMonthDay: this.#intlHelper(Intl.DateTimeFormat, {timeZone: 'UTC', month: 'numeric', day: 'numeric'}),
     intl_number: this.#intlHelper(Intl.NumberFormat),
     intl_listConjunction: this.#intlHelper(Intl.ListFormat, {type: 'conjunction'}),
     intl_listDisjunction: this.#intlHelper(Intl.ListFormat, {type: 'disjunction'}),

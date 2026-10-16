@@ -637,6 +637,12 @@ export function flipBoolean(value) {
 }
 
 export function parseDate(date) {
+  if (typeof date === 'string') {
+    // Somehow this even overrides any previous timezone entered for
+    // the given date, so: given timezones are flat-out ignored. Sorry!
+    return new Date(date + ' UTC');
+  }
+
   return new Date(date);
 }
 
