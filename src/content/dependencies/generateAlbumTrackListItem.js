@@ -49,9 +49,7 @@ export default {
           : false),
 
       showNameDetail:
-        (data.albumStyle === 'meta'
-          ? 'from within section'
-          : false),
+        'from within section',
 
       showDuration:
         (slots.collapseDurationScope === 'track'
