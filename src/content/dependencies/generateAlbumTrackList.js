@@ -96,11 +96,11 @@ export default {
                 ? null
              : section.isTrackSectionContinuation
                 ? null
-                : accumulateSum(section.tracks, track => track.duration)));
+                : accumulateSum(section.tracksInRun, track => track.duration)));
 
         data.trackSectionDurationsApproximate =
           album.trackSections
-            .map(section => section.tracks.length > 1);
+            .map(section => section.tracksInRun.length > 1);
 
         data.trackSectionsAreAsideSections =
           album.trackSections
