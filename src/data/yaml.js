@@ -1220,8 +1220,20 @@ export function parseContentEntriesFromSourceText(thingClass, sourceText, {subdo
     };
   }
 
+  const matches =
+    Array.from(matchContentEntries(sourceText));
+
+  if (sourceText.trim().length) {
+    if (
+      empty(matches) ||
+      sourceText.slice(0, matches[0].index).trim().length
+    ) {
+      throw new Error(`Expected properly-formatted content entry heading at start`);
+    }
+  }
+
   const documents =
-    Array.from(matchContentEntries(sourceText))
+    matches
       .map(matchEntry =>
         withEntries(
           map(matchEntry),

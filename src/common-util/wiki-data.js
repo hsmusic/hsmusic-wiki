@@ -139,6 +139,9 @@ export function* matchContentEntries(sourceText) {
     }
 
     workingEntry = {
+      index:
+        headingMatch.index,
+
       artists:
         headingMatch.groups.artists ?? null,
 
