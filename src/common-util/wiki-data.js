@@ -305,53 +305,17 @@ export function chunkArtistTrackContributions(contributions) {
         ])));
 }
 
-// Ditto. More shared logic for the artist page.
+// Ditto. More shared logic for the artist info page.
 export function selectRepresentativeArtistContributorContribs(contribs) {
-  const creditedAsNormalArtist =
-    contribs
-      .some(contrib =>
-        contrib.thingProperty === 'artistContribs' &&
-       !contrib.isFeaturingCredit);
-
-  const creditedAsContributor =
-    contribs
-      .some(contrib => contrib.thingProperty === 'contributorContribs');
-
-  const annotatedContribs =
-    contribs
-      .filter(contrib => !empty(contrib.annotationParts));
-
-  const annotatedArtistContribs =
-    annotatedContribs
-      .filter(contrib => contrib.thingProperty === 'artistContribs');
-
-  const annotatedContributorContribs =
-    annotatedContribs
-      .filter(contrib => contrib.thingProperty === 'contributorContribs');
-
-  // Don't display annotations associated with crediting in the
-  // Contributors field if the artist is also credited as an Artist
-  // *and* the Artist-field contribution is non-annotated. This is
-  // so that we don't misrepresent the artist - the contributor
-  // annotation tends to be for "secondary" and performance roles.
-  // For example, this avoids crediting Marcy Nabors on Renewed
-  // Return seemingly only for "bass clarinet" when they're also
-  // the one who composed and arranged Renewed Return!
-  if (
-    creditedAsNormalArtist &&
-    creditedAsContributor &&
-    empty(annotatedArtistContribs)
-  ) {
-    return null;
-  } else if (
-    !empty(annotatedArtistContribs) ||
-    !empty(annotatedContributorContribs)
-  ) {
-    return [
-      ...annotatedArtistContribs,
-      ...annotatedContributorContribs,
-    ];
-  }
+  // This function used to hold more involved logic for discriminating
+  // whether to show annotated contributor contributions, in an effort
+  // to avoid "misrepresenting" an artist's total contributions, next
+  // to a track or music video. But the entire by-line artist credit
+  // is always, functionally, presented unambiguously, so now if the
+  // artist is credited as an artist, that is apparent. Consequently
+  // all contributions are "representative" and all annotations should
+  // be shown together, no extra dynamics required.
+  return contribs;
 }
 
 // Simple function, really a port of the old algorithm that originated

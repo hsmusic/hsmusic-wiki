@@ -1,5 +1,4 @@
 import {sortAlbumsTracksChronologically} from '#sort';
-import {empty} from '#sugar';
 import {selectRepresentativeArtistContributorContribs} from '#wiki-data';
 
 export default {
@@ -62,9 +61,7 @@ export default {
     trackListItem:
       relation('generateTrackListItem',
         query.track,
-        (empty(query.track.album.artistContribs)
-          ? [artist.mockSimpleContribution]
-          : query.track.album.artistContribs)),
+        query.track.album.artistContribs),
 
     rereleaseTooltip:
       (query.isLaterRelease
