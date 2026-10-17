@@ -298,6 +298,26 @@ export function compareObjects(obj1, obj2, {
   return true;
 }
 
+export function compareErrors(err1, err2) {
+  if (!err1 && !err2) return true;
+  if (err1 && !err2 || err2 && !err1) return false;
+  if (err1.constructor !== err2.constructor) return false;
+  if (err1.message !== err2.message) return false;
+
+  if (err1 instanceof AggregateError) {
+    const A = err1.errors;
+    const B = err2.errors;
+    if (A.length !== B.length) return false;
+    if (A.some((err, i) => !compareErrors(err, B[i]))) return false;
+  }
+
+  if (err1.cause || err2.cause) {
+    if (!compareErrors(err1.cause, err2.cause)) return false;
+  }
+
+  return true;
+}
+
 // Stolen from jq! Which pro8a8ly stole the concept from other places. Nice.
 export const withEntries = (obj, fn) => {
   if (obj instanceof Map) {
