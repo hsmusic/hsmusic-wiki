@@ -314,16 +314,30 @@ function makeProcessDocument(thingConstructor, {
       },
     };
 
+    const fieldValueTransformationErrors = [];
+
     for (const [field, documentValue] of documentEntries) {
       if (skippedFields.has(field)) continue;
 
       // This variable would like to certify itself as "not into capitalism".
-      let propertyValue =
-        (documentValue === null
-          ? null
-       : fieldSpecs[field].transform
-          ? fieldSpecs[field].transform(documentValue, transformUtilities)
-          : documentValue);
+      let propertyValue;
+
+      if (documentValue === null) {
+        propertyValue = null;
+      } else if (fieldSpecs[field].transform) {
+        try {
+          propertyValue =
+            fieldSpecs[field].transform(documentValue, transformUtilities);
+        } catch (caughtError) {
+          propertyValue = null;
+          fieldValueTransformationErrors.push(new FieldValueTransformationError(
+            field, documentValue,
+            {cause: caughtError}));
+          skippedFields.add(field);
+        }
+      } else {
+        propertyValue = documentValue;
+      }
 
       // Completely blank items in a YAML list are read as null.
       // They're handy to have around when filling out a document and shouldn't
@@ -358,6 +372,11 @@ function makeProcessDocument(thingConstructor, {
       }
 
       fieldValues[field] = propertyValue;
+    }
+
+    if (!empty(fieldValueTransformationErrors)) {
+      aggregate.push(new FieldValueTransformationAggregateError(
+        fieldValueTransformationErrors, thingConstructor));
     }
 
     const subdocErrors = [];
@@ -443,7 +462,7 @@ function makeProcessDocument(thingConstructor, {
         subdocErrors, thingConstructor));
     }
 
-    const fieldValueErrors = [];
+    const fieldValueAssignmentErrors = [];
 
     for (const [field, value] of Object.entries(fieldValues)) {
       const {property} = fieldSpecs[field];
@@ -452,14 +471,14 @@ function makeProcessDocument(thingConstructor, {
         thing[property] = value;
       } catch (caughtError) {
         skippedFields.add(field);
-        fieldValueErrors.push(new FieldValueError(
+        fieldValueAssignmentErrors.push(new FieldValueAssignmentError(
           field, value, {cause: caughtError}));
       }
     }
 
-    if (!empty(fieldValueErrors)) {
-      aggregate.push(new FieldValueAggregateError(
-        fieldValueErrors, thingConstructor));
+    if (!empty(fieldValueAssignmentErrors)) {
+      aggregate.push(new FieldValueAssignmentAggregateError(
+        fieldValueAssignmentErrors, thingConstructor));
     }
 
     if (skippedFields.size >= 1) {
@@ -543,7 +562,37 @@ export class FieldCombinationError extends Error {
   }
 }
 
-export class FieldValueAggregateError extends AggregateError {
+export class FieldValueTransformationAggregateError extends AggregateError {
+  [Symbol.for('hsmusic.aggregate.translucent')] = true;
+
+  constructor(errors, thingConstructor) {
+    const constructorText =
+      colors.green(thingConstructor.name);
+
+    super(
+      errors,
+      `Errors transforming field values for ${constructorText}`);
+  }
+}
+
+export class FieldValueTransformationError extends Error {
+  constructor(field, value, options) {
+    const fieldText =
+      colors.green(`"${field}"`);
+
+    const valueText =
+      inspect(value, {maxStringLength: 40});
+
+    super(
+      `Failed to prepare ${fieldText} field as internal data, from:` +
+      (valueText.length > 30 ? '\n' : ' ') +
+      valueText,
+
+      options);
+  }
+}
+
+export class FieldValueAssignmentAggregateError extends AggregateError {
   [Symbol.for('hsmusic.aggregate.translucent')] = true;
 
   constructor(errors, thingConstructor) {
@@ -556,7 +605,7 @@ export class FieldValueAggregateError extends AggregateError {
   }
 }
 
-export class FieldValueError extends Error {
+export class FieldValueAssignmentError extends Error {
   constructor(field, value, options) {
     const fieldText =
       colors.green(`"${field}"`);
