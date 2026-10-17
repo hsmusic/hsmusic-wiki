@@ -9,7 +9,7 @@ import {quickLoadContentDependencies} from '#content-dependencies';
 import {quickEvaluate} from '#content-function';
 import * as html from '#html';
 import * as pageSpecs from '#page-specs';
-import {empty, queue, withEntries} from '#sugar';
+import {compareErrors, empty, queue, withEntries} from '#sugar';
 
 import {
   fileIssue,
@@ -334,15 +334,140 @@ export async function go({
 
   const commonUtilities = {...universalUtilities};
 
-  const perLanguageFn = async (language, i, entries) => {
-    const baseDirectory =
-      language === defaultLanguage ? '' : language.code;
+  const languagesToRun =
+    (writeOneLanguage
+      ? {[writeOneLanguage]: languages[writeOneLanguage]}
+      : withEntries(languages, entries =>
+          entries.filter(([k]) => k !== 'default')));
 
-    console.log(`\x1b[34;1m${`[${i + 1}/${entries.length}] ${language.code} (-> /${baseDirectory}) `.padEnd(60, '-')}\x1b[0m`);
+  const totalLanguagesToRun = Object.keys(languages).length;
 
-    await progressPromiseAll(`Writing ${language.code}`, queue([
-      ...pageWrites.map(page => () => {
+  // Prewarm the languages' strings properties, since computing those
+  // may report warnings, and it's nice to gather them at the start
+  // instead of during the build.
+  for (const language of Object.values(languagesToRun)) {
+    void language.strings;
+  }
+
+  const spreadAcrossLanguages = fn => {
+    const errors = Object.create(null);
+    let anyErrored = false;
+    let remainingToRun = totalLanguagesToRun;
+
+    const deduplicateAndThrowErrors = () => {
+      if (!anyErrored) {
+        return;
+      }
+
+      const deduplicatedErrors = [];
+
+      perLanguage:
+      for (const [code, language] of Object.entries(languagesToRun)) {
+        const A = errors[code];
+        if (!A) continue;
+
+        for (const [codes, B] of deduplicatedErrors) {
+          if (compareErrors(A, B)) {
+            codes.push(code);
+            continue perLanguage;
+          }
+        }
+
+        deduplicatedErrors.push([[code], A]);
+      }
+
+      const annotateDeduplicatedError = (codes, error) =>
+        (codes.length === 1 && totalLanguagesToRun === 1
+          ? error
+
+       : codes.length === totalLanguagesToRun
+          ? new Error(
+              `Errored consistently across all languages:`,
+              {cause: error})
+
+          : new Error(
+              `Errored across languages ${codes.join(', ')}:`,
+              {cause: error}));
+
+      const annotatedErrors =
+        deduplicatedErrors
+          .map(([codes, error]) => annotateDeduplicatedError(codes, error));
+
+      if (annotatedErrors.length === 1) {
+        throw annotatedErrors[0];
+      } else {
+        throw new AggregateError(
+          annotatedErrors, `Errors across various languages`);
+      }
+    };
+
+    // Basically mapAggregate, but deferred.
+    const fns =
+      Object.values(languagesToRun)
+        .map(language => async () => {
+          try {
+            return await fn(language);
+          } catch (caughtError) {
+            errors[language.code] = caughtError;
+            anyErrored = true;
+            return null;
+          } finally {
+            remainingToRun--;
+            if (remainingToRun === 0) {
+              deduplicateAndThrowErrors();
+            }
+          }
+        });
+
+    return fns;
+  };
+
+  await progressPromiseAll(`Writing redirects`, queue(
+    redirectWrites.flatMap(({fromPath, toPath, title, getTitle}) =>
+      spreadAcrossLanguages(language => {
+        title ??= getTitle?.({language});
+
+        const baseDirectory =
+          language === defaultLanguage ? '' : language.code;
+
+        const to = getURLsFrom({
+          baseDirectory,
+          pagePath: fromPath,
+          urls,
+        });
+
+        const target = to('localized.' + toPath[0], ...toPath.slice(1));
+        const pageHTML = generateRedirectHTML(title, target, {language});
+
+        return writePage({
+          pageHTML,
+          outputDirectory: path.join(outputPath, getPagePathname({
+            baseDirectory,
+            device: true,
+            pagePath: fromPath,
+            urls,
+          })),
+        });
+      }).map(fn => async (...args) => {
+          try {
+            await fn(...args);
+          } catch (caughtError) {
+            const simplePathname = getPagePathname({pagePath: fromPath, urls});
+            logError`\rError preparing redirect: ${simplePathname}`;
+            niceShowAggregate(caughtError, {showTraces: true});
+            errored = true;
+          }
+        })),
+
+    queueSize));
+
+  await progressPromiseAll(`Writing pages`, queue(
+    pageWrites.flatMap(page =>
+      spreadAcrossLanguages(language => {
         const pagePath = page.path;
+
+        const baseDirectory =
+          language === defaultLanguage ? '' : language.code;
 
         const pathname = getPagePathname({
           baseDirectory,
@@ -383,11 +508,10 @@ export async function go({
             });
 
           ({pageHTML, oEmbedJSON} = html.resolve(topLevelResult));
-        } catch (error) {
-          logError`\rError generating page: ${pathname}`;
-          niceShowAggregate(error, {showTraces: true});
-          errored = true;
-          return;
+        } catch (caughtError) {
+          // Just throw the error. It'll be caught and processed externally
+          // (i.e. deduplicated across languages before being reported).
+          throw caughtError;
         }
 
         return writePage({
@@ -400,37 +524,18 @@ export async function go({
             urls,
           })),
         });
-      }),
+      }).map(fn => async (...args) => {
+          try {
+            await fn(...args);
+          } catch (caughtError) {
+            const simplePathname = getPagePathname({pagePath: page.path, urls});
+            logError`\rError generating page: ${simplePathname}`;
+            niceShowAggregate(caughtError, {showTraces: true});
+            errored = true;
+          }
+        })),
 
-      ...redirectWrites.map(({fromPath, toPath, title, getTitle}) => () => {
-        title ??= getTitle?.({language});
-
-        const to = getURLsFrom({
-          baseDirectory,
-          pagePath: fromPath,
-          urls,
-        });
-
-        const target = to('localized.' + toPath[0], ...toPath.slice(1));
-        const pageHTML = generateRedirectHTML(title, target, {language});
-
-        return writePage({
-          pageHTML,
-          outputDirectory: path.join(outputPath, getPagePathname({
-            baseDirectory,
-            device: true,
-            pagePath: fromPath,
-            urls,
-          })),
-        });
-      }),
-    ], queueSize));
-  };
-
-  await wrapLanguages(perLanguageFn, {
-    languages,
-    writeOneLanguage,
-  });
+    queueSize));
 
   // The single most important step.
   logInfo`Written!`;
@@ -447,25 +552,6 @@ export async function go({
   }
 
   return true;
-}
-
-// Wrapper function for running a function once for all languages.
-async function wrapLanguages(fn, {
-  languages,
-  writeOneLanguage = null,
-}) {
-  const k = writeOneLanguage;
-  const languagesToRun = k ? {[k]: languages[k]} : languages;
-
-  const entries = Object.entries(languagesToRun).filter(
-    ([key]) => key !== 'default'
-  );
-
-  for (let i = 0; i < entries.length; i++) {
-    const [_key, language] = entries[i];
-
-    await fn(language, i, entries);
-  }
 }
 
 async function writePage({
