@@ -280,7 +280,7 @@ async function main() {
     stepsWhich(step =>
       which.every(w => !step.for?.includes(w)));
 
-  const defaultQueueSize = 500;
+  const defaultQueueSize = 25;
 
   const buildModeFlagOptions =
     withEntries(buildModes, entries =>
