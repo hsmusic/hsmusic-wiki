@@ -1,4 +1,5 @@
-import {accumulateSum, stitchArrays, withEntries} from '#sugar';
+import {stitchArrays, withEntries} from '#sugar';
+import {accumulateDuration} from '#wiki-data';
 
 export default {
   sprawl: ({groupCategoryData}) => ({
@@ -38,12 +39,13 @@ export default {
           ([group, things]) =>
           ([group, things.size])));
 
+
     const groupToTotalDuration =
       withEntries(
         groupToThingsCountedForDuration,
         entries => entries.map(
           ([group, things]) =>
-          ([group, accumulateSum(things, thing => thing.duration)])))
+          ([group, accumulateDuration(Array.from(things))])));
 
     const filteredGroupsOrdered =
       allGroupsOrdered.filter(group =>

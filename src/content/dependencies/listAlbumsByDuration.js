@@ -1,6 +1,5 @@
 import {sortAlphabetically, sortByCount} from '#sort';
 import {filterByCount, stitchArrays} from '#sugar';
-import {getTotalDuration} from '#wiki-data';
 
 export default {
   sprawl({albumData}) {
@@ -13,7 +12,7 @@ export default {
         albumData.filter(album => !album.hideDuration));
 
     const durations =
-      albums.map(album => getTotalDuration(album.tracks));
+      albums.map(album => album.duration.sum);
 
     filterByCount(albums, durations);
     sortByCount(albums, durations, {greatestFirst: true});

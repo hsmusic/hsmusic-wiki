@@ -695,6 +695,13 @@ export function isDuration(duration) {
   return true;
 }
 
+export const isDurationObject =
+  validateProperties({
+    sum: isDuration,
+    any: isBoolean,
+    approximate: isBoolean,
+  });
+
 export const isCarouselUpdateFrequency =
   is('daily', 'weekly');
 

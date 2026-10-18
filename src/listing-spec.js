@@ -1,6 +1,5 @@
 import {showAggregate} from '#aggregate';
 import {empty} from '#sugar';
-import {getTotalDuration} from '#wiki-data';
 
 const listingSpec = [];
 
@@ -32,7 +31,7 @@ listingSpec.push({
   contentFunction: 'listAlbumsByDuration',
 
   condition: ({albumData}) =>
-    albumData.some(album => getTotalDuration(album.tracks)),
+    albumData.some(album => album.duration.any),
 });
 
 listingSpec.push({
@@ -191,7 +190,7 @@ listingSpec.push({
     wikiInfo.enableGroupUI &&
     Iterator.from(groupData)
       .flatMap(group => group.albums)
-      .some(album => getTotalDuration(album.tracks)),
+      .some(album => album.duration.any),
 });
 
 listingSpec.push({

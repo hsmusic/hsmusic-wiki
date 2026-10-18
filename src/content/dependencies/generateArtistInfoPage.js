@@ -270,7 +270,7 @@ export default {
                 title: language.$(pageCapsule, 'trackList.title'),
               }),
 
-            data.totalDuration > 0 &&
+            data.totalDuration.any &&
               html.tag('p',
                 {[html.onlyIfSiblings]: true},
 
@@ -278,8 +278,8 @@ export default {
                   artist: data.name,
                   duration:
                     language.formatDuration(data.totalDuration, {
-                      approximate: data.totalTrackCount > 1,
-                      unit: true,
+                      showApproximate: true,
+                      showUnit: true,
                     }),
                 })),
 

@@ -145,7 +145,7 @@ function handleArtistExternalLinkTooltipMouseMoved(domEvent) {
       return Math.sqrt(deltaX ** 2 + deltaY ** 2);
     });
 
-  const totalTravelDistance =
+  const {sum: totalTravelDistance} =
     accumulateSum(movementTravelDistances);
 
   // In seconds rather than milliseconds.

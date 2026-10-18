@@ -1,7 +1,7 @@
 import {input, V} from '#composite';
 import {empty} from '#sugar';
 import Thing from '#thing';
-import {getKebabCase} from '#wiki-data';
+import {accumulateDurationForAlbum, getKebabCase} from '#wiki-data';
 
 import {
   anyOf,
@@ -263,6 +263,7 @@ export class Album extends Thing {
 
     // > Update & expose - General configuration
 
+    countTracksInAlbumDuration: flag(V(true)),
     countTracksInArtistTotals: flag(V(true)),
 
     excludingTrackURLs: {
@@ -589,6 +590,17 @@ export class Album extends Thing {
 
     isAlbum: exposeConstant(V(true)),
 
+    duration: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['tracks', 'hideDuration'],
+        compute: ({tracks, hideDuration}) =>
+          (hideDuration
+            ? accumulateDurationForAlbum([])
+            : accumulateDurationForAlbum(tracks)),
+      },
+    },
+
     nameForReferencingAcrossWiki: [
       {
         dependencies: ['alwaysReferenceByDirectory'],
@@ -914,6 +926,7 @@ export class Album extends Thing {
 
       // General configuration
 
+      'Count Tracks In Album Duration': {property: 'countTracksInAlbumDuration'},
       'Count Tracks In Artist Totals': {property: 'countTracksInArtistTotals'},
 
       'Excluding Track URLs': {

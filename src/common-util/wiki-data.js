@@ -1,6 +1,6 @@
 // Utility functions for interacting with wiki data.
 
-import {sortByDate} from './sort.js';
+import {sortChronologically, sortByDate} from './sort.js';
 
 import {
   accumulateSum,
@@ -216,8 +216,8 @@ export function getAllTracks(albumData) {
 export function getArtistNumContributions(artist) {
   const keep = contrib => contrib.countInContributionTotals;
 
-  return accumulateSum(
-    [
+  const {sum} =
+    accumulateSum([
       // Track artist and contributor contributions, to the same track,
       // only count for one.
       unique(
@@ -249,8 +249,9 @@ export function getArtistNumContributions(artist) {
 
       artist.midiProjectFileArtistContributions
         .filter(keep),
-    ],
-    ({length}) => length);
+    ], ({length}) => length);
+
+  return sum;
 }
 
 export function getFlashCover(flash, {to}) {
@@ -261,14 +262,97 @@ export function getFlashLink(flash) {
   return `https://homestuck.com/story/${flash.page}`;
 }
 
-export function getTotalDuration(tracks, {
-  mainReleasesOnly = false,
-} = {}) {
-  if (mainReleasesOnly) {
-    tracks = tracks.filter(t => !t.mainReleaseTrack);
+export function accumulateDuration(things) {
+  // Note that this function does not perform any dynamics
+  // except to process the input into a generic list of things,
+  // duplicates not counted, and that purely in terms of identity.
+  // Two releases of the same track would be summed here, for example.
+
+  const use =
+    unique(things.map(thing => thing.isContribution ? thing.thing : thing));
+
+  return accumulateSum(use, thing => thing.duration);
+}
+
+export function accumulateDurationForAlbum(tracks) {
+  // Note that countInAlbumDuration is independent of countInArtistTotals.
+  // This function is intended for use within or between albums, nowhere else.
+
+  const use = tracks.filter(track => track.countInAlbumDuration);
+  return accumulateSum(use, track => track.duration);
+}
+
+export function accumulateDurationForArtist(contribs) {
+  // Contributions fold in all logic about counting in artist totals,
+  // interfacing across relevant data objects, etc. There are more dynamics
+  // than obvious/apparent right here. This function is the only one which
+  // operates on individual contributions rather than tracks.
+
+  const useContribs = contribs.filter(contrib => contrib.countInDurationTotals);
+
+  // Multiple contributions to the same thing do not count twice.
+  const useThings = unique(useContribs.map(contrib => contrib.thing));
+
+  const useTracks = useThings.filter(thing => thing.isTrack);
+  return accumulateSum(useTracks, track => track.duration);
+}
+
+export function accumulateDurationForGroup(tracks) {
+  const duplications = new Map();
+  const use = new Set();
+
+  perTrack:
+  for (const track of tracks) {
+    if (!track.countInArtistTotals) {
+      continue perTrack;
+    }
+
+    if (track.isMainRelease && duplications.has(track)) {
+      duplications.get(track).push(track);
+      continue perTrack;
+    }
+
+    if (track.isMainRelease) {
+      use.add(track);
+      continue perTrack;
+    }
+
+    if (duplications.has(track.mainReleaseTrack)) {
+      duplications.get(track.mainReleaseTrack).push(track);
+      continue perTrack;
+    }
+
+    // ...which includes the main release track, mind you
+    for (const release of track.otherReleases) {
+      if (use.has(release)) {
+        use.delete(release);
+        duplications.set(track.mainReleaseTrack, [release, track]);
+        continue perTrack;
+      }
+    }
+
+    use.add(track);
   }
 
-  return accumulateSum(tracks, track => track.duration);
+  perDuplication:
+  for (const [mainRelease, includedReleases] of duplications) {
+    // Prefer main release above any other, if actually present in
+    // the list of tracks.
+    if (includedReleases.includes(mainRelease)) {
+      use.add(mainRelease);
+      continue perDuplication;
+    }
+
+    // From this point on choosing which track to use for the duration
+    // is arbitrary, e.g: main release, even though it's not in the list
+    // of tracks; nearest release to main release; earliest included release;
+    // longest release in duration; shortest release in duration.
+
+    const releasesWithDuration = includedReleases.filter(r => r.duration);
+    use.add(sortChronologically(releasesWithDuration).at(0));
+  }
+
+  return accumulateSum(use, track => track.duration);
 }
 
 export function getTrackCover(track, {to}) {

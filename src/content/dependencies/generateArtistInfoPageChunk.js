@@ -29,8 +29,7 @@ export default {
     date: {validate: v => v.isDate},
     dates: {validate: v => v.sparseArrayOf(v.isDate)},
 
-    duration: {validate: v => v.isDuration},
-    durationApproximate: {type: 'boolean'},
+    duration: {validate: v => v.isDurationObject},
 
     creditedAsAliases: {validate: v => v.strictArrayOf(v.isString)},
   },
@@ -73,11 +72,11 @@ export default {
             language.formatDateRange(earliestItemDate, latestItemDate);
         }
 
-        if (slots.duration) {
+        if (slots.duration && slots.duration.any) {
           parts.push('withDuration');
           options.duration =
             language.formatDuration(slots.duration, {
-              approximate: slots.durationApproximate,
+              showApproximate: true,
             });
         }
 

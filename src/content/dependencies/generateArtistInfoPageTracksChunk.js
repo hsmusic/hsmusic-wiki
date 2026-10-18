@@ -1,6 +1,6 @@
 import {sortAlbumsTracksChronologically} from '#sort';
 import {empty, unique} from '#sugar';
-import {getTotalDuration} from '#wiki-data';
+import {accumulateDurationForArtist} from '#wiki-data';
 
 function countTowardTrackTotals(contribs) {
   const {thing} = contribs[0];
@@ -106,20 +106,8 @@ export default {
       contribs
         .map(contrib => contrib.date);
 
-    // TODO: Duration stuff should *maybe* be in proper data logic? Maaaybe?
-    const durationTerms =
-      unique(
-        contribs
-          .filter(contrib => contrib.countInDurationTotals)
-          .map(contrib => contrib.thing)
-          .filter(track => track.isMainRelease)
-          .filter(track => track.duration > 0));
-
     data.duration =
-      getTotalDuration(durationTerms);
-
-    data.durationApproximate =
-      durationTerms.length > 1;
+      accumulateDurationForArtist(contribs);
 
     const tracks =
       trackContribLists
@@ -206,7 +194,6 @@ export default {
       dates: data.contribDates,
 
       duration: data.duration,
-      durationApproximate: data.durationApproximate,
 
       creditedAsAliases: data.creditedAsAliases,
 

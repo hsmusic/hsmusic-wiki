@@ -3,7 +3,7 @@ import {inspect} from 'node:util';
 import {colors} from '#cli';
 import {input, V} from '#composite';
 import Thing from '#thing';
-import {getKebabCase} from '#wiki-data';
+import {accumulateDurationForAlbum, getKebabCase} from '#wiki-data';
 import {parseDate, parseExcludingURLs} from '#yaml';
 
 import {
@@ -139,6 +139,15 @@ export class TrackSection extends Thing {
 
     dateOriginallyReleased: simpleDate(),
 
+    countTracksInAlbumDuration: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      withPropertyFromObject('album', V('countTracksInAlbumDuration')),
+      exposeDependency('#album.countTracksInAlbumDuration'),
+    ],
+
     countTracksInArtistTotals: [
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
@@ -206,7 +215,7 @@ export class TrackSection extends Thing {
 
     stem: exposeConstant(V(null)),
 
-    sectionsInRun: [
+    sectionsAcrossRun: [
       withPropertyFromObject('album', V('trackSections')),
 
       {
@@ -231,11 +240,29 @@ export class TrackSection extends Thing {
       exposeDependency('#filteredList'),
     ],
 
-    tracksInRun: [
-      withPropertyFromList('sectionsInRun', V('tracks')),
-      withFlattenedList('#sectionsInRun.tracks'),
+    tracksAcrossRun: [
+      withPropertyFromList('sectionsAcrossRun', V('tracks')),
+      withFlattenedList('#sectionsAcrossRun.tracks'),
       exposeDependency('#flattenedList'),
     ],
+
+    duration: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['tracks'],
+        compute: ({tracks}) =>
+          accumulateDurationForAlbum(tracks),
+      },
+    },
+
+    durationAcrossRun: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['tracksAcrossRun'],
+        compute: ({tracksAcrossRun}) =>
+          accumulateDurationForAlbum(tracksAcrossRun),
+      },
+    },
   });
 
   static [Thing.yamlDocumentSpec] = {
@@ -255,6 +282,7 @@ export class TrackSection extends Thing {
         transform: parseDate,
       },
 
+      'Count Tracks In Album Duration': {property: 'countTracksInAlbumDuration'},
       'Count Tracks In Artist Totals': {property: 'countTracksInArtistTotals'},
       'Hide Duration': {property: 'hideDuration'},
 

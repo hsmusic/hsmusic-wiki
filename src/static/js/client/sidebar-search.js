@@ -853,7 +853,7 @@ function updateSidebarSearchStatus() {
 
   if (downloadProgressValues.some(v => v < 1.00)) {
     const total = Object.keys(state.indexDownloadStatuses).length;
-    const sum = accumulateSum(downloadProgressValues);
+    const {sum} = accumulateSum(downloadProgressValues);
     showSidebarSearchProgress(
       sum / total,
       templateContent(info.loadingDataString));

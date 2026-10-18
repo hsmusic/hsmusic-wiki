@@ -1,5 +1,4 @@
 import {sortChronologically} from '#sort';
-import {getTotalDuration} from '#wiki-data';
 
 export default {
   sprawl: ({wikiInfo}) =>
@@ -61,7 +60,7 @@ export default {
       query.allTracks.length,
 
     totalDuration:
-      getTotalDuration(query.allTracks, {mainReleasesOnly: true}),
+      group.duration,
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -94,7 +93,7 @@ export default {
               time:
                 html.tag('b',
                   language.formatDuration(data.totalDuration, {
-                    unit: true,
+                    showUnit: true,
                     showZero: true,
                   })),
             })),

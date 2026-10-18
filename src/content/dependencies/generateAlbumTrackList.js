@@ -1,4 +1,4 @@
-import {accumulateSum, empty, stitchArrays} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 function displayTrackSections(album) {
   if (empty(album.trackSections)) {
@@ -96,11 +96,7 @@ export default {
                 ? null
              : section.isTrackSectionContinuation
                 ? null
-                : accumulateSum(section.tracksInRun, track => track.duration)));
-
-        data.trackSectionDurationsApproximate =
-          album.trackSections
-            .map(section => section.tracksInRun.length > 1);
+                : section.durationAcrossRun));
 
         data.trackSectionsAreAsideSections =
           album.trackSections
@@ -150,7 +146,6 @@ export default {
 
             name: data.trackSectionNames,
             duration: data.trackSectionDurations,
-            durationApproximate: data.trackSectionDurationsApproximate,
             isAsideTrackSection: data.trackSectionsAreAsideSections,
             hasTrackNumbers: data.trackSectionsHaveTrackNumbers,
             startCountingFrom: data.trackSectionsStartCountingFrom,
@@ -161,7 +156,6 @@ export default {
 
               name,
               duration,
-              durationApproximate,
               isAsideTrackSection,
               hasTrackNumbers,
               startCountingFrom,
@@ -190,7 +184,7 @@ export default {
                         workingCapsule += '.withDuration';
                         workingOptions.duration =
                           language.formatDuration(duration, {
-                            approximate: durationApproximate,
+                            showApproximate: true,
                           });
                       }
 

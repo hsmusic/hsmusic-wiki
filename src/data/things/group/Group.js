@@ -1,6 +1,8 @@
 import {input, V} from '#composite';
+import {sortAlbumsTracksChronologically} from '#sort';
 import Thing from '#thing';
 import {isBoolean} from '#validators';
+import {accumulateDurationForGroup} from '#wiki-data';
 
 import {
   parseAlbumCarousel,
@@ -14,6 +16,7 @@ import {withUniqueReferencingThing} from '#composite/wiki-data';
 
 import {
   exposeConstant,
+  exposeDependency,
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
 } from '#composite/control-flow';
@@ -120,14 +123,23 @@ export class Group extends Thing {
       },
     },
 
-    color: {
+    tracks: {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['this', '_reverse'],
-        compute: ({this: group, _reverse: reverse}) =>
-          reverse.groupCategoriesWhichInclude(group, {unique: true})
-            ?.color,
+        dependencies: ['albums'],
+        compute: ({albums}) =>
+          sortAlbumsTracksChronologically(
+            albums.flatMap(album => album.tracks)),
+      },
+    },
+
+    duration: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['tracks'],
+        compute: ({tracks}) =>
+          accumulateDurationForGroup(tracks),
       },
     },
 
@@ -141,6 +153,11 @@ export class Group extends Thing {
           null,
       },
     },
+
+    color: [
+      withPropertyFromObject('category', V('color')),
+      exposeDependency('#category.color'),
+    ],
   });
 
   static [Thing.findSpecs] = {

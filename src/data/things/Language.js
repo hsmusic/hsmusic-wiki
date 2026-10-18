@@ -214,7 +214,7 @@ export class Language extends Thing {
     const string = html.resolve(text, {normalize: 'plain'});
     const segments = this.intl_wordSegmenter.segment(string);
 
-    return accumulateSum(segments, segment => segment.isWordLike ? 1 : 0);
+    return accumulateSum(segments, segment => segment.isWordLike ? 1 : 0).sum;
   }
 
   getUnitForm(value) {
@@ -705,14 +705,30 @@ export class Language extends Thing {
     }
   }
 
-  formatDuration(secTotal, {
-    approximate = false,
-    unit = false,
+  formatDuration(durationOrDurationObject, {
+    showApproximate = false,
+    showUnit = false,
     showZero = false,
   } = {}) {
-    // Null or undefined duration is blank content.
-    if (secTotal === null || secTotal === undefined) {
+    if (
+      durationOrDurationObject === null ||
+      durationOrDurationObject === undefined
+    ) {
       return html.blank();
+    }
+
+    const durationObject =
+      (typeof durationOrDurationObject === 'object'
+        ? durationOrDurationObject
+        : null);
+
+    const secTotal =
+      (durationObject
+        ? durationObject.sum
+        : durationOrDurationObject);
+
+    if (typeof secTotal !== 'number') {
+      throw new Error(`Expected a duration object or a number`);
     }
 
     // Zero duration is a "missing" string, unless bypassed.
@@ -726,7 +742,7 @@ export class Language extends Thing {
 
     const pad = (val) => val.toString().padStart(2, '0');
 
-    const stringSubkey = unit ? '.withUnit' : '';
+    const stringSubkey = showUnit ? '.withUnit' : '';
 
     const duration =
       hour > 0
@@ -740,9 +756,11 @@ export class Language extends Thing {
             seconds: pad(sec),
           });
 
-    return approximate
-      ? this.formatString('count.duration.approximate', {duration})
-      : duration;
+    if (showApproximate && durationObject?.approximate) {
+      return this.formatString('count.duration.approximate', {duration});
+    } else {
+      return duration;
+    }
   }
 
   formatTimeIntoDuration(secCur, secTotal) {

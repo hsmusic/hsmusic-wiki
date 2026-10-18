@@ -9,10 +9,9 @@ export default {
   query({groupData}, spec) {
     const groups = sortAlphabetically(groupData.slice());
     const counts =
-      groups.map(group =>
-        accumulateSum(
-          group.albums,
-          ({tracks}) => tracks.length));
+      groups
+        .map(group => accumulateSum(group.albums, album => album.tracks.length))
+        .map(({sum}) => sum);
 
     filterByCount(groups, counts);
     sortByCount(groups, counts, {greatestFirst: true});

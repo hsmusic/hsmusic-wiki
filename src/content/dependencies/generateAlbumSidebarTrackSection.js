@@ -64,7 +64,7 @@ export default {
 
     data.runIncludesCurrentTrack =
       (track
-        ? trackSection.tracksInRun.includes(track)
+        ? trackSection.tracksAcrossRun.includes(track)
         : null);
 
     return data;

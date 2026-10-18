@@ -18,7 +18,6 @@ export {default as splitContentNodesAround} from './splitContentNodesAround.js';
 export {default as withClonedThings} from './withClonedThings.js';
 export {default as withConstitutedArtwork} from './withConstitutedArtwork.js';
 export {default as withContentNodes} from './withContentNodes.js';
-export {default as withContributionListSums} from './withContributionListSums.js';
 export {default as withDirectory} from './withDirectory.js';
 export {default as withRecontextualizedContributionList} from './withRecontextualizedContributionList.js';
 export {default as withRedatedContributionList} from './withRedatedContributionList.js';

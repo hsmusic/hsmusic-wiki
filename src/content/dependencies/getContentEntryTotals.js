@@ -24,6 +24,6 @@ export default {
           multilingualWordCount(
             html.resolve(
               body.slot('mode', 'multiline'),
-              {normalize: 'plain'})))),
+              {normalize: 'plain'})))).sum,
   }),
 };

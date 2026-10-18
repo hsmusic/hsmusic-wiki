@@ -1,4 +1,4 @@
-import {getTotalDuration} from '#wiki-data';
+import {accumulateDurationForGroup} from '#wiki-data';
 
 export default {
   sprawl({albumData, trackData, wikiInfo}) {
@@ -7,8 +7,7 @@ export default {
       numTracks: trackData.length,
       numAlbums: albumData.length,
       totalDuration:
-        getTotalDuration(
-          trackData.filter(track => track.countInArtistTotals)),
+        accumulateDurationForGroup(trackData),
     };
   },
 
@@ -58,8 +57,8 @@ export default {
             duration:
               html.tag('b',
                 language.formatDuration(data.totalDuration, {
-                  approximate: true,
-                  unit: true,
+                  showApproximate: true,
+                  showUnit: true,
                 })),
           })),
 

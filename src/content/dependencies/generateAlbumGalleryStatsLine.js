@@ -1,5 +1,3 @@
-import {getTotalDuration} from '#wiki-data';
-
 export default {
   data: (album) => ({
     date:
@@ -14,7 +12,7 @@ export default {
     duration:
       (album.hideDuration
         ? null
-        : getTotalDuration(album.tracks)),
+        : album.duration),
 
     tracks:
       (album.hideDuration
@@ -40,7 +38,7 @@ export default {
 
           workingOptions.duration =
             html.tag('b',
-              language.formatDuration(data.duration, {unit: true}));
+              language.formatDuration(data.duration, {showUnit: true}));
         }
 
         if (data.dateStyle === 'released') {

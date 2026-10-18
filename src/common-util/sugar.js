@@ -130,11 +130,20 @@ export function accumulateSum(array, fn = x => x) {
     return accumulateSum(Array.from(array, fn));
   }
 
-  return array.reduce(
-    (accumulator, value, index, array) =>
-      accumulator +
-      (fn(value, index, array) ?? 0),
-    0);
+  const terms =
+    array.map((...args) => fn(...args) ?? 0);
+
+  const countingTerms =
+    terms.filter(term => term > 0);
+
+  switch (countingTerms.length) {
+    case 0: return {sum: 0, any: false, approximate: false};
+    case 1: return {sum: countingTerms[0], any: true, approximate: false};
+    default: {
+      const sum = countingTerms.reduce((a, b) => a + b);
+      return {sum, any: true, approximate: true};
+    }
+  }
 }
 
 // Stitches together the items of separate arrays into one array of objects

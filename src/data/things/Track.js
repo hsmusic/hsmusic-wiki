@@ -376,6 +376,15 @@ export class Track extends Thing {
 
     // > Update & expose - General configuration
 
+    countInAlbumDuration: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      withPropertyFromObject('trackSection', V('countTracksInAlbumDuration')),
+      exposeDependency('#trackSection.countTracksInAlbumDuration'),
+    ],
+
     // This matters to total-counting, but doesn't directly figure in - it's
     // part of methods countOwnContributionIn{Contribution,Duration}Totals,
     // accessed in turn by Contribution.countIn{Contribution,Duration}Totals.
@@ -1170,6 +1179,7 @@ export class Track extends Thing {
 
       // General configuration
 
+      'Count In Album Duration': {property: 'countInAlbumDuration'},
       'Count In Artist Totals': {property: 'countInArtistTotals'},
       'Show In Reference Lists': {property: 'showInReferenceLists'},
 

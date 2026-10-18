@@ -4,6 +4,7 @@ import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input, V} from '#composite';
 import Thing from '#thing';
+import {accumulateDurationForArtist} from '#wiki-data';
 import {parseArtistAliases, parseArtwork, parseURLs} from '#yaml';
 
 import {
@@ -16,8 +17,7 @@ import {exitWithoutDependency, exposeConstant, exposeDependency}
   from '#composite/control-flow';
 import {withFilteredList, withMappedList, withPropertyFromList}
   from '#composite/data';
-import {withContributionListSums, withReverseReferenceList}
-  from '#composite/wiki-data';
+import {withReverseReferenceList} from '#composite/wiki-data';
 
 import {
   constitutibleArtwork,
@@ -287,16 +287,14 @@ export class Artist extends Thing {
       reverse: soupyReverse.input('midiProjectFileArtistContributionsBy'),
     }),
 
-    totalDuration: [
-      withPropertyFromList('musicContributions', V('thing')),
-      withPropertyFromList('#musicContributions.thing', V('isMainRelease')),
-
-      withFilteredList('musicContributions', '#musicContributions.thing.isMainRelease')
-        .outputs({'#filteredList': '#mainReleaseContributions'}),
-
-      withContributionListSums('#mainReleaseContributions'),
-      exposeDependency('#contributionListDuration'),
-    ],
+    totalDuration: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['musicContributions'],
+        compute: ({musicContributions}) =>
+          accumulateDurationForArtist(musicContributions),
+      },
+    },
   });
 
   static [Thing.getSerializeDescriptors] = ({

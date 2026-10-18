@@ -1,5 +1,4 @@
 import {stitchArrays} from '#sugar';
-import {getTotalDuration} from '#wiki-data';
 
 export default {
   query: (albums, _group) => ({
@@ -55,7 +54,7 @@ export default {
       albums.map(album =>
         (album.style === 'single'
           ? album.tracks[0]?.duration ?? null
-          : getTotalDuration(album.tracks))),
+          : album.duration.sum)),
 
     notFromThisGroup:
       albums.map(album => !album.groups.includes(group)),

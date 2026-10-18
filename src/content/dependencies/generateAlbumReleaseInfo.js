@@ -1,5 +1,3 @@
-import {accumulateSum, empty} from '#sugar';
-
 export default {
   relations: (relation, album) => ({
     block:
@@ -27,19 +25,7 @@ export default {
       data.coverArtDate = album.coverArtDate;
     }
 
-    const durationTerms =
-      album.tracks
-        .map(track => track.duration)
-        .filter(value => value > 0);
-
-    if (empty(durationTerms) || album.hideDuration) {
-      data.duration = null;
-      data.durationApproximate = null;
-    } else {
-      data.duration = accumulateSum(durationTerms);
-      data.durationApproximate = album.tracks.length > 1;
-    }
-
+    data.duration = album.duration;
     data.numTracks = album.tracks.length;
 
     return data;
@@ -72,13 +58,13 @@ export default {
               })
             : html.blank()),
 
-          language.$(capsule, 'duration', {
-            [language.onlyIfOptions]: ['duration'],
-            duration:
-              language.formatDuration(data.duration, {
-                approximate: data.durationApproximate,
-              }),
-          }),
+          data.duration.any &&
+            language.$(capsule, 'duration', {
+              duration:
+                language.formatDuration(data.duration, {
+                  showApproximate: true,
+                }),
+            }),
         ]),
 
         relations.listenLineOrList.slots({

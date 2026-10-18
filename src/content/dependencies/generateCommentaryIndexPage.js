@@ -50,10 +50,10 @@ export default {
           totals.entryCount,
         ]));
 
-    const totalWordCount =
+    const {sum: totalWordCount} =
       accumulateSum(wordCounts);
 
-    const totalEntryCount =
+    const {sum: totalEntryCount} =
       accumulateSum(entryCounts);
 
     return language.encapsulate('commentaryIndex', pageCapsule =>

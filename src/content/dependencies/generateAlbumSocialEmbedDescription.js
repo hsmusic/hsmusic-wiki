@@ -1,9 +1,7 @@
-import {accumulateSum} from '#sugar';
-
 export default {
   data: (album) => ({
     duration:
-      accumulateSum(album.tracks, track => track.duration),
+      album.duration,
 
     tracks:
       album.tracks.length,
@@ -21,7 +19,7 @@ export default {
 
       let any = false;
 
-      if (data.duration > 0) {
+      if (data.duration.any) {
         any = true;
         workingCapsule += '.withDuration';
         workingOptions.duration =
