@@ -895,6 +895,7 @@ misc:
       _: "HSMusic"
       archive: "HSMusic (wiki archive)"
 
+    imdb: "IMDb"
     instagram: "Instagram"
     internetArchive: "Internet Archive"
     itch: "itch.io"
@@ -915,6 +916,7 @@ misc:
     soundcloud: "SoundCloud"
     spotify: "Spotify"
     steam: "Steam"
+    teamstarkid: "Starkid Shop"
     tiktok: "TikTok"
     toyhouse: "Toyhouse"
     tumblr: "Tumblr"

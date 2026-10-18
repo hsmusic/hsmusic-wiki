@@ -475,6 +475,12 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'imdb.com'},
+    platform: 'imdb',
+    icon: 'globe',
+  },
+
+  {
     match: {domain: 'instagram.com'},
 
     platform: 'instagram',
@@ -624,7 +630,7 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {domains: ['spotify.com', 'open.spotify.com']},
+    match: {domains: ['spotify.com', 'open.spotify.com', 'artists.spotify.com']},
     platform: 'spotify',
     icon: 'spotify',
   },
@@ -633,6 +639,12 @@ export const externalLinkSpec = [
     match: {domains: ['store.steampowered.com', 'steamcommunity.com']},
     platform: 'steam',
     icon: 'steam',
+  },
+
+  {
+    match: {domain: 'shop.teamstarkid.com'},
+    platform: 'teamstarkid',
+    icon: 'globe',
   },
 
   {
