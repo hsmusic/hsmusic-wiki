@@ -2377,7 +2377,8 @@ export function getThingLayoutForFilename(filename, wikiData) {
   const documentMode = allDocumentModes[0];
 
   switch (documentMode) {
-    case documentModes.allInOne: {
+    case documentModes.allInOne:
+    case documentModes.allTogether: {
       return {
         documentMode,
         things:

@@ -1,8 +1,9 @@
-import {readFile, writeFile} from 'node:fs/promises';
+import {readFile, stat, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
 import {V} from '#composite';
-import {chunkByProperties, compareArrays} from '#sugar';
+import {traverse} from '#node-utils';
+import {chunkByConditions, compareArrays, transposeArrays} from '#sugar';
 import Thing from '#thing';
 import {isObject, isStringNonEmpty, anyOf, strictArrayOf} from '#validators';
 
@@ -32,10 +33,12 @@ export class DocumentSortingRule extends ThingSortingRule {
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
-    // TODO: glob :plead:
-    filename: {
+    pathnames: {
       flags: {update: true, expose: true},
-      update: {validate: isStringNonEmpty},
+      update: {
+        validate:
+          strictArrayOf(isStringNonEmpty),
+      },
     },
 
     message: {
@@ -80,7 +83,19 @@ export class DocumentSortingRule extends ThingSortingRule {
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
-      'Sort Documents': {property: 'filename'},
+      'Sort Documents': {
+        property: 'pathnames',
+        transform(value) {
+          if (Array.isArray(value)) {
+            return value;
+          } else if (typeof value === 'string') {
+            return [value];
+          } else {
+            throw new Error(`Expected a string or an array`);
+          }
+        },
+      },
+
       'Select Documents Following': {property: 'selectDocumentsFollowing'},
       'Select Documents Under': {property: 'selectDocumentsUnder'},
     },
@@ -93,74 +108,148 @@ export class DocumentSortingRule extends ThingSortingRule {
     ],
   };
 
+  async *getTargetedFilePaths({dataPath}) {
+    for (const pathInYAML of this.pathnames) {
+      const pathOnSystem =
+        path.join(
+          dataPath,
+          pathInYAML.split(path.posix.sep).join(path.sep));
+
+      let stats;
+      try {
+        stats = await stat(pathOnSystem);
+      } catch {
+        continue;
+      }
+
+      if (stats.isDirectory()) {
+        const pathsOnSystem =
+          await traverse(pathOnSystem, {
+            filterFile: file => path.extname(file) === '.yaml',
+          });
+
+        const pathsInYAML =
+          pathsOnSystem.map(pathOnSystem =>
+            path.relative(dataPath, pathOnSystem)
+              .split(path.sep)
+              .join(path.posix.sep));
+
+        yield* transposeArrays([pathsOnSystem, pathsInYAML]);
+      } else {
+        yield [pathOnSystem, pathInYAML];
+      }
+    }
+  }
+
   static async apply(rule, {wikiData, dataPath, dry}) {
-    const oldLayout = getThingLayoutForFilename(rule.filename, wikiData);
-    if (!oldLayout) return null;
+    const filePaths =
+      await Array.fromAsync(rule.getTargetedFilePaths({dataPath}));
 
-    const newLayout = rule.#processLayout(oldLayout);
+    const changes = new Map();
+    let changedAny = false;
 
-    const oldOrder = flattenThingLayoutToDocumentOrder(oldLayout);
-    const newOrder = flattenThingLayoutToDocumentOrder(newLayout);
-    const changed = compareArrays(oldOrder, newOrder);
+    for (const [pathOnSystem, pathInYAML] of filePaths) {
+      const oldLayout = getThingLayoutForFilename(pathInYAML, wikiData);
+      if (!oldLayout) continue;
 
-    if (dry) return {changed};
+      const newLayout = rule.#processLayout(oldLayout);
 
-    const realPath =
-      path.join(
-        dataPath,
-        rule.filename.split(path.posix.sep).join(path.sep));
+      const oldOrder = flattenThingLayoutToDocumentOrder(oldLayout);
+      const newOrder = flattenThingLayoutToDocumentOrder(newLayout);
+      const changedThisOne = compareArrays(oldOrder, newOrder);
 
-    const oldSourceText = await readFile(realPath, 'utf8');
-    const newSourceText = reorderDocumentsInYAMLSourceText(oldSourceText, newOrder);
+      if (changedThisOne) {
+        changes.set(pathOnSystem, newOrder)
+        changedAny = true;
+      }
+    }
 
-    await writeFile(realPath, newSourceText);
+    if (!changedAny) {
+      return {changed: false};
+    }
 
-    return {changed};
+    for (const [pathOnSystem, newOrder] of changes) {
+      const oldSourceText = await readFile(pathOnSystem, 'utf8');
+      const newSourceText = reorderDocumentsInYAMLSourceText(oldSourceText, newOrder);
+      changes.set(pathOnSystem, newSourceText);
+    }
+
+    for (const [pathOnSystem, newSourceText] of changes) {
+      await writeFile(pathOnSystem, newSourceText);
+    }
+
+    return {changed: true};
   }
 
   static async* applyAll(rules, {wikiData, dataPath, dry}) {
-    rules = rules
-      .toSorted((a, b) => a.filename.localeCompare(b.filename, 'en'));
+    const pathRulePairs =
+      (await Promise.all(
+        rules.map(rule =>
+          Array.fromAsync(rule.getTargetedFilePaths({dataPath}))
+            .then(filePaths => filePaths
+              .map(([pathOnSystem, pathInYAML]) =>
+                [pathOnSystem, pathInYAML, rule])))))
+        .flat();
 
-    for (const {chunk, filename} of chunkByProperties(rules, ['filename'])) {
-      const initialLayout = getThingLayoutForFilename(filename, wikiData);
-      if (!initialLayout) continue;
+    pathRulePairs.sort((a, b) => a[0].localeCompare(b[0]));
+
+    const pathRuleMap =
+      new Map(
+        chunkByConditions(pathRulePairs, [(a, b) => a[0] !== b[0]])
+          .map(pairs => [pairs[0][0], {
+            pathOnSystem: pairs[0][0],
+            pathInYAML: pairs[0][1],
+            rules: pairs.map(pair => pair[2]),
+          }]));
+
+    const changes = new Map();
+    let anyFilesChanged = false;
+
+    for (const {pathOnSystem, pathInYAML, rules} of pathRuleMap.values()) {
+      const initialLayout = getThingLayoutForFilename(pathInYAML, wikiData);
+      if (!initialLayout) {
+        continue;
+      }
 
       let currLayout = initialLayout;
       let prevLayout = initialLayout;
-      let anyChanged = false;
+      let anyRulesHadEffect = false;
 
-      for (const rule of chunk) {
+      for (const rule of rules) {
         currLayout = rule.#processLayout(currLayout);
 
         const prevOrder = flattenThingLayoutToDocumentOrder(prevLayout);
         const currOrder = flattenThingLayoutToDocumentOrder(currLayout);
 
         if (compareArrays(currOrder, prevOrder)) {
-          yield {rule, changed: false};
+          yield {rule, path: pathInYAML, changed: false};
         } else {
-          anyChanged = true;
-          yield {rule, changed: true};
+          anyRulesHadEffect = true;
+          yield {rule, path: pathInYAML, changed: true};
         }
 
         prevLayout = currLayout;
       }
 
-      if (!anyChanged) continue;
-      if (dry) continue;
+      if (anyRulesHadEffect) {
+        changes.set(pathOnSystem, currLayout);
+        anyFilesChanged = true;
+      }
+    }
 
-      const newLayout = currLayout;
+    if (dry) {
+      return;
+    }
+
+    for (const [pathOnSystem, newLayout] of changes) {
       const newOrder = flattenThingLayoutToDocumentOrder(newLayout);
+      changes.set(pathOnSystem, newOrder);
+    }
 
-      const realPath =
-        path.join(
-          dataPath,
-          filename.split(path.posix.sep).join(path.sep));
-
-      const oldSourceText = await readFile(realPath, 'utf8');
+    for (const [pathOnSystem, newOrder] of changes) {
+      const oldSourceText = await readFile(pathOnSystem, 'utf8');
       const newSourceText = reorderDocumentsInYAMLSourceText(oldSourceText, newOrder);
-
-      await writeFile(realPath, newSourceText);
+      await writeFile(pathOnSystem, newSourceText);
     }
   }
 

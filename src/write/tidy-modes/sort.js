@@ -32,26 +32,25 @@ export async function go({
     }
   }
 
-  let numUpdated = 0;
-  let numActive = 0;
+  const rulesEffected = new Set();
 
   for await (const result of SortingRule.go({wikiData, dataPath})) {
-    numActive++;
-
     const niceMessage = `"${result.rule.message}"`;
 
     if (result.changed) {
-      numUpdated++;
-      logInfo`Updated to satisfy ${niceMessage}.`;
+      rulesEffected.add(result.rule);
+      logInfo`Updating to satisfy: ${niceMessage}:`;
+      logInfo`  ${result.path}`;
     } else {
-      logInfo`Already good: ${niceMessage}`;
+      logInfo`Already satisfied: ${niceMessage}`;
+      logInfo`  ${result.path}`;
     }
   }
 
-  if (numUpdated > 1) {
-    logInfo`Updated data files to satisfy ${numUpdated} sorting rules.`;
+  if (rulesEffected.size > 1) {
+    logInfo`Updated data files to satisfy ${rulesEffected.size} sorting rules.`;
     return 'updated';
-  } else if (numUpdated === 1) {
+  } else if (rulesEffected.size === 1) {
     logInfo`Updated data files to satisfy ${1} sorting rule.`
     return 'updated';
   } else {

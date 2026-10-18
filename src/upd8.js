@@ -2134,8 +2134,8 @@ async function main() {
       });
     } else {
       logWarn`Some of this wiki's sorting rules currently aren't satisfied:`;
-      for (const {rule} of needed) {
-        logWarn`- ${rule.message}`;
+      for (const {rule, path} of needed) {
+        logWarn`- ${rule.message}: ${path}`;
       }
       logWarn`Run ${'hsmusic --sort'} to automatically update data files.`;
       paragraph = false;
