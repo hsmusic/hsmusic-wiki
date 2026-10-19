@@ -446,7 +446,6 @@
 
 @layer print {
   s.spoiler {
-    display: inline-block;
     color: transparent;
     text-decoration: underline;
     text-decoration-color: white;
