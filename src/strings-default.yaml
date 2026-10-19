@@ -3509,7 +3509,7 @@ trackPage:
       withNumber: "{NUMBER}. {TRACK}"
 
   needsLyrics: >-
-    This track has vocals, but there aren't lyrics available for it on this wiki, yet!
+    This track has vocals, but there aren't lyrics available for it on this wiki, yet.
 
   socialEmbed:
     heading: "{ALBUM}"
