@@ -185,6 +185,8 @@ export default {
             ...slots.additionalStringOptions,
             artists: formattedArtistList,
           });
+      } else {
+        content = html.blank();
       }
     } else {
       if (empty(relations.normalContributionLinks)) {
