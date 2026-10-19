@@ -97,12 +97,17 @@ export default {
               return {stringsKey, ...options};
             })),
 
+      chunkStickyTitles:
+        relations.albumLinks
+          .map(link => ({album: link})),
+
       chunkRows:
         relations.trackListItems
           .map(items => items
             .map(item => ({
               track:
                 html.inside(item.slots({
+                  showArtists: slots.showArtists ? 'auto' : false,
                   showNameDetail: 'from within album',
                   showDuration: false,
                   hash: slots.hash,

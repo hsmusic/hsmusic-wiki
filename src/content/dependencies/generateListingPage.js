@@ -72,6 +72,11 @@ export default {
       validate: v => v.strictArrayOf(v.optional(v.isObject)),
     },
 
+    // Expressly part of content headings!
+    chunkStickyTitles: {
+      validate: v => v.strictArrayOf(v.optional(v.isObject)),
+    },
+
     chunkRows: {
       validate: v => v.strictArrayOf(v.isObject),
     },
@@ -208,10 +213,18 @@ export default {
             stitchArrays({
               title: slots.chunkTitles,
               titleAccent: slots.chunkTitleAccents,
+              stickyTitle: slots.chunkStickyTitles,
               id: slots.chunkIDs,
               rows: slots.chunkRows,
               rowAttributes: slots.chunkRowAttributes,
-            }).map(({title, titleAccent, id, rows, rowAttributes}) => [
+            }).map(({
+                title,
+                titleAccent,
+                stickyTitle,
+                id,
+                rows,
+                rowAttributes,
+              }) => [
                 (slots.useContentHeadingsForChunks
                   ? relations.chunkHeading.clone().slots({
                       tag: 'dt',
@@ -229,6 +242,14 @@ export default {
                             context: ['chunk.title', title.stringsKey, 'accent'],
                             provided: titleAccent,
                           }),
+
+                      stickyTitle:
+                        (stickyTitle
+                          ? formatListingString({
+                              context: 'chunk.title',
+                              provided: stickyTitle,
+                            })
+                          : null),
                     })
                   : html.tag('dt', id && {id},
                       formatListingString({
