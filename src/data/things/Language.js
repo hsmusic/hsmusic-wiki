@@ -1029,6 +1029,10 @@ export class Language extends Thing {
         ? args.at(-1)
         : null);
 
+    if (args.length === 1 && fn) {
+      return fn();
+    }
+
     const parts =
       (fn
         ? args.slice(0, -1)

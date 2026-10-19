@@ -36,10 +36,18 @@ export default {
         query.albums
           .map(album => relation('linkAlbum', album)),
 
-      trackLinks:
+      albumCredits:
+        query.albums
+          .map(album => relation('generateArtistCredit',
+            album.artistContribs,
+            [])),
+
+      trackListItems:
         query.tracks
           .map(tracks => tracks
-            .map(track => relation('linkTrack', track))),
+            .map(track => relation('generateTrackListItem',
+              track,
+              track.album.trackArtistContribs))),
     };
   },
 
@@ -53,30 +61,52 @@ export default {
   slots: {
     hash: {type: 'string'},
     showAlbumDates: {type: 'boolean', default: true},
+    showArtists: {type: 'boolean', default: false},
   },
 
-  generate(data, relations, slots, {language}) {
+  generate(data, relations, slots, {html, language}) {
     return relations.page.slots({
       type: 'chunks',
 
       chunkTitles:
         stitchArrays({
-          albumLink: relations.albumLinks,
+          link: relations.albumLinks,
+          credit: relations.albumCredits,
           date: data.dates,
-        }).map(({albumLink, date}) =>
-            (slots.showAlbumDates && date
-              ? {
-                  stringsKey: 'withDate',
-                  album: albumLink,
-                  date: language.formatDate(date),
-                }
-              : {album: albumLink})),
+        }).map(({link, credit, date}) =>
+            language.encapsulate((stringsKey = '') => {
+              const options = {album: link};
+
+              // Sorry, this is totally cheating.
+              credit.setSlots({
+                normalStringKey:
+                  'artistPage.creditList.album.credit.by',
+              });
+
+              if (slots.showArtists && !html.isBlank(credit)) {
+                stringsKey += 'withCredit';
+                options.credit = credit;
+              }
+
+              if (slots.showAlbumDates && date) {
+                stringsKey += stringsKey ? '.' : '';
+                stringsKey += 'withDate';
+                options.date = language.formatDate(date);
+              }
+
+              return {stringsKey, ...options};
+            })),
 
       chunkRows:
-        relations.trackLinks
-          .map(trackLinks => trackLinks
-            .map(trackLink => ({
-              track: trackLink.slot('hash', slots.hash),
+        relations.trackListItems
+          .map(items => items
+            .map(item => ({
+              track:
+                html.inside(item.slots({
+                  showNameDetail: 'from within album',
+                  showDuration: false,
+                  hash: slots.hash,
+                })),
             }))),
     });
   },

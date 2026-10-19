@@ -3171,8 +3171,18 @@ listingPage:
       title.short: "...which need Lyrics"
 
       chunk:
-        title: "{ALBUM}"
-        title.withDate: "{ALBUM} ({DATE})"
+        title: >-
+          {ALBUM}
+
+        title.withCredit: >-
+          {ALBUM} {CREDIT}
+
+        title.withDate: >-
+          {ALBUM} ({DATE})
+
+        title.withCredit.withDate: >-
+          {ALBUM} {CREDIT} ({DATE})
+
         item: "{TRACK}"
 
   listMotifs:

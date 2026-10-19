@@ -75,6 +75,10 @@ export default {
       default: false,
     },
 
+    hash: {
+      type: 'string',
+    },
+
     colorMode: {
       validate: v => v.is('none', 'track', 'line'),
       default: 'track',
@@ -133,8 +137,10 @@ export default {
           }
 
           workingOptions.track =
-            relations.trackLink
-              .slot('color', slots.colorMode === 'track');
+            relations.trackLink.slots({
+              color: slots.colorMode === 'track',
+              hash: slots.hash,
+            });
 
           const nameDetail =
             (slots.showNameDetail === 'from within section'

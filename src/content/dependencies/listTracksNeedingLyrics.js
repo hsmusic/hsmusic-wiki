@@ -3,5 +3,7 @@ export default {
     ({page: relation('listTracksWithExtra', spec, 'needsLyrics', 'truthy')}),
 
   generate: (relations) =>
-    relations.page,
+    relations.page.slots({
+      showArtists: true,
+    }),
 };
