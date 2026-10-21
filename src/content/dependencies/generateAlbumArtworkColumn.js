@@ -3,7 +3,7 @@ export default {
     nonAttachingArtworkIndex:
       (album.hasCoverArt
         ? album.coverArtworks.findIndex((artwork, index) =>
-            index > 1 &&
+            index >= 1 &&
             !artwork.attachAbove)
         : null),
   }),
