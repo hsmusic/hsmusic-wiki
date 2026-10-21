@@ -858,6 +858,8 @@ misc:
       artistRelease: "Bandcamp (artist's release)"
       officialRelease: "Bandcamp (official release)"
 
+    bandlab: "BandLab"
+
     bgreco:
       _: "bgreco.net"
       flash: "bgreco.net (high quality audio)"
@@ -916,7 +918,7 @@ misc:
     soundcloud: "SoundCloud"
     spotify: "Spotify"
     steam: "Steam"
-    teamstarkid: "Starkid Shop"
+    teamstarkid: "StarKid Shop"
     tiktok: "TikTok"
     toyhouse: "Toyhouse"
     tumblr: "Tumblr"

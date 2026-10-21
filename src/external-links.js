@@ -250,6 +250,12 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'bandlab.com'},
+    platform: 'bandlab',
+    icon: 'globe',
+  },
+
+  {
     match: {domains: ['bc.s3m.us', 'music.solatrus.com']},
 
     platform: 'bandcamp',
