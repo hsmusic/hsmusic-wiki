@@ -164,9 +164,7 @@ export default {
       track.nameStyle,
 
     nameDetail:
-      (track.album.style === 'meta'
-        ? track.nameDetailWithinAlbum
-        : null),
+      track.nameDetailOnTrackPage,
 
     color:
       track.color,

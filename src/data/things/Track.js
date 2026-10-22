@@ -399,6 +399,44 @@ export class Track extends Thing {
 
     showInReferenceLists: flag(V(true)),
 
+    nameDetailOnTrackPage: [
+      {
+        dependencies: [
+          input.updateValue({
+            validate:
+              anyOf(isString, isBoolean),
+          }),
+        ],
+
+        compute: (continuation, {[input.updateValue()]: value}) =>
+          (typeof value === 'string'
+            ? value
+         : value === false
+            ? null
+            : continuation()),
+      },
+
+      withPropertyFromObject('trackSection', V('showNameDetailsOnTrackPages')),
+
+      {
+        dependencies: [
+          '#trackSection.showNameDetailsOnTrackPages',
+          'nameDetailWithinAlbum',
+        ],
+
+        compute: ({
+          ['#trackSection.showNameDetailsOnTrackPages']:
+            showNameDetailsOnTrackPages,
+
+          ['nameDetailWithinAlbum']:
+            nameDetailWithinAlbum,
+        }) =>
+          (showNameDetailsOnTrackPages
+            ? nameDetailWithinAlbum
+            : null),
+      },
+    ],
+
     // This property doesn't resolve any references, i.e. doesn't interact
     // with find/reverse, so it's safe to depend on when constituting artworks
     // (or elsewhere while loading data).
@@ -1182,6 +1220,7 @@ export class Track extends Thing {
       'Count In Album Duration': {property: 'countInAlbumDuration'},
       'Count In Artist Totals': {property: 'countInArtistTotals'},
       'Show In Reference Lists': {property: 'showInReferenceLists'},
+      'Show Name Detail On Track Page': {property: 'nameDetailOnTrackPage'},
 
       'Has Cover Art': {property: 'hasUniqueCoverArt'},
       'Has Date': {property: 'disableDate', transform: flipBoolean},
@@ -1384,6 +1423,17 @@ export class Track extends Thing {
         ],
 
         drop: ['URLs'],
+      },
+
+      {
+        message: `Only a custom name detail will be shown on the track page`,
+
+        fields: [
+          ['Name Detail', v => v === 'album'],
+          ['Show Name Detail On Track Page', v => v === true],
+        ],
+
+        drop: ['Show Name Detail On Track Page'],
       },
     ],
   };

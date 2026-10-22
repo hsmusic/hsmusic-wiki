@@ -320,6 +320,20 @@ export class Album extends Thing {
 
     showArtistsInTrackList: flag(V(true)),
 
+    showNameDetailsOnTrackPages: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      {
+        dependencies: ['style'],
+        compute: ({style}) =>
+          (style === 'meta'
+            ? true
+            : false),
+      },
+    ],
+
     hideDuration: [
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
@@ -942,6 +956,7 @@ export class Album extends Thing {
       'Show Album In Tracks Without Artists': {property: 'showAlbumInTracksWithoutArtists'},
       'Show Section In Nav Bar': {property: 'showTrackSectionInNavBar'},
       'Show Artists In Track List': {property: 'showArtistsInTrackList'},
+      'Show Name Details On Track Pages': {property: 'showNameDetailsOnTrackPages'},
       'Hide Duration': {property: 'hideDuration'},
       'Hide Track Section Durations': {property: 'hideTrackSectionDurations'},
 

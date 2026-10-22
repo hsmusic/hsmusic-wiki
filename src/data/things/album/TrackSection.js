@@ -157,6 +157,15 @@ export class TrackSection extends Thing {
       exposeDependency('#album.countTracksInArtistTotals'),
     ],
 
+    showNameDetailsOnTrackPages: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      withPropertyFromObject('album', V('showNameDetailsOnTrackPages')),
+      exposeDependency('#album.showNameDetailsOnTrackPages'),
+    ],
+
     hideDuration: [
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
@@ -284,6 +293,7 @@ export class TrackSection extends Thing {
 
       'Count Tracks In Album Duration': {property: 'countTracksInAlbumDuration'},
       'Count Tracks In Artist Totals': {property: 'countTracksInArtistTotals'},
+      'Show Name Details On Track Pages': {property: 'showNameDetailsOnTrackPages'},
       'Hide Duration': {property: 'hideDuration'},
 
       'Excluding Track URLs': {
