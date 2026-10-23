@@ -216,7 +216,7 @@ export default templateCompositeFrom({
         ['#trackSection.directorySuffixForTracks']:
           trackSectionDirectorySuffixForTracks,
       }) {
-        if (nameDetail === 'album name deatil') {
+        if (nameDetail === 'album name detail') {
           return continuation.raiseOutput({
             ['#directorySuffix']: albumDirectorySuffix,
             ['#directorySuffixWithinAlbum']: null,
