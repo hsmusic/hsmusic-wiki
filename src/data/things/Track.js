@@ -731,7 +731,7 @@ export class Track extends Thing {
       update: {
         validate:
           anyOf(
-            is('album', 'section'),
+            is('album', 'album name detail', 'section'),
             isString),
       },
     },
@@ -856,6 +856,8 @@ export class Track extends Thing {
         }) =>
           (nameDetail === 'album'
             ? null
+         : nameDetail === 'album name detail'
+            ? null
          : nameDetail === 'section'
             ? null
             : nameDetail),
@@ -879,6 +881,8 @@ export class Track extends Thing {
         }) =>
           (nameDetail === 'album'
             ? null
+         : nameDetail === 'album name detail'
+            ? null
          : nameDetail === 'section'
             ? trackSectionNameDetailForTracks
             : nameDetail),
@@ -886,12 +890,13 @@ export class Track extends Thing {
     ],
 
     nameDetailAcrossWiki: [
-      withPropertyFromObject('album', V('nameDetailForTracks')),
+      withPropertiesFromObject('album', V(['nameDetail', 'nameDetailForTracks'])),
       withPropertyFromObject('trackSection', V('nameDetailForTracks')),
 
       {
         dependencies: [
           '_nameDetail',
+          '#album.nameDetail',
           '#album.nameDetailForTracks',
           '#trackSection.nameDetailForTracks',
         ],
@@ -899,6 +904,9 @@ export class Track extends Thing {
         compute: ({
           ['_nameDetail']:
             nameDetail,
+
+          ['#album.nameDetail']:
+            albumNameDetail,
 
           ['#album.nameDetailForTracks']:
             albumNameDetailForTracks,
@@ -908,6 +916,8 @@ export class Track extends Thing {
         }) =>
           (nameDetail === 'album'
             ? albumNameDetailForTracks
+         : nameDetail === 'album name detail'
+            ? albumNameDetail
          : nameDetail === 'section'
             ? trackSectionNameDetailForTracks
             : nameDetail),
@@ -920,6 +930,7 @@ export class Track extends Thing {
         dependencies: ['_nameDetail'],
         compute: ({['_nameDetail']: nameDetail}) =>
           nameDetail === 'album' ||
+          nameDetail === 'album name detail' ||
           nameDetail === 'section',
       },
     },
