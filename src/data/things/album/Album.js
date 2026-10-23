@@ -882,8 +882,7 @@ export class Album extends Thing {
       'Name Detail For Tracks': {property: 'nameDetailForTracks'},
 
       'Directory': {property: 'directory'},
-      'Suffix Own Directory': {property: 'suffixDirectory'},
-
+      'Suffix Directory': {property: 'suffixDirectory'},
       'Directory Suffix': {property: 'directorySuffixForTracks'},
       'Suffix Track Directories': {property: 'suffixTrackDirectoriesByDefault'},
 
