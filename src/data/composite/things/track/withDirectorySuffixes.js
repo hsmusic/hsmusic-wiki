@@ -32,6 +32,7 @@ export default templateCompositeFrom({
         'suffixTrackDirectoriesByDefault',
         'directorySuffixForTracks',
         'nameDetailForTracks',
+        'suffixDirectory',
       ]),
     }),
 
@@ -194,7 +195,7 @@ export default templateCompositeFrom({
       // actually-set Name Detail, and inheritence is not a factor at all.
       dependencies: [
         '_nameDetail',
-        '#album.nameDetailForTracks',
+        '#album.suffixDirectory',
         '#album.directorySuffixForTracks',
         '#trackSection.nameDetailForTracks',
         '#trackSection.directorySuffixForTracks',
@@ -203,8 +204,8 @@ export default templateCompositeFrom({
       compute(continuation, {
         ['_nameDetail']: nameDetail,
 
-        ['#album.nameDetailForTracks']:
-          albumNameDetailForTracks,
+        ['#album.suffixDirectory']:
+          albumDirectorySuffix,
 
         ['#album.directorySuffixForTracks']:
           albumDirectorySuffixForTracks,
@@ -215,11 +216,11 @@ export default templateCompositeFrom({
         ['#trackSection.directorySuffixForTracks']:
           trackSectionDirectorySuffixForTracks,
       }) {
-        if (nameDetail === 'section') {
+        if (nameDetail === 'album name deatil') {
           return continuation.raiseOutput({
-            ['#directorySuffix']: trackSectionDirectorySuffixForTracks,
-            ['#directorySuffixWithinAlbum']: trackSectionDirectorySuffixForTracks,
-          })
+            ['#directorySuffix']: albumDirectorySuffix,
+            ['#directorySuffixWithinAlbum']: null,
+          });
         }
 
         if (nameDetail === 'album') {
@@ -227,6 +228,13 @@ export default templateCompositeFrom({
             ['#directorySuffix']: albumDirectorySuffixForTracks,
             ['#directorySuffixWithinAlbum']: null,
           });
+        }
+
+        if (nameDetail === 'section') {
+          return continuation.raiseOutput({
+            ['#directorySuffix']: trackSectionDirectorySuffixForTracks,
+            ['#directorySuffixWithinAlbum']: trackSectionDirectorySuffixForTracks,
+          })
         }
 
         if (nameDetail) {

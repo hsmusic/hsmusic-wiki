@@ -854,9 +854,9 @@ export class Track extends Thing {
         compute: ({
           ['_nameDetail']: nameDetail,
         }) =>
-          (nameDetail === 'album'
+          (nameDetail === 'album name detail'
             ? null
-         : nameDetail === 'album name detail'
+         : nameDetail === 'album'
             ? null
          : nameDetail === 'section'
             ? null
@@ -879,9 +879,9 @@ export class Track extends Thing {
           ['#trackSection.nameDetailForTracks']:
             trackSectionNameDetailForTracks,
         }) =>
-          (nameDetail === 'album'
+          (nameDetail === 'album name detail'
             ? null
-         : nameDetail === 'album name detail'
+         : nameDetail === 'album'
             ? null
          : nameDetail === 'section'
             ? trackSectionNameDetailForTracks
@@ -902,8 +902,7 @@ export class Track extends Thing {
         ],
 
         compute: ({
-          ['_nameDetail']:
-            nameDetail,
+          ['_nameDetail']: nameDetail,
 
           ['#album.nameDetail']:
             albumNameDetail,
@@ -914,10 +913,10 @@ export class Track extends Thing {
           ['#trackSection.nameDetailForTracks']:
             trackSectionNameDetailForTracks,
         }) =>
-          (nameDetail === 'album'
-            ? albumNameDetailForTracks
-         : nameDetail === 'album name detail'
+          (nameDetail === 'album name detail'
             ? albumNameDetail
+         : nameDetail === 'album'
+            ? albumNameDetailForTracks
          : nameDetail === 'section'
             ? trackSectionNameDetailForTracks
             : nameDetail),
