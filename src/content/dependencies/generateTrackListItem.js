@@ -37,6 +37,9 @@ export default {
     nameDetailAcrossWiki:
       track.nameDetailAcrossWiki,
 
+    nameDetailOnTrackPage:
+      track.nameDetailOnTrackPage,
+
     duration:
       track.duration ?? 0,
 
@@ -155,6 +158,9 @@ export default {
             workingCapsule += '.withDetail';
             workingOptions.detailAccent =
               html.tag('span', {class: 'name-detail'},
+                !data.nameDetailOnTrackPage &&
+                  {class: 'clarification'},
+
                 language.$(itemCapsule, 'withDetail', 'accent', {
                   detail: language.sanitize(nameDetail),
                 }));

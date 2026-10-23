@@ -63,8 +63,8 @@
       padding-right: clamp(40px, 6vw, 60px);
       .by { display: inline-block; }
 
-      .name-detail:not(.from-detail) { opacity: 0.85; }
-      .name-detail.from-detail { opacity: 0.7; font-size: 0.9em; }
+      .name-detail:not(.clarification) { opacity: 0.85; }
+      .name-detail.clarification { opacity: 0.7; font-size: 0.9em; }
     }
   }
 

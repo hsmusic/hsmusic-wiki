@@ -924,17 +924,6 @@ export class Track extends Thing {
       },
     ],
 
-    nameDetailIsFromDetail: {
-      flags: {expose: true},
-      expose: {
-        dependencies: ['_nameDetail'],
-        compute: ({['_nameDetail']: nameDetail}) =>
-          nameDetail === 'album' ||
-          nameDetail === 'album name detail' ||
-          nameDetail === 'section',
-      },
-    },
-
     isMainRelease:
       exposeWhetherDependencyAvailable({
         dependency: 'mainReleaseTrack',

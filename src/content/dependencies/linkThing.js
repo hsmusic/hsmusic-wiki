@@ -26,9 +26,11 @@ export default {
       thing.nameDetailAcrossWiki ??
       null,
 
-    nameDetailIsFromDetail:
-      thing.nameDetailIsFromDetail ??
-      false,
+    // Only tracks (should) have this property: "name detail on its own page",
+    // really.
+    nameDetailOnTrackPage:
+      thing.nameDetailOnTrackPage ??
+      null,
 
     path:
       (pathKey
@@ -197,8 +199,8 @@ export default {
 
             accent:
               html.tag('span', {class: 'name-detail'},
-                data.nameDetailIsFromDetail &&
-                  {class: 'from-detail'},
+                !data.nameDetailOnTrackPage &&
+                  {class: 'clarification'},
 
                 language.$(nameDetailCapsule, 'accent', {
                   detail: data.nameDetail,
