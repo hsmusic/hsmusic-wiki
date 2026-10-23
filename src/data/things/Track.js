@@ -764,16 +764,32 @@ export class Track extends Thing {
       exposeDependency('nameForSorting'),
     ],
 
-    nameForSorting: [
+    nameForReferencingWithinAlbum: [
       {
-        dependencies: ['name', 'nameDetailAcrossWiki'],
-        compute: (continuation, {name, nameDetailAcrossWiki}) =>
-          (nameDetailAcrossWiki
-            ? continuation.exit(`${name} (${nameDetailAcrossWiki})`)
+        dependencies: ['referenceByDirectory'],
+        compute: (continuation, {referenceByDirectory}) =>
+          (referenceByDirectory === 'always'
+            ? continuation.exit(null)
             : continuation()),
       },
 
-      exposeDependency('name'),
+      {
+        dependencies: ['name', 'nameDetailWithinAlbum'],
+        compute: ({name, nameDetailWithinAlbum}) =>
+          (nameDetailWithinAlbum
+            ? `${name} (${nameDetailWithinAlbum})`
+            : `${name}`),
+      },
+    ],
+
+    nameForSorting: [
+      {
+        dependencies: ['name', 'nameDetailAcrossWiki'],
+        compute: ({name, nameDetailAcrossWiki}) =>
+          (nameDetailAcrossWiki
+            ? `${name} (${nameDetailAcrossWiki})`
+            : `${name}`),
+      },
     ],
 
     directoryWithinAlbum: [
@@ -1482,7 +1498,7 @@ export class Track extends Thing {
             continue;
           }
 
-          if (track.name === referencedName) {
+          if (track.nameForReferencingWithinAlbum === referencedName) {
             if (track.isSecondaryRelease) {
               return track.mainReleaseTrack;
             } else {
