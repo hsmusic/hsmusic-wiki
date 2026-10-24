@@ -64,7 +64,9 @@ export default class Thing extends CacheableObject {
 
     let name;
     try {
-      if (this.name) {
+      if (this.nameForReferencingAcrossWiki) {
+        name = colors.green(`"${this.nameForReferencingAcrossWiki}"`);
+      } else if (this.name) {
         name = colors.green(`"${this.name}"`);
       }
     } catch {
