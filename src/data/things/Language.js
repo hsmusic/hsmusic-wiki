@@ -901,7 +901,7 @@ export class Language extends Thing {
     }
 
     // Blank items aren't for display.
-    array = array.filter(item => !html.isBlank(item));
+    array = array.filter(item => item && !html.isBlank(item));
 
     // Empty lists are blank content.  (2, The Sequel)
     if (empty(array)) {
