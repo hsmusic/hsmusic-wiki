@@ -183,6 +183,12 @@
     grid-column-start: handle-start;
     grid-column-end: handle-end;
     margin-bottom: 2px;
+
+    &.main-name.above {
+      grid-column-start: icon-start;
+      min-width: 200px;
+      padding: 0 4px;
+    }
   }
 
   .contribution-tooltip .chronology-heading {
@@ -283,7 +289,6 @@
   .contribution-tooltip.show-info {
     .main-name,
     .chronology-heading {
-      grid-column-start: handle-start;
       grid-column-end: platform-end;
     }
   }

@@ -97,6 +97,18 @@ export default {
         separateContentItems: true,
 
         content: [
+          ((html.isBlank(relations.externalLinkSection) ||
+            !slots.showExternalLinks) &&
+
+            data.creditedName &&
+            !compareKebabCase(data.creditedName, data.artistName)) &&
+
+            html.tag('span', {class: ['main-name', 'above']},
+              language.$(capsule, 'mainNameIfAliased.withoutExternalLinks', {
+                name:
+                  language.sanitize(data.artistName),
+              })),
+
           html.tags([
             data.creditedName &&
             !compareKebabCase(data.creditedName, data.artistName) &&
