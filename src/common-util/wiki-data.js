@@ -312,21 +312,21 @@ export function accumulateDurationForGroup(tracks) {
       continue perTrack;
     }
 
-    if (track.isMainRelease) {
-      use.add(track);
-      continue perTrack;
-    }
-
-    if (duplications.has(track.mainReleaseTrack)) {
+    if (track.isSecondaryRelease && duplications.has(track.mainReleaseTrack)) {
       duplications.get(track.mainReleaseTrack).push(track);
       continue perTrack;
     }
 
-    // ...which includes the main release track, mind you
     for (const release of track.otherReleases) {
       if (use.has(release)) {
         use.delete(release);
-        duplications.set(track.mainReleaseTrack, [release, track]);
+
+        if (track.isMainRelease) {
+          duplications.set(track, [release, track]);
+        } else {
+          duplications.set(track.mainReleaseTrack, [release, track]);
+        }
+
         continue perTrack;
       }
     }
