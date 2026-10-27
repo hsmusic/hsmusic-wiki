@@ -1,17 +1,19 @@
 export default {
-  query: (artworkOrThing) => ({
+  query: (artworkOrThing, thing = null) => ({
     artwork:
       (artworkOrThing.isArtwork
         ? artworkOrThing
         : null),
 
     thing:
-      (artworkOrThing.isArtwork
+      (thing
+        ? thing
+     : artworkOrThing.isArtwork
         ? artworkOrThing.thing
         : artworkOrThing),
   }),
 
-  relations: (relation, query, _artworkOrThing) => ({
+  relations: (relation, query, _artworkOrThing, _thing) => ({
     link:
       relation('linkAnythingMan', query.thing),
 

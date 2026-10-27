@@ -22,7 +22,7 @@ export default {
         artwork: query.artworks,
         thing: things,
       }).map(({artwork, thing}) =>
-          relation('generateCoverGridItem', artwork ?? thing)),
+          relation('generateCoverGridItem', artwork ?? thing, thing)),
 
     links:
       things
