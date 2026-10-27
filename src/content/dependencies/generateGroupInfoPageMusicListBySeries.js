@@ -1,13 +1,18 @@
-import {stitchArrays} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 export default {
   query: (group) => ({
     closelyLinkedArtists:
       group.closelyLinkedArtists
         .map(({artist}) => artist),
+
+    serieslessThings:
+      group.albumsAndTracks
+        .filter(thing =>
+          group.serieses.every(series => !series.things.includes(thing))),
   }),
 
-  relations: (relation, _query, group) => ({
+  relations: (relation, query, group) => ({
     seriesHeadings:
       group.serieses
         .map(() => relation('generateContentHeading')),
@@ -23,6 +28,14 @@ export default {
             relation('generateGroupInfoPageMusicListItem',
               thing,
               group))),
+
+    serieslessHeading:
+      relation('generateContentHeading'),
+
+    serieslessItems:
+      query.serieslessThings
+        .map(thing =>
+          relation('generateGroupInfoPageMusicListItem', thing, group)),
   }),
 
   data: (query, group) => ({
@@ -92,5 +105,17 @@ export default {
                         detail:
                           (showArtists ? 'artists' : null),
                       })))),
-            ])))),
+            ])),
+
+        !empty(data.seriesNames) &&
+        html.tags([
+          relations.serieslessHeading.slots({
+            tag: 'dt',
+            title: language.$(listCapsule, 'seriesless'),
+          }),
+
+          html.tag('td', {[html.onlyIfContent]: true},
+            html.tag('ul', {[html.onlyIfContent]: true},
+              relations.serieslessItems)),
+        ]))),
 };

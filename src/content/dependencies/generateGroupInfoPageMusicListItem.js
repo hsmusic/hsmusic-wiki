@@ -72,7 +72,8 @@ export default {
       group.name,
 
     notFromThisGroup:
-      !thing.groups.includes(group),
+      !thing.groups.includes(group) &&
+      !thing.ownGroups?.includes(group),
 
     autoDetailArtists:
       query.detail === 'artists',
@@ -164,7 +165,7 @@ export default {
           workingCapsule += '.withOtherGroups';
           workingOptions.fromOtherGroups =
             html.tag('span', {class: 'other-group-accent'},
-              language.$(otherGroupCapsule, 'notFromThisGroup', {
+              language.$(otherGroupCapsule, 'accent.notFromThisGroup', {
                 group:
                   data.groupName,
               }));

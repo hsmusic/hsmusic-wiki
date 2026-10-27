@@ -1,5 +1,6 @@
 import {input, V} from '#composite';
 import {sortAlbumsTracksChronologically} from '#sort';
+import {unique} from '#sugar';
 import Thing from '#thing';
 import {isBoolean} from '#validators';
 import {accumulateDurationForGroup} from '#wiki-data';
@@ -123,7 +124,7 @@ export class Group extends Thing {
       },
     },
 
-    tracks: {
+    albumTracks: {
       flags: {expose: true},
 
       expose: {
@@ -134,25 +135,64 @@ export class Group extends Thing {
       },
     },
 
-    albumsAndTracks: {
+    selectTracks: {
       flags: {expose: true},
 
       expose: {
         dependencies: ['this', '_reverse'],
         compute: ({this: group, _reverse: reverse}) =>
-          sortAlbumsTracksChronologically([
-            ...reverse.albumsWhoseGroupsInclude(group),
-            ...reverse.tracksWhoseOwnGroupsInclude(group),
-          ]),
+          reverse.tracksWhoseOwnGroupsInclude(group),
       },
     },
 
-    duration: {
+    tracksOverall: {
+      flags: {expose: true},
+
+      expose: {
+        dependencies: ['albumTracks', 'selectTracks'],
+        compute: ({albumTracks, selectTracks}) =>
+          sortAlbumsTracksChronologically(
+            unique([
+              ...albumTracks,
+              ...selectTracks,
+            ])),
+      },
+    },
+
+    albumsAndTracks: {
+      flags: {expose: true},
+
+      expose: {
+        dependencies: ['albums', 'selectTracks'],
+        compute: ({albums, selectTracks}) =>
+          sortAlbumsTracksChronologically([...albums, ...selectTracks]),
+      },
+    },
+
+    durationFromAlbums: {
       flags: {expose: true},
       expose: {
-        dependencies: ['tracks'],
-        compute: ({tracks}) =>
-          accumulateDurationForGroup(tracks),
+        dependencies: ['albumTracks'],
+        compute: ({albumTracks}) =>
+          accumulateDurationForGroup(albumTracks),
+      },
+    },
+
+    durationFromSelectTracks: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['selectTracks'],
+        compute: ({selectTracks}) =>
+          accumulateDurationForGroup(selectTracks),
+      },
+    },
+
+    durationOverall: {
+      flags: {expose: true},
+      expose: {
+        dependencies: ['tracksOverall'],
+        compute: ({tracksOverall}) =>
+          accumulateDurationForGroup(tracksOverall),
       },
     },
 

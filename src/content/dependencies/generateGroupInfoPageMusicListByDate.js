@@ -1,16 +1,18 @@
-import {sortChronologically} from '#sort';
+import {sortAlbumsTracksChronologically} from '#sort';
 
 export default {
   query: (group) => ({
     // Typically, a latestFirst: false (default) chronological sort would be
-    // appropriate here, but navigation between adjacent albums in a group is a
-    // rather "essential" movement or relationship in the wiki, and we consider
+    // appropriate here, but navigation between adjacent releases in a group is
+    // a rather "essential" movement or relationship in the wiki, and we consider
     // the sorting order of a group's gallery page (latestFirst: true) to be
     // "canonical" in this regard. We exactly match its sort here, but reverse
     // it, to still present earlier albums preceding later ones.
     albums:
-      sortChronologically(group.albums.slice(), {latestFirst: true})
-        .reverse(),
+      sortAlbumsTracksChronologically(
+        group.albumsAndTracks.slice(),
+        {latestFirst: true})
+          .reverse(),
   }),
 
   relations: (relation, query, group) => ({

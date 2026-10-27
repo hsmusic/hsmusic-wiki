@@ -1,5 +1,5 @@
 import {sortAlphabetically, sortByCount} from '#sort';
-import {accumulateSum, filterByCount, stitchArrays} from '#sugar';
+import {filterByCount, stitchArrays} from '#sugar';
 
 export default {
   sprawl({groupData}) {
@@ -10,8 +10,7 @@ export default {
     const groups = sortAlphabetically(groupData.slice());
     const counts =
       groups
-        .map(group => accumulateSum(group.albums, album => album.tracks.length))
-        .map(({sum}) => sum);
+        .map(group => group.tracksOverall.length);
 
     filterByCount(groups, counts);
     sortByCount(groups, counts, {greatestFirst: true});

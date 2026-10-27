@@ -11,7 +11,10 @@ export default {
       sortChronologically(group.albums.slice(), {latestFirst: true});
 
     query.allTracks =
-      query.allAlbums.flatMap((album) => album.tracks);
+      query.allAlbums.flatMap(album => album.tracks);
+
+    query.selectTracks =
+      group.albumsAndTracks.filter(thing => thing.isTrack);
 
     return query;
   },
@@ -59,8 +62,14 @@ export default {
     numTracks:
       query.allTracks.length,
 
-    totalDuration:
-      group.duration,
+    numSelectTracks:
+      query.selectTracks.length,
+
+    totalDurationFromAlbums:
+      group.durationFromAlbums,
+
+    totalDurationFromSelectTracks:
+      group.durationFromSelectTracks,
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -77,6 +86,8 @@ export default {
           relations.quickDescription,
 
           html.tag('p', {class: 'quick-info'},
+            {[html.joinChildren]: html.tag('br')},
+
             language.$(pageCapsule, 'infoLine', {
               tracks:
                 html.tag('b',
@@ -92,7 +103,25 @@ export default {
 
               time:
                 html.tag('b',
-                  language.formatDuration(data.totalDuration, {
+                  language.formatDuration(data.totalDurationFromAlbums, {
+                    showUnit: true,
+                    showZero: true,
+                  })),
+            }),
+
+            language.$(pageCapsule, 'infoLine.alsoSelectTracks', {
+              [language.onlyIfOptions]: ['tracks'],
+
+              tracks:
+                html.tag('b', {[html.onlyIfContent]: true},
+                  language.countTracks(data.numSelectTracks, {
+                    unit: true,
+                    blankIfZero: true,
+                  })),
+
+              time:
+                html.tag('b',
+                  language.formatDuration(data.totalDurationFromSelectTracks, {
                     showUnit: true,
                     showZero: true,
                   })),

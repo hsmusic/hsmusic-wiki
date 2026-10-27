@@ -8,7 +8,7 @@ export default {
 
   query({groupData}, spec) {
     const groups = sortAlphabetically(groupData.slice());
-    const durations = groups.map(group => group.duration.sum);
+    const durations = groups.map(group => group.durationOverall.sum);
 
     filterByCount(groups, durations);
     sortByCount(groups, durations, {greatestFirst: true});

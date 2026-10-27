@@ -2486,7 +2486,7 @@ groupInfoPage:
     _: >-
       View {LINK}! Or browse the list:
 
-    link: "album gallery"
+    link: "music gallery"
 
     withViewSwitcher:
       _: >-
@@ -2501,9 +2501,8 @@ groupInfoPage:
   musicList:
     title: "Music"
 
-    series:
-      _: >-
-        {SERIES}:
+    series: "{SERIES}:"
+    seriesless: "Not in any series:"
 
     item.album:
       _: >-
@@ -2579,6 +2578,9 @@ groupGalleryPage:
 
   infoLine: >-
     {TRACKS} across {ALBUMS}, totaling {TIME}.
+
+  infoLine.alsoSelectTracks: >-
+    Plus {TRACKS} from other groups, totaling {TIME}.
 
   musicViewSwitcher:
     _: "Showing music:"
