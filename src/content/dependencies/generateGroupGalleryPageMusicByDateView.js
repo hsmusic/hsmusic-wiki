@@ -1,9 +1,11 @@
-import {sortChronologically} from '#sort';
+import {sortAlbumsTracksChronologically} from '#sort';
 
 export default {
   query: (group) => ({
-    albums:
-      sortChronologically(group.albums.slice(), {latestFirst: true}),
+    albumsAndTracks:
+      sortAlbumsTracksChronologically(
+        group.albumsAndTracks.slice(),
+        {latestFirst: true}),
   }),
 
   relations: (relation, query, group) => ({
@@ -12,9 +14,9 @@ export default {
         ? relation('generateGroupGalleryPageStyleSelector', group)
         : null),
 
-    albumGrid:
-      relation('generateGroupGalleryPageAlbumGrid',
-        query.albums,
+    grid:
+      relation('generateGroupGalleryPageMusicGrid',
+        query.albumsAndTracks,
         group),
   }),
 
@@ -30,8 +32,8 @@ export default {
   },
 
   generate: (relations, slots, {html, language}) =>
-    language.encapsulate('groupGalleryPage.albumsByDate', capsule =>
-      html.tag('div', {id: 'group-album-gallery-by-date'},
+    language.encapsulate('groupGalleryPage.musicByDate', capsule =>
+      html.tag('div', {id: 'group-music-gallery-by-date'},
         slots.attributes,
         {[html.onlyIfContent]: true},
 
@@ -41,5 +43,5 @@ export default {
               language.$(capsule, 'title')),
 
           relations.styleSelector,
-          relations.albumGrid))),
+          relations.grid))),
 };

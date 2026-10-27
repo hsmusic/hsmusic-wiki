@@ -282,6 +282,7 @@ export const exhaust = (generatorFunction) =>
 export function compareObjects(obj1, obj2, {
   checkOrder = false,
   checkSymbols = true,
+  recurse = true,
 } = {}) {
   const keys1 = Object.keys(obj1);
   const keys2 = Object.keys(obj2);
@@ -294,14 +295,28 @@ export function compareObjects(obj1, obj2, {
     if (!compareArrays(syms1, syms2, {checkOrder})) return false;
   }
 
-  for (const key of keys1) {
-    if (obj2[key] !== obj1[key]) return false;
-  }
+  const accessors =
+    (checkSymbols ? [...keys1, ...syms1] : keys1);
 
-  if (checkSymbols) {
-    for (const sym of syms1) {
-      if (obj2[sym] !== obj1[sym]) return false;
+  for (const accessor of keys1) {
+    const val1 = obj1[accessor];
+    const val2 = obj2[accessor];
+
+    if (val1 === val2)
+      continue;
+
+    if (recurse) {
+      if (Array.isArray(val1) && Array.isArray(val2))
+      if (compareArrays(val1, val2))
+        continue;
+
+      if (typeof val1 === 'object' && val1 !== null)
+      if (typeof val2 === 'object' && val2 !== null)
+      if (compareObjects(val1, val2, {checkOrder, checkSymbols}))
+        continue;
     }
+
+    return false;
   }
 
   return true;

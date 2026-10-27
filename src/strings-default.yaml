@@ -1346,6 +1346,10 @@ misc:
         single, {TIME}
       albumLength.single.withMultipleTracks: >-
         single, {TRACKS}, {TIME}+
+      albumLength.selectTrack: >-
+        select track
+      albumLength.selectTrack.withTime: >-
+        select track, {TIME}
       albumLength.tracksOnly: >-
         {TRACKS}
 
@@ -1430,8 +1434,8 @@ albumSidebar:
 
   groupBox:
     title: "{GROUP}"
-    next: "Next: {ALBUM}"
-    previous: "Previous: {ALBUM}"
+    next: "Next: {RELEASE}"
+    previous: "Previous: {RELEASE}"
 
   # releaseBox:
   #   This is the narrow box for alternate releases of the
@@ -2494,19 +2498,14 @@ groupInfoPage:
     bySeries: "By series"
     byDate: "By date"
 
-  # albumList:
-  #   Many albums are present under multiple groups, and these get an
-  #   accent indicating what other group is highest on the album's
-  #   list of groups.
-
-  albumList:
-    title: "Albums"
+  musicList:
+    title: "Music"
 
     series:
       _: >-
         {SERIES}:
 
-    item:
+    item.album:
       _: >-
         {ALBUM}
 
@@ -2516,12 +2515,12 @@ groupInfoPage:
 
         accent: "({YEAR})"
 
-      withOtherGroup:
+      withOtherGroups:
         _: >-
-          {ALBUM} {OTHER_GROUP_ACCENT}
+          {ALBUM} {FROM_OTHER_GROUPS}
 
-        accent: "(from {GROUPS})"
-        notFromThisGroup: "(not from {GROUP})"
+        accent: "(also: {GROUPS})"
+        accent.notFromThisGroup: "(not from {GROUP})"
 
       withArtists:
         _: >-
@@ -2531,11 +2530,42 @@ groupInfoPage:
         featuring: "feat. {ARTISTS}"
         by.featuring: "by {ARTISTS} feat. {FEATURING}"
 
-      withYear.withOtherGroup: >-
-        {YEAR_ACCENT} {ALBUM} {OTHER_GROUP_ACCENT}
+      withYear.withOtherGroups: >-
+        {YEAR_ACCENT} {ALBUM} {FROM_OTHER_GROUPS}
 
       withYear.withArtists: >-
         {YEAR_ACCENT} {ALBUM} {BY}
+
+    item.track:
+      _: >-
+        {TRACK}
+
+      withYear:
+        _: >-
+          {YEAR_ACCENT} {TRACK}
+
+        accent: "({YEAR})"
+
+      withOtherGroups:
+        _: >-
+          {TRACK} {FROM_OTHER_GROUPS}
+
+        accent: "(also: {GROUPS})"
+        accent.notFromThisGroup: "(not from {GROUP})"
+
+      withArtists:
+        _: >-
+          {TRACK} {BY}
+
+        by: "by {ARTISTS}"
+        featuring: "feat. {ARTISTS}"
+        by.featuring: "by {ARTISTS} feat. {FEATURING}"
+
+      withYear.withOtherGroups: >-
+        {YEAR_ACCENT} {TRACK} {FROM_OTHER_GROUPS}
+
+      withYear.withArtists: >-
+        {YEAR_ACCENT} {TRACK} {BY}
 
 #
 # groupGalleryPage:
@@ -2550,17 +2580,18 @@ groupGalleryPage:
   infoLine: >-
     {TRACKS} across {ALBUMS}, totaling {TIME}.
 
-  albumViewSwitcher:
-    _: "Showing albums:"
+  musicViewSwitcher:
+    _: "Showing music:"
 
     bySeries: "By series"
     byDate: "By date"
 
-  albumStyleSwitcher:
+  musicStyleSelector:
     _: "Showing these releases:"
 
     album: "Albums"
     single: "Singles"
+    track: "Select tracks"
     vgm: "Games"
 
     count:
@@ -2568,8 +2599,8 @@ groupGalleryPage:
       filtered: "{COUNT} of {TOTAL}"
       none: "none at all"
 
-  albumsByDate:
-    title: "All albums"
+  musicByDate:
+    title: "All music"
 
   albumSection:
     caption: >-
@@ -2584,8 +2615,32 @@ groupGalleryPage:
     caption.withYearRange: >-
       {TRACKS} across {ALBUMS}, released {YEAR_RANGE}.
 
-    caption.seriesAlbumsNotFromGroup: >-
-      Albums marked {MARKER} are part of {SERIES}, but not from {GROUP}.
+    caption.tracksOnly: >-
+      {TRACKS}.
+
+    caption.tracksOnly.withDate: >-
+      {TRACKS}, released {DATE}.
+
+    caption.tracksOnly.withYear: >-
+      {TRACKS}, released during {YEAR}.
+
+    caption.tracksOnly.withYearRange: >-
+      {TRACKS}, released {YEAR_RANGE}.
+
+    caption.mixedTracksAndAlbums: >-
+      {TRACKS} and {ALBUMS}.
+
+    caption.mixedTracksAndAlbums.withDate: >-
+      {TRACKS} and {ALBUMS}, released {DATE}.
+
+    caption.mixedTracksAndAlbums.withYear: >-
+      {TRACKS} and {ALBUMS}, released during {YEAR}.
+
+    caption.mixedTracksAndAlbums.withYearRange: >-
+      {TRACKS} and {ALBUMS}, released {YEAR_RANGE}.
+
+    caption.seriesItemsNotFromGroup: >-
+      Items marked {MARKER} are part of {SERIES}, but not from {GROUP}.
 
 #
 # listingIndex:

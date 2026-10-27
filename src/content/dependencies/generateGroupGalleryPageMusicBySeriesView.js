@@ -14,7 +14,7 @@ export default {
   },
 
   generate: (relations, slots, {html}) =>
-    html.tag('div', {id: 'group-album-gallery-by-series'},
+    html.tag('div', {id: 'group-music-gallery-by-series'},
       slots.attributes,
 
       {[html.onlyIfContent]: true},

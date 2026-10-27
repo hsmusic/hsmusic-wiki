@@ -6,11 +6,11 @@ export default {
     galleryLink:
       relation('linkGroupGallery', group),
 
-    albumsListByDate:
-      relation('generateGroupInfoPageAlbumsListByDate', group),
+    musicListByDate:
+      relation('generateGroupInfoPageMusicListByDate', group),
 
-    albumsListBySeries:
-      relation('generateGroupInfoPageAlbumsListBySeries', group),
+    musicListBySeries:
+      relation('generateGroupInfoPageMusicListBySeries', group),
 
     viewSwitcher:
       relation('generateIntrapageDotSwitcher'),
@@ -18,13 +18,12 @@ export default {
 
   generate: (relations, {html, language}) =>
     language.encapsulate('groupInfoPage', pageCapsule =>
-      language.encapsulate(pageCapsule, 'albumList', listCapsule =>
+      language.encapsulate(pageCapsule, 'musicList', listCapsule =>
         html.tags([
-          relations.contentHeading
-            .slots({
-              tag: 'h2',
-              title: language.$(listCapsule, 'title'),
-            }),
+          relations.contentHeading.slots({
+            tag: 'h2',
+            title: language.$(listCapsule, 'title'),
+          }),
 
           html.tag('p',
             {[html.onlyIfSiblings]: true},
@@ -39,8 +38,8 @@ export default {
                       language.$(viewAlbumGalleryCapsule, 'link'));
 
                 if (
-                  !html.isBlank(relations.albumsListByDate) &&
-                  !html.isBlank(relations.albumsListBySeries)
+                  !html.isBlank(relations.musicListByDate) &&
+                  !html.isBlank(relations.musicListBySeries)
                 ) {
                   workingCapsule += '.withViewSwitcher';
                   workingOptions.viewSwitcher =
@@ -57,8 +56,8 @@ export default {
                               ],
 
                               targetIDs: [
-                                'group-album-list-by-series',
-                                'group-album-list-by-date',
+                                'group-music-list-by-series',
+                                'group-music-list-by-date',
                               ],
                             }),
                         })));
@@ -67,17 +66,17 @@ export default {
                 return language.$(workingCapsule, workingOptions);
               }))),
 
-          ((!html.isBlank(relations.albumsListByDate) &&
-            !html.isBlank(relations.albumsListBySeries))
+          ((!html.isBlank(relations.musicListByDate) &&
+            !html.isBlank(relations.musicListBySeries))
 
             ? [
-                relations.albumsListBySeries,
-                relations.albumsListByDate.slot('hidden', true),
+                relations.musicListBySeries,
+                relations.musicListByDate.slot('hidden', true),
               ]
 
             : [
-                relations.albumsListBySeries,
-                relations.albumsListByDate,
+                relations.musicListBySeries,
+                relations.musicListByDate,
               ]),
         ]))),
 };

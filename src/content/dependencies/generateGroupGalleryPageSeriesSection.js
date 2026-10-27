@@ -1,30 +1,41 @@
-import {sortChronologically} from '#sort';
+import {sortAlbumsTracksChronologically} from '#sort';
+import {empty} from '#sugar';
 
 export default {
   query(series) {
     const query = {};
 
-    query.albums =
-      sortChronologically(series.albums.slice(), {latestFirst: true});
+    query.things =
+      series.things.toReversed();
 
-    query.allAlbumsDated =
-      series.albums.length >= 1 &&
-      series.albums.every(album => album.date);
+    const thingsLatestFirst =
+      sortAlbumsTracksChronologically(
+        series.things.slice(),
+        {latestFirst: true});
 
-    query.anyAlbumNotFromThisGroup =
-      series.albums.some(album => !album.groups.includes(series.group));
+    query.allDated =
+      series.things.length >= 1 &&
+      series.things.every(thing => thing.date);
 
-    query.latestAlbum =
-      query.albums
-        .filter(album => album.date)
-        .at(0) ??
+    query.latest =
+      thingsLatestFirst.filter(thing => thing.date).at(0) ??
       null;
 
-    query.earliestAlbum =
-      query.albums
-        .filter(album => album.date)
-        .at(-1) ??
+    query.earliest =
+      thingsLatestFirst.filter(thing => thing.date).at(-1) ??
       null;
+
+    query.composition =
+      (empty(query.things)
+        ? 'empty'
+     : query.things.every(thing => thing.isAlbum)
+        ? 'albums'
+     : query.things.every(thing => thing.isTrack)
+        ? 'tracks'
+        : 'mixed');
+
+    query.anyNotFromThisGroup =
+      series.things.some(thing => !thing.groups.includes(series.group));
 
     return query;
   },
@@ -34,8 +45,8 @@ export default {
       relation('generateContentHeading'),
 
     grid:
-      relation('generateGroupGalleryPageAlbumGrid',
-        query.albums,
+      relation('generateGroupGalleryPageMusicGrid',
+        query.things,
         series.group),
   }),
 
@@ -46,28 +57,37 @@ export default {
     groupName:
       series.group.name,
 
-    albums:
-      series.albums.length,
+    composition:
+      query.composition,
 
-    tracks:
-      series.albums
-        .flatMap(album => album.tracks)
-        .length,
+    numAlbums:
+      (query.composition === 'albums'
+        ? series.things.length
+     : query.composition === 'tracks'
+        ? null
+        : series.things.filter(thing => thing.isAlbum).length),
 
-    allAlbumsDated:
-      query.allAlbumsDated,
+    numTracks:
+      (query.composition === 'albums'
+        ? series.things.flatMap(album => album.tracks).length
+     : query.composition === 'tracks'
+        ? series.things.length
+        : series.things.filter(thing => thing.isTrack).length),
 
-    anyAlbumNotFromThisGroup:
-      query.anyAlbumNotFromThisGroup,
+    allDated:
+      query.allDated,
+
+    anyNotFromThisGroup:
+      query.anyNotFromThisGroup,
 
     earliestAlbumDate:
-      (query.earliestAlbum
-        ? query.earliestAlbum.date
+      (query.earliest
+        ? query.earliest.date
         : null),
 
     latestAlbumDate:
-      (query.latestAlbum
-        ? query.latestAlbum.date
+      (query.latest
+        ? query.latest.date
         : null),
   }),
 
@@ -85,8 +105,8 @@ export default {
           bottomCaption:
             language.encapsulate(capsule, 'caption', captionCapsule =>
               html.tags([
-                data.anyAlbumNotFromThisGroup &&
-                  language.$(captionCapsule, 'seriesAlbumsNotFromGroup', {
+                data.anyNotFromThisGroup &&
+                  language.$(captionCapsule, 'seriesItemsNotFromGroup', {
                     marker:
                       language.$('misc.coverGrid.details.notFromThisGroup.marker'),
 
@@ -99,15 +119,27 @@ export default {
                 language.encapsulate(captionCapsule, workingCapsule => {
                   const workingOptions = {};
 
-                  workingOptions.tracks =
-                    html.tag('b',
-                      language.countTracks(data.tracks, {unit: true}));
+                  const tracksFigure =
+                    html.tag('b', {[html.onlyIfContent]: true},
+                      language.countTracks(data.numTracks, {unit: true}));
 
-                  workingOptions.albums =
-                    html.tag('b',
-                      language.countAlbums(data.albums, {unit: true}));
+                  const albumsFigure =
+                    html.tag('b', {[html.onlyIfContent]: true},
+                      language.countAlbums(data.numAlbums, {unit: true}));
 
-                  if (data.allAlbumsDated) {
+                  if (data.composition === 'albums') {
+                    workingOptions.tracks = tracksFigure;
+                    workingOptions.albums = albumsFigure;
+                  } else if (data.composition === 'tracks') {
+                    workingCapsule += '.tracksOnly';
+                    workingOptions.tracks = tracksFigure;
+                  } else {
+                    workingCapsule += '.mixedTracksAndAlbums';
+                    workingOptions.tracks = tracksFigure;
+                    workingOptions.albums = albumsFigure;
+                  }
+
+                  if (data.allDated) {
                     const earliestDate = data.earliestAlbumDate;
                     const latestDate = data.latestAlbumDate;
 

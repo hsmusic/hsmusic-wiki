@@ -1,7 +1,8 @@
 import {inspect} from 'node:util';
 
 import {colors, logWarn} from '#cli';
-import {compareObjects, stitchArrays, typeAppearance} from '#sugar';
+import {compareObjects, filterProperties, stitchArrays, typeAppearance}
+  from '#sugar';
 import thingConstructors from '#things';
 import {isFunction, validateArrayItems} from '#validators';
 import {getCaseSensitiveKebabCase} from '#wiki-data';
@@ -483,11 +484,22 @@ export function findFindSpec(key) {
 }
 
 function findMixedHelper(config) {
+  const {
+    prioritize: prioritizeKeys,
+    ...restConfig
+  } = config;
+
   const
-    keys = Object.keys(config),
-    tokens = Object.values(config),
+    keys = Object.keys(restConfig),
+    tokens = Object.values(restConfig),
     specKeys = tokens.map(token => token[findTokenKey]),
     specs = specKeys.map(specKey => findFindSpec(specKey));
+
+  // Recursion!
+  const prioritizedFind =
+    (prioritizeKeys
+      ? findMixed(filterProperties(restConfig, prioritizeKeys))
+      : null);
 
   const cache = new WeakMap();
 
@@ -500,6 +512,13 @@ function findMixedHelper(config) {
 
     if (!data) {
       throw new TypeError(`Expected data to be present`);
+    }
+
+    const prioritizedResult =
+      prioritizedFind?.(fullRef, data, {mode: 'quiet'});
+
+    if (prioritizedResult) {
+      return prioritizedResult;
     }
 
     let subcache = cache.get(data);
@@ -570,7 +589,10 @@ export function findMixed(config) {
 
   // Validate that this is a valid config to begin with - we can do this
   // before find specs are actually available.
-  const tokens = Object.values(config);
+  const tokens =
+    Object.entries(config)
+      .filter(entry => entry[0] !== 'prioritize')
+      .map(entry => entry[1]);
 
   try {
     validateArrayItems(token => {

@@ -1,20 +1,22 @@
 import {atOffset} from '#sugar';
 
 export default {
-  query(series, album) {
+  query(series, album, track) {
     const query = {};
 
-    const albums =
-      series.albums;
+    const things =
+      series.things;
 
     const currentIndex =
-      albums.indexOf(album);
+      (track && things.includes(track)
+        ? things.indexOf(track)
+        : things.indexOf(album));
 
-    query.previousAlbum =
-      atOffset(albums, currentIndex, -1);
+    query.previousThing =
+      atOffset(things, currentIndex, -1);
 
-    query.nextAlbum =
-      atOffset(albums, currentIndex, +1);
+    query.nextThing =
+      atOffset(things, currentIndex, +1);
 
     return query;
   },
@@ -30,18 +32,34 @@ export default {
       relation('generateColorStyleAttribute', series.group.color),
 
     previousAlbumLink:
-      (query.previousAlbum
-        ? relation('linkAlbumDynamically', query.previousAlbum)
+      (query.previousThing?.isAlbum
+        ? relation('linkAlbumDynamically', query.previousThing)
+        : null),
+
+    previousTrackLink:
+      (query.previousThing?.isTrack
+        ? relation('linkTrack', query.previousThing)
         : null),
 
     nextAlbumLink:
-      (query.nextAlbum
-        ? relation('linkAlbumDynamically', query.nextAlbum)
+      (query.nextThing?.isAlbum
+        ? relation('linkAlbumDynamically', query.nextThing)
+        : null),
+
+    nextTrackLink:
+      (query.nextThing?.isTrack
+        ? relation('linkTrack', query.nextThing)
         : null),
   }),
 
-  data: (_query, series) => ({
-    name: series.name,
+  data: (_query, series, _album, track) => ({
+    name:
+      series.name,
+
+    seriesDirectlyIncludesTrack:
+      (track
+        ? series.things.includes(track)
+        : null),
   }),
 
   slots: {
@@ -55,7 +73,9 @@ export default {
     relations.parentSiblingsPart.slots({
       attributes: {class: 'series-nav-links'},
 
-      showPreviousNext: slots.mode === 'album',
+      showPreviousNext:
+        slots.mode === 'album' ||
+        data.seriesDirectlyIncludesTrack,
 
       colorStyle: relations.colorStyle,
 
@@ -66,18 +86,14 @@ export default {
         }),
 
       previousLink:
-        (relations.previousAlbumLink
-          ? relations.previousAlbumLink.slots({
-              linkCommentaryPages: true,
-            })
-          : null),
+        relations.previousAlbumLink?.slot('linkCommentaryPages', true) ??
+        relations.previousTrackLink ??
+        null,
 
       nextLink:
-        (relations.nextAlbumLink
-          ? relations.nextAlbumLink.slots({
-              linkCommentaryPages: true,
-            })
-          : null),
+        relations.nextAlbumLink?.slot('linkCommentaryPages', true) ??
+        relations.nextTrackLink ??
+        null,
 
       stringsKey: 'albumSecondaryNav.series',
       mainLinkOption: 'series',

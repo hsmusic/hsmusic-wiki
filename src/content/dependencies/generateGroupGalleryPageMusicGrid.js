@@ -1,63 +1,82 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  query: (albums, _group) => ({
+  query: (things, _group) => ({
     artworks:
-      albums.map(album =>
-        (album.hasCoverArt
-          ? album.coverArtworks[0]
+      things.map(thing =>
+        (thing.isAlbum && thing.hasCoverArt
+          ? thing.coverArtworks[0]
+       : thing.isTrack && thing.hasUniqueCoverArt
+          ? thing.trackArtworks[0]
+       : thing.isTrack && thing.album.hasCoverArt
+          ? thing.album.coverArtworks[0]
           : null)),
   }),
 
-  relations: (relation, query, albums, group) => ({
+  relations: (relation, query, things, group) => ({
     coverGrid:
       relation('generateCoverGrid'),
 
     coverGridItems:
       stitchArrays({
         artwork: query.artworks,
-        album: albums,
-      }).map(({artwork, album}) =>
-          relation('generateCoverGridItem', artwork ?? album)),
+        thing: things,
+      }).map(({artwork, thing}) =>
+          relation('generateCoverGridItem', artwork ?? thing)),
 
     links:
-      albums
-        .map(album => relation('linkAlbum', album)),
+      things
+        .map(thing => relation('linkAnythingMan', thing)),
 
     images:
       query.artworks
         .map(artwork => relation('image', artwork)),
 
     tabs:
-      albums
-        .map(album =>
-          relation('generateGroupGalleryPageAlbumGridTab', album, group)),
+      things
+        .map(thing =>
+          (thing.isAlbum
+            ? relation('generateGroupGalleryPageAlbumGridTab', thing, group)
+         : thing.isTrack
+            ? relation('generateGroupGalleryPageTrackGridTab', thing, group)
+            : null)),
   }),
 
-  data: (query, albums, group) => ({
+  data: (query, things, group) => ({
     showRevealAllArtworksControl:
       group.showRevealAllArtworksControl,
 
     styles:
-      albums.map(album => album.style),
+      things.map(thing =>
+        (thing.isAlbum ? thing.style :
+         thing.isTrack ? 'select track' :
+         null)),
 
     allWarnings:
       query.artworks.flatMap(artwork => artwork?.contentWarnings),
 
     hideDuration:
-      albums.map(album => album.hideDuration),
+      things.map(thing =>
+        (thing.isAlbum ? thing.hideDuration : false)),
 
     tracks:
-      albums.map(album => album.tracks.length),
+      things.map(thing =>
+        (thing.isAlbum ? thing.tracks.length : null)),
 
     durations:
-      albums.map(album =>
-        (album.style === 'single'
-          ? album.tracks[0]?.duration ?? null
-          : album.duration.sum)),
+      things.map(thing =>
+        (thing.isAlbum && thing.style === 'single'
+          ? thing.tracks[0]?.duration ?? null
+       : thing.isAlbum
+          ? thing.duration.sum
+       : thing.isTrack
+          ? thing.duration
+          : null)),
 
     notFromThisGroup:
-      albums.map(album => !album.groups.includes(group)),
+      things.map(thing =>
+        !thing.groups.includes(group) &&
+        !thing.ownGroups?.includes(group)),
   }),
 
   generate: (data, relations, {language}) =>
@@ -96,22 +115,35 @@ export default {
                   language.encapsulate(capsule, 'details.albumLength', capsule =>
                     (hideDuration
                       ? null
+
                    : !duration && !tracks
                       ? null
+
+                   : style === 'select track' && duration
+                      ? language.$(capsule, 'selectTrack.withTime', {
+                          time: language.formatDuration(duration),
+                        })
+
+                   : style === 'select track'
+                      ? language.$(capsule, 'selectTrack')
+
                    : style === 'single' && tracks > 1 && duration
                       ? language.$(capsule, 'single.withMultipleTracks', {
                           time: language.formatDuration(duration),
                           tracks: language.countTracks(tracks, {unit: true}),
                         })
+
                    : style === 'single' && duration
                       ? language.$(capsule, 'single', {
                           time: language.formatDuration(duration),
                         })
+
                    : duration && tracks
                       ? language.$(capsule, {
                           time: language.formatDuration(duration),
                           tracks: language.countTracks(tracks, {unit: true}),
                         })
+
                       : language.$(capsule, 'tracksOnly', {
                           tracks: language.countTracks(tracks, {unit: true}),
                         }))),

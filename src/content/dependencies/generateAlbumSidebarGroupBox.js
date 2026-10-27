@@ -1,34 +1,36 @@
-import {sortChronologically} from '#sort';
+import {sortAlbumsTracksChronologically} from '#sort';
 import {atOffset} from '#sugar';
 
 export default {
-  query(album, group) {
+  query(album, track, group) {
     const query = {};
 
     if (album.date) {
-      const albums =
-        group.albums.filter(album => album.date);
+      const things =
+        group.albumsAndTracks.filter(album => album.date);
 
       // Sort by latest first. This matches the sorting order used on group
       // gallery pages, ensuring that previous/next matches moving up/down
       // the gallery. Note that this makes the index offsets "backwards"
       // compared to how latest-last chronological lists are accessed.
-      sortChronologically(albums, {latestFirst: true});
+      sortAlbumsTracksChronologically(things, {latestFirst: true});
 
-      const index =
-        albums.indexOf(album);
+      const currentIndex =
+        (track && things.includes(track)
+          ? things.indexOf(track)
+          : things.indexOf(album));
 
-      query.previousAlbum =
-        atOffset(albums, index, +1);
+      query.previousThing =
+        atOffset(things, currentIndex, +1);
 
-      query.nextAlbum =
-        atOffset(albums, index, -1);
+      query.nextThing =
+        atOffset(things, currentIndex, -1);
     }
 
     return query;
   },
 
-  relations(relation, query, album, group) {
+  relations(relation, query, _album, _track, group) {
     const relations = {};
 
     relations.box =
@@ -46,18 +48,25 @@ export default {
         relation('transformContent', group.descriptionShort);
     }
 
-    if (query.previousAlbum) {
-      relations.previousAlbumLink =
-        relation('linkAlbum', query.previousAlbum);
+    if (query.previousThing) {
+      relations.previousThingLink =
+        relation('linkAlbum', query.previousThing);
     }
 
-    if (query.nextAlbum) {
-      relations.nextAlbumLink =
-        relation('linkAlbum', query.nextAlbum);
+    if (query.nextThing) {
+      relations.nextThingLink =
+        relation('linkAlbum', query.nextThing);
     }
 
     return relations;
   },
+
+  data: (_query, _album, track, group) => ({
+    groupDirectlyIncludesTrack:
+      (track
+        ? group.albumsAndTracks.includes(track)
+        : null),
+  }),
 
   slots: {
     mode: {
@@ -66,9 +75,13 @@ export default {
     },
   },
 
-  generate: (relations, slots, {html, language}) =>
-    language.encapsulate('albumSidebar.groupBox', boxCapsule =>
-      relations.box.slots({
+  generate: (data, relations, slots, {html, language}) =>
+    language.encapsulate('albumSidebar.groupBox', boxCapsule => {
+      const hsmusicLikeAnAlbum =
+        slots.mode === 'album' ||
+        data.groupDirectlyIncludesTrack;
+
+      return relations.box.slots({
         attributes: {class: 'individual-group-sidebar-box'},
         content: [
           html.tag('h1',
@@ -76,7 +89,7 @@ export default {
               group: relations.groupLink,
             })),
 
-          slots.mode === 'album' &&
+          hsmusicLikeAnAlbum &&
             relations.description
               ?.slot('mode', 'multiline'),
 
@@ -92,29 +105,22 @@ export default {
                     .map(link => link.slot('context', 'group'))),
             })),
 
-          slots.mode === 'album' &&
+          hsmusicLikeAnAlbum &&
+          relations.nextThingLink &&
             html.tag('p', {class: 'group-chronology-link'},
-              {[html.onlyIfContent]: true},
-
               language.$(boxCapsule, 'next', {
-                [language.onlyIfOptions]: ['album'],
-
-                album:
-                  relations.nextAlbumLink
-                    ?.slot('showNameDetail', 'accent'),
+                release:
+                  relations.nextThingLink.slot('showNameDetail', 'accent'),
               })),
 
-          slots.mode === 'album' &&
+          hsmusicLikeAnAlbum &&
+          relations.previousThingLink &&
             html.tag('p', {class: 'group-chronology-link'},
-              {[html.onlyIfContent]: true},
-
               language.$(boxCapsule, 'previous', {
-                [language.onlyIfOptions]: ['album'],
-
-                album:
-                  relations.previousAlbumLink
-                    ?.slot('showNameDetail', 'accent'),
+                release:
+                  relations.previousThingLink.slot('showNameDetail', 'accent'),
               })),
         ],
-      })),
+      });
+    }),
 };

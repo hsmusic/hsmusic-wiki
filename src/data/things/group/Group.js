@@ -134,6 +134,19 @@ export class Group extends Thing {
       },
     },
 
+    albumsAndTracks: {
+      flags: {expose: true},
+
+      expose: {
+        dependencies: ['this', '_reverse'],
+        compute: ({this: group, _reverse: reverse}) =>
+          sortAlbumsTracksChronologically([
+            ...reverse.albumsWhoseGroupsInclude(group),
+            ...reverse.tracksWhoseOwnGroupsInclude(group),
+          ]),
+      },
+    },
+
     duration: {
       flags: {expose: true},
       expose: {

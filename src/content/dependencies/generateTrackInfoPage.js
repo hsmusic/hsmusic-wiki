@@ -58,7 +58,7 @@ export default {
       relation('generateAlbumNavSwitcher', track.album, track),
 
     secondaryNav:
-      relation('generateAlbumSecondaryNav', track.album),
+      relation('generateAlbumSecondaryNav', track.album, track),
 
     sidebar:
       relation('generateAlbumSidebar', track.album, track),

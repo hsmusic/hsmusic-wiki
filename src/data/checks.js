@@ -10,6 +10,7 @@ import {compareArrays, cut, cutStart, empty, getNestedProp, iterateMultiline}
   from '#sugar';
 import Thing from '#thing';
 import thingConstructors from '#things';
+import {combineWikiDataArrays} from '#wiki-data';
 
 import {
   annotateError,
@@ -320,7 +321,7 @@ export function filterReferenceErrors(wikiData, {
     }],
 
     ['seriesData', {
-      albums: 'album',
+      things: '_albumOrTrackAlbumPreferred',
     }],
 
     ['sheetMusicFileData', additionalFileShape],
@@ -334,6 +335,7 @@ export function filterReferenceErrors(wikiData, {
       artTags: '_artTag',
       referencedArtworks: '_artwork',
       mainRelease: '_mainRelease',
+      ownGroups: 'group',
       commentary: '_content',
       creditingSources: '_content',
       referencingSources: '_content',
@@ -412,6 +414,25 @@ export function filterReferenceErrors(wikiData, {
             let findFn;
 
             switch (findFnKey) {
+              case '_albumOrTrackAlbumPreferred': {
+                const mixed =
+                  find.mixed({
+                    prioritize: ['album'],
+                    album: find.album,
+                    track: find.track,
+                  });
+
+                const data =
+                  combineWikiDataArrays([
+                    wikiData.albumData,
+                    wikiData.trackData,
+                  ]);
+
+                findFn = ref => mixed(ref, data, {mode: 'error'});
+
+                break;
+              }
+
               case '_artwork': {
                 const mixed =
                   find.mixed({

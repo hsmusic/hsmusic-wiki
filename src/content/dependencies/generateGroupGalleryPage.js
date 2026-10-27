@@ -36,14 +36,14 @@ export default {
     quickDescription:
       relation('generateQuickDescription', group),
 
-    albumViewSwitcher:
+    musicViewSwitcher:
       relation('generateIntrapageDotSwitcher'),
 
-    albumsBySeriesView:
-      relation('generateGroupGalleryPageAlbumsBySeriesView', group),
+    musicBySeriesView:
+      relation('generateGroupGalleryPageMusicBySeriesView', group),
 
-    albumsByDateView:
-      relation('generateGroupGalleryPageAlbumsByDateView', group),
+    musicByDateView:
+      relation('generateGroupGalleryPageMusicByDateView', group),
   }),
 
   data: (query, _sprawl, group) => ({
@@ -99,11 +99,11 @@ export default {
             })),
 
           ([
-            !html.isBlank(relations.albumsBySeriesView),
-            !html.isBlank(relations.albumsByDateView)
+            !html.isBlank(relations.musicBySeriesView),
+            !html.isBlank(relations.musicByDateView)
           ]).filter(Boolean).length > 1 &&
 
-            language.encapsulate(pageCapsule, 'albumViewSwitcher', capsule =>
+            language.encapsulate(pageCapsule, 'musicViewSwitcher', capsule =>
               html.tag('p', {class: 'gallery-view-switcher'},
                 {class: ['drop', 'shiny']},
 
@@ -113,35 +113,35 @@ export default {
                 [
                   language.$(capsule),
 
-                  relations.albumViewSwitcher.slots({
+                  relations.musicViewSwitcher.slots({
                     initialOptionIndex: 0,
 
                     titles: [
-                      !html.isBlank(relations.albumsByDateView) &&
+                      !html.isBlank(relations.musicByDateView) &&
                         language.$(capsule, 'byDate'),
 
-                      !html.isBlank(relations.albumsBySeriesView) &&
+                      !html.isBlank(relations.musicBySeriesView) &&
                         language.$(capsule, 'bySeries'),
                     ].filter(Boolean),
 
                     targetIDs: [
-                      !html.isBlank(relations.albumsByDateView) &&
-                        'group-album-gallery-by-date',
+                      !html.isBlank(relations.musicByDateView) &&
+                        'group-music-gallery-by-date',
 
-                      !html.isBlank(relations.albumsBySeriesView) &&
-                        'group-album-gallery-by-series',
+                      !html.isBlank(relations.musicBySeriesView) &&
+                        'group-music-gallery-by-series',
                     ].filter(Boolean),
                   }),
                 ])),
 
-          relations.albumsByDateView.slots({
+          relations.musicByDateView.slots({
             showTitle:
-              !html.isBlank(relations.albumsBySeriesView),
+              !html.isBlank(relations.musicBySeriesView),
           }),
 
-          relations.albumsBySeriesView.slots({
+          relations.musicBySeriesView.slots({
             attributes: [
-              !html.isBlank(relations.albumsBySeriesView) &&
+              !html.isBlank(relations.musicBySeriesView) &&
                 {style: 'display: none'},
             ],
           }),

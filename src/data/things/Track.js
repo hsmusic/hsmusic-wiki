@@ -129,6 +129,7 @@ export class Track extends Thing {
     CommentaryEntry,
     CreditingSourcesEntry,
     FeaturedMotifConnection,
+    Group,
     LyricsEntry,
     MidiProjectFile,
     MiscellaneousAdditionalFile,
@@ -287,6 +288,13 @@ export class Track extends Thing {
     datePosted: simpleDate(),
 
     additionalNames: thingList(V(AdditionalName)),
+
+    // > Update & expose - Groups
+
+    ownGroups: referenceList({
+      class: input.value(Group),
+      find: soupyFind.input('group'),
+    }),
 
     // > Update & expose - Credits and contributors
 
@@ -1212,6 +1220,10 @@ export class Track extends Thing {
         transform: parseAdditionalNames,
       },
 
+      // Groups
+
+      'Groups': {property: 'ownGroups'},
+
       // Credits and contributors
 
       'Artist Text': {property: 'artistText'},
@@ -1641,6 +1653,13 @@ export class Track extends Thing {
 
       referencing: track => [track],
       referenced: track => track.artTags,
+    },
+
+    tracksWhoseOwnGroupsInclude: {
+      bindTo: 'trackData',
+
+      referencing: track => [track],
+      referenced: track => track.ownGroups,
     },
 
     trackArtistContributionsBy:

@@ -1,34 +1,36 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  sprawl: ({groupData}) => ({
-    // TODO: Series aren't their own things, so we access them weirdly.
-    seriesData:
-      groupData.flatMap(group => group.serieses),
-  }),
+  sprawl: ({seriesData}) => ({seriesData}),
 
-  query(sprawl, album) {
+  query(sprawl, album, track) {
     const query = {};
 
     query.groups =
-      album.groups;
+      (track ? track.groups : album.groups);
+
+    const includedInSeries = series =>
+      series.things.includes(album) ||
+      series.things.includes(track);
 
     query.groupSerieses =
       query.groups
         .map(group =>
           group.serieses
-            .filter(series => series.albums.includes(album)));
+            .filter(series => includedInSeries(series)));
+
+    const allGroupSerieses =
+      query.groupSerieses.flat();
 
     query.disconnectedSerieses =
       sprawl.seriesData
-        .filter(series =>
-          series.albums.includes(album) &&
-          !query.groups.includes(series.group));
+        .filter(series => includedInSeries(series))
+        .filter(series => !allGroupSerieses.includes(series));
 
     return query;
   },
 
-  relations: (relation, query, _sprawl, album) => ({
+  relations: (relation, query, _sprawl, album, track) => ({
     secondaryNav:
       relation('generateSecondaryNav'),
 
@@ -51,14 +53,16 @@ export default {
           .map(series =>
             relation('generateAlbumSecondaryNavSeriesPart',
               series,
-              album))),
+              album,
+              track))),
 
     disconnectedSeriesParts:
       query.disconnectedSerieses
         .map(series =>
           relation('generateAlbumSecondaryNavSeriesPart',
             series,
-            album)),
+            album,
+            track)),
   }),
 
   slots: {

@@ -56,8 +56,8 @@ export default {
     description:
       relation('transformContent', group.description),
 
-    albumSection:
-      relation('generateGroupInfoPageAlbumsSection', group),
+    musicSection:
+      relation('generateGroupInfoPageMusicSection', group),
   }),
 
   data: (query, _sprawl, group) => ({
@@ -148,7 +148,7 @@ export default {
             {[html.onlyIfContent]: true},
             relations.description.slot('mode', 'multiline')),
 
-          relations.albumSection,
+          relations.musicSection,
         ],
 
         leftSidebar:

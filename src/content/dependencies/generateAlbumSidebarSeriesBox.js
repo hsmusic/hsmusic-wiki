@@ -1,25 +1,27 @@
 import {atOffset} from '#sugar';
 
 export default {
-  query(album, series) {
+  query(album, track, series) {
     const query = {};
 
-    const albums =
-      series.albums;
+    const things =
+      series.things;
 
-    const index =
-      albums.indexOf(album);
+    const currentIndex =
+      (track && things.includes(track)
+        ? things.indexOf(track)
+        : things.indexOf(album));
 
-    query.previousAlbum =
-      atOffset(albums, index, -1);
+    query.previousThing =
+      atOffset(things, currentIndex, -1);
 
-    query.nextAlbum =
-      atOffset(albums, index, +1);
+    query.nextThing =
+      atOffset(things, currentIndex, +1);
 
     return query;
   },
 
-  relations: (relation, query, _album, series) => ({
+  relations: (relation, query, album, track, series) => ({
     box:
       relation('generatePageSidebarBox'),
 
@@ -29,19 +31,25 @@ export default {
     description:
       relation('transformContent', series.description),
 
-    previousAlbumLink:
-      (query.previousAlbum
-        ? relation('linkAlbum', query.previousAlbum)
+    previousThingLink:
+      (query.previousThing
+        ? relation('linkAnythingMan', query.previousThing)
         : null),
 
-    nextAlbumLink:
-      (query.nextAlbum
-        ? relation('linkAlbum', query.nextAlbum)
+    nextThingLink:
+      (query.nextThing
+        ? relation('linkAnythingMan', query.nextThing)
         : null),
   }),
 
-  data: (_query, _album, series) => ({
-    name: series.name,
+  data: (_query, _album, track, series) => ({
+    name:
+      series.name,
+
+    seriesDirectlyIncludesTrack:
+      (track
+        ? series.things.includes(track)
+        : null),
   }),
 
   slots: {
@@ -52,8 +60,12 @@ export default {
   },
 
   generate: (data, relations, slots, {html, language}) =>
-    language.encapsulate('albumSidebar.groupBox', boxCapsule =>
-      relations.box.slots({
+    language.encapsulate('albumSidebar.groupBox', boxCapsule => {
+      const hsmusicLikeAnAlbum =
+        slots.mode === 'album' ||
+        data.seriesDirectlyIncludesTrack;
+
+      return relations.box.slots({
         attributes: {class: 'individual-series-sidebar-box'},
         content: [
           html.tag('h1',
@@ -65,29 +77,23 @@ export default {
                 }),
             })),
 
-          slots.mode === 'album' &&
-            relations.description
-              ?.slot('mode', 'multiline'),
+          hsmusicLikeAnAlbum &&
+            relations.description.slot('mode', 'multiline'),
 
-          slots.mode === 'album' &&
+          hsmusicLikeAnAlbum &&
+          relations.nextThingLink &&
             html.tag('p', {class: 'series-chronology-link'},
-              {[html.onlyIfContent]: true},
-
               language.$(boxCapsule, 'next', {
-                [language.onlyIfOptions]: ['album'],
-
-                album: relations.nextAlbumLink,
+                release: relations.nextThingLink,
               })),
 
-          slots.mode === 'album' &&
+          hsmusicLikeAnAlbum &&
+          relations.previousThingLink &&
             html.tag('p', {class: 'series-chronology-link'},
-              {[html.onlyIfContent]: true},
-
               language.$(boxCapsule, 'previous', {
-                [language.onlyIfOptions]: ['album'],
-
-                album: relations.previousAlbumLink,
+                release: relations.previousThingLink,
               })),
         ],
-      })),
+      });
+    }),
 };

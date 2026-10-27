@@ -1,31 +1,34 @@
 import {sortAlbumsTracksChronologically} from '#sort';
-import {stitchArrays, transposeArrays} from '#sugar';
+import {stitchArrays, transposeArrays, unique} from '#sugar';
 import {compareKebabCase} from '#wiki-data';
 
 export default {
-  sprawl: ({groupData}) => ({
-    // TODO: Series aren't their own things, so we access them weirdly.
-    seriesData:
-      groupData.flatMap(group => group.serieses),
-  }),
+  sprawl: ({seriesData}) => ({seriesData}),
 
   query(sprawl, album, track) {
     const query = {};
 
     query.groups =
-      album.groups;
+      (track ? unique([...track.ownGroups, ...track.groups]) :
+       album.groups);
+
+    const includedInSeries = series =>
+      series.things.includes(album) ||
+      series.things.includes(track);
 
     query.groupSerieses =
       query.groups
         .map(group =>
           group.serieses
-            .filter(series => series.albums.includes(album)));
+            .filter(series => includedInSeries(series)));
+
+    const allGroupSerieses =
+      query.groupSerieses.flat();
 
     query.disconnectedSerieses =
       sprawl.seriesData
-        .filter(series =>
-          series.albums.includes(album) &&
-          !query.groups.includes(series.group));
+        .filter(series => includedInSeries(series))
+        .filter(series => !allGroupSerieses.includes(series));
 
     if (track) {
       const albumTrackMap =
@@ -90,18 +93,18 @@ export default {
     groupBoxes:
       query.groups
         .map(group =>
-          relation('generateAlbumSidebarGroupBox', album, group)),
+          relation('generateAlbumSidebarGroupBox', album, track, group)),
 
     seriesBoxes:
       query.groupSerieses
         .map(serieses => serieses
           .map(series =>
-            relation('generateAlbumSidebarSeriesBox', album, series))),
+            relation('generateAlbumSidebarSeriesBox', album, track, series))),
 
     disconnectedSeriesBoxes:
       query.disconnectedSerieses
         .map(series =>
-          relation('generateAlbumSidebarSeriesBox', album, series)),
+          relation('generateAlbumSidebarSeriesBox', album, track, series)),
 
     earlierTrackReleaseBoxes:
       (track

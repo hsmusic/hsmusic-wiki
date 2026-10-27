@@ -2194,7 +2194,7 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
 
     ['referencingSourceData', [/* find */]],
 
-    ['seriesData', [/* find */]],
+    ['seriesData', ['albumData', 'trackData']],
 
     ['sheetMusicFileData', [/* find */]],
 

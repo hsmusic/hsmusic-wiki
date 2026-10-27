@@ -18,10 +18,10 @@ export default {
 
     seriesItems:
       group.serieses
-        .map(series => series.albums
-          .map(album =>
-            relation('generateGroupInfoPageAlbumsListItem',
-              album,
+        .map(series => series.things
+          .map(thing =>
+            relation('generateGroupInfoPageMusicListItem',
+              thing,
               group))),
   }),
 
@@ -32,24 +32,26 @@ export default {
 
     seriesItemsShowArtists:
       group.serieses.map(series =>
-        (series.showAlbumArtists === 'all'
-          ? new Array(series.albums.length).fill(true)
-       : series.showAlbumArtists === 'differing'
-          ? series.albums.map(album =>
-              album.artistContribs
+        (series.showArtists === 'all'
+          ? Array.from({length: series.things.length}, () => true)
+
+       : series.showArtists === 'differing'
+          ? series.things.map(thing =>
+              thing.artistContribs
                 .map(contrib => contrib.artist)
                 .some(artist => !query.closelyLinkedArtists.includes(artist)))
-          : new Array(series.albums.length).fill(false))),
+
+          : Array.from({length: series.things.length}, () => false))),
   }),
 
   generate: (data, relations, {html, language}) =>
-    language.encapsulate('groupInfoPage.albumList', listCapsule =>
+    language.encapsulate('groupInfoPage.musicList', listCapsule =>
       html.tag('dl',
-        {id: 'group-album-list-by-series'},
+        {id: 'group-music-list-by-series'},
         {class: 'group-series-list'},
 
         relations.seriesItems.flat().length > 1 &&
-        language.$order(listCapsule, 'item.withYear', 0) === 'YEAR_ACCENT' &&
+        language.$order(listCapsule, 'item.album.withYear', 0) === 'YEAR_ACCENT' &&
           {class: 'offset-tooltips'},
 
         {[html.onlyIfContent]: true},

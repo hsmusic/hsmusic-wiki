@@ -1,14 +1,16 @@
-import {unique} from '#sugar';
-
 export default {
   query: (group) => ({
     styles:
-      unique(group.albums.map(album => album.style)),
+      ['album', 'single', 'select track', 'in-game vgm']
+        .filter(style =>
+          (style === 'select track'
+            ? group.albumsAndTracks.some(thing => thing.isTrack)
+            : group.albums.some(album => album.style === style))),
   }),
 
   data: (query, group) => ({
-    albums:
-      group.albums.length,
+    total:
+      group.albumsAndTracks.length,
 
     styles:
       query.styles,
@@ -21,7 +23,7 @@ export default {
         : html.tag('p', {class: 'gallery-style-selector'},
             {class: ['drop', 'shiny']},
 
-            language.encapsulate(pageCapsule, 'albumStyleSwitcher', capsule => [
+            language.encapsulate(pageCapsule, 'musicStyleSelector', capsule => [
               html.tag('span',
                 language.$(capsule)),
 
@@ -41,6 +43,7 @@ export default {
                         switch (style) {
                           case 'album': workingCapsule += '.album'; break;
                           case 'single': workingCapsule += '.single'; break;
+                          case 'select track': workingCapsule += '.track'; break;
                           case 'in-game vgm': workingCapsule += '.vgm'; break;
                           default: return html.blank();
                         }
@@ -52,7 +55,7 @@ export default {
 
               html.tag('span', {class: ['count', 'all']},
                 language.$(capsule, 'count.all', {
-                  total: data.albums,
+                  total: data.total,
                 })),
 
               html.tag('span', {class: ['count', 'filtered']},
@@ -60,7 +63,7 @@ export default {
 
                 language.$(capsule, 'count.filtered', {
                   count: html.tag('span'),
-                  total: data.albums,
+                  total: data.total,
                 })),
 
               html.tag('span', {class: ['count', 'none']},
