@@ -1,3 +1,5 @@
+import {inspect} from 'node:util';
+
 import {input, V} from '#composite';
 import Thing from '#thing';
 
@@ -45,4 +47,28 @@ export class WikiUpdateSection extends Thing {
       'Changes': {property: 'changes'},
     },
   };
+
+  [inspect.custom](depth, options, inspect) {
+    const parts = [];
+
+    parts.push(Thing.prototype[inspect.custom].apply(this));
+
+    if (this.update) {
+      if (depth >= 0) {
+        const newOptions = {
+          ...options,
+          depth:
+            (options.depth === null
+              ? null
+              : options.depth - 1),
+        };
+
+        parts.push(` of ${inspect(this.update, newOptions)}`);
+      } else {
+        parts.push(` of ${Thing.inspectReference(this.update)}`);
+      }
+    }
+
+    return parts.join('');
+  }
 }
