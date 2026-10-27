@@ -261,6 +261,8 @@ export function filterReferenceErrors(wikiData, {
   const referenceSpec = [
     ['albumData', {
       artistContribs: '_contrib',
+      trackArtistContribs: '_contrib',
+      trackContributorContribs: '_contrib',
       coverArtistContribs: '_contrib',
       trackCoverArtistContribs: '_contrib',
       wallpaperArtistContribs: '_contrib',
