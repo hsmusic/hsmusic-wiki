@@ -6,7 +6,7 @@ import * as path from 'node:path';
 
 import {compress} from 'compress-json';
 import FlexSearch from 'flexsearch';
-import {pack} from 'msgpackr';
+import {encode} from 'msgpack-lite';
 
 import {logWarn} from '#cli';
 import {makeSearchIndex} from '#search-shape';
@@ -126,7 +126,7 @@ export async function writeSearchData({
   const packedIndexes =
     serializedIndexes
       .map(data => compress(data))
-      .map(data => pack(data));
+      .map(data => encode(data));
 
   const outputDirectory =
     path.join(wikiCachePath, 'search');

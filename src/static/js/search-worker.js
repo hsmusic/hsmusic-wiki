@@ -22,7 +22,7 @@ import {fetchWithProgress} from './xhr-util.js';
 
 // Will be loaded from dependencies.
 let decompress;
-let unpack;
+let decode;
 
 let idb;
 
@@ -51,11 +51,11 @@ async function loadDependencies() {
   const {compressJSON} =
     await loadDependency.fromWindow('../lib/compress-json/bundle.min.js');
 
-  const msgpackr =
-    await loadDependency.fromModuleExports('../lib/msgpackr/index.js');
+  const {msgpack} =
+    await loadDependency.fromWindow('../lib/msgpack-lite/msgpack.min.js');
 
   ({decompress} = compressJSON);
-  ({unpack} = msgpackr);
+  ({decode} = msgpack);
 }
 
 async function promisifyIDBRequest(request) {
@@ -265,7 +265,7 @@ async function main(fromRetry = false) {
 
   function arrayBufferToJSON(data) {
     data = new Uint8Array(data);
-    data = unpack(data);
+    data = decode(data);
     data = decompress(data);
     return data;
   }

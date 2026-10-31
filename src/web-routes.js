@@ -82,7 +82,7 @@ export const dependencyRoutes = [
   }),
 
   quickNodeDependency({
-    name: 'msgpackr',
+    name: 'msgpack-lite',
     path: 'dist',
   }),
 ].flat();
