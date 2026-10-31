@@ -177,6 +177,10 @@
     margin-right: 30px;
   }
 
+  .switcher-drop {
+    width: calc(100% - 20px);
+  }
+
   .music-video {
     width: 70%;
     margin-left: auto;

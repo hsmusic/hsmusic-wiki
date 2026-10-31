@@ -28,19 +28,24 @@ export default {
   generate: (data, relations, {html, language}) =>
     language.encapsulate('releaseInfo.lyrics', capsule =>
       html.tags([
-        relations.heading
-          .slots({
+        relations.annotationParts.length <= 1 &&
+          relations.heading.slots({
             attributes: {id: 'lyrics'},
             title: language.$(capsule),
           }),
 
-        html.tag('p', {class: 'lyrics-switcher'},
-          {[html.onlyIfContent]: true},
+        relations.annotationParts.length >= 2 &&
+          relations.heading.slots({
+            attributes: [
+              {id: 'lyrics'},
+              {class: ['drop', 'switcher-drop']},
+            ],
 
-          language.$(capsule, 'switcher', {
-            [language.onlyIfOptions]: ['entries'],
+            stickyTitle: language.$(capsule),
 
-            entries:
+            title: [
+              html.tag('b', language.$(capsule)),
+
               relations.switcher.slots({
                 initialOptionIndex: 0,
                 memorableID: 'lyrics-entry',
@@ -68,7 +73,8 @@ export default {
                 targetIDs:
                   data.ids,
               }),
-          })),
+            ],
+          }),
 
         stitchArrays({
           entry: relations.entries,

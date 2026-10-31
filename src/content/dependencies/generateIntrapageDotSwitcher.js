@@ -15,6 +15,8 @@ export default {
     initialOptionIndex: {type: 'number'},
     memorableID: {type: 'string'},
 
+    drop: {type: 'boolean', default: false},
+
     titles: {
       validate: v => v.strictArrayOf(v.isHTML),
     },

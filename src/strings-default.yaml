@@ -326,11 +326,7 @@ releaseInfo:
 
   contributors: "Contributors:"
 
-  lyrics:
-    _: "Lyrics:"
-
-    switcher: "({ENTRIES})"
-
+  lyrics: "Lyrics:"
   note: "Notes:"
 
   alsoReleased:
