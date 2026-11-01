@@ -29,7 +29,7 @@ export default {
           [language.onlyIfOptions]: ['artworks'],
 
           artworks:
-            language.countArtworks(data.referenced, {blankIfZero: true),
+            language.countArtworks(data.referenced, {blankIfZero: true}),
         });
 
       const referencingText =
