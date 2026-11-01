@@ -14,8 +14,8 @@ export default {
     navAccent:
       relation('generateMotifNavAccent', motif),
 
-    additionalNamesBox:
-      relation('generateAdditionalNamesBox', motif.additionalNames),
+    additionalNamesPanel:
+      relation('generateAdditionalNamesPanel', motif),
 
     motifSectionLink:
       (motif.motifSection.isDefaultMotifSection
@@ -72,9 +72,9 @@ export default {
         headingMode: 'sticky',
         color: data.color,
 
-        additionalNames:
-          relations.additionalNamesBox.slots({
-            alwaysVisible: true,
+        additionalNamesPanel:
+          relations.additionalNamesPanel.slots({
+            alwaysOpen: true,
           }),
 
         mainContent: [

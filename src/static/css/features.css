@@ -33,6 +33,41 @@
   }
 }
 
+/* Additional names (panel) */
+
+#additional-names-panel {
+  @layer layout {
+    margin-top: 0.85em !important;
+    margin-left: -20px;
+    padding-left: 10px;
+
+    ul {
+      margin-top: 0.25em;
+      margin-bottom: 0.5em;
+    }
+
+    &:is(p) {
+      padding-left: 20px;
+    }
+  }
+
+  @layer material {
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid rgba(220, 220, 220, 0.3);
+  }
+
+  @layer interaction {
+    &[open] {
+      padding-bottom: 0;
+    }
+
+    &:is(p),
+    &:not([open]) summary {
+      opacity: 0.8;
+    }
+  }
+}
+
 /* Additional names (heading and box) */
 
 @layer layout {
@@ -451,19 +486,19 @@
 }
 
 @layer construction {
-  summary.content-heading {
+  summary:has(.cue) {
     list-style-type: none;
-  }
 
-  summary.content-heading .cue {
-    display: inline-flex;
-  }
+    .cue {
+      display: inline-flex;
+    }
 
-  summary.content-heading .cue::after {
-    content: "";
-    padding-left: 0.5ch;
-    display: list-item;
-    list-style-position: inside;
+    .cue::after {
+      content: "";
+      padding-left: 0.5ch;
+      display: list-item;
+      list-style-position: inside;
+    }
   }
 }
 
@@ -519,15 +554,15 @@
     text-decoration-style: wavy;
   }
 
-  summary.content-heading .when-open {
+  summary .when-open {
     display: none;
   }
 
-  details[open] > summary.content-heading .when-open {
+  details[open] > summary .when-open {
     display: unset;
   }
 
-  details[open] > summary.content-heading .when-collapsed {
+  details[open] > summary .when-collapsed {
     display: none;
   }
 }

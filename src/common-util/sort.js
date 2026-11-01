@@ -9,8 +9,8 @@
 // somehow.
 export const SORTING_LOCALE = 'en';
 
-import {empty, re, sortMultipleArrays, unique}
-  from './sugar.js';
+import {empty, re, runs, sortMultipleArrays, unique} from './sugar.js';
+import {getKebabCase} from './wiki-data.js';
 
 // General sorting utilities! These don't do any sorting on their own but are
 // handy in the sorting functions below (or if you're making your own sort).
@@ -89,6 +89,69 @@ export function aggressivelyNormalizeName(s, badtothebone = 3) {
   s = s.replace(/^(.*?: )?\[S\] /, '');
 
   return s;
+}
+
+export function simpler(A1, B1) {
+  const simplifications = [
+    // Surrounding quote marks
+    s => s.replace(/^(['"])(?=.*\1$)|(['"])(?<=^\2.*\2)$/g, ''),
+
+    s => s.replace(/ \(.*\)$/, ''),
+    s => s.replace(/ \[.*\]$/, ''),
+    s => s.replace(/(?<!\b): .*/, ''),
+  ];
+
+  let complexityA = 0, complexityB = 0;
+  let comparable = false;
+
+  const kebabrisons = new Map();
+
+  for (const fns of [...runs(simplifications), []]) {
+    let A2 = A1, B2 = B1;
+    let Af = 0, Bf = 0;
+
+    // Af and Bf count the number of changes which had an effect, so they
+    // effectively score complexity. Not simplicity!
+    for (const fn of fns) {
+      const An = fn(A2), Bn = fn(B2);
+      if (An !== A2) { Af++; A2 = An; }
+      if (Bn !== B2) { Bf++; B2 = Bn; }
+    }
+
+    if (Af >= 1) complexityA += 1.413 ** Af;
+    if (Bf >= 1) complexityB += 1.413 ** Bf;
+
+    const Ak = getKebabCase(A2);
+    const Bk = getKebabCase(B2);
+
+    if (kebabrisons.has(Ak) && kebabrisons.get(Ak).has(Bk)) {
+      continue;
+    } else if (kebabrisons.has(Ak)) {
+      kebabrisons.get(Ak).add(Bk);
+    } else {
+      kebabrisons.set(Ak, new Set([Bk]));
+    }
+
+    if (Ak === Bk) {
+      comparable = true;
+    } else if (Ak.startsWith(Bk) || Ak.endsWith(Bk)) {
+      comparable = true;
+      complexityA += 1.025 ** Af;
+    } else if (Bk.startsWith(Ak) || Bk.endsWith(Ak)) {
+      comparable = true;
+      complexityB += 1.025 ** Bf;
+    }
+  }
+
+  if (comparable) {
+    if (complexityB >= complexityA) {
+      return A1;
+    } else {
+      return B1;
+    }
+  } else {
+    return null;
+  }
 }
 
 // This stemmer can become WAY COOLER but we're not doing it right now.

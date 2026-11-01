@@ -1,7 +1,7 @@
 export default {
-  relations: (relation, additionalNames) => ({
+  relations: (relation, thing) => ({
     items:
-      additionalNames
+      thing.additionalNames
         .map(entry => relation('generateAdditionalNamesBoxItem', entry)),
   }),
 
@@ -23,7 +23,7 @@ export default {
       html.tag('p',
         {[html.onlyIfSiblings]: true},
 
-        language.$('misc.additionalNames.title')),
+        language.$('misc.additionalNames.box.title')),
 
       html.tag('ul',
         {[html.onlyIfContent]: true},

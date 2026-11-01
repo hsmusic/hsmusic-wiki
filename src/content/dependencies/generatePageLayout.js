@@ -92,7 +92,12 @@ export default {
       default: true,
     },
 
-    additionalNames: {
+    additionalNamesBox: {
+      type: 'html',
+      mutable: false,
+    },
+
+    additionalNamesPanel: {
       type: 'html',
       mutable: false,
     },
@@ -301,13 +306,13 @@ export default {
           return html.blank();
         }
 
-        if (!html.isBlank(slots.additionalNames)) {
-          const box = html.resolve(slots.additionalNames, {slots: ['alwaysVisible']});
+        if (!html.isBlank(slots.additionalNamesBox)) {
+          const box = html.resolve(slots.additionalNamesBox, {slots: ['alwaysVisible']});
           if (!box.getSlotValue('alwaysVisible')) {
             return (
               html.tag('a',
                 {href: '#additional-names-box'},
-                {title: language.$('misc.additionalNames.tooltip').toString()},
+                {title: language.$('misc.additionalNames.box.tooltip').toString()},
                 language.sanitize(slots.title))
             );
           }
@@ -398,7 +403,8 @@ export default {
 
           subheadingHTML,
 
-          slots.additionalNames,
+          slots.additionalNamesBox,
+          slots.additionalNamesPanel,
 
           html.tag('div', {class: 'main-content-container'},
             {[html.onlyIfContent]: true},

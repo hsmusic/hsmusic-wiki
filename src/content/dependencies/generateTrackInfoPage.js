@@ -63,8 +63,8 @@ export default {
     sidebar:
       relation('generateAlbumSidebar', track.album, track),
 
-    additionalNamesBox:
-      relation('generateAdditionalNamesBox', track.additionalNames),
+    additionalNamesPanel:
+      relation('generateAdditionalNamesPanel', track),
 
     artworkColumn:
       (query.firstTrackInSingle
@@ -197,7 +197,7 @@ export default {
 
         headingMode: 'sticky',
 
-        additionalNames: relations.additionalNamesBox,
+        additionalNamesPanel: relations.additionalNamesPanel,
 
         color: data.color,
         styleTags: relations.albumStyleTags,

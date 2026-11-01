@@ -10,7 +10,7 @@ export default {
   }),
 
   generate: (relations, {html, language}) => {
-    const prefix = 'misc.additionalNames.item';
+    const prefix = 'misc.additionalNames.box.item';
 
     const itemParts = [prefix];
     const itemOptions = {};

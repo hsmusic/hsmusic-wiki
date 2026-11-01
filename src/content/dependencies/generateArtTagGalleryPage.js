@@ -25,7 +25,7 @@ export default {
       relation('generateArtTagNavLinks', artTag),
 
     additionalNamesBox:
-      relation('generateAdditionalNamesBox', artTag.additionalNames),
+      relation('generateAdditionalNamesBox', artTag),
 
     quickDescription:
       relation('generateQuickDescription', artTag),
@@ -89,7 +89,7 @@ export default {
         headingMode: 'static',
         color: data.color,
 
-        additionalNames: relations.additionalNamesBox,
+        additionalNamesBox: relations.additionalNamesBox,
 
         mainClasses: ['top-index'],
         mainContent: [
