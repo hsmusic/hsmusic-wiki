@@ -34,7 +34,7 @@ export default {
         if (!data.hideDuration) {
           workingOptions.tracks =
             html.tag('b',
-              language.countTracks(data.tracks, {unit: true}));
+              language.countTracks(data.tracks));
 
           workingOptions.duration =
             html.tag('b',

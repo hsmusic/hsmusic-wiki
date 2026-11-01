@@ -42,7 +42,7 @@ export default {
           count: data.counts,
         }).map(({link, count}) => ({
             motif: link,
-            timesUsed: language.countTimesUsed(count, {unit: true}),
+            timesUsed: language.countTimesUsed(count),
           })),
     }),
 };

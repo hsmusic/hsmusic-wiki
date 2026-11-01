@@ -167,15 +167,11 @@ export default {
                 if (relations.totals.entryCount >= 1) {
                   workingOptions.words =
                     html.tag('b',
-                      language.formatWordCount(
-                        relations.totals.wordCount,
-                        {unit: true}));
+                      language.formatWordCount(relations.totals.wordCount));
 
                   workingOptions.entries =
                     html.tag('b',
-                      language.countCommentaryEntries(
-                        relations.totals.entryCount,
-                        {unit: true}));
+                      language.countCommentaryEntries(relations.totals.entryCount));
                 } else {
                   workingCapsule += '.withoutCommentary';
                 }

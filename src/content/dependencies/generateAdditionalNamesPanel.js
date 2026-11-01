@@ -123,7 +123,7 @@ export default {
     }
 
     const more =
-      language.countMore(data.numConcealedAdditionalNames, {unit: true});
+      language.countMore(data.numConcealedAdditionalNames);
 
     const summary =
       html.tag('summary',

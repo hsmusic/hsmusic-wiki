@@ -91,15 +91,11 @@ export default {
             language.$(pageCapsule, 'infoLine', {
               tracks:
                 html.tag('b',
-                  language.countTracks(data.numTracks, {
-                    unit: true,
-                  })),
+                  language.countTracks(data.numTracks)),
 
               albums:
                 html.tag('b',
-                  language.countAlbums(data.numAlbums, {
-                    unit: true,
-                  })),
+                  language.countAlbums(data.numAlbums)),
 
               time:
                 html.tag('b',
@@ -115,7 +111,6 @@ export default {
               tracks:
                 html.tag('b', {[html.onlyIfContent]: true},
                   language.countTracks(data.numSelectTracks, {
-                    unit: true,
                     blankIfZero: true,
                   })),
 

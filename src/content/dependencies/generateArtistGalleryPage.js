@@ -63,9 +63,7 @@ export default {
           html.tag('p', {class: 'quick-info'},
             language.$(pageCapsule, 'infoLine', {
               coverArts:
-                language.countArtworks(data.numArtworks, {
-                  unit: true,
-                }),
+                language.countArtworks(data.numArtworks),
             })),
 
           relations.coverGrid.slots({

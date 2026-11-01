@@ -43,7 +43,7 @@ export default {
           count: data.counts,
         }).map(({link, count}) => ({
             group: link,
-            tracks: language.countTracks(count, {unit: true}),
+            tracks: language.countTracks(count),
           })),
     });
   },

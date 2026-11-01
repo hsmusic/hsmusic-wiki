@@ -30,7 +30,7 @@ export default {
         any = true;
         workingCapsule += '.withTracks';
         workingOptions.tracks =
-          language.countTracks(data.tracks, {unit: true});
+          language.countTracks(data.tracks);
       }
 
       if (data.dateStyle === 'released') {

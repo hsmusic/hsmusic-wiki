@@ -166,7 +166,7 @@ export default {
               artistCount: artistCounts,
             }).map(({artistLink, artistCount}) => ({
                 artist: artistLink,
-                contributions: language[countFunction](artistCount, {unit: true}),
+                contributions: language[countFunction](artistCount),
               }))),
     });
   },

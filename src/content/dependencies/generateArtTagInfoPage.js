@@ -128,24 +128,24 @@ export default {
              : data.numArtworksDirectly === 0
                 ? language.$(capsule, 'indirectlyOnly', {
                     artworks:
-                      language.countArtworks(data.numArtworksIndirectly, {unit: true}),
+                      language.countArtworks(data.numArtworksIndirectly),
                   })
 
              : data.numArtworksIndirectly === 0
                 ? language.$(capsule, 'directlyOnly', {
                     artworks:
-                      language.countArtworks(data.numArtworksDirectly, {unit: true}),
+                      language.countArtworks(data.numArtworksDirectly),
                   })
 
                 : language.$(capsule, 'directlyAndIndirectly', {
                     artworksDirectly:
-                      language.countArtworks(data.numArtworksDirectly, {unit: true}),
+                      language.countArtworks(data.numArtworksDirectly),
 
                     artworksIndirectly:
-                      language.countArtworks(data.numArtworksIndirectly, {unit: false}),
+                      language.formatNumber(data.numArtworksIndirectly),
 
                     artworksTotal:
-                      language.countArtworks(data.numArtworksTotal, {unit: false}),
+                      language.formatNumber(data.numArtworksTotal),
                   })))),
 
           html.tag('p',

@@ -121,11 +121,11 @@ export default {
 
                   const tracksFigure =
                     html.tag('b', {[html.onlyIfContent]: true},
-                      language.countTracks(data.numTracks, {unit: true}));
+                      language.countTracks(data.numTracks));
 
                   const albumsFigure =
                     html.tag('b', {[html.onlyIfContent]: true},
-                      language.countAlbums(data.numAlbums, {unit: true}));
+                      language.countAlbums(data.numAlbums));
 
                   if (data.composition === 'albums') {
                     workingOptions.tracks = tracksFigure;

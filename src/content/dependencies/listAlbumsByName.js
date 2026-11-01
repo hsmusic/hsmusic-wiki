@@ -40,7 +40,7 @@ export default {
           count: data.counts,
         }).map(({link, count}) => ({
             album: link,
-            tracks: language.countTracks(count, {unit: true}),
+            tracks: language.countTracks(count),
           })),
     });
   },

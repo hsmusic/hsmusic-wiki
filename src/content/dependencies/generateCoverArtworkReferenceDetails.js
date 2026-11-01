@@ -29,10 +29,7 @@ export default {
           [language.onlyIfOptions]: ['artworks'],
 
           artworks:
-            language.countArtworks(data.referenced, {
-              blankIfZero: true,
-              unit: true,
-            }),
+            language.countArtworks(data.referenced, {blankIfZero: true),
         });
 
       const referencingText =
@@ -40,10 +37,7 @@ export default {
           [language.onlyIfOptions]: ['artworks'],
 
           artworks:
-            language.countArtworks(data.referencedBy, {
-              blankIfZero: true,
-              unit: true,
-            }),
+            language.countArtworks(data.referencedBy, {blankIfZero: true}),
         });
 
       return (

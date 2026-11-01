@@ -1055,7 +1055,6 @@ export class Language extends Thing {
 
 const countHelper = (stringKey, optionName = stringKey) =>
   function(value, {
-    unit = false,
     blankIfZero = false,
   } = {}) {
     // Null or undefined value is blank content.
@@ -1069,9 +1068,7 @@ const countHelper = (stringKey, optionName = stringKey) =>
     }
 
     const string =
-      (unit
-        ? `count.${stringKey}.withUnit.` + this.getUnitForm(value)
-        : `count.${stringKey}`);
+      `count.${stringKey}.` + this.getUnitForm(value);
 
     const options = {[optionName]: this.formatNumber(value)};
 

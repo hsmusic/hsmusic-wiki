@@ -12,8 +12,6 @@ export default {
 
         language.$(pageCapsule, 'featuredLine', slots.string, {
           coverArts:
-            language.countArtworks(slots.count, {
-              unit: true,
-            }),
+            language.countArtworks(slots.count),
         }))),
 };

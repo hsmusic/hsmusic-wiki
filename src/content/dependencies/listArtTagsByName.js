@@ -47,7 +47,7 @@ export default {
           count: data.counts,
         }).map(({link, count}) => ({
             tag: link,
-            timesUsed: language.countTimesUsed(count, {unit: true}),
+            timesUsed: language.countTimesUsed(count),
           })),
     });
   },

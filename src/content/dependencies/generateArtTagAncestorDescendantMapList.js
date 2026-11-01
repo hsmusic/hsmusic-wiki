@@ -117,7 +117,7 @@ export default {
           html.tag('dt',
             language.$('artTagPage.sidebar.otherTagsExempt', {
               tags:
-                language.countArtTags(dataNode.numExemptArtTags, {unit: true}),
+                language.countArtTags(dataNode.numExemptArtTags),
             })),
 
         stitchArrays({

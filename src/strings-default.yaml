@@ -38,194 +38,143 @@ count:
   # Count things and objects
 
   albums:
-    _: "{ALBUMS}"
-
-    withUnit:
-      zero: ""
-      one: "{ALBUMS} album"
-      two: ""
-      few: ""
-      many: ""
-      other: "{ALBUMS} albums"
+    zero: ""
+    one: "{ALBUMS} album"
+    two: ""
+    few: ""
+    many: ""
+    other: "{ALBUMS} albums"
 
   artTags:
-    _: "{TAGS}"
-
-    withUnit:
-      zero: ""
-      one: "{TAGS} tag"
-      two: ""
-      few: ""
-      many: ""
-      other: "{TAGS} tags"
+    zero: ""
+    one: "{TAGS} tag"
+    two: ""
+    few: ""
+    many: ""
+    other: "{TAGS} tags"
 
   artworks:
-    _: "{ARTWORKS}"
-
-    withUnit:
-      zero: ""
-      one: "{ARTWORKS} artwork"
-      two: ""
-      few: ""
-      many: ""
-      other: "{ARTWORKS} artworks"
+    zero: ""
+    one: "{ARTWORKS} artwork"
+    two: ""
+    few: ""
+    many: ""
+    other: "{ARTWORKS} artworks"
 
   commentaryEntries:
-    _: "{ENTRIES}"
-
-    withUnit:
-      zero: ""
-      one: "{ENTRIES} entry"
-      two: ""
-      few: ""
-      many: ""
-      other: "{ENTRIES} entries"
+    zero: ""
+    one: "{ENTRIES} entry"
+    two: ""
+    few: ""
+    many: ""
+    other: "{ENTRIES} entries"
 
   contributions:
-    _: "{CONTRIBUTIONS}"
-
-    withUnit:
-      zero: ""
-      one: "{CONTRIBUTIONS} contribution"
-      two: ""
-      few: ""
-      many: ""
-      other: "{CONTRIBUTIONS} contributions"
+    zero: ""
+    one: "{CONTRIBUTIONS} contribution"
+    two: ""
+    few: ""
+    many: ""
+    other: "{CONTRIBUTIONS} contributions"
 
   files:
-    _: "{FILES}"
-
-    withUnit:
-      zero: ""
-      one: "{FILES} file"
-      two: ""
-      few: ""
-      many: ""
-      other: "{FILES} files"
+    zero: ""
+    one: "{FILES} file"
+    two: ""
+    few: ""
+    many: ""
+    other: "{FILES} files"
 
   flashes:
-    _: "{FLASHES}"
-
-    withUnit:
-      zero: ""
-      one: "{FLASHES} flash"
-      two: ""
-      few: ""
-      many: ""
-      other: "{FLASHES} flashes"
+    zero: ""
+    one: "{FLASHES} flash"
+    two: ""
+    few: ""
+    many: ""
+    other: "{FLASHES} flashes"
 
   tracks:
-    _: "{TRACKS}"
-
-    withUnit:
-      zero: ""
-      one: "{TRACKS} track"
-      two: ""
-      few: ""
-      many: ""
-      other: "{TRACKS} tracks"
+    zero: ""
+    one: "{TRACKS} track"
+    two: ""
+    few: ""
+    many: ""
+    other: "{TRACKS} tracks"
 
   # Count more abstract stuff
 
   more:
-    _: "{COUNT}"
-
-    withUnit:
-      zero: ""
-      one: "{COUNT} more"
-      two: ""
-      few: ""
-      many: ""
-      other: "{COUNT} more"
+    zero: ""
+    one: "{COUNT} more"
+    two: ""
+    few: ""
+    many: ""
+    other: "{COUNT} more"
 
   days:
-    _: "{DAYS}"
-
-    withUnit:
-      zero: ""
-      one: "{DAYS} day"
-      two: ""
-      few: ""
-      many: ""
-      other: "{DAYS} days"
+    zero: ""
+    one: "{DAYS} day"
+    two: ""
+    few: ""
+    many: ""
+    other: "{DAYS} days"
 
   months:
-    _: "{MONTHS}"
-
-    withUnit:
-      zero: ""
-      one: "{MONTHS} month"
-      two: ""
-      few: ""
-      many: ""
-      other: "{MONTHS} months"
+    zero: ""
+    one: "{MONTHS} month"
+    two: ""
+    few: ""
+    many: ""
+    other: "{MONTHS} months"
 
   timesFeatured:
-    _: "{TIMES_FEATURED}"
-
-    withUnit:
-      zero: ""
-      one: "featured {TIMES_FEATURED} time"
-      two: ""
-      few: ""
-      many: ""
-      other: "featured {TIMES_FEATURED} times"
+    zero: ""
+    one: "featured {TIMES_FEATURED} time"
+    two: ""
+    few: ""
+    many: ""
+    other: "featured {TIMES_FEATURED} times"
 
   timesReferenced:
-    _: "{TIMES_REFERENCED}"
-
-    withUnit:
-      zero: ""
-      one: "{TIMES_REFERENCED} time referenced"
-      two: ""
-      few: ""
-      many: ""
-      other: "{TIMES_REFERENCED} times referenced"
+    zero: ""
+    one: "{TIMES_REFERENCED} time referenced"
+    two: ""
+    few: ""
+    many: ""
+    other: "{TIMES_REFERENCED} times referenced"
 
   timesUsed:
-    _: "{TIMES_USED}"
-
-    withUnit:
-      zero: ""
-      one: "used {TIMES_USED} time"
-      two: ""
-      few: ""
-      many: ""
-      other: "used {TIMES_USED} times"
+    zero: ""
+    one: "used {TIMES_USED} time"
+    two: ""
+    few: ""
+    many: ""
+    other: "used {TIMES_USED} times"
 
   weeks:
-    _: "{WEEKS}"
-
-    withUnit:
-      zero: ""
-      one: "{WEEKS} week"
-      two: ""
-      few: ""
-      many: ""
-      other: "{WEEKS} weeks"
+    zero: ""
+    one: "{WEEKS} week"
+    two: ""
+    few: ""
+    many: ""
+    other: "{WEEKS} weeks"
 
   words:
     _: "{WORDS}"
-    thousand: "{WORDS}k"
-
-    withUnit:
-      zero: ""
-      one: "{WORDS} word"
-      two: ""
-      few: ""
-      many: ""
-      other: "{WORDS} words"
+    zero: ""
+    one: "{WORDS} word"
+    two: ""
+    few: ""
+    many: ""
+    other: "{WORDS} words"
 
   years:
-    _: "{YEARS}"
-
-    withUnit:
-      zero: ""
-      one: "{YEARS} year"
-      two: ""
-      few: ""
-      many: ""
-      other: "{YEARS} years"
+    zero: ""
+    one: "{YEARS} year"
+    two: ""
+    few: ""
+    many: ""
+    other: "{YEARS} years"
 
   # Numerical things that aren't exactly counting, per se
 

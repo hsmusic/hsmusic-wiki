@@ -48,7 +48,7 @@ export default {
           count: data.counts,
         }).map(({link, count}) => ({
             artist: link,
-            entries: language.countCommentaryEntries(count, {unit: true}),
+            entries: language.countCommentaryEntries(count),
           })),
     });
   },

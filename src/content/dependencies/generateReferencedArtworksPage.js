@@ -48,9 +48,7 @@ export default {
           html.tag('p', {class: 'quick-info'},
             language.$(pageCapsule, 'statsLine', {
               artworks:
-                language.countArtworks(data.count, {
-                  unit: true,
-                }),
+                language.countArtworks(data.count),
             })),
 
           relations.referencedArtworksCoverGrid,

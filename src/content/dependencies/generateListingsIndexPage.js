@@ -48,11 +48,11 @@ export default {
 
             tracks:
               html.tag('b',
-                language.countTracks(data.numTracks, {unit: true})),
+                language.countTracks(data.numTracks)),
 
             albums:
               html.tag('b',
-                language.countAlbums(data.numAlbums, {unit: true})),
+                language.countAlbums(data.numAlbums)),
 
             duration:
               html.tag('b',

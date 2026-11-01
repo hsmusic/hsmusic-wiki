@@ -67,11 +67,11 @@ export default {
           html.tag('p', language.$(pageCapsule, 'infoLine', {
             words:
               html.tag('b',
-                language.formatWordCount(totalWordCount, {unit: true})),
+                language.formatWordCount(totalWordCount)),
 
             entries:
               html.tag('b',
-                language.countCommentaryEntries(totalEntryCount, {unit: true})),
+                language.countCommentaryEntries(totalEntryCount)),
           })),
 
           language.encapsulate(pageCapsule, 'albumList', listCapsule => [
@@ -87,8 +87,8 @@ export default {
                 html.tag('li',
                   language.$(listCapsule, 'item', {
                     album: albumLink,
-                    words: language.formatWordCount(wordCount, {unit: true}),
-                    entries: language.countCommentaryEntries(entryCount, {unit: true}),
+                    words: language.formatWordCount(wordCount),
+                    entries: language.countCommentaryEntries(entryCount),
                   })))),
           ]),
         ],

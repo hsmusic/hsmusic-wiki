@@ -41,7 +41,7 @@ export default {
           count: data.counts,
         }).map(({link, count}) => ({
             group: link,
-            albums: language.countAlbums(count, {unit: true}),
+            albums: language.countAlbums(count),
           })),
     });
   },

@@ -148,7 +148,7 @@ export default {
               count: counts,
             }).map(({link, count}) => ({
                 artist: link,
-                contributions: language.countContributions(count, {unit: true}),
+                contributions: language.countContributions(count),
               }))),
     }),
 };

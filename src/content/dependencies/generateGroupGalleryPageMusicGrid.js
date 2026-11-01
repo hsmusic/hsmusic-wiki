@@ -130,7 +130,7 @@ export default {
                    : style === 'single' && tracks > 1 && duration
                       ? language.$(capsule, 'single.withMultipleTracks', {
                           time: language.formatDuration(duration),
-                          tracks: language.countTracks(tracks, {unit: true}),
+                          tracks: language.countTracks(tracks),
                         })
 
                    : style === 'single' && duration
@@ -141,11 +141,11 @@ export default {
                    : duration && tracks
                       ? language.$(capsule, {
                           time: language.formatDuration(duration),
-                          tracks: language.countTracks(tracks, {unit: true}),
+                          tracks: language.countTracks(tracks),
                         })
 
                       : language.$(capsule, 'tracksOnly', {
-                          tracks: language.countTracks(tracks, {unit: true}),
+                          tracks: language.countTracks(tracks),
                         }))),
               })),
       })),

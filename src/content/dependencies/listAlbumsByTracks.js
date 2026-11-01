@@ -51,7 +51,7 @@ export default {
         }).map(({link, count, style}) => {
             const row = {
               album: link,
-              tracks: language.countTracks(count, {unit: true}),
+              tracks: language.countTracks(count),
             };
 
             if (style === 'single') {

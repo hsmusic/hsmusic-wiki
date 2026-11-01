@@ -68,7 +68,7 @@ export default {
           if (numTracks >= 2) {
             workingCapsule += '.withMultipleTracks';
             workingOptions.tracks =
-              language.countTracks(numTracks, {unit: true});
+              language.countTracks(numTracks);
           } else if (numTracks === 1) {
             workingCapsule += '.withOneTrack';
             workingOptions.track =

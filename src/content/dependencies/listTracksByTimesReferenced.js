@@ -42,7 +42,7 @@ export default {
         }).map(({link, timesReferenced}) => ({
             track: link,
             timesReferenced:
-              language.countTimesReferenced(timesReferenced, {unit: true}),
+              language.countTimesReferenced(timesReferenced),
           })),
     });
   },

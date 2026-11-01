@@ -63,9 +63,7 @@ export default {
           if (slots.showTimesFeatured && data.timesFeaturedTotal >= 1) {
             workingCapsule += `.withTimesUsed`;
             workingOptions.timesUsed =
-              language.countTimesFeatured(data.timesFeaturedTotal, {
-                unit: true,
-              });
+              language.countTimesFeatured(data.timesFeaturedTotal);
           }
 
           return language.$(workingCapsule, workingOptions);

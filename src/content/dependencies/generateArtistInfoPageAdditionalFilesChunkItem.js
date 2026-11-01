@@ -120,7 +120,7 @@ export default {
         if (numFiles >= 2) {
           workingCapsule += '.withMultipleFiles';
           workingOptions.files =
-            language.countFiles(numFiles, {unit: true});
+            language.countFiles(numFiles);
         } else if (numFiles === 0) {
           workingCapsule += '.withNoFiles';
         }

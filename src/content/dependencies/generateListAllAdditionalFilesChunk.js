@@ -85,7 +85,7 @@ export default {
                       } else if (links.length >= 2) {
                         workingCapsule += '.withMultipleFiles';
                         workingOptions.files =
-                          language.countFiles(links.length, {unit: true});
+                          language.countFiles(links.length);
                       }
 
                       return language.$(workingCapsule, workingOptions);
