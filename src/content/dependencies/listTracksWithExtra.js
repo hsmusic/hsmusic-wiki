@@ -99,7 +99,9 @@ export default {
 
       chunkStickyTitles:
         relations.albumLinks
-          .map(link => ({album: link})),
+          .map(link => ({
+            album: link,
+          })),
 
       chunkRows:
         relations.trackListItems

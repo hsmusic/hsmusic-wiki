@@ -28,14 +28,14 @@ export default {
           html.tag('p',
             {[html.onlyIfSiblings]: true},
 
-            language.encapsulate(pageCapsule, 'viewAlbumGallery', viewAlbumGalleryCapsule =>
-              language.encapsulate(viewAlbumGalleryCapsule, workingCapsule => {
+            language.encapsulate(pageCapsule, 'viewMusicGallery', viewMusicGalleryCapsule =>
+              language.encapsulate(viewMusicGalleryCapsule, workingCapsule => {
                 const workingOptions = {};
 
                 workingOptions.link =
                   relations.galleryLink
                     .slot('content',
-                      language.$(viewAlbumGalleryCapsule, 'link'));
+                      language.$(viewMusicGalleryCapsule, 'link'));
 
                 if (
                   !html.isBlank(relations.musicListByDate) &&

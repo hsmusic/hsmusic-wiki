@@ -2448,7 +2448,7 @@ groupInfoPage:
       _: "{ARTIST}"
       withAnnotation: "{ARTIST} ({ANNOTATION})"
 
-  viewAlbumGallery:
+  viewMusicGallery:
     _: >-
       View {LINK}! Or browse the list:
 
@@ -3148,19 +3148,7 @@ listingPage:
       title.short: "...with Music Videos"
 
       chunk:
-        title: >-
-          {ALBUM}
-
-        title.withCredit: >-
-          {ALBUM} {CREDIT}
-
-        title.withDate: >-
-          {ALBUM} ({DATE})
-
-        title.withCredit.withDate: >-
-          {ALBUM} {CREDIT} ({DATE})
-
-        stickyTitle: "{ALBUM}"
+        title: "{ALBUM}"
         item: "{TRACK}"
 
     # listTracks.withSheetMusicFiles:
@@ -3178,7 +3166,6 @@ listingPage:
       chunk:
         title: "{ALBUM}"
         title.withDate: "{ALBUM} ({DATE})"
-        stickyTitle: "{ALBUM}"
         item: "{TRACK}"
 
     # listTracks.withMidiProjectFiles:
@@ -3196,7 +3183,6 @@ listingPage:
       chunk:
         title: "{ALBUM}"
         title.withDate: "{ALBUM} ({DATE})"
-        stickyTitle: "{ALBUM}"
         item: "{TRACK}"
 
     # listTracks.needingLyrics:
@@ -3224,7 +3210,6 @@ listingPage:
         title.withCredit.withDate: >-
           {ALBUM} {CREDIT} ({DATE})
 
-        stickyTitle: "{ALBUM}"
         item: "{TRACK}"
 
   listMotifs:
