@@ -886,12 +886,12 @@ export class Language extends Thing {
       value > 1000 ? Math.floor(value / 100) / 10 : value
     );
 
-    const words =
-      value > 1000
-        ? this.formatString('count.words.thousand', {words: num})
-        : this.formatString('count.words', {words: num});
+    const prefix =
+      (value > 1000
+        ? 'count.words.thousand'
+        : 'count.words');
 
-    return this.formatString('count.words.withUnit.' + this.getUnitForm(value), {words});
+    return this.formatString(prefix + '.' + this.getUnitForm(value), {words: num});
   }
 
   #formatListHelper(array, processFn) {

@@ -160,13 +160,20 @@ count:
     other: "{WEEKS} weeks"
 
   words:
-    _: "{WORDS}"
     zero: ""
     one: "{WORDS} word"
     two: ""
     few: ""
     many: ""
     other: "{WORDS} words"
+
+    thousand:
+      zero: ""
+      one: "{WORDS}k words"
+      two: ""
+      few: ""
+      many: ""
+      other: "{WORDS}k words"
 
   years:
     zero: ""
