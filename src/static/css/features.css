@@ -120,14 +120,6 @@
     font-style: oblique;
   }
 
-  #additional-names-box li .accent {
-    opacity: 0.8;
-  }
-
-  #additional-names-box li .additional-name > img {
-    vertical-align: text-bottom;
-  }
-
   #content.top-index #additional-names-box {
     text-align: center;
   }
@@ -146,6 +138,22 @@
 
   #additional-names-box:not(.always-visible) {
     display: none;
+  }
+}
+
+/* Additional names (panel & box) */
+
+@layer print {
+  #additional-names-box,
+  #additional-names-panel {
+    li .accent {
+      &:where(#additional-names-box *) { opacity: 0.8; }
+      &:where(#additional-names-panel *) { opacity: 0.74; }
+    }
+
+    li .additional-name > img {
+      vertical-align: text-bottom;
+    }
   }
 }
 
