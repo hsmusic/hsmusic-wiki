@@ -114,6 +114,9 @@ export class WikiInfo extends Thing {
     },
 
     // Feature toggles
+
+    preferAdditionalNamesBox: flag(V(false)),
+
     enableFlashesAndGames: flag(V(false)),
     enableListings: flag(V(false)),
     enableNews: flag(V(false)),
@@ -177,6 +180,8 @@ export class WikiInfo extends Thing {
       'Meta Wallpaper File Extension': {property: 'metaWallpaperFileExtension'},
       'Meta Wallpaper Style': {property: 'metaWallpaperStyle'},
       'Meta Wallpaper Parts': {property: 'metaWallpaperParts', transform: parseWallpaperParts},
+
+      'Prefer Additional Names Box': {property: 'preferAdditionalNamesBox'},
 
       'Enable Flashes & Games': {property: 'enableFlashesAndGames'},
       'Enable Listings': {property: 'enableListings'},

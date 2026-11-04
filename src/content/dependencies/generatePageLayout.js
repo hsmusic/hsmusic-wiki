@@ -92,12 +92,7 @@ export default {
       default: true,
     },
 
-    additionalNamesBox: {
-      type: 'html',
-      mutable: false,
-    },
-
-    additionalNamesPanel: {
+    additionalNames: {
       type: 'html',
       mutable: false,
     },
@@ -300,14 +295,32 @@ export default {
       }
     })();
 
+    const additionalNamesStyle =
+      (() => {
+        if (html.isBlank(slots.additionalNames)) {
+          return null;
+        }
+
+        const {content: items} = html.smush(slots.additionalNames);
+        const {attributes} = items.at(0);
+
+        if (attributes.has('id', 'additional-names-box')) {
+          return 'box';
+        } else if (attributes.has('id', 'additional-names-panel')) {
+          return 'panel';
+        } else {
+          return null;
+        }
+      })();
+
     const headingNamePart =
       (() => {
         if (html.isBlank(slots.title)) {
           return html.blank();
         }
 
-        if (!html.isBlank(slots.additionalNamesBox)) {
-          const box = html.resolve(slots.additionalNamesBox, {slots: ['alwaysVisible']});
+        if (additionalNamesStyle === 'box') {
+          const box = html.resolve(slots.additionalNames, {slots: ['alwaysVisible']});
           if (!box.getSlotValue('alwaysVisible')) {
             return (
               html.tag('a',
@@ -403,8 +416,7 @@ export default {
 
           subheadingHTML,
 
-          slots.additionalNamesBox,
-          slots.additionalNamesPanel,
+          slots.additionalNames,
 
           html.tag('div', {class: 'main-content-container'},
             {[html.onlyIfContent]: true},

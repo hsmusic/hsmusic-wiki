@@ -20,8 +20,8 @@ export default {
     sidebar:
       relation('generateAlbumSidebar', album, null),
 
-    additionalNamesPanel:
-      relation('generateAdditionalNamesPanel', album),
+    additionalNames:
+      relation('generateAdditionalNamesPanelOrBox', album),
 
     artworkColumn:
       relation('generateAlbumArtworkColumn', album),
@@ -102,7 +102,7 @@ export default {
         headingMode: 'sticky',
         styleTags: relations.albumStyleTags,
 
-        additionalNamesPanel: relations.additionalNamesPanel,
+        additionalNames: relations.additionalNames,
 
         artworkColumnContent:
           relations.artworkColumn,

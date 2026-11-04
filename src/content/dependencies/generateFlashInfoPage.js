@@ -40,8 +40,8 @@ export default {
     sidebar:
       relation('generateFlashActSidebar', flash.act, flash),
 
-    additionalNamesPanel:
-      relation('generateAdditionalNamesPanel', flash),
+    additionalNames:
+      relation('generateAdditionalNamesPanelOrBox', flash),
 
     externalLinks:
       query.urls
@@ -112,7 +112,7 @@ export default {
         color: data.color,
         headingMode: 'sticky',
 
-        additionalNamesPanel: relations.additionalNamesPanel,
+        additionalNames: relations.additionalNames,
 
         artworkColumnContent: relations.artworkColumn,
 

@@ -34,8 +34,8 @@ export default {
     sidebar:
       relation('generateArtTagSidebar', artTag),
 
-    additionalNamesPanel:
-      relation('generateAdditionalNamesPanel', artTag),
+    additionalNames:
+      relation('generateAdditionalNamesPanelOrBox', artTag),
 
     contentHeading:
       relation('generateContentHeading'),
@@ -117,7 +117,7 @@ export default {
         headingMode: 'sticky',
         color: data.color,
 
-        additionalNamesPanel: relations.additionalNamesPanel,
+        additionalNames: relations.additionalNames,
 
         mainContent: [
           html.tag('p',

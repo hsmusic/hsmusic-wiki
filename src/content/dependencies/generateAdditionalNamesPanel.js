@@ -74,7 +74,7 @@ export default {
   }),
 
   slots: {
-    alwaysOpen: {
+    alwaysVisible: {
       type: 'boolean',
       default: false,
     },
@@ -107,17 +107,10 @@ export default {
         relations.items
           .map(item => html.tag('li', item)));
 
-    if (slots.alwaysOpen) {
+    if (slots.alwaysVisible) {
       const p =
         html.tag('p', {id: 'additional-names-panel'},
-          (empty(data.interestingAdditionalNames)
-            ? html.tag('span', {class: 'when-open'},
-                language.$(capsule, 'noNames.open'))
-         : data.numConcealedAdditionalNames === 0
-            ? html.tag('span', {class: 'when-open'},
-                language.$(capsule, 'open'))
-            : html.tag('span', {class: 'when-open'},
-                language.$(capsule, 'open'))));
+          language.$(capsule, 'noNames.keptOpen'));
 
       return html.tags([p, content]);
     }

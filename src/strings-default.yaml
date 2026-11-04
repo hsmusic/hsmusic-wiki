@@ -620,6 +620,8 @@ misc:
 
       title.all: "AKA: {NAMES}"
 
+      title.keptOpen: "Also known as:"
+
       item: "{NAME}"
       item.withAccent: "{NAME} {ACCENT}"
 
