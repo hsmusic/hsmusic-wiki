@@ -124,6 +124,10 @@ export function simpler(A1, B1) {
     const Ak = getKebabCase(A2);
     const Bk = getKebabCase(B2);
 
+    if (!Ak || !Bk) {
+      continue;
+    }
+
     if (kebabrisons.has(Ak) && kebabrisons.get(Ak).has(Bk)) {
       continue;
     } else if (kebabrisons.has(Ak)) {
