@@ -3,8 +3,9 @@
 // These files totally go together, so read them side by side, okay?
 
 import baseSearchSpec from '#search-shape';
+import {sortAlbumsTracksChronologically} from '#sort';
 import {empty, unique} from '#sugar';
-import {compareKebabCase} from '#wiki-data';
+import {chunkByDivisions, compareKebabCase} from '#wiki-data';
 
 function prepareArtwork(artwork, thing, {
   checkIfImagePathHasCachedThumbnails,
@@ -53,95 +54,9 @@ function prepareArtwork(artwork, thing, {
   return serializeSrc;
 }
 
-function determineAlbumGroups(album, opts) {
-  const dividingGroups =
-    opts.wikiInfo.divideTrackListsByGroups;
-
-  const artists =
-    album.artistContribs.map(contrib => contrib.artist);
-
-  const artistNames =
-    artists.map(artist => artist.name);
-
-  const groups = [];
-
-  for (const group of album.groups) {
-    const matchesGroupName = x => compareKebabCase(group.name, x);
-
-    if (!dividingGroups.includes(group))
-    if (artistNames.some(matchesGroupName))
-      continue;
-
-    groups.push(group);
-  }
-
-  return groups;
-}
-
-function determineArtistGroups(artist, opts) {
-  const contributions = [
-    artist.musicContributions,
-    artist.artworkContributions
-      .filter(contrib => !contrib.annotation?.includes('edits for wiki')),
-  ].flat();
-
-  const contributionGroups =
-    contributions.flatMap(contrib => contrib.groups);
-
-  const groupToZero =
-    new Map(unique(contributionGroups).map(group => [group, 0]));
-
-  const scores = new Map(groupToZero);
-  const counts = new Map(groupToZero);
-
-  const artistNames =
-    [artist, ...artist.artistAliases]
-      .map(({name}) => name);
-
-  group:
-  for (const group of scores.keys()) {
-    for (const artistName of artistNames) {
-      if (compareKebabCase(group.name, artistName)) {
-        scores.delete(group);
-        counts.delete(group);
-        continue group;
-      }
-    }
-  }
-
-  for (const group of contributionGroups) {
-    scores.set(group, scores.get(group) + 1 / contributions.length);
-    counts.set(group, counts.get(group) + 1);
-  }
-
-  const dividingGroups =
-    opts.wikiInfo.divideTrackListsByGroups;
-
-  const dividingGroupScoreThreshold =
-    (contributions.length < 50 ? 0.08 : 0.16);
-
-  const generalGroupScoreThreshold =
-    (contributions.length < 50 ? 0.00 : 0.12);
-
-  const dividingGroupCountThreshold = 15;
-  const generalGroupCountThreshold = 20;
-
-  for (const group of scores.keys()) {
-    const [scoreThreshold, countThreshold] =
-      (dividingGroups.includes(group)
-        ? [dividingGroupScoreThreshold, dividingGroupCountThreshold]
-        : [generalGroupScoreThreshold, generalGroupCountThreshold]);
-
-    if (scores.get(group) >= scoreThreshold);
-    else if (counts.get(group) >= countThreshold);
-    else scores.delete(group);
-  }
-
-  return Array.from(scores.keys());
-}
-
-function baselineProcess(thing, _opts) {
+function baselineProcess(entry, _opts) {
   const fields = {};
+  const {thing} = entry;
 
   fields.primaryName =
     thing.name;
@@ -153,6 +68,14 @@ function baselineProcess(thing, _opts) {
   fields.directory =
     thing.directoryWithinAlbum ??
     thing.directory;
+
+  fields.division =
+    (entry.division
+      ? [
+          entry.division.constructor.getReference(entry.division),
+          entry.division.name,
+        ]
+      : null);
 
   fields.artwork =
     null;
@@ -169,52 +92,46 @@ function baselineProcess(thing, _opts) {
 }
 
 function genericSelect(wikiData) {
-  const groupOrder =
-    wikiData.wikiInfo.divideTrackListsByGroups;
+  const wikiDivisions =
+    wikiData.wikiInfo.divideMusicBy;
 
-  const getGroupRank = thing => {
-    const relevantRanks =
-      Array.from(groupOrder.entries())
-        .filter(({1: group}) => thing.groups.includes(group))
-        .map(({0: index}) => index);
-
-    if (relevantRanks.length === 0) {
-      return Infinity;
-    } else if (relevantRanks.length === 1) {
-      return relevantRanks[0];
-    } else {
-      return relevantRanks[0] + 0.5;
-    }
-  }
-
-  const sortByGroupRank = things =>
-    things.sort((a, b) => getGroupRank(a) - getGroupRank(b));
+  const sortByWikiDivisions = things =>
+    chunkByDivisions(things, wikiDivisions, {duplicate: false})
+      .flatMap(({division, things}) => things
+        .map(thing => ({thing, division})));
 
   return [
-    sortByGroupRank(
-      wikiData.trackData
-        .filter(track =>
-          track.isMainRelease ||
-          !compareKebabCase(
-            track.name,
-            track.mainReleaseTrack.name))),
-
-    sortByGroupRank(wikiData.albumData.slice()),
-
     wikiData.artistData
-      .filter(artist => !artist.isAlias),
+      .filter(artist => !artist.isAlias)
+      .map(artist => ({thing: artist})),
 
-    wikiData.groupData,
-
-    wikiData.flashData,
+    wikiData.groupData
+      .map(group => ({thing: group})),
 
     wikiData.artTagData
-      .filter(artTag => !artTag.isContentWarning),
+      .filter(artTag => !artTag.isContentWarning)
+      .map(artTag => ({thing: artTag})),
+
+    wikiData.flashData
+      .map(flash => ({thing: flash})),
+
+    sortByWikiDivisions(
+      sortAlbumsTracksChronologically([
+        ...wikiData.albumData,
+        ...
+          wikiData.trackData
+            .filter(track =>
+              track.isMainRelease ||
+              !compareKebabCase(
+                track.name,
+                track.mainReleaseTrack.name)),
+      ])),
   ].flat();
 }
 
-function genericProcess(thing, opts) {
-  const fields = baselineProcess(thing, opts);
+function genericProcess(entry, opts) {
+  const fields = baselineProcess(entry, opts);
+  const {thing} = entry;
 
   const boundPrepareArtwork = artwork =>
     prepareArtwork(artwork, thing, opts);
@@ -233,7 +150,7 @@ function genericProcess(thing, opts) {
   const boundProcessAttachedResult = thing => ({
     id: thing.constructor.getReference(thing),
     doc: {
-      ...genericProcess(thing, opts),
+      ...genericProcess({thing}, opts),
       artwork: null,
       attachedResults: [],
       disambiguators: [],
@@ -291,7 +208,7 @@ function genericProcess(thing, opts) {
                 .join(', ')),
         ]
 
-      : [thing.parentName]);
+      : [fields.parentName]);
 
   fields.additionalNames =
     (thing.constructor.hasPropertyDescriptor('additionalNames')
@@ -299,15 +216,6 @@ function genericProcess(thing, opts) {
    : thing.constructor.hasPropertyDescriptor('artistAliases')
       ? thing.artistAliases.map(alias => alias.name)
       : []);
-
-  const groups =
-    (thing.isAlbum ? determineAlbumGroups(thing, opts)
-   : thing.isTrack ? determineAlbumGroups(thing.album, opts)
-   : thing.isArtist ? determineArtistGroups(thing, opts)
-   : []);
-
-  fields.groups =
-    groups.map(group => group.name);
 
   return fields;
 }

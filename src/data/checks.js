@@ -346,6 +346,7 @@ export function filterReferenceErrors(wikiData, {
 
     ['wikiInfo', {
       divideTrackListsByGroups: 'group',
+      divideMusicBy: '_wikiMusicDivisions',
     }],
 
     ['wikiUpdateData', {
@@ -603,6 +604,26 @@ export function filterReferenceErrors(wikiData, {
                   return track;
                 };
                 break;
+
+              case '_wikiMusicDivisions': {
+                const mixed =
+                  find.mixed({
+                    'album': find.album,
+                    'group': find.group,
+                    'group-category': find.groupCategory,
+                  });
+
+                const data =
+                  combineWikiDataArrays([
+                    wikiData.albumData,
+                    wikiData.groupData,
+                    wikiData.groupCategoryData,
+                  ]);
+
+                findFn = ref => mixed(ref, data, {mode: 'error'});
+
+                break;
+              }
 
               default:
                 if (findFnKey.startsWith('_')) {

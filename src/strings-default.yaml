@@ -341,8 +341,8 @@ releaseInfo:
 
     sticky:
       _: "Tracks that reference this one:"
-      fromGroup: "Tracks that reference this one — from {GROUP}:"
-      fromOther: "Tracks that reference this one — from somewhere else:"
+      fromDivision: "Tracks that reference this one — from {DIVISION}:"
+      notFromDivision: "Tracks that reference this one — from somewhere else:"
 
   tracksThatSample:
     _: "Tracks that sample {TRACK}:"
@@ -350,8 +350,8 @@ releaseInfo:
 
     sticky:
       _: "Tracks that sample this one:"
-      fromGroup: "Tracks that sample this one — from {GROUP}:"
-      fromOther: "Tracks that sample this one — from somewhere else:"
+      fromDivision: "Tracks that sample this one — from {DIVISION}:"
+      notFromDivision: "Tracks that sample this one — from somewhere else:"
 
   motifsFeatured:
     _: "Motifs that {TRACK} features:"
@@ -364,8 +364,8 @@ releaseInfo:
 
     sticky:
       _: "Tracks that feature this motif:"
-      fromGroup: "Tracks that feature this motif — from {GROUP}:"
-      fromOther: "Tracks that feature this motif — from somewhere else:"
+      fromDivision: "Tracks that feature this motif — from {DIVISION}:"
+      notFromDivision: "Tracks that feature this motif — from somewhere else:"
 
   motifsThatDeriveFromMotif:
     _: "Motifs that derive from '{MOTIF}':"
@@ -515,8 +515,8 @@ trackList:
     withDuration: "{SECTION}: ({DURATION})"
     sticky: "{SECTION}:"
 
-  fromGroup: "from {GROUP}:"
-  fromOther: "from somewhere else:"
+  fromDivision: "from {DIVISION}:"
+  notFromDivision: "from somewhere else:"
 
   item:
     _: "{TRACK}"
@@ -1063,6 +1063,8 @@ misc:
       Check spelling and use complete words.
 
     back: "Return to: {PAGE}"
+
+    fromDivision: "From {DIVISION}:"
 
     currentResult: "(you are here)"
     endSearch: "(OK, I'm done searching now.)"
@@ -2616,7 +2618,7 @@ groupGalleryPage:
     caption.mixedTracksAndAlbums.withYearRange: >-
       {TRACKS} and {ALBUMS}, released {YEAR_RANGE}.
 
-    caption.seriesItemsNotFromGroup: >-
+    caption.seriesItemsNotFromDivision: >-
       Items marked {MARKER} are part of {SERIES}, but not from {GROUP}.
 
 #
@@ -3237,7 +3239,7 @@ listingPage:
       title.short: "...by Group"
 
       chunk:
-        title: "{GROUP}"
+        title: "From {GROUP}:"
         item: "{MOTIF}"
 
   other:
@@ -3378,26 +3380,13 @@ listingPage:
         title:
           misc: "Miscellaneous:"
 
-          # fromAlbum:
-          #   If the wiki hasn't got "Divide Track Lists By Groups"
-          #   set, all albums across the wiki are grouped in one
-          #   long chunk.
-
           fromAlbum: "From an album:"
 
-          # fromGroup:
-          #   If the wiki does have "Divide Track Lists By Groups"
-          #   set, there's one chunk past Miscellaneous for each of
-          #   those groups, listing all the albums from that group,
-          #   each of which links to a random track from that album.
-
-          fromGroup:
-            _: "From {GROUP}:"
-
-            accent:
-              _: "({RANDOM_ALBUM}, {RANDOM_TRACK})"
-              randomAlbum: "Random Album"
-              randomTrack: "Random Track"
+          fromGroup: "From {GROUP}:"
+          fromGroup.accent:
+            _: "({RANDOM_ALBUM}, {RANDOM_TRACK})"
+            randomAlbum: "Random Album"
+            randomTrack: "Random Track"
 
         item:
           album: "{ALBUM}"

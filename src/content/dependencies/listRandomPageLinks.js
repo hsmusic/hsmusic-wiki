@@ -7,17 +7,19 @@ export default {
   query(sprawl, spec) {
     const query = {spec};
 
-    const groups = sprawl.wikiInfo.divideTrackListsByGroups;
+    const groupishDivisions =
+      sprawl.wikiInfo.divideMusicBy
+        .filter(thing => thing.isGroup || thing.isGroupCategory);
 
-    query.divideByGroups = !empty(groups);
+    query.divide = !empty(groupishDivisions);
 
-    if (query.divideByGroups) {
-      query.groups = groups;
+    if (query.divide) {
+      query.divisions = groupishDivisions;
 
-      query.groupAlbums =
-        groups
-          .map(group =>
-            group.albums.filter(album => album.tracks.length > 1));
+      query.dividedAlbums =
+        groupishDivisions
+          .map(division => division.albums
+            .filter(album => album.tracks.length > 1));
     } else {
       query.undividedAlbums =
         sortChronologically(sprawl.albumData.slice())
@@ -33,13 +35,13 @@ export default {
     relations.page =
       relation('generateListingPage', query.spec);
 
-    if (query.divideByGroups) {
-      relations.groupLinks =
-        query.groups
-          .map(group => relation('linkGroup', group));
+    if (query.divide) {
+      relations.divisionLinks =
+        query.divisions
+          .map(division => relation('linkAnythingMan', division));
 
-      relations.groupAlbumLinks =
-        query.groupAlbums
+      relations.dividedAlbumLinks =
+        query.dividedAlbums
           .map(albums => albums
             .map(album =>
               relation('generateListRandomPageLinksAlbumLink', album)));
@@ -56,10 +58,10 @@ export default {
   data(query) {
     const data = {};
 
-    if (query.divideByGroups) {
-      data.groupDirectories =
-        query.groups
-          .map(group => group.directory);
+    if (query.divide) {
+      data.divisionDirectories =
+        query.divisions
+          .map(division => division.directory);
     }
 
     return data;
@@ -101,7 +103,7 @@ export default {
           language.encapsulate(capsule, 'chooseLinkLine', capsule =>
             language.$(capsule, {
               fromPart:
-                (relations.groupLinks
+                (relations.divisionLinks
                   ? language.$(capsule, 'fromPart.dividedByGroups')
                   : language.$(capsule, 'fromPart.notDividedByGroups')),
 
@@ -122,16 +124,16 @@ export default {
       showSkipToSection: true,
 
       chunkIDs:
-        (data.groupDirectories
-          ? [null, ...data.groupDirectories]
+        (data.divisionDirectories
+          ? [null, ...data.divisionDirectories]
           : null),
 
       chunkTitles: [
         {stringsKey: 'misc'},
 
         ...
-          (relations.groupLinks
-            ? relations.groupLinks.map(groupLink => ({
+          (relations.divisionLinks
+            ? relations.divisionLinks.map(groupLink => ({
                 stringsKey: 'fromGroup',
                 group: groupLink,
               }))
@@ -142,8 +144,8 @@ export default {
         null,
 
         ...
-          (relations.groupLinks
-            ? relations.groupLinks.map(() =>
+          (relations.divisionLinks
+            ? relations.divisionLinks.map(() =>
                 language.encapsulate(capsule, 'chunk.title.fromGroup.accent', capsule => ({
                   randomAlbum:
                     html.tag('a',
@@ -162,8 +164,8 @@ export default {
         miscellaneousChunkRows,
 
         ...
-          (relations.groupAlbumLinks
-            ? relations.groupAlbumLinks.map(albumLinks =>
+          (relations.dividedAlbumLinks
+            ? relations.dividedAlbumLinks.map(albumLinks =>
                 albumLinks.map(albumLink => ({
                   stringsKey: 'album',
                   album: albumLink,
@@ -179,8 +181,8 @@ export default {
       chunkRowAttributes: [
         miscellaneousChunkRowAttributes,
         ...
-          (relations.groupAlbumLinks
-            ? relations.groupAlbumLinks.map(albumLinks =>
+          (relations.dividedAlbumLinks
+            ? relations.dividedAlbumLinks.map(albumLinks =>
                 albumLinks.map(() => null))
             : [relations.undividedAlbumLinks.map(() => null)]),
       ],

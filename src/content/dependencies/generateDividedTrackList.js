@@ -1,119 +1,82 @@
-import {empty, filterMultipleArrays, runs, stitchArrays, unique} from '#sugar';
-import {TupleMapForBabies} from '#wiki-data';
+import {empty, stitchArrays} from '#sugar';
+import {chunkByDivisions, chunkByDivisionRuns} from '#wiki-data';
 
 export default {
   sprawl: ({wikiInfo}) => ({
-    divideTrackListsByGroups:
-      wikiInfo.divideTrackListsByGroups,
+    divideMusicBy:
+      wikiInfo.divideMusicBy,
   }),
 
   query(sprawl, tracks, contextTrack) {
-    const wikiDividingGroups = sprawl.divideTrackListsByGroups;
+    const wikiDivisions = sprawl.divideMusicBy;
 
-    const contextDividingGroups =
+    const contextDivisions =
       contextTrack.groups
-        .filter(group => !wikiDividingGroups.includes(group))
+        .filter(group => !wikiDivisions.includes(group))
         .filter(group => group.useForDividingReferenceLists);
 
-    const contextGroupRuns =
-      Array.from(runs(contextDividingGroups));
+    const contextDivisionResults =
+      chunkByDivisionRuns(tracks, contextDivisions);
 
-    const groupings = new TupleMapForBabies('strong');
-    const ungroupedTracks = [];
+    const contextDivisionExtras =
+      (contextDivisionResults.at(-1) &&
+       empty(contextDivisionResults.at(-1).divisions)
+        ? contextDivisionResults.pop().things
+        : []);
 
-    const order = [
-      ...contextGroupRuns,
-      ...wikiDividingGroups.map(group => [group]),
+    const wikiDivisionResults =
+      chunkByDivisions(contextDivisionExtras, wikiDivisions);
+
+    const wikiDivisionExtras =
+      (wikiDivisionResults.at(-1) &&
+       wikiDivisionResults.at(-1).division === null
+        ? wikiDivisionResults.pop().things
+        : []);
+
+    const divisions = [
+      ...contextDivisionResults.map(({divisions}) => divisions),
+      ...wikiDivisionResults.map(({division}) => [division]),
     ];
 
-    for (const track of tracks) {
-      let run;
-      getRun: {
-        run =
-          contextDividingGroups
-            .filter(group => track.groups.includes(group));
+    const dividedTracks = [
+      ...contextDivisionResults.map(({things}) => things),
+      ...wikiDivisionResults.map(({things}) => things),
+    ];
 
-        if (!empty(run)) {
-          break getRun;
-        }
+    const undividedTracks = wikiDivisionExtras;
 
-        const wikiGroup =
-          wikiDividingGroups.find(group => track.groups.includes(group));
-
-        if (wikiGroup) {
-          run = [wikiGroup];
-          break getRun;
-        }
-
-        ungroupedTracks.push(track);
-        continue;
-      }
-
-      if (groupings.has(...run)) {
-        groupings.get(...run).push(track);
-      } else {
-        groupings.set(...run, [track]);
-      }
-    }
-
-    let groupingGroups = order.slice();
-    const groupedTracks = order.map(run => groupings.get(...run) ?? []);
-
-    filterMultipleArrays(
-      groupingGroups,
-      groupedTracks,
-      (_groups, tracks) => !empty(tracks));
-
-    const presentContextDividingGroups =
-      unique(groupingGroups.flat())
-        .filter(group => contextDividingGroups.includes(group));
-
-    const uninformativeGroups =
-      presentContextDividingGroups.filter((group, index) =>
-        presentContextDividingGroups
-          .slice(0, index)
-          .some(earlier =>
-            groupingGroups.every(run =>
-              run.includes(earlier) && run.includes(group) ||
-             !run.includes(earlier) && !run.includes(group))));
-
-    groupingGroups =
-      groupingGroups.map(groups =>
-        groups.filter(group =>
-          !uninformativeGroups.includes(group)));
-
-    return {groupingGroups, groupedTracks, ungroupedTracks};
+    return {divisions, dividedTracks, undividedTracks};
   },
 
   relations: (relation, query, _sprawl, tracks, contextTrack) => ({
     flatList:
-      (empty(query.groupedTracks)
+      (empty(query.dividedTracks)
         ? relation('generateNearbyTrackList', tracks, contextTrack, [])
         : null),
 
     contentHeading:
       relation('generateContentHeading'),
 
-    groupLinks:
-      query.groupingGroups
-        .map(groups => groups
-          .map(group => relation('linkGroup', group))),
+    divisionLinks:
+      query.divisions
+        .map(divisions => divisions
+          .map(division => relation('linkAnythingMan', division))),
 
-    groupedTrackLists:
-      query.groupedTracks
+    dividedTrackLists:
+      query.dividedTracks
         .map(tracks => relation('generateNearbyTrackList', tracks, contextTrack, [])),
 
-    ungroupedTrackList:
-      (empty(query.ungroupedTracks)
+    undividedTrackList:
+      (empty(query.undividedTracks)
         ? null
-        : relation('generateNearbyTrackList', query.ungroupedTracks, contextTrack, [])),
+        : relation('generateNearbyTrackList', query.undividedTracks, contextTrack, [])),
   }),
 
   data: (query, _sprawl, _tracks) => ({
-    groupNames:
-      query.groupingGroups
-        .map(groups => groups
-          .map(group => group.name)),
+    divisionNames:
+      query.divisions
+        .map(divisions => divisions
+          .map(division => division.name)),
   }),
 
   slots: {
@@ -130,20 +93,20 @@ export default {
 
       language.encapsulate('trackList', listCapsule => [
         stitchArrays({
-          groupNames: data.groupNames,
-          groupLinks: relations.groupLinks,
-          trackList: relations.groupedTrackLists,
+          divisionNames: data.divisionNames,
+          divisionLinks: relations.divisionLinks,
+          trackList: relations.dividedTrackLists,
         }).map(({
-            groupNames,
-            groupLinks,
+            divisionNames,
+            divisionLinks,
             trackList,
           }) => [
-            language.encapsulate(listCapsule, 'fromGroup', capsule => {
+            language.encapsulate(listCapsule, 'fromDivision', capsule => {
               const title =
                 language.$(capsule, {
-                  group:
+                  division:
                     language.formatConjunctionList(
-                      groupLinks.map(link => link.slot('color', false))),
+                      divisionLinks.map(link => link.slot('color', false))),
                 });
 
               if (slots.headingString) {
@@ -151,9 +114,9 @@ export default {
                   tag: 'dt',
                   title,
                   stickyTitle:
-                    language.$(slots.headingString, 'sticky', 'fromGroup', {
-                      group:
-                        language.formatConjunctionList(groupNames),
+                    language.$(slots.headingString, 'sticky.fromDivision', {
+                      division:
+                        language.formatConjunctionList(divisionNames),
                     }),
                 });
               } else {
@@ -164,8 +127,8 @@ export default {
             html.tag('dd', trackList),
           ]),
 
-        relations.ungroupedTrackList && [
-          language.encapsulate(listCapsule, 'fromOther', capsule =>
+        html.tags([
+          language.encapsulate(listCapsule, 'notFromDivision', capsule =>
             (slots.headingString
               ? relations.contentHeading.clone().slots({
                   tag: 'dt',
@@ -174,12 +137,14 @@ export default {
                     language.$(capsule),
 
                   stickyTitle:
-                    language.$(slots.headingString, 'sticky', 'fromOther'),
+                    language.$(slots.headingString, 'sticky.notFromDivision'),
                 })
-              : html.tag('dt',
+
+              : html.tag('dt', {[html.onlyIfSiblings]: true},
                   language.$(capsule)))),
 
-          html.tag('dd', relations.ungroupedTrackList),
-        ],
+          html.tag('dd', {[html.onlyIfContent]: true},
+            relations.undividedTrackList),
+        ]),
       ])),
 };

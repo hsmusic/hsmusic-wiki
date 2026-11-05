@@ -76,6 +76,8 @@ export const info = {
 
   backString: null,
 
+  fromDivisionString: null,
+
   albumResultKindString: null,
   artistResultKindString: null,
   flashResultKindString: null,
@@ -218,6 +220,9 @@ export function getPageReferences() {
 
   info.endSearchString =
     findString('end-search');
+
+  info.fromDivisionString =
+    findString('from-division');
 
   info.albumResultKindString =
     findString('album-result-kind');
@@ -963,11 +968,12 @@ function showSidebarSearchResults(results) {
 
 function tidyResults(results) {
   const tidiedResults =
-    results.results.map(({doc, id, tier}) => ({
+    results.results.map(({doc, id}) => ({
       reference: id ?? null,
       referenceType: (id ? id.split(':')[0] : null),
       directory: (id ? id.split(':')[1] : null),
-      tier: tier,
+      division: (doc.division ? doc.division[0] : null),
+      divisionName: (doc.division ? doc.division[1] : null),
       data: doc,
     }));
 
@@ -1029,7 +1035,9 @@ function fillResultElements(results, {
     return false;
   }
 
-  let lastTier = null;
+  let previousReferenceType = null;
+  let previousDivision = null;
+
   for (const result of filteredResults) {
     let el;
     try {
@@ -1041,14 +1049,57 @@ function fillResultElements(results, {
 
     if (!el) continue;
 
-    if (result.tier !== lastTier && lastTier) {
-      info.results.appendChild(document.createElement('hr'));
-      lastTier = result.tier;
-    } else if (result.tier !== lastTier) {
-      lastTier = result.tier;
+    let hasSplit = false;
+
+    if (
+      result.referenceType === 'track' ||
+      result.referenceType === 'album'
+    ) {
+      if (info.results.hasChildNodes()) {
+        let A = previousDivision;
+        let B = result.division;
+
+        if (A !== B) {
+          info.results.appendChild(document.createElement('hr'));
+          hasSplit = true;
+        }
+      }
+
+      if (!previousDivision || info.results.lastChild?.nodeName === 'HR') {
+        if (result.division) {
+          const p = document.createElement('p');
+          p.classList.add('wiki-search-division');
+
+          if (!previousDivision && info.results.lastChild?.nodeName === 'HR') {
+            info.results.lastChild.classList.add('greater-margin');
+          }
+
+          p.appendChild(
+            templateContent(info.fromDivisionString, {
+              division: document.createTextNode(result.divisionName),
+            }));
+
+          info.results.appendChild(p);
+        }
+      }
+    }
+
+    if (!hasSplit && !filterType && previousReferenceType) {
+      let A = previousReferenceType;
+      let B = result.referenceType;
+
+      if (A === 'album' || A === 'track') A = 'album or track';
+      if (B === 'album' || B === 'track') B = 'album or track';
+
+      if (A !== B) {
+        info.results.appendChild(document.createElement('hr'));
+      }
     }
 
     info.results.appendChild(el);
+
+    previousReferenceType = result.referenceType;
+    previousDivision = result.division;
   }
 
   return true;
@@ -1136,6 +1187,11 @@ function generateSidebarSearchResult(result, results, givenSlots = {}) {
 
     imageSource:
       getSearchResultImageSource(result),
+
+    showImagePlaceholder:
+      result.referenceType === 'album' ||
+      result.referenceType === 'track' ||
+      result.referenceType === 'flash',
 
     ...givenSlots,
   };
@@ -1289,6 +1345,13 @@ function generateSidebarSearchResult(result, results, givenSlots = {}) {
       break disambiguate;
     }
 
+    // No sense showing the disambiguation if it matches this result's
+    // division, since the result is definitely being shown under that
+    // division.
+    if (disambiguation === result.divisionName) {
+      break disambiguate;
+    }
+
     const string =
       info[result.referenceType + 'ResultDisambiguatorString' + (i + 1)];
 
@@ -1368,6 +1431,7 @@ function generateSidebarSearchResultTemplate(slots) {
     }
   }
 
+  showImage:
   if (!slots.isAttachedResult) {
     const imgContainer = document.createElement('span');
     imgContainer.classList.add('wiki-search-result-image-container');
@@ -1380,10 +1444,12 @@ function generateSidebarSearchResultTemplate(slots) {
       if (slots.imageSource.endsWith('.mini.jpg')) {
         img.classList.add('has-warning');
       }
-    } else {
+    } else if (slots.showImagePlaceholder) {
       const placeholder = document.createElement('span');
       placeholder.classList.add('wiki-search-result-image-placeholder');
       imgContainer.appendChild(placeholder);
+    } else {
+      break showImage;
     }
 
     link.appendChild(imgContainer);
@@ -1457,7 +1523,7 @@ function generateSidebarSearchResultTemplate(slots) {
         link.nextElementSibling ||
         containingAttachedResultsDiv?.nextElementSibling;
 
-      if (sibling?.tagName === 'HR') {
+      while (sibling?.tagName === 'HR' || sibling?.tagName === 'P') {
         sibling = sibling.nextElementSibling;
       }
 
@@ -1470,7 +1536,7 @@ function generateSidebarSearchResultTemplate(slots) {
         link.previousElementSibling ||
         containingAttachedResultsDiv?.previousElementSibling;
 
-      if (sibling?.tagName === 'HR') {
+      while (sibling?.tagName === 'HR' || sibling?.tagName === 'P') {
         sibling = sibling.previousElementSibling;
       }
 
@@ -1539,7 +1605,13 @@ function focusFirstSidebarSearchResult() {
     clearTimeout(state.dismissChangeEventTimeout);
   }
 
-  if (!focusIntoResultishElement(info.results.firstChild)) {
+  let sibling = info.results.firstChild;
+
+  while (sibling?.tagName === 'P') {
+    sibling = sibling.nextElementSibling;
+  }
+
+  if (!focusIntoResultishElement(sibling)) {
     return;
   }
 
@@ -1547,6 +1619,10 @@ function focusFirstSidebarSearchResult() {
     setTimeout(() => {
       state.dismissChangeEventTimeout = null;
     }, settings.dismissChangeEventAfterFocusingFirstResultLatency);
+}
+
+function scrollSearchResultsToTop() {
+  info.resultsContainer.scrollTop = 0;
 }
 
 function saveSidebarSearchResultsScrollOffset() {
@@ -1632,6 +1708,8 @@ function toggleSidebarSearchFilter(toggleType) {
       if (session.activeQueryResults) {
         shownAnyResults =
           fillResultElements(session.activeQueryResults, {filterType});
+
+        scrollSearchResultsToTop();
       }
 
       session.activeFilterType = filterType;

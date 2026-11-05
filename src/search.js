@@ -43,12 +43,13 @@ function bindSearchUtilities({
 }
 
 function populateSearchIndex(index, descriptor, wikiData, utilities) {
-  for (const thing of descriptor.select(wikiData)) {
+  for (const entry of descriptor.select(wikiData)) {
+    const {thing} = entry;
     const reference = thing.constructor.getReference(thing);
 
     let processed;
     try {
-      processed = descriptor.process(thing, utilities);
+      processed = descriptor.process(entry, utilities);
     } catch (caughtError) {
       throw new Error(
         `Failed to process searchable thing ${reference}`,

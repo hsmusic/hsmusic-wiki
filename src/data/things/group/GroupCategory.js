@@ -1,7 +1,9 @@
 import {input, V} from '#composite';
 import Thing from '#thing';
 
-import {exposeConstant} from '#composite/control-flow';
+import {exposeConstant, exposeDependency} from '#composite/control-flow';
+import {withFlattenedList, withPropertyFromList, withUniqueItemsOnly}
+  from '#composite/data';
 
 import {color, directory, flag, name, referenceList, soupyFind}
   from '#composite/wiki-properties';
@@ -34,7 +36,24 @@ export class GroupCategory extends Thing {
     // Expose only
 
     isGroupCategory: exposeConstant(V(true)),
+
+    albums: [
+      withPropertyFromList('groups', V('albums')),
+
+      withFlattenedList('#groups.albums')
+        .outputs({'#flattenedList': '#albums'}),
+
+      withUniqueItemsOnly('#albums'),
+      exposeDependency('#albums'),
+    ],
   });
+
+  static [Thing.findSpecs] = {
+    groupCategory: {
+      referenceTypes: ['group-category'],
+      bindTo: 'groupCategoryData',
+    },
+  };
 
   static [Thing.reverseSpecs] = {
     groupCategoriesWhichInclude: {

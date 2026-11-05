@@ -3,16 +3,19 @@ import {sortAlbumsTracksChronologically, sortAlphabetically}
   from '#sort';
 
 export default {
-  sprawl: ({groupData, motifData}) =>
-    ({groupData, motifData}),
+  sprawl: ({wikiInfo, motifData}) => ({wikiInfo, motifData}),
 
-  query({groupData, motifData}, spec) {
+  query(sprawl, spec) {
+    const groupishDivisions =
+      sprawl.wikiInfo.divideMusicBy
+        .filter(thing => thing.isGroup || thing.isGroupCategory);
+
+    const motifs = sprawl.motifData.slice();
+
     const firstAppearance = motif =>
       (empty(motif.featuredInTracks)
         ? null
         : motif.featuredInTracks.at(0).track);
-
-    const motifs = motifData.slice();
 
     // Multiple motifs may originate in the same track. These need an
     // unambiguous sort. It's just alphabetical here but could be
@@ -37,43 +40,45 @@ export default {
       motifFirstAppearances.indexOf(firstAppearance(a)) -
       motifFirstAppearances.indexOf(firstAppearance(b)));
 
-    const groupMotifMap = new Map();
+    const divisionMotifMap = new Map();
 
-    // Initialize the map with empty arrays for each group.
+    // Initialize the map with empty arrays for each division.
     // This is most important just to ensure the final order of keys/values
     // stored within the map.
-    for (const group of groupData) {
-      groupMotifMap.set(group, []);
+    for (const division of groupishDivisions) {
+      divisionMotifMap.set(division, []);
     }
 
     for (const motif of motifs) {
-      for (const group of firstAppearance(motif).groups) {
-        groupMotifMap.get(group).push(motif);
+      for (const division of firstAppearance(motif).divisions) {
+        if (divisionMotifMap.has(division)) {
+          divisionMotifMap.get(division).push(motif);
+        }
       }
     }
 
-    const groups =
-      Array.from(groupMotifMap.keys());
+    const divisions =
+      Array.from(divisionMotifMap.keys());
 
-    const groupMotifs =
-      Array.from(groupMotifMap.values());
+    const divisionMotifs =
+      Array.from(divisionMotifMap.values());
 
-    filterMultipleArrays(groups, groupMotifs,
+    filterMultipleArrays(divisions, divisionMotifs,
       (_group, motifs) => !empty(motifs));
 
-    return {spec, groups, groupMotifs};
+    return {spec, divisions, motifs: divisionMotifs};
   },
 
   relations: (relation, query) => ({
     page:
       relation('generateListingPage', query.spec),
 
-    groupLinks:
-      query.groups
-        .map(group => relation('linkGroup', group)),
+    divisionLinks:
+      query.divisions
+        .map(division => relation('linkAnythingMan', division)),
 
     motifLinks:
-      query.groupMotifs
+      query.motifs
         .map(motifs => motifs
           .map(motif => relation('linkMotif', motif))),
   }),
@@ -86,7 +91,7 @@ export default {
       type: 'chunks',
 
       chunkTitles:
-        relations.groupLinks
+        relations.divisionLinks
           .map(groupLink => ({group: groupLink})),
 
       chunkRows:

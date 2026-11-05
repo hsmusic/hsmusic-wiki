@@ -148,7 +148,7 @@
   #additional-names-panel {
     li .accent {
       &:where(#additional-names-box *) { opacity: 0.8; }
-      &:where(#additional-names-panel *) { opacity: 0.74; }
+      &:where(#additional-names-panel *) { opacity: 0.77; }
     }
 
     li .additional-name > img {

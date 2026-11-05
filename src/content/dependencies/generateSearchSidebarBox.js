@@ -46,6 +46,11 @@ export default {
           html.tag('template', {class: 'wiki-search-end-search-string'},
             language.$(capsule, 'endSearch')),
 
+          html.tag('template', {class: 'wiki-search-from-division-string'},
+            language.$(capsule, 'fromDivision', {
+              division: html.tag('slot', {name: 'division'}),
+            })),
+
           language.encapsulate(capsule, 'resultKind', capsule => [
             html.tag('template', {class: 'wiki-search-album-result-kind-string'},
               language.$(capsule, 'album')),

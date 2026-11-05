@@ -8,6 +8,7 @@ import {
   empty,
   filterMultipleArrays,
   re,
+  runs,
   unique,
 } from './sugar.js';
 
@@ -405,41 +406,126 @@ export function selectRepresentativeArtistContributorContribs(contribs) {
   return contribs;
 }
 
-// Simple function, really a port of the old algorithm that originated
-// in generateDividedTrackList. Not actually used there, since the new
-// approach is hells of more involved, and we haven't abstracted that.
-export function divideIntoGroups(things, dividingGroups, {compareGroup}) {
-  const groupings = new Map();
-  const ungroupedItems = [];
+export function chunkDivisionsBySpecificity(divisions) {
+  // Most specific first.
+  const map = {
+    albums: [],
+    groups: [],
+    groupCategories: [],
+  };
 
-  // Entry order matters! Add blank lists for each group
-  // in the order that those groups are provided.
-  for (const group of dividingGroups) {
-    groupings.set(group, []);
-  }
-
-  for (const item of things) {
-    const firstMatchingGroup =
-      dividingGroups.find(group => compareGroup(item, group));
-
-    if (firstMatchingGroup) {
-      groupings.get(firstMatchingGroup).push(item);
-    } else {
-      ungroupedItems.push(item);
+  for (const division of divisions) {
+    if (division.isGroupCategory) {
+      map.groupCategories.push(division);
+    } else if (division.isGroup) {
+      map.groups.push(division);
+    } else if (division.isAlbum) {
+      map.albums.push(division);
     }
   }
 
-  const groups = Array.from(groupings.keys());
-  const groupedItems = Array.from(groupings.values());
+  return Object.values(map).filter(divisions => !empty(divisions));
+}
 
-  // Drop the empty lists, so just the groups which
-  // at least a single track matched are left.
-  filterMultipleArrays(
-    groups,
-    groupedItems,
-    (_group, tracks) => !empty(tracks));
+export function chunkByDivisions(things, divisions, {
+  duplicate = true,
+  getDivisions = thing => thing.divisions,
+} = {}) {
+  const map = new Map(divisions.map(division => [division, []]));
+  const extra = [];
 
-  return {groups, groupedItems, ungroupedItems};
+  perThing:
+  for (const thing of things) {
+    let any = false;
+
+    for (const divisions of chunkDivisionsBySpecificity(getDivisions(thing))) {
+      let anyHere = false;
+
+      for (const division of divisions) {
+        if (map.has(division)) {
+          map.get(division).push(thing);
+
+          anyHere = true;
+          any = true;
+
+          if (!duplicate) {
+            continue perThing;
+          }
+        }
+      }
+
+      if (anyHere) {
+        continue perThing;
+      }
+    }
+
+    if (!any) {
+      extra.push(thing);
+    }
+  }
+
+  const result = [];
+
+  for (const [division, things] of map) {
+    if (!empty(things)) {
+      result.push({division, things});
+    }
+  }
+
+  if (!empty(extra)) {
+    result.push({division: null, things: extra});
+  }
+
+  return result;
+}
+
+export function chunkByDivisionRuns(things, divisions, {
+  getDivisions = thing => thing.divisions,
+} = {}) {
+  const tupleMap = new TupleMapForBabies('strong');
+  const extra = [];
+
+  const runRelevantDivisions = divisions;
+  const allRuns = Array.from(runs(runRelevantDivisions));
+
+  for (const run of allRuns) {
+    tupleMap.set(...run, []);
+  }
+
+  for (const thing of things) {
+    let any = false;
+
+    for (const divisions of chunkDivisionsBySpecificity(getDivisions(thing))) {
+      // Enter the thing into just the applicable run of these divisions.
+      const run =
+        divisions.filter(division => runRelevantDivisions.includes(division));
+
+      if (!empty(run)) {
+        any = true;
+        tupleMap.get(...run).push(thing);
+        break;
+      }
+    }
+
+    if (!any) {
+      extra.push(thing);
+    }
+  }
+
+  const result = [];
+
+  for (const run of allRuns) {
+    const things = tupleMap.get(...run);
+    if (!empty(things)) {
+      result.push({divisions: run, things});
+    }
+  }
+
+  if (!empty(extra)) {
+    result.push({divisions: [], things: extra});
+  }
+
+  return result;
 }
 
 // Big-ass homepage row functions

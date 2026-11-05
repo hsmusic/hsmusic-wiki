@@ -324,17 +324,17 @@
 
 /* Divider above search result list */
 
-@layer material {
-  .wiki-search-sidebar-box hr {
-    margin-top: 3px !important;
-    margin-bottom: 3px !important;
+@layer layout {
+  .wiki-search-sidebar-box > hr {
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
   }
 }
 
-@layer layout {
-  .wiki-search-sidebar-box hr {
-    border-color: var(--primary-color);
-    border-style: none none dotted none;
+@layer material {
+  .wiki-search-sidebar-box > hr {
+    border-color: var(--dim-color);
+    border-style: none none solid none;
   }
 }
 
@@ -384,6 +384,41 @@
     height: 16px; bottom: -2px;
     background: linear-gradient(to top, black, black 30%, transparent);
     opacity: 0.4;
+  }
+}
+
+/* Dividers in result list, and "from (division)" text */
+
+@layer layout {
+  .wiki-search-results > hr {
+    margin-top: 6px !important;
+    &.greater-margin { margin-top: 12px !important; }
+
+    margin-bottom: 4px !important;
+  }
+
+  .wiki-search-division {
+    margin-top: 1px;
+    &:where(hr + *) { margin-top: 6px; }
+
+    margin-bottom: 4px;
+    padding: 0 6px;
+  }
+}
+
+@layer material {
+  .wiki-search-results > hr {
+    border-color: var(--dim-color);
+    border-style: none none solid none;
+
+    border-width: 2px;
+    &.greater-margin { border-width: 3px; }
+  }
+}
+
+@layer print {
+  .wiki-search-division {
+    opacity: 0.85;
   }
 }
 

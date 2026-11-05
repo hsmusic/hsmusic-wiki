@@ -19,49 +19,48 @@ export default {
       sortAlphabetically(
         sprawl.artistData.filter(artist => !artist.isAlias));
 
-    const interestingGroups =
-      sprawl.wikiInfo.divideTrackListsByGroups;
+    const groupishDivisions =
+      sprawl.wikiInfo.divideMusicBy
+        .filter(thing => thing.isGroup || thing.isGroupCategory);
 
-    if (empty(interestingGroups)) {
+    if (empty(groupishDivisions)) {
       return {spec};
     }
 
     // We don't actually care about *which* things belong to each group, only
     // how many belong to each group. So we'll just compute a list of all the
-    // (interesting) groups that each of each artists' things belongs to.
-    const artistThingGroups =
-      artists.map(artist =>
-        ([
-          (unique(
-            ([
-              artist.albumArtistContributions
-                .map(contrib => contrib.thing),
-              artist.albumCoverArtistContributions
-                .map(contrib => contrib.thing.thing),
-              artist.albumWallpaperArtistContributions
-                .map(contrib => contrib.thing.thing),
-              artist.albumBannerArtistContributions
-                .map(contrib => contrib.thing.thing),
-            ]).flat()
-          )).map(album => album.groups),
-          (unique(
-            ([
-              artist.trackArtistContributions
-                .map(contrib => contrib.thing),
-              artist.trackContributorContributions
-                .map(contrib => contrib.thing),
-              artist.trackCoverArtistContributions
-                .map(contrib => contrib.thing.thing),
-            ]).flat()
-          )).map(track => track.album.groups),
-        ]).flat()
-          .map(groups => groups
-            .filter(group => interestingGroups.includes(group))));
+    // divisions that each of each artists' things belongs to.
+    const artistThingDivisions =
+      artists.map(artist => {
+        const artworkThings =
+          unique(
+            artist.artworkContributions
+              .map(contrib => contrib.thing)
+              .map(artwork => artwork.thing));
 
-    const [artistsByGroup, countsByGroup] =
-      transposeArrays(interestingGroups.map(group => {
+        const musicThings =
+          unique(
+            artist.musicContributions
+              .map(contrib => contrib.thing));
+
+        // This list can deliberately include doubles, i.e. if an artist
+        // contributed music and art for the sames track.
+        const things =
+          [artworkThings, musicThings].flat();
+
+        const thingDivisions =
+          things
+            .map(thing => thing.divisions ?? [])
+            .map(divisions => divisions
+              .filter(group => groupishDivisions.includes(group)));
+
+        return thingDivisions;
+      });
+
+    const [artistsByDivision, countsByDivision] =
+      transposeArrays(groupishDivisions.map(group => {
         const counts =
-          artistThingGroups
+          artistThingDivisions
             .map(thingGroups => thingGroups
               .filter(thingGroups => thingGroups.includes(group))
               .length);
@@ -73,19 +72,19 @@ export default {
         return [filteredArtists, counts];
       }));
 
-    const groups = interestingGroups;
+    const divisions = groupishDivisions;
 
     filterMultipleArrays(
-      groups,
-      artistsByGroup,
-      countsByGroup,
+      divisions,
+      artistsByDivision,
+      countsByDivision,
       (_group, artists, _counts) => !empty(artists));
 
     return {
       spec,
-      groups,
-      artistsByGroup,
-      countsByGroup,
+      divisions,
+      artistsByDivision,
+      countsByDivision,
     };
   },
 
@@ -95,13 +94,13 @@ export default {
     relations.page =
       relation('generateListingPage', query.spec);
 
-    if (query.artistsByGroup) {
-      relations.groupLinks =
-        query.groups
-          .map(group => relation('linkGroup', group));
+    if (query.artistsByDivision) {
+      relations.divisionLinks =
+        query.divisions
+          .map(division => relation('linkAnythingMan', division));
 
-      relations.artistLinksByGroup =
-        query.artistsByGroup
+      relations.artistLinksByDivision =
+        query.artistsByDivision
           .map(artists => artists
             .map(artist => relation('linkArtist', artist)));
     }
@@ -112,13 +111,13 @@ export default {
   data(query) {
     const data = {};
 
-    if (query.artistsByGroup) {
-      data.groupDirectories =
-        query.groups
-          .map(group => group.directory);
+    if (query.artistsByDivision) {
+      data.divisionDirectories =
+        query.divisions
+          .map(division => division.directory);
 
-      data.countsByGroup =
-        query.countsByGroup;
+      data.countsByDivision =
+        query.countsByDivision;
     }
 
     return data;
@@ -130,18 +129,18 @@ export default {
 
       showSkipToSection: true,
       chunkIDs:
-        data.groupDirectories
+        data.divisionDirectories
           .map(directory => `contributed-to-${directory}`),
 
       chunkTitles:
-        relations.groupLinks.map(groupLink => ({
+        relations.divisionLinks.map(groupLink => ({
           group: groupLink,
         })),
 
       chunkRows:
         stitchArrays({
-          artistLinks: relations.artistLinksByGroup,
-          counts: data.countsByGroup,
+          artistLinks: relations.artistLinksByDivision,
+          counts: data.countsByDivision,
         }).map(({artistLinks, counts}) =>
             stitchArrays({
               link: artistLinks,

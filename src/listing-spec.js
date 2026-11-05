@@ -115,10 +115,10 @@ listingSpec.push({
   seeAlso: ['artists/by-name', 'artists/by-contribs'],
 
   // TODO: This is a crude approximation, since it doesn't check if artists'
-  // contributions ever actually end up in any of these groups.
+  // contributions ever actually end up in any of these divisions.
   condition: ({artistData, wikiInfo}) =>
     wikiInfo.enableGroupUI &&
-    !empty(wikiInfo.divideTrackListsByGroups) &&
+    wikiInfo.divideMusicBy.some(thing => thing.isGroup || thing.isGroupCategory) &&
     !empty(artistData),
 });
 
@@ -229,10 +229,10 @@ listingSpec.push({
   contentFunction: 'listMotifsByGroup',
 
   // TODO: Same as artists/by-group. This is a crude approximation, since it
-  // doesn't check if motifs are actually used in any of these groups.
+  // doesn't check if motifs are actually used in any of these divisions.
   condition: ({motifData, wikiInfo}) =>
     wikiInfo.enableGroupUI &&
-    !empty(wikiInfo.divideTrackListsByGroups) &&
+    wikiInfo.divideMusicBy.some(thing => thing.isGroup || thing.isGroupCategory) &&
     !empty(motifData),
 });
 

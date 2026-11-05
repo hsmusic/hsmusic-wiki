@@ -61,36 +61,6 @@ export function normalizeName(s) {
   return s;
 }
 
-// It's normalizeName, but tougher!
-export const badtothebone                                 = 3;
-export function aggressivelyNormalizeName(s, badtothebone = 3) {
-  if (badtothebone >= 3) {
-    // Discard everything up to "Vol" etc.
-    s = s.replace(/^.*(?=Vol(\.|ume)?[ 0-9])/, '');
-  }
-
-  if (badtothebone >= 2) {
-    // Discard a parenthesized part at the end of the name, and stuff
-    // after a colon, which might be details, annotations, subtitles,
-    // or otherwise "extra".
-    s = s.replace(/ \(.*\)$/, '');
-    s = s.replace(/(?<!\b): .*/, '');
-  }
-
-  s = normalizeName(s);
-
-  if (badtothebone >= 1) {
-    // Stem words.
-    let s2;
-    do { s2 = s.replace(stemRegex, ''); }
-    while (s2 !== s && (s = s2));
-  }
-
-  s = s.replace(/^(.*?: )?\[S\] /, '');
-
-  return s;
-}
-
 export function simpler(A1, B1) {
   const simplifications = [
     // Surrounding quote marks

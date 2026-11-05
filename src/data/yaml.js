@@ -2203,7 +2203,11 @@ export function linkWikiDataArrays(wikiData, {bindFind, bindReverse}) {
       'wikiInfo',
     ]],
 
-    ['wikiInfo', [/* find */]],
+    ['wikiInfo', [
+      'albumData',
+      'groupData',
+      'groupCategoryData',
+    ]],
 
     ['wikiUpdateData', ['wikiUpdateData']],
   ]);

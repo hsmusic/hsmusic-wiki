@@ -11,6 +11,7 @@ const baselineStore = [
   'nameDetail',
   'disambiguators',
   'classification',
+  'division',
   'artwork',
   'color',
   'attachedResults',
@@ -27,7 +28,6 @@ const searchShape = {
       // 'parentName',
       // 'parentDirectory',
       'additionalNames',
-      'groups',
     ].map(field => ({field, tokenize: 'forward'})),
 
     store: genericStore,
@@ -41,7 +41,6 @@ const searchShape = {
       // 'parentName',
       // 'parentDirectory',
       'additionalNames',
-      'groups',
     ],
 
     store: genericStore,

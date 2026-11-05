@@ -1,16 +1,8 @@
 import {empty, stitchArrays} from '#sugar';
 import {sortMotifConnectionsChronologically} from '#sort';
-import {divideIntoGroups} from '#wiki-data';
+import {chunkByDivisions} from '#wiki-data';
 
 export default {
-  contentDependencies: [
-    'generateContentHeading',
-    'generateMotifConnectionList',
-    'generateMotifConnectionListItem',
-    'linkGroup'
-  ],
-  extraDependencies: ['html', 'wikiData', 'language'],
-
   slots: {
     headingString: {
       type: 'string',
@@ -18,24 +10,32 @@ export default {
   },
 
   sprawl: ({wikiInfo}) => ({
-    divideTrackListsByGroups:
-      wikiInfo.divideTrackListsByGroups,
+    divideMusicBy:
+      wikiInfo.divideMusicBy,
   }),
 
   query(sprawl, motifConnections) {
-    const dividingGroups = sprawl.divideTrackListsByGroups;
+    const wikiDivisions = sprawl.divideMusicBy;
 
-    const {groups, groupedItems, ungroupedItems} =
-      divideIntoGroups(motifConnections, dividingGroups, {
-        compareGroup: (connection, group) =>
-          connection.track.album.groups.includes(group),
+    const wikiDivisionResults =
+      chunkByDivisions(motifConnections, wikiDivisions, {
+        getDivisions: connection =>
+          connection.track.divisions,
       });
 
-    return {
-      groups,
-      groupedRefs: groupedItems,
-      ungroupedRefs: ungroupedItems,
-    };
+    const undividedConnections =
+      (wikiDivisionResults.at(-1) &&
+       wikiDivisionResults.at(-1).division === null
+        ? wikiDivisionResults.pop().things
+        : []);
+
+    const divisions =
+      wikiDivisionResults.map(({division}) => division);
+
+    const dividedConnections =
+      wikiDivisionResults.map(({things}) => things);
+
+    return {divisions, dividedConnections, undividedConnections};
   },
 
   relations: (relation, query, sprawl, connections, context) => ({
@@ -47,24 +47,25 @@ export default {
     contentHeading:
       relation('generateContentHeading'),
 
-    groupLinks:
-      query.groups
-        .map(group => relation('linkGroup', group)),
+    divisionLinks:
+      query.divisions
+        .map(division => relation('linkAnythingMan', division)),
 
-    groupedRefLists:
-      query.groupedRefs
-        .map(refs => relation('generateMotifConnectionList', refs, context)),
+    dividedConnectionLists:
+      query.dividedConnections
+        .map(connections =>
+          relation('generateMotifConnectionList', connections, context)),
 
-    ungroupedRefList:
-      (empty(query.ungroupedRefs)
+    undividedConnectionList:
+      (empty(query.undividedConnections)
         ? null
-        : relation('generateMotifConnectionList', query.ungroupedRefs, context)),
+        : relation('generateMotifConnectionList', query.undividedConnections, context)),
   }),
 
   data: (query, _sprawl, _connections, _context) => ({
-    groupNames:
-      query.groups
-        .map(group => group.name),
+    divisionNames:
+      query.divisions
+        .map(division => division.name),
   }),
 
   generate: (data, relations, slots, {html, language}) =>
@@ -75,39 +76,35 @@ export default {
 
       language.encapsulate('trackList', listCapsule => [
         stitchArrays({
-          groupName: data.groupNames,
-          groupLink: relations.groupLinks,
-          refList: relations.groupedRefLists,
+          divisionName: data.divisionNames,
+          divisionLink: relations.divisionLinks,
+          connectionList: relations.dividedConnectionLists,
         }).map(({
-            groupName,
-            groupLink,
-            refList,
+            divisionName,
+            divisionLink,
+            connectionList,
           }) => [
-            language.encapsulate(listCapsule, 'fromGroup', capsule =>
+            language.encapsulate(listCapsule, 'fromDivision', capsule =>
               (slots.headingString
                 ? relations.contentHeading.clone().slots({
                     tag: 'dt',
 
                     title:
-                      language.$(capsule, {
-                        group: groupLink
-                      }),
+                      language.$(capsule, {division: divisionLink}),
 
                     stickyTitle:
-                      language.$(slots.headingString, 'sticky', 'fromGroup', {
-                        group: groupName,
-                      }),
+                      language.$(slots.headingString, 'sticky.fromDivision',
+                        {division: divisionName}),
                   })
-                : html.tag('dt',
-                    language.$(capsule, {
-                      group: groupLink
-                    })))),
 
-            html.tag('dd', refList),
+                : html.tag('dt',
+                    language.$(capsule, {division: divisionLink})))),
+
+            html.tag('dd', connectionList),
           ]),
 
-        relations.ungroupedRefList && [
-          language.encapsulate(listCapsule, 'fromOther', capsule =>
+        html.tags([
+          language.encapsulate(listCapsule, 'notFromDivision', capsule =>
             (slots.headingString
               ? relations.contentHeading.clone().slots({
                   tag: 'dt',
@@ -116,12 +113,14 @@ export default {
                     language.$(capsule),
 
                   stickyTitle:
-                    language.$(slots.headingString, 'sticky', 'fromOther'),
+                    language.$(slots.headingString, 'sticky.notFromDivision'),
                 })
-              : html.tag('dt',
+
+              : html.tag('dt', {[html.onlyIfSiblings]: true},
                   language.$(capsule)))),
 
-          html.tag('dd', relations.ungroupedRefList),
-        ],
+          html.tag('dd', {[html.onlyIfContent]: true},
+            relations.undividedConnectionList),
+        ]),
       ]))
 };

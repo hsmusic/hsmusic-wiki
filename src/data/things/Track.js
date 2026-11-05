@@ -4,7 +4,7 @@ import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input, V} from '#composite';
 import find, {keyRefRegex} from '#find';
-import {empty, onlyItem} from '#sugar';
+import {empty, onlyItem, unique} from '#sugar';
 import {sortByDate} from '#sort';
 import Thing from '#thing';
 import {compareKebabCase} from '#wiki-data';
@@ -69,6 +69,7 @@ import {
   withPropertiesFromObject,
   withPropertyFromList,
   withPropertyFromObject,
+  withUniqueItemsOnly,
 } from '#composite/data';
 
 import {
@@ -851,6 +852,38 @@ export class Track extends Thing {
 
       withPropertyFromObject('album', V('dateStyle')),
       exposeDependency('#album.dateStyle'),
+    ],
+
+    divisions: [
+      {
+        dependencies: ['ownGroups', 'groups'],
+        compute: (continuation, {ownGroups, groups}) =>
+          continuation({
+            ['#groups']:
+              unique([...ownGroups, ...groups]),
+          }),
+      },
+
+      withPropertyFromList('#groups', V('category')),
+      withUniqueItemsOnly('#groups.category'),
+
+      {
+        dependencies: [
+          'album',
+          '#groups',
+          '#groups.category',
+        ],
+
+        compute: ({
+          ['album']: album,
+          ['#groups']: groups,
+          ['#groups.category']: groupCategories,
+        }) => [
+          album,
+          ...groups,
+          ...groupCategories,
+        ],
+      },
     ],
 
     trackNumber: [

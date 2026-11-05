@@ -32,7 +32,8 @@ import {
   parseURLs,
 } from '#yaml';
 
-import {withFlattenedList, withPropertyFromList} from '#composite/data';
+import {withFlattenedList, withPropertyFromList, withUniqueItemsOnly}
+  from '#composite/data';
 
 import {
   exitWithoutDependency,
@@ -668,7 +669,30 @@ export class Album extends Thing {
          : datePosted   ? 'posted'
                         : null),
       },
-    ]
+    ],
+
+    divisions: [
+      withPropertyFromList('groups', V('category')),
+      withUniqueItemsOnly('#groups.category'),
+
+      {
+        dependencies: [
+          input.myself(),
+          'groups',
+          '#groups.category',
+        ],
+
+        compute: ({
+          [input.myself()]: album,
+          ['groups']: groups,
+          ['#groups.category']: groupCategories,
+        }) => [
+          album,
+          ...groups,
+          ...groupCategories,
+        ],
+      },
+    ],
   });
 
   static [Thing.getSerializeDescriptors] = ({
