@@ -67,6 +67,7 @@ export class GroupCategory extends Thing {
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Category': {property: 'name'},
+      'Directory': {property: 'directory'},
 
       'Color': {property: 'color'},
 
