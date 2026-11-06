@@ -1125,22 +1125,8 @@
     --dim-color: inherit !important;
   }
 
-  .grid-listing > .grid-caption,
-  .grid-listing > .grid-expando {
+  .grid-listing > .grid-caption {
     flex-basis: 100%;
-  }
-
-  .grid-expando {
-    margin-top: 1em;
-    margin-bottom: 2em;
-
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-  }
-
-  .grid-expando-content {
-    margin: 0;
   }
 }
 
@@ -1218,11 +1204,6 @@
     text-align: center;
     line-height: 1.5;
   }
-
-  .grid-expando-content {
-    text-align: center;
-    line-height: 1.5;
-  }
 }
 
 @layer interaction {
@@ -1258,25 +1239,6 @@
   /* title */
   .grid-item:hover > .image-container + span {
     text-decoration: underline;
-  }
-
-  .grid-expando-toggle {
-    text-decoration: underline;
-    text-decoration-style: dotted;
-  }
-
-  .grid-item.shown-by-expandable-cut {
-    animation: expand-cover-grid 0.8s forwards;
-  }
-
-  @keyframes expand-cover-grid {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
   }
 }
 

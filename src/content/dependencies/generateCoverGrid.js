@@ -2,9 +2,6 @@ import {unique} from '#sugar';
 
 export default {
   relations: (relation, artworksAndThings) => ({
-    expando:
-      relation('generateGridExpando'),
-
     actionLinks:
       relation('generateGridActionLinks'),
 
@@ -26,7 +23,6 @@ export default {
 
     // Configuration stuff
     lazy: {validate: v => v.anyOf(v.isWholeNumber, v.isBoolean)},
-    cutIndex: {validate: v => v.isWholeNumber},
 
     // Optional - overrides the defaults
     items: {validate: v => v.strictArrayOf(v.isHTML)},
@@ -50,10 +46,6 @@ export default {
          : typeof slots.lazy === 'boolean'
             ? slots.lazy
             : false),
-
-        cut:
-          slots.cutIndex >= 1 &&
-          index >= slots.cutIndex,
       });
     }
 
@@ -105,12 +97,9 @@ export default {
       relations.actionLinks.slot('actionLinks', slots.actionLinks);
 
     const bottom =
-      (slots.cutIndex >= 1 &&
-       slots.cutIndex < items.length
-        ? relations.expando.slot('caption', slots.bottomCaption)
-        : html.tag('p', {class: 'grid-caption'},
-            {[html.onlyIfContent]: true},
-            slots.bottomCaption));
+      html.tag('p', {class: 'grid-caption'},
+        {[html.onlyIfContent]: true},
+        slots.bottomCaption);
 
     const grid =
       html.tag('div', {class: 'grid-listing'},

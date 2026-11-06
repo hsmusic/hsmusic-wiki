@@ -100,8 +100,6 @@ export default {
         }),
 
         relations.grid.slots({
-          cutIndex: 4,
-
           bottomCaption:
             language.encapsulate(capsule, 'caption', captionCapsule =>
               html.tags([

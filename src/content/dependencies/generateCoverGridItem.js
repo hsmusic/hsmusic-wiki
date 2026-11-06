@@ -44,7 +44,6 @@ export default {
 
     // Managed by generateCoverGrid
     lazy: {type: 'boolean', default: false},
-    cut: {type: 'boolean', default: false},
   },
 
   generate(relations, slots, {html, language}) {
@@ -82,9 +81,6 @@ export default {
 
       !html.isBlank(slots.tab) &&
         {class: 'has-tab'},
-
-      slots.cut &&
-        {class: 'hidden-by-expandable-cut'},
     ]);
 
     const content = html.tags([

@@ -7,7 +7,6 @@ import * as artistExternalLinkTooltipModule from './artist-external-link-tooltip
 import * as artistRollingWindowModule from './artist-rolling-window.js';
 import * as datetimestampTooltipModule from './datetimestamp-tooltip.js';
 import * as draggedLinkModule from './dragged-link.js';
-import * as expandableGridSectionModule from './expandable-grid-section.js';
 import * as galleryStyleSelectorModule from './gallery-style-selector.js';
 import * as groupContributionsTableModule from './group-contributions-table.js';
 import * as hashLinkModule from './hash-link.js';
@@ -39,7 +38,6 @@ export const modules = [
   artistRollingWindowModule,
   datetimestampTooltipModule,
   draggedLinkModule,
-  expandableGridSectionModule,
   galleryStyleSelectorModule,
   groupContributionsTableModule,
   hashLinkModule,
