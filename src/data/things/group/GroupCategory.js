@@ -20,6 +20,7 @@ export class GroupCategory extends Thing {
     directory: directory(),
 
     useGroupsForDividingReferenceLists: flag(V(false)),
+    collapseGroupsInAlbumSidebars: flag(V(false)),
     excludeGroupsFromOtherGroupAlbumSummaries: flag(V(false)),
 
     color: color(),
@@ -73,6 +74,10 @@ export class GroupCategory extends Thing {
 
       'Use Groups For Dividing Reference Lists': {
         property: 'useGroupsForDividingReferenceLists',
+      },
+
+      'Collapse Groups In Album Sidebars': {
+        property: 'collapseGroupsInAlbumSidebars',
       },
 
       'Exclude Groups From Other Group Album Summaries': {

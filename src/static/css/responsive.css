@@ -78,9 +78,9 @@
 /* Layout - Medium or Thin */
 
 @media (max-width: 849.98px) {
-  .sidebar.collapsible,
-  .sidebar-box-joiner.collapsible,
-  .sidebar-column.all-boxes-collapsible {
+  .sidebar.hide-for-narrow-layout,
+  .sidebar-box-joiner.hide-for-narrow-layout,
+  .sidebar-column.all-boxes-hide-for-narrow-layout {
     display: none;
   }
 

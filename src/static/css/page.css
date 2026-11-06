@@ -559,35 +559,35 @@
 }
 
 @layer print {
-  .sidebar > h1,
-  .sidebar > h2,
-  .sidebar > h3,
-  .sidebar > p {
+  .sidebar-content > h1,
+  .sidebar-content > h2,
+  .sidebar-content > h3,
+  .sidebar-content > p {
     text-align: center;
     padding-left: 4px;
     padding-right: 4px;
   }
 
-  .sidebar h1 {
+  .sidebar-content h1 {
     font-size: 1.25em;
   }
 
-  .sidebar h1 a {
+  .sidebar-content h1 a {
     word-break: break-word;
     line-break: loose;
   }
 
-  .sidebar h2 {
+  .sidebar-content h2 {
     font-size: 1.1em;
     margin: 0;
   }
 
-  .sidebar h2:first-child {
+  .sidebar-content h2:first-child {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
   }
 
-  .sidebar h3 {
+  .sidebar-content h3 {
     font-size: 1.1em;
     font-style: oblique;
     font-variant: small-caps;
@@ -595,148 +595,148 @@
     margin-bottom: 0em;
   }
 
-  .sidebar > p {
+  .sidebar-content > p {
     margin: 0.5em 0;
     padding: 0 5px;
   }
 
-  .sidebar hr {
+  .sidebar-content hr {
     color: #555;
     margin: 10px 5px;
   }
 
-  .sidebar > ol,
-  .sidebar > ul {
+  .sidebar-content > ol,
+  .sidebar-content > ul {
     padding-left: 30px;
     padding-right: 15px;
   }
 
-  .sidebar > dl {
+  .sidebar-content > dl {
     padding-right: 15px;
     padding-left: 0;
   }
 
-  .sidebar > dl dt {
+  .sidebar-content > dl dt {
     padding-left: 10px;
     margin-top: 0.5em;
   }
 
-  .sidebar > dl dt.current {
+  .sidebar-content > dl dt.current {
     font-weight: 800;
   }
 
-  .sidebar > dl dd {
+  .sidebar-content > dl dd {
     margin-left: 0;
   }
 
-  .sidebar > dl dd ul {
+  .sidebar-content > dl dd ul {
     padding-left: 30px;
     margin-left: 0;
   }
 
-  .sidebar > dl .side {
+  .sidebar-content > dl .side {
     padding-left: 10px;
   }
 
-  .sidebar details.has-tree-list[open] summary {
+  .sidebar-content details.has-tree-list[open] summary {
     font-weight: 800;
   }
 
-  .sidebar dl.tree-list {
+  .sidebar-content dl.tree-list {
     margin-top: 0.25em;
     line-height: 1.25em;
     padding-left: 15px;
   }
 
-  .sidebar dl.tree-list dt {
+  .sidebar-content dl.tree-list dt {
     display: list-item;
     list-style-type: disc;
     padding-left: 0;
     margin-left: 20px;
   }
 
-  .sidebar dl.tree-list dl {
+  .sidebar-content dl.tree-list dl {
     padding-left: 15px;
   }
 
-  .sidebar dl.tree-list dd {
+  .sidebar-content dl.tree-list dd {
     margin-left: 0;
   }
 
-  .sidebar dl.tree-list dt.current a {
+  .sidebar-content dl.tree-list dt.current a {
     font-weight: 800;
     border-bottom: 1px solid;
   }
 
-  .sidebar .times-used {
+  .sidebar-content .times-used {
     opacity: 0.7;
     font-size: 0.9em;
     cursor: default;
   }
 
-  .sidebar li.current {
+  .sidebar-content li.current {
     font-weight: 800;
   }
 
-  .sidebar li {
+  .sidebar-content li {
     overflow-wrap: break-word;
     padding-right: 3px;
   }
 
-  .sidebar li.structured {
+  .sidebar-content li.structured {
     margin-bottom: 3px;
   }
 
-  .sidebar li .name-detail {
+  .sidebar-content li .name-detail {
     opacity: 0.85;
   }
 
-  .sidebar li.current .name-detail {
+  .sidebar-content li.current .name-detail {
     opacity: 1;
   }
 
-  .sidebar > details.current summary {
+  .sidebar-content > details.current summary {
     font-weight: 800;
   }
 
-  .sidebar > details summary {
+  .sidebar-content > details summary {
     margin-top: 0.5em;
     padding-left: 5px;
   }
 
-  .sidebar > details.current summary span b {
+  .sidebar-content > details.current summary span b {
     font-weight: 800;
   }
 
-  .sidebar > details ul,
-  .sidebar > details ol {
+  .sidebar-content > details ul,
+  .sidebar-content > details ol {
     margin-top: 0;
     margin-bottom: 0;
   }
 
-  .sidebar > details:last-child {
+  .sidebar-content > details:last-child {
     margin-bottom: 10px;
   }
 
-  .sidebar > details[open] {
+  .sidebar-content > details[open] {
     margin-bottom: 1em;
   }
 
-  .sidebar article {
+  .sidebar-content article {
     text-align: left;
     margin: 5px 5px 15px 5px;
   }
 
-  .sidebar article:last-child {
+  .sidebar-content article:last-child {
     margin-bottom: 5px;
   }
 
-  .sidebar article h2,
+  .sidebar-content article h2,
   .news-index h2 {
     border-bottom: 1px dotted;
   }
 
-  .sidebar article h2 time,
+  .sidebar-content article h2 time,
   .news-index time {
     float: right;
     font-weight: normal;
@@ -764,6 +764,88 @@
       bottom: -4px; left: 4px; right: 12px;
       border-bottom: 1px solid
         color-mix(in srgb, var(--primary-color), 50% transparent);
+    }
+  }
+}
+
+/* Sidebars - expand/collapse */
+
+@layer layout {
+  .sidebar > details summary,
+  .sidebar > .chain-details .chain-summary {
+    display: grid;
+    grid-template-columns: auto 1.5ch;
+
+    margin: -5px;
+    padding: 4px;
+  }
+
+  .sidebar > details[open] summary {
+    margin-bottom: 2px;
+  }
+}
+
+@layer material {
+  .sidebar > details[open] summary {
+    border-bottom: 1px solid var(--deep-color);
+  }
+}
+
+@layer print {
+  .sidebar > details summary,
+  .sidebar > .chain-details .chain-summary {
+    color: var(--primary-color);
+
+    padding-left: 8px;
+    text-align: left;
+    font-style: oblique;
+  }
+}
+
+@layer construction {
+  .sidebar > details summary::after {
+    font-style: normal;
+    font-size: 0.8em;
+
+    content: "\25b6";
+  }
+
+  .sidebar > details[open] summary::after {
+    content: "\25bc";
+  }
+}
+
+@layer interaction {
+  .sidebar > details summary div span {
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .sidebar > .chain-details .chain-summary {
+    cursor: default;
+  }
+
+  .sidebar .chain-details .sidebar-content { display: none; }
+
+  .sidebar:has(> details:not([open])) {
+    ~ .sidebar-box-joiner { height: 8px; }
+
+    ~ .sidebar:has(> details[open]),
+    ~ .sidebar:not(:has(> details, > .chain-details)) {
+      ~ .sidebar-box-joiner { height: revert-layer; }
+    }
+  }
+
+  .sidebar:has(> details[open]) {
+    ~ .sidebar:has(.chain-details) .chain-summary { display: none; }
+    ~ .sidebar:has(.chain-details) .sidebar-content { display: unset; }
+
+    ~ .sidebar:has(> details:not([open])) {
+      ~ .sidebar:has(.chain-details) .chain-summary { display: unset; }
+      ~ .sidebar:has(.chain-details) .sidebar-content { display: none; }
     }
   }
 }

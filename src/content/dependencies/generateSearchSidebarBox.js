@@ -8,7 +8,7 @@ export default {
     language.encapsulate('misc.search', capsule =>
       relations.sidebarBox.slots({
         attributes: {class: 'wiki-search-sidebar-box'},
-        collapsible: false,
+        hideForNarrowLayout: false,
 
         content: [
           html.tag('label', {class: 'wiki-search-label'},

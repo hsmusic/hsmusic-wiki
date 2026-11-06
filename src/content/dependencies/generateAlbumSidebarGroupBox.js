@@ -61,7 +61,16 @@ export default {
     return relations;
   },
 
-  data: (_query, _album, track, group) => ({
+  data: (query, _album, track, group) => ({
+    directory:
+      group.directory,
+
+    color:
+      group.color,
+
+    collapse:
+      group.collapseInAlbumSidebars,
+
     groupDirectlyIncludesTrack:
       (track
         ? group.albumsAndTracks.includes(track)
@@ -83,12 +92,15 @@ export default {
 
       return relations.box.slots({
         attributes: {class: 'individual-group-sidebar-box'},
-        content: [
-          html.tag('h1',
-            language.$(boxCapsule, 'title', {
-              group: relations.groupLink,
-            })),
+        color: (data.collapse ? data.color : null),
 
+        collapse: data.collapse,
+        collapseMemorableID: `${data.directory}-sidebar-group`,
+
+        title:
+          language.$(boxCapsule, 'title', {group: relations.groupLink}),
+
+        content: [
           hsmusicLikeAnAlbum &&
             relations.description
               ?.slot('mode', 'multiline'),

@@ -95,6 +95,10 @@ export default {
         .map(group =>
           relation('generateAlbumSidebarGroupBox', album, track, group)),
 
+    groupColorStyles:
+      query.groups
+        .map(group => relation('generateColorStyleAttribute', group.color)),
+
     seriesBoxes:
       query.groupSerieses
         .map(serieses => serieses
@@ -162,13 +166,16 @@ export default {
             relations.disconnectedSeriesBoxes,
             stitchArrays({
               groupBox: relations.groupBoxes,
+              groupColorStyle: relations.groupColorStyles,
               seriesBoxes: relations.seriesBoxes,
-            }).map(({groupBox, seriesBoxes}) => [
+            }).map(({groupBox, groupColorStyle, seriesBoxes}) => [
                 groupBox,
                 seriesBoxes.map(seriesBox => [
                   html.tag('div',
                     {class: 'sidebar-box-joiner'},
-                    {class: 'collapsible'}),
+                    {class: 'hide-for-narrow-layout'},
+                    groupColorStyle.slot('context', 'primary-only')),
+
                   seriesBox,
                 ]),
               ]),

@@ -62,6 +62,17 @@ export class Group extends Thing {
       exposeConstant(V(false)),
     ],
 
+    collapseInAlbumSidebars: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
+      }),
+
+      withPropertyFromObject('category', V('collapseGroupsInAlbumSidebars')),
+      exposeDependencyOrContinue('#category.collapseGroupsInAlbumSidebars'),
+
+      exposeConstant(V(false)),
+    ],
+
     excludeFromOtherGroupAlbumSummaries: [
       exposeUpdateValueOrContinue({
         validate: input.value(isBoolean),
@@ -246,6 +257,10 @@ export class Group extends Thing {
 
       'Use For Dividing Reference Lists': {
         property: 'useForDividingReferenceLists',
+      },
+
+      'Collapse In Album Sidebars': {
+        property: 'collapseInAlbumSidebars',
       },
 
       'Exclude From Other Group Album Summaries': {

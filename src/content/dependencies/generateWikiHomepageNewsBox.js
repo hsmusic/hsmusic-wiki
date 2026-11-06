@@ -35,7 +35,7 @@ export default {
     language.encapsulate('homepage.news', boxCapsule =>
       relations.box.slots({
         attributes: {class: 'latest-news-sidebar-box'},
-        collapsible: false,
+        hideForNarrowLayout: false,
 
         content: [
           html.tag('h1',

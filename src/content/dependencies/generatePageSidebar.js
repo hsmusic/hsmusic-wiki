@@ -59,14 +59,14 @@ export default {
 
     const {content: boxes} = html.smooth(slots.boxes);
 
-    const allBoxesCollapsible =
-      boxes.every(box =>
-        html.resolve(box)
-          .attributes
-          .has('class', 'collapsible'));
+    const allBoxesHideForNarrowLayout =
+      boxes
+        .map(box => html.resolve(box))
+        .filter(box => !html.isBlank(box))
+        .every(box => box.attributes.has('class', 'hide-for-narrow-layout'));
 
-    if (allBoxesCollapsible) {
-      attributes.add('class', 'all-boxes-collapsible');
+    if (allBoxesHideForNarrowLayout) {
+      attributes.add('class', 'all-boxes-hide-for-narrow-layout');
     }
 
     return html.tag('div', attributes, slots.boxes);

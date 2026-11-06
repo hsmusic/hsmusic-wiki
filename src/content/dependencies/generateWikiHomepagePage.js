@@ -70,7 +70,7 @@ export default {
           boxes: [
             relations.customSidebarBox.slots({
               attributes: {class: 'custom-content-sidebar-box'},
-              collapsible: false,
+              hideForNarrowLayout: false,
 
               content:
                 relations.customSidebarContent

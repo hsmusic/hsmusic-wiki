@@ -25,8 +25,8 @@ export default {
     box:
       relation('generatePageSidebarBox'),
 
-    groupLink:
-      relation('linkGroup', series.group),
+    seriesLink:
+      relation('linkGroupSeries', series),
 
     description:
       relation('transformContent', series.description),
@@ -42,9 +42,15 @@ export default {
         : null),
   }),
 
-  data: (_query, _album, track, series) => ({
+  data: (query, _album, track, series) => ({
     name:
       series.name,
+
+    color:
+      series.group.color,
+
+    collapse:
+      series.group.collapseInAlbumSidebars,
 
     seriesDirectlyIncludesTrack:
       (track
@@ -67,16 +73,15 @@ export default {
 
       return relations.box.slots({
         attributes: {class: 'individual-series-sidebar-box'},
-        content: [
-          html.tag('h1',
-            language.$(boxCapsule, 'title', {
-              group:
-                relations.groupLink.slots({
-                  attributes: {class: 'series'},
-                  content: language.sanitize(data.name),
-                }),
-            })),
+        color: (data.collapse ? data.color : null),
 
+        collapse:
+          (data.collapse ? 'chain' : false),
+
+        title:
+          language.$(boxCapsule, 'title', {group: relations.seriesLink}),
+
+        content: [
           hsmusicLikeAnAlbum &&
             relations.description.slot('mode', 'multiline'),
 
