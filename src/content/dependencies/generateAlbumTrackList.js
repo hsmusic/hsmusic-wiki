@@ -138,7 +138,7 @@ export default {
 
     switch (data.displayMode) {
       case 'trackSections':
-        return html.tag('dl', {class: 'album-group-list'},
+        return html.tag('dl', {class: 'album-track-section-list'},
           stitchArrays({
             heading: relations.trackSectionHeadings,
             description: relations.trackSectionDescriptions,
@@ -207,17 +207,23 @@ export default {
                   description),
 
                 (hasTrackNumbers
-                  ? html.tag('ol', {start: startCountingFrom},
+                  ? html.tag('ol', {class: 'album-track-list'},
+                      {start: startCountingFrom},
                       slotItems(items))
-                  : html.tag('ul', slotItems(items)))),
+
+                  : html.tag('ul', {class: 'album-track-list'},
+                      slotItems(items)))),
             ]));
 
       case 'tracks':
-        if (data.albumHasTrackNumbers) {
-          return html.tag('ol', slotItems(relations.items));
-        } else {
-          return html.tag('ul', slotItems(relations.items));
-        }
+        return (
+          (data.albumHasTrackNumbers
+            ? html.tag('ol', {class: 'album-track-list'},
+                slotItems(relations.items))
+
+            : html.tag('ul', {class: 'album-track-list'},
+                slotItems(relations.items)))
+        );
 
       default:
         return html.blank();

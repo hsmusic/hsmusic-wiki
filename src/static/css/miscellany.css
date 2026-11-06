@@ -625,49 +625,49 @@
 /* Track sections, and similar */
 
 @layer layout {
-  .album-group-list dt,
+  .album-track-section-list dt,
   .group-series-list dt {
     padding-left: 0;
   }
 
-  .album-group-list dd,
+  .album-track-section-list dd,
   .group-series-list dd {
     margin-left: 0;
   }
 
-  .album-group-list dd.aside :is(ul, ol) {
+  .album-track-section-list dd.aside :is(ul, ol) {
     padding-left: 36px;
   }
 
-  .album-group-list li {
+  .album-track-section-list li {
     padding-left: 1.5ch;
     text-indent: -1.5ch;
   }
 
-  .album-group-list li > * {
+  .album-track-section-list li > * {
     text-indent: 0;
   }
 
-  .album-group-list blockquote,
+  .album-track-section-list blockquote,
   .group-series-list blockquote {
     max-width: 540px;
     margin-bottom: 9px;
     margin-top: 3px;
   }
 
-  .album-group-list blockquote p:first-child,
+  .album-track-section-list blockquote p:first-child,
   .group-series-list blockquote p:first-child {
     margin-top: 0;
   }
 
-  .album-group-list blockquote p:last-child,
+  .album-track-section-list blockquote p:last-child,
   .group-series-list blockquote p:last-child {
     margin-bottom: 0;
   }
 }
 
 @layer print {
-  .album-group-list dt,
+  .album-track-section-list dt,
   .group-series-list dt {
     font-style: oblique;
   }
@@ -676,12 +676,12 @@
 /* Aside track sections */
 
 @layer layout {
-  .album-group-list dt.aside {
+  .album-track-section-list dt.aside {
     margin-left: -5px;
     padding: 5px 4px 0 5px;
   }
 
-  .album-group-list dd.aside {
+  .album-track-section-list dd.aside {
     position: relative;
     margin-top: 1px;
     margin-left: -5px;
@@ -697,15 +697,15 @@
     }
   }
 
-  .album-group-list dd:has(+ dt.aside) { margin-bottom: 0.65em; }
-  .album-group-list dt.aside           { margin-top: 0.65em; }
-  .album-group-list dd.aside           { margin-bottom: 0.65em; }
-  .album-group-list dd.aside + dt      { margin-top: 0.65em; }
+  .album-track-section-list dd:has(+ dt.aside) { margin-bottom: 0.65em; }
+  .album-track-section-list dt.aside           { margin-top: 0.65em; }
+  .album-track-section-list dd.aside           { margin-bottom: 0.65em; }
+  .album-track-section-list dd.aside + dt      { margin-top: 0.65em; }
 }
 
 @layer material {
-  .album-group-list dt.aside,
-  .album-group-list dd.aside {
+  .album-track-section-list dt.aside,
+  .album-track-section-list dd.aside {
     background: #ffffff0a;
     border: 1px solid #ffffff3a;
 
@@ -713,7 +713,7 @@
     &:is(dd) { border-top: none; border-radius: 0 0 4px 4px; }
   }
 
-  .album-group-list dd.aside::before {
+  .album-track-section-list dd.aside::before {
     border-left: 1px dashed;
   }
 }
