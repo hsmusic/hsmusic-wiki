@@ -89,7 +89,7 @@ export default {
         headingMode: 'static',
         color: data.color,
 
-        additionalNamesBox: relations.additionalNamesBox,
+        additionalNames: relations.additionalNamesBox,
 
         mainClasses: ['top-index'],
         mainContent: [
