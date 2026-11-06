@@ -1389,16 +1389,26 @@ albumSidebar:
 
     fallbackSectionName: "Track list"
 
-    # group:
-    #   "Group" is a misnomer - these are track sections. Some albums
-    #   don't use track numbers at all, and for these, the default
-    #   string will be used instead of group.withRange.
+    section: >-
+      {SECTION}
 
-    group:
-      _: "{GROUP}"
+    section.withRange: >-
+      {SECTION} {RANGE_ACCENT}
 
-      withRange: "{GROUP} {RANGE_PART}"
-      withRange.rangePart: "({RANGE})"
+    section.withRange.accent: >-
+      ({RANGE})
+
+    section.withRange.range: >-
+      {START}–{END}
+
+    section.withRange.one: >-
+      {NUMBER}
+
+    section.withCount: >-
+      {SECTION} {COUNT_ACCENT}
+
+    section.withCount.accent: >-
+      ({COUNT})
 
   # groupBox:
   #   This is the box for groups. Apart from the next and previous

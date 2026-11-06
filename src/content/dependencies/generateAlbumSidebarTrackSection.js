@@ -27,6 +27,9 @@ export default {
     data.isAsideTrackSection = !!trackSection.isAsideTrackSection;
     data.hasSiblingSections = album.trackSections.length > 1;
 
+    data.numTracks =
+      trackSection.tracks.length;
+
     data.firstTrackNumber =
       (data.hasTrackNumbers
         ? trackSection.tracks.at(0).trackNumber
@@ -36,6 +39,16 @@ export default {
       (data.hasTrackNumbers
         ? trackSection.tracks.at(-1).trackNumber
         : null);
+
+    const stemTrackSections =
+      album.trackSections.filter(section =>
+        !section.isTrackSectionContinuation &&
+        !section.isAsideTrackSection);
+
+    data.showTrackCount =
+      stemTrackSections.length > 1 &&
+      stemTrackSections
+        .every(section => section.tracks.at(0).trackNumber === 1);
 
     data.trackDirectories =
       trackSection.tracks
@@ -185,17 +198,32 @@ export default {
         colorStyle,
 
         html.tag('span',
-          language.encapsulate(capsule, 'group', groupCapsule =>
-            language.encapsulate(groupCapsule, workingCapsule => {
-              const workingOptions = {group: sectionName};
+          language.encapsulate(capsule, 'section', sectionCapsule =>
+            language.encapsulate(sectionCapsule, workingCapsule => {
+              const workingOptions = {section: sectionName};
 
-              if (data.hasTrackNumbers) {
+              if (data.showTrackCount) {
+                workingCapsule += '.withCount';
+                workingOptions.countAccent =
+                  html.tag('span', {class: 'track-section-accent'},
+                    language.$(sectionCapsule, 'withCount.accent', {
+                      count:
+                        language.countTracks(data.numTracks),
+                    }));
+              } else if (data.hasTrackNumbers) {
                 workingCapsule += '.withRange';
-                workingOptions.rangePart =
-                  html.tag('span', {class: 'track-section-range'},
-                    language.$(groupCapsule, 'withRange.rangePart', {
+                workingOptions.rangeAccent =
+                  html.tag('span', {class: 'track-section-accent'},
+                    language.$(sectionCapsule, 'withRange.accent', {
                       range:
-                        `${data.firstTrackNumber}–${data.lastTrackNumber}`,
+                        (data.firstTrackNumber === data.lastTrackNumber
+                          ? language.$(sectionCapsule, 'withRange.one', {
+                              number: data.firstTrackNumber,
+                            })
+                          : language.$(sectionCapsule, 'withRange.range', {
+                              start: data.firstTrackNumber,
+                              end: data.lastTrackNumber,
+                            })),
                     }));
               }
 
