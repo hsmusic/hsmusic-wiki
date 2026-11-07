@@ -362,8 +362,10 @@ export function quickEvaluate({
 
   allContentDependencies = {...allContentDependencies};
   for (const [name, contentFunction] of Object.entries(allContentDependencies)) {
-    allContentDependencies[name] =
-      contentFunction.bindExtraDependencies(allExtraDependencies);
+    if (contentFunction) {
+      allContentDependencies[name] =
+        contentFunction.bindExtraDependencies(allExtraDependencies);
+    }
   }
 
   const slotResults = {};
