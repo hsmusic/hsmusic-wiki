@@ -198,7 +198,7 @@ export default {
 
           language.encapsulate(pageCapsule, 'descendsFromTags', listCapsule =>
             html.tags([
-              relations.contentHeading.clone().slots({
+              relations.contentHeading.cloneWithSlots({
                 title:
                   language.$(listCapsule, {
                     tag: language.sanitize(data.name),
@@ -221,7 +221,7 @@ export default {
 
           language.encapsulate(pageCapsule, 'descendantTags', listCapsule =>
             html.tags([
-              relations.contentHeading.clone().slots({
+              relations.contentHeading.cloneWithSlots({
                 title:
                   language.encapsulate(listCapsule, workingCapsule => {
                     const workingOptions = {

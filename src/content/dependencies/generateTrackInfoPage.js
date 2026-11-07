@@ -291,7 +291,7 @@ export default {
           }),
 
           html.tags([
-            relations.connectionsContentHeading.clone().slots({
+            relations.connectionsContentHeading.cloneWithSlots({
               attributes: {id: 'references'},
               string: 'releaseInfo.tracksReferenced',
             }),
@@ -300,7 +300,7 @@ export default {
           ]),
 
           html.tags([
-            relations.connectionsContentHeading.clone().slots({
+            relations.connectionsContentHeading.cloneWithSlots({
               attributes: {id: 'samples'},
               string: 'releaseInfo.tracksSampled',
             }),
@@ -310,7 +310,7 @@ export default {
 
           html.tags([
             language.encapsulate('releaseInfo.motifsFeatured', capsule =>
-              relations.connectionsContentHeading.clone().slots({
+              relations.connectionsContentHeading.cloneWithSlots({
                 attributes: {id: 'features-motifs'},
                 string: capsule,
               })),
@@ -320,7 +320,7 @@ export default {
 
           language.encapsulate('releaseInfo.tracksThatReference', capsule =>
             html.tags([
-              relations.connectionsContentHeading.clone().slots({
+              relations.connectionsContentHeading.cloneWithSlots({
                 attributes: {id: 'referenced-by'},
                 string: capsule,
               }),
@@ -332,7 +332,7 @@ export default {
 
           language.encapsulate('releaseInfo.tracksThatSample', capsule =>
             html.tags([
-              relations.connectionsContentHeading.clone().slots({
+              relations.connectionsContentHeading.cloneWithSlots({
                 attributes: {id: 'sampled-by'},
                 string: capsule,
               }),
@@ -343,7 +343,7 @@ export default {
             ])),
 
           html.tags([
-            relations.connectionsContentHeading.clone().slots({
+            relations.connectionsContentHeading.cloneWithSlots({
               attributes: {id: 'featured-in'},
               string: 'releaseInfo.flashesThatFeature',
             }),
@@ -352,7 +352,7 @@ export default {
           ]),
 
           html.tags([
-            relations.connectionsContentHeading.clone().slots({
+            relations.connectionsContentHeading.cloneWithSlots({
               attributes: {id: 'previously-featured-in'},
               string: 'releaseInfo.flashesThatPreviouslyFeatured',
             }),
@@ -382,7 +382,7 @@ export default {
           relations.lyricsSection,
 
           html.tags([
-            relations.contentHeading.clone().slots({
+            relations.contentHeading.cloneWithSlots({
               attributes: {id: 'sheet-music-files'},
               title: language.$('releaseInfo.sheetMusicFiles.heading'),
             }),
@@ -393,7 +393,7 @@ export default {
           ]),
 
           html.tags([
-            relations.contentHeading.clone().slots({
+            relations.contentHeading.cloneWithSlots({
               attributes: {id: 'midi-project-files'},
               title: language.$('releaseInfo.midiProjectFiles.heading'),
             }),
@@ -404,7 +404,7 @@ export default {
           ]),
 
           html.tags([
-            relations.contentHeading.clone().slots({
+            relations.contentHeading.cloneWithSlots({
               attributes: {id: 'additional-files'},
               title: language.$('releaseInfo.miscellaneousAdditionalFiles.heading'),
             }),

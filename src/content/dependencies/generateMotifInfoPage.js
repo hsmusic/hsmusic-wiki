@@ -97,7 +97,7 @@ export default {
             ),
 
           html.tags([
-            relations.connectionsContentHeading.clone().slots({
+            relations.connectionsContentHeading.cloneWithSlots({
               attributes: {id: 'derived-for-motifs'},
               string: 'releaseInfo.motifsThatDeriveFromMotif',
             }),
@@ -110,7 +110,7 @@ export default {
           ]),
 
           html.tags([
-            relations.connectionsContentHeading.clone().slots({
+            relations.connectionsContentHeading.cloneWithSlots({
               attributes: {id: 'featured-in-tracks'},
               string: 'releaseInfo.tracksThatFeatureMotif',
             }),

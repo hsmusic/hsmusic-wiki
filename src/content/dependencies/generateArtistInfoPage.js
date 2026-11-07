@@ -263,12 +263,11 @@ export default {
             })),
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                tag: 'h2',
-                attributes: {id: 'tracks'},
-                title: language.$(pageCapsule, 'trackList.title'),
-              }),
+            relations.contentHeading.cloneWithSlots({
+              tag: 'h2',
+              attributes: {id: 'tracks'},
+              title: language.$(pageCapsule, 'trackList.title'),
+            }),
 
             data.totalDuration.any &&
               html.tag('p',
@@ -290,12 +289,11 @@ export default {
           ]),
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                tag: 'h2',
-                attributes: {id: 'art'},
-                title: language.$(pageCapsule, 'artList.title'),
-              }),
+            relations.contentHeading.cloneWithSlots({
+              tag: 'h2',
+              attributes: {id: 'art'},
+              title: language.$(pageCapsule, 'artList.title'),
+            }),
 
             html.tag('p',
               {[html.onlyIfContent]: true},
@@ -317,28 +315,26 @@ export default {
 
             html.tags([
               language.encapsulate(pageCapsule, 'wikiEditArtworks', capsule =>
-                relations.contentHeading.clone()
-                  .slots({
-                    tag: 'p',
+                relations.contentHeading.cloneWithSlots({
+                  tag: 'p',
 
-                    title:
-                      language.$(capsule, {artist: data.name}),
+                  title:
+                    language.$(capsule, {artist: data.name}),
 
-                    stickyTitle:
-                      language.$(capsule, 'sticky'),
-                  })),
+                  stickyTitle:
+                    language.$(capsule, 'sticky'),
+                })),
 
               relations.editsForWikiArtworksChunkedList,
             ]),
           ]),
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                tag: 'h2',
-                attributes: {id: 'music-videos'},
-                title: language.$(pageCapsule, 'musicVideoList.title'),
-              }),
+            relations.contentHeading.cloneWithSlots({
+              tag: 'h2',
+              attributes: {id: 'music-videos'},
+              title: language.$(pageCapsule, 'musicVideoList.title'),
+            }),
 
             relations.musicVideosChunkedList.slots({
               groupInfo:
@@ -347,71 +343,65 @@ export default {
           ]),
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                tag: 'h2',
-                attributes: {id: 'sheet-music-files'},
-                title: language.$(pageCapsule, 'sheetMusicFileList.title'),
-              }),
+            relations.contentHeading.cloneWithSlots({
+              tag: 'h2',
+              attributes: {id: 'sheet-music-files'},
+              title: language.$(pageCapsule, 'sheetMusicFileList.title'),
+            }),
 
             relations.sheetMusicFilesChunkedList,
           ]),
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                tag: 'h2',
-                attributes: {id: 'midi-project-files'},
-                title: language.$(pageCapsule, 'midiProjectFileList.title'),
-              }),
+            relations.contentHeading.cloneWithSlots({
+              tag: 'h2',
+              attributes: {id: 'midi-project-files'},
+              title: language.$(pageCapsule, 'midiProjectFileList.title'),
+            }),
 
             relations.midiProjectFilesChunkedList,
           ]),
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                tag: 'h2',
-                attributes: {id: 'additional-files'},
-                title: language.$(pageCapsule, 'miscellaneousAdditionalFileList.title'),
-              }),
+            relations.contentHeading.cloneWithSlots({
+              tag: 'h2',
+              attributes: {id: 'additional-files'},
+              title: language.$(pageCapsule, 'miscellaneousAdditionalFileList.title'),
+            }),
 
             relations.miscellaneousAdditionalFilesChunkedList,
           ]),
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                tag: 'h2',
-                attributes: {id: 'flashes'},
-                title: language.$(pageCapsule, 'flashList.title'),
-              }),
+            relations.contentHeading.cloneWithSlots({
+              tag: 'h2',
+              attributes: {id: 'flashes'},
+              title: language.$(pageCapsule, 'flashList.title'),
+            }),
 
             relations.flashesChunkedList,
           ]),
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                tag: 'h2',
-                attributes: {id: 'commentary'},
-                title: language.$(pageCapsule, 'commentaryList.title'),
-              }),
+            relations.contentHeading.cloneWithSlots({
+              tag: 'h2',
+              attributes: {id: 'commentary'},
+              title: language.$(pageCapsule, 'commentaryList.title'),
+            }),
 
             relations.commentaryChunkedList,
 
             html.tags([
               language.encapsulate(pageCapsule, 'wikiEditorCommentary', capsule =>
-                relations.contentHeading.clone()
-                  .slots({
-                    tag: 'p',
+                relations.contentHeading.cloneWithSlots({
+                  tag: 'p',
 
-                    title:
-                      language.$(capsule, {artist: data.name}),
+                  title:
+                    language.$(capsule, {artist: data.name}),
 
-                    stickyTitle:
-                      language.$(capsule, 'sticky'),
-                  })),
+                  stickyTitle:
+                    language.$(capsule, 'sticky'),
+                })),
 
               relations.wikiEditorCommentaryChunkedList,
             ]),

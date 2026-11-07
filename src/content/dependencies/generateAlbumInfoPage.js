@@ -182,7 +182,7 @@ export default {
             html.tag('hr', {class: 'main-separator'}),
 
           html.tags([
-            relations.contentHeading.clone().slots({
+            relations.contentHeading.cloneWithSlots({
               attributes: {id: 'additional-files'},
               title: language.$('releaseInfo.miscellaneousAdditionalFiles.heading'),
             }),

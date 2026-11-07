@@ -31,7 +31,7 @@ export default {
     html.tags([
       relations.wallpaperStyleTag,
 
-      relations.styleTag.clone().slots({
+      relations.styleTag.cloneWithSlots({
         attributes: {class: 'album-banner-style'},
 
         rules: [
@@ -42,7 +42,7 @@ export default {
         ],
       }),
 
-      relations.styleTag.clone().slots({
+      relations.styleTag.cloneWithSlots({
         attributes: {class: 'album-directory-style'},
 
         rules: [

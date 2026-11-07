@@ -1943,9 +1943,7 @@ export class Template {
   }
 
   clone() {
-    const clone = Reflect.construct(this.constructor, [
-      this.#description,
-    ]);
+    const clone = Reflect.construct(this.constructor, [this.#description]);
 
     // getSlotValue(), called via #getReadySlotValues(), is responsible for
     // preparing slot values for consumption, which includes cloning mutable
@@ -1954,6 +1952,36 @@ export class Template {
     // cloned, so that this template and its clones will never mutate the same
     // identities.
     clone.setSlots(this.#getReadySlotValues());
+
+    return clone;
+  }
+
+  cloneWithSlots(slots) {
+    const clone = Reflect.construct(this.constructor, [this.#description]);
+
+    try {
+      this.setSlots(slots, {dry: true});
+    } catch (caughtError) {
+      const clonePart =
+        (typeof this.description.annotation === 'string'
+          ? `clone of "${this.description.annotation}"`
+          : `clone`);
+
+      const message = `Errors validating slots for ${clonePart}`;
+
+      if (caughtError instanceof AggregateError) {
+        throw new AggregateError(caughtError.errors, message);
+      } else {
+        throw new Error(message, {cause: caughtError});
+      }
+    }
+
+    // Same as above but pass in the given slots to overshadow current slot
+    // values. These values will NOT be prepared for safe subsequent mutation:
+    // it's just the same as a subsequent setSlots() call.
+    // (Passing into getReadySlotValues skips needless cloning work for values
+    // that won't be used anyway.)
+    clone.setSlots(this.#getReadySlotValues({shadow: slots}));
 
     return clone;
   }
@@ -2107,7 +2135,7 @@ export class Template {
     this.#slotValues[slotName] = value;
   }
 
-  setSlots(slotNamesToValues) {
+  setSlots(slotNamesToValues, {dry = false} = {}) {
     if (
       typeof slotNamesToValues !== 'object' ||
       Array.isArray(slotNamesToValues) ||
@@ -2140,7 +2168,9 @@ export class Template {
           : `Error validating template slots`));
     }
 
-    Object.assign(this.#slotValues, slotNamesToValues);
+    if (!dry) {
+      Object.assign(this.#slotValues, slotNamesToValues);
+    }
   }
 
   static validateSlotValueAgainstDescription(value, description) {
@@ -2204,61 +2234,11 @@ export class Template {
     const description = this.#getSlotDescriptionOrError(slotName);
     const providedValue = this.#slotValues[slotName] ?? null;
 
-    if (description.type === 'html') {
-      // Per validateSlotValueAgainstDescription, providedValue matches
-      // the validator isHTML. Take care of trivial blanks first - null,
-      // undefined, false, and empty string.
-      if (!providedValue) {
-        return blank();
-      }
+    const preparedValue =
+      this.#prepareSlotValue(providedValue, description);
 
-      // Handle tags and templates. These are good to go for exposing as
-      // a value, but must cloned if the slot is marked as mutable.
-      if (
-        providedValue instanceof Tag ||
-        providedValue instanceof Template
-      ) {
-        if (description.mutable) {
-          return providedValue.clone();
-        } else {
-          return providedValue;
-        }
-      }
-
-      // The only other possibilities are non-empty string and array.
-      // Neither of these is HTML as-is, so wrap in a dummy html.tags()
-      // element, which will also shuttle away nested trivial blanks.
-      return tags(providedValue);
-    }
-
-    if (description.type === 'attributes') {
-      if (!providedValue) {
-        return blankAttributes();
-      }
-
-      if (providedValue instanceof Attributes) {
-        if (description.mutable) {
-          return providedValue.clone();
-        } else {
-          return providedValue;
-        }
-      }
-
-      return new Attributes(providedValue);
-    }
-
-    if (description.type === 'string') {
-      if (providedValue instanceof Tag || providedValue instanceof Template) {
-        return providedValue.toString();
-      }
-
-      if (isBlank(providedValue)) {
-        return null;
-      }
-    }
-
-    if (providedValue !== null) {
-      return providedValue;
+    if (preparedValue) {
+      return preparedValue;
     }
 
     if ('default' in description) {
@@ -2266,6 +2246,65 @@ export class Template {
     }
 
     return null;
+  }
+
+  #prepareSlotValue(value, description, {cloneMutable = false} = {}) {
+    // This function assumes the given value is already validated against
+    // the given description.
+
+    if (description.type === 'html') {
+      // Take care of trivial blanks first:
+      // null, undefined, false, and empty string.
+      if (!value) {
+        return blank();
+      }
+
+      // Handle tags and templates. These are good to go for exposing as
+      // a value, but must be cloned if the slot is marked as mutable.
+      if (
+        value instanceof Tag ||
+        value instanceof Template
+      ) {
+        if (cloneMutable && description.mutable) {
+          return value.clone();
+        } else {
+          return value;
+        }
+      }
+
+      // The only other possibilities are non-empty string and array.
+      // Neither of these is HTML as-is, so wrap in a dummy html.tags()
+      // element, which will also shuttle away nested trivial blanks.
+      return tags(value);
+    }
+
+    if (description.type === 'attributes') {
+      if (!value) {
+        return blankAttributes();
+      }
+
+      if (value instanceof Attributes) {
+        if (cloneMutable && description.mutable) {
+          return value.clone();
+        } else {
+          return value;
+        }
+      }
+
+      return new Attributes(value);
+    }
+
+    if (description.type === 'string') {
+      if (value instanceof Tag || value instanceof Template) {
+        return value.toString();
+      }
+
+      if (isBlank(value)) {
+        return null;
+      }
+    }
+
+    return value; // ...which may still be null, falsy etc
   }
 
   getSlotDescription(slotName) {
@@ -2295,11 +2334,35 @@ export class Template {
     return description;
   }
 
-  #getReadySlotValues() {
+  #getReadySlotValues({shadow = null} = {}) {
     const slots = {};
 
-    for (const slotName of Object.keys(this.description.slots ?? {})) {
-      slots[slotName] = this.getSlotValue(slotName);
+    const keys =
+      unique([
+        ...Object.keys(this.description.slots ?? {}),
+        ...Object.keys(shadow ?? {}),
+      ]);
+
+    for (const slotName of keys) {
+      const description = this.#getSlotDescriptionOrError(slotName);
+
+      if (shadow && Object.hasOwn(shadow, slotName)) {
+        slots[slotName] =
+          this.#prepareSlotValue(
+            shadow[slotName],
+            description,
+            {cloneMutable: false});
+      } else {
+        slots[slotName] =
+          this.#prepareSlotValue(
+            this.#slotValues[slotName] ?? null,
+            description,
+            {cloneMutable: true});
+      }
+
+      if (slots[slotName] === null && 'default' in description) {
+        slots[slotName] = description.default;
+      }
     }
 
     return slots;
@@ -2310,6 +2373,9 @@ export class Template {
   }
 
   get content() {
+    // No shadow passed so all values are taken from the template's regularly
+    // provided slots, and all mutable values get cloned before going into
+    // the content() function. (That's the point of marking them mutable!)
     const slots = this.#getReadySlotValues();
 
     try {

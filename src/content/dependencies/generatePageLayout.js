@@ -371,7 +371,7 @@ export default {
               cover: primaryCover,
             }),
 
-            relations.stickyHeadingContainer.clone().slots({
+            relations.stickyHeadingContainer.cloneWithSlots({
               rootAttributes: {inert: true},
             }),
           ];

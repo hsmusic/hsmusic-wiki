@@ -43,8 +43,7 @@ export default {
       html.tags([
         html.tag('p', {class: 'content-entry-heading'},
           slots.color &&
-            relations.colorStyle.clone()
-              .slot('color', slots.color),
+            relations.colorStyle.cloneWithSlots({color: slots.color}),
 
           !html.isBlank(relations.date) &&
             {class: 'dated'},
@@ -112,8 +111,7 @@ export default {
 
         html.tag('blockquote', {class: 'content-entry-body'},
           slots.color &&
-            relations.colorStyle.clone()
-              .slot('color', slots.color),
+            relations.colorStyle.cloneWithSlots({color: slots.color}),
 
           data.isWikiEditorEntry &&
             {class: 'wiki-commentary'},

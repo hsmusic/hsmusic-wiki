@@ -110,7 +110,7 @@ export default {
                 });
 
               if (slots.headingString) {
-                return relations.contentHeading.clone().slots({
+                return relations.contentHeading.cloneWithSlots({
                   tag: 'dt',
                   title,
                   stickyTitle:
@@ -130,7 +130,7 @@ export default {
         html.tags([
           language.encapsulate(listCapsule, 'notFromDivision', capsule =>
             (slots.headingString
-              ? relations.contentHeading.clone().slots({
+              ? relations.contentHeading.cloneWithSlots({
                   tag: 'dt',
 
                   title:

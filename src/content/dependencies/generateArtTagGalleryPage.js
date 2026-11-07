@@ -106,7 +106,7 @@ export default {
               ]),
 
             data.numArtworksTotal >= 1 &&
-              relations.featuredLine.clone().slots({
+              relations.featuredLine.cloneWithSlots({
                 string:
                   (data.hasMixedDirectIndirect
                     ? 'altogether'
@@ -117,13 +117,13 @@ export default {
               }),
 
             data.hasMixedDirectIndirect && [
-              relations.featuredLine.clone().slots({
+              relations.featuredLine.cloneWithSlots({
                 string: 'direct',
                 filter: 'direct',
                 count: data.numArtworksDirectly,
               }),
 
-              relations.featuredLine.clone().slots({
+              relations.featuredLine.cloneWithSlots({
                 string: 'indirect',
                 filter: 'indirect',
                 count: data.numArtworksIndirectly,
@@ -133,14 +133,9 @@ export default {
             data.hasMixedDirectIndirect && [
               html.tag('br'),
 
-              relations.showingLine.clone()
-                .slot('filter', 'all'),
-
-              relations.showingLine.clone()
-                .slot('filter', 'direct'),
-
-              relations.showingLine.clone()
-                .slot('filter', 'indirect'),
+              relations.showingLine.cloneWithSlots({filter: 'all'}),
+              relations.showingLine.cloneWithSlots({filter: 'direct'}),
+              relations.showingLine.cloneWithSlots({filter: 'indirect'}),
             ],
           ]),
 

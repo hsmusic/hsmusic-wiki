@@ -25,11 +25,18 @@ export default {
     },
   },
 
-  generate: (data, relations, slots) => ({
-    style:
-      relations.colorVariables.slots({
-        color: slots.color ?? data.color,
-        context: slots.context,
-      }).content,
-  }),
+  generate(data, relations, slots) {
+    const {colorVariables} = relations;
+
+    colorVariables.setSlots({
+      color: slots.color ?? data.color,
+      context: slots.context,
+    });
+
+    if (colorVariables.content) {
+      return {style: colorVariables.content};
+    } else {
+      return {};
+    }
+  },
 };

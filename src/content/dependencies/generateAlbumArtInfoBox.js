@@ -75,7 +75,7 @@ export default {
                   any = true;
                   workingCapsule += '.withWallpaper';
                   workingOptions.wallpaper =
-                    relations.linkTemplate.clone().slots({
+                    relations.linkTemplate.cloneWithSlots({
                       path: data.wallpaperImagePath,
                       content: language.$(downloadCapsule, 'wallpaper'),
                     });
@@ -85,7 +85,7 @@ export default {
                   any = true;
                   workingCapsule += '.withBanner';
                   workingOptions.banner =
-                    relations.linkTemplate.clone().slots({
+                    relations.linkTemplate.cloneWithSlots({
                       path: data.bannerImagePath,
                       content: language.$(downloadCapsule, 'banner'),
                     });
@@ -104,7 +104,7 @@ export default {
                 parts:
                   language.formatUnitList(
                     data.wallpaperPartPaths.map(path =>
-                      relations.linkTemplate.clone().slots({
+                      relations.linkTemplate.cloneWithSlots({
                         path,
                         content: language.sanitize(basename(path.at(-1))),
                       }))),

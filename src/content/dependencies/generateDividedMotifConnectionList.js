@@ -86,7 +86,7 @@ export default {
           }) => [
             language.encapsulate(listCapsule, 'fromDivision', capsule =>
               (slots.headingString
-                ? relations.contentHeading.clone().slots({
+                ? relations.contentHeading.cloneWithSlots({
                     tag: 'dt',
 
                     title:
@@ -106,7 +106,7 @@ export default {
         html.tags([
           language.encapsulate(listCapsule, 'notFromDivision', capsule =>
             (slots.headingString
-              ? relations.contentHeading.clone().slots({
+              ? relations.contentHeading.cloneWithSlots({
                   tag: 'dt',
 
                   title:

@@ -154,27 +154,25 @@ export default {
             ])),
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'features'},
-                title:
-                  language.$('releaseInfo.tracksFeatured', {
-                    flash: html.tag('i', data.name),
-                  }),
-              }),
+            relations.contentHeading.cloneWithSlots({
+              attributes: {id: 'features'},
+              title:
+                language.$('releaseInfo.tracksFeatured', {
+                  flash: html.tag('i', data.name),
+                }),
+            }),
 
             relations.featuredTracksList,
           ]),
 
           html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                attributes: {id: 'previously-featured'},
-                title:
-                  language.$('releaseInfo.tracksPreviouslyFeatured', {
-                    flash: html.tag('i', data.name),
-                  }),
-              }),
+            relations.contentHeading.cloneWithSlots({
+              attributes: {id: 'previously-featured'},
+              title:
+                language.$('releaseInfo.tracksPreviouslyFeatured', {
+                  flash: html.tag('i', data.name),
+                }),
+            }),
 
             relations.previouslyFeaturedTracksList,
           ]),

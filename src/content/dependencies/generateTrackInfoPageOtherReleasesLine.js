@@ -95,7 +95,7 @@ export default {
                 albumName,
                 albumColor,
               }) =>
-                relations.textWithTooltip.clone().slots({
+                relations.textWithTooltip.cloneWithSlots({
                   customInteractionCue: true,
 
                   text:
@@ -125,7 +125,7 @@ export default {
 
           workingCapsule += '.' + singleStringPart;
           workingOptions.single =
-            relations.textWithTooltip.clone().slots({
+            relations.textWithTooltip.cloneWithSlots({
               customInteractionCue: true,
 
               text:

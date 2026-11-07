@@ -49,8 +49,10 @@ export default {
       data.showTrackSection &&
         {
           html:
-            relations.albumLink.clone()
-              .slot('content', language.sanitize(data.trackSectionName)),
+            relations.albumLink.cloneWithSlots({
+              content:
+                language.sanitize(data.trackSectionName),
+            }),
         },
 
       {

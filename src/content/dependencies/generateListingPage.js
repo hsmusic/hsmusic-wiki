@@ -196,18 +196,16 @@ export default {
                   }).filter(({id}) => id)
                     .map(({title, id}) =>
                       html.tag('li',
-                        relations.showSkipToSectionLinkTemplate
-                          .clone()
-                          .slots({
-                            hash: id,
-                            content:
-                              html.normalize(
-                                formatListingString({
-                                  context: 'chunk.title',
-                                  provided: title,
-                                }).toString()
-                                  .replace(/:$/, '')),
-                          }))))),
+                        relations.showSkipToSectionLinkTemplate.cloneWithSlots({
+                          hash: id,
+                          content:
+                            html.normalize(
+                              formatListingString({
+                                context: 'chunk.title',
+                                provided: title,
+                              }).toString()
+                                .replace(/:$/, '')),
+                        }))))),
             ],
 
             stitchArrays({
