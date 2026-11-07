@@ -86,7 +86,7 @@ export default {
                       html.tag('li',
                         link,
                         html.tag('span', {class: 'times-used'},
-                          language.countTimesFeatured(timesFeaturedTotal)))))),
+                          language.formatNumber(timesFeaturedTotal)))))),
 
             stitchArrays({
               name: data.furthestAncestorArtTagNames,
