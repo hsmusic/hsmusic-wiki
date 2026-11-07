@@ -25,7 +25,7 @@ export default {
       attributes: slots.attributes,
       content:
         slots.boxes.slice()
-          .map(box => box.getSlotValue('content'))
+          .map(box => box.cloneWithSlots({contentOnly: true}))
           .map((content, index, {length}) => [
             content,
             index < length - 1 &&

@@ -38,6 +38,13 @@ export default {
       type: 'html',
       mutable: false,
     },
+
+    // Controlled by generatePageSidebarConjoinedBox, probably not applicable
+    // much of anywhere else.
+    contentOnly: {
+      type: 'boolean',
+      default: false,
+    },
   },
 
   generate(relations, slots, {html}) {
@@ -62,6 +69,10 @@ export default {
           slots.title),
 
         slots.content);
+
+    if (slots.contentOnly) {
+      return content;
+    }
 
     const box =
       html.tag('div', {class: 'sidebar'},
