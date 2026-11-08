@@ -2624,7 +2624,7 @@ groupGalleryPage:
     caption.mixedTracksAndAlbums.withYearRange: >-
       {TRACKS} and {ALBUMS}, released {YEAR_RANGE}.
 
-    caption.seriesItemsNotFromDivision: >-
+    caption.seriesItemsNotFromGroup: >-
       Items marked {MARKER} are part of {SERIES}, but not from {GROUP}.
 
 #
