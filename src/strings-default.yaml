@@ -2330,37 +2330,50 @@ artTagGalleryPage:
   descendsFrom: "Up: {TAGS}."
   descendants: "Down: {TAGS}."
 
-  featuredLine:
-    simple: >-
-      Featured in {COVER_ARTS}.
+  viewSwitcher:
+    _: "Showing:"
 
-    altogether: >-
-      Altogether, featured in {COVER_ARTS}.
+    artworks: "Artworks"
+    subtags: "Subtags"
 
-    direct: >-
-      Featured directly in {COVER_ARTS}.
+  artworks:
+    title: "Artworks"
 
-    indirect: >-
-      Featured indirectly in {COVER_ARTS}.
+    featuredLine:
+      simple: >-
+        Featured in {ARTWORKS}.
 
-    notFeatured:
-      _: >-
-        This tag hasn't been featured in any artworks yet.
+      altogether: >-
+        Altogether, featured in {ARTWORKS}.
 
-      callToAction: >-
-        Maybe your track will be the first!
+      direct: >-
+        Featured directly in {ARTWORKS}.
 
-  showingLine:
-    _: "Showing: {SHOWING}."
+      indirect: >-
+        Featured indirectly in {ARTWORKS}.
 
-    all: >-
-      all artworks featuring this tag
+      notFeatured:
+        _: >-
+          This tag hasn't been featured in any artworks yet.
 
-    indirect: >-
-      artworks indirectly featuring this tag
+        callToAction: >-
+          Maybe your track will be the first!
 
-    direct: >-
-      artworks directly featuring this tag
+    showingLine:
+      _: "Showing: {SHOWING}."
+
+      all: >-
+        all artworks featuring this tag
+
+      indirect: >-
+        artworks indirectly featuring this tag
+
+      direct: >-
+        artworks directly featuring this tag
+
+  subtags:
+    title: "Subtags"
+    collection: "{TAG}"
 
 #
 # commentaryIndex:

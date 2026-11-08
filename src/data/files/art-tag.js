@@ -6,7 +6,11 @@ import {sortAlphabetically} from '#sort';
 
 export default ({
   documentModes: {allTogether},
-  thingConstructors: {ArtTag},
+  thingConstructors: {
+    ArtTag,
+    CategoryArtTag,
+    CollectionArtTag,
+  },
 }) => ({
   title: `Process art tags file`,
 
@@ -24,9 +28,31 @@ export default ({
         .flatMap(({value}) => value)),
 
   documentMode: allTogether,
-  documentThing: ArtTag,
+  documentThing: document =>
+    (document['Category']
+      ? CategoryArtTag
+   : document['Collection']
+      ? CollectionArtTag
+      : ArtTag),
 
   sort({artTagData}) {
-    sortAlphabetically(artTagData);
+    const categories =
+      artTagData.filter(artTag => artTag.isCategoryArtTag);
+
+    const collections =
+      artTagData.filter(artTag => artTag.isCollectionArtTag);
+
+    const rest =
+      artTagData.filter(artTag =>
+        !artTag.isCategoryArtTag &&
+        !artTag.isCollectionArtTag);
+
+    sortAlphabetically(collections);
+    sortAlphabetically(rest);
+
+    artTagData.splice(0, Infinity,
+      ...categories,
+      ...collections,
+      ...rest);
   },
 });

@@ -8,13 +8,13 @@ export default {
   },
 
   generate: (slots, {html, language}) =>
-    language.encapsulate('artTagGalleryPage', pageCapsule =>
+    language.encapsulate('artTagGalleryPage.artworks.showingLine', capsule =>
       html.tag('span',
         {id: `showing-${slots.filter}-line`},
 
-        language.$(pageCapsule, 'showingLine', {
+        language.$(capsule, {
           showing:
             html.tag('a', {href: '#'},
-              language.$(pageCapsule, 'showingLine', slots.filter)),
+              language.$(capsule, slots.filter)),
         }))),
 };

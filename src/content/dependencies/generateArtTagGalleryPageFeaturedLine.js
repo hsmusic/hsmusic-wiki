@@ -6,12 +6,12 @@ export default {
   },
 
   generate: (slots, {html, language}) =>
-    language.encapsulate('artTagGalleryPage', pageCapsule =>
+    language.encapsulate('artTagGalleryPage.artworks.featuredLine', capsule =>
       html.tag('span',
         {id: `featured-${slots.filter}-line`},
 
-        language.$(pageCapsule, 'featuredLine', slots.string, {
-          coverArts:
+        language.$(capsule, slots.string, {
+          artworks:
             language.countArtworks(slots.count),
         }))),
 };

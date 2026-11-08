@@ -6,6 +6,9 @@ export default {
      : thing.isMusicVideo
         ? relation('linkAnythingMan', thing.thing)
 
+     : thing.isArtTag
+        ? relation('linkArtTagDynamically', thing)
+
      : thing.isAlbum
         ? relation('linkAlbum', thing)
      : thing.isArtwork

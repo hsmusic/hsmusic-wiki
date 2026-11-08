@@ -1,23 +1,5 @@
-import {sortArtworksChronologically} from '#sort';
-import {stitchArrays, unique} from '#sugar';
-
 export default {
-  sprawl: ({wikiInfo}) => ({
-    enableListings:
-      wikiInfo.enableListings,
-  }),
-
-  query(sprawl, artTag) {
-    const directArtworks = artTag.directlyFeaturedInArtworks;
-    const indirectArtworks = artTag.indirectlyFeaturedInArtworks;
-    const allArtworks = unique([...directArtworks, ...indirectArtworks]);
-
-    sortArtworksChronologically(allArtworks, {latestFirst: true});
-
-    return {directArtworks, indirectArtworks, allArtworks};
-  },
-
-  relations: (relation, query, sprawl, artTag) => ({
+  relations: (relation, artTag) => ({
     layout:
       relation('generatePageLayout'),
 
@@ -29,12 +11,6 @@ export default {
 
     quickDescription:
       relation('generateQuickDescription', artTag),
-
-    featuredLine:
-      relation('generateArtTagGalleryPageFeaturedLine'),
-
-    showingLine:
-      relation('generateArtTagGalleryPageShowingLine'),
 
     extraReadingLinks:
       artTag.extraReadingURLs
@@ -48,34 +24,19 @@ export default {
       artTag.directDescendantArtTags
         .map(artTag => relation('linkArtTagGallery', artTag)),
 
-    coverGrid:
-      relation('generateCoverGrid'),
+    viewSwitcher:
+      relation('generateIntrapageDotSwitcher'),
 
-    coverGridItems:
-      query.allArtworks
-        .map(artwork => relation('generateCoverGridItem', artwork)),
+    artworksView:
+      relation('generateArtTagGalleryPageArtworksView', artTag),
+
+    subtagsView:
+      relation('generateArtTagGalleryPageSubtagsView', artTag),
   }),
 
-  data: (query, sprawl, artTag) => ({
-    enableListings: sprawl.enableListings,
-
+  data: (artTag) => ({
     name: artTag.name,
     color: artTag.color,
-
-    numArtworksIndirectly: query.indirectArtworks.length,
-    numArtworksDirectly: query.directArtworks.length,
-    numArtworksTotal: query.allArtworks.length,
-
-    onlyFeaturedIndirectly:
-      query.allArtworks.map(artwork => !query.directArtworks.includes(artwork)),
-
-    hasMixedDirectIndirect:
-      query.allArtworks.some(artwork => query.directArtworks.includes(artwork)) &&
-      query.allArtworks.some(artwork => !query.directArtworks.includes(artwork)),
-
-    allWarnings:
-      query.allArtworks
-        .flatMap(artwork => artwork?.contentWarnings),
   }),
 
   generate: (data, relations, {html, language}) =>
@@ -97,48 +58,6 @@ export default {
             extraReadingLinks: relations.extraReadingLinks,
           }),
 
-          html.tag('p', {class: 'quick-info'}, [
-            data.numArtworksTotal === 0 &&
-              language.encapsulate(pageCapsule, 'featuredLine.notFeatured', capsule => [
-                language.$(capsule),
-                html.tag('br'),
-                language.$(capsule, 'callToAction'),
-              ]),
-
-            data.numArtworksTotal >= 1 &&
-              relations.featuredLine.cloneWithSlots({
-                string:
-                  (data.hasMixedDirectIndirect
-                    ? 'altogether'
-                    : 'simple'),
-
-                filter: 'all',
-                count: data.numArtworksTotal,
-              }),
-
-            data.hasMixedDirectIndirect && [
-              relations.featuredLine.cloneWithSlots({
-                string: 'direct',
-                filter: 'direct',
-                count: data.numArtworksDirectly,
-              }),
-
-              relations.featuredLine.cloneWithSlots({
-                string: 'indirect',
-                filter: 'indirect',
-                count: data.numArtworksIndirectly,
-              }),
-            ],
-
-            data.hasMixedDirectIndirect && [
-              html.tag('br'),
-
-              relations.showingLine.cloneWithSlots({filter: 'all'}),
-              relations.showingLine.cloneWithSlots({filter: 'direct'}),
-              relations.showingLine.cloneWithSlots({filter: 'indirect'}),
-            ],
-          ]),
-
           html.tag('p', {id: 'descends-from-line'},
             {class: 'quick-info'},
             {[html.onlyIfContent]: true},
@@ -157,21 +76,49 @@ export default {
               tags: language.formatUnitList(relations.descendantLinks),
             })),
 
-          relations.coverGrid.slots({
-            lazy: 12,
-            allWarnings: data.allWarnings,
+          language.encapsulate(pageCapsule, 'viewSwitcher', capsule =>
+            html.tag('p', {class: 'gallery-view-switcher'},
+              {class: ['drop', 'shiny']},
 
-            items:
-              stitchArrays({
-                item: relations.coverGridItems,
-                onlyFeaturedIndirectly: data.onlyFeaturedIndirectly,
-              }).map(({item, onlyFeaturedIndirectly}) =>
-                  item.slots({
-                    attributes: [
-                      onlyFeaturedIndirectly &&
-                        {class: 'featured-indirectly'},
-                    ],
-                  })),
+              {[html.onlyIfContent]: true},
+              {[html.joinChildren]: html.tag('br')},
+
+              [
+                language.$(capsule),
+
+                relations.viewSwitcher.slots({
+                  // TODO: swap order or initial option index based on
+                  // whether this tag is a collection, probably?
+                  initialOptionIndex: 0,
+
+                  titles: [
+                    !html.isBlank(relations.subtagsView) &&
+                      language.$(capsule, 'subtags'),
+
+                    !html.isBlank(relations.artworksView) &&
+                      language.$(capsule, 'artworks'),
+                  ].filter(Boolean),
+
+                  targetIDs: [
+                    !html.isBlank(relations.subtagsView) &&
+                      'art-tag-subtags-gallery',
+
+                    !html.isBlank(relations.artworksView) &&
+                      'art-tag-artworks-gallery',
+                  ].filter(Boolean),
+                }),
+              ])),
+
+          relations.subtagsView,
+
+          relations.artworksView.slots({
+            attributes: [
+              !html.isBlank(relations.subtagsView) &&
+                {style: 'display: none'},
+            ],
+
+            showTitle:
+              !html.isBlank(relations.subtagsView),
           }),
         ],
 
