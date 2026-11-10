@@ -10,7 +10,7 @@ export default {
     multipleRegularTrackSections:
       section.album.trackSections
         .filter(section => section.stem === null)
-        .length > 2,
+        .length >= 2,
 
     firstDirectoryInRun:
       section.sectionsAcrossRun[0].directoryWithinAlbum,
