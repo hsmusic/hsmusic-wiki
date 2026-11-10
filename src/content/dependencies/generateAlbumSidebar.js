@@ -145,6 +145,10 @@ export default {
       }).map(({group, serieses}) =>
           serieses.map(series =>
             compareKebabCase(series.name, group.name))),
+
+    groupsCollapse:
+      query.groups
+        .map(group => group.collapseInAlbumSidebars),
   }),
 
   generate(data, relations, {html}) {
@@ -168,13 +172,20 @@ export default {
               groupBox: relations.groupBoxes,
               groupColorStyle: relations.groupColorStyles,
               seriesBoxes: relations.seriesBoxes,
-            }).map(({groupBox, groupColorStyle, seriesBoxes}) => [
+              groupCollapses: data.groupsCollapse,
+            }).map(({
+                groupBox,
+                groupColorStyle,
+                seriesBoxes,
+                groupCollapses,
+              }) => [
                 groupBox,
                 seriesBoxes.map(seriesBox => [
-                  html.tag('div',
-                    {class: 'sidebar-box-joiner'},
-                    {class: 'hide-for-narrow-layout'},
-                    groupColorStyle.slot('context', 'primary-only')),
+                  html.tag('div', {class: 'sidebar-box-joiner'},
+                    groupCollapses &&
+                      groupColorStyle.slot('context', 'primary-only'),
+
+                    {class: 'hide-for-narrow-layout'}),
 
                   seriesBox,
                 ]),
