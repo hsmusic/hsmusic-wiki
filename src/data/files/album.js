@@ -44,6 +44,7 @@ export default ({
     Object.assign(defaultTrackSection, {
       name: `Default Track Section`,
       isDefaultTrackSection: true,
+      directoryWithinAlbum: 'default',
     });
 
     let currentTrackSection = null;
@@ -123,6 +124,32 @@ export default ({
             currentTrackSection = new TrackSectionContinuation();
             currentTrackSection.stem = latestNonContinuationTrackSection;
             currentTrackSectionTracks = [];
+
+            const stemDirectory =
+              latestNonContinuationTrackSection.directoryWithinAlbum;
+
+            const previousContinuation =
+              trackSections
+                .findLast(section => section.isTrackSectionContinuation);
+
+            const previousContinuationDirectory =
+              (previousContinuation
+                ? previousContinuation.directoryWithinAlbum
+                : null);
+
+            const match =
+              (previousContinuation
+                ? previousContinuationDirectory.match(/-sec(\d+)$/)
+                : null);
+
+            if (match) {
+              const n = parseInt(match[1]) + 1;
+              currentTrackSection.directoryWithinAlbum =
+                stemDirectory + '-sec' + n;
+            } else {
+              currentTrackSection.directoryWithinAlbum =
+                stemDirectory + '-sec2';
+            }
           } else {
             attachLeadingTrackSections(defaultTrackSection);
             latestNonContinuationTrackSection = defaultTrackSection;

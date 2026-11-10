@@ -318,6 +318,19 @@ export class TrackSection extends Thing {
     },
   };
 
+  static [Thing.findSpecs] = {
+    trackSection: {
+      referenceTypes: ['track-section'],
+      bindTo: 'trackSectionData',
+
+      getMatchableNames: section =>
+        [`${section.album.name} - ${section.name}`],
+
+      getMatchableDirectories: section =>
+        [`${section.album.directory}/${section.directoryWithinAlbum}`],
+    },
+  };
+
   [inspect.custom](depth) {
     const parts = [];
 
