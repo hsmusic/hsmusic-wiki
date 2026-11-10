@@ -652,6 +652,19 @@
     }
   }
 
+  /* Same thing as above but for sidebars. Clunky... */
+  .track-list-sidebar-box .sidebar-content {
+    &:has(> details:nth-child(2 of .starts-run)) {
+      &:has(> details:not(.starts-run)) {
+        margin-bottom: 1.25em;
+
+        details.starts-run {
+          margin-top: 1.25em;
+        }
+      }
+    }
+  }
+
   .album-track-list li {
     padding-left: 1.5ch;
     text-indent: -1.5ch;

@@ -39,6 +39,7 @@ export default {
     data.isDefaultTrackSection = trackSection.isDefaultTrackSection;
     data.isAsideTrackSection = !!trackSection.isAsideTrackSection;
     data.hasSiblingSections = album.trackSections.length > 1;
+    data.startsRun = trackSection.startsRun;
 
     data.numTracks =
       trackSection.tracks.length;
@@ -196,6 +197,9 @@ export default {
     return html.tag('details',
       data.includesCurrentTrack &&
         {class: 'current'},
+
+      data.startsRun &&
+        {class: 'starts-run'},
 
       // Allow forcing open via a template slot.
       // This isn't exactly janky, but the rest of this function
