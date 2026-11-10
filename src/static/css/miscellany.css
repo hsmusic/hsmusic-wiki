@@ -122,6 +122,10 @@
     --custom-scroll-offset: calc(2.5em - 2px);
   }
 
+  dl dt[id].content-heading {
+    --custom-scroll-offset: calc(1em - 4px);
+  }
+
   dl dd {
     margin-bottom: 1em;
   }

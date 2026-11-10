@@ -304,21 +304,7 @@ export class Album extends Thing {
     ],
 
     showAlbumInTracksWithoutArtists: flag(V(false)),
-
-    showTrackSectionInNavBar: [
-      exposeUpdateValueOrContinue({
-        validate: input.value(isBoolean),
-      }),
-
-      {
-        dependencies: ['style'],
-        compute: ({style}) =>
-          (style === 'in-game vgm'
-            ? true
-            : false),
-      },
-    ],
-
+    showTrackSectionInNavBar: flag(V(true)),
     showArtistsInTrackList: flag(V(true)),
 
     showNameDetailsOnTrackPages: [

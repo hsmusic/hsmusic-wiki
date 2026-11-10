@@ -89,6 +89,10 @@ export default {
                 ? null
                 : section.name));
 
+        data.trackSectionDirectories =
+          album.trackSections
+            .map(section => section.directoryWithinAlbum);
+
         data.trackSectionDurations =
           album.trackSections
             .map(section =>
@@ -164,6 +168,7 @@ export default {
             items: relations.trackSectionItems,
 
             name: data.trackSectionNames,
+            directory: data.trackSectionDirectories,
             duration: data.trackSectionDurations,
             isAsideTrackSection: data.trackSectionsAreAsideSections,
             hasTrackNumbers: data.trackSectionsHaveTrackNumbers,
@@ -175,6 +180,7 @@ export default {
               items,
 
               name,
+              directory,
               duration,
               isAsideTrackSection,
               hasTrackNumbers,
@@ -186,6 +192,8 @@ export default {
                   tag: 'dt',
 
                   attributes: [
+                    {id: 'sec-' + directory},
+
                     isAsideTrackSection &&
                       {class: 'aside'},
                   ],

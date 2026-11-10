@@ -56,6 +56,8 @@ export class TrackSection extends Thing {
 
     name: name(V('Unnamed Track Section')),
 
+    directoryWithinAlbum: directory(),
+
     // Track sections don't have a Name Detail themselves, but they do provide
     // a value which tracks can reference via 'Name Detail: section'.
     nameDetailForTracks: {
@@ -277,6 +279,7 @@ export class TrackSection extends Thing {
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Section': {property: 'name'},
+      'Directory': {property: 'directoryWithinAlbum'},
       'Name Detail For Tracks': {property: 'nameDetailForTracks'},
 
       'Directory Suffix': {property: 'directorySuffixForTracks'},

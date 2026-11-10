@@ -6,6 +6,9 @@ export default {
     albumLinkNavAccent:
       relation('generateAlbumLinkNavAccent', track.album),
 
+    sectionLink:
+      relation('linkTrackSection', track.trackSection),
+
     trackLink:
       relation('linkTrack', track),
   }),
@@ -13,14 +16,11 @@ export default {
   data: (track) => ({
     showTrackSection:
       track.album.showTrackSectionInNavBar &&
-      (track.album.trackSections.length >= 2 ||
+      (track.album.trackSections.length >= 2 &&
        !track.trackSection.isDefaultTrackSection),
 
     hasTrackNumbers:
       track.album.hasTrackNumbers,
-
-    trackSectionName:
-      track.trackSection.name,
 
     trackNumber:
       track.trackNumber,
@@ -48,11 +48,7 @@ export default {
 
       data.showTrackSection &&
         {
-          html:
-            relations.albumLink.cloneWithSlots({
-              content:
-                language.sanitize(data.trackSectionName),
-            }),
+          html: relations.sectionLink.slot('color', false),
         },
 
       {
