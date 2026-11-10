@@ -14,9 +14,22 @@ export default {
   data(album, track, trackSection) {
     const data = {};
 
+    const hasTrackNumbers = section =>
+      section.hasTrackNumbers &&
+      !empty(section.tracks);
+
+    const firstTrackNumber = section =>
+      (hasTrackNumbers(section)
+        ? section.tracks.at(0).trackNumber
+        : null);
+
+    const lastTrackNumber = section =>
+      (hasTrackNumbers(section)
+        ? section.tracks.at(-1).trackNumber
+        : null);
+
     data.hasTrackNumbers =
-      trackSection.hasTrackNumbers &&
-      !empty(trackSection.tracks);
+      hasTrackNumbers(trackSection);
 
     data.isTrackPage = !!track;
     data.albumStyle = album.style;
@@ -31,14 +44,17 @@ export default {
       trackSection.tracks.length;
 
     data.firstTrackNumber =
-      (data.hasTrackNumbers
-        ? trackSection.tracks.at(0).trackNumber
-        : null);
+      firstTrackNumber(trackSection);
 
     data.lastTrackNumber =
-      (data.hasTrackNumbers
-        ? trackSection.tracks.at(-1).trackNumber
-        : null);
+      lastTrackNumber(trackSection);
+
+    data.skipAnnotatingTrackNumbers =
+      album.trackSections
+        .every(section =>
+          // Empty track sections report null for both of these values,
+          // so they satisfy this condition too.
+          firstTrackNumber(section) === lastTrackNumber(section));
 
     const stemTrackSections =
       album.trackSections.filter(section =>
@@ -225,7 +241,7 @@ export default {
                       count:
                         language.countTracks(data.numTracks),
                     }));
-              } else if (data.hasTrackNumbers) {
+              } else if (data.hasTrackNumbers && !data.skipAnnotatingTrackNumbers) {
                 workingCapsule += '.withRange';
                 workingOptions.rangeAccent =
                   html.tag('span', {class: 'track-section-accent'},
