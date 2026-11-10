@@ -6,7 +6,14 @@ export default {
 
   data: (section) => ({
     name: section.name,
-    directory: section.directoryWithinAlbum,
+
+    multipleRegularTrackSections:
+      section.album.trackSections
+        .filter(section => section.stem === null)
+        .length > 2,
+
+    firstDirectoryInRun:
+      section.sectionsAcrossRun[0].directoryWithinAlbum,
 
     albumIsSingle:
       section.album.style === 'single',
@@ -17,8 +24,8 @@ export default {
       content: language.sanitize(data.name),
 
       hash:
-        (data.albumIsSingle
+        (data.albumIsSingle || !data.multipleRegularTrackSections
           ? null
-          : 'sec-' + data.directory),
+          : 'sec-' + data.firstDirectoryInRun),
     }),
 };
