@@ -7,11 +7,18 @@ export default {
   data: (section) => ({
     name: section.name,
     directory: section.directoryWithinAlbum,
+
+    albumIsSingle:
+      section.album.style === 'single',
   }),
 
   generate: (data, relations, {language}) =>
     relations.link.slots({
       content: language.sanitize(data.name),
-      hash: 'sec-' + data.directory,
+
+      hash:
+        (data.albumIsSingle
+          ? null
+          : 'sec-' + data.directory),
     }),
 };
