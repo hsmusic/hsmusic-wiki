@@ -106,6 +106,15 @@ export default {
           album.trackSections
             .map(section => section.isAsideTrackSection === true);
 
+        data.trackSectionsStartNewRuns =
+          album.trackSections
+            .map((section, index, sections) =>
+              index === 0 ||
+              (section.stem
+                ? section.stem !== sections[index - 1].stem &&
+                  section.stem !== sections[index - 1]
+                : section !== sections[index - 1].stem));
+
         data.trackSectionsHaveTrackNumbers =
           album.trackSections
             .map(section => section.hasTrackNumbers);
@@ -171,6 +180,7 @@ export default {
             directory: data.trackSectionDirectories,
             duration: data.trackSectionDurations,
             isAsideTrackSection: data.trackSectionsAreAsideSections,
+            startsNewRun: data.trackSectionsStartNewRuns,
             hasTrackNumbers: data.trackSectionsHaveTrackNumbers,
             startCountingFrom: data.trackSectionsStartCountingFrom,
             trackNumbers: data.trackSectionTrackNumbers,
@@ -183,6 +193,7 @@ export default {
               directory,
               duration,
               isAsideTrackSection,
+              startsNewRun,
               hasTrackNumbers,
               startCountingFrom,
               trackNumbers,
@@ -196,6 +207,9 @@ export default {
 
                     isAsideTrackSection &&
                       {class: 'aside'},
+
+                    startsNewRun &&
+                      {class: 'starts-new-run'},
                   ],
 
                   title:

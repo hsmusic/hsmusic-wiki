@@ -639,6 +639,19 @@
     margin-left: 0;
   }
 
+  .album-track-section-list {
+    &:has(> dt:nth-child(2 of .starts-new-run)) {
+      &:has(> dt:not(.starts-new-run)) {
+        margin-top: 1.25em;
+        margin-bottom: 1.5em;
+
+        dt.starts-new-run:not(:first-child) {
+          margin-top: 1.5em;
+        }
+      }
+    }
+  }
+
   .album-track-list li {
     padding-left: 1.5ch;
     text-indent: -1.5ch;
