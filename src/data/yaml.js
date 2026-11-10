@@ -33,6 +33,7 @@ import {
 
 import {
   atOffset,
+  deduplicate,
   empty,
   filterProperties,
   getNestedProp,
@@ -71,6 +72,7 @@ function pushWikiData(a, b) {
     if (Array.isArray(a[key])) {
       if (Array.isArray(b[key])) {
         a[key].push(...b[key]);
+        deduplicate(a[key]);
       } else {
         throw new Error(`${key} is an array, expected array of items to push`);
       }

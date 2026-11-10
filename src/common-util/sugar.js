@@ -238,6 +238,14 @@ export const mapInPlace = (array, fn) =>
 
 export const unique = (arr) => Array.from(new Set(arr));
 
+export function deduplicate(array) {
+  const deduped = unique(array);
+
+  if (deduped.length < array.length) {
+    array.splice(0, array.length, ...deduped);
+  }
+}
+
 export function* permutations(array) {
   switch (array.length) {
     case 0: return;
