@@ -20,6 +20,7 @@ import {
   isDirectory,
   isExcludingURLsReason,
   isFileExtension,
+  isNumber,
   isString,
   strictArrayOf,
   validateReference,
@@ -500,6 +501,29 @@ export class Track extends Thing {
 
     // > Update & expose - General metadata
 
+    trackNumber: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isNumber),
+      }),
+
+      // Zero is the fallback, not one, but in most albums the first track
+      // (and its intended output by this composition) will be one.
+
+      exitWithoutDependency('trackSection', V(0)),
+      withPropertiesFromObject('trackSection', V(['tracks', 'startCountingFrom'])),
+
+      withIndexInList('#trackSection.tracks', input.myself()),
+      exitWithoutDependency('#index', V(0), V('index')),
+
+      {
+        dependencies: ['#trackSection.startCountingFrom', '#index'],
+        compute: ({
+          ['#trackSection.startCountingFrom']: startCountingFrom,
+          ['#index']: index,
+        }) => startCountingFrom + index,
+      },
+    ],
+
     duration: duration(),
 
     color: [
@@ -886,25 +910,6 @@ export class Track extends Thing {
       },
     ],
 
-    trackNumber: [
-      // Zero is the fallback, not one, but in most albums the first track
-      // (and its intended output by this composition) will be one.
-
-      exitWithoutDependency('trackSection', V(0)),
-      withPropertiesFromObject('trackSection', V(['tracks', 'startCountingFrom'])),
-
-      withIndexInList('#trackSection.tracks', input.myself()),
-      exitWithoutDependency('#index', V(0), V('index')),
-
-      {
-        dependencies: ['#trackSection.startCountingFrom', '#index'],
-        compute: ({
-          ['#trackSection.startCountingFrom']: startCountingFrom,
-          ['#index']: index,
-        }) => startCountingFrom + index,
-      },
-    ],
-
     nameDetailWithinSection: [
       {
         dependencies: ['_nameDetail'],
@@ -1286,6 +1291,10 @@ export class Track extends Thing {
       'Has Date': {property: 'disableDate', transform: flipBoolean},
 
       // General metadata
+
+      'Track Number': {
+        property: 'trackNumber',
+      },
 
       'Duration': {
         property: 'duration',

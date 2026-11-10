@@ -113,6 +113,18 @@ export default {
                 ? section.startCountingFrom
                 : null));
 
+        data.trackSectionTrackNumbers =
+          album.trackSections
+            .map(section => section.tracks
+              .map(track => track.trackNumber));
+
+        break;
+
+      case 'tracks':
+        data.trackNumbers =
+          album.tracks
+            .map(track => track.trackNumber);
+
         break;
     }
 
@@ -129,12 +141,19 @@ export default {
   },
 
   generate(data, relations, slots, {html, language}) {
-    const slotItems = items =>
-      items.map(item =>
-        item.slots({
-          collapseDurationScope:
-            slots.collapseDurationScope,
-        }));
+    const slotItems = (items, trackNumbers) =>
+      stitchArrays({
+        item: items,
+        trackNumber: trackNumbers,
+      }).map(({item, trackNumber}, index) => {
+          item.setSlot('collapseDurationScope', slots.collapseDurationScope);
+
+          if (index >= 1 && trackNumber !== trackNumbers[index - 1] + 1) {
+            item.setSlot('setTrackNumberAttribute', true);
+          }
+
+          return item;
+        });
 
     switch (data.displayMode) {
       case 'trackSections':
@@ -149,6 +168,7 @@ export default {
             isAsideTrackSection: data.trackSectionsAreAsideSections,
             hasTrackNumbers: data.trackSectionsHaveTrackNumbers,
             startCountingFrom: data.trackSectionsStartCountingFrom,
+            trackNumbers: data.trackSectionTrackNumbers,
           }).map(({
               heading,
               description,
@@ -159,6 +179,7 @@ export default {
               isAsideTrackSection,
               hasTrackNumbers,
               startCountingFrom,
+              trackNumbers,
             }) => [
               language.encapsulate('trackList.section', capsule =>
                 heading.slots({
@@ -209,20 +230,20 @@ export default {
                 (hasTrackNumbers
                   ? html.tag('ol', {class: 'album-track-list'},
                       {start: startCountingFrom},
-                      slotItems(items))
+                      slotItems(items, trackNumbers))
 
                   : html.tag('ul', {class: 'album-track-list'},
-                      slotItems(items)))),
+                      slotItems(items, trackNumbers)))),
             ]));
 
       case 'tracks':
         return (
           (data.albumHasTrackNumbers
             ? html.tag('ol', {class: 'album-track-list'},
-                slotItems(relations.items))
+                slotItems(relations.items, data.trackNumbers))
 
             : html.tag('ul', {class: 'album-track-list'},
-                slotItems(relations.items)))
+                slotItems(relations.items, data.trackNumbers)))
         );
 
       default:

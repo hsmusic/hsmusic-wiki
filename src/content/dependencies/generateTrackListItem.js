@@ -45,6 +45,9 @@ export default {
 
     trackHasDuration:
       !!track.duration,
+
+    trackNumber:
+      track.trackNumber,
   }),
 
   slots: {
@@ -78,6 +81,13 @@ export default {
       default: false,
     },
 
+    // If true the <li> tag will get a value attribute to force the right
+    // track number.
+    setTrackNumberAttribute: {
+      type: 'boolean',
+      default: false,
+    },
+
     hash: {
       type: 'string',
     },
@@ -91,6 +101,9 @@ export default {
   generate: (data, relations, slots, {html, language}) =>
     language.encapsulate('trackList.item', itemCapsule =>
       html.tag('li',
+        slots.setTrackNumberAttribute &&
+          {value: data.trackNumber},
+
         slots.colorMode === 'line' &&
           relations.colorStyle.slot('context', 'primary-only'),
 

@@ -61,6 +61,10 @@ export default {
             ? track.nameDetailWithinAlbum
             : null));
 
+    data.trackNumbers =
+      trackSection.tracks
+        .map(track => track.trackNumber);
+
     data.tracksAreMissingCommentary =
       trackSection.tracks
         .map(track => empty(track.commentary));
@@ -113,16 +117,22 @@ export default {
         trackLink: relations.trackLinks,
         directory: data.trackDirectories,
         nameDetail: data.trackNameDetails,
+        trackNumber: data.trackNumbers,
         isCurrentTrack: data.tracksAreCurrentTrack,
         missingCommentary: data.tracksAreMissingCommentary,
       }).map(({
           trackLink,
           directory,
           nameDetail,
+          trackNumber,
           isCurrentTrack,
           missingCommentary,
-        }) =>
+        }, index) =>
           html.tag('li',
+            index >= 1 &&
+            trackNumber !== data.trackNumbers[index - 1] + 1 &&
+              {value: trackNumber},
+
             data.includesCurrentTrack &&
             isCurrentTrack &&
               {class: 'current'},

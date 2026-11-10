@@ -39,10 +39,17 @@ export default {
 
       default: 'album',
     },
+
+    setTrackNumberAttribute: {
+      type: 'boolean',
+      default: false,
+    },
   },
 
   generate: (data, relations, slots) =>
     relations.item.slots({
+      setTrackNumberAttribute: slots.setTrackNumberAttribute,
+
       showArtists:
         (data.albumShowsTrackArtists
           ? 'auto'
