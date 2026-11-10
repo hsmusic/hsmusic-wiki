@@ -187,6 +187,11 @@ export default {
       slots.open &&
         {open: true},
 
+      // Force open for singles. They don't have a corresponding "main" page
+      // to show all the sections in full, so never collapse for singles.
+      data.albumStyle === 'single' &&
+        {open: true},
+
       // Leave sidebar track sections collapsed on album info page,
       // since there's already a view of the full track listing
       // in the main content area.
