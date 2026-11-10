@@ -20,6 +20,7 @@ import {
 import {
   withFilteredList,
   withFlattenedList,
+  withIndexInList,
   withMappedList,
   withLengthOfList,
   withNearbyItemFromList,
@@ -255,6 +256,15 @@ export class TrackSection extends Thing {
       withPropertyFromList('sectionsAcrossRun', V('tracks')),
       withFlattenedList('#sectionsAcrossRun.tracks'),
       exposeDependency('#flattenedList'),
+    ],
+
+    startsRun: [
+      withIndexInList('sectionsAcrossRun', input.myself()),
+
+      {
+        dependencies: ['#index'],
+        compute: ({'#index': index}) => index === 0,
+      },
     ],
 
     duration: {
