@@ -26,7 +26,15 @@ export default {
     };
   },
 
-  generate(relations) {
+  data(query) {
+    return {
+      albumsHaveTrackNumbers:
+        query.albums
+          .map(album => album.hasTrackNumbers),
+    };
+  },
+
+  generate(data, relations) {
     return relations.page.slots({
       type: 'chunks',
 
@@ -34,7 +42,9 @@ export default {
         relations.albumLinks
           .map(albumLink => ({album: albumLink})),
 
-      listStyle: 'ordered',
+      chunkListStyles:
+        data.albumsHaveTrackNumbers
+          .map(hasTrackNumbers => hasTrackNumbers ? 'ordered' : 'unordered'),
 
       chunkRows:
         relations.trackLinks

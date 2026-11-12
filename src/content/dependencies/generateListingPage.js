@@ -77,6 +77,14 @@ export default {
       validate: v => v.strictArrayOf(v.optional(v.isObject)),
     },
 
+    chunkListStyles: {
+      validate: v => v.strictArrayOf(v.optional(v.is('ordered', 'unordered'))),
+    },
+
+    chunkListAttributes: {
+      validate: v => v.strictArrayOf(v.optional(v.isObject)),
+    },
+
     chunkRows: {
       validate: v => v.strictArrayOf(v.isObject),
     },
@@ -139,10 +147,21 @@ export default {
               provided: row,
             })));
 
-    const formatRowList = ({context, rows, rowAttributes}) =>
+    const formatRowList = ({
+      context,
+      listStyle,
+      listAttributes,
+      rows,
+      rowAttributes,
+    }) =>
       html.tag(
-        (slots.listStyle === 'ordered' ? 'ol' : 'ul'),
+        (listStyle === 'ordered' ? 'ol'
+       : listStyle === 'unordered' ? 'ul'
+       : slots.listStyle === 'ordered' ? 'ol'
+       : 'ul'),
+
         slots.listAttributes,
+        listAttributes,
 
         stitchArrays({
           row: rows,
@@ -173,6 +192,8 @@ export default {
 
         slots.content,
 
+        // Also considers the top-level listStyle and listAttributes slots,
+        // because those are always referenced by formatRowList.
         slots.type === 'rows' &&
           formatRowList({
             context: 'item',
@@ -213,6 +234,8 @@ export default {
               titleAccent: slots.chunkTitleAccents,
               stickyTitle: slots.chunkStickyTitles,
               id: slots.chunkIDs,
+              listStyle: slots.chunkListStyles,
+              listAttributes: slots.chunkListAttributes,
               rows: slots.chunkRows,
               rowAttributes: slots.chunkRowAttributes,
             }).map(({
@@ -220,6 +243,8 @@ export default {
                 titleAccent,
                 stickyTitle,
                 id,
+                listStyle,
+                listAttributes,
                 rows,
                 rowAttributes,
               }) => [
@@ -249,6 +274,7 @@ export default {
                             })
                           : null),
                     })
+
                   : html.tag('dt', id && {id},
                       formatListingString({
                         context: 'chunk.title',
@@ -258,6 +284,8 @@ export default {
                 html.tag('dd',
                   formatRowList({
                     context: 'chunk.item',
+                    listStyle,
+                    listAttributes,
                     rows,
                     rowAttributes,
                   })),
