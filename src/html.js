@@ -2043,10 +2043,15 @@ export class Template {
 
       if ('default' in slotDescription) validateDefault: {
         if (
-          slotDescription.default === undefined ||
-          slotDescription.default === null
+          (slotDescription.default === null || slotDescription === undefined) &&
+          ('type' in slotDescription && !('validate' in slotDescription))
         ) {
-          slotErrors.push(new TypeError(`(${slotName}) Leave slot default unspecified instead of undefined or null`));
+          slotErrors.push(new TypeError(`(${slotName}) Leave slot default unspecified unless using custom validator`));
+          break validateDefault;
+        }
+
+        if (slotDescription.default === undefined) {
+          slotErrors.push(new TypeError(`(${slotName}) Specify slot default as null, not undefined`));
           break validateDefault;
         }
 
