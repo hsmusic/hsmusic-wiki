@@ -103,7 +103,7 @@ export default {
       relation('generateReferencedTracksList', track),
 
     sampledTracksList:
-      relation('generateNearbyTrackList', track.sampledTracks, track, []),
+      relation('generateNearbyTrackList', track.sampledTracks, track),
 
     featuredMotifsList:
       relation('generateMotifConnectionList',

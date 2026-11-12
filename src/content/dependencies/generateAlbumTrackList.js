@@ -1,270 +1,94 @@
-import {empty, stitchArrays} from '#sugar';
-
-function displayTrackSections(album) {
-  if (empty(album.trackSections)) {
-    return false;
-  }
-
-  if (album.trackSections.length > 1) {
-    return true;
-  }
-
-  if (!album.trackSections[0].isDefaultTrackSection) {
-    return true;
-  }
-
-  return false;
-}
-
-function displayTracks(album) {
-  if (empty(album.tracks)) {
-    return false;
-  }
-
-  return true;
-}
-
-function getDisplayMode(album) {
-  if (displayTrackSections(album)) {
-    return 'trackSections';
-  } else if (displayTracks(album)) {
-    return 'tracks';
-  } else {
-    return 'none';
-  }
-}
+import {empty, stitchArrays, transposeArrays} from '#sugar';
 
 export default {
-  query(album) {
-    return {
-      displayMode: getDisplayMode(album),
-    };
-  },
+  relations: (relation, album) => ({
+    contentHeading:
+      relation('generateContentHeading'),
 
-  relations(relation, query, album) {
-    const relations = {};
+    trackSectionTitles:
+      album.trackSections
+        .map(section => relation('generateTrackSectionTitle', section)),
 
-    switch (query.displayMode) {
-      case 'trackSections':
-        relations.trackSectionHeadings =
-          album.trackSections.map(() =>
-            relation('generateContentHeading'));
+    trackSectionTrackLists:
+      album.trackSections
+        .map(section => relation('generateTrackSectionTrackList', section)),
 
-        relations.trackSectionDescriptions =
-          album.trackSections.map(section =>
-            relation('transformContent', section.description));
+    trackSectionDescriptions:
+      album.trackSections
+        .map(section => relation('transformContent', section.description)),
+  }),
 
-        relations.trackSectionItems =
-          album.trackSections.map(section =>
-            section.tracks.map(track =>
-              relation('generateAlbumTrackListItem', track, album)));
+  data: (album) => ({
+    showTrackArtists:
+      album.showArtistsInTrackList,
 
-        break;
+    hasSubstantialTrackSections:
+      album.trackSections.length >= 2 ||
 
-      case 'tracks':
-        relations.items =
-          album.tracks.map(track =>
-            relation('generateAlbumTrackListItem', track, album));
+      album.trackSections.length === 1 &&
+      !album.trackSections[0].isDefaultTrackSection,
 
-        break;
-    }
+    trackSectionDirectories:
+      album.trackSections.map(section => section.directoryWithinAlbum),
 
-    return relations;
-  },
+    trackSectionsStartRuns:
+      album.trackSections.map(section => section.startsRun),
+  }),
 
-  data(query, album) {
-    const data = {};
+  generate(data, relations, {html}) {
+    const trackLists =
+      relations.trackSectionTrackLists
+        .map(list => list.slots({
+          collapseDurationScope: 'album',
+          showArtists: data.showTrackArtists,
+          showDuration: true,
+        }));
 
-    data.displayMode = query.displayMode;
-    data.albumHasTrackNumbers = album.hasTrackNumbers;
+    if (data.hasSubstantialTrackSections) {
+      const headings =
+        stitchArrays({
+          title: relations.trackSectionTitles,
+          directory: data.trackSectionDirectories,
+          startsRun: data.trackSectionsStartRuns,
+        }).map(({title, directory, startsRun}) =>
+            relations.contentHeading.cloneWithSlots({
+              tag: 'dt',
 
-    switch (query.displayMode) {
-      case 'trackSections':
-        data.trackSectionNames =
-          album.trackSections
-            .map(section =>
-              (section.isDefaultTrackSection
-                ? null
-             : section.isTrackSectionContinuation
-                ? null
-                : section.name));
+              attributes: [
+                {id: 'sec-' + directory},
 
-        data.trackSectionDirectories =
-          album.trackSections
-            .map(section => section.directoryWithinAlbum);
+                startsRun &&
+                  {class: 'starts-run'},
+              ],
 
-        data.trackSectionDurations =
-          album.trackSections
-            .map(section =>
-              (section.hideDuration
-                ? null
-             : section.isTrackSectionContinuation
-                ? null
-                : section.durationAcrossRun));
+              title:
+                title.cloneWithSlots({mode: 'content', detail: 'duration'}),
 
-        data.trackSectionsAreAsideSections =
-          album.trackSections
-            .map(section => section.isAsideTrackSection === true);
+              stickyTitle:
+                title.cloneWithSlots({mode: 'content'}),
+            }));
 
-        data.trackSectionsStartRuns =
-          album.trackSections
-            .map(section => section.startsRun);
+      const descriptions =
+        relations.trackSectionDescriptions
+          .map(description =>
+            html.tag('blockquote', {[html.onlyIfContent]: true},
+              description));
 
-        data.trackSectionsHaveTrackNumbers =
-          album.trackSections
-            .map(section => section.hasTrackNumbers);
-
-        data.trackSectionsStartCountingFrom =
-          album.trackSections
-            .map(section =>
-              (section.hasTrackNumbers
-                ? section.startCountingFrom
-                : null));
-
-        data.trackSectionTrackNumbers =
-          album.trackSections
-            .map(section => section.tracks
-              .map(track => track.trackNumber));
-
-        break;
-
-      case 'tracks':
-        data.trackNumbers =
-          album.tracks
-            .map(track => track.trackNumber);
-
-        break;
-    }
-
-    return data;
-  },
-
-  slots: {
-    collapseDurationScope: {
-      validate: v =>
-        v.is('never', 'track', 'section', 'album'),
-
-      default: 'album',
-    },
-  },
-
-  generate(data, relations, slots, {html, language}) {
-    const slotItems = (items, trackNumbers) =>
-      stitchArrays({
-        item: items,
-        trackNumber: trackNumbers,
-      }).map(({item, trackNumber}, index) => {
-          item.setSlot('collapseDurationScope', slots.collapseDurationScope);
-
-          if (index >= 1 && trackNumber !== trackNumbers[index - 1] + 1) {
-            item.setSlot('setTrackNumberAttribute', true);
-          }
-
-          return item;
-        });
-
-    switch (data.displayMode) {
-      case 'trackSections':
-        return html.tag('dl', {class: 'album-track-section-list'},
-          stitchArrays({
-            heading: relations.trackSectionHeadings,
-            description: relations.trackSectionDescriptions,
-            items: relations.trackSectionItems,
-
-            name: data.trackSectionNames,
-            directory: data.trackSectionDirectories,
-            duration: data.trackSectionDurations,
-            isAsideTrackSection: data.trackSectionsAreAsideSections,
-            startsRun: data.trackSectionsStartRuns,
-            hasTrackNumbers: data.trackSectionsHaveTrackNumbers,
-            startCountingFrom: data.trackSectionsStartCountingFrom,
-            trackNumbers: data.trackSectionTrackNumbers,
-          }).map(({
+      const list =
+        html.tag('dl', {class: 'album-track-section-list'},
+          transposeArrays([headings, descriptions, trackLists])
+            .map(([heading, description, trackList]) => [
               heading,
-              description,
-              items,
-
-              name,
-              directory,
-              duration,
-              isAsideTrackSection,
-              startsRun,
-              hasTrackNumbers,
-              startCountingFrom,
-              trackNumbers,
-            }) => [
-              language.encapsulate('trackList.section', capsule =>
-                heading.slots({
-                  tag: 'dt',
-
-                  attributes: [
-                    {id: 'sec-' + directory},
-
-                    isAsideTrackSection &&
-                      {class: 'aside'},
-
-                    startsRun &&
-                      {class: 'starts-run'},
-                  ],
-
-                  title:
-                    language.encapsulate(capsule, workingCapsule => {
-                      const workingOptions = {
-                        [language.onlyIfOptions]: ['section'],
-                        section: name,
-                      };
-
-                      if (html.isBlank(name)) {
-                        return html.blank();
-                      }
-
-                      if (duration) {
-                        workingCapsule += '.withDuration';
-                        workingOptions.duration =
-                          language.formatDuration(duration, {
-                            showApproximate: true,
-                          });
-                      }
-
-                      return language.$(workingCapsule, workingOptions);
-                    }),
-
-                  stickyTitle:
-                    language.$(capsule, 'sticky', {
-                      [language.onlyIfOptions]: ['section'],
-                      section: name,
-                    }),
-                })),
-
-              html.tag('dd',
-                isAsideTrackSection &&
-                  {class: 'aside'},
-
-                html.tag('blockquote',
-                  {[html.onlyIfContent]: true},
-                  description),
-
-                (hasTrackNumbers
-                  ? html.tag('ol', {class: 'album-track-list'},
-                      {start: startCountingFrom},
-                      slotItems(items, trackNumbers))
-
-                  : html.tag('ul', {class: 'album-track-list'},
-                      slotItems(items, trackNumbers)))),
+              html.tag('dd', [description, trackList]),
             ]));
 
-      case 'tracks':
-        return (
-          (data.albumHasTrackNumbers
-            ? html.tag('ol', {class: 'album-track-list'},
-                slotItems(relations.items, data.trackNumbers))
-
-            : html.tag('ul', {class: 'album-track-list'},
-                slotItems(relations.items, data.trackNumbers)))
-        );
-
-      default:
-        return html.blank();
+      return list;
     }
-  }
+
+    if (!empty(trackLists)) {
+      return trackLists[0];
+    }
+
+    return html.blank();
+  },
 };

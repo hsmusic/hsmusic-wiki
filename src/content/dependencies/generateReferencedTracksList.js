@@ -1,10 +1,7 @@
 export default {
   relations: (relation, track) => ({
    trackList:
-      relation('generateNearbyTrackList',
-        track.referencedTracks,
-        track,
-        []),
+      relation('generateNearbyTrackList', track.referencedTracks, track),
   }),
 
   generate: (relations, {html}) =>

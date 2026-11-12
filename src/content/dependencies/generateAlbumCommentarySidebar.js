@@ -11,12 +11,8 @@ export default {
     albumLink:
       relation('linkAlbum', album),
 
-    trackSections:
-      album.trackSections.map(trackSection =>
-        relation('generateAlbumSidebarTrackSection',
-          album,
-          null,
-          trackSection)),
+    trackList:
+      relation('generateAlbumSidebarTrackList', album, null),
   }),
 
   data: (album) => ({
@@ -50,13 +46,7 @@ export default {
                   return language.$(workingCapsule);
                 })),
 
-              data.anyTrackHasCommentary &&
-                relations.trackSections.map(section =>
-                  section.slots({
-                    anchor: true,
-                    open: true,
-                    mode: 'commentary',
-                  })),
+              relations.trackList.slot('mode', 'commentary'),
             ],
           }),
         ]

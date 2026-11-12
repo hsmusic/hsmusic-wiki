@@ -6,9 +6,8 @@ export default {
     albumLink:
       relation('linkAlbum', album),
 
-    trackSections:
-      album.trackSections.map(trackSection =>
-        relation('generateAlbumSidebarTrackSection', album, track, trackSection)),
+    trackList:
+      relation('generateAlbumSidebarTrackList', album, track),
   }),
 
   generate: (relations, {html}) =>
@@ -21,7 +20,7 @@ export default {
             showNameDetail: 'inside',
           })),
 
-        relations.trackSections,
+        relations.trackList,
       ],
-    })
+    }),
 };

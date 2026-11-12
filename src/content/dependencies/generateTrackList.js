@@ -1,26 +1,16 @@
 export default {
-  relations: (relation, list, contextContributions) => ({
+  relations: (relation, list) => ({
     items:
       list.map(item =>
         (item.isDivider
           ? relation('generateListDivider')
-          : relation('generateTrackListItem', item, contextContributions))),
+          : relation('generateTrackListItem', item, []))),
   }),
 
   slots: {
-    showArtists: {
-      validate: v => v.is(true, false, 'auto'),
-      default: 'auto',
-    },
-
     showNameDetail: {
       type: 'boolean',
       default: true,
-    },
-
-    showDuration: {
-      type: 'boolean',
-      default: false,
     },
 
     colorMode: {
@@ -36,9 +26,6 @@ export default {
       relations.items.map(item => {
         if (item.setSlots) {
           item.setSlots({
-            showArtists: slots.showArtists,
-            showDuration: slots.showDuration,
-
             showNameDetail:
               (slots.showNameDetail
                 ? 'from across wiki'

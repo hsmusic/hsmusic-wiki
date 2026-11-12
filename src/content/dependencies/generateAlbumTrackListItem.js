@@ -22,7 +22,6 @@ export default {
 
   data: (query, track, album) => ({
     albumStyle: album.style,
-    albumShowsTrackArtists: album.showArtistsInTrackList,
 
     trackHasDuration: query.trackHasDuration,
     sectionHasDuration: query.sectionHasDuration,
@@ -33,32 +32,40 @@ export default {
   }),
 
   slots: {
+    attributes: {type: 'attributes', mutable: false},
+    setTrackNumberAttribute: {type: 'boolean', default: false},
+
+    anchor: {type: 'boolean'},
+    linkless: {type: 'boolean'},
+    hash: {type: 'string'},
+
+    showArtists: {type: 'boolean', default: true},
+    showDuration: {type: 'boolean', default: false},
+
     collapseDurationScope: {
       validate: v =>
         v.is('never', 'track', 'section', 'album'),
 
       default: 'album',
     },
-
-    setTrackNumberAttribute: {
-      type: 'boolean',
-      default: false,
-    },
   },
 
   generate: (data, relations, slots) =>
     relations.item.slots({
+      attributes: slots.attributes,
       setTrackNumberAttribute: slots.setTrackNumberAttribute,
 
-      showArtists:
-        (data.albumShowsTrackArtists
-          ? 'auto'
-          : false),
+      anchor: slots.anchor,
+      linkless: slots.linkless,
+      hash: slots.hash,
+
+      showArtists: slots.showArtists,
 
       showNameDetail:
         'from within section',
 
       showDuration:
+        slots.showDuration &&
         (slots.collapseDurationScope === 'track'
           ? data.trackHasDuration
        : slots.collapseDurationScope === 'section'

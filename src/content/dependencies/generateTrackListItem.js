@@ -3,16 +3,10 @@ export default {
     trackLink:
       relation('linkTrack', track),
 
-    contextualCredit:
+    artistCredit:
       relation('generateArtistCredit',
         track.artistContribs,
         contextContributions,
-        track.artistTextInLists),
-
-    acontextualCredit:
-      relation('generateArtistCredit',
-        track.artistContribs,
-        [],
         track.artistTextInLists),
 
     colorStyle:
@@ -51,12 +45,13 @@ export default {
   }),
 
   slots: {
-    // true always shows artists, false never does; 'auto' shows only if
-    // the track's artists differ from the given context contributions.
-    showArtists: {
-      validate: v => v.is(true, false, 'auto'),
-      default: 'auto',
-    },
+    attributes: {type: 'attributes', mutable: false},
+
+    anchor: {type: 'boolean'},
+    linkless: {type: 'boolean'},
+    hash: {type: 'string'},
+
+    showArtists: {type: 'boolean', default: true},
 
     showNameDetail: {
       validate: v => v.is(...[
@@ -88,10 +83,6 @@ export default {
       default: false,
     },
 
-    hash: {
-      type: 'string',
-    },
-
     colorMode: {
       validate: v => v.is('none', 'track', 'line'),
       default: 'track',
@@ -101,6 +92,8 @@ export default {
   generate: (data, relations, slots, {html, language}) =>
     language.encapsulate('trackList.item', itemCapsule =>
       html.tag('li',
+        slots.attributes,
+
         slots.setTrackNumberAttribute &&
           {value: data.trackNumber},
 
@@ -155,6 +148,8 @@ export default {
           workingOptions.track =
             relations.trackLink.slots({
               color: slots.colorMode === 'track',
+              anchor: slots.anchor,
+              linkless: slots.linkless,
               hash: slots.hash,
             });
 
@@ -181,20 +176,13 @@ export default {
 
           const artists =
             language.encapsulate(itemCapsule, 'artists', artistsCapsule => {
-              const chosenCredit =
-                (slots.showArtists === true
-                  ? relations.acontextualCredit
-               : slots.showArtists === 'auto'
-                  ? relations.contextualCredit
-                  : null);
-
-              if (!chosenCredit) {
+              if (!slots.showArtists) {
                 return html.blank();
               }
 
-              // This might still be blank, if the contextual credit is chosen
-              // and it matches its context credit.
-              return chosenCredit.slots({
+              // This might still be blank, if the credit matches the given
+              // context contributions.
+              return relations.artistCredit.slots({
                 normalStringKey:
                   artistsCapsule + '.by',
 

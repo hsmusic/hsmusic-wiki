@@ -49,7 +49,7 @@ export default {
 
       relations.trackListItems.forEach(item => {
         item.setSlots({
-          showArtists: 'auto',
+          showArtists: true,
           showNameDetail: 'from across wiki',
           showDuration: false,
           showDate: false,

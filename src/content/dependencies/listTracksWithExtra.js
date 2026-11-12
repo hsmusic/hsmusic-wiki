@@ -109,7 +109,7 @@ export default {
             .map(item => ({
               track:
                 html.inside(item.slots({
-                  showArtists: slots.showArtists ? 'auto' : false,
+                  showArtists: slots.showArtists,
                   showNameDetail: 'from within album',
                   showDuration: false,
                   hash: slots.hash,

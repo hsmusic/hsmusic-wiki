@@ -500,20 +500,22 @@ releaseInfo:
       _: "Download {LINK}."
       link: "MIDI & project files"
 
-#
-# trackList:
-#
-#   A list of tracks! These are used pretty much across the wiki.
-#   Track lists can be split into sections, groups, or not split at
-#   all. "Track sections" are divisions in the list which suit the
-#   album as a whole, like if it has multiple discs or bonus tracks.
-#   "Groups" are actual group objects (see ex. groupInfoPage).
-#
 trackList:
-  section:
-    _: "{SECTION}:"
-    withDuration: "{SECTION}: ({DURATION})"
-    sticky: "{SECTION}:"
+  section.fallbackName: "Track list"
+
+  section.inContent: "{SECTION}:"
+  section.inSidebar: "{SECTION}"
+  section.withDetail: "{SECTION} {DETAIL}"
+
+  section.detail:
+    _: "({DETAIL})"
+
+    count: "{TRACKS}"
+
+    range: "{START}–{END}"
+    range.one: "{NUMBER}"
+
+    duration: "{DURATION}"
 
   fromDivision: "from {DIVISION}:"
   notFromDivision: "from somewhere else:"
@@ -1376,39 +1378,6 @@ homepage:
 #   in each section rather than the section's duration.
 #
 albumSidebar:
-  trackList:
-    item: "{TRACK}"
-    item.withDetail: "{TRACK} {DETAIL_ACCENT}"
-    item.withDetail.accent: "({DETAIL})"
-
-    # fallbackSectionName:
-    #   If an album's track list isn't sectioned, the track list here
-    #   will still have all the tracks grouped under a list that can
-    #   be toggled open and closed. This controls how that list gets
-    #   titled.
-
-    fallbackSectionName: "Track list"
-
-    section: >-
-      {SECTION}
-
-    section.withRange: >-
-      {SECTION} {RANGE_ACCENT}
-
-    section.withRange.accent: >-
-      ({RANGE})
-
-    section.withRange.range: >-
-      {START}–{END}
-
-    section.withRange.one: >-
-      {NUMBER}
-
-    section.withCount: >-
-      {SECTION} {COUNT_ACCENT}
-
-    section.withCount.accent: >-
-      ({COUNT})
 
   # groupBox:
   #   This is the box for groups. Apart from the next and previous

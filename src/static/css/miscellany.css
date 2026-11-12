@@ -472,8 +472,9 @@
 /* Summary elements */
 
 @layer print {
-  summary > span b {
-    font-weight: normal;
+  summary > span b,
+  summary > span span.track-section-name {
+    &:is(b) { font-weight: normal; }
     color: var(--primary-color);
   }
 }
@@ -492,7 +493,7 @@
       text-decoration: none !important;
     }
 
-    span {
+    span:not(.track-section-name, .track-section-detail) {
       text-decoration: underline;
     }
   }

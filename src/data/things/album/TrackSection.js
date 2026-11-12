@@ -284,6 +284,33 @@ export class TrackSection extends Thing {
           accumulateDurationForAlbum(tracksAcrossRun),
       },
     },
+
+    // The track number properties are in principle the same as start- and
+    // continueCountingFrom (or the latter minus one), but in practice these
+    // refer to the trackNumber properties on the first and last tracks, and
+    // those might be overridden to another value.
+
+    firstTrackNumber: [
+      exitWithoutDependency('hasTrackNumbers'),
+      exitWithoutDependency('tracks', V('empty')),
+
+      {
+        dependencies: ['tracks'],
+        compute: ({tracks}) =>
+          tracks.at(0).trackNumber,
+      },
+    ],
+
+    lastTrackNumber: [
+      exitWithoutDependency('hasTrackNumbers'),
+      exitWithoutDependency('tracks', V('empty')),
+
+      {
+        dependencies: ['tracks'],
+        compute: ({tracks}) =>
+          tracks.at(-1).trackNumber,
+      },
+    ],
   });
 
   static [Thing.yamlDocumentSpec] = {

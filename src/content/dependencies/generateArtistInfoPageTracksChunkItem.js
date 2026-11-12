@@ -112,7 +112,7 @@ export default {
           track:
             html.inside(
               relations.trackListItem.slots({
-                showArtists: 'auto',
+                showArtists: true,
                 showNameDetail: 'from within album',
                 showDuration: slots.showDuration,
                 showDate: data.date,

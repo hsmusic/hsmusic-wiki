@@ -1,7 +1,7 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  query: (tracks, contextTrack, _contextContributions) => ({
+  query: (tracks, contextTrack) => ({
     presentedTracks:
       (contextTrack
         ? tracks.map(track =>
@@ -10,29 +10,19 @@ export default {
         : tracks),
   }),
 
-  relations: (relation, query, _tracks, _contextTrack, contextContributions) => ({
+  relations: (relation, query, _tracks, _contextTrack) => ({
     items:
       query.presentedTracks
-        .map(track => relation('generateTrackListItem', track, contextContributions)),
+        .map(track => relation('generateTrackListItem', track, [])),
   }),
 
-  data: (query, _tracks, contextTrack, _contextContributions) => ({
+  data: (query, _tracks, contextTrack) => ({
     presentedTracksMatchContextRelease:
       query.presentedTracks
         .map(track => track.album === contextTrack.album),
   }),
 
   slots: {
-    showArtists: {
-      validate: v => v.is(true, false, 'auto'),
-      default: 'auto',
-    },
-
-    showDuration: {
-      type: 'boolean',
-      default: false,
-    },
-
     showNameDetail: {
       type: 'boolean',
       default: true,
@@ -53,9 +43,6 @@ export default {
         releasesMatch: data.presentedTracksMatchContextRelease,
       }).map(({item, releasesMatch}) =>
         item.slots({
-          showArtists: slots.showArtists,
-          showDuration: slots.showDuration,
-
           showNameDetail:
             (slots.showNameDetail && releasesMatch
               ? 'from within album'
