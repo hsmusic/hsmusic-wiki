@@ -940,7 +940,7 @@ function showSidebarSearchResults(results) {
 
   showFilterElements(results);
 
-  if (!shownAnyResults) {
+  if (!shownAnyResults && filterType) {
     shownAnyResults = toggleSidebarSearchFilter(filterType);
     filterType = null;
   }
@@ -1118,7 +1118,7 @@ function showFilterElements(results) {
   forEachFilter((type, filterLink) => {
     filterLink.classList.remove('shown', 'hidden');
 
-    if (allReferenceTypes.includes(type)) {
+    if (allReferenceTypes.includes(type) || type === queriedKind) {
       shownAny = true;
       cssProp(filterLink, 'display', null);
 
