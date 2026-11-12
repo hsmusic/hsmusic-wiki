@@ -66,7 +66,7 @@ export default {
         case 'count':
           detailText =
             language.$(capsule, 'detail.count', {
-              count: language.countTracks(data.tracks),
+              tracks: language.countTracks(data.numTracks),
             });
 
           break;

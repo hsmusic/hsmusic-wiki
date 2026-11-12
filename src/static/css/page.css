@@ -868,7 +868,7 @@
 
   .sidebar:has(> details:not([open])) {
     ~ .sidebar-box-joiner {
-      height: 5px;
+      height: 6px;
       border-right-style: solid;
       border-right-color: var(--dimmish-solid-line-color);
     }

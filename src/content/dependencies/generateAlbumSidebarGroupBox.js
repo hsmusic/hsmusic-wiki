@@ -32,36 +32,30 @@ export default {
     return query;
   },
 
-  relations(relation, query, _album, _track, group) {
-    const relations = {};
+  relations: (relation, query, _album, _track, group) => ({
+    box:
+      relation('generatePageSidebarBox'),
 
-    relations.box =
-      relation('generatePageSidebarBox');
+    groupLink:
+      relation('linkGroup', group),
 
-    relations.groupLink =
-      relation('linkGroup', group);
-
-    relations.externalLinks =
+    externalLinks:
       group.urls
-        .map(entry => relation('linkExternal', entry));
+        .map(entry => relation('linkExternal', entry)),
 
-    if (group.descriptionShort) {
-      relations.description =
-        relation('transformContent', group.descriptionShort);
-    }
+    description:
+      relation('transformContent', group.descriptionShort),
 
-    if (query.previousThing) {
-      relations.previousThingLink =
-        relation('linkAlbum', query.previousThing);
-    }
+    previousThingLink:
+      (query.previousThing
+        ? relation('linkAlbum', query.previousThing)
+        : null),
 
-    if (query.nextThing) {
-      relations.nextThingLink =
-        relation('linkAlbum', query.nextThing);
-    }
-
-    return relations;
-  },
+    nextThingLink:
+      (query.nextThing
+        ? relation('linkAlbum', query.nextThing)
+        : null),
+  }),
 
   data: (query, _album, track, group) => ({
     directory:
