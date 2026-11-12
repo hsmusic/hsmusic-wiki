@@ -1,9 +1,19 @@
-import {empty, stitchArrays, transposeArrays} from '#sugar';
+import {stitchArrays, transposeArrays} from '#sugar';
 
 export default {
   relations: (relation, album) => ({
     contentHeading:
       relation('generateContentHeading'),
+
+    albumColorStyle:
+      relation('generateColorStyleAttribute', album.color),
+
+    trackSectionColorStyles:
+      album.trackSections
+        .map(section =>
+          (section.color === album.color
+            ? relation('generateColorStyleAttribute', section.color)
+            : null)),
 
     trackSectionTitles:
       album.trackSections
@@ -35,60 +45,96 @@ export default {
       album.trackSections.map(section => section.startsRun),
   }),
 
-  generate(data, relations, {html}) {
+  slots: {
+    color: {type: 'boolean', default: false},
+
+    showArtists: {type: 'boolean', default: true},
+    showDuration: {type: 'boolean', default: true},
+
+    showTrackSections: {
+      validate: v => v.is(true, false, 'divided'),
+      default: true,
+    },
+  },
+
+  generate(data, relations, slots, {html}) {
     const trackLists =
       relations.trackSectionTrackLists
         .map(list => list.slots({
           collapseDurationScope: 'album',
-          showArtists: data.showTrackArtists,
-          showDuration: true,
+          showArtists: (slots.showArtists ? data.showTrackArtists : false),
+          showDuration: slots.showDuration,
         }));
 
-    if (data.hasSubstantialTrackSections) {
-      const headings =
-        stitchArrays({
-          title: relations.trackSectionTitles,
-          directory: data.trackSectionDirectories,
-          startsRun: data.trackSectionsStartRuns,
-        }).map(({title, directory, startsRun}) =>
-            relations.contentHeading.cloneWithSlots({
-              tag: 'dt',
-
-              attributes: [
-                {id: 'sec-' + directory},
-
-                startsRun &&
-                  {class: 'starts-run'},
-              ],
-
-              title:
-                title.cloneWithSlots({mode: 'content', detail: 'duration'}),
-
-              stickyTitle:
-                title.cloneWithSlots({mode: 'content'}),
-            }));
-
-      const descriptions =
-        relations.trackSectionDescriptions
-          .map(description =>
-            html.tag('blockquote', {[html.onlyIfContent]: true},
-              description));
-
+    if (
+      slots.showTrackSections === false ||
+      !data.hasSubstantialTrackSections
+    ) {
       const list =
-        html.tag('dl', {class: 'album-track-section-list'},
-          transposeArrays([headings, descriptions, trackLists])
-            .map(([heading, description, trackList]) => [
-              heading,
-              html.tag('dd', [description, trackList]),
-            ]));
+        html.tag('div', {class: 'album-track-list'},
+          {[html.onlyIfContent]: true},
+          relations.albumColorStyle,
+          trackLists);
 
       return list;
     }
 
-    if (!empty(trackLists)) {
-      return trackLists[0];
+    if (slots.showTrackSections === 'divided') {
+      const list =
+        html.tag('div', {class: 'album-track-list'},
+          {[html.onlyIfContent]: true},
+          {[html.joinChildren]:
+            html.tag('hr', {class: 'track-section-division-placeholder'})},
+          relations.albumColorStyle,
+          trackLists);
+
+      return list;
     }
 
-    return html.blank();
+    const headings =
+      stitchArrays({
+        title: relations.trackSectionTitles,
+        colorStyle: relations.trackSectionColorStyles,
+        directory: data.trackSectionDirectories,
+        startsRun: data.trackSectionsStartRuns,
+      }).map(({title, colorStyle, directory, startsRun}) =>
+          relations.contentHeading.cloneWithSlots({
+            tag: 'dt',
+
+            attributes: [
+              {id: 'sec-' + directory},
+
+              startsRun &&
+                {class: 'starts-run'},
+
+              colorStyle,
+            ],
+
+            title:
+              title.cloneWithSlots({mode: 'content', detail: 'duration'}),
+
+            stickyTitle:
+              title.cloneWithSlots({mode: 'content'}),
+          }));
+
+    const colorStyles = relations.trackSectionColorStyles;
+
+    const descriptions =
+      relations.trackSectionDescriptions
+        .map(description =>
+          html.tag('blockquote', {[html.onlyIfContent]: true},
+            description));
+
+    const list =
+      html.tag('dl', {class: 'album-track-section-list'},
+        relations.albumColorStyle,
+
+        transposeArrays([headings, colorStyles, descriptions, trackLists])
+          .map(([heading, colorStyle, description, trackList]) => [
+            heading,
+            html.tag('dd', colorStyle, [description, trackList]),
+          ]));
+
+    return list;
   },
 };

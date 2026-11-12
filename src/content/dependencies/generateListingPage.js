@@ -77,6 +77,11 @@ export default {
       validate: v => v.strictArrayOf(v.optional(v.isObject)),
     },
 
+    // Used in place of a list of rows.
+    chunkContent: {
+      validate: v => v.strictArrayOf(v.optional(v.isHTML)),
+    },
+
     chunkListStyles: {
       validate: v => v.strictArrayOf(v.optional(v.is('ordered', 'unordered'))),
     },
@@ -234,6 +239,7 @@ export default {
               titleAccent: slots.chunkTitleAccents,
               stickyTitle: slots.chunkStickyTitles,
               id: slots.chunkIDs,
+              content: slots.chunkContent,
               listStyle: slots.chunkListStyles,
               listAttributes: slots.chunkListAttributes,
               rows: slots.chunkRows,
@@ -243,6 +249,7 @@ export default {
                 titleAccent,
                 stickyTitle,
                 id,
+                content,
                 listStyle,
                 listAttributes,
                 rows,
@@ -282,6 +289,7 @@ export default {
                       }))),
 
                 html.tag('dd',
+                  content ??
                   formatRowList({
                     context: 'chunk.item',
                     listStyle,

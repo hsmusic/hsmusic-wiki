@@ -675,6 +675,11 @@
     text-indent: 0;
   }
 
+  #content .album-track-list hr.track-section-division-placeholder {
+    margin-left: 15px;
+    width: min(300px, 60%);
+  }
+
   .album-track-section-list blockquote,
   .group-series-list blockquote {
     max-width: 540px;
@@ -690,6 +695,13 @@
   .album-track-section-list blockquote p:last-child,
   .group-series-list blockquote p:last-child {
     margin-bottom: 0;
+  }
+}
+
+@layer material {
+  #content .album-track-list hr.track-section-division-placeholder {
+    border: none !important;
+    border-bottom: 1px solid var(--dim-color) !important;
   }
 }
 

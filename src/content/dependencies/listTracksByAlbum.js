@@ -19,10 +19,13 @@ export default {
         query.albums
           .map(album => relation('linkAlbum', album)),
 
-      trackLinks:
-        query.tracks
-          .map(tracks => tracks
-            .map(track => relation('linkTrack', track))),
+      albumColorStyles:
+        query.albums
+          .map(album => relation('generateColorStyleAttribute', album.color)),
+
+      albumTrackLists:
+        query.albums
+          .map(album => relation('generateAlbumTrackList', album)),
     };
   },
 
@@ -46,10 +49,17 @@ export default {
         data.albumsHaveTrackNumbers
           .map(hasTrackNumbers => hasTrackNumbers ? 'ordered' : 'unordered'),
 
-      chunkRows:
-        relations.trackLinks
-          .map(trackLinks => trackLinks
-            .map(trackLink => ({track: trackLink}))),
+      chunkListAttributes:
+        relations.albumColorStyles
+          .map(style => style.slot('context', 'primary-only')),
+
+      chunkContent:
+        relations.albumTrackLists
+          .map(list => list.slots({
+            showArtists: false,
+            showDuration: false,
+            showTrackSections: 'divided',
+          })),
     });
   },
 };
