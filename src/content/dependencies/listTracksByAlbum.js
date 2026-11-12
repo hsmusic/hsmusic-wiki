@@ -7,7 +7,6 @@ export default {
     return {
       spec,
       albums: albumData,
-      tracks: albumData.map(album => album.tracks),
     };
   },
 
