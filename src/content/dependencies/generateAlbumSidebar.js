@@ -84,9 +84,6 @@ export default {
     sidebar:
       relation('generatePageSidebar'),
 
-    conjoinedBox:
-      relation('generatePageSidebarConjoinedBox'),
-
     trackListBox:
       relation('generateAlbumSidebarTrackListBox', album, track),
 
@@ -164,59 +161,32 @@ export default {
       box.setSlot('mode', presentGroupsLikeAlbum ? 'album' : 'track');
     }
 
-    const groupBoxes =
-      (presentGroupsLikeAlbum
-        ? [
-            relations.disconnectedSeriesBoxes,
-            stitchArrays({
-              groupBox: relations.groupBoxes,
-              groupColorStyle: relations.groupColorStyles,
-              seriesBoxes: relations.seriesBoxes,
-              groupCollapses: data.groupsCollapse,
-            }).map(({
-                groupBox,
-                groupColorStyle,
-                seriesBoxes,
-                groupCollapses,
-              }) => [
-                groupBox,
-                seriesBoxes.map(seriesBox => [
-                  html.tag('div', {class: 'sidebar-box-joiner'},
-                    groupCollapses &&
-                      groupColorStyle.slot('context', 'primary-only'),
+    const groupBoxes = [
+      relations.disconnectedSeriesBoxes,
 
-                    {class: 'hide-for-narrow-layout'}),
+      stitchArrays({
+        groupBox: relations.groupBoxes,
+        groupColorStyle: relations.groupColorStyles,
+        seriesBoxes: relations.seriesBoxes,
+        groupCollapses: data.groupsCollapse,
+      }).map(({
+          groupBox,
+          groupColorStyle,
+          seriesBoxes,
+          groupCollapses,
+        }) => [
+          groupBox,
+          seriesBoxes.map(seriesBox => [
+            html.tag('div', {class: 'sidebar-box-joiner'},
+              (groupCollapses || data.isTrackPage) &&
+                groupColorStyle.slot('context', 'primary-only'),
 
-                  seriesBox,
-                ]),
-              ]),
-          ]
-        : [
-            relations.conjoinedBox.slots({
-              attributes: {class: 'conjoined-group-sidebar-box'},
-              boxes:
-                ([relations.disconnectedSeriesBoxes,
-                  stitchArrays({
-                    groupBox: relations.groupBoxes,
-                    seriesBoxes: relations.seriesBoxes,
-                    seriesBoxesResembleGroup: data.seriesBoxesResembleGroup,
-                  }).flatMap(({
-                      groupBox,
-                      seriesBoxes,
-                      seriesBoxesResembleGroup,
-                    }) => [
-                      groupBox,
-                      ...
-                        stitchArrays({
-                          seriesBox: seriesBoxes,
-                          resemblesGroup: seriesBoxesResembleGroup,
-                        }).filter(({resemblesGroup}) => !resemblesGroup)
-                          .map(({seriesBox}) => seriesBox),
-                    ]),
-                ]).flat()
-                  .map(box => box.content), /* TODO: Kludge. */
-            })
-          ]);
+              {class: 'hide-for-narrow-layout'}),
+
+            seriesBox,
+          ]),
+        ]),
+    ];
 
     return relations.sidebar.slots({
       boxes: [
@@ -234,6 +204,11 @@ export default {
         data.isTrackPage &&
           relations.metaReleaseBoxes
             .map(box => box.slot('meta', true)),
+
+        data.isTrackPage &&
+        !html.isBlank(groupBoxes) &&
+        !html.isBlank(relations.trackListBox) &&
+          html.tag('hr'),
 
         data.isTrackPage &&
           groupBoxes,

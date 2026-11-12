@@ -38,13 +38,6 @@ export default {
       type: 'html',
       mutable: false,
     },
-
-    // Controlled by generatePageSidebarConjoinedBox, probably not applicable
-    // much of anywhere else.
-    contentOnly: {
-      type: 'boolean',
-      default: false,
-    },
   },
 
   generate(relations, slots, {html}) {
@@ -70,14 +63,16 @@ export default {
 
         slots.content);
 
-    if (slots.contentOnly) {
-      return content;
-    }
-
     const box =
       html.tag('div', {class: 'sidebar'},
         slots.hideForNarrowLayout &&
           {class: 'hide-for-narrow-layout'},
+
+        slots.collapse &&
+          {class: 'collapsible'},
+
+        slots.collapse === 'chain' &&
+          {class: 'chain-collapsible'},
 
         slots.attributes,
 

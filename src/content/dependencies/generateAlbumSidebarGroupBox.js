@@ -15,10 +15,12 @@ export default {
       // compared to how latest-last chronological lists are accessed.
       sortAlbumsTracksChronologically(things, {latestFirst: true});
 
-      const currentIndex =
-        (track && things.includes(track)
-          ? things.indexOf(track)
-          : things.indexOf(album));
+      const currentThing =
+        (album.style === 'single' && track === album.tracks[0]
+          ? album
+          : track ?? album);
+
+      const currentIndex = things.indexOf(currentThing);
 
       query.previousThing =
         atOffset(things, currentIndex, +1);
@@ -86,24 +88,21 @@ export default {
 
   generate: (data, relations, slots, {html, language}) =>
     language.encapsulate('albumSidebar.groupBox', boxCapsule => {
-      const hsmusicLikeAnAlbum =
-        slots.mode === 'album' ||
-        data.groupDirectlyIncludesTrack;
+      const collapse =
+        slots.mode === 'track' ||
+        data.collapse;
 
       return relations.box.slots({
         attributes: {class: 'individual-group-sidebar-box'},
-        color: (data.collapse ? data.color : null),
-
-        collapse: data.collapse,
+        color: (collapse ? data.color : null),
+        collapse: collapse,
         collapseMemorableID: `${data.directory}-sidebar-group`,
 
         title:
           language.$(boxCapsule, 'title', {group: relations.groupLink}),
 
         content: [
-          hsmusicLikeAnAlbum &&
-            relations.description
-              ?.slot('mode', 'multiline'),
+          relations.description.slot('mode', 'multiline'),
 
           html.tag('p',
             {[html.onlyIfContent]: true},
@@ -117,7 +116,6 @@ export default {
                     .map(link => link.slot('context', 'group'))),
             })),
 
-          hsmusicLikeAnAlbum &&
           relations.nextThingLink &&
             html.tag('p', {class: 'group-chronology-link'},
               language.$(boxCapsule, 'next', {
@@ -125,7 +123,6 @@ export default {
                   relations.nextThingLink.slot('showNameDetail', 'accent'),
               })),
 
-          hsmusicLikeAnAlbum &&
           relations.previousThingLink &&
             html.tag('p', {class: 'group-chronology-link'},
               language.$(boxCapsule, 'previous', {

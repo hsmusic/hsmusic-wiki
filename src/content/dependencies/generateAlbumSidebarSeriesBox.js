@@ -7,10 +7,12 @@ export default {
     const things =
       series.things;
 
-    const currentIndex =
-      (track && things.includes(track)
-        ? things.indexOf(track)
-        : things.indexOf(album));
+    const currentThing =
+      (album.style === 'single' && track === album.tracks[0]
+        ? album
+        : track ?? album);
+
+    const currentIndex = things.indexOf(currentThing);
 
     query.previousThing =
       atOffset(things, currentIndex, -1);
@@ -67,32 +69,27 @@ export default {
 
   generate: (data, relations, slots, {html, language}) =>
     language.encapsulate('albumSidebar.groupBox', boxCapsule => {
-      const hsmusicLikeAnAlbum =
-        slots.mode === 'album' ||
-        data.seriesDirectlyIncludesTrack;
+      const collapse =
+        slots.mode === 'track' ||
+        data.collapse;
 
       return relations.box.slots({
         attributes: {class: 'individual-series-sidebar-box'},
-        color: (data.collapse ? data.color : null),
-
-        collapse:
-          (data.collapse ? 'chain' : false),
+        color: (collapse ? data.color : null),
+        collapse: (collapse ? 'chain' : false),
 
         title:
           language.$(boxCapsule, 'title', {group: relations.seriesLink}),
 
         content: [
-          hsmusicLikeAnAlbum &&
-            relations.description.slot('mode', 'multiline'),
+          relations.description.slot('mode', 'multiline'),
 
-          hsmusicLikeAnAlbum &&
           relations.nextThingLink &&
             html.tag('p', {class: 'series-chronology-link'},
               language.$(boxCapsule, 'next', {
                 release: relations.nextThingLink,
               })),
 
-          hsmusicLikeAnAlbum &&
           relations.previousThingLink &&
             html.tag('p', {class: 'series-chronology-link'},
               language.$(boxCapsule, 'previous', {

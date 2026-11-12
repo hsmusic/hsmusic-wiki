@@ -141,6 +141,11 @@
     border-right-color: var(--page-border-color-dim);
     border-bottom-color: var(--page-border-color-dim);
 
+    &, .sidebar-multiple > [style*="--primary-color"] {
+      --dimmish-solid-line-color:
+        color-mix(in srgb, var(--primary-color), 30% #242424, 20% transparent);
+    }
+
     box-shadow:
       0 0 40px rgba(0, 0, 0, calc(0.5 - (var(--box-opacity) - 0.6) / 0.55)),
       0 20px 15px -4px #0002,
@@ -508,6 +513,24 @@
   .sidebar-multiple .sidebar:not(:first-child) {
     margin-top: 15px;
   }
+
+  .sidebar-multiple > hr {
+    margin-top: 16px;
+    margin-bottom: 0;
+    width: 85%;
+  }
+
+  .sidebar-multiple > hr + .sidebar {
+    margin-top: 21px !important;
+  }
+}
+
+@layer material {
+  .sidebar-multiple > hr {
+    border: none;
+    border-bottom: 1px solid;
+    border-bottom-color: var(--dimmish-solid-line-color);
+  }
 }
 
 @layer interaction {
@@ -762,8 +785,7 @@
       content: "";
       position: absolute;
       bottom: -4px; left: 4px; right: 12px;
-      border-bottom: 1px solid
-        color-mix(in srgb, var(--primary-color), 50% transparent);
+      border-bottom: 1px solid var(--dimmish-solid-line-color);
     }
   }
 }
@@ -771,8 +793,12 @@
 /* Sidebars - expand/collapse */
 
 @layer layout {
-  .sidebar > details summary,
-  .sidebar > .chain-details .chain-summary {
+  .sidebar.collapsible:not(.chain-collapsible) {
+    margin-top: 10px;
+  }
+
+  .sidebar.collapsible > details summary,
+  .sidebar.collapsible > .chain-details .chain-summary {
     display: grid;
     grid-template-columns: auto 1.5ch;
 
@@ -780,7 +806,7 @@
     padding: 4px;
   }
 
-  .sidebar > details[open] summary {
+  .sidebar.collapsible > details[open] summary {
     margin-bottom: 2px;
   }
 }
@@ -788,6 +814,16 @@
 @layer material {
   .sidebar > details[open] summary {
     border-bottom: 1px solid var(--deep-color);
+  }
+
+  .sidebar.collapsible:has(+ .sidebar-box-joiner) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .sidebar.chain-collapsible {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
 }
 
@@ -831,12 +867,22 @@
   .sidebar .chain-details .sidebar-content { display: none; }
 
   .sidebar:has(> details:not([open])) {
-    ~ .sidebar-box-joiner { height: 8px; }
+    ~ .sidebar-box-joiner {
+      height: 5px;
+      border-right-style: solid;
+      border-right-color: var(--dimmish-solid-line-color);
+    }
 
     ~ .sidebar:has(> details[open]),
     ~ .sidebar:not(:has(> details, > .chain-details)) {
       ~ .sidebar-box-joiner { height: revert-layer; }
     }
+
+    /* Only a directly following sibling. Further siblings
+     * follow a series box connected to this box, and those
+     * should stay separated by the usual, greater margin.
+     */
+    + .sidebar:has(> details) { margin-top: 8px; }
   }
 
   .sidebar:has(> details[open]) {
@@ -884,10 +930,6 @@
 
   .track-release-sidebar-box.meta-album + .track-release-sidebar-box.meta-album {
     margin-top: 5px !important;
-  }
-
-  .track-release-sidebar-box.meta-album + .conjoined-group-sidebar-box {
-    margin-top: 10px !important;
   }
 }
 
