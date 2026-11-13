@@ -5,11 +5,8 @@ import {isName} from '#validators';
 import {parseAdditionalNames, parseAnnotatedReferences, parseURLs}
   from '#yaml';
 
-import {
-  exitWithoutDependency,
-  exposeConstant,
-  exposeUpdateValueOrContinue,
-} from '#composite/control-flow';
+import {exitWithoutDependency, exposeConstant, exposeUpdateValueOrContinue}
+  from '#composite/control-flow';
 
 import {
   annotatedReferenceList,
@@ -104,6 +101,26 @@ export class ArtTag extends Thing {
               .flatMap(artTag => artTag.directlyFeaturedInArtworks)),
       },
     ],
+
+    featuredInArtworks: {
+      flags: {expose: true},
+
+      expose: {
+        dependencies: [
+          'directlyFeaturedInArtworks',
+          'indirectlyFeaturedInArtworks',
+        ],
+
+        compute: ({
+          directlyFeaturedInArtworks,
+          indirectlyFeaturedInArtworks,
+        }) =>
+          unique([
+            ...directlyFeaturedInArtworks,
+            ...indirectlyFeaturedInArtworks,
+          ]),
+      },
+    },
 
     // All the art tags which descend from this one - that means its own direct
     // descendants, plus all the direct and indirect descendants of each of those!

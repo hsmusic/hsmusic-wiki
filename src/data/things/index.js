@@ -2,6 +2,7 @@
 
 export * from './additional-file/index.js';
 export * from './album/index.js';
+export * from './art-tag/index.js';
 export * from './artwork/index.js';
 export * from './carousel/index.js';
 export * from './content/index.js';
@@ -14,7 +15,6 @@ export * from './sorting-rule/index.js';
 export * from './wiki-update/index.js';
 
 export * from './AdditionalName.js';
-export * from './ArtTag.js';
 export * from './Artist.js';
 export * from './Language.js';
 export * from './MusicVideo.js';
