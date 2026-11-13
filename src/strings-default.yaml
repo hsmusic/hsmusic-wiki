@@ -251,12 +251,8 @@ releaseInfo:
   by.featuring: >-
     By {ARTISTS}, featuring {FEATURING}.
   by.withAlbum: >-
-    From {ALBUM}, by {ARTISTS}.
-  by.featuring.withAlbum: >-
-    From {ALBUM}, by {ARTISTS} feat. {FEATURING}.
-  by.withAlbum.albumLast: >-
     By {ARTISTS}, from {ALBUM}.
-  by.featuring.withAlbum.albumLast: >-
+  by.featuring.withAlbum: >-
     By {ARTISTS}, featuring {FEATURING}. From {ALBUM}.
 
   from: "From {ALBUM}."
@@ -272,14 +268,11 @@ releaseInfo:
   released: "Released {DATE}."
   albumReleased: "Album released {DATE}."
   trackReleased: "Track released {DATE}."
-  released.withAlbum: "From {ALBUM}, released {DATE}."
+  vgmTrackReleased: "From {ALBUM} ({YEAR})."
 
   posted: "Posted {DATE}."
   albumPosted: "Album posted {DATE}."
   trackPosted: "Track posted {DATE}."
-  posted.withAlbum: "From {ALBUM}, posted {DATE}."
-
-  released.vgm.withAlbum: "From {ALBUM} ({DATE})."
 
   addedToWiki: "Added to wiki {DATE}."
 

@@ -50,11 +50,11 @@ export default {
 
     data.duration = track.duration;
 
-    if (album.showAlbumInAllTracks) {
+    if (album.style === 'in-game vgm') {
       if (+data.date === +album.date) {
-        data.showAlbum = 'date';
+        data.showAlbum = 'on vgm release line';
       } else {
-        data.showAlbum = 'last';
+        data.showAlbum = 'in artists line';
       }
     } else {
       data.showAlbum = false;
@@ -68,13 +68,9 @@ export default {
       html.tags([
         relations.block.slot('items', [
           language.encapsulate(capsule, 'by', capsule => {
-            // The 'front' presentation is currently unused and was made for
-            // the old "From Scramcatcher, by Kalibration" presentation.
             const withAlbum =
-              (data.showAlbum === 'front'
+              (data.showAlbum === 'in artists line'
                 ? '.withAlbum'
-             : data.showAlbum === 'last'
-                ? '.withAlbum.albumLast'
                 : '');
 
             const albumOptions =
@@ -93,28 +89,18 @@ export default {
           language.encapsulate(capsule, workingCapsule => {
             const workingOptions = {};
 
-            if (data.dateStyle === 'released') {
-              if (
-                data.showAlbum === 'date' &&
-                data.albumStyle === 'in-game vgm'
-              ) {
-                workingCapsule += '.released.vgm';
-                workingOptions.date =
-                  relations.datetimestamp.slot('style', 'year');
-              } else {
-                workingCapsule += '.released';
-                workingOptions.date = language.formatDate(data.date);
-              }
+            if (data.showAlbum === 'on vgm release line') {
+              workingCapsule += '.vgmTrackReleased';
+              workingOptions.year = relations.datetimestamp.slot('style', 'year');
+              workingOptions.album = relations.albumLink;
+            } else if (data.dateStyle === 'released') {
+              workingCapsule += '.released';
+              workingOptions.date = language.formatDate(data.date);
             } else if (data.dateStyle === 'posted') {
               workingCapsule += '.posted';
               workingOptions.date = language.formatDate(data.date);
             } else {
               return html.blank();
-            }
-
-            if (data.showAlbum === 'date') {
-              workingCapsule += '.withAlbum';
-              workingOptions.album = relations.albumLink;
             }
 
             return language.$(workingCapsule, workingOptions);
