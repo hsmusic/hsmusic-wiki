@@ -1,5 +1,3 @@
-import {compareArrays} from '#sugar';
-
 export default {
   relations: (relation, track) => ({
     block:
@@ -58,18 +56,6 @@ export default {
       } else {
         data.showAlbum = 'last';
       }
-    } else if (album.showAlbumInTracksWithoutArtists) {
-      if (
-        track.artistContribs.every(({annotation}) => !annotation) &&
-        compareArrays(
-          track.artistContribs.map(({artist}) => artist),
-          album.artistContribs.map(({artist}) => artist),
-          {checkOrder: true})
-      ) {
-        data.showAlbum = 'front';
-      } else {
-        data.showAlbum = false;
-      }
     } else {
       data.showAlbum = false;
     }
@@ -82,6 +68,8 @@ export default {
       html.tags([
         relations.block.slot('items', [
           language.encapsulate(capsule, 'by', capsule => {
+            // The 'front' presentation is currently unused and was made for
+            // the old "From Scramcatcher, by Kalibration" presentation.
             const withAlbum =
               (data.showAlbum === 'front'
                 ? '.withAlbum'
