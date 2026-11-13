@@ -1,5 +1,5 @@
 import {sortAlbumsTracksChronologically} from '#sort';
-import {atOffset} from '#sugar';
+import {atOffset, empty} from '#sugar';
 
 export default {
   query(album, track, group) {
@@ -15,12 +15,10 @@ export default {
       // compared to how latest-last chronological lists are accessed.
       sortAlbumsTracksChronologically(things, {latestFirst: true});
 
-      const currentThing =
-        (album.style === 'single' && track === album.tracks[0]
-          ? album
-          : track ?? album);
-
-      const currentIndex = things.indexOf(currentThing);
+      let currentIndex = things.indexOf(track ?? album);
+      if (currentIndex === -1 && track && empty(track.ownGroups)) {
+        currentIndex = things.indexOf(album);
+      }
 
       query.previousThing =
         atOffset(things, currentIndex, +1);
