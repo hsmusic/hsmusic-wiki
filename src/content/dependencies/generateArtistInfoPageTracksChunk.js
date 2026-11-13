@@ -69,7 +69,7 @@ export default {
       relation('linkAlbum', album),
 
     albumArtistCredit:
-      relation('generateArtistCredit', album.artistContribs, []),
+      relation('generateArtistCredit', album.artistContribs, [], album.artistText),
 
     albumArtistOnlyItem:
      (query.isAlbumArtist &&

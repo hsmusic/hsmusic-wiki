@@ -1,7 +1,7 @@
 import {compareArrays, empty, stitchArrays} from '#sugar';
 
 export default {
-  query: (creditContributions, contextContributions, _formatText) => {
+  query: (creditContributions, contextContributions, formatText, contextFormatText) => {
     const query = {};
 
     const featuringFilter = contribution =>
@@ -46,6 +46,11 @@ export default {
         contextNormalContributions.map(({annotation}) => annotation),
         {checkOrder: true});
 
+    query.artistTextDiffersFromContext =
+      formatText !== undefined &&
+      contextFormatText !== undefined &&
+      formatText !== contextFormatText;
+
     return query;
   },
 
@@ -78,6 +83,9 @@ export default {
 
     normalContributionAnnotationsDifferFromContext:
       query.normalContributionAnnotationsDifferFromContext,
+
+    artistTextDiffersFromContext:
+      query.artistTextDiffersFromContext,
 
     normalContributionArtistDirectories:
       query.normalContributions
@@ -122,7 +130,8 @@ export default {
 
     const effectivelyDiffers =
       (slots.showAnnotation && data.normalContributionAnnotationsDifferFromContext) ||
-      (data.normalContributionArtistsDifferFromContext);
+      (data.normalContributionArtistsDifferFromContext) ||
+      (data.artistTextDiffersFromContext);
 
     for (const link of [
       ...relations.normalContributionLinks,

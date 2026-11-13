@@ -44,7 +44,7 @@ export default {
   relations: (relation, query, album, _group) => ({
     artistCredit:
       (query.mode === 'artists'
-        ? relation('generateArtistCredit', album.artistContribs, [])
+        ? relation('generateArtistCredit', album.artistContribs, [], album.artistText)
         : null),
   }),
 

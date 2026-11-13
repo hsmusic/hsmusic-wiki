@@ -40,14 +40,16 @@ export default {
         query.albums
           .map(album => relation('generateArtistCredit',
             album.artistContribs,
-            [])),
+            [],
+            album.artistText)),
 
       trackListItems:
         query.tracks
           .map(tracks => tracks
             .map(track => relation('generateTrackListItem',
               track,
-              track.album.trackArtistContribs))),
+              track.album.trackArtistContribs,
+              track.album.trackArtistText))),
     };
   },
 

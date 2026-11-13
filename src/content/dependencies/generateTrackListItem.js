@@ -1,5 +1,5 @@
 export default {
-  relations: (relation, track, contextContributions) => ({
+  relations: (relation, track, contextContributions, contextFormatText) => ({
     trackLink:
       relation('linkTrack', track),
 
@@ -7,7 +7,8 @@ export default {
       relation('generateArtistCredit',
         track.artistContribs,
         contextContributions,
-        track.artistTextInLists),
+        track.artistTextInLists,
+        contextFormatText),
 
     colorStyle:
       relation('generateColorStyleAttribute', track.color),

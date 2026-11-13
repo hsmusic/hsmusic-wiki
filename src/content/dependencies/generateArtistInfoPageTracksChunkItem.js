@@ -61,7 +61,8 @@ export default {
     trackListItem:
       relation('generateTrackListItem',
         query.track,
-        query.track.album.artistContribs),
+        query.track.album.artistContribs,
+        query.track.album.artistText),
 
     rereleaseTooltip:
       (query.isLaterRelease

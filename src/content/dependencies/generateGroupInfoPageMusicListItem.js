@@ -54,7 +54,8 @@ export default {
         : null),
 
     artistCredit:
-      relation('generateArtistCredit', thing.artistContribs, []),
+      relation('generateArtistCredit', thing.artistContribs, [],
+        thing.artistTextInLists ?? thing.artistText),
 
     otherGroupLinks:
       (query.detail === 'groups'

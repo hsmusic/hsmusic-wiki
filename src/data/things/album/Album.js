@@ -7,6 +7,7 @@ import {
   anyOf,
   is,
   isBoolean,
+  isContentString,
   isContributionList,
   isDate,
   isExcludingURLsReason,
@@ -230,12 +231,20 @@ export class Album extends Thing {
 
     // > Update & expose - Credits and contributors
 
+    artistText: contentString(),
+
     artistContribs: contributionList({
       class: input.value(AlbumArtistContribution),
       artistProperty: input.value('albumArtistContributions'),
     }),
 
-    trackArtistText: contentString(),
+    trackArtistText: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isContentString),
+      }),
+
+      exposeDependency('artistText'),
+    ],
 
     trackArtistContribs: [
       withResolvedContribs({
@@ -927,14 +936,14 @@ export class Album extends Thing {
 
       // Credits and contributors
 
+      'Artist Text': {property: 'artistText'},
+
       'Artists': {
         property: 'artistContribs',
         transform: parseContributors,
       },
 
-      'Track Artist Text': {
-        property: 'trackArtistText',
-      },
+      'Track Artist Text': {property: 'trackArtistText'},
 
       'Track Artists': {
         property: 'trackArtistContribs',

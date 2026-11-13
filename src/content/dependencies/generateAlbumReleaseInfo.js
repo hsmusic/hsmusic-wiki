@@ -4,10 +4,10 @@ export default {
       relation('generateReleaseInfoBlock'),
 
     artistContributionsLine:
-      relation('generateReleaseInfoContributionsLine', album.artistContribs),
+      relation('generateReleaseInfoContributionsLine', album.artistContribs, album.artistText),
 
     trackArtistContributionsLine:
-      relation('generateReleaseInfoContributionsLine', album.trackArtistContribs),
+      relation('generateReleaseInfoContributionsLine', album.trackArtistContribs, album.trackArtistText),
 
     listenLineOrList:
       relation('generateListenLineOrList', album),

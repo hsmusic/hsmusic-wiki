@@ -17,7 +17,8 @@ export default {
     item:
       relation('generateTrackListItem',
         track,
-        track.album.trackArtistContribs),
+        track.album.trackArtistContribs,
+        track.album.trackArtistText),
   }),
 
   data: (query, track, album) => ({
