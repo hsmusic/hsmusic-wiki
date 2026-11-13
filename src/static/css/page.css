@@ -515,13 +515,26 @@
   }
 
   .sidebar-multiple > hr {
-    margin-top: 16px;
     margin-bottom: 0;
-    width: 85%;
-  }
 
-  .sidebar-multiple > hr + .sidebar {
-    margin-top: 21px !important;
+    &:is(.track-list-sidebar-box + hr) {
+      width: 85%;
+
+      margin-top: 12px;
+      + .sidebar { margin-top: 20px; }
+    }
+
+    &:is(.sidebar.collapsible + hr) {
+      width: 75%;
+
+      margin-top: 8px;
+      /* todo: The margin-top here should expand a little more
+       * past an open collapsible sidebar, or an open attached
+       * chain-collapsible. We were too lazy to code that.
+       */
+
+      + .sidebar { margin-top: 16px; }
+    }
   }
 }
 

@@ -57,12 +57,10 @@ export default {
       attributes.add('class', `sticky-${slots.stickyMode}`);
     }
 
-    const {content: boxes} = html.smooth(slots.boxes);
-
     const allBoxesHideForNarrowLayout =
-      boxes
-        .map(box => html.resolve(box))
-        .filter(box => !html.isBlank(box))
+      html.smush(slots.boxes).content
+        .filter(item => item.tagName)
+        .filter(box => box.attributes.has('class', 'sidebar'))
         .every(box => box.attributes.has('class', 'hide-for-narrow-layout'));
 
     if (allBoxesHideForNarrowLayout) {

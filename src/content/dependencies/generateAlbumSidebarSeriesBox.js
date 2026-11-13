@@ -42,7 +42,7 @@ export default {
         : null),
   }),
 
-  data: (query, _album, track, series) => ({
+  data: (query, album, track, series) => ({
     name:
       series.name,
 
@@ -51,6 +51,11 @@ export default {
 
     collapse:
       series.group.collapseInAlbumSidebars,
+
+    disconnected:
+      (track
+        ? !series.group.albumsAndTracks.includes(track)
+        : !series.group.albumsAndTracks.includes(album)),
 
     seriesDirectlyIncludesTrack:
       (track
@@ -74,7 +79,11 @@ export default {
       return relations.box.slots({
         attributes: {class: 'individual-series-sidebar-box'},
         color: (collapse ? data.color : null),
-        collapse: (collapse ? 'chain' : false),
+
+        collapse:
+          (collapse && data.disconnected ? true
+         : collapse ? 'chain'
+         : false),
 
         title:
           language.$(boxCapsule, 'title', {group: relations.seriesLink}),

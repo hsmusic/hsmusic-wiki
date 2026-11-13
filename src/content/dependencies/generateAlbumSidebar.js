@@ -1,6 +1,5 @@
 import {sortAlbumsTracksChronologically} from '#sort';
-import {stitchArrays, transposeArrays, unique} from '#sugar';
-import {compareKebabCase} from '#wiki-data';
+import {transposeArrays, unique} from '#sugar';
 
 export default {
   sprawl: ({seriesData}) => ({seriesData}),
@@ -87,25 +86,11 @@ export default {
     trackListBox:
       relation('generateAlbumSidebarTrackListBox', album, track),
 
-    groupBoxes:
-      query.groups
-        .map(group =>
-          relation('generateAlbumSidebarGroupBox', album, track, group)),
+    trackGroupBoxes:
+      relation('generateAlbumSidebarGroupBoxes', album, track),
 
-    groupColorStyles:
-      query.groups
-        .map(group => relation('generateColorStyleAttribute', group.color)),
-
-    seriesBoxes:
-      query.groupSerieses
-        .map(serieses => serieses
-          .map(series =>
-            relation('generateAlbumSidebarSeriesBox', album, track, series))),
-
-    disconnectedSeriesBoxes:
-      query.disconnectedSerieses
-        .map(series =>
-          relation('generateAlbumSidebarSeriesBox', album, track, series)),
+    albumGroupBoxes:
+      relation('generateAlbumSidebarGroupBoxes', album),
 
     earlierTrackReleaseBoxes:
       (track
@@ -135,14 +120,6 @@ export default {
 
     albumStyle: album.style,
 
-    seriesBoxesResembleGroup:
-      stitchArrays({
-        group: query.groups,
-        serieses: query.groupSerieses,
-      }).map(({group, serieses}) =>
-          serieses.map(series =>
-            compareKebabCase(series.name, group.name))),
-
     groupsCollapse:
       query.groups
         .map(group => group.collapseInAlbumSidebars),
@@ -153,66 +130,36 @@ export default {
       data.isAlbumPage ||
       data.albumStyle === 'single';
 
-    for (const box of [
-      ...relations.groupBoxes,
-      ...relations.seriesBoxes.flat(),
-      ...relations.disconnectedSeriesBoxes,
-    ]) {
-      box.setSlot('mode', presentGroupsLikeAlbum ? 'album' : 'track');
+    for (const boxes of [relations.albumGroupBoxes, relations.trackGroupBoxes]) {
+      boxes.setSlot('mode', presentGroupsLikeAlbum ? 'album' : 'track');
     }
 
-    const groupBoxes = [
-      relations.disconnectedSeriesBoxes,
-
-      stitchArrays({
-        groupBox: relations.groupBoxes,
-        groupColorStyle: relations.groupColorStyles,
-        seriesBoxes: relations.seriesBoxes,
-        groupCollapses: data.groupsCollapse,
-      }).map(({
-          groupBox,
-          groupColorStyle,
-          seriesBoxes,
-          groupCollapses,
-        }) => [
-          groupBox,
-          seriesBoxes.map(seriesBox => [
-            html.tag('div', {class: 'sidebar-box-joiner'},
-              (groupCollapses || data.isTrackPage) &&
-                groupColorStyle.slot('context', 'primary-only'),
-
-              {class: 'hide-for-narrow-layout'}),
-
-            seriesBox,
-          ]),
-        ]),
-    ];
-
     return relations.sidebar.slots({
-      boxes: [
-        data.isAlbumPage &&
-          groupBoxes,
+      boxes:
+        html.tags([
+          html.tags([
+            data.isAlbumPage &&
+              relations.albumGroupBoxes,
 
-        data.isTrackPage &&
-          relations.earlierTrackReleaseBoxes,
+            data.isTrackPage &&
+              relations.earlierTrackReleaseBoxes,
 
-        relations.trackListBox,
+            relations.trackListBox,
 
-        data.isTrackPage &&
-          relations.laterTrackReleaseBoxes,
+            data.isTrackPage &&
+              relations.laterTrackReleaseBoxes,
 
-        data.isTrackPage &&
-          relations.metaReleaseBoxes
-            .map(box => box.slot('meta', true)),
+            data.isTrackPage &&
+              relations.metaReleaseBoxes
+                .map(box => box.slot('meta', true)),
+          ]),
 
-        data.isTrackPage &&
-        !html.isBlank(groupBoxes) &&
-        !html.isBlank(relations.trackListBox) &&
-          html.tag('hr'),
+          data.isTrackPage &&
+            relations.trackGroupBoxes,
 
-        data.isTrackPage &&
-          groupBoxes,
-      ],
+          data.isTrackPage &&
+            relations.albumGroupBoxes,
+        ], {[html.joinChildren]: html.tag('hr')}),
     });
   },
 };
