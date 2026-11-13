@@ -305,6 +305,21 @@ export class Track extends Thing {
         validate: input.value(isContentString),
       }),
 
+      // Access the update value directly - so the presence of
+      // the `Artists` field means this track's artistText no longer inherits.
+      withResultOfAvailabilityCheck('_artistContribs')
+        .outputs({'#availability': '#hasOwnArtistContribsList'}),
+
+      {
+        dependencies: ['#hasOwnArtistContribsList'],
+        compute: (continuation, {
+          ['#hasOwnArtistContribsList']: hasOwnArtistContribsList,
+        }) =>
+          (hasOwnArtistContribsList
+            ? continuation.exit(null)
+            : continuation()),
+      },
+
       withPropertyFromObject('album', V('trackArtistText')),
       exposeDependency('#album.trackArtistText'),
     ],
