@@ -1,4 +1,4 @@
-import {stitchArrays} from '../../shared-util/sugar.js';
+import {modcircle, stitchArrays} from '../../shared-util/sugar.js';
 import {prng} from '../../shared-util/prng.js';
 
 import {cssProp} from '../client-util.js';
@@ -63,14 +63,15 @@ function getRotatingSeed(anchorDate, updateFrequency) {
 }
 
 function getRotatingIndex(anchorDate, updateFrequency) {
+  const msDay = 1000 * 60 * 60 * 24;
+  const msWeek = 7 * msDay;
+
   switch (updateFrequency) {
     case 'daily': {
       const today = new Date();
       today.setUTCHours(0, 0, 0, 0);
 
-      const a = Math.min(today, anchorDate);
-      const b = Math.max(today, anchorDate);
-      return (b - a) / 86400000;
+      return (today - anchorDate) / msDay;
     }
 
     case 'weekly': {
@@ -80,9 +81,7 @@ function getRotatingIndex(anchorDate, updateFrequency) {
       const dayOfTheWeek = anchorDate.getUTCDay();
       today.setUTCDate(today.getUTCDate() - today.getUTCDay() + dayOfTheWeek);
 
-      const a = Math.min(today, anchorDate);
-      const b = Math.max(today, anchorDate);
-      return (b - a) / 86400000;
+      return (today - anchorDate) / msWeek;
     }
 
     default:
@@ -129,7 +128,7 @@ function getCurrentIndex(carouselIndex, tileIndex, length) {
   const index =
     getRotatingIndex(anchorDate, updateFrequency);
 
-  return index % length;
+  return modcircle(index, length);
 }
 
 export function getPageReferences() {

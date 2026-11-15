@@ -502,6 +502,16 @@ export function errors(fn) {
   }
 }
 
+export function modcircle(A, B) {
+  if (A >= 0) {
+    return A % B;
+  } else if (-A % B === 0) {
+    return 0;
+  } else {
+    return B - (-A % B);
+  }
+}
+
 // Stolen from here: https://stackoverflow.com/a/3561711
 //
 // There's a proposal for a native JS function like this, 8ut it's not even
