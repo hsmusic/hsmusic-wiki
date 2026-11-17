@@ -17,7 +17,7 @@ export default {
       section.tracks.map(track => empty(track.commentary)),
 
     trackColorsDifferFromCurrentCustomTrackColor:
-      (currentTrack.color !== currentTrack.album.color
+      (currentTrack && currentTrack.color !== currentTrack.album.color
         ? section.tracks.map(track => track.color !== currentTrack.color)
         : section.tracks.map(() => false)),
   }),
