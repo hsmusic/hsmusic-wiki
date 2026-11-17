@@ -35,7 +35,8 @@ export default {
 
     showTrackCounts:
       query.stemTrackSections.length > 1 &&
-      query.stemTrackSections.every(section => section.firstTrackNumber === 1),
+      (query.stemTrackSections.every(section => section.firstTrackNumber === 1) ||
+       query.stemTrackSections.every(section => !section.hasTrackNumbers)),
 
     hasTrackNumbers:
       album.hasTrackNumbers,
