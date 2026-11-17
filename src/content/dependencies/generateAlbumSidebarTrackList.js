@@ -46,6 +46,9 @@ export default {
         // so they satisfy this condition too.
         section.firstTrackNumber === section.lastTrackNumber),
 
+    trackSectionsHaveTrackNumbers:
+      album.trackSections.map(section => section.hasTrackNumbers),
+
     trackSectionsAreAsideSections:
       album.trackSections.map(section => section.isAsideTrackSection),
 
@@ -81,7 +84,8 @@ export default {
       stitchArrays({
         title: relations.trackSectionTitles,
         colorStyle: relations.trackSectionColorStyles,
-      }).map(({title, colorStyle}) =>
+        hasTrackNumbers: data.trackSectionsHaveTrackNumbers,
+      }).map(({title, colorStyle, hasTrackNumbers}) =>
           html.tag('summary',
             colorStyle.slot('context', 'primary-only'),
 
@@ -92,7 +96,7 @@ export default {
                 detail:
                   (data.showTrackCounts
                     ? 'count'
-                 : data.hasTrackNumbers &&
+                 : hasTrackNumbers &&
                    !data.skipAnnotatingTrackNumbers
                     ? 'range'
                     : null),
