@@ -37,6 +37,10 @@ export default {
       validate: v => v.sparseArrayOf(v.isAttributes),
     },
 
+    colorizeItems: {
+      validate: v => v.sparseArrayOf(v.isBoolean),
+    },
+
     linkSlots: {
       validate: v =>
         v.sparseArrayOf(
@@ -54,9 +58,10 @@ export default {
         item: relations.items,
         trackNumber: data.trackNumbers,
 
-        attributes: slots.itemAttributes ?? relations.items.map(() => null),
-        linkSlots: slots.linkSlots ?? relations.items.map(() => null),
-      }).map(({item, trackNumber, attributes, linkSlots}, index) => {
+        attributes: slots.itemAttributes,
+        linkSlots: slots.linkSlots,
+        colorize: slots.colorizeItems,
+      }).map(({item, trackNumber, attributes, linkSlots, colorize}, index) => {
           item.setSlots({
             attributes: attributes,
             collapseDurationScope: slots.collapseDurationScope,
@@ -64,6 +69,8 @@ export default {
             anchor: linkSlots?.anchor ?? null,
             linkless: linkSlots?.linkless ?? null,
             hash: linkSlots?.hash ?? null,
+
+            colorize: colorize,
 
             showArtists: slots.showArtists,
             showDuration: slots.showDuration,

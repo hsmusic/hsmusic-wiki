@@ -15,6 +15,11 @@ export default {
 
     tracksAreMissingCommentary:
       section.tracks.map(track => empty(track.commentary)),
+
+    trackColorsDifferFromCurrentCustomTrackColor:
+      (currentTrack.color !== currentTrack.album.color
+        ? section.tracks.map(track => track.color !== currentTrack.color)
+        : section.tracks.map(() => false)),
   }),
 
   slots: {
@@ -27,6 +32,9 @@ export default {
   generate: (data, relations, slots) =>
     relations.trackList.slots({
       showArtists: false,
+
+      colorizeItems:
+        data.trackColorsDifferFromCurrentCustomTrackColor,
 
       itemAttributes:
         stitchArrays({

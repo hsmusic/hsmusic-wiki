@@ -43,6 +43,8 @@ export default {
     showArtists: {type: 'boolean', default: true},
     showDuration: {type: 'boolean', default: false},
 
+    colorize: {type: 'boolean', default: false},
+
     collapseDurationScope: {
       validate: v =>
         v.is('never', 'track', 'section', 'album'),
@@ -76,7 +78,7 @@ export default {
           : true),
 
       colorMode:
-        (data.colorize
+        (data.colorize || slots.colorize
           ? 'line'
           : 'none'),
     }),
