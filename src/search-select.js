@@ -210,13 +210,6 @@ function genericProcess(entry, opts) {
 
       : [fields.parentName]);
 
-  fields.additionalNames =
-    (thing.constructor.hasPropertyDescriptor('additionalNames')
-      ? thing.additionalNames.map(entry => entry.name)
-   : thing.constructor.hasPropertyDescriptor('artistAliases')
-      ? thing.artistAliases.map(alias => alias.name)
-      : []);
-
   return fields;
 }
 

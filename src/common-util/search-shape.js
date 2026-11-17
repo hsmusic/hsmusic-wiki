@@ -24,10 +24,6 @@ const searchShape = {
     index: [
       'primaryName',
       'nameDetail',
-      'directory',
-      // 'parentName',
-      // 'parentDirectory',
-      'additionalNames',
     ].map(field => ({field, tokenize: 'forward'})),
 
     store: genericStore,
@@ -37,10 +33,6 @@ const searchShape = {
     index: [
       'primaryName',
       'nameDetail',
-      'directory',
-      // 'parentName',
-      // 'parentDirectory',
-      'additionalNames',
     ],
 
     store: genericStore,
