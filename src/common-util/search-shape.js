@@ -33,7 +33,15 @@ const searchShape = {
     index: [
       'primaryName',
       'nameDetail',
-    ],
+    ].map(field => ({
+        field,
+        tokenize: 'strict',
+        context: {
+          resolution: 9,
+          depth: 1,
+          bidirectional: false,
+        },
+      })),
 
     store: genericStore,
   },
