@@ -261,7 +261,8 @@ export default {
           });
       } else {
         multipleArtists =
-          (relations.normalContributionLinks + relations.featuringContributionLinks)
+          (relations.normalContributionLinks.length
+         + relations.featuringContributionLinks.length)
             >= 2;
 
         content =
