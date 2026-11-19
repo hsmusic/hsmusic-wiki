@@ -46,10 +46,13 @@ export default {
         contextNormalContributions.map(({annotation}) => annotation),
         {checkOrder: true});
 
+    // inputs are strings, null, or undefined; output is null, true, false.
+    // undefined input means the comparison is not to be performed.
+    // null output means the comparison was not performed.
     query.artistTextDiffersFromContext =
-      formatText !== undefined &&
-      contextFormatText !== undefined &&
-      formatText !== contextFormatText;
+      (formatText === undefined || contextFormatText === undefined
+        ? null
+        : formatText !== contextFormatText);
 
     return query;
   },
@@ -130,8 +133,9 @@ export default {
 
     const effectivelyDiffers =
       (slots.showAnnotation && data.normalContributionAnnotationsDifferFromContext) ||
-      (data.normalContributionArtistsDifferFromContext) ||
-      (data.artistTextDiffersFromContext);
+      (typeof data.artistTextDiffersFromContext === 'boolean'
+        ? data.artistTextDiffersFromContext
+        : data.normalContributionArtistsDifferFromContext);
 
     for (const link of [
       ...relations.normalContributionLinks,
