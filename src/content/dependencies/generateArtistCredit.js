@@ -48,9 +48,13 @@ export default {
 
     // inputs are strings, null, or undefined; output is null, true, false.
     // undefined input means the comparison is not to be performed.
-    // null output means the comparison was not performed.
+    // null output means the comparison was not performed *or is moot,*
+    // in the case that the artist text field is unset *both* for this thing
+    // and the given context.
     query.artistTextDiffersFromContext =
       (formatText === undefined || contextFormatText === undefined
+        ? null
+     : formatText === null && contextFormatText === null
         ? null
         : formatText !== contextFormatText);
 
