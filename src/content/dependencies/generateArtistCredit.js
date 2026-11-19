@@ -135,12 +135,6 @@ export default {
     if (!slots.normalStringKey) return html.blank();
     if (data.blank) return html.blank();
 
-    const effectivelyDiffers =
-      (slots.showAnnotation && data.normalContributionAnnotationsDifferFromContext) ||
-      (typeof data.artistTextDiffersFromContext === 'boolean'
-        ? data.artistTextDiffersFromContext
-        : data.normalContributionArtistsDifferFromContext);
-
     for (const link of [
       ...relations.normalContributionLinks,
       ...relations.featuringContributionLinks,
@@ -191,7 +185,8 @@ export default {
     let multipleArtists = false;
 
     if (formattedArtistList) {
-      if (effectivelyDiffers) {
+      const differs = data.artistTextDiffersFromContext;
+      if (differs === true || differs === null) {
         // We can't know this without inspecting the actual text, but anyway
         // this variable is only intended to control whether we use blockwrap,
         // which is not guaranteed appropriate on custom artist text.
@@ -209,6 +204,10 @@ export default {
       if (empty(relations.normalContributionLinks)) {
         return html.blank();
       }
+
+      const normalContributionsDifferFromContext =
+        (slots.showAnnotation && data.normalContributionAnnotationsDifferFromContext) ||
+        (data.normalContributionArtistsDifferFromContext);
 
       const artistsList =
         (data.hasWikiEdits && slots.showWikiEdits
@@ -234,7 +233,7 @@ export default {
         ]);
 
       if (empty(relations.featuringContributionLinks)) {
-        if (effectivelyDiffers) {
+        if (normalContributionsDifferFromContext) {
           multipleArtists = relations.normalContributionLinks.length >= 2;
           content =
             language.$(slots.normalStringKey, {
@@ -244,7 +243,7 @@ export default {
         } else {
           return html.blank();
         }
-      } else if (effectivelyDiffers && slots.normalFeaturingStringKey) {
+      } else if (normalContributionsDifferFromContext && slots.normalFeaturingStringKey) {
         multipleArtists = true;
         content =
           language.$(slots.normalFeaturingStringKey, {
