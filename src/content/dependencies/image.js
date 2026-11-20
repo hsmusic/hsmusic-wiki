@@ -164,6 +164,10 @@ export default {
         dimensions &&
         dimensions[1] &&
           {height: dimensions[1]},
+
+        dimensions && dimensions[0] && dimensions[1] &&
+        dimensions[1] / dimensions[0] >= 1.1 &&
+          {class: 'tall'},
       ],
     ]);
 

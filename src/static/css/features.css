@@ -627,6 +627,10 @@
   #artwork-column .music-video {
     width: 88.888888%;
     margin-left: auto;
+
+    &:has(img.tall) {
+      width: 77.77777%;
+    }
   }
 
   #artwork-column .cover-artwork + .music-video {
